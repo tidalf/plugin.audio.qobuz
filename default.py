@@ -111,13 +111,13 @@ except:
 
 # **tid
 try:
-	qob = Qobuz()
-	if not qob.login("tidalf","klione"):
-	  print "Cannot login, abort...\n"
-	  exit(0)
- 	#playlists=qob.Api.get_playlists()
+   qob = Qobuz()
+   if not qob.login("tidalf","klione"):
+     print "Cannot login, abort...\n"
+     exit(0)
+   #playlists=qob.Api.get_playlists()
     #print json.dumps(playlists,sort_keys=True, indent=4)
-	#qplaylist = qob.getPlaylist(10076)
+   #qplaylist = qob.getPlaylist(10076)
 except:
     dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
     dialog.ok(__language__(30008),__language__(30009))
@@ -544,28 +544,28 @@ class Grooveshark:
         
     # Make a song directory item
     def songItem(self, songid, name, album, albumid, artist, coverart, trackLabelFormat=ARTIST_ALBUM_NAME_LABEL):
-		songImg = self._get_icon(coverart, 'song-' + str(songid) + "-image")
-		if int(trackLabelFormat) == NAME_ALBUM_ARTIST_LABEL:
-			if artist:
-				trackLabel = name + " - " + album + " - " + artist
-			else:
-				trackLabel = name + " - " + album
-		else:
-			trackLabel = artist + " - " + album + " - " + name
+      songImg = self._get_icon(coverart, 'song-' + str(songid) + "-image")
+      if int(trackLabelFormat) == NAME_ALBUM_ARTIST_LABEL:
+         if artist:
+            trackLabel = name + " - " + album + " - " + artist
+         else:
+            trackLabel = name + " - " + album
+      else:
+         trackLabel = artist + " - " + album + " - " + name
         
-		duration = self._getSongDuration(songid,albumid)
-		item = xbmcgui.ListItem(label = trackLabel, thumbnailImage=songImg, iconImage=songImg)
-		item.setInfo( type="music", infoLabels={ "title": name, "album": album, "artist": artist, "duration": duration} )
-		item.setProperty('mimetype', 'audio/flac')
-		item.setProperty("IsPlayable", "true")
-		item.setProperty('songid', str(songid))
-		item.setProperty('coverart', songImg)
-		item.setProperty('title', name)
-		item.setProperty('album', album)
-		item.setProperty('artist', str(artist))
-		item.setProperty('duration', str(duration))
-		
-		return item
+      duration = self._getSongDuration(songid,albumid)
+      item = xbmcgui.ListItem(label = trackLabel, thumbnailImage=songImg, iconImage=songImg)
+      item.setInfo( type="music", infoLabels={ "title": name, "album": album, "artist": artist, "duration": duration} )
+      item.setProperty('mimetype', 'audio/flac')
+      item.setProperty("IsPlayable", "true")
+      item.setProperty('songid', str(songid))
+      item.setProperty('coverart', songImg)
+      item.setProperty('title', name)
+      item.setProperty('album', album)
+      item.setProperty('artist', str(artist))
+      item.setProperty('duration', str(duration))
+      
+      return item
     
     # Next page of songs
     def songPage(self, offset, trackLabelFormat, playlistid = 0, playlistname = ''):
@@ -960,11 +960,11 @@ class Grooveshark:
 
         # Not in cache
         if duration < 0:
-			durationstring = qob.Api.get_track(songid)['duration']
-			values = durationstring.split(":")
-			duration = int(values[0])*3600 + int(values[1])*60 + int(values[2])
-			song = [id, duration]
-			self._setSongDuration(song, durations)
+         durationstring = qob.Api.get_track(songid)['duration']
+         values = durationstring.split(":")
+         duration = int(values[0])*3600 + int(values[1])*60 + int(values[2])
+         song = [id, duration]
+         self._setSongDuration(song, durations)
 
         return duration
         
