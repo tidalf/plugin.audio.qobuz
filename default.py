@@ -960,13 +960,9 @@ class Grooveshark:
 
         # Not in cache
         if duration < 0:
-        	#stream = groovesharkApi.getSubscriberStreamKey(songid)
 			durationstring = qob.Api.get_track(songid)['duration']
 			values = durationstring.split(":")
-			duration = values[0]*3600+values[1]*60+values[2]
-            # duration = 600
-            # if stream != False and stream['url'] != '': 
-            #   duration = self._setDuration(stream['uSecs'])
+			duration = int(values[0])*3600 + int(values[1])*60 + int(values[2])
 			song = [id, duration]
 			self._setSongDuration(song, durations)
 
@@ -987,10 +983,10 @@ class Grooveshark:
             pass
 
     # Duration to seconds
-    def _setDuration(self, usecs):
-        if usecs < 60000000:
-            usecs = usecs * 10 # Some durations are 10x to small
-        return usecs / 1000000
+    def _setDuration(self, secs):
+        #if usecs < 60000000:
+        #    usecs = usecs * 10 # Some durations are 10x to small
+        return secs
     
 # Parse URL parameters
 def get_params():
