@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.qobuz" name="Qobuz XBMC"
-	version="1.0.4" provider-name="Stephen Denham & showi & tid">
+<addon id="plugin.audio.qobuz" name="Qobuz XBMC" version="1.0.4" provider-name="Stephen Denham">
 	<requires>
 		<import addon="xbmc.python" version="2.0" />
 		<import addon="script.module.simplejson"/>
