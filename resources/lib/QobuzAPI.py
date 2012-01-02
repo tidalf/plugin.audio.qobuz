@@ -57,7 +57,7 @@ class Api:
           # print json.dumps(items)
         for playlist in items:
           # s = playlists[i]
-    	    list.append([playlist['playlist']['name'].encode('ascii', 'ignore'), playlist['playlist']['id']])
+    	    list.append([playlist['playlist']['name'].encode('utf8', 'ignore'), playlist['playlist']['id']])
           #i = i + 1
         return list
      
@@ -196,7 +196,7 @@ class Playlist:
 #                    coverart = track['image']['large']
             print "CoverArt: " + coverart
             if track['interpreter']['name']:
-                artist=track['interpreter']['name'].encode('ascii', 'ignore')
+                artist=track['interpreter']['name'].encode('utf8', 'ignore')
             else:
                 artist=track['interpreter']['name']
 #            info = []
@@ -208,7 +208,7 @@ class Playlist:
 #            info.append(track['interpreter']['id'])
 #            info.append(covertart)
 #            list.append(info)
-            list.append([track['title'].encode('ascii', 'ignore'),track['id'],track['album']['title'].encode('ascii', 'ignore') ,track['album']['id'],artist,track['interpreter']['id'],coverart])
+            list.append([track['title'].encode('utf8', 'ignore'),track['id'],track['album']['title'].encode('utf8', 'ignore') ,track['album']['id'],artist,track['interpreter']['id'],coverart])
         return list
             
 
