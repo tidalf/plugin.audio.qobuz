@@ -38,6 +38,7 @@ MODE_REMOVE_PLAYLIST_SONG = 21
 MODE_ADD_PLAYLIST_SONG = 22
 
 class QobuzXbmc:
+    fanImg = xbmc.translatePath(os.path.join('resources/img/', 'playlist.png'))
     def __init__(self):
         self.data = ""
         self.conn = ""
@@ -168,7 +169,7 @@ class QobuzXbmcUserPlaylists(QobuzUserPlaylists):
             dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
         xbmcplugin.setContent(self.Qob._handle,'files')
         xbmcplugin.addSortMethod(self.Qob._handle,xbmcplugin.SORT_METHOD_LABEL)
-        #xbmcplugin.setPluginFanart(int(sys.argv[1]),self.fanImg)
+        #xbmcplugin.setPluginFanart(int(sys.argv[1]),self.Qob.fanImg)
    
 
 class QobuzPlaylist(object):
