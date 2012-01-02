@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import httplib, json,time,urllib2,urllib,hashlib,mutagen
 from mutagen.flac import FLAC
+import pprint
 # import os,sys,re,string,array
 # import playlist
 class Api:
@@ -188,12 +189,25 @@ class Playlist:
         #   else:
         list = []
         for track in self.pdata['playlist']['tracks']:
-            coverart = 'None'
+            pprint.pprint(track)
+            coverart = track['album']['image']['large']
+#           if 'image' in track:
+#                if 'large' in track['image']:
+#                    coverart = track['image']['large']
+            print "CoverArt: " + coverart
             if track['interpreter']['name']:
                 artist=track['interpreter']['name'].encode('ascii', 'ignore')
             else:
                 artist=track['interpreter']['name']
-    
+#            info = []
+#            info.append(track['title'].encode('ascii', 'ignore'))
+#            info.append(track['id'])
+#            info.append(track['album']['title'].encode('ascii', 'ignore'))
+#            info.append(track['album']['id'])
+#            info.append(artist)
+#            info.append(track['interpreter']['id'])
+#            info.append(covertart)
+#            list.append(info)
             list.append([track['title'].encode('ascii', 'ignore'),track['id'],track['album']['title'].encode('ascii', 'ignore') ,track['album']['id'],artist,track['interpreter']['id'],coverart])
         return list
             
