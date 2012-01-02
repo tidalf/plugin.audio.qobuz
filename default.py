@@ -91,7 +91,8 @@ listBackground = os.path.join(imgDir, 'listbackground.png')
 
 sys.path.append (libDir)
 from GroovesharkAPI import GrooveAPI
-from QobuzAPI import Qobuz,Playlist,Api,Album
+from QobuzXbmc import QobuzXbmc
+#,Playlist,Api,Album
 from threading import Event, Thread
 
 if __debugging__ == 'true':
@@ -111,7 +112,7 @@ except:
 
 # **tid
 try:
-     qob = Qobuz()
+     qob = QobuzXbmc()
      if not qob.login("tidalf","klione"):
       print "Cannot login, abort...\n"
       exit(0)
@@ -412,9 +413,11 @@ class Grooveshark:
           userid = self._get_login()
           if (userid != 0):
                 #playlists = groovesharkApi.getUserPlaylists()
-                playlists = qob.Api.get_playlists()
+                user_playlists = qob.getUserPlaylists()
+                user_playlists.add_to_directory()
+                playlists = qob.Api.get_playlists1()
                 if (len(playlists) > 0):
-                     self._add_playlists_directory(playlists)
+                     pass#self._add_playlists_directory(playlists)
                 else:
                      dialog = xbmcgui.Dialog()
                      dialog.ok(__language__(30008), __language__(30033))
@@ -468,7 +471,7 @@ class Grooveshark:
      # **tid
                 # songs = groovesharkApi.getPlaylistSongs(playlistid)
                 myplaylist = qob.getPlaylist(playlistid)
-                songs = myplaylist.parseSongs()             
+                songs = myplaylist.get_tracks1()
                 self._add_songs_directory(songs, trackLabelFormat=NAME_ALBUM_ARTIST_LABEL, playlistid=playlistid, playlistname=playlistname)
           else:
                 dialog = xbmcgui.Dialog()
@@ -923,7 +926,7 @@ class Grooveshark:
           try:
                 f = open(path, 'rb')
                 songs = pickle.load(f)
-                f.close()
+                f.close() 
           except:
                 songs = []
                 pass
