@@ -45,6 +45,12 @@ class QobuzXbmc:
         self.Api = QobuzApi(self) 
         self.__playlists = {}
         self._handle = int(sys.argv[1])
+        self.cacheDir = os.path.join(tempfile.gettempdir(), 'qobuz_xbmc')
+        print "cacheDir: " + self.cacheDir + "\n"
+        if os.path.isdir(self.cacheDir) == False:
+            os.makedirs(self.cacheDir)
+            if self._debugging:
+                print "Made " + self.cacheDir
 
     def login(self, user, password):
         return self.Api.login(user,password)
@@ -76,7 +82,7 @@ class QobuzXbmc:
         return QobuzXbmcPlaylist(self, id)
     
     def getUserPlaylists(self):
-        return QobuzXbmcUserPlaylists(self)
+        return QobuzUserPlaylists(self)
     
     def getAlbum(self, id):
         return Album(self, id)
@@ -143,20 +149,41 @@ class QobuzUserPlaylists(object):
     def __init__(self, qob):
         self.Qob = qob
         self._raw_data = []
+        self._debugging = 1
+        self.cachePath =  os.path.join(self.Qob.cacheDir, 'userplaylists.dat')
+        self.refreshCacheTime = 60
         self.__fetch_data()
     
-    def __fetch_data(self):
-        data = self.Qob.Api.get_user_playlists()
-        self._raw_data = []
-        for p in data:
-            self._raw_data.append(p['playlist'])
-        return self._raw_data
-            
-
-class QobuzXbmcUserPlaylists(QobuzUserPlaylists):
-    def __init__(self, qob):
-        super(QobuzXbmcUserPlaylists, self).__init__(qob)
+    def __load_cache_data(self):
+        try:
+            mtime = os.path.getmtime(self.cachePath)
+            if time.time() - mtime > self.refreshCacheTime:
+                print "Refreshing cache\n"
+                return None
+        except: pass
+        f = None
+        try:
+            f = open(self.cachePath, 'rb')
+        except:
+            return None
+        print "Data from cache\n"
+        return pickle.load(f)
+    
+    def __save_cache_data(self, data):
+        f = open(self.cachePath, 'wb')
+        pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+        f.close()
         
+    def __fetch_data(self):
+        self._raw_data = self.__load_cache_data()
+        if not self._raw_data:
+            data = self.Qob.Api.get_user_playlists()            
+            self._raw_data = []
+            for p in data:
+                self._raw_data.append(p['playlist'])
+            self.__save_cache_data(self._raw_data)
+        return self._raw_data
+
     def length(self):
         return len(self._raw_data)
     
@@ -164,12 +191,30 @@ class QobuzXbmcUserPlaylists(QobuzUserPlaylists):
         n = self.length()
         xbmc.log("Found " + repr(self.length()) + " playlists...")
         for p in self._raw_data:
-
             playlistImg = None
             dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
         xbmcplugin.setContent(self.Qob._handle,'files')
         xbmcplugin.addSortMethod(self.Qob._handle,xbmcplugin.SORT_METHOD_LABEL)
         #xbmcplugin.setPluginFanart(int(sys.argv[1]),self.Qob.fanImg)
+
+#class QobuzXbmcUserPlaylists(QobuzUserPlaylists):
+#   
+#    def __init__(self, qob):
+#        super(QobuzXbmcUserPlaylists, self).__init__(qob)
+#        print "cacheDir: " + self.Qob.cacheDir + "\n"
+#        
+#    def length(self):
+#        return len(self._raw_data)
+#    
+#    def add_to_directory(self):
+#        n = self.length()
+#        xbmc.log("Found " + repr(self.length()) + " playlists...")
+#        for p in self._raw_data:
+#            playlistImg = None
+#            dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
+#        xbmcplugin.setContent(self.Qob._handle,'files')
+#        xbmcplugin.addSortMethod(self.Qob._handle,xbmcplugin.SORT_METHOD_LABEL)
+#        #xbmcplugin.setPluginFanart(int(sys.argv[1]),self.Qob.fanImg)
    
 
 class QobuzPlaylist(object):
