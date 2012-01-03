@@ -79,7 +79,7 @@ class QobuzXbmc:
         u.close()
 
     def getPlaylist(self, id):
-        return QobuzXbmcPlaylist(self, id)
+        return QobuzPlaylist(self, id)
     
     def getUserPlaylists(self):
         return QobuzUserPlaylists(self)
@@ -87,6 +87,9 @@ class QobuzXbmc:
     def getAlbum(self, id):
         return Album(self, id)
      
+    def getTrack(self, id):
+        return QobuzTrack(self, id)
+    
     def tag_track(self,track,file_name,album_title="null"):
         audio = FLAC(file_name)
         audio["title"] = track['title']
@@ -144,224 +147,238 @@ class QobuzXbmc:
           dir.addContextMenuItems(menuItems, replaceItems=False)
           
           return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)
-     
-class QobuzUserPlaylists(object):
+    
+def log(obj, msg, lvl = "LOG"):
+    xbmc.log('[' + lvl + '] ' + str(type(obj)) + ": " + msg)
+                 
+def warn(obj, msg):
+    if __debugging__:
+        log(obj, msg, 'WARN')
+
+def info(obj, msg):
+    if __debugging__:
+        log(obj, msg, 'INFO')
+
+def error(obj, msg, code):
+    log(obj, msg, 'ERROR')
+    os.sys.exit(code)
+    
+class ICacheable(object):
+    
+    def __init__(self):
+        self._raw_data = None
+        self.cache_refresh = 60
+        self.cache_path = None
+
+    def _load_cache_data(self):
+        log(self, "Load: " + self.cache_path)
+        if not os.path.exists(self.cache_path):
+            return None
+        mtime = None
+        try:
+            mtime = os.path.getmtime(self.cache_path)
+        except: 
+            warn(self, "Cannot stat cache file: " + self.cache_path)
+        
+        if (time.time() - mtime) > self.cache_refresh:
+            info(self, "Refreshing cache")
+            return None
+
+        f = None
+        try:
+            f = open(self.cache_path, 'rb')
+        except:
+            warn(self, "Cannot open cache file: " + self.cache_path)
+            return None
+        return pickle.load(f)
+
+    def _save_cache_data(self, data):
+        f = open(self.cache_path, 'wb')
+        pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+        f.close()
+
+    def fetch_data(self):
+        self._raw_data = self._load_cache_data()
+        if not self._raw_data:
+            data = self._fetch_data()
+            self._save_cache_data(data)
+            self._raw_data = data
+        return self._raw_data
+
+    def _fetch_data(self):
+        assert("Need to implement fetch_data!")
+        
+    def to_s(self):
+        str = "Cache refresh: " + repr(self.cache_refresh) + "\n"
+        str += "Cache path: " + self.cache_path + "\n"
+        return str
+
+class QobuzUserPlaylists(ICacheable):
     
     def __init__(self, qob):
         self.Qob = qob
         self._raw_data = []
-        self._debugging = 1
-        self.cachePath =  os.path.join(self.Qob.cacheDir, 'userplaylists.dat')
-        self.refreshCacheTime = 60
-        self.__fetch_data()
-    
-    def __load_cache_data(self):
-        try:
-            mtime = os.path.getmtime(self.cachePath)
-            if time.time() - mtime > self.refreshCacheTime:
-                print "Refreshing cache\n"
-                return None
-        except: pass
-        f = None
-        try:
-            f = open(self.cachePath, 'rb')
-        except:
-            return None
-        #print "Data from cache\n"
-        return pickle.load(f)
-    
-    def __save_cache_data(self, data):
-        f = open(self.cachePath, 'wb')
-        pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
-        f.close()
-        
-    def __fetch_data(self):
-        self._raw_data = self.__load_cache_data()
-        if not self._raw_data:
-            data = self.Qob.Api.get_user_playlists()            
-            self._raw_data = []
-            for p in data:
-                self._raw_data.append(p['playlist'])
-            self.__save_cache_data(self._raw_data)
-        return self._raw_data
+        self.cache_path =  os.path.join(self.Qob.cacheDir, 'userplaylists.dat')
+        self.cache_refresh = 600
+        self.fetch_data()
+           
+    def _fetch_data(self):
+        raw_data = self.Qob.Api.get_user_playlists()            
+        data = []
+        for p in raw_data:
+            data.append(p['playlist'])
+        return data
 
     def length(self):
         return len(self._raw_data)
     
     def add_to_directory(self):
         n = self.length()
+        log(self, "Found " + str(n) + " playlist(s)")
         h = int(sys.argv[1])
-        #xbmc.log("Found " + repr(self.length()) + " playlists...")
         u = dir = None
-        for p in self._raw_data:
-            u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&name="+urllib.quote_plus(p['name'])+"&id="+str(p['id'])
-            dir=xbmcgui.ListItem(p['name'])
-            dir.setInfo( type="Music", infoLabels={ "title": p['name'] } )
-            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=dir,isFolder=True, totalItems=n)
-            #dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
         xbmcplugin.setContent(h, 'files')
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
+        for p in self._raw_data:
+            u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&name="+urllib.quote_plus(p['name'])+"&id="+str(p['id'])
+            item=xbmcgui.ListItem()
+            item.setLabel(p['name'])
+            item.setLabel2(p['owner']['name'])
+            item.setInfo( type="Music", infoLabels={ "title": p['name'] } )
+            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True, totalItems=n)
+            #dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
+        #xbmcplugin.setContent(h, 'Playlists')
+        #xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         #xbmcplugin.setPluginFanart(int(sys.argv[1]),self.Qob.fanImg)
         #xbmcplugin.endOfDirectory(h, True, False, True)
 
-#class QobuzXbmcUserPlaylists(QobuzUserPlaylists):
-#   
-#    def __init__(self, qob):
-#        super(QobuzXbmcUserPlaylists, self).__init__(qob)
-#        print "cacheDir: " + self.Qob.cacheDir + "\n"
-#        
-#    def length(self):
-#        return len(self._raw_data)
-#    
-#    def add_to_directory(self):
-#        n = self.length()
-#        xbmc.log("Found " + repr(self.length()) + " playlists...")
-#        for p in self._raw_data:
-#            playlistImg = None
-#            dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
-#        xbmcplugin.setContent(self.Qob._handle,'files')
-#        xbmcplugin.addSortMethod(self.Qob._handle,xbmcplugin.SORT_METHOD_LABEL)
-#        #xbmcplugin.setPluginFanart(int(sys.argv[1]),self.Qob.fanImg)
-   
-
-class QobuzPlaylist(object):
-    def __init__(self,qob,playlist_id):
-        self.qob = qob
-        self.id = playlist_id
-        self.data = None
-        self.__tracks = []
-        self.__fetch_data()
-
-
-#    def download_all(self):
-#        for track in self.pdata['playlist']['tracks']:
-#            self.qob.download_track(track,'playlist',self.playlist_id)
-#        #   print "\nsleeping 5s"
-#            time.sleep(5)
-#
-#    def print_tracks (self):
-#        for track in self.pdata['playlist']['tracks']:
-#            print track['interpreter']['name'] +" - "+ track['album']['title'] + " - "+track['track_number'] +" - " + track['title']
-    def __fetch_data(self):
-         self._raw_data = self.qob.Api.get_playlist(self.id)['playlist']
-
-    def get_tracks(self):
-        return self._raw_data['tracks']
-    
-    def get_info(self):
-        return self.data
-
-class QobuzTrack(object):
-    
-    def __init__(self):
-        self.data = None
-    
-    def load_json(self, json):
-        self.data = json
-    
-class QobuzXbmcTrack(QobuzTrack):
-    def __init__(self):
-        super(QobuzXbmcTrack, self).__init__()
-
-    def add_to_directory(self):
-        pass
+class QobuzTrack(ICacheable):
+    def __init__(self, qob, id):
+        self.Qob = qob
+        self.id = id
+        self._raw_data = []
+        self.cache_path =  os.path.join(
+                                        self.Qob.cacheDir, 
+                                        'track-'+repr(self.id)+'.dat'
+        )
+        self.cache_refresh = 1200
+        self.format_id = 6       
+        settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
+        # Todo : Due to caching, streaming url can be mixed if settings are 
+        # changed
+        if settings.getSetting('streamtype') == 'mp3':
+            self.format_id = 5
+        self.fetch_data()
+        #pprint.pprint(self._raw_data)
         
-
-class QobuzXbmcPlaylist(QobuzPlaylist):
+    def _fetch_data(self):
+        data = {}
+        data['info'] = self.Qob.Api.get_track(self.id)
+        data['stream'] = self.Qob.Api.get_track_url(self.id, 'playlist', data['info']['album']['id'], self.format_id)
+        return data
+    
+    def get_duration(self):
+        (sh, sm, ss) = self._raw_data['info']['duration'].split(':')
+        return (int(sh)*3600 + int(sm)*60 + int(ss))
+    
+    def play(self):
+        global player
+        listitem = xbmcgui.ListItem(self._raw_data['info']['title'])
+        i = self._raw_data['info']
+        a = i['album']
+        mimetype = 'audio/flac'
+        if self.format_id == 5:
+            mimetype = 'audio/mpeg'
+        listitem.setInfo('music', {
+                                   'count': self.id,
+                                   'title': i['title'], 
+                                   'artist' : i['interpreter']['name'],
+                                   'genre': a['genre']['name'],
+                                   'tracknumber': int(i['track_number']),
+                                   'duration': self.get_duration(),
+                                   'mimetype': mimetype
+                                   })
+        listitem.setThumbnailImage(a['image']['large'])
+        listitem.setPath(self._raw_data['stream']['streaming_url'])
+        p = xbmc.Player()
+        if p.isPlaying():
+            p.stop()
+            xbmc.sleep(250)
+        p.play(str(self._raw_data['stream']['streaming_url']), listitem)
+        #xbmc.executebuiltin('PlayMedia('+str(self._raw_data['stream']['streaming_url'])+')')
+            
+class QobuzPlaylist(ICacheable):
 
     def __init__(self, qob, id):
-        super(QobuzXbmcPlaylist, self).__init__(qob, id)
+        self.Qob = qob
+        self.id = id
+        self._raw_data = []
+        self.cache_path =  os.path.join(
+                                        self.Qob.cacheDir, 
+                                        'playlist-'+repr(self.id)+'.dat'
+        )
+        self.cache_refresh = 600
+        self.fetch_data()
 
+    def _fetch_data(self):
+        return self.Qob.Api.get_playlist(self.id)['playlist']
+    
+    def length(self):
+        return len(self._raw_data['tracks'])
+    
     def get_tracks1(self):
-        data = super(QobuzXbmcPlaylist, self).get_tracks()
         list = []
-        for track in data:
+        for track in self._raw_data['tracks']:
+            print "----\n"
             coverart = track['album']['image']['large']
-            # Trop space ce if :p
             if track['interpreter']['name']:
                 artist=track['interpreter']['name'].encode('utf8', 'ignore')
             else:
-                artist=track['interpreter']['name']
-            list.append([track['title'].encode('utf8', 'ignore'),track['id'],track['album']['title'].encode('utf8', 'ignore') ,track['album']['id'],artist,track['interpreter']['id'],coverart])
+                artist= ""
+            list.append([
+                         track['title'].encode('utf8', 'ignore'),
+                         track['id'],
+                         track['album']['title'].encode('utf8', 'ignore') ,
+                         track['album']['id'],
+                         artist,
+                         track['interpreter']['id'],
+                         coverart
+            ])
         return list
     
     def add_to_directory(self):
-    #def _add_songs_directory(self, songs, trackLabelFormat=ARTIST_ALBUM_NAME_LABEL, offset=0, playlistid=0, playlistname='', isFavorites=False):
-          tracks =  super(QobuzXbmcPlaylist, self).get_tracks()
-          totalSongs = len(tracks)
-          offset = 0
-          offset = int(offset)
-          start = 0
-          end = totalSongs
+        n = self.length()
+        h = int(sys.argv[1])
+        #playlist.clear()
+        xbmc.executebuiltin("Playlist.Clear");
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
+        for t in self._raw_data['tracks']:
+            #pprint.pprint(t)
+            interpreter = urllib.quote_plus(t['interpreter']['name']) if t['interpreter']['name'] else 'Unknown'
+            u=sys.argv[0]+"?mode="+str(MODE_SONG)+"&name="+urllib.quote_plus(t['title'].encode('ascii', 'ignore'))+"&id="+str(t['id']) 
+                     #+"&album="+urllib.quote_plus(t['album']['title']) \
+                     #+"&albumid="+urllib.quote_plus(str(t['album']['id'])) \
+                     #+"&artist="+interpreter \
+                     #+"&coverart="+urllib.quote_plus(t['image']['large'].convert('ascii', 'ignore'))
+            item = xbmcgui.ListItem()
+            item.setLabel(t['interpreter']['name'] + ' - ' + t['album']['title'] + ' - ' + t['track_number'] + ' - ' + t['title'])
+            #item.setLabel2(t['title'])
+            item.setInfo( type="Music", infoLabels= { 
+                                                   "title": t['title'], 
+                                                   "artist": t['interpreter']['name'],
+                                                   "album": t['album']['title'],
+                                                   "tracknumber": int(t['track_number']),
+                                                   "genre": t['album']['genre']['name'],
+                                                   "comment": "Qobuz Stream",
+                                                   "year": int(t['album']['release_date'].split('-')[0])
+                                                   })
+            item.setThumbnailImage(t['album']['image']['large'])
+            playlist.add(url=u, listitem=item)
+            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=False, totalItems=n)
+        xbmcplugin.setContent(h, 'songs')
+        xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
 
-          # No pages needed
-          if offset == 0 and totalSongs <= self.songspagelimit:
-                if __debugging__ :
-                     xbmc.log("Found " + str(totalSongs) + " songs...")
-          # Pages
-          else:
-                # Cache all next pages songs
-                if offset == 0:
-                     self._setSavedSongs(songs)
-                else:
-                     songs = self._getSavedSongs()
-                     totalSongs = len(songs)
-                     
-                if totalSongs > 0:
-                     start = offset
-                     end = min(start + self.songspagelimit,totalSongs)
-          
-          id = 0
-          n = start
-          items = end - start
-          while n < end:
-                song = songs[n]
-                songid = song[1]
-                albumid = song[3]
-                duration = self._getSongDuration(songid,albumid)
-                if duration != -1:  
-                     item = self._get_song_item(song, trackLabelFormat)
-                     coverart = item.getProperty('coverart')
-                     songname = song[0]
-                     songalbum = song[2] or "none"
-                     songalbumid = song[3] or "none"
-                     songartist = song[4] or "none"
-                     coverart = "none"
-                     u=sys.argv[0]+"?mode="+str(MODE_SONG)+"&name="+urllib.quote_plus(songname)+"&id="+str(songid) \
-                     +"&album="+urllib.quote_plus(songalbum) \
-                     +"&albumid="+urllib.quote_plus(songalbumid) \
-                     +"&artist="+urllib.quote_plus(songartist) \
-                     +"&coverart="+urllib.quote_plus(coverart)
-                     fav=sys.argv[0]+"?mode="+str(MODE_FAVORITE)+"&name="+urllib.quote_plus(songname)+"&id="+str(songid)
-                     unfav=sys.argv[0]+"?mode="+str(MODE_UNFAVORITE)+"&name="+urllib.quote_plus(songname)+"&id="+str(songid)+"&prevmode="
-                     menuItems = []
-                     if isFavorites == True:
-                          unfav = unfav +str(MODE_FAVORITES)
-                     else:
-                          menuItems.append((__language__(30071), "XBMC.RunPlugin("+fav+")"))
-                     menuItems.append((__language__(30072), "XBMC.RunPlugin("+unfav+")"))
-                     if playlistid > 0:
-                          rmplaylstsong=sys.argv[0]+"?playlistid="+str(playlistid)+"&id="+str(songid)+"&mode="+str(MODE_REMOVE_PLAYLIST_SONG)+"&name="+playlistname
-                          menuItems.append((__language__(30073), "XBMC.RunPlugin("+rmplaylstsong+")"))
-                     else:
-                          addplaylstsong=sys.argv[0]+"?id="+str(songid)+"&mode="+str(MODE_ADD_PLAYLIST_SONG)
-                          menuItems.append((__language__(30074), "XBMC.RunPlugin("+addplaylstsong+")"))
-                     item.addContextMenuItems(menuItems, replaceItems=False)
-                     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=item,isFolder=False, totalItems=items)
-                     id = id + 1
-                else:
-                     end = min(end + 1,totalSongs)
-                     if __debugging__ :
-                          xbmc.log(song[0] + " does not exist.")
-                n = n + 1
-
-          if totalSongs > end:
-                u=sys.argv[0]+"?mode="+str(MODE_SONG_PAGE)+"&id=playlistid"+"&offset="+str(end)+"&label="+str(trackLabelFormat)+"&name="+playlistname
-                self._add_dir(__language__(30075) + '...', u, MODE_SONG_PAGE, self.songImg, 0, totalSongs - end)
-
-          xbmcplugin.setContent(self.Qob._handle, 'songs')
-          #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
-    
 class Album:
     def __init__(self,qob,album_id):
         self.qob = qob

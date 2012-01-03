@@ -68,7 +68,7 @@ STREAM_MARKING_TIME = 30
 STREAM_TIMEOUT = 30
 
 songMarkTime = 0
-player = xbmc.Player()
+player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 playTimer = None
 
 baseDir = __cwd__
@@ -111,6 +111,7 @@ except:
      dialog.ok(__language__(30008),__language__(30009))
      sys.exit(-1)
      
+qob = None
 try:
     qob = QobuzXbmc()
     settings = xbmcaddon.Addon(id='plugin.audio.qobuz')      
@@ -475,8 +476,9 @@ class Grooveshark:
      # **tid
                 # songs = groovesharkApi.getPlaylistSongs(playlistid)
                 myplaylist = qob.getPlaylist(playlistid)
-                songs = myplaylist.get_tracks1()
-                self._add_songs_directory(songs, trackLabelFormat=NAME_ALBUM_ARTIST_LABEL, playlistid=playlistid, playlistname=playlistname)
+                myplaylist.add_to_directory()
+                #songs = myplaylist.get_tracks1()
+                #self._add_songs_directory(songs, trackLabelFormat=NAME_ALBUM_ARTIST_LABEL, playlistid=playlistid, playlistname=playlistname)
           else:
                 dialog = xbmcgui.Dialog()
                 dialog.ok(__language__(30008), __language__(30034), __language__(30040))
@@ -1070,16 +1072,18 @@ elif mode==MODE_SONG_PAGE:
      grooveshark.songPage(offset, label, id, name)
 
 elif mode==MODE_SONG:
-     try: album=urllib.unquote_plus(params["album"])
-     except: pass
-     try: artist=urllib.unquote_plus(params["artist"])
-     except: pass
-     try: coverart=urllib.unquote_plus(params["coverart"])
-     except: pass
-     try: albumid=urllib.unquote_plus(params["albumid"])
-     except: pass
-     song = grooveshark.songItem(id, name, album, albumid, artist, coverart)
-     grooveshark.playSong(song)
+     t = qob.getTrack(id)
+     t.play()
+#     try: album=urllib.unquote_plus(params["album"])
+#     except: pass
+#     try: artist=urllib.unquote_plus(params["artist"])
+#     except: pass
+#     try: coverart=urllib.unquote_plus(params["coverart"])
+#     except: pass
+#     try: albumid=urllib.unquote_plus(params["albumid"])
+#     except: pass
+     #song = grooveshark.songItem(id, name, album, albumid, artist, coverart)
+     #grooveshark.playSong(song)
 
 elif mode==MODE_ARTIST:
      grooveshark.artist(id)

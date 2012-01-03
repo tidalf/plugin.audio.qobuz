@@ -1,9 +1,7 @@
 #!/usr/bin/python
 import httplib,json,time,urllib2,urllib,hashlib,mutagen
-
 from mutagen.flac import FLAC
 import pprint
-
 
 class QobuzApi:
 
@@ -20,8 +18,13 @@ class QobuzApi:
         response_json = json.loads(response.read())
         return response_json
 
-    def get_track_url(self,track_id,context_type,context_id):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'track_id': track_id ,'format_id':6,'context_type':context_type,'context_id':context_id})
+    def get_track_url(self,track_id,context_type,context_id ,format_id = 6):
+        params = urllib.urlencode({
+                                   'x-api-auth-token':self.authtoken,
+                                   'track_id': track_id ,
+                                   'format_id': format_id,
+                                   'context_type':context_type,
+                                   'context_id':context_id})
     # add try catch here
         done = False
         while done == False:
@@ -32,7 +35,7 @@ class QobuzApi:
                 print "try again"
         # xbmc.log(json.dumps(data))
             url = data[u'streaming_url']
-        return url
+        return data
 
 
     def get_track(self,trackid):
