@@ -112,7 +112,7 @@ except:
 try:
     qob = QobuzXbmc()
     settings = xbmcaddon.Addon(id='plugin.audio.qobuz')      
-    if not qob.login(settings.getSetting('qname'),settings.getSetting('qpass')):
+    if not qob.login(settings.getSetting('username'),settings.getSetting('password')):
         print "Cannot login, abort...\n"
         exit(0)
      #playlists=qob.Api.get_playlists()
@@ -408,21 +408,21 @@ class Grooveshark:
 
      # Get my playlists                 
      def playlists(self):
-          userid = self._get_login()
-          if (userid != 0):
+          # userid = self._get_login()
+          # if (userid != 0):
                 #playlists = groovesharkApi.getUserPlaylists()
-                user_playlists = qob.getUserPlaylists()
-                user_playlists.add_to_directory()
-                playlists = qob.Api.get_playlists1()
-                if (len(playlists) > 0):
-                     pass#self._add_playlists_directory(playlists)
-                else:
-                     dialog = xbmcgui.Dialog()
-                     dialog.ok(__language__(30008), __language__(30033))
-                     self.categories()
-          else:
+            user_playlists = qob.getUserPlaylists()
+            user_playlists.add_to_directory()
+            playlists = qob.Api.get_playlists1()
+            if (len(playlists) > 0):
+                pass#self._add_playlists_directory(playlists)
+            else:
                 dialog = xbmcgui.Dialog()
-                dialog.ok(__language__(30008), __language__(30034), __language__(30035))
+                dialog.ok(__language__(30008), __language__(30033))
+                self.categories()
+          #else:
+          #      dialog = xbmcgui.Dialog()
+          #      dialog.ok(__language__(30008), __language__(30034), __language__(30035))
                      
      # Make songs a favorite 
      def favorite(self, songid):
@@ -719,19 +719,21 @@ class Grooveshark:
      
      # Login to grooveshark
      def _get_login(self):
-          if (self.username == "" or self.password == ""):
-                dialog = xbmcgui.Dialog()
-                dialog.ok(__language__(30008), __language__(30069), __language__(30070))
-                return 0
-          else:
-                if self.userid == 0:
-                     uid = groovesharkApi.login(self.username, self.password)
-                if (uid != 0):
-                     return uid
-                else:
-                     dialog = xbmcgui.Dialog()
-                     dialog.ok(__language__(30008), __language__(30069), __language__(30070))
-                     return 0
+          #=====================================================================
+          # if (self.username == "" or self.password == ""):
+          #      dialog = xbmcgui.Dialog()
+          #      dialog.ok(__language__(30008), __language__(30069), __language__(30070))
+          #      return 0
+          # else:
+          #      if self.userid == 0:
+          #           uid = groovesharkApi.login(self.username, self.password)
+          #      if (uid != 0):
+          #           return uid
+          #      else:
+          #           dialog = xbmcgui.Dialog()
+          #           dialog.ok(__language__(30008), __language__(30069), __language__(30070))
+          #=====================================================================
+                     return 1
      
      # Get a song directory item
      def _get_song_item(self, song, trackLabelFormat):
