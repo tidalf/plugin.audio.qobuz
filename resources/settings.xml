@@ -1,7 +1,7 @@
 <settings>
    <category label="User credentials">
-   <setting id="username" type="text" label="30000" default=""/>
-   <setting id="password" type="text" option="hidden" label="30001" default="" />
+   <setting id="username" type="text" label="37000" default=""/>
+   <setting id="password" type="text" option="hidden" label="37001" default="" />
    </category>
    <category label="Limits">
    <setting id="songsearchlimit" type="labelenum" label="30002" default="20" values="5|10|15|20|25|30|40|50|60|70|80|90|100" />
