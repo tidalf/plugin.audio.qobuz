@@ -146,6 +146,7 @@ class QobuzXbmc:
           return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)
      
 class QobuzUserPlaylists(object):
+    
     def __init__(self, qob):
         self.Qob = qob
         self._raw_data = []
@@ -166,7 +167,7 @@ class QobuzUserPlaylists(object):
             f = open(self.cachePath, 'rb')
         except:
             return None
-        print "Data from cache\n"
+        #print "Data from cache\n"
         return pickle.load(f)
     
     def __save_cache_data(self, data):
@@ -189,13 +190,19 @@ class QobuzUserPlaylists(object):
     
     def add_to_directory(self):
         n = self.length()
-        xbmc.log("Found " + repr(self.length()) + " playlists...")
+        h = int(sys.argv[1])
+        #xbmc.log("Found " + repr(self.length()) + " playlists...")
+        u = dir = None
         for p in self._raw_data:
-            playlistImg = None
-            dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
-        xbmcplugin.setContent(self.Qob._handle,'files')
-        xbmcplugin.addSortMethod(self.Qob._handle,xbmcplugin.SORT_METHOD_LABEL)
+            u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&name="+urllib.quote_plus(p['name'])+"&id="+str(p['id'])
+            dir=xbmcgui.ListItem(p['name'])
+            dir.setInfo( type="Music", infoLabels={ "title": p['name'] } )
+            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=dir,isFolder=True, totalItems=n)
+            #dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
+        xbmcplugin.setContent(h, 'files')
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         #xbmcplugin.setPluginFanart(int(sys.argv[1]),self.Qob.fanImg)
+        #xbmcplugin.endOfDirectory(h, True, False, True)
 
 #class QobuzXbmcUserPlaylists(QobuzUserPlaylists):
 #   
