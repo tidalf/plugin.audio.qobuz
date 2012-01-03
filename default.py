@@ -102,8 +102,10 @@ else:
 
 try:
      groovesharkApi = GrooveAPI(__debugging__)
-     if groovesharkApi.pingService() != True:
-          raise StandardError(__language__(30007))
+     # SHO #
+     #if groovesharkApi.pingService() != True:
+     #     raise StandardError(__language__(30007))
+     # SHO #
 except:
      dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
      dialog.ok(__language__(30008),__language__(30009))
@@ -131,12 +133,16 @@ def markSong(songid, duration, streamKey, streamServerID):
      if player.isPlayingAudio():
           tNow = player.getTime()
           if tNow >= STREAM_MARKING_TIME and songMarkTime == 0:
-                groovesharkApi.markStreamKeyOver30Secs(streamKey, streamServerID)
+                # SHO #
+                #groovesharkApi.markStreamKeyOver30Secs(streamKey, streamServerID)
+                # SHO #
                 songMarkTime = tNow
           elif duration > tNow and duration - tNow < 2 and songMarkTime >= STREAM_MARKING_TIME:
                 playTimer.cancel()
                 songMarkTime = 0
-                groovesharkApi.markSongComplete(songid, streamKey, streamServerID)
+                # SHO #
+                #groovesharkApi.markSongComplete(songid, streamKey, streamServerID)
+                # SHO #
      else:
           playTimer.cancel()
           songMarkTime = 0
