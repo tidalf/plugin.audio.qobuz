@@ -2,6 +2,8 @@
 <strings>
 	<string id="30000">Username</string>
 	<string id="30001">Password</string>
+	<string id="37000">Username</string>
+	<string id="37001">Password</string>
 	<string id="30002">Song search limit</string>
 	<string id="30003">Album search limit</string>
 	<string id="30004">Artist search limit</string>

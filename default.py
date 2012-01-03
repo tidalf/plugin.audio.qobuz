@@ -109,13 +109,12 @@ except:
      dialog.ok(__language__(30008),__language__(30009))
      sys.exit(-1)
      
-
-# **tid
 try:
-     qob = QobuzXbmc()
-     if not qob.login("tidalf","klione"):
-      print "Cannot login, abort...\n"
-      exit(0)
+    qob = QobuzXbmc()
+    settings = xbmcaddon.Addon(id='plugin.audio.qobuz')      
+    if not qob.login(settings.getSetting('qname'),settings.getSetting('qpass')):
+        print "Cannot login, abort...\n"
+        exit(0)
      #playlists=qob.Api.get_playlists()
      #print json.dumps(playlists,sort_keys=True, indent=4)
      #qplaylist = qob.getPlaylist(10076)
@@ -123,8 +122,7 @@ except:
      dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
      dialog.ok(__language__(30008),__language__(30009))
      sys.exit(-1)
-# **tid
-  
+
 # Mark song as playing or played
 def markSong(songid, duration, streamKey, streamServerID):
      global songMarkTime
