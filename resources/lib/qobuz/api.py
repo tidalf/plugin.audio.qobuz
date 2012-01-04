@@ -75,6 +75,11 @@ class QobuzApi:
     def search_tracks(self, query, limit = 100):
         params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'tracks', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/track/search")
+    
+    def get_recommandations(self, genre_id, limit = 100):
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'genre_id': genre_id, 'type': 'new-releases', 'limit': limit})
+        return self._api_request(params,"/api.json/0.1/product/getRecommendations")
+    
 
 if __name__ == '__main__':
     pass

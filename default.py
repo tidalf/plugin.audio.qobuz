@@ -48,6 +48,7 @@ MODE_REMOVE_PLAYLIST = 34
 MODE_RENAME_PLAYLIST = 35
 MODE_REMOVE_PLAYLIST_SONG = 36
 MODE_ADD_PLAYLIST_SONG = 37
+MODE_SHOW_RECOS = 38
 
 ACTION_MOVE_LEFT = 1
 ACTION_MOVE_UP = 3
@@ -338,6 +339,7 @@ class Grooveshark:
           xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
           
           self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
+          self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
 #          self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
 #          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
 #          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
@@ -366,6 +368,25 @@ class Grooveshark:
                      self.categories()
            else:
                 self.categories()
+     
+     def ShowRecommandation(self):
+           # query = self._get_keyboard(default="",heading=__language__(30020))
+           genre_id=64
+           if (genre_id != ''):
+               r = qob.getRecommandation(genre_id)
+               r.get(genre_id, self.songsearchlimit)
+               if r.length() > 0:
+                   r.add_to_directory()
+#                songs = groovesharkApi.getSongSearchResults(query, limit = self.songsearchlimit)
+#                if (len(songs) > 0):
+#                     self._add_songs_directory(songs)
+               else:
+                     dialog = xbmcgui.Dialog()
+                     dialog.ok(__language__(30008),__language__(30021))
+                     self.categories()
+           else:
+                self.categories()     
+     
      
      # Search for albums
      def searchAlbums(self):
@@ -1060,6 +1081,9 @@ if mode==None:
           
 elif mode==MODE_SEARCH_SONGS:
      grooveshark.searchSongs()
+
+elif mode==MODE_SHOW_RECOS:
+     grooveshark.ShowRecommandation()  
      
 elif mode==MODE_SEARCH_ALBUMS:
      grooveshark.searchAlbums()
