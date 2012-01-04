@@ -95,7 +95,48 @@ from GroovesharkAPI import GrooveAPI
 from QobuzXbmc import QobuzXbmc
 #,Playlist,Api,Album
 from threading import Event, Thread
+# Parse URL parameters
 
+def get_params():
+    param=[]
+    paramstring=sys.argv[2]
+    if __debugging__ :
+          xbmc.log(paramstring)
+    if len(paramstring)>=2:
+          params=sys.argv[2]
+          cleanedparams=params.replace('?','')
+          if (params[len(params)-1]=='/'):
+                params=params[0:len(params)-2]
+          pairsofparams=cleanedparams.split('&')
+          param={}
+          for i in range(len(pairsofparams)):
+                splitparams={}
+                splitparams=pairsofparams[i].split('=')
+                if (len(splitparams))==2:
+                     param[splitparams[0]]=splitparams[1]
+    return param
+
+params=get_params()
+mode=None
+try: mode=int(params["mode"])
+except: pass
+
+if mode == 60:
+    print "Plop\n"
+    if player.isPlayingAudio() == True:
+        diff = player.getTotalTime() - player.getTime()
+        print "Diff: " + str(diff) + "\n"
+        if diff <= 4:
+            player.playnext()
+            exit(0)
+        else:
+            xbmc.sleep(2)
+            url = sys.argv[0] + '?mode=60'
+            print "url: " + url
+            xbmc.executebuiltin('XBMC.RunPlugin('+url+')')
+    else:
+        exit(0)
+    
 if __debugging__ == 'true':
      __debugging__ = True
 else:
@@ -296,7 +337,7 @@ class Grooveshark:
           # Setup
           xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
           
-#          self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
+          self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
 #          self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
 #          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
 #          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
@@ -310,16 +351,20 @@ class Grooveshark:
 
      # Search for songs              
      def searchSongs(self):
-          query = self._get_keyboard(default="", heading=__language__(30020))
-          if (query != ''):
-                songs = groovesharkApi.getSongSearchResults(query, limit = self.songsearchlimit)
-                if (len(songs) > 0):
-                     self._add_songs_directory(songs)
-                else:
+           query = self._get_keyboard(default="",heading=__language__(30020))
+           if (query != ''):
+               s = qob.getQobuzSearchTracks()
+               s.search(query, self.songsearchlimit)
+               if s.length() > 0:
+                 s.add_to_directory()
+#                songs = groovesharkApi.getSongSearchResults(query, limit = self.songsearchlimit)
+#                if (len(songs) > 0):
+#                     self._add_songs_directory(songs)
+               else:
                      dialog = xbmcgui.Dialog()
-                     dialog.ok(__language__(30008), __language__(30021))
+                     dialog.ok(__language__(30008),__language__(30021))
                      self.categories()
-          else:
+           else:
                 self.categories()
      
      # Search for albums
@@ -996,34 +1041,13 @@ class Grooveshark:
           #  usecs = usecs * 10 # Some durations are 10x to small
           return secs
      
-# Parse URL parameters
-def get_params():
-    param=[]
-    paramstring=sys.argv[2]
-    if __debugging__ :
-          xbmc.log(paramstring)
-    if len(paramstring)>=2:
-          params=sys.argv[2]
-          cleanedparams=params.replace('?','')
-          if (params[len(params)-1]=='/'):
-                params=params[0:len(params)-2]
-          pairsofparams=cleanedparams.split('&')
-          param={}
-          for i in range(len(pairsofparams)):
-                splitparams={}
-                splitparams=pairsofparams[i].split('=')
-                if (len(splitparams))==2:
-                     param[splitparams[0]]=splitparams[1]
-    return param
+
           
 # Main
 grooveshark = Grooveshark();
 qob._handle = grooveshark._handle
 
-params=get_params()
-mode=None
-try: mode=int(params["mode"])
-except: pass
+
 id=0
 try: id=int(params["id"])
 except: pass
@@ -1071,6 +1095,10 @@ elif mode==MODE_SONG_PAGE:
 elif mode == MODE_SONG:
      t = qob.getTrack(id)
      t.play()
+#     if player.isPlayingAudio() == True:
+#         url = sys.argv[0] + '?mode=60'
+#         print "url: " + url
+#         xbmc.executebuiltin('XBMC.RunPlugin('+url+')')
      #grooveshark.playSong(t)
 #     try: album=urllib.unquote_plus(params["album"])
 #     except: pass
@@ -1120,6 +1148,8 @@ elif mode==MODE_REMOVE_PLAYLIST_SONG:
 
 elif mode==MODE_ADD_PLAYLIST_SONG:
      grooveshark.addPlaylistSong(id)              
-     
+
+
+    
 if mode < MODE_SONG:
      xbmcplugin.endOfDirectory(int(sys.argv[1]))

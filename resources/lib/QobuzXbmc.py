@@ -121,6 +121,9 @@ class QobuzXbmc:
     
     def getEncounteredAlbum(self):
         return QobuzEncounteredAlbum(self)
+    
+    def getQobuzSearchTracks(self):
+        return QobuzSearchTracks(self)
 
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)
@@ -250,6 +253,61 @@ class QobuzUserPlaylists(ICacheable):
         xbmcplugin.setPluginFanart(h,self.Qob.fanImg)
 
 ###############################################################################
+# Class QobuzSearchTracks
+###############################################################################
+class QobuzSearchTracks():
+
+    def __init__(self, qob,):
+        self.Qob = qob
+        self._raw_data = {}
+        
+    def search(self, query, limit = 100):
+        self._raw_data = self.Qob.Api.search_tracks(query, limit)
+        pprint.pprint(self._raw_data)
+        return self
+        
+    def length(self):
+        return len(self._raw_data['results']['tracks'])
+    
+    def add_to_directory(self):
+        n = self.length()
+        h = int(sys.argv[1])
+        for t in self._raw_data['results']['tracks']:
+            title = _sc(t['title'])
+            if t['streaming_type'] != 'full':
+                warn(self, "Skipping sample " + title)
+                continue
+            interpreter = _sc(t['interpreter']['name'])
+            #print "Interpreter: " + interpreter + "\n"
+            #print "Title: " + t['title']
+            year = int(t['album']['release_date'].split('-')[0]) if t['album']['release_date'] else 0
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str(t['id'])
+            (sh,sm,ss) = t['duration'].split(':')
+            duration = (int(sh) * 3600 + int(sm) * 60 + int(ss))
+            item = xbmcgui.ListItem('test')
+            item.setLabel(interpreter + ' - ' + _sc(t['album']['title']) + ' - ' + _sc(t['track_number']) + ' - ' + _sc(t['title']))
+            item.setInfo(type="Music",infoLabels={
+                                                   #"count":+,
+                                                   "title":  title,
+                                                   "artist": interpreter,
+                                                   "album": _sc(t['album']['title']),
+                                                   "tracknumber": int(t['track_number']),
+                                                   "genre": _sc(t['album']['genre']['name']),
+                                                   "comment": "Qobuz Stream",
+                                                   "duration": duration,
+                                                   "year": year
+                                                   })
+            item.setPath(u)
+            item.setProperty('Music','true')
+            item.setProperty('IsPlayable','true');
+            item.setProperty('mimetype','audio/flac')
+            item.setThumbnailImage(t['album']['image']['large'])
+            xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
+        xbmcplugin.setContent(h,'songs')
+        #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
+
+
+###############################################################################
 # Class QobuzPLaylist
 ###############################################################################
 class QobuzPlaylist(ICacheable):
@@ -279,8 +337,11 @@ class QobuzPlaylist(ICacheable):
         n = self.length()
         h = int(sys.argv[1])
         for t in self._raw_data['tracks']:
-            interpreter = _sc(t['interpreter']['name'])
             title = _sc(t['title'])
+            if t['streaming_type'] != 'full':
+                warn(self, "Skipping sample " + title)
+                continue
+            interpreter = _sc(t['interpreter']['name'])
             year = int(t['album']['release_date'].split('-')[0]) if t['album']['release_date'] else 0
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str(t['id'])
             (sh,sm,ss) = t['duration'].split(':')
@@ -370,6 +431,7 @@ class QobuzTrack(ICacheable):
         item.setProperty('Music','true')
         item.setProperty('mimetype',mimetype)
         item.setProperty("IsPlayable",'true')
+        item.setProperty('duration', str(self.get_duration()))
         #item.setProperty('songid', str(self.id))
         #item.setProperty('coverart', a['image']['large'])
         #item.setProperty('title', i['title'])
@@ -383,9 +445,16 @@ class QobuzTrack(ICacheable):
 
     # Play this track
     def play(self):
-        global player
+        player = xbmc.Player()
         item = self.getItem()
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
+        timeout = 30
+        while timeout > 0:
+            if player.isPlayingAudio == True:
+                return
+            print "Waiting for stream to start\n"
+            xbmc.sleep(1)
+            timeout-=1
 
 class QobuzEncounteredAlbum(ICacheable):
     # Constructor
