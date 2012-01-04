@@ -1,2 +1,8 @@
 This is a Qobuz plugin for XBMC
 -------------------------------
+
+Configuration:
+--------------
+
+- Valid Qobuz credentials must be entered (GUI settings)
+- You can switch stream format (FLAC/Mp3)
