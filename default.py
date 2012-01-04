@@ -1032,7 +1032,6 @@ except: pass
 name = None
 try: name=urllib.unquote_plus(params["name"])
 except: pass
-
 # Call function for URL
 if mode==None:
      grooveshark.categories()

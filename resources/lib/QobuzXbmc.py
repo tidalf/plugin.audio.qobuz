@@ -136,7 +136,7 @@ class QobuzXbmc:
           # Custom menu items
           menuItems = []
           if mode == MODE_ALBUM:
-                mkplaylst=sys.argv[0]+"?mode="+str(MODE_MAKE_PLAYLIST)+"&name="+name+"&id="+str(id)
+                mkplaylst=sys.argv[0]+"?mode="+str(MODE_MAKE_PLAYLIST)+"&id="+str(id)
                 menuItems.append((__language__(30076), "XBMC.RunPlugin("+mkplaylst+")"))
           if mode == MODE_PLAYLIST:
                 rmplaylst=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
@@ -241,7 +241,8 @@ class QobuzUserPlaylists(ICacheable):
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
         for p in self._raw_data:
-            u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&name="+urllib.quote_plus(p['name'])+"&id="+str(p['id'])
+            print "Name: " + repr(p['name']) + "\n"
+            u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&id="+str(p['id'])
             item=xbmcgui.ListItem()
             item.setLabel(p['name'])
             item.setLabel2(p['owner']['name'])
@@ -284,6 +285,7 @@ class QobuzTrack(ICacheable):
     
     def play(self):
         global player
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
         listitem = xbmcgui.ListItem(self._raw_data['info']['title'])
         i = self._raw_data['info']
         a = i['album']
@@ -351,42 +353,54 @@ class QobuzPlaylist(ICacheable):
         n = self.length()
         h = int(sys.argv[1])
         #playlist.clear()
-        xbmc.executebuiltin("Playlist.Clear");
+        #xbmc.executebuiltin("Playlist.Clear");
         playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
+        #playlist.clear()
         for t in self._raw_data['tracks']:
             #pprint.pprint(t)
-	    if not t['interpreter']['name']: 
+            if not t['interpreter']['name']: 
                 t['interpreter']['name']="unknown"
 
             interpreter = urllib.quote_plus(t['interpreter']['name'].encode('utf8', 'ignore')) 
-            u=sys.argv[0]+"?mode="+str(MODE_SONG)+"&name="+urllib.quote_plus(t['title'].encode('ascii', 'ignore'))+"&id="+str(t['id']) 
+            u=sys.argv[0]+"?mode="+str(MODE_SONG)+"&id="+str(t['id']) 
                      #+"&album="+urllib.quote_plus(t['album']['title']) \
                      #+"&albumid="+urllib.quote_plus(str(t['album']['id'])) \
                      #+"&artist="+interpreter \
-                     #+"&coverart="+urllib.quote_plus(t['image']['large'].convert('ascii', 'ignore'))
+                     #+"&coverart="+urllib.quote_plus(t['image']['large'].convert('ascii', 'ignore')) 
             item = xbmcgui.ListItem()
-	    if not t['interpreter']['name'] or t['interpreter']['name'] == "unknown":
-	         interpreter_name = ""
-		 t['interpreter']['name']='unknown'
-	    else: 
+            pitem = xbmc.PlayListItem()
+            
+            if not t['interpreter']['name'] or t['interpreter']['name'] == "unknown":
+                interpreter_name = ""
+                t['interpreter']['name']='unknown'
+            else: 
                  interpreter_name = t['interpreter']['name']+" - "
 
+            (sh, sm, ss) = t['duration'].split(':')
+            duration = (int(sh)*3600 + int(sm)*60 + int(ss))
             item.setLabel(interpreter_name + t['album']['title'] + ' - ' + t['track_number'] + ' - ' + t['title'])
             #item.setLabel2(t['title'])
-            item.setInfo( type="Music", infoLabels= { 
+            position = playlist.getposition()
+            print "Position: " + repr(position) + "\n"
+            item.setInfo( type="music", infoLabels= { 
+                                                    "count": + self.id,
+                                                    "size:": '10000',
                                                    "title": t['title'], 
                                                    "artist": t['interpreter']['name'],
                                                    "album": t['album']['title'],
                                                    "tracknumber": int(t['track_number']),
                                                    "genre": t['album']['genre']['name'],
                                                    "comment": "Qobuz Stream",
+                                                   "duration": duration,
                                                    "year": int(t['album']['release_date'].split('-')[0])
                                                    })
+            playlist.add(url=u, listitem=item)
             item.setThumbnailImage(t['album']['image']['large'])
             playlist.add(url=u, listitem=item)
             xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=False, totalItems=n)
         xbmcplugin.setContent(h, 'songs')
         xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
+        #xbmc.executebuiltin('playlist.playoffset(music,0)')
 
 class Album:
     def __init__(self,qob,album_id):
