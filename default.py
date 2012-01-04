@@ -17,6 +17,7 @@
 
 
 import urllib, sys, os, shutil, re, pickle, time, tempfile, xbmcaddon, xbmcplugin, xbmcgui, xbmc
+import pprint
 
 __addon__     = xbmcaddon.Addon('plugin.audio.qobuz')
 __addonname__ = __addon__.getAddonInfo('name')
@@ -376,7 +377,8 @@ class Grooveshark:
            genre_id=64
            if (genre_id != ''):
                r = qob.getRecommandation(genre_id)
-               r.get(genre_id, self.songsearchlimit)
+               pprint.pprint(r)
+               # r.get(genre_id, self.songsearchlimit)
                if r.length() > 0:
                    r.add_to_directory()
 #                songs = groovesharkApi.getSongSearchResults(query, limit = self.songsearchlimit)
