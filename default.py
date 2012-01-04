@@ -70,6 +70,7 @@ STREAM_TIMEOUT = 30
 songMarkTime = 0
 player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 playTimer = None
+playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
 
 baseDir = __cwd__
 resDir = xbmc.translatePath(os.path.join(baseDir, 'resources'))
@@ -508,25 +509,29 @@ class Grooveshark:
                 self.categories()
                 
      # Play a song
-     def playSong(self, item):
+     def playSong(self, p_item):
           global playTimer
           global player
           player.stop()
+          item = p_item.getItem()
           if item != None:
                 url = ''
-                songid = item.getProperty('songid')
-                albumid = item.getProperty('albumid')
-                duration = int(self._getSongDuration(songid,albumid))
+                #songid = item.getProperty('songid')
+                #albumid = item.getProperty('albumid')
+                #duration = int(self._getSongDuration(songid,albumid))
 
                 # **tid
                 #stream = groovesharkApi.getSubscriberStreamKey(songid)
                 #if stream != False:
-                url = qob.Api.get_track_url(songid,"album",albumid)
+                #url = qob.Api.get_track_url(songid,"album",albumid)
                 #url = stream['url']
                 #key = stream['StreamKey']
                 #server = stream['StreamServerID']
                 #duration = self._setDuration(stream['uSecs'])
-                
+                url = p_item._raw_data['stream']['streaming_url']
+                duration = p_item.get_duration()
+                songid = p_item.id
+                albumid = p_item._raw_data['info']['album']['id']
                 if url != '':
                      item.setPath(url)
                      xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]), succeeded=True, listitem=item)
@@ -1021,6 +1026,7 @@ def get_params():
           
 # Main
 grooveshark = Grooveshark();
+qob._handle = grooveshark._handle
 
 params=get_params()
 mode=None
@@ -1070,9 +1076,10 @@ elif mode==MODE_SONG_PAGE:
      except: pass
      grooveshark.songPage(offset, label, id, name)
 
-elif mode==MODE_SONG:
+elif mode == MODE_SONG:
      t = qob.getTrack(id)
      t.play()
+     #grooveshark.playSong(t)
 #     try: album=urllib.unquote_plus(params["album"])
 #     except: pass
 #     try: artist=urllib.unquote_plus(params["artist"])

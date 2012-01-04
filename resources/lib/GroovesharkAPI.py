@@ -15,7 +15,8 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-groove.   If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2, pprint, md5, os, pickle, tempfile, time, re, simplejson, base64, sys, socket
+import urllib2, pprint, md5, os, pickle, tempfile, time, re, base64, sys, socket
+#import simplejson
 from blowfish import Blowfish
 
 SESSION_EXPIRY = 1209600 # 2 weeks
@@ -45,7 +46,7 @@ class GrooveAPI:
     def __init__(self, debug):
         
         self._debugging = debug
-        self.simplejson = simplejson
+        #self.simplejson = simplejson
         if "linux" in sys.platform.lower():
             socket.setdefaulttimeout(30)
             
