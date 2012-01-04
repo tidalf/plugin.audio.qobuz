@@ -241,7 +241,7 @@ class QobuzUserPlaylists(ICacheable):
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
         for p in self._raw_data:
-            u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&name="+urllib.quote_plus(p['name'])+"&id="+str(p['id'])
+            u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&name="+urllib.quote_plus(p['name'].encode("utf8","ignore"))+"&id="+str(p['id'])
             item=xbmcgui.ListItem()
             item.setLabel(p['name'])
             item.setLabel2(p['owner']['name'])
