@@ -29,7 +29,7 @@ class QobuzApi:
         done = False
         while done == False:
             try:
-                data = self._api_request(params,"/api.json/0.1/track/getStreamingUrl")
+                data = self._api_request(params,"/api.json/0.1/track/getStreamingUrl") 
                 done = True
             except:
                 print "try again"
