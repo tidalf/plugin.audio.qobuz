@@ -468,7 +468,7 @@ class QobuzTrack(ICacheable):
             album_id = data['info']['album']['id']
         except: pass
         data['info'] = self.Qob.Api.get_track(self.id)
-        pprint.pprint(data['info'])
+        #pprint.pprint(data['info'])
         data['stream'] = self.Qob.Api.get_track_url(self.id,
                                                     'playlist',
                                                     album_id,
@@ -525,15 +525,16 @@ class QobuzTrack(ICacheable):
         item = self.getItem()
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
         timeout = 30
+        print "Waiting song to start: "
         while timeout > 0:
-            if player.isPlayingAudio == True:
-                return
-            #print "Waiting for stream to start\n"
-            xbmc.sleep(1)
-            timeout-=1
+            if player.isPlayingAudio == False:
+                print "."
+                time.sleep(.500)
+                timeout-=.500
+            else: timeout = 0
         self.Qob.Api.report_streaming_start(self.id)
-        
-        player.onPlayBackEnded('stop_track('+str(self.id)+')')
+        print "\n"
+        #player.onPlayBackEnded('stop_track('+str(self.id)+')')
         
         
 class QobuzPlayer(xbmc.Player):
