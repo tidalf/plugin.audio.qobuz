@@ -126,6 +126,7 @@ class QobuzXbmc:
     def getQobuzSearchTracks(self):
         return QobuzSearchTracks(self)
 
+<<<<<<< HEAD
     def watchPlayback( self ):
         if not self.player.isPlayingAudio():
             self.Timer.stop()
@@ -134,6 +135,11 @@ class QobuzXbmc:
         self.Timer = threading.Timer( 6, self.watchPlayback, () )
         self.Timer.start()
         
+=======
+    def getRecommandation(self,genre_id):
+        return QobuzGetRecommandation(self)
+
+>>>>>>> origin/boom
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)
 #        audio["title"] = track['title']
@@ -286,7 +292,7 @@ class QobuzSearchTracks():
         for t in self._raw_data['results']['tracks']:
             title = _sc(t['title'])
             if t['streaming_type'] != 'full':
-                warn(self, "Skipping sample " + title)
+                warn(self, "Skipping sample " + title.encode("utf8","ignore"))
                 continue
             interpreter = _sc(t['interpreter']['name'])
             #print "Interpreter: " + interpreter + "\n"
@@ -316,6 +322,55 @@ class QobuzSearchTracks():
             xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
         xbmcplugin.setContent(h,'songs')
         #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
+
+class QobuzGetRecommandation():
+
+    def __init__(self, qob,):
+        self.Qob = qob
+        self._raw_data = {}
+        
+    def get(self, genre_id, limit = 100):
+        self._raw_data = self.Qob.Api.get_recommandations(genre_id, limit)
+        pprint.pprint(self._raw_data)
+        return self
+        
+    def length(self):
+        pprint.pprint(self._raw_data)
+        return len(self._raw_data)
+    
+    def add_to_directory(self):
+        n = self.length()
+        h = int(sys.argv[1])
+        for t in self._raw_data:
+            title = _sc(t['title'])
+            interpreter = _sc(t['subtitle'])
+            #print "Interpreter: " + interpreter + "\n"
+            #print "Title: " + t['title']
+            year = int(t['released_at'].split('-')[0]) if t['released_at'] else 0
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str(t['id'])
+            #(sh,sm,ss) = t['duration'].split(':')
+            #duration = (int(sh) * 3600 + int(sm) * 60 + int(ss))
+            item = xbmcgui.ListItem('test')
+            item.setLabel(interpreter + ' - ' + _sc(t['subtitle']) + ' - ' + _sc(t['title']))
+            item.setInfo(type="Music",infoLabels={
+                                                   #"count":+,
+                                                   "title":  title,
+                                                   "artist": interpreter,
+                                                   "album": _sc(t['subtitle']),
+                                                   # "tracknumber": '0',
+                                                   "genre": 'unavailable',
+                                                   "comment": "Qobuz Stream",
+                                                   # "duration": duration,
+                                                   "year": year
+                                                   })
+            item.setPath(u)
+            item.setProperty('Music','true')
+            item.setProperty('IsPlayable','true');
+            item.setProperty('mimetype','audio/flac')
+            item.setThumbnailImage(t['image']['large'])
+            xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
+        xbmcplugin.setContent(h,'songs')
+        #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)       
 
 
 ###############################################################################
@@ -350,7 +405,7 @@ class QobuzPlaylist(ICacheable):
         for t in self._raw_data['tracks']:
             title = _sc(t['title'])
             if t['streaming_type'] != 'full':
-                warn(self, "Skipping sample " + title)
+                warn(self, "Skipping sample " + title.encode("utf8","ignore"))
                 continue
             interpreter = _sc(t['interpreter']['name'])
             year = int(t['album']['release_date'].split('-')[0]) if t['album']['release_date'] else 0
