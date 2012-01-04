@@ -3,6 +3,8 @@ import xbmcgui
 import xbmcplugin
 from utils import _sc
 from constants import *
+from mydebug import log, info, warn
+
 ###############################################################################
 # Class QobuzSearchTracks 
 ###############################################################################
