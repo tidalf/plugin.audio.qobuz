@@ -2,9 +2,13 @@ import xbmcaddon
 import xbmcplugin
 import xbmcgui
 import xbmc
+import os,sys
+import pprint
 
 from icacheable import ICacheable
 from logging import *
+from utils import _sc
+from constants import *
 
 ###############################################################################
 # Class QobuzProduct
