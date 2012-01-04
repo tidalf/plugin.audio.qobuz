@@ -275,7 +275,7 @@ class QobuzSearchTracks():
         for t in self._raw_data['results']['tracks']:
             title = _sc(t['title'])
             if t['streaming_type'] != 'full':
-                warn(self, "Skipping sample " + title)
+                warn(self, "Skipping sample " + title.encode("utf8","ignore"))
                 continue
             interpreter = _sc(t['interpreter']['name'])
             #print "Interpreter: " + interpreter + "\n"
@@ -339,7 +339,7 @@ class QobuzPlaylist(ICacheable):
         for t in self._raw_data['tracks']:
             title = _sc(t['title'])
             if t['streaming_type'] != 'full':
-                warn(self, "Skipping sample " + title)
+                warn(self, "Skipping sample " + title.encode("utf8","ignore"))
                 continue
             interpreter = _sc(t['interpreter']['name'])
             year = int(t['album']['release_date'].split('-')[0]) if t['album']['release_date'] else 0
