@@ -237,9 +237,7 @@ class QobuzUserPlaylists(ICacheable):
         log(self, "Found " + str(n) + " playlist(s)")
         h = int(sys.argv[1])
         u = dir = None
-        xbmcplugin.setContent(h, 'files')
-        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
-        xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
+ 
         for p in self._raw_data:
             u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&id="+str(p['id'])
             item=xbmcgui.ListItem()
@@ -247,6 +245,9 @@ class QobuzUserPlaylists(ICacheable):
             item.setLabel2(p['owner']['name'])
             item.setInfo( type="Music", infoLabels={ "title": p['name'] } )
             xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True, totalItems=n)
+        xbmcplugin.setContent(h, 'songs')
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
             #dir = self.Qob._add_dir(p['name'].encode('utf8', 'ignore'),'',MODE_PLAYLIST,playlistImg,p['id'], n)
         #xbmcplugin.setContent(h, 'Playlists')
         #xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
@@ -298,7 +299,8 @@ class QobuzTrack(ICacheable):
                                    'genre': a['genre']['name'],
                                    'tracknumber': int(i['track_number']),
                                    'duration': self.get_duration(),
-                                   'mimetype': mimetype
+                                   'mimetype': mimetype,
+                                   'size' : 1024,
                                    })
         listitem.setThumbnailImage(a['image']['large'])
         listitem.setPath(self._raw_data['stream']['streaming_url'])
