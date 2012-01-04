@@ -19,6 +19,8 @@
 import urllib, sys, os, shutil, re, pickle, time, tempfile, xbmcaddon, xbmcplugin, xbmcgui, xbmc
 import pprint
 
+
+gabou = 'plop'
 __addon__     = xbmcaddon.Addon('plugin.audio.qobuz')
 __addonname__ = __addon__.getAddonInfo('name')
 __cwd__       = __addon__.getAddonInfo('path')
@@ -95,10 +97,11 @@ thumbDef = os.path.join(imgDir, 'default.tbn')
 listBackground = os.path.join(imgDir, 'listbackground.png')
 
 sys.path.append (libDir)
+
 #from GroovesharkAPI import GrooveAPI
-from QobuzXbmc import QobuzXbmc
-#,Playlist,Api,Album
-from threading import Event, Thread
+from qobuz.qobuz import QobuzXbmc
+from qobuz.api import QobuzApi
+from qobuz.constants import *
 # Parse URL parameters
 
 def get_params():
@@ -158,12 +161,13 @@ except: pass
 #     sys.exit(-1)
      
 qob = None
-try:
-    qob = QobuzXbmc()
-    settings = xbmcaddon.Addon(id='plugin.audio.qobuz')      
-    if not qob.login(settings.getSetting('username'),settings.getSetting('password')):
-        print "Cannot login, abort...\n"
-        exit(0)
+#try:
+qob = QobuzXbmc()
+settings = xbmcaddon.Addon(id='plugin.audio.qobuz')      
+if not qob.login(settings.getSetting('username'),settings.getSetting('password')):
+    print "Cannot login, abort...\n"
+    exit(0)
+try: pass
      #playlists=qob.Api.get_playlists()
      #print json.dumps(playlists,sort_keys=True, indent=4)
      #qplaylist = qob.getPlaylist(10076)
@@ -486,13 +490,24 @@ class Grooveshark:
 #
      # Get my playlists                 
      def playlists(self):
-        try:
-            user_playlists = qob.getUserPlaylists()
-            user_playlists.add_to_directory()
+        #try:
+        user_playlists = qob.getUserPlaylists()
+        user_playlists.add_to_directory()
+        try: pass
         except:
             dialog = xbmcgui.Dialog()
             dialog.ok(__language__(30008), __language__(30033))
             self.categories()
+            
+             # Get album                 
+     def product (self, id):
+         album = qob.getProduct(id)
+         album.add_to_directory()
+         try: pass
+         except:
+            dialog = xbmcgui.Dialog()
+            dialog.ok(__language__(30008), __language__(30033))
+            #self.categories()
 #         
 #     # Make songs a favorite 
 #     def favorite(self, songid):
@@ -1128,8 +1143,10 @@ elif mode == MODE_SONG:
 #elif mode==MODE_ARTIST:
 #     grooveshark.artist(id)
 #     
-#elif mode==MODE_ALBUM:
-#     grooveshark.album(id)
+elif mode==MODE_ALBUM:
+     print "Product ID: " + str(id) + "\n"
+     grooveshark.product(id)
+     
      
 elif mode==MODE_PLAYLIST:
      grooveshark.playlist(id, name)
