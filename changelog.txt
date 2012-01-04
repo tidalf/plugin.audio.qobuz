@@ -1,10 +1,9 @@
 
 0.0.1 
 -----
-Where all begin (Support favorite playlist, artist search, recommendation)
+Where it all began (Support favorite playlists, track search, recommendations)
 
------ based on XBMC Grooveshark Addon -----
+----- inspired by XBMC Grooveshark Addon (Stephen Denham) -----
 
 GrooveShark 1.0.2
 New icon for dark backgrounds. Socket timeout for Linux.
-
