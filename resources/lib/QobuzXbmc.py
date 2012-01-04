@@ -245,8 +245,8 @@ class QobuzUserPlaylists(ICacheable):
     def _fetch_data(self):
         raw_data = self.Qob.Api.get_user_playlists()
         data = []
-        for p in raw_data['tracks']:
-            data.append(p)
+        for p in raw_data:
+            data.append(p['playlist'])
         return data
 
     def length(self):

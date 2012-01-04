@@ -377,7 +377,7 @@ class Grooveshark:
            genre_id=64
            if (genre_id != ''):
                r = qob.getRecommandation(genre_id)
-               pprint.pprint(r)
+               
                # r.get(genre_id, self.songsearchlimit)
                if r.length() > 0:
                    r.add_to_directory()
