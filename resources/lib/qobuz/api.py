@@ -75,6 +75,12 @@ class QobuzApi:
     def search_tracks(self, query, limit = 100):
         params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'tracks', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/track/search")
+    
+    def report_streaming_start(self, track_id):
+        print "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id) + "\n"
+    
+    def report_streaming_stop(self, track_id):
+        print "Report Streaming stop for user:  " + str(self.userid) + ", track: " + str(track_id) + "\n"
 
 if __name__ == '__main__':
     pass

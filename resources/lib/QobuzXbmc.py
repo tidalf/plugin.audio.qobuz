@@ -1,5 +1,6 @@
 import httplib,json,time,urllib2,urllib,hashlib,mutagen
 import sys,os,shutil,re,pickle,time,tempfile,xbmcaddon,xbmcplugin,xbmcgui,xbmc
+import threading
 #from mutagen.flac import FLAC
 import pprint
 
@@ -40,7 +41,7 @@ MODE_ADD_PLAYLIST_SONG = 37
 # Loggin helper functions
 ###############################################################################
 def log(obj,msg,lvl="LOG"):
-    xbmc.log('[' + lvl + '] ' + str(type(obj)) + ": " + msg)
+    xbmc.log(_sc('[' + lvl + '] ' + str(type(obj)) + ": " + msg))
 
 def warn(obj,msg):
     if __debugging__:
@@ -125,6 +126,14 @@ class QobuzXbmc:
     def getQobuzSearchTracks(self):
         return QobuzSearchTracks(self)
 
+    def watchPlayback( self ):
+        if not self.player.isPlayingAudio():
+            self.Timer.stop()
+            exit(0)
+        print "Watching player: " + self.player.getPlayingFile() + "\n"
+        self.Timer = threading.Timer( 6, self.watchPlayback, () )
+        self.Timer.start()
+        
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)
 #        audio["title"] = track['title']
@@ -263,10 +272,12 @@ class QobuzSearchTracks():
         
     def search(self, query, limit = 100):
         self._raw_data = self.Qob.Api.search_tracks(query, limit)
-        pprint.pprint(self._raw_data)
+        #pprint.pprint(self._raw_data)
         return self
         
     def length(self):
+        if not self._raw_data['results']:
+            return 0
         return len(self._raw_data['results']['tracks'])
     
     def add_to_directory(self):
@@ -369,6 +380,7 @@ class QobuzPlaylist(ICacheable):
         #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
 
 
+
 ###############################################################################
 # Class QobuzTrack 
 #
@@ -442,20 +454,43 @@ class QobuzTrack(ICacheable):
         #item.setProperty('path', self._raw_data['stream']['streaming_url'] )
         item.setPath(self._raw_data['stream']['streaming_url'])
         return item
-
+    
+    def stop(self, id):
+        self.Qob.Api.report_streaming_stop(self.id)
+        
     # Play this track
     def play(self):
+        #global player
         player = xbmc.Player()
+        #player.set_track_id(self.id)
         item = self.getItem()
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
         timeout = 30
         while timeout > 0:
             if player.isPlayingAudio == True:
                 return
-            print "Waiting for stream to start\n"
+            #print "Waiting for stream to start\n"
             xbmc.sleep(1)
             timeout-=1
-
+        self.Qob.Api.report_streaming_start(self.id)
+        
+        player.onPlayBackEnded('stop_track('+str(self.id)+')')
+        
+        
+class QobuzPlayer(xbmc.Player):
+    def __init__(self, type):
+        super(QobuzPlayer, self).__init__(type)
+        self.id = None
+        self.last_id = None
+    
+    def onPlayBackEnded(self, id):
+        print "Stopping file with id" + str(self.last_id)
+    
+    def set_track_id(self, id):
+        if self.id:
+            self.last_id = self.id
+        self.id = id
+        
 class QobuzEncounteredAlbum(ICacheable):
     # Constructor
     def __init__(self,qob):
