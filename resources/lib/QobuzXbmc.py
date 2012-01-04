@@ -346,7 +346,7 @@ class QobuzGetRecommandation():
             #print "Interpreter: " + interpreter + "\n"
             #print "Title: " + t['title']
             year = int(t['released_at'].split('-')[0]) if t['released_at'] else 0
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str(t['id'])
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str('' + t['id'])
             #(sh,sm,ss) = t['duration'].split(':')
             #duration = (int(sh) * 3600 + int(sm) * 60 + int(ss))
             item = xbmcgui.ListItem('test')
@@ -368,7 +368,7 @@ class QobuzGetRecommandation():
             item.setProperty('mimetype','audio/flac')
             item.setThumbnailImage(t['image']['large'])
             xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
-        xbmcplugin.setContent(h,'songs')
+            xbmcplugin.setContent(h,'songs')
         #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)       
 
 
@@ -450,7 +450,7 @@ class QobuzTrack(ICacheable):
         self.id = id
         self._raw_data = []
         self.cache_path = os.path.join(self.Qob.cacheDir,
-                                        'track-' + repr(self.id) + '.dat')
+                                        'track-' + str(self.id) + '.dat')
         self.cache_refresh = 1200
         self.format_id = 6
         settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
@@ -463,10 +463,15 @@ class QobuzTrack(ICacheable):
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
         data = {}
+        album_id = ''
+        try:
+            album_id = data['info']['album']['id']
+        except: pass
         data['info'] = self.Qob.Api.get_track(self.id)
+        pprint.pprint(data['info'])
         data['stream'] = self.Qob.Api.get_track_url(self.id,
                                                     'playlist',
-                                                    data['info']['album']['id'],
+                                                    album_id,
                                                     self.format_id)
         return data
 
