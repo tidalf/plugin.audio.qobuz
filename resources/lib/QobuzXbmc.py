@@ -355,14 +355,23 @@ class QobuzPlaylist(ICacheable):
         playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
         for t in self._raw_data['tracks']:
             #pprint.pprint(t)
-            interpreter = urllib.quote_plus(t['interpreter']['name']) if t['interpreter']['name'] else 'Unknown'
+	    if not t['interpreter']['name']: 
+                t['interpreter']['name']="unknown"
+
+            interpreter = urllib.quote_plus(t['interpreter']['name'].encode('utf8', 'ignore')) 
             u=sys.argv[0]+"?mode="+str(MODE_SONG)+"&name="+urllib.quote_plus(t['title'].encode('ascii', 'ignore'))+"&id="+str(t['id']) 
                      #+"&album="+urllib.quote_plus(t['album']['title']) \
                      #+"&albumid="+urllib.quote_plus(str(t['album']['id'])) \
                      #+"&artist="+interpreter \
                      #+"&coverart="+urllib.quote_plus(t['image']['large'].convert('ascii', 'ignore'))
             item = xbmcgui.ListItem()
-            item.setLabel(t['interpreter']['name'] + ' - ' + t['album']['title'] + ' - ' + t['track_number'] + ' - ' + t['title'])
+	    if not t['interpreter']['name'] or t['interpreter']['name'] == "unknown":
+	         interpreter_name = ""
+		 t['interpreter']['name']='unknown'
+	    else: 
+                 interpreter_name = t['interpreter']['name']+" - "
+
+            item.setLabel(interpreter_name + t['album']['title'] + ' - ' + t['track_number'] + ' - ' + t['title'])
             #item.setLabel2(t['title'])
             item.setInfo( type="Music", infoLabels= { 
                                                    "title": t['title'], 
