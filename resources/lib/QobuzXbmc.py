@@ -253,7 +253,7 @@ class QobuzUserPlaylists(ICacheable):
         xbmcplugin.setPluginFanart(h,self.Qob.fanImg)
 
 ###############################################################################
-# Class QobuzSearchTracks
+# Class QobuzSearchTracks 
 ###############################################################################
 class QobuzSearchTracks():
 
