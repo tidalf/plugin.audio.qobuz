@@ -241,8 +241,10 @@ class QobuzUserPlaylists(ICacheable):
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
         for p in self._raw_data:
-            print "Name: " + repr(p['name']) + "\n"
+<<<<<<< HEAD
             u=sys.argv[0]+"?mode="+str(MODE_PLAYLIST)+"&id="+str(p['id'])
+=======
+>>>>>>> origin/boom
             item=xbmcgui.ListItem()
             item.setLabel(p['name'])
             item.setLabel2(p['owner']['name'])
