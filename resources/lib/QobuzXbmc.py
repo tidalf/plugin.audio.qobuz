@@ -28,6 +28,8 @@ MODE_ARTIST = 11
 MODE_PLAYLIST = 12
 MODE_SONG_PAGE = 13
 MODE_SIMILAR_ARTISTS = 14
+MODE_SHOW_RECOS = 15
+
 MODE_SONG = 30
 MODE_FAVORITE = 31
 MODE_UNFAVORITE = 32
@@ -126,7 +128,6 @@ class QobuzXbmc:
     def getQobuzSearchTracks(self):
         return QobuzSearchTracks(self)
 
-<<<<<<< HEAD
     def watchPlayback( self ):
         if not self.player.isPlayingAudio():
             self.Timer.stop()
@@ -134,12 +135,10 @@ class QobuzXbmc:
         print "Watching player: " + self.player.getPlayingFile() + "\n"
         self.Timer = threading.Timer( 6, self.watchPlayback, () )
         self.Timer.start()
-        
-=======
+
     def getRecommandation(self,genre_id):
         return QobuzGetRecommandation(self)
 
->>>>>>> origin/boom
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)
 #        audio["title"] = track['title']
