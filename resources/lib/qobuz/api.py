@@ -18,7 +18,7 @@ class QobuzApi:
         response_json = json.loads(response.read())
         return response_json
 
-    def get_track_url(self,track_id,context_type,context_id ,format_id=6):
+    def get_track_url(self,track_id,context_type,context_id ,format_id = 6):
         params = urllib.urlencode({
                                    'x-api-auth-token':self.authtoken,
                                    'track_id': track_id ,
@@ -43,16 +43,10 @@ class QobuzApi:
         data = self._api_request(params,"/api.json/0.1/track/get")
         return data
 
-    def get_playlists1(self):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'user_id': self.userid})
-        data = self._api_request(params,"/api.json/0.1/playlist/getUserPlaylists")
-        return self._parsePlaylists(data)
-
     def get_user_playlists(self):
         params = urllib.urlencode({'x-api-auth-token':self.authtoken,'user_id': self.userid})
         data = self._api_request(params,"/api.json/0.1/playlist/getUserPlaylists")
         return data
-
 
     def getPlaylistSongs(self,playlistID):
         result = self._callRemote('getPlaylistSongs',{'playlistID' : playlistID});

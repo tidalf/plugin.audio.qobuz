@@ -27,14 +27,14 @@ MODE_ARTIST = 11
 MODE_PLAYLIST = 12
 MODE_SONG_PAGE = 13
 MODE_SIMILAR_ARTISTS = 14
-MODE_SONG = 15
-MODE_FAVORITE = 16
-MODE_UNFAVORITE = 17
-MODE_MAKE_PLAYLIST = 18
-MODE_REMOVE_PLAYLIST = 19
-MODE_RENAME_PLAYLIST = 20
-MODE_REMOVE_PLAYLIST_SONG = 21
-MODE_ADD_PLAYLIST_SONG = 22
+MODE_SONG = 30
+MODE_FAVORITE = 31
+MODE_UNFAVORITE = 32
+MODE_MAKE_PLAYLIST = 33
+MODE_REMOVE_PLAYLIST = 34
+MODE_RENAME_PLAYLIST = 35
+MODE_REMOVE_PLAYLIST_SONG = 36
+MODE_ADD_PLAYLIST_SONG = 37
 
 ###############################################################################
 # Loggin helper functions
@@ -118,6 +118,9 @@ class QobuzXbmc:
 
     def getTrack(self,id):
         return QobuzTrack(self,id)
+    
+    def getEncounteredAlbum(self):
+        return QobuzEncounteredAlbum(self)
 
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)
@@ -174,11 +177,10 @@ class ICacheable(object):
             mtime = os.path.getmtime(self.cache_path)
         except:
             warn(self,"Cannot stat cache file: " + self.cache_path)
-
-        if (time.time() - mtime) > self.cache_refresh:
-            info(self,"Refreshing cache")
-            return None
-
+        if self.cache_refresh:
+            if (time.time() - mtime) > self.cache_refresh:
+                info(self,"Refreshing cache")
+                return None
         f = None
         try:
             f = open(self.cache_path,'rb')
@@ -264,7 +266,11 @@ class QobuzPlaylist(ICacheable):
         self.fetch_data()
 
     def _fetch_data(self):
-        return self.Qob.Api.get_playlist(self.id)['playlist']
+        #ea = self.Qob.getEncounteredAlbum()
+        data = self.Qob.Api.get_playlist(self.id)['playlist']
+        #for a in data['tracks']:
+        #    ea.add(a)
+        return data
 
     def length(self):
         return len(self._raw_data['tracks'])
@@ -380,3 +386,26 @@ class QobuzTrack(ICacheable):
         global player
         item = self.getItem()
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
+
+class QobuzEncounteredAlbum(ICacheable):
+    # Constructor
+    def __init__(self,qob):
+        self.Qob = qob
+        self._raw_data = {}
+        self.cache_path = os.path.join(self.Qob.cacheDir,
+                                        'encoutered_albums' + '.dat')
+        self.cache_refresh = None
+
+    # Methode called by parent class ICacheable when fresh data is needed
+    def _fetch_data(self):
+        return self._raw_data
+
+    def add(self, album):
+        id = str(album['id'])
+        print "Id: " + id + "\n"
+        if self._raw_data[id]:
+            info(self, "AlbumID: " + id + ' already present')
+        self._raw_data[id] = album
+        self._save_cache_data(album)
+    
+    

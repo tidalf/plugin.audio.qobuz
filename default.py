@@ -40,14 +40,14 @@ MODE_ARTIST = 11
 MODE_PLAYLIST = 12
 MODE_SONG_PAGE = 13
 MODE_SIMILAR_ARTISTS = 14
-MODE_SONG = 15
-MODE_FAVORITE = 16
-MODE_UNFAVORITE = 17
-MODE_MAKE_PLAYLIST = 18
-MODE_REMOVE_PLAYLIST = 19
-MODE_RENAME_PLAYLIST = 20
-MODE_REMOVE_PLAYLIST_SONG = 21
-MODE_ADD_PLAYLIST_SONG = 22
+MODE_SONG = 30
+MODE_FAVORITE = 31
+MODE_UNFAVORITE = 32
+MODE_MAKE_PLAYLIST = 33
+MODE_REMOVE_PLAYLIST = 34
+MODE_RENAME_PLAYLIST = 35
+MODE_REMOVE_PLAYLIST_SONG = 36
+MODE_ADD_PLAYLIST_SONG = 37
 
 ACTION_MOVE_LEFT = 1
 ACTION_MOVE_UP = 3
@@ -296,16 +296,16 @@ class Grooveshark:
           # Setup
           xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
           
-          self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
-          self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
-          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
-          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
-          # Not supported by key
-          #self._add_dir("Search for user's playlists...", '', MODE_SEARCH_PLAYLISTS, self.usersplaylistsImg, 0)
-          self._add_dir(__language__(30016), '', MODE_ARTIST_POPULAR, self.popularSongsArtistImg, 0)
-          self._add_dir(__language__(30017), '', MODE_POPULAR_SONGS, self.popularSongsImg, 0)
+#          self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
+#          self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
+#          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
+#          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
+#          # Not supported by key
+#          #self._add_dir("Search for user's playlists...", '', MODE_SEARCH_PLAYLISTS, self.usersplaylistsImg, 0)
+#          self._add_dir(__language__(30016), '', MODE_ARTIST_POPULAR, self.popularSongsArtistImg, 0)
+#          self._add_dir(__language__(30017), '', MODE_POPULAR_SONGS, self.popularSongsImg, 0)
           if (self.userid != 0):
-                self._add_dir(__language__(30018), '', MODE_FAVORITES, self.favoritesImg, 0)
+                #self._add_dir(__language__(30018), '', MODE_FAVORITES, self.favoritesImg, 0)
                 self._add_dir(__language__(30019), '', MODE_PLAYLISTS, self.playlistImg, 0)
 
      # Search for songs              
@@ -416,22 +416,14 @@ class Grooveshark:
 
      # Get my playlists                 
      def playlists(self):
-          # userid = self._get_login()
-          # if (userid != 0):
-                #playlists = groovesharkApi.getUserPlaylists()
+        try:
             user_playlists = qob.getUserPlaylists()
             user_playlists.add_to_directory()
-            playlists = qob.Api.get_playlists1()
-            if (len(playlists) > 0):
-                pass#self._add_playlists_directory(playlists)
-            else:
-                dialog = xbmcgui.Dialog()
-                dialog.ok(__language__(30008), __language__(30033))
-                self.categories()
-          #else:
-          #      dialog = xbmcgui.Dialog()
-          #      dialog.ok(__language__(30008), __language__(30034), __language__(30035))
-                     
+        except:
+            dialog = xbmcgui.Dialog()
+            dialog.ok(__language__(30008), __language__(30033))
+            self.categories()
+         
      # Make songs a favorite 
      def favorite(self, songid):
           userid = self._get_login()
