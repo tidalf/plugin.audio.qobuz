@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-#     Copyright 2011 Stephen Denham
+#     Copyright 2011 Stephen Denham, Joachim Basmaison, Cyril Leclerc
 #
-#     This file is part of xbmc-groove.
-=======
-# Copyright 2011 Stephen Denham, Joachim Basmaison, Cyril Leclerc
-
 #     This file is part of xbmc-qobuz.
->>>>>>> origin/boom
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
