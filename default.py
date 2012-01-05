@@ -1110,8 +1110,8 @@ grooveshark = Grooveshark();
 qob._handle = grooveshark._handle
 
 
-id=0
-try: id=int(params["id"])
+id=''
+try: id=params["id"]
 except: pass
 name = None
 try: name=urllib.unquote_plus(params["name"])
@@ -1181,7 +1181,7 @@ elif mode == MODE_SONG:
 #     
 elif mode==MODE_ALBUM:
      print "Product ID: " + str(id) + "\n"
-     grooveshark.product(id)
+     grooveshark.product(str(id))
      
      
 elif mode==MODE_PLAYLIST:
