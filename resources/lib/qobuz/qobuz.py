@@ -113,8 +113,8 @@ class QobuzXbmc:
         self.Timer = threading.Timer( 6, self.watchPlayback, () )
         self.Timer.start()
 
-    def getRecommandation(self,genre_id):
-        return QobuzGetRecommandation(self,genre_id)
+    def getRecommandation(self,genre_id,type):
+        return QobuzGetRecommandation(self,genre_id,type)
 
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)

@@ -44,7 +44,8 @@ MODE_PLAYLIST = 12
 MODE_SONG_PAGE = 13
 MODE_SIMILAR_ARTISTS = 14
 MODE_SHOW_RECOS = 15
-
+MODE_SHOW_RECO_T = 16
+MODE_SHOW_RECO_T_G = 17
 MODE_SONG = 30
 MODE_FAVORITE = 31
 MODE_UNFAVORITE = 32
@@ -376,11 +377,11 @@ class Grooveshark:
            else:
                 self.categories()
      
-     def ShowRecommandation(self):
+     def ShowRecommendations(self,type,genre_id):
            # query = self._get_keyboard(default="",heading=__language__(30020))
-           genre_id=64
+           # genre_id=64
            if (genre_id != ''):
-               r = qob.getRecommandation(genre_id)
+               r = qob.getRecommandation(genre_id, type)
                
                # r.get(genre_id, self.songsearchlimit)
                if r.length() > 0:
@@ -394,8 +395,28 @@ class Grooveshark:
                      self.categories()
            else:
                 self.categories()     
-     
-     
+
+     def ShowRecommendationsTypes(self):
+           # query = self._get_keyboard(default="",heading=__language__(30020))
+          xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
+          self._add_dir(__language__(30083), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=press-awards','', self.songImg, 0)
+          self._add_dir(__language__(30084), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases','', self.songImg, 0)
+          self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', self.songImg, 0)
+          self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', self.songImg, 0)
+    
+     def ShowRecommendationsGenres(self,ype):
+          self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, self.songImg, 0)
+          self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, self.songImg, 0)
+
+          
      # Search for albums
      def searchAlbums(self):
           query = self._get_keyboard(default="", heading=__language__(30022))
@@ -1103,7 +1124,22 @@ elif mode==MODE_SEARCH_SONGS:
      grooveshark.searchSongs()
 
 elif mode == MODE_SHOW_RECOS:
-     grooveshark.ShowRecommandation()  
+     grooveshark.ShowRecommendationsTypes()
+
+elif mode == MODE_SHOW_RECO_T_G:     
+     try: 
+         type=urllib.unquote_plus(params["type"])
+         genre=urllib.unquote_plus(params["genre"])
+     except: 
+         pass
+     grooveshark.ShowRecommendations(type,genre)
+     
+elif mode == MODE_SHOW_RECO_T:
+     try: 
+         type=urllib.unquote_plus(params["type"])
+     except: 
+         pass
+     grooveshark.ShowRecommendationsGenres(type)
      
 #elif mode==MODE_SEARCH_ALBUMS:
 #     grooveshark.searchAlbums()

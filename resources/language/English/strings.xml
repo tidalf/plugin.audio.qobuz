@@ -82,8 +82,21 @@
 	<string id="30079"></string>		
 	<string id="30080"></string>
 	<string id="30081"></string>		
-	<string id="30082">Show recommandations</string>		
-			
+	<string id="30082">Show recommandations</string>	
+	<string id="30083">Press awards</string>
+    <string id="30084">News</string>
+    <string id="30085">Best sellers</string>
+    <string id="30086">Editor's picks</string>
+    <string id="30087">Pop/Rock</string>
+    <string id="30088">Electro</string>
+    <string id="30089">Jazz</string>
+    <string id="30090">Chanson Française</string>
+    <string id="30091">Soul/Funk/Rap</string>
+    <string id="30092">World Music</string>
+    <string id="30093">Blues/Country/Folk</string>
+    <string id="30094">Movie Soundtracks</string>
+    <string id="30095">Classical</string>
+    <string id="30096">All of them</string>
 </strings>
 
 
