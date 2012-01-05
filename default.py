@@ -1,5 +1,5 @@
-# Copyright 2011 Stephen Denham
-
+#     Copyright 2011 Stephen Denham
+#
 #     This file is part of xbmc-groove.
 #
 #     xbmc-groove is free software: you can redistribute it and/or modify
@@ -16,7 +16,8 @@
 #     along with xbmc-groove.   If not, see <http://www.gnu.org/licenses/>.
 
 
-import urllib, sys, os, shutil, re, pickle, time, tempfile, xbmcaddon, xbmcplugin, xbmcgui, xbmc
+import urllib, sys, os, shutil, re, pickle, time, tempfile
+import xbmcaddon, xbmcplugin, xbmcgui, xbmc
 import pprint
 
 __addon__     = xbmcaddon.Addon('plugin.audio.qobuz')
@@ -127,22 +128,6 @@ mode=None
 try: mode=int(params["mode"])
 except: pass
 
-#if mode == 60:
-#    print "Plop\n"
-#    if player.isPlayingAudio() == True:
-#        diff = player.getTotalTime() - player.getTime()
-#        print "Diff: " + str(diff) + "\n"
-#        if diff <= 4:
-#            player.playnext()
-#            exit(0)
-#        else:
-#            xbmc.sleep(2)
-#            url = sys.argv[0] + '?mode=60'
-#            print "url: " + url
-#            xbmc.executebuiltin('XBMC.RunPlugin('+url+')')
-#    else:
-#        exit(0)
-    
 #if __debugging__ == 'true':
 #     __debugging__ = True
 #else:
@@ -345,8 +330,9 @@ class Grooveshark:
           xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
           
           self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
-          self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
           self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
+          self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
+
 #          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
 #          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
 #          # Not supported by key
@@ -1111,7 +1097,6 @@ class Grooveshark:
 grooveshark = Grooveshark();
 qob._handle = grooveshark._handle
 
-
 id=''
 try: id=params["id"]
 except: pass
@@ -1182,9 +1167,7 @@ elif mode == MODE_SONG:
 #     grooveshark.artist(id)
 #     
 elif mode==MODE_ALBUM:
-     print "Product ID: " + str(id) + "\n"
      grooveshark.product(str(id))
-     
      
 elif mode==MODE_PLAYLIST:
      grooveshark.playlist(id, name)
@@ -1217,7 +1200,6 @@ elif mode==MODE_PLAYLIST:
 #
 #elif mode==MODE_ADD_PLAYLIST_SONG:
 #     grooveshark.addPlaylistSong(id)              
-
 
     
 if mode < MODE_SONG:
