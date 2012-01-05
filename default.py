@@ -74,6 +74,7 @@ STREAM_MARKING_TIME = 30
 STREAM_TIMEOUT = 30
 
 songMarkTime = 0
+player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 playTimer = None
 playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
 
@@ -97,12 +98,11 @@ listBackground = os.path.join(imgDir, 'listbackground.png')
 
 sys.path.append (libDir)
 
+#from GroovesharkAPI import GrooveAPI
 from qobuz.qobuz import QobuzXbmc
-from qobuz.qobuz import QobuzPlayer
 from qobuz.api import QobuzApi
 from qobuz.constants import *
 # Parse URL parameters
-player = QobuzPlayer(xbmc.PLAYER_CORE_AUTO)
 
 def get_params():
   param=[]
