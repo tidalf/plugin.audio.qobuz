@@ -1,7 +1,10 @@
+0.0.2
+-----
+* [added features] search by artists and albums
 
 0.0.1 
 -----
-Where it all began (Support favorite playlists, track search, recommendations)
+* Where it all began (Support favorite playlists, track search, recommendations)
 
 ----- inspired by XBMC Grooveshark Addon (Stephen Denham) -----
 
