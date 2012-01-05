@@ -1,19 +1,19 @@
-# Copyright 2011 Stephen Denham
+# Copyright 2011 Stephen Denham, Joachim Basmaison, Cyril Leclerc
 
-#     This file is part of xbmc-groove.
+#     This file is part of xbmc-qobuz.
 #
-#     xbmc-groove is free software: you can redistribute it and/or modify
+#     xbmc-qobuz is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     xbmc-groove is distributed in the hope that it will be useful,
+#     xbmc-qobuz is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with xbmc-groove.   If not, see <http://www.gnu.org/licenses/>.
+#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 
 import urllib, sys, os, shutil, re, pickle, time, tempfile, xbmcaddon, xbmcplugin, xbmcgui, xbmc
@@ -202,7 +202,7 @@ except:
 #          self.__dict__.update( kwargs )
 
 # Window dialog to select a grooveshark playlist          
-class GroovesharkPlaylistSelect(xbmcgui.WindowDialog):
+class QobuzPlaylistSelect(xbmcgui.WindowDialog):
      
      def __init__(self, items=[]):
           gap = int(self.getHeight()/100)
@@ -300,7 +300,7 @@ class GroovesharkPlaylistSelect(xbmcgui.WindowDialog):
 #          return self.iterations * self.interval
 
 
-class Grooveshark:
+class Qobuz:
      
      albumImg = xbmc.translatePath(os.path.join(imgDir, 'album.png'))
      artistImg = xbmc.translatePath(os.path.join(imgDir, 'artist.png'))
@@ -1134,8 +1134,8 @@ class Grooveshark:
           
 
 # Main
-grooveshark = Grooveshark();
-qob._handle = grooveshark._handle
+qobuz = Qobuz();
+qob._handle = qobuz._handle
 
 
 id=''
@@ -1146,13 +1146,13 @@ try: name=urllib.unquote_plus(params["name"])
 except: pass
 # Call function for URL
 if mode==None:
-     grooveshark.categories()
+     qobuz.categories()
           
 elif mode==MODE_SEARCH_SONGS:
-     grooveshark.searchSongs()
+     qobuz.searchSongs()
 
 elif mode == MODE_SHOW_RECOS:
-     grooveshark.ShowRecommendationsTypes()
+     qobuz.ShowRecommendationsTypes()
 
      
 elif mode == MODE_SHOW_RECO_T_G:     
@@ -1161,20 +1161,20 @@ elif mode == MODE_SHOW_RECO_T_G:
          genre=urllib.unquote_plus(params["genre"])
      except: 
          pass
-     grooveshark.ShowRecommendations(type,genre)
+     qobuz.ShowRecommendations(type,genre)
      
 elif mode == MODE_SHOW_RECO_T:
      try: 
          type=urllib.unquote_plus(params["type"])
      except: 
          pass
-     grooveshark.ShowRecommendationsGenres(type)
+     qobuz.ShowRecommendationsGenres(type)
      
 elif mode==MODE_SEARCH_ALBUMS:
-     grooveshark.searchAlbums()
+     qobuz.searchAlbums()
      
 elif mode==MODE_SEARCH_ARTISTS:
-     grooveshark.searchArtists()
+     qobuz.searchArtists()
 #     
 #elif mode==MODE_SEARCH_ARTISTS_ALBUMS:
 #     grooveshark.searchArtistsAlbums(name)
@@ -1189,10 +1189,10 @@ elif mode==MODE_SEARCH_ARTISTS:
 #     grooveshark.artistPopularSongs()
 
 elif mode==MODE_FAVORITES:
-     grooveshark.favorites()
+     qobuz.favorites()
 
 elif mode==MODE_PLAYLISTS:
-     grooveshark.playlists()
+     qobuz.playlists()
      
 #elif mode==MODE_SONG_PAGE:
 #     try: offset=urllib.unquote_plus(params["offset"])
@@ -1206,15 +1206,15 @@ elif mode == MODE_SONG:
      t.play()
 
 elif mode==MODE_ARTIST:
-     grooveshark.artist(str(id))
+     qobuz.artist(str(id))
      
 elif mode==MODE_ALBUM:
      print "Product ID: " + str(id) + "\n"
-     grooveshark.product(str(id))
+     qobuz.product(str(id))
      
      
 elif mode==MODE_PLAYLIST:
-     grooveshark.playlist(str(id), name)
+     qobuz.playlist(str(id), name)
      
 #elif mode==MODE_FAVORITE:
 #     grooveshark.favorite(id)
