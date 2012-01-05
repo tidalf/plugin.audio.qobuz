@@ -14,24 +14,22 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
-###############################################################################
-# Interface ICacheable
-###############################################################################
 import os
 import time
 import pickle
 from mydebug import log, info, warn
 
 class ICacheable(object):
-
+    '''
+        Interface ICacheable
+    '''
     def __init__(self):
         self._raw_data = None
         self.cache_refresh = 60
         self.cache_path = None
 
     def _load_cache_data(self):
-        log(self,"Load: " + self.cache_path)
+        info(self,"Load: " + self.cache_path)
         if not os.path.exists(self.cache_path):
             return None
         mtime = None
@@ -57,8 +55,10 @@ class ICacheable(object):
         f.close()
 
     def fetch_data(self):
+        info(self, "Fetching data: " + self.cache_path)
         self._raw_data = self._load_cache_data()
         if not self._raw_data:
+            info(self, "Fetching new data")
             data = self._fetch_data()
             self._save_cache_data(data)
             self._raw_data = data
@@ -67,6 +67,12 @@ class ICacheable(object):
     def _fetch_data(self):
         assert("Need to implement fetch_data!")
 
+    def get_data(self):
+        return self._raw_data
+    
+    def length(self):
+        return len(self._raw_data)
+    
     def to_s(self):
         str = "Cache refresh: " + repr(self.cache_refresh) + "\n"
         str += "Cache path: " + self.cache_path + "\n"

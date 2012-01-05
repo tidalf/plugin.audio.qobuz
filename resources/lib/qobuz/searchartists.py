@@ -40,6 +40,12 @@ class QobuzSearchArtists():
         return self
         
     def length(self):
+        try:
+            self._raw_data['results']
+        except: return 0
+        try:
+            self._raw_data['results']['artists']
+        except: return 0
         return len(self._raw_data['results']['artists'])
     
     def add_to_directory(self):

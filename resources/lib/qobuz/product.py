@@ -30,7 +30,7 @@ class QobuzProduct(ICacheable):
     def _fetch_data(self):
         #ea = self.Qob.getEncounteredAlbum()
         data = self.Qob.Api.get_product(str(self.id))['product']
-        pprint.pprint(data)
+        #pprint.pprint(data)
         #for a in data['tracks']:
         #    ea.add(a)
         return data
@@ -39,7 +39,7 @@ class QobuzProduct(ICacheable):
         return len(self._raw_data['tracks'])
 
     def add_to_directory(self):
-        pprint.pprint(self._raw_data)
+        #pprint.pprint(self._raw_data)
         n = self.length()
         h = int(sys.argv[1])
         p = self._raw_data

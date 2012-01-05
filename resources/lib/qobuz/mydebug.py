@@ -14,17 +14,24 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+import os
 
 import xbmc
+
 from utils import _sc
-import os
-__debugging__ = 1
+from constants import __debugging__
+
 
 ###############################################################################
 # Loggin helper functions
 ###############################################################################
 def log(obj,msg,lvl="LOG"):
-    print(_sc('[' + lvl + '] ' + str(type(obj)) + ": " + msg))
+    name = None
+    try:
+        name = obj.__class__.__name__
+    except:
+        name = type(obj)
+    xbmc.log(_sc('[' + lvl + '] ' + str(name) + ": " + msg))
 
 def warn(obj,msg):
     if __debugging__:

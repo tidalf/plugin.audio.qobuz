@@ -128,33 +128,14 @@ mode=None
 try: mode=int(params["mode"])
 except: pass
 
-#if __debugging__ == 'true':
-#     __debugging__ = True
-#else:
-#     __debugging__ = False
-#
-#try:
-#     groovesharkApi = GrooveAPI(__debugging__)
-#     # SHO #
-#     #if groovesharkApi.pingService() != True:
-#     #     raise StandardError(__language__(30007))
-#     # SHO #
-#except:
-#     dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
-#     dialog.ok(__language__(30008),__language__(30009))
-#     sys.exit(-1)
-
 qob = None
 #try:
-qob = QobuzXbmc()
+qob = QobuzXbmc(baseDir)
 settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
-if not qob.login(settings.getSetting('username'),settings.getSetting('password')):
+if not qob.login(settings.getSetting('username'), settings.getSetting('password')):
   print "Cannot login, abort...\n"
   exit(0)
 try: pass
-  #playlists=qob.Api.get_playlists()
-  #print json.dumps(playlists,sort_keys=True, indent=4)
-  #qplaylist = qob.getPlaylist(10076)
 except:
   dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
   dialog.ok(__language__(30008),__language__(30009))
@@ -330,10 +311,9 @@ class Qobuz:
      xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
 
      self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
-     self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
      self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
      self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.albumImg, 0)
-
+     self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
 #          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
 #          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
 #          # Not supported by key
@@ -344,37 +324,34 @@ class Qobuz:
         #self._add_dir(__language__(30018), '', MODE_FAVORITES, self.favoritesImg, 0)
         self._add_dir(__language__(30019), '', MODE_PLAYLISTS, self.playlistImg, 0)
 
-  ####################
-  # Search for songs #
-  ####################
+  """
+  Search for songs #
+  """
   def searchSongs(self):
      query = self._get_keyboard(default="",heading=__language__(30020))
      if (query != ''):
        s = qob.getQobuzSearchTracks()
        s.search(query, self.songsearchlimit)
        if s.length() > 0:
-        s.add_to_directory()
+           s.add_to_directory()
        else:
-          dialog = xbmcgui.Dialog()
-          dialog.ok(__language__(30008),__language__(30021))
-          self.categories()
+           xbmc.executebuiltin('XBMC.Notification(' + __language__(30008) + ',' + __language__(30021)+ ', 2000, ' + thumbDef + ')')
+           self.searchSongs()
      else:
-        self.searchSongs()
-
-  #####################
+        self.categories()
+  """
   # Search for Albums #
-  #####################
+  """
   def searchAlbums(self):
      query = self._get_keyboard(default="",heading=__language__(30020))
      if (query != ''):
        s = qob.getQobuzSearchAlbums()
        s.search(query, self.songsearchlimit)
        if s.length() > 0:
-        s.add_to_directory()
+           s.add_to_directory()
        else:
-          dialog = xbmcgui.Dialog()
-          dialog.ok(__language__(30008),__language__(30021))
-          self.categories()
+           xbmc.executebuiltin('XBMC.Notification(' + __language__(30008) + ',' + __language__(30021)+ ', 2000, ' + thumbDef + ')')
+           self.searchAlbums()
      else:
         self.categories()
 
@@ -384,21 +361,21 @@ class Qobuz:
        s = qob.getQobuzSearchArtists()
        s.search(query, self.songsearchlimit)
        if s.length() > 0:
-        s.add_to_directory()
+           s.add_to_directory()
        else:
-          dialog = xbmcgui.Dialog()
-          dialog.ok(__language__(30008),__language__(30021))
-          self.categories()
+           xbmc.executebuiltin('XBMC.Notification(' + __language__(30008) + ',' + __language__(30021)+ ', 2000, ' + thumbDef + ')')
+           self.searchAlbums()
      else:
         self.categories()
 
 
-  def ShowRecommendations(self,type,genre_id):
+  def showRecommendations(self, type, genre_id):
      # query = self._get_keyboard(default="",heading=__language__(30020))
      # genre_id=64
+     xbmc.log("showRecommendation")
      if (genre_id != ''):
        r = qob.getRecommandation(genre_id, type)
-
+       r.fetch_data()
        # r.get(genre_id, self.songsearchlimit)
        if r.length() > 0:
          r.add_to_directory()
@@ -408,11 +385,11 @@ class Qobuz:
        else:
           dialog = xbmcgui.Dialog()
           dialog.ok(__language__(30008),__language__(30021))
-          self.categories()
-     else:
-        self.categories()
+          self.showRecommendationsGenres(type)
+#     else:
+#        self.categories()
 
-  def ShowRecommendationsTypes(self):
+  def showRecommendationsTypes(self):
      # query = self._get_keyboard(default="",heading=__language__(30020))
      xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
      self._add_dir(__language__(30083), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=press-awards','', self.songImg, 0)
@@ -420,7 +397,7 @@ class Qobuz:
      self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', self.songImg, 0)
      self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', self.songImg, 0)
 
-  def ShowRecommendationsGenres(self,ype):
+  def showRecommendationsGenres(self,type):
      self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, self.songImg, 0)
      self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, self.songImg, 0)
      self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, self.songImg, 0)
@@ -1044,86 +1021,14 @@ class Qobuz:
      dir.addContextMenuItems(menuItems, replaceItems=False)
 
      return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)
-#
-#     def _getSavedSongs(self):
-#          path = os.path.join(cacheDir, 'songs.dmp')
-#          try:
-#                f = open(path, 'rb')
-#                songs = pickle.load(f)
-#                f.close()
-#          except:
-#                songs = []
-#                pass
-#          return songs
-#
-#     def _setSavedSongs(self, songs):
-#          try:
-#                # Create the 'data' directory if it doesn't exist.
-#                if not os.path.exists(cacheDir):
-#                     os.makedirs(cacheDir)
-#                path = os.path.join(cacheDir, 'songs.dmp')
-#                f = open(path, 'wb')
-#                pickle.dump(songs, f, protocol=pickle.HIGHEST_PROTOCOL)
-#                f.close()
-#          except:
-#                xbmc.log("An error occurred saving songs")
-#                pass
-#
-#     def _getSongDuration(self, songid, albumid):
-#          id = int(songid)
-#          duration = -1
-#          durations = []
-#          path = os.path.join(cacheDir, 'duration.dmp')
-#          try:
-#                f = open(path, 'rb')
-#                durations = pickle.load(f)
-#                for song in durations:
-#                     if song[0] == id:
-#                          duration = song[1]
-#                          break;
-#                f.close()
-#          except:
-#                pass
-#
-#          # Not in cache
-#          if duration < 0:
-#            durationstring = qob.Api.get_track(songid)['duration']
-#            values = durationstring.split(":")
-#            duration = int(values[0])*3600 + int(values[1])*60 + int(values[2])
-#            song = [id, duration]
-#            self._setSongDuration(song, durations)
-#
-#          return duration
-#
-#     def _setSongDuration(self, song, durations):
-#          try:
-#                durations.append(song)
-#                # Create the cache directory if it doesn't exist.
-#                if not os.path.exists(cacheDir):
-#                     os.makedirs(cacheDir)
-#                path = os.path.join(cacheDir, 'duration.dmp')
-#                f = open(path, 'wb')
-#                pickle.dump(durations, f, protocol=pickle.HIGHEST_PROTOCOL)
-#                f.close()
-#          except:
-#                xbmc.log("An error occurred saving duration")
-#                pass
-#
-#     # Duration to seconds
-#     def _setDuration(self, secs):
-#          #if usecs < 60000000:
-#          #  usecs = usecs * 10 # Some durations are 10x to small
-#          return secs
 
-
-
-
-# Main
+'''
+Main
+'''
 qobuz = Qobuz();
 qob._handle = qobuz._handle
-
 id=''
-try: id=str(params["id"])
+try: id = str(params["id"])
 except: pass
 name = None
 try: name=urllib.unquote_plus(params["name"])
@@ -1136,99 +1041,45 @@ elif mode==MODE_SEARCH_SONGS:
   qobuz.searchSongs()
 
 elif mode == MODE_SHOW_RECOS:
-  qobuz.ShowRecommendationsTypes()
-
+  qobuz.showRecommendationsTypes()
 
 elif mode == MODE_SHOW_RECO_T_G:
-  try:
-    type=urllib.unquote_plus(params["type"])
-    genre=urllib.unquote_plus(params["genre"])
-  except:
-    pass
-  qobuz.ShowRecommendations(type,genre)
+    try:
+        type=urllib.unquote_plus(params["type"])
+        genre=urllib.unquote_plus(params["genre"])
+    except: pass
+    qobuz.showRecommendations(type,genre)
 
 elif mode == MODE_SHOW_RECO_T:
-  try:
-    type=urllib.unquote_plus(params["type"])
-  except:
-    pass
-  qobuz.ShowRecommendationsGenres(type)
+    try:
+        type=urllib.unquote_plus(params["type"])
+    except: pass
+    qobuz.showRecommendationsGenres(type)
 
 elif mode==MODE_SEARCH_ALBUMS:
-  qobuz.searchAlbums()
+    qobuz.searchAlbums()
 
 elif mode==MODE_SEARCH_ARTISTS:
-  qobuz.searchArtists()
-#
-#elif mode==MODE_SEARCH_ARTISTS_ALBUMS:
-#     grooveshark.searchArtistsAlbums(name)
-#
-#elif mode==MODE_SEARCH_PLAYLISTS:
-#     grooveshark.searchPlaylists()
-#
-#elif mode==MODE_POPULAR_SONGS:
-#     grooveshark.popularSongs()
-#
-#elif mode==MODE_ARTIST_POPULAR:
-#     grooveshark.artistPopularSongs()
+    qobuz.searchArtists()
 
 elif mode==MODE_FAVORITES:
-  qobuz.favorites()
+    qobuz.favorites()
 
 elif mode==MODE_PLAYLISTS:
-  qobuz.playlists()
-
-#elif mode==MODE_SONG_PAGE:
-#     try: offset=urllib.unquote_plus(params["offset"])
-#     except: pass
-#     try: label=urllib.unquote_plus(params["label"])
-#     except: pass
-#     grooveshark.songPage(offset, label, id, name)
+    qobuz.playlists()
 
 elif mode == MODE_SONG:
-  t = qob.getTrack(str(id))
-  t.play()
+    t = qob.getTrack(str(id))
+    t.play()
 
 elif mode==MODE_ARTIST:
   qobuz.artist(str(id))
 
 elif mode==MODE_ALBUM:
-  print "Product ID: " + str(id) + "\n"
   qobuz.product(str(id))
-
 
 elif mode==MODE_PLAYLIST:
   qobuz.playlist(str(id), name)
-
-#elif mode==MODE_FAVORITE:
-#     grooveshark.favorite(id)
-
-#elif mode==MODE_UNFAVORITE:
-#     try: prevMode=int(urllib.unquote_plus(params["prevmode"]))
-#     except:
-#          prevMode = 0
-#     grooveshark.unfavorite(id, prevMode)
-#
-#elif mode==MODE_SIMILAR_ARTISTS:
-#     grooveshark.similarArtists(id)
-#
-#elif mode==MODE_MAKE_PLAYLIST:
-#     grooveshark.makePlaylist(id, name)
-#
-#elif mode==MODE_REMOVE_PLAYLIST:
-#     grooveshark.removePlaylist(id, name)
-#
-#elif mode==MODE_RENAME_PLAYLIST:
-#     grooveshark.renamePlaylist(id, name)
-#
-#elif mode==MODE_REMOVE_PLAYLIST_SONG:
-#     try: playlistID=urllib.unquote_plus(params["playlistid"])
-#     except: pass
-#     grooveshark.removePlaylistSong(playlistID, name, id)
-#
-#elif mode==MODE_ADD_PLAYLIST_SONG:
-#     grooveshark.addPlaylistSong(id)
-
 
 if mode < MODE_SONG:
   xbmcplugin.endOfDirectory(int(sys.argv[1]))

@@ -9,14 +9,14 @@ from mydebug import log, info, warn
 from utils import _sc
 
 
-###############################################################################
-# Class QobuzTrack 
-#
-# @summary: Manage one qobuz track
-# @param qob: parent
-# @param id: track id
-# @return: New QobuzTrack 
-###############################################################################
+'''
+ Class QobuzTrack 
+
+ @summary: Manage one qobuz track
+ @param qob: parent
+ @param id: track id
+ @return: New QobuzTrack 
+'''
 class QobuzTrack(ICacheable):
     # Constructor
     def __init__(self,qob,id):
@@ -99,14 +99,13 @@ class QobuzTrack(ICacheable):
         item = self.getItem()
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
         timeout = 30
-        print "Waiting song to start: "
+        info(self, "Waiting song to start")
         while timeout > 0:
             if player.isPlayingAudio == False:
-                print "."
                 time.sleep(.500)
                 timeout-=.500
             else: timeout = 0
+        info(self, "Song started")
         self.Qob.Api.report_streaming_start(self.id)
-        print "\n"
         #player.onPlayBackEnded('stop_track('+str(self.id)+')')
         

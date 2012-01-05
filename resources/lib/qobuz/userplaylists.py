@@ -7,9 +7,10 @@ from icacheable import ICacheable
 from mydebug import log, info, warn
 from constants import *
 from easytag import EasyMediaTag, EasyMediaTag_UserPlaylists
-###############################################################################
-# Class QobuzUserPLaylists
-###############################################################################
+
+'''
+    Class QobuzUserPLaylists
+'''
 class QobuzUserPlaylists(ICacheable):
 
     def __init__(self,qob):
@@ -46,13 +47,3 @@ class QobuzUserPlaylists(ICacheable):
         xbmcplugin.setContent(h,'songs')
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.setPluginFanart(h,self.Qob.fanImg)
-#        for p in self._raw_data:
-#            u = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST) + "&id=" + str(p['id'])
-#            item = xbmcgui.ListItem()
-#            item.setLabel(p['name'])
-#            item.setLabel2(p['owner']['name'])
-#            item.setInfo(type="Music",infoLabels={ "title": p['name'] })
-#            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
-#        xbmcplugin.setContent(h,'songs')
-#        xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-#        xbmcplugin.setPluginFanart(h,self.Qob.fanImg)

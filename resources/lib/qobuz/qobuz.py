@@ -1,5 +1,5 @@
-# Copyright 2011 Joachim Basmaison, Cyril Leclerc
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
 #     This file is part of xbmc-qobuz.
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify
@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 import os
 import sys
 
@@ -37,22 +36,23 @@ from searchtracks import QobuzSearchTracks
 from searchalbums import QobuzSearchAlbums
 from searchartists import QobuzSearchArtists
 
-###############################################################################
-# Class QobuzXbmc
-###############################################################################
+"""
+ Class QobuzXbmc
+"""
 class QobuzXbmc:
     fanImg = xbmc.translatePath(os.path.join('resources/img/','playlist.png'))
-    def __init__(self):
+    def __init__(self, baseDir):
         self.data = ""
         self.conn = ""
         self.Api = QobuzApi(self)
         self.__playlists = {}
         self._handle = int(sys.argv[1])
-        self.cacheDir = os.path.join(tempfile.gettempdir(),'qobuz_xbmc')
+        self.baseDir = baseDir
+        self.cacheDir = os.path.join(xbmc.translatePath('special://temp/'), os.path.basename(self.baseDir))
         info(self, "cacheDir: " + self.cacheDir)
         if os.path.isdir(self.cacheDir) == False:
             os.makedirs(self.cacheDir)
-            info("Make cache directory: " + self.cacheDir)
+            info(self, "Make cache directory: " + self.cacheDir)
 
     def login(self,user,password):
         info(self, "Try to login as user: " + user)
@@ -87,22 +87,24 @@ class QobuzXbmc:
     
     def getQobuzSearchArtists(self):
         return QobuzSearchArtists(self)
-    
+
     def getProductsFromArtist(self):
         return QobuzSearchAlbums(self)
-    
+
     def watchPlayback( self ):
         if not self.player.isPlayingAudio():
             self.Timer.stop()
             exit(0)
-        print "Watching player: " + self.player.getPlayingFile() + "\n"
+        info(self, "Watching player: " + self.player.getPlayingFile())
         self.Timer = threading.Timer( 6, self.watchPlayback, () )
         self.Timer.start()
 
-
     def getRecommandation(self,genre_id):
         return QobuzGetRecommandation(self, genre_id)
-    
+
+    def getRecommandation(self, genre_id,type):
+        return QobuzGetRecommandation(self, genre_id, type)
+
 #    def download_track_withurl(self,file_name,url):
 #        u = urllib2.urlopen(url)
 #        f = open(file_name, 'wb')
@@ -122,11 +124,7 @@ class QobuzXbmc:
 #            print status,
 #        f.close()
 #        u.close()
-
-    def getRecommandation(self, genre_id,type):
-        return QobuzGetRecommandation(self, genre_id, type)
-
-
+#
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)
 #        audio["title"] = track['title']
@@ -161,154 +159,3 @@ class QobuzXbmc:
 #            self.tag_track(track,file_name,album_title)
 #        else:
 #            self.tag_track(track,file_name)
-
-#===============================================================================
-# class QobuzGetRecommandation():
-# 
-#    def __init__(self, qob,):
-#        self.Qob = qob
-#        self._raw_data = {}
-#        
-#    def get(self, genre_id, limit = 100):
-#        self._raw_data = self.Qob.Api.get_recommandations(genre_id, limit)
-#        pprint.pprint(self._raw_data)
-#        return self
-#        
-#    def length(self):
-#        pprint.pprint(self._raw_data)
-#        return len(self._raw_data)
-#    
-#    def add_to_directory(self):
-#        n = self.length()
-#        h = int(sys.argv[1])
-#        for t in self._raw_data:
-#            title = _sc(t['title'])
-#            interpreter = _sc(t['subtitle'])
-#            #print "Interpreter: " + interpreter + "\n"
-#            #print "Title: " + t['title']
-#            year = int(t['released_at'].split('-')[0]) if t['released_at'] else 0
-#            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str('' + t['id'])
-#            #(sh,sm,ss) = t['duration'].split(':')
-#            #duration = (int(sh) * 3600 + int(sm) * 60 + int(ss))
-#            item = xbmcgui.ListItem('test')
-#            item.setLabel(interpreter + ' - ' + _sc(t['subtitle']) + ' - ' + _sc(t['title']))
-#            item.setInfo(type="Music",infoLabels={
-#                                                   #"count":+,
-#                                                   "title":  title,
-#                                                   "artist": interpreter,
-#                                                   "album": _sc(t['subtitle']),
-#                                                   # "tracknumber": '0',
-#                                                   "genre": 'unavailable',
-#                                                   "comment": "Qobuz Stream",
-#                                                   # "duration": duration,
-#                                                   "year": year
-#                                                   })
-#            item.setPath(u)
-#            item.setProperty('Music','true')
-#            item.setProperty('IsPlayable','true');
-#            item.setProperty('mimetype','audio/flac')
-#            item.setThumbnailImage(t['image']['large'])
-#            xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
-#            xbmcplugin.setContent(h,'songs')
-#        #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)       
-#===============================================================================
-
-
-
-###############################################################################
-# Class QobuzAlbum
-###############################################################################
-#class QobuzAlbum(ICacheable):
-#
-#    def __init__(self, qob, id):
-#        self.Qob = qob
-#        self.id = id
-#        self._raw_data = []
-#        self.cache_path = os.path.join(
-#                                        self.Qob.cacheDir,
-#                                        'album-' + str(self.id) + '.dat'
-#        )
-#        self.cache_refresh = 600
-#        self.fetch_data()
-#
-#    def _fetch_data(self):
-#        #ea = self.Qob.getEncounteredAlbum()
-#        data = self.Qob.Api.get_product(self.id)
-#        #for a in data['tracks']:
-#        #    ea.add(a)
-#        return data
-#
-#    def length(self):
-#        return len(self._raw_data['tracks'])
-#
-#    def add_to_directory(self):
-#        n = self.length()
-#        h = int(sys.argv[1])
-#        for t in self._raw_data['tracks']:
-#            title = _sc(t['title'])
-#            if t['streaming_type'] != 'full':
-#                warn(self, "Skipping sample " + title.encode("utf8","ignore"))
-#                continue
-#            interpreter = _sc(t['interpreter']['name'])
-#            year = int(t['album']['release_date'].split('-')[0]) if t['album']['release_date'] else 0
-#            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str(t['id'])
-#            (sh,sm,ss) = t['duration'].split(':')
-#            duration = (int(sh) * 3600 + int(sm) * 60 + int(ss))
-#            item = xbmcgui.ListItem('test')
-#            item.setLabel(interpreter + ' - ' + t['album']['title'] + ' - ' + t['track_number'] + ' - ' + t['title'])
-#            item.setInfo(type="Music",infoLabels={
-#                                                    "count":+self.id,
-#                                                   "title":  title,
-#                                                   "artist": interpreter,
-#                                                   "album": _sc(t['album']['title']),
-#                                                   "tracknumber": int(t['track_number']),
-#                                                   "genre": _sc(t['album']['genre']['name']),
-#                                                   "comment": "Qobuz Stream",
-#                                                   "duration": duration,
-#                                                   "year": year
-#                                                   })
-#            item.setPath(u)
-#            item.setProperty('Music','true')
-#            item.setProperty('IsPlayable','true');
-#            item.setProperty('mimetype','audio/flac')
-#            item.setThumbnailImage(t['album']['image']['large'])
-#            xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
-#        xbmcplugin.setContent(h,'songs')
-#        #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
-
-
-class QobuzPlayer(xbmc.Player):
-    def __init__(self, type):
-        super(QobuzPlayer, self).__init__(type)
-        self.id = None
-        self.last_id = None
-    
-    def onPlayBackEnded(self, id):
-        print "Stopping file with id" + str(self.last_id)
-    
-    def set_track_id(self, id):
-        if self.id:
-            self.last_id = self.id
-        self.id = id
-        
-class QobuzEncounteredAlbum(ICacheable):
-    # Constructor
-    def __init__(self,qob):
-        self.Qob = qob
-        self._raw_data = {}
-        self.cache_path = os.path.join(self.Qob.cacheDir,
-                                        'encoutered_albums' + '.dat')
-        self.cache_refresh = None
-
-    # Methode called by parent class ICacheable when fresh data is needed
-    def _fetch_data(self):
-        return self._raw_data
-
-    def add(self, album):
-        id = str(album['id'])
-        print "Id: " + id + "\n"
-        if self._raw_data[id]:
-            info(self, "AlbumID: " + id + ' already present')
-        self._raw_data[id] = album
-        self._save_cache_data(album)
-    

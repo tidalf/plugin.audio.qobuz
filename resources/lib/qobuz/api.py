@@ -18,6 +18,8 @@
 import httplib,json,time,urllib2,urllib,hashlib,mutagen
 from mutagen.flac import FLAC
 import pprint
+from constants import __debugging__
+from mydebug import log, info, warn
 
 class QobuzApi:
 
@@ -27,9 +29,10 @@ class QobuzApi:
         self.authtoken = None
         self.userid = None
 
-    def _api_request(self,params,uri):
+    def _api_request(self, params, uri):
         self.conn = httplib.HTTPConnection("player.qobuz.com")
-        self.conn.request("POST",uri,params,self.headers)
+        self.conn.request("POST", uri, params, self.headers)
+        info(self, "Get " + uri + ' / ' + params)
         response = self.conn.getresponse()
         response_json = json.loads(response.read())
         try:
@@ -85,7 +88,6 @@ class QobuzApi:
             return self._parseSongs(result)
         else:
             return []
-
 
     def get_playlist(self,playlist_id=39837):
         params = urllib.urlencode({'x-api-auth-token':self.authtoken,'playlist_id':playlist_id,'extra':'tracks'})

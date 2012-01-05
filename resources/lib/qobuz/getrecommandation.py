@@ -1,5 +1,5 @@
-# Copyright 2011 Joachim Basmaison, Cyril Leclerc
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
 #     This file is part of xbmc-qobuz.
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify
@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 import sys
 import os
 import xbmcgui
@@ -24,30 +23,33 @@ import pprint
 
 from mydebug import log, info, warn
 from constants import *
+from icacheable import ICacheable
 
-class QobuzGetRecommandation():
+"""
+    Class QobuzGetRecommendation
+"""
+class QobuzGetRecommandation(ICacheable):
 
-    def __init__(self,qob,genre_id,type='new-releases'):
+    def __init__(self, qob, genre_id, type ='new-releases', limit = 100):
         self.Qob = qob
         self._raw_data = []
-        self.cache_path = os.path.join(self.Qob.cacheDir,'recommandations.dat')
+        self.cache_path = os.path.join(self.Qob.cacheDir, 'recommandations-' + genre_id + '-' + type + '.dat')
         self.cache_refresh = 600
-        self._raw_data = self._fetch_data(genre_id,type)
-
-    def _fetch_data(self,genre_id, type, limit=100):
-        return self.Qob.Api.get_recommandations(genre_id, type,limit)
-    
-    def length(self):
-        return len(self._raw_data)
+        self.genre_id = genre_id
+        self.type = type
+        self.limit = limit 
+        
+    def _fetch_data(self):
+        return self.Qob.Api.get_recommandations(self.genre_id, self.type, self.limit)
 
     def add_to_directory(self):
+        data = self.fetch_data()
         n = self.length()
-        log(self,"Found " + str(n) + " albums(s)")
+        info(self,"Found " + str(n) + " albums(s)")
         h = int(sys.argv[1])
         u = dir = None
 
-        for p in self._raw_data:
-            pprint.pprint(p)
+        for p in data:
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(p['id'])
             item = xbmcgui.ListItem()
             year = int(p['released_at'].split('-')[0]) if p['released_at'] else 0
@@ -56,7 +58,7 @@ class QobuzGetRecommandation():
             item.setLabel2(p['title'])
             item.setInfo(type="Music",infoLabels={ "title": p['title'] })
             item.setThumbnailImage(p['image']['large'])
-            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
+            xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, isFolder=True, totalItems=n)
         xbmcplugin.setContent(h,'songs')
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.setPluginFanart(h,self.Qob.fanImg)
