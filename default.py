@@ -1,19 +1,25 @@
+<<<<<<< HEAD
 #     Copyright 2011 Stephen Denham
 #
 #     This file is part of xbmc-groove.
+=======
+# Copyright 2011 Stephen Denham, Joachim Basmaison, Cyril Leclerc
+
+#     This file is part of xbmc-qobuz.
+>>>>>>> origin/boom
 #
-#     xbmc-groove is free software: you can redistribute it and/or modify
+#     xbmc-qobuz is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
 #
-#     xbmc-groove is distributed in the hope that it will be useful,
+#     xbmc-qobuz is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with xbmc-groove.   If not, see <http://www.gnu.org/licenses/>.
+#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 
 import urllib, sys, os, shutil, re, pickle, time, tempfile
@@ -105,23 +111,23 @@ from qobuz.constants import *
 # Parse URL parameters
 
 def get_params():
-    param=[]
-    paramstring=sys.argv[2]
-    if __debugging__ :
-          xbmc.log(paramstring)
-    if len(paramstring)>=2:
-          params=sys.argv[2]
-          cleanedparams=params.replace('?','')
-          if (params[len(params)-1]=='/'):
-                params=params[0:len(params)-2]
-          pairsofparams=cleanedparams.split('&')
-          param={}
-          for i in range(len(pairsofparams)):
-                splitparams={}
-                splitparams=pairsofparams[i].split('=')
-                if (len(splitparams))==2:
-                     param[splitparams[0]]=splitparams[1]
-    return param
+  param=[]
+  paramstring=sys.argv[2]
+  if __debugging__ :
+     xbmc.log(paramstring)
+  if len(paramstring)>=2:
+     params=sys.argv[2]
+     cleanedparams=params.replace('?','')
+     if (params[len(params)-1]=='/'):
+        params=params[0:len(params)-2]
+     pairsofparams=cleanedparams.split('&')
+     param={}
+     for i in range(len(pairsofparams)):
+        splitparams={}
+        splitparams=pairsofparams[i].split('=')
+        if (len(splitparams))==2:
+          param[splitparams[0]]=splitparams[1]
+  return param
 
 params=get_params()
 mode=None
@@ -143,22 +149,22 @@ except: pass
 #     dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
 #     dialog.ok(__language__(30008),__language__(30009))
 #     sys.exit(-1)
-     
+
 qob = None
 #try:
 qob = QobuzXbmc()
-settings = xbmcaddon.Addon(id='plugin.audio.qobuz')      
+settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
 if not qob.login(settings.getSetting('username'),settings.getSetting('password')):
-    print "Cannot login, abort...\n"
-    exit(0)
+  print "Cannot login, abort...\n"
+  exit(0)
 try: pass
-     #playlists=qob.Api.get_playlists()
-     #print json.dumps(playlists,sort_keys=True, indent=4)
-     #qplaylist = qob.getPlaylist(10076)
+  #playlists=qob.Api.get_playlists()
+  #print json.dumps(playlists,sort_keys=True, indent=4)
+  #qplaylist = qob.getPlaylist(10076)
 except:
-     dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
-     dialog.ok(__language__(30008),__language__(30009))
-     sys.exit(-1)
+  dialog = xbmcgui.Dialog(__language__(30008),__language__(30009),__language__(30010))
+  dialog.ok(__language__(30008),__language__(30009))
+  sys.exit(-1)
 
 ## Mark song as playing or played
 #def markSong(songid, duration, streamKey, streamServerID):
@@ -181,74 +187,74 @@ except:
 #     else:
 #          playTimer.cancel()
 #          songMarkTime = 0
-#                
+#
 #class _Info:
 #     def __init__( self, *args, **kwargs ):
 #          self.__dict__.update( kwargs )
 
-# Window dialog to select a grooveshark playlist          
-class GroovesharkPlaylistSelect(xbmcgui.WindowDialog):
-     
-     def __init__(self, items=[]):
-          gap = int(self.getHeight()/100)
-          w = int(self.getWidth()*0.5)
-          h = self.getHeight()-30*gap
-          rw = self.getWidth()
-          rh = self.getHeight()
-          x = rw/2 - w/2
-          y = rh/2 -h/2
-          
-          self.imgBg = xbmcgui.ControlImage(x+gap, 5*gap+y, w-2*gap, h-5*gap, listBackground)
-          self.addControl(self.imgBg)
+# Window dialog to select a grooveshark playlist
+class QobuzPlaylistSelect(xbmcgui.WindowDialog):
 
-          self.playlistControl = xbmcgui.ControlList(2*gap+x, y+3*gap+30, w-4*gap, h-10*gap, textColor='0xFFFFFFFF', selectedColor='0xFFFF4242', itemTextYOffset=0, itemHeight=50, alignmentY = 0)
-          self.addControl(self.playlistControl)
+  def __init__(self, items=[]):
+     gap = int(self.getHeight()/100)
+     w = int(self.getWidth()*0.5)
+     h = self.getHeight()-30*gap
+     rw = self.getWidth()
+     rh = self.getHeight()
+     x = rw/2 - w/2
+     y = rh/2 -h/2
 
-          self.lastPos = 0
-          self.isSelecting = False
-          self.selected = -1
-          listitems = []
-          for playlist in items:
-                listitems.append(xbmcgui.ListItem(playlist[0]))
-          listitems.append(xbmcgui.ListItem(__language__(30011)))
-          self.playlistControl.addItems(listitems)
-          self.setFocus(self.playlistControl)
-          self.playlistControl.selectItem(0)
-          item = self.playlistControl.getListItem(self.lastPos)
-          item.select(True)
+     self.imgBg = xbmcgui.ControlImage(x+gap, 5*gap+y, w-2*gap, h-5*gap, listBackground)
+     self.addControl(self.imgBg)
 
-     # Highlight selected item
-     def setHighlight(self):
-          if self.isSelecting:
-                return
-          else:
-                self.isSelecting = True
-          
-          pos = self.playlistControl.getSelectedPosition()
-          if pos >= 0:
-                item = self.playlistControl.getListItem(self.lastPos)
-                item.select(False)
-                item = self.playlistControl.getListItem(pos)
-                item.select(True)
-                self.lastPos = pos
-          self.isSelecting = False
+     self.playlistControl = xbmcgui.ControlList(2*gap+x, y+3*gap+30, w-4*gap, h-10*gap, textColor='0xFFFFFFFF', selectedColor='0xFFFF4242', itemTextYOffset=0, itemHeight=50, alignmentY = 0)
+     self.addControl(self.playlistControl)
 
-     # Control - select
-     def onControl(self, control):
-          if control == self.playlistControl:
-                self.selected = self.playlistControl.getSelectedPosition()
-                self.close()
+     self.lastPos = 0
+     self.isSelecting = False
+     self.selected = -1
+     listitems = []
+     for playlist in items:
+        listitems.append(xbmcgui.ListItem(playlist[0]))
+     listitems.append(xbmcgui.ListItem(__language__(30011)))
+     self.playlistControl.addItems(listitems)
+     self.setFocus(self.playlistControl)
+     self.playlistControl.selectItem(0)
+     item = self.playlistControl.getListItem(self.lastPos)
+     item.select(True)
 
-     # Action - close or up/down             
-     def onAction(self, action):
-          if action == ACTION_PREVIOUS_MENU:
-                self.selected = -1
-                self.close()
-          elif action == ACTION_MOVE_UP or action == ACTION_MOVE_DOWN or action == ACTION_PAGE_UP or action == ACTION_PAGE_DOWN == 6:
-                self.setFocus(self.playlistControl)
-                self.setHighlight()
+  # Highlight selected item
+  def setHighlight(self):
+     if self.isSelecting:
+        return
+     else:
+        self.isSelecting = True
 
- 
+     pos = self.playlistControl.getSelectedPosition()
+     if pos >= 0:
+        item = self.playlistControl.getListItem(self.lastPos)
+        item.select(False)
+        item = self.playlistControl.getListItem(pos)
+        item.select(True)
+        self.lastPos = pos
+     self.isSelecting = False
+
+  # Control - select
+  def onControl(self, control):
+     if control == self.playlistControl:
+        self.selected = self.playlistControl.getSelectedPosition()
+        self.close()
+
+  # Action - close or up/down
+  def onAction(self, action):
+     if action == ACTION_PREVIOUS_MENU:
+        self.selected = -1
+        self.close()
+     elif action == ACTION_MOVE_UP or action == ACTION_MOVE_DOWN or action == ACTION_PAGE_UP or action == ACTION_PAGE_DOWN == 6:
+        self.setFocus(self.playlistControl)
+        self.setHighlight()
+
+
 #class PlayTimer(Thread):
 #     # interval -- floating point number specifying the number of seconds to wait before executing function
 #     # function -- the function (or callable object) to be executed
@@ -256,7 +262,7 @@ class GroovesharkPlaylistSelect(xbmcgui.WindowDialog):
 #     # iterations -- integer specifying the number of iterations to perform
 #     # args -- list of positional arguments passed to function
 #     # kwargs -- dictionary of keyword arguments passed to function
-#     
+#
 #     def __init__(self, interval, function, iterations=0, args=[], kwargs={}):
 #          Thread.__init__(self)
 #          self.interval = interval
@@ -265,7 +271,7 @@ class GroovesharkPlaylistSelect(xbmcgui.WindowDialog):
 #          self.args = args
 #          self.kwargs = kwargs
 #          self.finished = Event()
-# 
+#
 #     def run(self):
 #          count = 0
 #          while not self.finished.isSet() and (self.iterations <= 0 or count < self.iterations):
@@ -273,65 +279,66 @@ class GroovesharkPlaylistSelect(xbmcgui.WindowDialog):
 #                if not self.finished.isSet():
 #                     self.function(*self.args, **self.kwargs)
 #                     count += 1
-# 
+#
 #     def cancel(self):
 #          self.finished.set()
-#     
+#
 #     def setIterations(self, iterations):
 #          self.iterations = iterations
-#          
+#
 #
 #     def getTime(self):
 #          return self.iterations * self.interval
 
 
-class Grooveshark:
-     
-     albumImg = xbmc.translatePath(os.path.join(imgDir, 'album.png'))
-     artistImg = xbmc.translatePath(os.path.join(imgDir, 'artist.png'))
-     artistsAlbumsImg = xbmc.translatePath(os.path.join(imgDir, 'artistsalbums.png'))
-     favoritesImg = xbmc.translatePath(os.path.join(imgDir, 'favorites.png'))
-     playlistImg = xbmc.translatePath(os.path.join(imgDir, 'playlist.png'))
-     usersplaylistsImg = xbmc.translatePath(os.path.join(imgDir, 'usersplaylists.png'))
-     popularSongsImg = xbmc.translatePath(os.path.join(imgDir, 'popularSongs.png'))
-     popularSongsArtistImg = xbmc.translatePath(os.path.join(imgDir, 'popularSongsArtist.png'))
-     songImg = xbmc.translatePath(os.path.join(imgDir, 'song.png'))
-     defImg = xbmc.translatePath(os.path.join(imgDir, 'default.tbn'))
-     fanImg = xbmc.translatePath(os.path.join(baseDir, 'fanart.jpg'))
+class Qobuz:
 
-     settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
-     songsearchlimit = int(settings.getSetting('songsearchlimit'))
-     albumsearchlimit = int(settings.getSetting('albumsearchlimit'))
-     artistsearchlimit = int(settings.getSetting('artistsearchlimit'))
-     songspagelimit = int(settings.getSetting('songspagelimit'))
-     username = settings.getSetting('username')
-     password = settings.getSetting('password')
+  albumImg = xbmc.translatePath(os.path.join(imgDir, 'album.png'))
+  artistImg = xbmc.translatePath(os.path.join(imgDir, 'artist.png'))
+  artistsAlbumsImg = xbmc.translatePath(os.path.join(imgDir, 'artistsalbums.png'))
+  favoritesImg = xbmc.translatePath(os.path.join(imgDir, 'favorites.png'))
+  playlistImg = xbmc.translatePath(os.path.join(imgDir, 'playlist.png'))
+  usersplaylistsImg = xbmc.translatePath(os.path.join(imgDir, 'usersplaylists.png'))
+  popularSongsImg = xbmc.translatePath(os.path.join(imgDir, 'popularSongs.png'))
+  popularSongsArtistImg = xbmc.translatePath(os.path.join(imgDir, 'popularSongsArtist.png'))
+  songImg = xbmc.translatePath(os.path.join(imgDir, 'song.png'))
+  defImg = xbmc.translatePath(os.path.join(imgDir, 'default.tbn'))
+  fanImg = xbmc.translatePath(os.path.join(baseDir, 'fanart.jpg'))
 
-     userid = 0
-     
-     def __init__( self ):
-          self._handle = int(sys.argv[1])
-          if os.path.isdir(cacheDir) == False:
-                os.makedirs(cacheDir)
-                if __debugging__ :
-                     xbmc.log(__language__(30012) + " " + cacheDir)
-          artDir = xbmc.translatePath(thumbDir)
-          if os.path.isdir(artDir) == False:
-                os.makedirs(artDir)
-                if __debugging__ :
-                     xbmc.log(__language__(30012) + " " + artDir)
-                
-     # Top-level menu
-     def categories(self):
+  settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
+  songsearchlimit = int(settings.getSetting('songsearchlimit'))
+  albumsearchlimit = int(settings.getSetting('albumsearchlimit'))
+  artistsearchlimit = int(settings.getSetting('artistsearchlimit'))
+  songspagelimit = int(settings.getSetting('songspagelimit'))
+  username = settings.getSetting('username')
+  password = settings.getSetting('password')
 
-          self.userid = self._get_login()
-          
-          # Setup
-          xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
-          
-          self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
-          self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
-          self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
+  userid = 0
+
+  def __init__( self ):
+     self._handle = int(sys.argv[1])
+     if os.path.isdir(cacheDir) == False:
+        os.makedirs(cacheDir)
+        if __debugging__ :
+          xbmc.log(__language__(30012) + " " + cacheDir)
+     artDir = xbmc.translatePath(thumbDir)
+     if os.path.isdir(artDir) == False:
+        os.makedirs(artDir)
+        if __debugging__ :
+          xbmc.log(__language__(30012) + " " + artDir)
+
+  # Top-level menu
+  def categories(self):
+
+     self.userid = self._get_login()
+
+     # Setup
+     xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
+
+     self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
+     self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
+     self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
+     self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.albumImg, 0)
 
 #          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
 #          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
@@ -339,90 +346,104 @@ class Grooveshark:
 #          #self._add_dir("Search for user's playlists...", '', MODE_SEARCH_PLAYLISTS, self.usersplaylistsImg, 0)
 #          self._add_dir(__language__(30016), '', MODE_ARTIST_POPULAR, self.popularSongsArtistImg, 0)
 #          self._add_dir(__language__(30017), '', MODE_POPULAR_SONGS, self.popularSongsImg, 0)
-          if (self.userid != 0):
-                #self._add_dir(__language__(30018), '', MODE_FAVORITES, self.favoritesImg, 0)
-                self._add_dir(__language__(30019), '', MODE_PLAYLISTS, self.playlistImg, 0)
-     
-     ####################
-     # Search for songs #
-     ####################             
-     def searchSongs(self):
-           query = self._get_keyboard(default="",heading=__language__(30020))
-           if (query != ''):
-               s = qob.getQobuzSearchTracks()
-               s.search(query, self.songsearchlimit)
-               if s.length() > 0:
-                 s.add_to_directory()
-               else:
-                     dialog = xbmcgui.Dialog()
-                     dialog.ok(__language__(30008),__language__(30021))
-                     self.categories()
-           else:
-                self.searchSongs()
+     if (self.userid != 0):
+        #self._add_dir(__language__(30018), '', MODE_FAVORITES, self.favoritesImg, 0)
+        self._add_dir(__language__(30019), '', MODE_PLAYLISTS, self.playlistImg, 0)
 
-     #####################
-     # Search for Albums #
-     #####################      
-     def searchAlbums(self):
-           query = self._get_keyboard(default="",heading=__language__(30020))
-           if (query != ''):
-               s = qob.getQobuzSearchAlbums()
-               s.search(query, self.songsearchlimit)
-               if s.length() > 0:
-                 s.add_to_directory()
-               else:
-                     dialog = xbmcgui.Dialog()
-                     dialog.ok(__language__(30008),__language__(30021))
-                     self.categories()
-           else:
-                self.categories()
+  ####################
+  # Search for songs #
+  ####################
+  def searchSongs(self):
+     query = self._get_keyboard(default="",heading=__language__(30020))
+     if (query != ''):
+       s = qob.getQobuzSearchTracks()
+       s.search(query, self.songsearchlimit)
+       if s.length() > 0:
+        s.add_to_directory()
+       else:
+          dialog = xbmcgui.Dialog()
+          dialog.ok(__language__(30008),__language__(30021))
+          self.categories()
+     else:
+        self.searchSongs()
 
-     
-     def ShowRecommendations(self,type,genre_id):
-           # query = self._get_keyboard(default="",heading=__language__(30020))
-           # genre_id=64
-           if (genre_id != ''):
-               r = qob.getRecommandation(genre_id, type)
-               
-               # r.get(genre_id, self.songsearchlimit)
-               if r.length() > 0:
-                   r.add_to_directory()
+  #####################
+  # Search for Albums #
+  #####################
+  def searchAlbums(self):
+     query = self._get_keyboard(default="",heading=__language__(30020))
+     if (query != ''):
+       s = qob.getQobuzSearchAlbums()
+       s.search(query, self.songsearchlimit)
+       if s.length() > 0:
+        s.add_to_directory()
+       else:
+          dialog = xbmcgui.Dialog()
+          dialog.ok(__language__(30008),__language__(30021))
+          self.categories()
+     else:
+        self.categories()
+
+  def searchArtists(self):
+     query = self._get_keyboard(default="",heading=__language__(30020))
+     if (query != ''):
+       s = qob.getQobuzSearchArtists()
+       s.search(query, self.songsearchlimit)
+       if s.length() > 0:
+        s.add_to_directory()
+       else:
+          dialog = xbmcgui.Dialog()
+          dialog.ok(__language__(30008),__language__(30021))
+          self.categories()
+     else:
+        self.categories()
+
+
+  def ShowRecommendations(self,type,genre_id):
+     # query = self._get_keyboard(default="",heading=__language__(30020))
+     # genre_id=64
+     if (genre_id != ''):
+       r = qob.getRecommandation(genre_id, type)
+
+       # r.get(genre_id, self.songsearchlimit)
+       if r.length() > 0:
+         r.add_to_directory()
 #                songs = groovesharkApi.getSongSearchResults(query, limit = self.songsearchlimit)
 #                if (len(songs) > 0):
 #                     self._add_songs_directory(songs)
-               else:
-                     dialog = xbmcgui.Dialog()
-                     dialog.ok(__language__(30008),__language__(30021))
-                     self.categories()
-           else:
-                self.categories()     
+       else:
+          dialog = xbmcgui.Dialog()
+          dialog.ok(__language__(30008),__language__(30021))
+          self.categories()
+     else:
+        self.categories()
 
-     def ShowRecommendationsTypes(self):
-           # query = self._get_keyboard(default="",heading=__language__(30020))
-          xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
-          self._add_dir(__language__(30083), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=press-awards','', self.songImg, 0)
-          self._add_dir(__language__(30084), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases','', self.songImg, 0)
-          self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', self.songImg, 0)
-          self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', self.songImg, 0)
-    
-     def ShowRecommendationsGenres(self,ype):
-          self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, self.songImg, 0)
-          self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, self.songImg, 0)
+  def ShowRecommendationsTypes(self):
+     # query = self._get_keyboard(default="",heading=__language__(30020))
+     xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
+     self._add_dir(__language__(30083), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=press-awards','', self.songImg, 0)
+     self._add_dir(__language__(30084), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases','', self.songImg, 0)
+     self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', self.songImg, 0)
+     self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', self.songImg, 0)
 
-          
-     
+  def ShowRecommendationsGenres(self,ype):
+     self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, self.songImg, 0)
+     self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, self.songImg, 0)
+
+
+
 #     # Search for artists
 #     def searchArtists(self):
 #          query = self._get_keyboard(default="", heading=__language__(30024))
-#          if (query != ''): 
+#          if (query != ''):
 #                artists = groovesharkApi.getArtistSearchResults(query, limit = self.artistsearchlimit)
 #                if (len(artists) > 0):
 #                     self._add_artists_directory(artists)
@@ -436,7 +457,7 @@ class Grooveshark:
 #     # Search for playlists
 #     def searchPlaylists(self):
 #          query = self._get_keyboard(default="", heading=__language__(30026))
-#          if (query != ''): 
+#          if (query != ''):
 #                #playlists = groovesharkApi.getUserPlaylistsByUsername(query)
 #                playlists = qob.Api.get_playlists()
 #                if (len(playlists) > 0):
@@ -454,7 +475,7 @@ class Grooveshark:
 #                query = self._get_keyboard(default="", heading=__language__(30028))
 #          else:
 #                query = artistName
-#          if (query != ''): 
+#          if (query != ''):
 #                artists = groovesharkApi.getArtistSearchResults(query, limit = self.artistsearchlimit)
 #                if (len(artists) > 0):
 #                     artist = artists[0]
@@ -474,7 +495,7 @@ class Grooveshark:
 #                     self.categories()
 #          else:
 #                self.categories()
-#                        
+#
 #     # Get my favorites
 #     def favorites(self):
 #          userid = self._get_login()
@@ -486,7 +507,7 @@ class Grooveshark:
 #                     dialog = xbmcgui.Dialog()
 #                     dialog.ok(__language__(30008), __language__(30031))
 #                     self.categories()
-#     
+#
 #     # Get popular songs
 #     def popularSongs(self):
 #          popular = groovesharkApi.getPopularSongsToday(limit = self.songsearchlimit)
@@ -497,28 +518,38 @@ class Grooveshark:
 #                dialog.ok(__language__(30008), __language__(30032))
 #                self.categories()
 #
-     # Get my playlists                 
-     def playlists(self):
-        #try:
-        user_playlists = qob.getUserPlaylists()
-        user_playlists.add_to_directory()
-        try: pass
-        except:
-            dialog = xbmcgui.Dialog()
-            dialog.ok(__language__(30008), __language__(30033))
-            self.categories()
-            
-             # Get album                 
-     def product (self, id):
-         album = qob.getProduct(id)
-         album.add_to_directory()
-         try: pass
-         except:
-            dialog = xbmcgui.Dialog()
-            dialog.ok(__language__(30008), __language__(30033))
-            #self.categories()
-#         
-#     # Make songs a favorite 
+  # Get my playlists
+  def playlists(self):
+    #try:
+    user_playlists = qob.getUserPlaylists()
+    user_playlists.add_to_directory()
+    try: pass
+    except:
+      dialog = xbmcgui.Dialog()
+      dialog.ok(__language__(30008), __language__(30033))
+      self.categories()
+
+      # Get album
+  def product (self, id):
+    album = qob.getProduct(id)
+    album.add_to_directory()
+    try: pass
+    except:
+      dialog = xbmcgui.Dialog()
+      dialog.ok(__language__(30008), __language__(30033))
+
+  def artist (self, id):
+    album = qob.getProductsFromArtist()
+    album.get_by_artist(id)
+    album.add_to_directory_by_artist()
+    try: pass
+    except:
+      dialog = xbmcgui.Dialog()
+      dialog.ok(__language__(30008), __language__(30033))
+      #self.categories()
+      #self.categories()
+#
+#     # Make songs a favorite
 #     def favorite(self, songid):
 #          userid = self._get_login()
 #          if (userid != 0):
@@ -529,7 +560,7 @@ class Grooveshark:
 #          else:
 #                dialog = xbmcgui.Dialog()
 #                dialog.ok(__language__(30008), __language__(30034), __language__(30037))
-#                
+#
 #     # Remove song from favorites
 #     def unfavorite(self, songid, prevMode=0):
 #          userid = self._get_login()
@@ -544,7 +575,7 @@ class Grooveshark:
 #          else:
 #                dialog = xbmcgui.Dialog()
 #                dialog.ok(__language__(30008), __language__(30034), __language__(30039))
-#                
+#
 #
 #     # Show selected album
 #     def album(self, albumid):
@@ -555,25 +586,25 @@ class Grooveshark:
 #     def artist(self, artistid):
 #          albums = groovesharkApi.getArtistAlbums(artistid, limit = self.albumsearchlimit)
 #          self._add_albums_directory(albums, artistid, True)
-     
-     # Show selected playlist
-     def playlist(self, playlistid, playlistname):
-          userid = self._get_login()
-          if (userid != 0):
-     # **tid
-                # songs = groovesharkApi.getPlaylistSongs(playlistid)
-                myplaylist = qob.getPlaylist(playlistid)
-                myplaylist.add_to_directory()
-                #songs = myplaylist.get_tracks1()
-                #self._add_songs_directory(songs, trackLabelFormat=NAME_ALBUM_ARTIST_LABEL, playlistid=playlistid, playlistname=playlistname)
-          else:
-                dialog = xbmcgui.Dialog()
-                dialog.ok(__language__(30008), __language__(30034), __language__(30040))
-                
+
+  # Show selected playlist
+  def playlist(self, playlistid, playlistname):
+     userid = self._get_login()
+     if (userid != 0):
+  # **tid
+        # songs = groovesharkApi.getPlaylistSongs(playlistid)
+        myplaylist = qob.getPlaylist(playlistid)
+        myplaylist.add_to_directory()
+        #songs = myplaylist.get_tracks1()
+        #self._add_songs_directory(songs, trackLabelFormat=NAME_ALBUM_ARTIST_LABEL, playlistid=playlistid, playlistname=playlistname)
+     else:
+        dialog = xbmcgui.Dialog()
+        dialog.ok(__language__(30008), __language__(30034), __language__(30040))
+
 #     # Show popular songs of the artist
 #     def artistPopularSongs(self):
 #          query = self._get_keyboard(default="", heading=__language__(30041))
-#          if (query != ''): 
+#          if (query != ''):
 #                artists = groovesharkApi.getArtistSearchResults(query, limit = self.artistsearchlimit)
 #                if (len(artists) > 0):
 #                     artist = artists[0]
@@ -593,7 +624,7 @@ class Grooveshark:
 #                     self.categories()
 #          else:
 #                self.categories()
-                
+
 #     # Play a song
 #     def playSong(self, p_item):
 #          global playTimer
@@ -641,7 +672,7 @@ class Grooveshark:
 #                     xbmc.log("No song URL")
 #          else:
 #                xbmc.executebuiltin('XBMC.Notification(' + __language__(30008) + ', ' + __language__(30044) + ', 1000, ' + thumbDef + ')')
-#          
+#
 #     # Make a song directory item
 #     def songItem(self, songid, name, album, albumid, artist, coverart, trackLabelFormat=ARTIST_ALBUM_NAME_LABEL):
 #        songImg = self._get_icon(coverart, 'song-' + str(songid) + "-image")
@@ -652,7 +683,7 @@ class Grooveshark:
 #                trackLabel = name + " - " + album
 #        else:
 #            trackLabel = artist + " - " + album + " - " + name
-#          
+#
 #        duration = self._getSongDuration(songid,albumid)
 #        item = xbmcgui.ListItem(label = trackLabel, thumbnailImage=songImg, iconImage=songImg)
 #        item.setInfo( type="music", infoLabels={ "title": name, "album": album, "artist": artist, "duration": duration} )
@@ -664,14 +695,14 @@ class Grooveshark:
 #        item.setProperty('album', album)
 #        item.setProperty('artist', str(artist))
 #        item.setProperty('duration', str(duration))
-#        
+#
 #        return item
-#     
+#
 #     # Next page of songs
 #     def songPage(self, offset, trackLabelFormat, playlistid = 0, playlistname = ''):
 #          self._add_songs_directory([], trackLabelFormat, offset, playlistid = playlistid, playlistname = playlistname)
-#          
-#     # Make a playlist from an album          
+#
+#     # Make a playlist from an album
 #     def makePlaylist(self, albumid, name):
 #          userid = self._get_login()
 #          if (userid != 0):
@@ -691,8 +722,8 @@ class Grooveshark:
 #          else:
 #                dialog = xbmcgui.Dialog()
 #                dialog.ok(__language__(30008), __language__(30034), __language__(30048))
-     
-     # Rename a playlist
+
+  # Rename a playlist
 #     def renamePlaylist(self, playlistid, name):
 #          userid = self._get_login()
 #          if (userid != 0):
@@ -708,7 +739,7 @@ class Grooveshark:
 #          else:
 #                dialog = xbmcgui.Dialog()
 #                dialog.ok(__language__(30008), __language__(30034), __language__(30051))
-#          
+#
 #     # Remove a playlist
 #     def removePlaylist(self, playlistid, name):
 #          dialog = xbmcgui.Dialog()
@@ -765,7 +796,7 @@ class Grooveshark:
 #                                if ret == False:
 #                                     dialog = xbmcgui.Dialog()
 #                                     dialog.ok(__language__(30008), __language__(30058))
-#                                else:       
+#                                else:
 #                                     xbmc.executebuiltin('XBMC.Notification(' + __language__(30008) + ',' + __language__(30059) + ', 1000, ' + thumbDef + ')')
 #                else:
 #                     dialog = xbmcgui.Dialog()
@@ -797,7 +828,7 @@ class Grooveshark:
 #                else:
 #                     dialog = xbmcgui.Dialog()
 #                     dialog.ok(__language__(30008), __language__(30034), __language__(30067))
-#        
+#
 #     # Find similar artists to searched artist
 #     def similarArtists(self, artistId):
 #          similar = groovesharkApi.getSimilarArtists(artistId, limit = self.artistsearchlimit)
@@ -807,34 +838,34 @@ class Grooveshark:
 #                dialog = xbmcgui.Dialog()
 #                dialog.ok(__language__(30008), __language__(30068))
 #                self.categories()
-     
-     # Get keyboard input
-     def _get_keyboard(self, default="", heading="", hidden=False):
-          kb = xbmc.Keyboard(default, heading, hidden)
-          kb.doModal()
-          if (kb.isConfirmed()):
-                return unicode(kb.getText(), "utf-8")
-          return ''
-     
-     # Login to grooveshark
-     def _get_login(self):
-          #=====================================================================
-          # if (self.username == "" or self.password == ""):
-          #      dialog = xbmcgui.Dialog()
-          #      dialog.ok(__language__(30008), __language__(30069), __language__(30070))
-          #      return 0
-          # else:
-          #      if self.userid == 0:
-          #           uid = groovesharkApi.login(self.username, self.password)
-          #      if (uid != 0):
-          #           return uid
-          #      else:
-          #           dialog = xbmcgui.Dialog()
-          #           dialog.ok(__language__(30008), __language__(30069), __language__(30070))
-          #=====================================================================
-                     return 1
-     
-     # Get a song directory item
+
+  # Get keyboard input
+  def _get_keyboard(self, default="", heading="", hidden=False):
+     kb = xbmc.Keyboard(default, heading, hidden)
+     kb.doModal()
+     if (kb.isConfirmed()):
+        return unicode(kb.getText(), "utf-8")
+     return ''
+
+  # Login to grooveshark
+  def _get_login(self):
+     #=====================================================================
+     # if (self.username == "" or self.password == ""):
+     #      dialog = xbmcgui.Dialog()
+     #      dialog.ok(__language__(30008), __language__(30069), __language__(30070))
+     #      return 0
+     # else:
+     #      if self.userid == 0:
+     #           uid = groovesharkApi.login(self.username, self.password)
+     #      if (uid != 0):
+     #           return uid
+     #      else:
+     #           dialog = xbmcgui.Dialog()
+     #           dialog.ok(__language__(30008), __language__(30069), __language__(30070))
+     #=====================================================================
+          return 1
+
+  # Get a song directory item
 #     def _get_song_item(self, song, trackLabelFormat):
 #          name = song[0]
 #          songid = song[1]
@@ -842,9 +873,9 @@ class Grooveshark:
 #          albumid = song[3]
 #          artist = song[4]
 #          coverart = song[6]
-#          return self.songItem(songid, name, album, albumid, artist, coverart, trackLabelFormat)                 
-#          
-#     # File download                  
+#          return self.songItem(songid, name, album, albumid, artist, coverart, trackLabelFormat)
+#
+#     # File download
 #     def _get_icon(self, url, songid):
 #          if url != 'None':
 #                localThumb = os.path.join(xbmc.translatePath(os.path.join(thumbDir, str(songid)))) + '.tbn'
@@ -857,7 +888,7 @@ class Grooveshark:
 #                return os.path.join(os.path.join(thumbDir, str(songid))) + '.tbn'
 #          else:
 #                return thumbDef
-#     
+#
 #     # Add songs to directory
 #     def _add_songs_directory(self, songs, trackLabelFormat=ARTIST_ALBUM_NAME_LABEL, offset=0, playlistid=0, playlistname='', isFavorites=False):
 #
@@ -878,11 +909,11 @@ class Grooveshark:
 #                else:
 #                     songs = self._getSavedSongs()
 #                     totalSongs = len(songs)
-#                     
+#
 #                if totalSongs > 0:
 #                     start = offset
 #                     end = min(start + self.songspagelimit,totalSongs)
-#          
+#
 #          id = 0
 #          n = start
 #          items = end - start
@@ -891,7 +922,7 @@ class Grooveshark:
 #                songid = song[1]
 #                albumid = song[3]
 #                duration = self._getSongDuration(songid,albumid)
-#                if duration != -1:  
+#                if duration != -1:
 #                     item = self._get_song_item(song, trackLabelFormat)
 #                     coverart = item.getProperty('coverart')
 #                     songname = song[0]
@@ -933,7 +964,7 @@ class Grooveshark:
 #
 #          xbmcplugin.setContent(self._handle, 'songs')
 #          xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
-#     
+#
 #     # Add albums to directory
 #     def _add_albums_directory(self, albums, artistid=0, isverified=False):
 #          n = len(albums)
@@ -944,7 +975,7 @@ class Grooveshark:
 #          while i < n:
 #                album = albums[i]
 #                albumID = album[3]
-#                if isverified or groovesharkApi.getDoesAlbumExist(albumID):                           
+#                if isverified or groovesharkApi.getDoesAlbumExist(albumID):
 #                     albumArtistName = album[0]
 #                     albumName = album[2]
 #                     albumImage = self._get_icon(album[4], 'album-' + str(albumID))
@@ -958,7 +989,7 @@ class Grooveshark:
 #          xbmcplugin.setContent(self._handle, 'albums')
 #          xbmcplugin.addSortMethod(self._handle, xbmcplugin.SORT_METHOD_ALBUM_IGNORE_THE)
 #          xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
-#     
+#
 #     # Add artists to directory
 #     def _add_artists_directory(self, artists):
 #          n = len(artists)
@@ -969,7 +1000,7 @@ class Grooveshark:
 #          while i < n:
 #                artist = artists[i]
 #                artistID = artist[1]
-#                if groovesharkApi.getDoesArtistExist(artistID):                           
+#                if groovesharkApi.getDoesArtistExist(artistID):
 #                     artistName = artist[0]
 #                     self._add_dir(artistName, '', MODE_ARTIST, self.artistImg, artistID, itemsExisting)
 #                else:
@@ -979,7 +1010,7 @@ class Grooveshark:
 #          xbmcplugin.addSortMethod(self._handle, xbmcplugin.SORT_METHOD_ARTIST_IGNORE_THE)
 #          xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
 #
-#     # Add playlists to directory               
+#     # Add playlists to directory
 #     def _add_playlists_directory(self, playlists):
 #          n = len(playlists)
 #          if __debugging__ :
@@ -990,48 +1021,48 @@ class Grooveshark:
 #                playlistName = playlist[0]
 #                playlistID = playlist[1]
 #                dir = self._add_dir(playlistName, '', MODE_PLAYLIST, self.playlistImg, playlistID, n)
-#                i = i + 1  
+#                i = i + 1
 #          xbmcplugin.setContent(self._handle, 'files')
 #          xbmcplugin.addSortMethod(self._handle, xbmcplugin.SORT_METHOD_LABEL)
 #          xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
-#        
-     # Add whatever directory
-     def _add_dir(self, name, url, mode, iconimage, id, items=1):
+#
+  # Add whatever directory
+  def _add_dir(self, name, url, mode, iconimage, id, items=1):
 
-          if url == '':
-                u=sys.argv[0]+"?mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
-          else:
-                u = url
-          dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
-          dir.setInfo( type="Music", infoLabels={ "title": name } )
-          
-          # Custom menu items
-          menuItems = []
-          if mode == MODE_ALBUM:
-                mkplaylst=sys.argv[0]+"?mode="+str(MODE_MAKE_PLAYLIST)+"&name="+name+"&id="+str(id)
-                menuItems.append((__language__(30076), "XBMC.RunPlugin("+mkplaylst+")"))
-          if mode == MODE_PLAYLIST:
-                rmplaylst=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
-                menuItems.append((__language__(30077), "XBMC.RunPlugin("+rmplaylst+")"))
-                mvplaylst=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
-                menuItems.append((__language__(30078), "XBMC.RunPlugin("+mvplaylst+")"))
+     if url == '':
+        u=sys.argv[0]+"?mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
+     else:
+        u = url
+     dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
+     dir.setInfo( type="Music", infoLabels={ "title": name } )
 
-          dir.addContextMenuItems(menuItems, replaceItems=False)
-          
-          return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)
-#     
+     # Custom menu items
+     menuItems = []
+     if mode == MODE_ALBUM:
+        mkplaylst=sys.argv[0]+"?mode="+str(MODE_MAKE_PLAYLIST)+"&name="+name+"&id="+str(id)
+        menuItems.append((__language__(30076), "XBMC.RunPlugin("+mkplaylst+")"))
+     if mode == MODE_PLAYLIST:
+        rmplaylst=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
+        menuItems.append((__language__(30077), "XBMC.RunPlugin("+rmplaylst+")"))
+        mvplaylst=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
+        menuItems.append((__language__(30078), "XBMC.RunPlugin("+mvplaylst+")"))
+
+     dir.addContextMenuItems(menuItems, replaceItems=False)
+
+     return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)
+#
 #     def _getSavedSongs(self):
 #          path = os.path.join(cacheDir, 'songs.dmp')
 #          try:
 #                f = open(path, 'rb')
 #                songs = pickle.load(f)
-#                f.close() 
+#                f.close()
 #          except:
 #                songs = []
 #                pass
 #          return songs
 #
-#     def _setSavedSongs(self, songs):               
+#     def _setSavedSongs(self, songs):
 #          try:
 #                # Create the 'data' directory if it doesn't exist.
 #                if not os.path.exists(cacheDir):
@@ -1069,10 +1100,10 @@ class Grooveshark:
 #            self._setSongDuration(song, durations)
 #
 #          return duration
-#          
-#     def _setSongDuration(self, song, durations):               
+#
+#     def _setSongDuration(self, song, durations):
 #          try:
-#                durations.append(song)                    
+#                durations.append(song)
 #                # Create the cache directory if it doesn't exist.
 #                if not os.path.exists(cacheDir):
 #                     os.makedirs(cacheDir)
@@ -1089,69 +1120,70 @@ class Grooveshark:
 #          #if usecs < 60000000:
 #          #  usecs = usecs * 10 # Some durations are 10x to small
 #          return secs
-     
 
-          
+
+
 
 # Main
-grooveshark = Grooveshark();
-qob._handle = grooveshark._handle
+qobuz = Qobuz();
+qob._handle = qobuz._handle
 
 id=''
-try: id=params["id"]
+try: id=str(params["id"])
 except: pass
 name = None
 try: name=urllib.unquote_plus(params["name"])
 except: pass
 # Call function for URL
 if mode==None:
-     grooveshark.categories()
-          
+  qobuz.categories()
+
 elif mode==MODE_SEARCH_SONGS:
-     grooveshark.searchSongs()
+  qobuz.searchSongs()
 
 elif mode == MODE_SHOW_RECOS:
-     grooveshark.ShowRecommendationsTypes()
+  qobuz.ShowRecommendationsTypes()
 
-elif mode == MODE_SHOW_RECO_T_G:     
-     try: 
-         type=urllib.unquote_plus(params["type"])
-         genre=urllib.unquote_plus(params["genre"])
-     except: 
-         pass
-     grooveshark.ShowRecommendations(type,genre)
-     
+
+elif mode == MODE_SHOW_RECO_T_G:
+  try:
+    type=urllib.unquote_plus(params["type"])
+    genre=urllib.unquote_plus(params["genre"])
+  except:
+    pass
+  qobuz.ShowRecommendations(type,genre)
+
 elif mode == MODE_SHOW_RECO_T:
-     try: 
-         type=urllib.unquote_plus(params["type"])
-     except: 
-         pass
-     grooveshark.ShowRecommendationsGenres(type)
-     
+  try:
+    type=urllib.unquote_plus(params["type"])
+  except:
+    pass
+  qobuz.ShowRecommendationsGenres(type)
+
 elif mode==MODE_SEARCH_ALBUMS:
-     grooveshark.searchAlbums()
+  qobuz.searchAlbums()
+
+elif mode==MODE_SEARCH_ARTISTS:
+  qobuz.searchArtists()
 #
-#elif mode==MODE_SEARCH_ARTISTS:
-#     grooveshark.searchArtists()
-#     
 #elif mode==MODE_SEARCH_ARTISTS_ALBUMS:
 #     grooveshark.searchArtistsAlbums(name)
-#     
+#
 #elif mode==MODE_SEARCH_PLAYLISTS:
-#     grooveshark.searchPlaylists() 
+#     grooveshark.searchPlaylists()
 #
 #elif mode==MODE_POPULAR_SONGS:
 #     grooveshark.popularSongs()
-#     
+#
 #elif mode==MODE_ARTIST_POPULAR:
 #     grooveshark.artistPopularSongs()
 
 elif mode==MODE_FAVORITES:
-     grooveshark.favorites()
+  qobuz.favorites()
 
 elif mode==MODE_PLAYLISTS:
-     grooveshark.playlists()
-     
+  qobuz.playlists()
+
 #elif mode==MODE_SONG_PAGE:
 #     try: offset=urllib.unquote_plus(params["offset"])
 #     except: pass
@@ -1160,21 +1192,23 @@ elif mode==MODE_PLAYLISTS:
 #     grooveshark.songPage(offset, label, id, name)
 
 elif mode == MODE_SONG:
-     t = qob.getTrack(id)
-     t.play()
+  t = qob.getTrack(str(id))
+  t.play()
 
-#elif mode==MODE_ARTIST:
-#     grooveshark.artist(id)
-#     
+elif mode==MODE_ARTIST:
+  qobuz.artist(str(id))
+
 elif mode==MODE_ALBUM:
-     grooveshark.product(str(id))
-     
+  print "Product ID: " + str(id) + "\n"
+  qobuz.product(str(id))
+
+
 elif mode==MODE_PLAYLIST:
-     grooveshark.playlist(id, name)
-     
+  qobuz.playlist(str(id), name)
+
 #elif mode==MODE_FAVORITE:
 #     grooveshark.favorite(id)
-     
+
 #elif mode==MODE_UNFAVORITE:
 #     try: prevMode=int(urllib.unquote_plus(params["prevmode"]))
 #     except:
@@ -1186,12 +1220,12 @@ elif mode==MODE_PLAYLIST:
 #
 #elif mode==MODE_MAKE_PLAYLIST:
 #     grooveshark.makePlaylist(id, name)
-#     
+#
 #elif mode==MODE_REMOVE_PLAYLIST:
-#     grooveshark.removePlaylist(id, name)     
+#     grooveshark.removePlaylist(id, name)
 #
 #elif mode==MODE_RENAME_PLAYLIST:
-#     grooveshark.renamePlaylist(id, name)     
+#     grooveshark.renamePlaylist(id, name)
 #
 #elif mode==MODE_REMOVE_PLAYLIST_SONG:
 #     try: playlistID=urllib.unquote_plus(params["playlistid"])
@@ -1199,8 +1233,8 @@ elif mode==MODE_PLAYLIST:
 #     grooveshark.removePlaylistSong(playlistID, name, id)
 #
 #elif mode==MODE_ADD_PLAYLIST_SONG:
-#     grooveshark.addPlaylistSong(id)              
+#     grooveshark.addPlaylistSong(id)
 
-    
+
 if mode < MODE_SONG:
-     xbmcplugin.endOfDirectory(int(sys.argv[1]))
+  xbmcplugin.endOfDirectory(int(sys.argv[1]))

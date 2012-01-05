@@ -1,3 +1,20 @@
+# Copyright 2011 Joachim Basmaison, Cyril Leclerc
+
+#     This file is part of xbmc-qobuz.
+#
+#     xbmc-qobuz is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     xbmc-qobuz is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
 import httplib,json,time,urllib2,urllib,hashlib,mutagen
 from mutagen.flac import FLAC
 import pprint
@@ -91,17 +108,21 @@ class QobuzApi:
     
     # SEARCH #
     def search_tracks(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'tracks', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'tracks', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/track/search")
 
     def search_albums(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'albums', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'albums', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/product/search")
     
     def search_artists(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'artists', 'limit': limit})
-        return self._api_request(params,"/api.json/0.1/artist/search")
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'artists', 'limit': limit})
+        return self._api_request(params,"/api.json/0.1/track/search")
     
+    def get_albums_from_artist(self, id, limit = 100):
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'artist_id': id, 'limit': limit})
+        return self._api_request(params,"/api.json/0.1/artist/get")
+
     # REPORT #    
     def report_streaming_start(self, track_id):
         print "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id) + "\n"
