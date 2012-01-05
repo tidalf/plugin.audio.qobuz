@@ -1,3 +1,4 @@
+import os
 import xbmcaddon
 import xbmcplugin
 import xbmcgui

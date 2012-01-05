@@ -347,7 +347,7 @@ class Grooveshark:
           
           self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
           self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
-#          self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
+          self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
 #          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
 #          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
 #          # Not supported by key
@@ -357,8 +357,10 @@ class Grooveshark:
           if (self.userid != 0):
                 #self._add_dir(__language__(30018), '', MODE_FAVORITES, self.favoritesImg, 0)
                 self._add_dir(__language__(30019), '', MODE_PLAYLISTS, self.playlistImg, 0)
-
-     # Search for songs              
+     
+     ####################
+     # Search for songs #
+     ####################             
      def searchSongs(self):
            query = self._get_keyboard(default="",heading=__language__(30020))
            if (query != ''):
@@ -366,16 +368,30 @@ class Grooveshark:
                s.search(query, self.songsearchlimit)
                if s.length() > 0:
                  s.add_to_directory()
-#                songs = groovesharkApi.getSongSearchResults(query, limit = self.songsearchlimit)
-#                if (len(songs) > 0):
-#                     self._add_songs_directory(songs)
                else:
                      dialog = xbmcgui.Dialog()
                      dialog.ok(__language__(30008),__language__(30021))
                      self.categories()
            else:
                 self.categories()
-     
+
+     #####################
+     # Search for Albums #
+     #####################      
+     def searchAlbums(self):
+           query = self._get_keyboard(default="",heading=__language__(30020))
+           if (query != ''):
+               s = qob.getQobuzSearchAlbums()
+               s.search(query, self.songsearchlimit)
+               if s.length() > 0:
+                 s.add_to_directory()
+               else:
+                     dialog = xbmcgui.Dialog()
+                     dialog.ok(__language__(30008),__language__(30021))
+                     self.categories()
+           else:
+                self.categories()
+
      def ShowRecommandation(self):
            # query = self._get_keyboard(default="",heading=__language__(30020))
            genre_id=64
@@ -394,22 +410,7 @@ class Grooveshark:
                      self.categories()
            else:
                 self.categories()     
-     
-     
-     # Search for albums
-     def searchAlbums(self):
-          query = self._get_keyboard(default="", heading=__language__(30022))
-          if (query != ''): 
-                albums = groovesharkApi.getAlbumSearchResults(query, limit = self.albumsearchlimit)
-                if (len(albums) > 0):
-                     self._add_albums_directory(albums)
-                else:
-                     dialog = xbmcgui.Dialog()
-                     dialog.ok(__language__(30008), __language__(30023))
-                     self.categories()
-          else:
-                self.categories()
-     
+
 #     # Search for artists
 #     def searchArtists(self):
 #          query = self._get_keyboard(default="", heading=__language__(30024))
@@ -1105,8 +1106,8 @@ elif mode==MODE_SEARCH_SONGS:
 elif mode == MODE_SHOW_RECOS:
      grooveshark.ShowRecommandation()  
      
-#elif mode==MODE_SEARCH_ALBUMS:
-#     grooveshark.searchAlbums()
+elif mode==MODE_SEARCH_ALBUMS:
+     grooveshark.searchAlbums()
 #
 #elif mode==MODE_SEARCH_ARTISTS:
 #     grooveshark.searchArtists()

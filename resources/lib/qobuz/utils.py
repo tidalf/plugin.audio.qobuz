@@ -2,7 +2,7 @@
 # 
 ###############################################################################
 def _sc(str):
-    if not str:
-        return 'NA'
+    if not str:   
+        return 'NA'    
     else:
         return u'' + str

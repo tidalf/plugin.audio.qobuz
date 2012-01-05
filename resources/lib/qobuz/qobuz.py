@@ -1,44 +1,23 @@
+import os
+import sys
+
 import xbmcaddon
 import xbmc
 
-import os
+import tempfile
+
 from icacheable import ICacheable
 from api import QobuzApi
-import sys
-import tempfile
 from mydebug import log, info, warn
 from utils import _sc
-from searchtracks import QobuzSearchTracks
 from track import QobuzTrack
 from icacheable import ICacheable
 from getrecommandation import QobuzGetRecommandation
 from product import QobuzProduct
 from userplaylists import QobuzUserPlaylists
 from playlist import QobuzPlaylist
-
-#import sys
-#import os
-#import httplib
-#import json
-#import time
-#import urllib2
-#import urllib
-#import hashlib
-#import mutagen
-#import shutil
-#import re
-#import pickle
-#import time
-#import tempfile
-#
-#import threading
-##from mutagen.flac import FLAC
-#import pprint
-#from qobuz import *
-
-
-
-
+from searchtracks import QobuzSearchTracks
+from searchalbums import QobuzSearchAlbums
 
 ###############################################################################
 # Class QobuzXbmc
@@ -64,26 +43,6 @@ class QobuzXbmc:
     def is_logged(self):
         return self.Api.userid
 
-#    def download_track_withurl(self,file_name,url):
-#        u = urllib2.urlopen(url)
-#        f = open(file_name, 'wb')
-#        meta = u.info()
-#        file_size = int(meta.getheaders("Content-Length")[0])
-#        print "Downloading: %s Bytes: %s" % (file_name, file_size)
-#        file_size_dl = 0
-#        block_sz = 8192
-#        while True:
-#            buffer = u.read(block_sz)
-#            if not buffer:
-#                break
-#            file_size_dl += len(buffer)
-#            f.write(buffer)
-#            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-#            status = status + chr(8)*(len(status)+1)
-#            print status,
-#        f.close()
-#        u.close()
-
     def getPlaylist(self,id):
         return QobuzPlaylist(self, id)
 
@@ -105,6 +64,9 @@ class QobuzXbmc:
     def getQobuzSearchTracks(self):
         return QobuzSearchTracks(self)
 
+    def getQobuzSearchAlbums(self):
+        return QobuzSearchAlbums(self)
+    
     def watchPlayback( self ):
         if not self.player.isPlayingAudio():
             self.Timer.stop()
@@ -115,6 +77,26 @@ class QobuzXbmc:
 
     def getRecommandation(self,genre_id):
         return QobuzGetRecommandation(self,genre_id)
+    
+#    def download_track_withurl(self,file_name,url):
+#        u = urllib2.urlopen(url)
+#        f = open(file_name, 'wb')
+#        meta = u.info()
+#        file_size = int(meta.getheaders("Content-Length")[0])
+#        print "Downloading: %s Bytes: %s" % (file_name, file_size)
+#        file_size_dl = 0
+#        block_sz = 8192
+#        while True:
+#            buffer = u.read(block_sz)
+#            if not buffer:
+#                break
+#            file_size_dl += len(buffer)
+#            f.write(buffer)
+#            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+#            status = status + chr(8)*(len(status)+1)
+#            print status,
+#        f.close()
+#        u.close()
 
 #    def tag_track(self,track,file_name,album_title="null"):
 #        audio = FLAC(file_name)
@@ -151,12 +133,6 @@ class QobuzXbmc:
 #        else:
 #            self.tag_track(track,file_name)
 
-
-
-
-
-
-        
 #===============================================================================
 # class QobuzGetRecommandation():
 # 
@@ -272,9 +248,6 @@ class QobuzXbmc:
 #        #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)
 
 
-
-
-        
 class QobuzPlayer(xbmc.Player):
     def __init__(self, type):
         super(QobuzPlayer, self).__init__(type)
