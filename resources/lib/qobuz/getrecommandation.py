@@ -34,7 +34,8 @@ class QobuzGetRecommandation():
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(p['id'])
             item = xbmcgui.ListItem()
             year = int(p['released_at'].split('-')[0]) if p['released_at'] else 0
-            item.setLabel(p['subtitle'] + ' - '+p['title'] + " (" + str(year) + ")")
+            artist =  p['subtitle'] + ' - ' if p['subtitle'] else ''
+            item.setLabel(artist +p['title'] + " (" + str(year) + ")")
             item.setLabel2(p['title'])
             item.setInfo(type="Music",infoLabels={ "title": p['title'] })
             item.setThumbnailImage(p['image']['large'])
