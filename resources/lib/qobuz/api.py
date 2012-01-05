@@ -91,15 +91,15 @@ class QobuzApi:
     
     # SEARCH #
     def search_tracks(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'tracks', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'tracks', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/track/search")
 
     def search_albums(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'albums', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'albums', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/product/search")
     
     def search_artists(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'artists', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'artists', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/track/search")
     
     def get_albums_from_artist(self, id, limit = 100):

@@ -27,10 +27,11 @@ class QobuzSearchTracks():
     def add_to_directory(self):
         n = self.length()
         h = int(sys.argv[1])
+        #if self._raw_data.length:
         for t in self._raw_data['results']['tracks']:
             title = _sc(t['title'])
             if t['streaming_type'] != 'full':
-                warn(self, "Skipping sample " + title.encode("utf8","ignore"))
+                # warn(self, "Skipping sample " + title.encode("utf8","ignore"))
                 continue
             interpreter = _sc(t['interpreter']['name'])
             #print "Interpreter: " + interpreter + "\n"
