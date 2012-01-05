@@ -347,6 +347,8 @@ class Grooveshark:
           self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, self.songImg, 0)
           self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, self.songImg, 0)
           self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, self.albumImg, 0)
+          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.albumImg, 0)
+          
 #          self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, self.artistImg, 0)
 #          self._add_dir(searchArtistsAlbumsName, '', MODE_SEARCH_ARTISTS_ALBUMS, self.artistsAlbumsImg, 0)
 #          # Not supported by key
@@ -381,6 +383,20 @@ class Grooveshark:
            query = self._get_keyboard(default="",heading=__language__(30020))
            if (query != ''):
                s = qob.getQobuzSearchAlbums()
+               s.search(query, self.songsearchlimit)
+               if s.length() > 0:
+                 s.add_to_directory()
+               else:
+                     dialog = xbmcgui.Dialog()
+                     dialog.ok(__language__(30008),__language__(30021))
+                     self.categories()
+           else:
+                self.categories()
+                
+     def searchArtists(self):
+           query = self._get_keyboard(default="",heading=__language__(30020))
+           if (query != ''):
+               s = qob.getQobuzSearchArtists()
                s.search(query, self.songsearchlimit)
                if s.length() > 0:
                  s.add_to_directory()
@@ -530,6 +546,16 @@ class Grooveshark:
          except:
             dialog = xbmcgui.Dialog()
             dialog.ok(__language__(30008), __language__(30033))
+
+     def artist (self, id):
+         album = qob.getProductsFromArtist()
+         album.get_by_artist(id)
+         album.add_to_directory_by_artist()
+         try: pass
+         except:
+            dialog = xbmcgui.Dialog()
+            dialog.ok(__language__(30008), __language__(30033))
+            #self.categories()
             #self.categories()
 #         
 #     # Make songs a favorite 
@@ -1113,7 +1139,7 @@ qob._handle = grooveshark._handle
 
 
 id=''
-try: id=params["id"]
+try: id=str(params["id"])
 except: pass
 name = None
 try: name=urllib.unquote_plus(params["name"])
@@ -1128,6 +1154,7 @@ elif mode==MODE_SEARCH_SONGS:
 elif mode == MODE_SHOW_RECOS:
      grooveshark.ShowRecommendationsTypes()
 
+     
 elif mode == MODE_SHOW_RECO_T_G:     
      try: 
          type=urllib.unquote_plus(params["type"])
@@ -1145,9 +1172,9 @@ elif mode == MODE_SHOW_RECO_T:
      
 elif mode==MODE_SEARCH_ALBUMS:
      grooveshark.searchAlbums()
-#
-#elif mode==MODE_SEARCH_ARTISTS:
-#     grooveshark.searchArtists()
+     
+elif mode==MODE_SEARCH_ARTISTS:
+     grooveshark.searchArtists()
 #     
 #elif mode==MODE_SEARCH_ARTISTS_ALBUMS:
 #     grooveshark.searchArtistsAlbums(name)
@@ -1175,19 +1202,19 @@ elif mode==MODE_PLAYLISTS:
 #     grooveshark.songPage(offset, label, id, name)
 
 elif mode == MODE_SONG:
-     t = qob.getTrack(id)
+     t = qob.getTrack(str(id))
      t.play()
 
-#elif mode==MODE_ARTIST:
-#     grooveshark.artist(id)
-#     
+elif mode==MODE_ARTIST:
+     grooveshark.artist(str(id))
+     
 elif mode==MODE_ALBUM:
      print "Product ID: " + str(id) + "\n"
      grooveshark.product(str(id))
      
      
 elif mode==MODE_PLAYLIST:
-     grooveshark.playlist(id, name)
+     grooveshark.playlist(str(id), name)
      
 #elif mode==MODE_FAVORITE:
 #     grooveshark.favorite(id)

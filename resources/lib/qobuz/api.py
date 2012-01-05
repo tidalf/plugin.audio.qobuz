@@ -100,8 +100,12 @@ class QobuzApi:
     
     def search_artists(self, query, limit = 100):
         params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query, 'type': 'artists', 'limit': limit})
-        return self._api_request(params,"/api.json/0.1/artist/search")
+        return self._api_request(params,"/api.json/0.1/track/search")
     
+    def get_albums_from_artist(self, id, limit = 100):
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'artist_id': id, 'limit': limit})
+        return self._api_request(params,"/api.json/0.1/artist/get")
+
     # REPORT #    
     def report_streaming_start(self, track_id):
         print "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id) + "\n"

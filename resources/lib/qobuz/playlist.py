@@ -49,7 +49,7 @@ class QobuzPlaylist(ICacheable):
             (sh,sm,ss) = t['duration'].split(':')
             duration = (int(sh) * 3600 + int(sm) * 60 + int(ss))
             item = xbmcgui.ListItem('test')
-            item.setLabel(interpreter + ' - ' + t['album']['title'] + ' - ' + t['track_number'] + ' - ' + t['title'])
+            item.setLabel(interpreter + ' - ' + _sc(t['album']['title']) + ' - ' + _sc(t['track_number']) + ' - ' + _sc(t['title']))
             item.setInfo(type="Music",infoLabels={
                                                     "count": int(self.id),
                                                    "title":  title,

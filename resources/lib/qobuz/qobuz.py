@@ -18,6 +18,7 @@ from userplaylists import QobuzUserPlaylists
 from playlist import QobuzPlaylist
 from searchtracks import QobuzSearchTracks
 from searchalbums import QobuzSearchAlbums
+from searchartists import QobuzSearchArtists
 
 ###############################################################################
 # Class QobuzXbmc
@@ -65,6 +66,12 @@ class QobuzXbmc:
         return QobuzSearchTracks(self)
 
     def getQobuzSearchAlbums(self):
+        return QobuzSearchAlbums(self)
+    
+    def getQobuzSearchArtists(self):
+        return QobuzSearchArtists(self)
+    
+    def getProductsFromArtist(self):
         return QobuzSearchAlbums(self)
     
     def watchPlayback( self ):

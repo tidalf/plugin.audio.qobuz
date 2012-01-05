@@ -20,6 +20,11 @@ class QobuzSearchAlbums():
         self._raw_data = self.Qob.Api.search_albums(query, limit)
         #pprint.pprint(self._raw_data)
         return self
+    
+    def get_by_artist(self,id, limit = 100):
+        self._raw_data = self.Qob.Api.get_albums_from_artist(id, limit)
+        #pprint.pprint(self._raw_data)
+        return self
         
     def length(self):
         return len(self._raw_data)
@@ -27,6 +32,12 @@ class QobuzSearchAlbums():
     def add_to_directory(self):
         h = int(sys.argv[1])
         xbmc_directory_products(self._raw_data, self.length())
+        #xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
+        xbmcplugin.setContent(h,'songs')
+    
+    def add_to_directory_by_artist(self):
+        h = int(sys.argv[1])
+        xbmc_directory_products_by_artist(self._raw_data, self.length())
         #xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
         xbmcplugin.setContent(h,'songs')
  
@@ -58,3 +69,32 @@ def xbmc_directory_products(json, len):
         #item.setProperty('IsPlayable','false');
         item.setThumbnailImage(image)
         xbmcplugin.addDirectoryItem(handle=h , url=u,listitem=item,isFolder=True,totalItems=len)
+
+def xbmc_directory_products_by_artist(json, len):
+    h = int(sys.argv[1])
+    artist = json['artist']['name']
+    for p in json['artist']['albums']:
+        a      = p
+        title  = _sc(a['title'])
+#        genre  = _sc(a['genre'])
+        image  = a['image']['large']
+        year   = int(a['released_at'].split('-')[0]) if a['released_at'] else 0
+        u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(a['id'])
+        #(sh,sm,ss) = a['duration'].split(':')
+        item   = xbmcgui.ListItem()
+        item.setLabel(title + "(" + str(year) + ")")
+        item.setInfo(type="Music",infoLabels={
+                                                   #"count"  : long(a['id']),
+                                                   "artist" : artist,
+#                                                   "album"  : title,
+#                                                   "genre"  : genre,
+#                                                   "comment": "Qobuz Stream",
+#                                                   "year"   : year
+        })
+        print "U:" + u + "\n"
+        #item.setPath(u)
+        #item.setProperty('Music','true')
+        #item.setProperty('IsPlayable','false');
+        item.setThumbnailImage(image)
+        xbmcplugin.addDirectoryItem(handle=h , url=u,listitem=item,isFolder=True,totalItems=len)
+
