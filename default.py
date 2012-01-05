@@ -372,7 +372,7 @@ class Grooveshark:
                      dialog.ok(__language__(30008),__language__(30021))
                      self.categories()
            else:
-                self.categories()
+                self.searchSongs()
 
      #####################
      # Search for Albums #
