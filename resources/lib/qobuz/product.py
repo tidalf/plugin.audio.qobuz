@@ -29,7 +29,7 @@ class QobuzProduct(ICacheable):
 
     def _fetch_data(self):
         #ea = self.Qob.getEncounteredAlbum()
-        data = self.Qob.Api.get_product(self.id)['product']
+        data = self.Qob.Api.get_product(str(self.id))['product']
         pprint.pprint(data)
         #for a in data['tracks']:
         #    ea.add(a)
