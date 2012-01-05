@@ -19,6 +19,8 @@
 import urllib, sys, os, shutil, re, pickle, time, tempfile, xbmcaddon, xbmcplugin, xbmcgui, xbmc
 import pprint
 
+
+gabou = 'plop'
 __addon__     = xbmcaddon.Addon('plugin.audio.qobuz')
 __addonname__ = __addon__.getAddonInfo('name')
 __cwd__       = __addon__.getAddonInfo('path')
@@ -373,6 +375,7 @@ class Grooveshark:
                      self.categories()
            else:
                 self.categories()
+<<<<<<< HEAD
 
      #####################
      # Search for Albums #
@@ -391,8 +394,11 @@ class Grooveshark:
            else:
                 self.categories()
 
+     def ShowRecommandation(self):
+=======
      
      def ShowRecommendations(self,type,genre_id):
+>>>>>>> origin/boom
            # query = self._get_keyboard(default="",heading=__language__(30020))
            # genre_id=64
            if (genre_id != ''):
@@ -411,6 +417,8 @@ class Grooveshark:
            else:
                 self.categories()     
 
+<<<<<<< HEAD
+=======
      def ShowRecommendationsTypes(self):
            # query = self._get_keyboard(default="",heading=__language__(30020))
           xbmcplugin.setPluginFanart(int(sys.argv[1]), self.fanImg)
@@ -432,7 +440,21 @@ class Grooveshark:
           self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, self.songImg, 0)
 
           
+     # Search for albums
+     def searchAlbums(self):
+          query = self._get_keyboard(default="", heading=__language__(30022))
+          if (query != ''): 
+                albums = groovesharkApi.getAlbumSearchResults(query, limit = self.albumsearchlimit)
+                if (len(albums) > 0):
+                     self._add_albums_directory(albums)
+                else:
+                     dialog = xbmcgui.Dialog()
+                     dialog.ok(__language__(30008), __language__(30023))
+                     self.categories()
+          else:
+                self.categories()
      
+>>>>>>> origin/boom
 #     # Search for artists
 #     def searchArtists(self):
 #          query = self._get_keyboard(default="", heading=__language__(30024))

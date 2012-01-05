@@ -81,8 +81,12 @@ class QobuzApi:
     def get_product(self, id):
         return self.get_album_tracks(id)
     
-    def get_recommandations(self, genre_id, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'genre_id': genre_id, 'type': 'new-releases', 'limit': limit})
+    def get_recommandations(self, genre_id, typer = "new-releases", limit = 100):
+        if genre_id == 'null':
+            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'type': typer, 'limit': limit})
+        else:
+            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'genre_id': genre_id, 'type': typer, 'limit': limit})
+        
         return self._api_request(params,"/api.json/0.1/product/getRecommendations")
     
     # SEARCH #

@@ -7,6 +7,7 @@ import xbmcplugin
 from icacheable import ICacheable
 from utils import _sc
 from constants import *
+from mydebug import * 
 
 ###############################################################################
 # Class QobuzPLaylist
