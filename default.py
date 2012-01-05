@@ -98,11 +98,11 @@ listBackground = os.path.join(imgDir, 'listbackground.png')
 sys.path.append (libDir)
 
 from qobuz.qobuz import QobuzXbmc
-from qobuz.qobuz import QobuzPlayer
+# from qobuz.qobuz import QobuzPlayer
 from qobuz.api import QobuzApi
 from qobuz.constants import *
 # Parse URL parameters
-player = QobuzPlayer(xbmc.PLAYER_CORE_AUTO)
+player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 
 def get_params():
   param=[]
