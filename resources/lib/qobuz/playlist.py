@@ -24,7 +24,9 @@ import xbmcplugin
 from icacheable import ICacheable
 from utils import _sc
 from constants import *
+from constants import __addon__
 from mydebug import * 
+
 
 ###############################################################################
 # Class QobuzPLaylist
@@ -39,7 +41,8 @@ class QobuzPlaylist(ICacheable):
                                         self.Qob.cacheDir,
                                         'playlist-' + str(self.id) + '.dat'
         )
-        self.cache_refresh = 600
+        self.cache_refresh = __addon__.getSetting('cache_duration_userplaylist')
+        info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):

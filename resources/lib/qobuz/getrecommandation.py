@@ -24,7 +24,7 @@ import pprint
 from mydebug import log, info, warn
 from constants import *
 from icacheable import ICacheable
-
+from constants import __addon__
 """
     Class QobuzGetRecommendation
 """
@@ -34,7 +34,8 @@ class QobuzGetRecommandation(ICacheable):
         self.Qob = qob
         self._raw_data = []
         self.cache_path = os.path.join(self.Qob.cacheDir, 'recommandations-' + genre_id + '-' + type + '.dat')
-        self.cache_refresh = 600
+        self.cache_refresh = __addon__.getSetting('cache_duration_recommandation')
+        info(self, "Cache duration: " + str(self.cache_refresh))
         self.genre_id = genre_id
         self.type = type
         self.limit = limit 

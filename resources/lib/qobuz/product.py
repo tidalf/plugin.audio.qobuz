@@ -10,7 +10,7 @@ from icacheable import ICacheable
 from logging import *
 from utils import _sc
 from constants import *
-
+from constants import __addon__
 ###############################################################################
 # Class QobuzProduct
 ###############################################################################
@@ -24,7 +24,8 @@ class QobuzProduct(ICacheable):
                                         self.Qob.cacheDir,
                                         'product-' + str(self.id) + '.dat'
         )
-        self.cache_refresh = 600
+        self.cache_refresh = __addon__.getSetting('cache_duration_album')
+        info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):

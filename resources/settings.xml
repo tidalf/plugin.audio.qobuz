@@ -12,7 +12,15 @@
    <setting id="artistsearchlimit" type="labelenum" label="30004" default="10" values="5|10|15|20|25|30|40|50|60|70|80|90|100" />
    <setting id="songspagelimit" type="labelenum" label="30005" default="10" values="10|20|30|40|50|60|70|80|90|100|200|500" />
    </category>
+    <category label="31006">
+     <setting label="31000" type="text" default="" enable="false"/>
+        <setting id="cache_duration_album" type="labelenum" label="31001" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_artist" type="labelenum" label="31002" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_track" type="labelenum" label="31003" default="1440" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_recommandation" type="labelenum" label="31004" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_userplaylist" type="labelenum" label="31005" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
+   </category>
    <category label="Other">
-   		<setting id="debug" label="Debug" type="bool" default="false" />
+        <setting id="debug" label="Debug" type="bool" default="false" />
    </category>   	
 </settings>

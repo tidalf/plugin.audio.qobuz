@@ -97,6 +97,17 @@
     <string id="30094">Movie Soundtracks</string>
     <string id="30095">Classical</string>
     <string id="30096">All of them</string>
+    <!-- Cache -->
+    <string id="31000">Time in minute for various Qobuz data to be held in cache
+    - 0 No cache</string>
+    <string id="31001">Album cache duration</string>
+    <string id="31002">Artist cache duration</string>
+    <string id="31003">Track cache duration</string>
+    <string id="31004">Recommendation cache duration</string>
+    <string id="31005">User playlist cache duration</string>
+    <string id="31006">Cache settings</string>
+    <string id="31007">Cache settings</string>
+    
 </strings>
 
 
