@@ -8,7 +8,7 @@ from icacheable import ICacheable
 from mydebug import log, info, warn
 from utils import _sc
 from constants import __addon__
-
+from player import QobuzPlayer
 '''
  Class QobuzTrack 
 
