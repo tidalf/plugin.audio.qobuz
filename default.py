@@ -74,7 +74,7 @@ STREAM_MARKING_TIME = 30
 STREAM_TIMEOUT = 30
 
 songMarkTime = 0
-player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+# player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 playTimer = None
 playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
 

@@ -105,6 +105,7 @@ class QobuzXbmc:
     def getRecommandation(self, genre_id,type):
         return QobuzGetRecommandation(self, genre_id, type)
 
+
 #    def download_track_withurl(self,file_name,url):
 #        u = urllib2.urlopen(url)
 #        f = open(file_name, 'wb')

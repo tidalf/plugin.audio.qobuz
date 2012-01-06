@@ -90,12 +90,16 @@ class QobuzTrack(ICacheable):
     
     def stop(self, id):
         self.Qob.Api.report_streaming_stop(self.id)
-        
+    
+    
+    
     # Play this track
     def play(self):
         #global player
-        player = xbmc.Player()
-        #player.set_track_id(self.id)
+        player = QobuzPlayer(xbmc.PLAYER_CORE_AUTO)
+        player.set_track_id(self.id)
+        player.setApi(self.Qob)
+        
         item = self.getItem()
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
         timeout = 30
@@ -106,6 +110,33 @@ class QobuzTrack(ICacheable):
                 timeout-=.500
             else: timeout = 0
         info(self, "Song started")
-        self.Qob.Api.report_streaming_start(self.id)
+        xbmc.sleep(6000)
+        if player.isPlayingAudio():
+            self.Qob.Api.report_streaming_start(self.id)
+        player.watchPlayback()
         #player.onPlayBackEnded('stop_track('+str(self.id)+')')
+
+class QobuzPlayer(xbmc.Player):
+    def __init__(self, type):
+        super(QobuzPlayer, self).__init__(type)
+        self.id = None
+        self.last_id = None
+        self.Qob = None
+
+    def setApi (self, qob):
+        self.Qob = qob
         
+    def onPlayBackEnded(self):
+        self.Qob.Api.report_streaming_stop(self.id)
+
+    def set_track_id(self, id):
+        if self.id:
+            self.last_id = self.id
+        self.id = id
+
+    def watchPlayback( self ):
+        while(self.isPlayingAudio()):
+            info (self,"Watching Playback...")
+            xbmc.sleep(6000)
+        info (self,"End of Playback detected")
+        exit(0)

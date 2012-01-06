@@ -128,9 +128,13 @@ class QobuzApi:
     # REPORT #    
     def report_streaming_start(self, track_id):
         print "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id) + "\n"
-    
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'user_id': self.userid, 'track_id': track_id})
+        return self._api_request(params,"/api.json/0.1/track/reportStreamingStart")        
+
     def report_streaming_stop(self, track_id):
         print "Report Streaming stop for user:  " + str(self.userid) + ", track: " + str(track_id) + "\n"
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'user_id': self.userid, 'track_id': track_id})
+        return self._api_request(params,"/api.json/0.1/track/reportStreamingEnd")
 
 if __name__ == '__main__':
     pass
