@@ -65,11 +65,14 @@ class IQobuzTag(object):
     def getArtist(self):
         label = []
         try:
-            label.append(self.interpreter_name)
-        except: 
+            label.append(self.artist)
+        except:
             try:
-                label.append(self.composer_name)
-            except: label.append('N/A')
+                label.append(self.interpreter_name)
+            except: 
+                try:
+                    label.append(self.composer_name)
+                except: label.append('N/A')
         return ''.join(label)
     
     def getGenre(self):
@@ -161,7 +164,6 @@ class QobuzTagAlbum(IQobuzTag):
             self.parse_json(json)
     
     def parse_json(self, p):
-        print "parse album"
         self.set('id', p['id'])
         self.set('title', p['title'])
         self.set('label', p['label'])
@@ -171,7 +173,36 @@ class QobuzTagAlbum(IQobuzTag):
         except: pass
         self.set('release_date', p['release_date'])
         self._is_loaded = True
-        
+
+'''
+'''
+class QobuzTagProduct(IQobuzTag):
+    
+    def __init__(self, json):
+        super(QobuzTagProduct, self).__init__(json)
+        self.set_valid_tags(['id', 'artist_name', 'genre', 'description',
+                            'image_large', 'image_small', 'image_thumbnail', 
+                            'label', 'price', 'realease_date', 'relevancy', 
+                            'title', 'type', 'url'])
+        if json:
+            self.parse_json(json)
+    
+    def parse_json(self, p):
+        self.set('id', p['id'])
+        self.set('artist', p['artist'])
+        self.set('genre', p['genre'])
+        self.set('image_large', p['image']['large'])
+        self.set('image_large', p['image']['small'])
+        self.set('image_small', p['image']['thumbnail'])
+        self.set('label', p['label'])
+        self.set('price', p['price'])
+        self.set('release_date', p['release_date'])
+        self.set('relevancy', p['relevancy'])
+        self.set('title', p['title'])
+        self.set('type', p['type'])
+        self.set('url', p['url'])
+        self._is_loaded = True
+
 '''
 '''
 class QobuzTagTrack(IQobuzTag):
@@ -200,24 +231,28 @@ class QobuzTagTrack(IQobuzTag):
         return ''.join(label)
     
     def parse_json(self, p):
-        if p['playlist_track_id']:
+        self.set('id', p['id'])
+        try:
             self.set('playlist_track_id', p['playlist_track_id'])
+        except: pass
+        self.set('title', p['title'])
+        try:
+            self.set('interpreter_name', p['interpreter']['name'])
+            self.set('interpreter_id', p['interpreter']['id'])
+        except: pass
+        try:
+            self.set('composer_id', p['composer_id'])
+            self.set('composer_name', p['composer_name'])
+        except: pass
+        try:
             self.set('position', p['position'])
-            self.set('id', p['id'])
-            self.set('title', p['title'])
-            try:
-                self.set('interpreter_name', p['interpreter']['name'])
-                self.set('interpreter_id', p['interpreter']['id'])
-            except: pass
-            try:
-                self.set('composer_id', p['composer_id'])
-                self.set('composer_name', p['composer_name'])
-            except: pass
-        self.set('position', p['position'])
+        except: pass
         self.set('track_number', p['track_number'])
         self.set('media_number', p['media_number'])
         self.set('duration', p['duration'])
-        self.set('created_at', p['created_at'])
+        try:
+            self.set('created_at', p['created_at'])
+        except: pass
         self.set('streaming_type', p['streaming_type'])
         self.__album = QobuzTagAlbum(p['album'])
         self._is_loaded = True

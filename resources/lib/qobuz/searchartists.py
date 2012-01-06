@@ -25,6 +25,8 @@ from mydebug import log, info, warn
 
 import pprint
 
+from easytag import QobuzTagTrack
+
 ###############################################################################
 # Class QobuzSearchArtists
 ###############################################################################
@@ -36,7 +38,6 @@ class QobuzSearchArtists():
         
     def search(self, query, limit = 100):
         self._raw_data = self.Qob.Api.search_artists(query, limit)
-        #pprint.pprint(self._raw_data)
         return self
         
     def length(self):
@@ -51,31 +52,13 @@ class QobuzSearchArtists():
     def add_to_directory(self):
         h = int(sys.argv[1])
         xbmc_directory_products(self._raw_data, self.length())
-        #xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
         xbmcplugin.setContent(h,'artists')
- 
 
 def xbmc_directory_products(json, len):
       h = int(sys.argv[1])
       for p in json['results']['artists']:
          artist = _sc(p['name'])
          u = sys.argv[0] + "?mode=" + str(MODE_ARTIST) + "&id=" + str(p['id'])
-         #(sh,sm,ss) = a['duration'].split(':')
          item   = xbmcgui.ListItem()
          item.setLabel(artist.encode("utf8","ignore"))
          xbmcplugin.addDirectoryItem(handle=h , url=u,listitem=item,isFolder=True,totalItems=len)
-
-#        item.setInfo(type="Music",infoLabels={
-#                                                   #"count"  : long(a['id']),
-#                                                   "artist" : artist,
-#                                                   "album"  : title,
-#                                                   "genre"  : genre,
-#                                                   "comment": "Qobuz Stream",
-#                                                   "year"   : year
-#        })
-#        print "U:" + u + "\n"
-        #item.setPath(u)
-        #item.setProperty('Music','true')
-        #item.setProperty('IsPlayable','false');
-#        item.setThumbnailImage(image)
-      

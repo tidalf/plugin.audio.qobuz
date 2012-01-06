@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmc
+from mydebug import info, warn, log
 
 class QobuzPlayer(xbmc.Player):
     def __init__(self, type):
