@@ -19,8 +19,8 @@ import os
 import xbmc
 
 from utils import _sc
-from constants import __debugging__
 
+__debugging__ = True
 
 ###############################################################################
 # Loggin helper functions

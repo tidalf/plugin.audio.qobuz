@@ -7,7 +7,7 @@ import xbmcplugin
 from icacheable import ICacheable
 from mydebug import log, info, warn
 from utils import _sc
-
+from constants import __addon__
 
 '''
  Class QobuzTrack 
@@ -25,7 +25,8 @@ class QobuzTrack(ICacheable):
         self._raw_data = []
         self.cache_path = os.path.join(self.Qob.cacheDir,
                                         'track-' + str(self.id) + '.dat')
-        self.cache_refresh = 1200
+        self.cache_refresh = __addon__.getSetting('cache_duration_track')
+        info(self, "Cache duration: " + str(self.cache_refresh))
         self.format_id = 6
         settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
         # Todo : Due to caching, streaming url can be mixed if settings are 
