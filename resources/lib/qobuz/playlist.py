@@ -27,9 +27,10 @@ from constants import *
 from constants import __addon__
 from mydebug import * 
 from easytag import QobuzTagPlaylist
-###############################################################################
-# Class QobuzPLaylist
-###############################################################################
+
+'''
+    Class QobuzPLaylist
+'''
 class QobuzPlaylist(ICacheable):
 
     def __init__(self,qob,id):
@@ -38,17 +39,13 @@ class QobuzPlaylist(ICacheable):
         self._raw_data = []
         self.cache_path = os.path.join(
                                         self.Qob.cacheDir,
-                                        'playlist-' + str(self.id) + '.dat'
-        )
+                                        'playlist-' + str(self.id) + '.dat')
         self.cache_refresh = __addon__.getSetting('cache_duration_userplaylist')
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
-        #ea = self.Qob.getEncounteredAlbum()
         data = self.Qob.Api.get_playlist(self.id)['playlist']
-        #for a in data['tracks']:
-        #    ea.add(a)
         return data
 
     def length(self):
@@ -61,28 +58,31 @@ class QobuzPlaylist(ICacheable):
         p = QobuzTagPlaylist(self.get_data())
         for t in p.get_tracks():
             if t.streaming_type and t.streaming_type != "full":
-                warn(self, "Skipping sample " + t.title)
+                warn(self, "Skipping sample " + t.getTitle())
                 continue
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id
-            item = xbmcgui.ListItem('test')
-            item.setLabel(t.getLabel())
+            label = t.get_album().getTitle() + ' - ' + t.getLabel()
+            item = xbmcgui.ListItem(label)
+            item.setLabel(label)
             item.setInfo(type="Music",infoLabels={
                                                    "count": int(self.id),
-                                                   "title":  t.title,
+                                                   "title":  t.getTitle(),
                                                    "artist": t.getArtist(),
-                                                   "album": t.title,
+                                                   "album": t.get_album().getTitle(),
                                                    "tracknumber": int(t.track_number),
-                                                   "genre": t.getGenre(),
+                                                   "genre": t.get_album().getGenre(),
                                                    "comment": "Qobuz Stream",
                                                    "duration": t.getDuration(),
-                                                   "year": t.getYear()
+                                                   "year": t.get_album().getYear()
                                                    })
             item.setPath(u)
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','true');
             item.setProperty('mimetype','audio/flac')
-            #item.setThumbnailImage(t['album']['image']['large'])
+            image = t.get_album().getImage()
+            item.setIconImage(image)
+            item.setThumbnailImage(image)
+            
             xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
             xp.add(u, item)
         xbmcplugin.setContent(h,'songs')
-        #xbmcplugin.setPluginFanart(int(sys.argv[1]), self.Qob.fanImg)

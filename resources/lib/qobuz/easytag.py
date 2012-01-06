@@ -38,7 +38,64 @@ class IQobuzTag(object):
     
     def is_loaded(self):
         return self.__is_loaded
-
+    
+    def getTitle(self):
+        v = 'N/A'
+        try:
+            v = self.title
+        except: pass
+        return v
+    
+    def getArtist(self):
+        label = []
+        try:
+            label.append(self.interpreter_name)
+        except: 
+            try:
+                label.append(self.composer_name)
+            except: label.append('N/A')
+        return ''.join(label)
+    
+    def getGenre(self):
+        genre = ''
+        try:
+            genre = self.genre
+        except:
+            genre = 'N/A'
+        return genre
+    
+    def getDuration(self):
+        (sh,sm,ss) = self.duration.split(':')
+        return (int(sh) * 3600 + int(sm) * 60 + int(ss))
+    
+    def getYear(self):
+        date = ''
+        try:
+            date = self.release_date
+        except:
+            try:
+                date = self.created_at
+            except: pass
+        if not date:
+            return date
+        year = 0
+        try: 
+            year = int(date.split('-')[0])
+        except: pass
+        return year
+    
+    def getImage(self):
+        image = ''
+        try:
+            image = self.image_large
+        except:
+            try:
+                image = self.image_small
+            except:
+                try:
+                    image = self.image_thumbnail
+                except: pass
+        return image
 '''
 '''
 class QobuzTagUserPlaylist(IQobuzTag):
@@ -78,6 +135,29 @@ class QobuzTagUserPlaylist(IQobuzTag):
 
 '''
 '''
+class QobuzTagAlbum(IQobuzTag):
+    
+    def __init__(self, json):
+        super(QobuzTagAlbum, self).__init__(json)
+        self.set_valid_tags(['id', 'title', 'genre', 'label', 'image_large', 
+                             'release_date'])
+        if json:
+            self.parse_json(json)
+    
+    def parse_json(self, p):
+        print "parse album"
+        self.set('id', p['id'])
+        self.set('title', p['title'])
+        self.set('label', p['label'])
+        self.set('genre', p['genre']['name'])
+        try:
+            self.set('image_large', p['image']['large'])
+        except: pass
+        self.set('release_date', p['release_date'])
+        self._is_loaded = True
+        
+'''
+'''
 class QobuzTagTrack(IQobuzTag):
     
     def __init__(self, json):
@@ -87,13 +167,13 @@ class QobuzTagTrack(IQobuzTag):
                              'composer_name', 'composer_id',
                              'tracke_numer', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
+        self.__album = None
         if json:
             self.parse_json(json)
-        self.__album = None
         
     def get_album(self):
         return self.__album
-        
+    
     def getLabel(self):
         label = []
         label.append(self.track_number)
@@ -102,35 +182,6 @@ class QobuzTagTrack(IQobuzTag):
         label.append(' - ')
         label.append(self.title)
         return ''.join(label)
-    
-    def getArtist(self):
-        label = []
-        try:
-            label.append(self.interpreter_name)
-        except: 
-            try:
-                label.append(self.composer_name)
-            except: label.append('N/A')
-        return ''.join(label)
-    
-    def getGenre(self):
-        genre = ''
-        try:
-            genre = self.genre_name
-        except:
-            genre = 'N/A'
-        return genre
-    
-    def getDuration(self):
-        (sh,sm,ss) = self.duration.split(':')
-        return (int(sh) * 3600 + int(sm) * 60 + int(ss))
-    
-    def getYear(self):
-        year = 0
-        try: 
-            year = int(t.release_date.split('-')[0])
-        except: pass
-        return year
     
     def parse_json(self, p):
         if p['playlist_track_id']:
@@ -152,6 +203,7 @@ class QobuzTagTrack(IQobuzTag):
         self.set('duration', p['duration'])
         self.set('created_at', p['created_at'])
         self.set('streaming_type', p['streaming_type'])
+        self.__album = QobuzTagAlbum(p['album'])
         self._is_loaded = True
 
 '''
