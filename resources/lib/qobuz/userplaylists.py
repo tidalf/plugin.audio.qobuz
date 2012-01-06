@@ -6,8 +6,7 @@ import xbmcgui
 from icacheable import ICacheable
 from mydebug import log, info, warn
 from constants import *
-from easytag import EasyMediaTag, EasyMediaTag_UserPlaylists
-
+from easytag import IQobuzTag, QobuzTagUserPlaylist
 '''
     Class QobuzUserPLaylists
 '''
@@ -34,16 +33,14 @@ class QobuzUserPlaylists(ICacheable):
         n = self.length()
         log(self,"Found " + str(n) + " playlist(s)")
         h = int(sys.argv[1])
-        u = dir = None
-        et = EasyMediaTag_UserPlaylists(self._raw_data)
-        et.parse()
-        for t in et.get_list():
+        for track in self.get_data():
+            t = QobuzTagUserPlaylist(track)
+            u = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST) + "&id=" + t.id
             item = xbmcgui.ListItem()
-            item.setLabel(t.getValue('title'))
-            item.setLabel2(t.getValue('owner_name'))
-            item.setInfo(type="Music",infoLabels={ "title": t.getName() })
-            item.setProperty('duration', str(t.getCreatedAt()[0]))
-            xbmcplugin.addDirectoryItem(handle=h,url=t.getValue('_url'),listitem=item,isFolder=True,totalItems=n)
-        xbmcplugin.setContent(h,'songs')
+            item.setLabel('[' + t.owner_name + '] - '+ t.name)
+            item.setInfo(type="Music",infoLabels={ "title": t.name })
+            item.setProperty('Music','true')
+            item.setProperty('IsPlayable','false');
+            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-        xbmcplugin.setPluginFanart(h,self.Qob.fanImg)
+
