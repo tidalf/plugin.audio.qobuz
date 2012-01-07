@@ -22,6 +22,7 @@ from utils import _sc
 from constants import *
 from mydebug import log, info, warn
 from easytag import QobuzTagProduct
+from easytag import QobuzTagAlbum
 import pprint
 
 '''
@@ -84,5 +85,5 @@ def xbmc_directory_products_by_artist(json, len):
         item = xbmcgui.ListItem()
         item.setLabel(a.getTitle() + "(" + str(a.getYear()) + ")")
         item.setInfo(type="Music",infoLabels={"artist" : a.getArtist() })
-        item.setThumbnailImage(image)
+        item.setThumbnailImage(a.getImage())
         xbmcplugin.addDirectoryItem(handle=h , url=u,listitem=item,isFolder=True,totalItems=len)

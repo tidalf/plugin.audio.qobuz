@@ -93,8 +93,12 @@ class IQobuzTag(object):
             date = self.release_date
         except:
             try:
-                date = self.created_at
-            except: pass
+                date = self.released_at
+                print "Date: " + date
+            except:
+                try:
+                    date = self.created_at
+                except: pass
         if not date:
             return date
         year = 0
@@ -152,6 +156,28 @@ class QobuzTagUserPlaylist(IQobuzTag):
             self.set('length', '-1')
         self._is_loaded = True
 
+class QobuzTagArtist(IQobuzTag):
+    
+    def __init__(self, json):
+        super(QobuzTagArtist, self).__init__(json)
+        self.set_valid_tags(['id', 'name'])
+        self.__album = None
+        if json:
+            self.parse_json(json)
+
+        
+    def getArtist(self):
+        return self.name
+    
+    def get_album(self):
+        return self.__album
+    
+    def parse_json(self, p):
+        self.set('id', p['id'])
+        self.set('name', p['artist']['name'])
+        self.__album = QobuzTagAlbum(p)
+        self._is_loaded = True
+        
 '''
 '''
 class QobuzTagAlbum(IQobuzTag):
@@ -166,12 +192,24 @@ class QobuzTagAlbum(IQobuzTag):
     def parse_json(self, p):
         self.set('id', p['id'])
         self.set('title', p['title'])
-        self.set('label', p['label'])
-        self.set('genre', p['genre']['name'])
+        try:
+            self.set('label', p['label'])
+        except: pass
+        try:
+            self.set('genre', p['genre']['name'])
+        except: pass
         try:
             self.set('image_large', p['image']['large'])
         except: pass
-        self.set('release_date', p['release_date'])
+        try:
+            self.set('release_date', p['release_date'])
+        except:
+            try:
+                self.set('released_at', p['released_at'])
+            except: pass
+        try:
+            self.set('subtitle', p['subtitle'])
+        except: pass
         self._is_loaded = True
 
 '''

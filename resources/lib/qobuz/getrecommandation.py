@@ -25,6 +25,7 @@ from mydebug import log, info, warn
 from constants import *
 from icacheable import ICacheable
 from constants import __addon__
+from easytag import QobuzTagArtist
 """
     Class QobuzGetRecommendation
 """
@@ -51,14 +52,21 @@ class QobuzGetRecommandation(ICacheable):
         u = dir = None
 
         for p in data:
-            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(p['id'])
+            pprint.pprint(p)
+            artist = QobuzTagArtist(p)
+            a=artist.get_album()
+            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
             item = xbmcgui.ListItem()
-            year = int(p['released_at'].split('-')[0]) if p['released_at'] else 0
-            artist =  p['subtitle'] + ' - ' if p['subtitle'] else ''
-            item.setLabel(artist +p['title'] + " (" + str(year) + ")")
-            item.setLabel2(p['title'])
-            item.setInfo(type="Music",infoLabels={ "title": p['title'] })
-            item.setThumbnailImage(p['image']['large'])
+            item.setLabel(artist.getName() + ' / ' + a.getTitle() + " (" + str(a.getYear()) + ")")
+            item.setLabel2(a.getTitle())
+            item.setInfo(type="Music",infoLabels={ 
+                                                  "title": a.getTitle(), 
+                                                  "genre": a.getGenre(),
+                                                  "year" : int(a.getYear())
+                                                  
+                                                  
+                                                  })
+            item.setThumbnailImage(a.getImage())
             xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, isFolder=True, totalItems=n)
         xbmcplugin.setContent(h,'songs')
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
