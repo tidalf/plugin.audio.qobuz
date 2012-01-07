@@ -24,25 +24,28 @@ import pprint
 from mydebug import log, info, warn
 from constants import *
 from icacheable import ICacheable
-from constants import __addon__
 from easytag import QobuzTagArtist
+
 """
     Class QobuzGetRecommendation
 """
 class QobuzGetRecommandation(ICacheable):
 
-    def __init__(self, qob, genre_id, type ='new-releases', limit = 100):
-        self.Qob = qob
+    def __init__(self, Core, genre_id, type ='new-releases', limit = 100):
+        self.Core = Core
         self._raw_data = []
-        self.cache_path = os.path.join(self.Qob.cacheDir, 'recommandations-' + genre_id + '-' + type + '.dat')
-        self.cache_refresh = __addon__.getSetting('cache_duration_recommandation')
+        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir, 
+                                       'recommandations-' 
+                                       + genre_id + '-' + type + '.dat')
+        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation')
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.genre_id = genre_id
         self.type = type
         self.limit = limit 
         
     def _fetch_data(self):
-        return self.Qob.Api.get_recommandations(self.genre_id, self.type, self.limit)
+        return self.Core.Api.get_recommandations(self.genre_id, 
+                                                self.type, self.limit)
 
     def add_to_directory(self):
         data = self.fetch_data()
@@ -52,22 +55,21 @@ class QobuzGetRecommandation(ICacheable):
         u = dir = None
 
         for p in data:
-            pprint.pprint(p)
+            #pprint.pprint(p)
             artist = QobuzTagArtist(p)
             a=artist.get_album()
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
             item = xbmcgui.ListItem()
-            item.setLabel(artist.getName() + ' / ' + a.getTitle() + " (" + str(a.getYear()) + ")")
+            item.setLabel(artist.getArtist() + ' / ' + a.getTitle() 
+                          + " (" + str(a.getYear()) + ")")
             item.setLabel2(a.getTitle())
             item.setInfo(type="Music",infoLabels={ 
                                                   "title": a.getTitle(), 
                                                   "genre": a.getGenre(),
-                                                  "year" : int(a.getYear())
-                                                  
-                                                  
-                                                  })
+                                                  "year" : int(a.getYear())})
             item.setThumbnailImage(a.getImage())
-            xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, isFolder=True, totalItems=n)
+            xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
+                                        isFolder=True, totalItems=n)
         xbmcplugin.setContent(h,'songs')
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-        xbmcplugin.setPluginFanart(h,self.Qob.fanImg)
+        xbmcplugin.setPluginFanart(h,self.Core.Bootstrap.Images.get('fanart'))

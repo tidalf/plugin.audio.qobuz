@@ -12,15 +12,15 @@ from easytag import IQobuzTag, QobuzTagUserPlaylist
 '''
 class QobuzUserPlaylists(ICacheable):
 
-    def __init__(self,qob):
-        self.Qob = qob
+    def __init__(self, Core):
+        self.Core = Core
         self._raw_data = []
-        self.cache_path = os.path.join(self.Qob.cacheDir,'userplaylists.dat')
+        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir,'userplaylists.dat')
         self.cache_refresh = 600
         self.fetch_data()
 
     def _fetch_data(self):
-        raw_data = self.Qob.Api.get_user_playlists()
+        raw_data = self.Core.Api.get_user_playlists()
         data = []
         for p in raw_data:
             data.append(p['playlist'])

@@ -28,13 +28,12 @@ from easytag import QobuzTagTrack
 ###############################################################################
 class QobuzSearchTracks():
 
-    def __init__(self, qob,):
-        self.Qob = qob
+    def __init__(self, Core):
+        self.Core = Core
         self._raw_data = {}
         
     def search(self, query, limit = 100):
-        self._raw_data = self.Qob.Api.search_tracks(query, limit)
-        #pprint.pprint(self._raw_data)
+        self._raw_data = self.Core.Api.search_tracks(query, limit)
         return self
         
     def length(self):
@@ -45,6 +44,7 @@ class QobuzSearchTracks():
     def add_to_directory(self):
         n = self.length()
         h = int(sys.argv[1])
+        pprint.pprint(self._raw_data)
         for track in self._raw_data['results']['tracks']:
             t = QobuzTagTrack(track)
             if t.streaming_type != 'full':

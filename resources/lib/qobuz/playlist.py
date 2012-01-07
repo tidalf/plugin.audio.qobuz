@@ -24,7 +24,6 @@ import xbmcplugin
 from icacheable import ICacheable
 from utils import _sc
 from constants import *
-from constants import __addon__
 from mydebug import * 
 from easytag import QobuzTagPlaylist
 
@@ -33,19 +32,19 @@ from easytag import QobuzTagPlaylist
 '''
 class QobuzPlaylist(ICacheable):
 
-    def __init__(self,qob,id):
-        self.Qob = qob
+    def __init__(self, Core, id):
+        self.Core = Core
         self.id = id
         self._raw_data = []
         self.cache_path = os.path.join(
-                                        self.Qob.cacheDir,
+                                        self.Core.Bootstrap.cacheDir,
                                         'playlist-' + str(self.id) + '.dat')
-        self.cache_refresh = __addon__.getSetting('cache_duration_userplaylist')
+        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist')
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
-        data = self.Qob.Api.get_playlist(self.id)['playlist']
+        data = self.Core.Api.get_playlist(self.id)['playlist']
         return data
 
     def length(self):

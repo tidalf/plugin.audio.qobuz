@@ -31,7 +31,7 @@ def log(obj,msg,lvl="LOG"):
         name = obj.__class__.__name__
     except:
         name = type(obj)
-    xbmc.log(_sc('[' + lvl + '] ' + str(name) + ": " + msg))
+    xbmc.log(_sc('[' + lvl + '] [' + str(name) + "] " + msg))
 
 def warn(obj,msg):
     if __debugging__:

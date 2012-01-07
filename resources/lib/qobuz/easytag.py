@@ -94,7 +94,7 @@ class IQobuzTag(object):
         except:
             try:
                 date = self.released_at
-                print "Date: " + date
+                #print "Date: " + date
             except:
                 try:
                     date = self.created_at

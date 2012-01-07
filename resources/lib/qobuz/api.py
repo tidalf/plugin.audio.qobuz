@@ -15,21 +15,83 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-import httplib,json,time,urllib2,urllib,hashlib,mutagen
+import os
+import httplib
+import json
+import time
+import urllib2
+import urllib
+import hashlib
+import mutagen 
+import pickle
 from mutagen.flac import FLAC
 import pprint
-from constants import __debugging__
+from time import time
+
 from mydebug import log, info, warn
 
 class QobuzApi:
 
-    def __init__(self,qob):
-        self.qob = qob
+    def __init__(self, Core):
+        self.Core = Core
         self.headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
         self.authtoken = None
         self.userid = None
+        self.authtime = None
+        self.token_validity_time = 3600
+        self.cacheDir = os.path.join(self.Core.Bootstrap.cacheDir,'auth.dat')
+        info(self, 'authCacheDir: ' + self.cacheDir)
 
-    def _api_request(self, params, uri):
+
+    def save_auth(self):
+        data = {}
+        data['authtoken'] = self.authtoken
+        data['authtime'] = self.authtime
+        data['userid'] = self.userid
+        f = None
+        try:
+            f = open(self.cacheDir, 'wb')
+        except:
+            warn(self, "Cannot open authentification cache for writing!")
+            return False
+        try:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+            f.close()
+        except:
+            warn(self, 'Cannot save authentification')
+            return False
+        return True
+    
+    def load_auth(self):
+        if not os.path.exists(self.cacheDir):
+            warn(self, "Caching directory doesn't exist")
+            return None
+        mtime = None
+        try:
+            mtime = os.path.getmtime(self.cacheDir)
+        except:
+            warn(self,"Cannot stat cache file: " + self.cacheDir)
+        if (time() - mtime) > self.token_validity_time:
+            info(self,"Our authentification token must be invalid")
+            return None
+        f = None
+        try:
+            f = open(self.cacheDir, 'rb')
+        except:
+            warn(self, "Cannot open authentification cache for reading!")
+            return None
+        data = None
+        try:
+            data = pickle.load(f)
+        except:
+            warn(self, "Cannot load serialized data")
+            return None
+        self.authtime = data['authtime']
+        self.authtoken = data['authtoken']
+        self.userid = data['userid']
+        return True
+            
+    def _api_request(self, params, uri):      
         self.conn = httplib.HTTPConnection("player.qobuz.com")
         self.conn.request("POST", uri, params, self.headers)
         info(self, "Get " + uri + ' / ' + params)
@@ -43,12 +105,17 @@ class QobuzApi:
         return response_json
     
     def login(self,user,password):
+        if self.load_auth():
+            info(self, 'Using authentification token from cache')
+            return self.userid
         params = urllib.urlencode({'x-api-auth-token':'null','email': user ,'hashed_password': hashlib.md5(password).hexdigest() })
         data = self._api_request(params,"/api.json/0.1/user/login")
         if not 'user' in data:
             return None
         self.authtoken = data['user']['session_id']
         self.userid = data['user']['id']
+        self.authtime = time()
+        self.save_auth()
         return self.userid
     
     def get_track_url(self,track_id,context_type,context_id ,format_id = 6):
@@ -69,8 +136,7 @@ class QobuzApi:
             # xbmc.log(json.dumps(data))
             url = data[u'streaming_url']
         return data
-
-
+            
 
     def get_track(self,trackid):
         params = urllib.urlencode({'x-api-auth-token':self.authtoken,'track_id': trackid})

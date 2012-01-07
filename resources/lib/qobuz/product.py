@@ -10,45 +10,36 @@ from icacheable import ICacheable
 from logging import *
 from utils import _sc
 from constants import *
-from constants import __addon__
 ###############################################################################
 # Class QobuzProduct
 ###############################################################################
 class QobuzProduct(ICacheable):
 
-    def __init__(self,qob,id):
-        self.Qob = qob
+    def __init__(self, Core, id):
+        self.Core = Core
         self.id = id
         self._raw_data = []
         self.cache_path = os.path.join(
-                                        self.Qob.cacheDir,
+                                        self.Core.Bootstrap.cacheDir,
                                         'product-' + str(self.id) + '.dat'
         )
-        self.cache_refresh = __addon__.getSetting('cache_duration_album')
+        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_album')
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
-        #ea = self.Qob.getEncounteredAlbum()
-        data = self.Qob.Api.get_product(str(self.id))['product']
-        #pprint.pprint(data)
-        #for a in data['tracks']:
-        #    ea.add(a)
+        data = self.Core.Api.get_product(str(self.id))['product']
         return data
 
     def length(self):
         return len(self._raw_data['tracks'])
 
     def add_to_directory(self):
-        #pprint.pprint(self._raw_data)
         n = self.length()
         h = int(sys.argv[1])
         p = self._raw_data
         for t in self._raw_data['tracks']:
             title = _sc(t['title'])
-#            if t['streaming_type'] != 'full':
-#                warn(self, "Skipping sample " + title.encode("utf8","ignore"))
-#                continue
             interpreter = _sc(t['interpreter']['name'])
             year = int(p['release_date'].split('-')[0]) if p['release_date'] else 0
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + str(t['id'])

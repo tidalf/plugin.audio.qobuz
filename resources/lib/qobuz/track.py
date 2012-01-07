@@ -7,7 +7,6 @@ import xbmcplugin
 from icacheable import ICacheable
 from mydebug import log, info, warn
 from utils import _sc
-from constants import __addon__
 from player import QobuzPlayer
 '''
  Class QobuzTrack 
@@ -20,12 +19,12 @@ from player import QobuzPlayer
 class QobuzTrack(ICacheable):
     # Constructor
     def __init__(self,qob,id):
-        self.Qob = qob
+        self.Core = qob
         self.id = id
         self._raw_data = []
-        self.cache_path = os.path.join(self.Qob.cacheDir,
+        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir,
                                         'track-' + str(self.id) + '.dat')
-        self.cache_refresh = __addon__.getSetting('cache_duration_track')
+        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_track')
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.format_id = 6
         settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
@@ -42,9 +41,9 @@ class QobuzTrack(ICacheable):
         try:
             album_id = data['info']['album']['id']
         except: pass
-        data['info'] = self.Qob.Api.get_track(self.id)
+        data['info'] = self.Core.Api.get_track(self.id)
         #pprint.pprint(data['info'])
-        data['stream'] = self.Qob.Api.get_track_url(self.id,
+        data['stream'] = self.Core.Api.get_track_url(self.id,
                                                     'playlist',
                                                     album_id,
                                                     self.format_id)
@@ -90,7 +89,7 @@ class QobuzTrack(ICacheable):
         return item
     
     def stop(self, id):
-        self.Qob.Api.report_streaming_stop(self.id)
+        self.Core.Api.report_streaming_stop(self.id)
     
     
     
@@ -99,7 +98,7 @@ class QobuzTrack(ICacheable):
         #global player
         player = QobuzPlayer(xbmc.PLAYER_CORE_AUTO)
         player.set_track_id(self.id)
-        player.setApi(self.Qob)
+        player.setApi(self.Core)
         
         item = self.getItem()
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
@@ -113,7 +112,7 @@ class QobuzTrack(ICacheable):
         info(self, "Song started")
         xbmc.sleep(6000)
         if player.isPlayingAudio():
-            self.Qob.Api.report_streaming_start(self.id)
+            self.Core.Api.report_streaming_start(self.id)
         player.watchPlayback()
         #player.onPlayBackEnded('stop_track('+str(self.id)+')')
 

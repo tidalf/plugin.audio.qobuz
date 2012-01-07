@@ -35,28 +35,24 @@ from playlist import QobuzPlaylist
 from searchtracks import QobuzSearchTracks
 from searchalbums import QobuzSearchAlbums
 from searchartists import QobuzSearchArtists
-
+from time import time
 """
  Class QobuzXbmc
 """
-class QobuzXbmc:
-    fanImg = xbmc.translatePath(os.path.join('resources/img/','playlist.png'))
-    def __init__(self, baseDir):
+class QobuzCore:
+    
+    def __init__(self, bootstrap):
+        self.Bootstrap = bootstrap
+        self.Api = QobuzApi(self)
         self.data = ""
         self.conn = ""
-        self.Api = QobuzApi(self)
-        self.__playlists = {}
-        self._handle = int(sys.argv[1])
-        self.baseDir = baseDir
-        self.cacheDir = os.path.join(xbmc.translatePath('special://temp/'), os.path.basename(self.baseDir))
-        info(self, "cacheDir: " + self.cacheDir)
-        if os.path.isdir(self.cacheDir) == False:
-            os.makedirs(self.cacheDir)
-            info(self, "Make cache directory: " + self.cacheDir)
-
-    def login(self,user,password):
+    
+    def login(self):
+        __addon__ = self.Bootstrap.__addon__
+        user =  __addon__.getSetting('username')
         info(self, "Try to login as user: " + user)
-        return self.Api.login(user,password)
+        return self.Api.login( user,
+                               __addon__.getSetting('password'))
 
     def is_logged(self):
         return self.Api.userid
@@ -104,59 +100,3 @@ class QobuzXbmc:
 
     def getRecommandation(self, genre_id,type):
         return QobuzGetRecommandation(self, genre_id, type)
-
-
-#    def download_track_withurl(self,file_name,url):
-#        u = urllib2.urlopen(url)
-#        f = open(file_name, 'wb')
-#        meta = u.info()
-#        file_size = int(meta.getheaders("Content-Length")[0])
-#        print "Downloading: %s Bytes: %s" % (file_name, file_size)
-#        file_size_dl = 0
-#        block_sz = 8192
-#        while True:
-#            buffer = u.read(block_sz)
-#            if not buffer:
-#                break
-#            file_size_dl += len(buffer)
-#            f.write(buffer)
-#            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-#            status = status + chr(8)*(len(status)+1)
-#            print status,
-#        f.close()
-#        u.close()
-#
-#    def tag_track(self,track,file_name,album_title="null"):
-#        audio = FLAC(file_name)
-#        audio["title"] = track['title']
-#        
-#        if album_title == "null":
-#            audio["album"] = track['album']['title']
-#            audio["genre"] = track['album']['genre']['name']
-#            audio["date"] = track['album']['release_date']
-#        else:
-#            audio["album"] = album_title
-#        
-#        #audio["genre"] = self.pdata['product']['genre']['name']
-#        #audio["date"] = self.pdata['product']['release_date'] 
-#        
-#        audio["length"] = track['duration']
-#        audio["artist"] = track['interpreter']['name']
-#        audio["discnumber"] = track['media_number']
-#        audio["tracknumber"] = track['track_number']
-#        audio.pprint()
-#        audio.save()
-#     
-#     
-#    def download_track(self,track,context,context_id,album_title="null"):
-#        url=self.Api.get_track_url(track['id'],context,context_id) 
-#        if album_title == "null":
-#            track_album=track['album']['title']
-#        else:
-#            track_album=album_title 
-#        file_name = track['interpreter']['name'] +" - "+ track_album + " - "+track['track_number']+" - "+track['title']+".flac"
-#        self.download_track_withurl(file_name,url)
-#        if album_title != "null":
-#            self.tag_track(track,file_name,album_title)
-#        else:
-#            self.tag_track(track,file_name)
