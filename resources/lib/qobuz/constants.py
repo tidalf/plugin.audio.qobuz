@@ -1,5 +1,5 @@
-# Copyright 2011 Joachim Basmaison, Cyril Leclerc
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
 #     This file is part of xbmc-qobuz.
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify
@@ -14,50 +14,12 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 import xbmcaddon
-from enum import Enum
 
-MODE = Enum(
-    'SEARCH_SONG', 
-    'SEARCH_ALBUMS',
-    'SEARCH_ARTISTS',
-    'SEARCH_ARTISTS_ALBUMS',
-    'SEARCH_PLAYLISTS',
-    'ARTIST_POPULAR',
-    'POPULAR_SONGS',
-    'FAVORITES',
-    'PLAYLISTS',
-    'ALBUM',
-    'ARTIST',
-    'PLAYLIST',
-    'SONG_PAGE',
-    'SIMILAR_ARTISTS',
-    'SHOW_RECOS',
-    'SHOW_RECO_T',
-    'SHOW_RECO_T_G',
-    'SONG',
-    'FAVORITE',
-    'UNFAVORITE',
-    'MAKE_PLAYLIST',
-    'REMOVE_PLAYLIST',
-    'RENAME_PLAYLIST',
-    'REMOVE_PLAYLIST_SONG',
-    'ADD_PLAYLIST_SONG');
-
-Qob = None
-
-#__addon__ = xbmcaddon.Addon('plugin.audio.qobuz')
-#__addonname__ = __addon__.getAddonInfo('name')
-#__cwd__ = __addon__.getAddonInfo('path')
-#__author__ = __addon__.getAddonInfo('author')
-#__version__ = __addon__.getAddonInfo('version')
-#__language__ = __addon__.getLocalizedString
+#Qob = None
 
 __debugging__ = 0
 
-#__addon__.getSetting('debug')
-#
 MODE_SEARCH_SONGS = 1
 MODE_SEARCH_ALBUMS = 2
 MODE_SEARCH_ARTISTS = 3

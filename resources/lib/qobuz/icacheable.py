@@ -1,5 +1,5 @@
-# Copyright 2011 Joachim Basmaison, Cyril Leclerc
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
 #     This file is part of xbmc-qobuz.
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify

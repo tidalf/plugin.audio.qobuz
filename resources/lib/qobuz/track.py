@@ -1,3 +1,19 @@
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
+#     This file is part of xbmc-qobuz.
+#
+#     xbmc-qobuz is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     xbmc-qobuz is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import os
 import xbmc
@@ -8,6 +24,7 @@ from icacheable import ICacheable
 from mydebug import log, info, warn
 from utils import _sc
 from player import QobuzPlayer
+from easytag import QobuzTagTrack
 '''
  Class QobuzTrack 
 
@@ -37,18 +54,9 @@ class QobuzTrack(ICacheable):
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
         data = {}
-        album_id = ''
-        try:
-            album_id = data['info']['album']['id']
-        except: pass
         data['info'] = self.Core.Api.get_track(self.id)
-        #pprint.pprint(data['info'])
-        data['stream'] = self.Core.Api.get_track_url(self.id,
-                                                    'playlist',
-                                                    album_id,
-                                                    self.format_id)
         return data
-
+        
     # Return track duration
     def get_duration(self):
         (sh,sm,ss) = self._raw_data['info']['duration'].split(':')
@@ -56,36 +64,22 @@ class QobuzTrack(ICacheable):
 
     # Build an XbmcItem based on json data
     def getItem(self):
-        item = xbmcgui.ListItem(label=repr(self._raw_data['info']['title']))
-        i = self._raw_data['info']
-        a = i['album']
+        '''
+            This hack work but we must stick with the real API and pass
+            album_id and context?
+        '''
+        album_id = ''
+        t = QobuzTagTrack(self._raw_data)
+        item = t.getXbmcItem()
+        stream = self.Core.Api.get_track_url(self.id,
+                                                    'playlist',
+                                                    album_id,
+                                                    self.format_id)
         mimetype = 'audio/flac'
         if self.format_id == 5:
             mimetype = 'audio/mpeg'
-        item.setInfo(type='music',infoLabels={
-                                   'count': self.id,
-                                   'title': _sc(i['title']),
-                                   'artist' : _sc(i['interpreter']['name']),
-                                   'genre': _sc(a['genre']['name']),
-                                   'tracknumber': int(i['track_number']),
-                                   'mimetype': mimetype,
-                                                "title": i['title'],
-                                                "album": a['title'],
-                                                "artist": i['interpreter']['name'],
-                                                "duration": self.get_duration()})
-        item.setProperty('Music','true')
-        item.setProperty('mimetype',mimetype)
-        item.setProperty("IsPlayable",'true')
-        item.setProperty('duration', str(self.get_duration()))
-        #item.setProperty('songid', str(self.id))
-        #item.setProperty('coverart', a['image']['large'])
-        #item.setProperty('title', i['title'])
-        #item.setProperty('album', a['title'])
-        #item.setProperty('artist', i['interpreter']['name'])
-        #item.setProperty('duration', str(self.get_duration()))
-        #item.setThumbnailImage(a['image']['large'])
-        #item.setProperty('path', self._raw_data['stream']['streaming_url'] )
-        item.setPath(self._raw_data['stream']['streaming_url'])
+        item.setProperty('mimetype', mimetype)
+        item.setProperty('stream', str(stream['streaming_url']))
         return item
     
     def stop(self, id):
@@ -99,9 +93,20 @@ class QobuzTrack(ICacheable):
         player = QobuzPlayer(xbmc.PLAYER_CORE_AUTO)
         player.set_track_id(self.id)
         player.setApi(self.Core)
-        
         item = self.getItem()
+        #xp.add( item.getProperty('stream'), item)
+#        item.setProperty('oldpath', item.getProperty('path'))
+#        item.setProperty('path', item.getProperty('stream'))
+        #player.play(item.getProperty('stream'), item, False)
+#        item.setProperty('path', item.getProperty('oldpath'))
+        #xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
+        #player.play(item.getProperty('stream'), item, False)
+        print 'Path: ' + item.getProperty('path')
+        item.setProperty('path_origin', item.getProperty('path'))
+        item.setPath(item.getProperty('stream'))
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
+        #item.setProperty('path', item.getProperty('stream'))
+        #xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
         timeout = 30
         info(self, "Waiting song to start")
         while timeout > 0:
@@ -109,7 +114,13 @@ class QobuzTrack(ICacheable):
                 time.sleep(.500)
                 timeout-=.500
             else: timeout = 0
-        info(self, "Song started")
+        info(self, "Song started: " + item.getProperty('image'))
+        item.setPath(item.getProperty('path_origin'))
+        #item.setProperty('path', item.getProperty('stream'))
+#        item.setPath(item.getProperty('path'))
+#        item.setThumbnailImage(item.getProperty('image'))
+#        item.setIconImage(item.getProperty('image'))
+        #item.select(True)
         xbmc.sleep(6000)
         if player.isPlayingAudio():
             self.Core.Api.report_streaming_start(self.id)

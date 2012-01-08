@@ -23,6 +23,7 @@ from constants import *
 from mydebug import log, info, warn
 from easytag import QobuzTagProduct
 from easytag import QobuzTagAlbum
+from icacheable import ICacheable
 import pprint
 
 '''
@@ -30,60 +31,51 @@ import pprint
 '''
 class QobuzSearchAlbums():
 
-    def __init__(self, qob,):
-        self.Qob = qob
+    def __init__(self, Core,):
+        self.Core = Core
         self._raw_data = []
         
+    def get_data(self):
+        return self._raw_data
+    
     def search(self, query, limit = 100):
-        self._raw_data = self.Qob.Api.search_albums(query, limit)
+        self._raw_data = self.Core.Api.search_albums(query, limit)
         return self
     
     def get_by_artist(self,id, limit = 100):
-        self._raw_data = self.Qob.Api.get_albums_from_artist(id, limit)
+        self._raw_data = self.Core.Api.get_albums_from_artist(id, limit)
         return self
         
     def length(self):
         return len(self._raw_data)
     
     def add_to_directory(self):
-        h = int(sys.argv[1])
-        xbmc_directory_products(self._raw_data, self.length())
-        xbmcplugin.setContent(h,'songs')
+        return self.xbmc_directory_products()
     
     def add_to_directory_by_artist(self):
+        return self.xbmc_directory_products_by_artist()
+
+    def xbmc_directory_products(self):
+        for product in self.get_data():
+            a = QobuzTagProduct(product['product'])
+            item = a.getXbmcItem()
+            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(a.id)
+            xbmcplugin.addDirectoryItem(handle=self.Core.Bootstrap.__handle__, 
+                                        url=u, listitem=item, isFolder=True, 
+                                        totalItems=self.length())
+        return self.length()
+
+
+    def xbmc_directory_products_by_artist(self):
+        json = self.get_data()
         h = int(sys.argv[1])
-        xbmc_directory_products_by_artist(self._raw_data, self.length())
-        xbmcplugin.setContent(h,'songs')
-
-'''
-    Helpers
-'''
-def xbmc_directory_products(json, len):
-    h = int(sys.argv[1])
-    for p in json:
-        pprint.pprint(p)
-        a = QobuzTagProduct(p['product'])
-        u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
-        item   = xbmcgui.ListItem()
-        item.setLabel(a.getGenre() + ' / ' + a.getArtist() + ' - ' + a.getTitle())
-        item.setInfo(type="Music",infoLabels={ 
-                                              "artist" : a.getArtist(),
-                                              "genre"  : a.getGenre(),
-                                              "title"  : a.getTitle(),
-                                              "year"   : a.getYear(),
-                                              "comment": "Qobuz Stream"
-                                              })
-        item.setThumbnailImage(a.getImage())
-        xbmcplugin.addDirectoryItem(handle=h , url=u, listitem=item,isFolder=True, totalItems=len)
-
-def xbmc_directory_products_by_artist(json, len):
-    h = int(sys.argv[1])
-    artist = json['artist']['name']
-    for p in json['artist']['albums']:
-        a = QobuzTagAlbum(p)
-        u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
-        item = xbmcgui.ListItem()
-        item.setLabel(a.getTitle() + "(" + str(a.getYear()) + ")")
-        item.setInfo(type="Music",infoLabels={"artist" : a.getArtist() })
-        item.setThumbnailImage(a.getImage())
-        xbmcplugin.addDirectoryItem(handle=h , url=u,listitem=item,isFolder=True,totalItems=len)
+        artist = json['artist']['name']
+        for p in json['artist']['albums']:
+            a = QobuzTagAlbum(p)
+            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
+            item = xbmcgui.ListItem()
+            item.setLabel(a.getTitle() + "(" + str(a.getYear()) + ")")
+            item.setInfo(type="Music",infoLabels={"artist" : a.getArtist() })
+            item.setThumbnailImage(a.getImage())
+            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, self.length())
+        return self.length()

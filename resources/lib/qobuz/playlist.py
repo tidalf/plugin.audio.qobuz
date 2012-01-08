@@ -1,5 +1,5 @@
-# Copyright 2011 Joachim Basmaison, Cyril Leclerc
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
 #     This file is part of xbmc-qobuz.
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify
@@ -53,35 +53,13 @@ class QobuzPlaylist(ICacheable):
     def add_to_directory(self):
         n = self.length()
         h = int(sys.argv[1])
-        xp = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         p = QobuzTagPlaylist(self.get_data())
         for t in p.get_tracks():
-            if t.streaming_type and t.streaming_type != "full":
-                warn(self, "Skipping sample " + t.getTitle())
-                continue
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id
-            label = t.get_album().getTitle() + ' - ' + t.getLabel()
-            item = xbmcgui.ListItem(label)
-            item.setLabel(label)
-            item.setInfo(type="Music",infoLabels={
-                                                   "count": int(self.id),
-                                                   "title":  t.getTitle(),
-                                                   "artist": t.getArtist(),
-                                                   "album": t.get_album().getTitle(),
-                                                   "tracknumber": int(t.track_number),
-                                                   "genre": t.get_album().getGenre(),
-                                                   "comment": "Qobuz Stream",
-                                                   "duration": t.getDuration(),
-                                                   "year": t.get_album().getYear()
-                                                   })
-            item.setPath(u)
-            item.setProperty('Music','true')
-            item.setProperty('IsPlayable','true');
-            item.setProperty('mimetype','audio/flac')
+            item = t.getXbmcItem('playlist')
             image = t.get_album().getImage()
-            item.setIconImage(image)
-            item.setThumbnailImage(image)
-            
+            if image:
+                item.setThumbnailImage(image)
+                item.setIconImage(image)
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id    
             xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
-            xp.add(u, item)
         xbmcplugin.setContent(h,'songs')

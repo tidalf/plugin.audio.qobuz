@@ -50,6 +50,9 @@ class QobuzCore:
     def login(self):
         __addon__ = self.Bootstrap.__addon__
         user =  __addon__.getSetting('username')
+        password = __addon__.getSetting('password')
+        if not user or not password:
+            return False
         info(self, "Try to login as user: " + user)
         return self.Api.login( user,
                                __addon__.getSetting('password'))

@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 import sys, os
 import urllib
 import xbmc
@@ -52,7 +51,10 @@ class QobuzImages():
         self.Bootstrap = bootstrap
         self.pool['fanart'] = xbmc.translatePath(os.path.join(self.Bootstrap.baseDir, 'fanart.jpg'))
         names = ['album', 'artist', 'artistalbum', 'favorites', 'playlist', 
-                 'userplaylists', 'popularSongs', 'popularSongsArtist', 'song', 'default']
+                 'userplaylists', 'popularSongs', 'popularSongsArtist', 'song', 'default',
+                 'genre-0', 'genre-80', 'genre-64']
+        
+        
         for n in names:
             self.set(n)
             
@@ -70,8 +72,10 @@ class QobuzImages():
 '''
 class QobuzBootstrap(object):
     
-    def __init__(self, __addon__):
+    def __init__(self, __addon__, __handle__):
         self.__addon__ = __addon__
+        self.__handle__ = __handle__
+        info(self, "Handle: " + str(self.__handle__))
         self.__language__ = __addon__.getLocalizedString
         self.bootstrapDirectories()
         self.Core = QobuzCore(self)
@@ -85,7 +89,9 @@ class QobuzBootstrap(object):
             http://wiki.xbmc.org/index.php?title=Thumbnails
         '''
         self.NAME = None
-        self.Core.login()
+        if not self.Core.login():
+            self.GUI.showLoginFailure()
+            exit(1)
     
     '''
         Initialize needed directories

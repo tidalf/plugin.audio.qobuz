@@ -2,10 +2,10 @@
 <addon id="plugin.audio.qobuz" name="Qobuz XBMC" version="0.0.3" provider-name="d@corp">
 	<requires>
 		<import addon="xbmc.python" version="2.0" />
-		<import addon="script.module.simplejson"/>
+		<!--  <import addon="script.module.simplejson"/> -->
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
-	<provides>audio</provides>
+	   <provides>audio</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<platform>all</platform>

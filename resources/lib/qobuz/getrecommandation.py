@@ -70,6 +70,6 @@ class QobuzGetRecommandation(ICacheable):
             item.setThumbnailImage(a.getImage())
             xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
                                         isFolder=True, totalItems=n)
-        xbmcplugin.setContent(h,'songs')
+            
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-        xbmcplugin.setPluginFanart(h,self.Core.Bootstrap.Images.get('fanart'))
+

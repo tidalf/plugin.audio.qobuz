@@ -1,5 +1,5 @@
-# Copyright 2011 Joachim Basmaison, Cyril Leclerc
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
 #     This file is part of xbmc-qobuz.
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify
@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 import os
 import httplib
 import json
@@ -110,6 +109,8 @@ class QobuzApi:
             return self.userid
         params = urllib.urlencode({'x-api-auth-token':'null','email': user ,'hashed_password': hashlib.md5(password).hexdigest() })
         data = self._api_request(params,"/api.json/0.1/user/login")
+        if not data:
+            return None
         if not 'user' in data:
             return None
         self.authtoken = data['user']['session_id']

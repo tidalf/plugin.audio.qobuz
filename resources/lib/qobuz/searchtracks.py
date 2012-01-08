@@ -1,5 +1,5 @@
-# Copyright 2011 Joachim Basmaison, Cyril Leclerc
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
 #     This file is part of xbmc-qobuz.
 #
 #     xbmc-qobuz is free software: you can redistribute it and/or modify
@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 import sys
 import xbmcgui
 import xbmcplugin
@@ -22,6 +21,7 @@ from utils import _sc
 from constants import *
 from mydebug import log, info, warn
 from easytag import QobuzTagTrack
+import pprint
 
 ###############################################################################
 # Class QobuzSearchTracks 
@@ -43,34 +43,14 @@ class QobuzSearchTracks():
     
     def add_to_directory(self):
         n = self.length()
-        h = int(sys.argv[1])
-        pprint.pprint(self._raw_data)
         for track in self._raw_data['results']['tracks']:
             t = QobuzTagTrack(track)
-            if t.streaming_type != 'full':
-                warn(self, "Skipping sample " + t.title)
-                continue
+            item = t.getXbmcItem('songs')
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id
-            item = xbmcgui.ListItem('test')
-            item.setLabel(t.getLabel())
-            item.setInfo(type="Music",infoLabels={
-                                                   #"count":+,
-                                                   "title":  t.getTitle(),
-                                                   "artist": t.getArtist(),
-                                                   "album": t.get_album().getTitle(),
-                                                   "tracknumber": int(t.track_number),
-                                                   "genre": t.get_album().getGenre(),
-                                                   "comment": "Qobuz Stream",
-                                                   "duration": int(t.getDuration()),
-                                                   "year": int(t.get_album().getYear())
-                                                   })
-            item.setPath(u)
-            item.setProperty('Music','true')
-            item.setProperty('IsPlayable','true');
-            item.setProperty('mimetype','audio/flac')
-            image = t.get_album().getImage()
-            item.setThumbnailImage(image)
-            item.setIconImage(image)
-            xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
+            if 1:
+                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
+                print "Show Album: " + action
+                item.addContextMenuItems([('Show album', action)], False)
+            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
 
 
