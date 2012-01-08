@@ -29,6 +29,7 @@ from utils import _sc
 from track import QobuzTrack
 from icacheable import ICacheable
 from getrecommandation import QobuzGetRecommandation
+from getpurchases import QobuzGetPurchases
 from product import QobuzProduct
 from userplaylists import QobuzUserPlaylists
 from playlist import QobuzPlaylist
@@ -103,3 +104,6 @@ class QobuzCore:
 
     def getRecommandation(self, genre_id,type):
         return QobuzGetRecommandation(self, genre_id, type)
+    
+    def getPurchases(self):
+        return QobuzGetPurchases(self)

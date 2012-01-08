@@ -182,6 +182,10 @@ class QobuzBootstrap(object):
         elif self.MODE == MODE_SHOW_RECOS:
             info(self, "Displaying recommendations")
             self.GUI.showRecommendationsTypes()
+
+        elif self.MODE == MODE_SHOW_PURCHASES:
+            info(self, "Displaying purchases")
+            self.GUI.showPurchases()
         
         elif self.MODE == MODE_SHOW_RECO_T_G:
             info(self, "Displaying recommendations T/G")

@@ -68,6 +68,7 @@ class QobuzGUI:
         self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, i.get('album'), 0)
         self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, i.get('album'), 0)
         self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, i.get('song'), 0)
+        self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('song'), 0)
         if (self.Bootstrap.Core.Api.userid != 0):
             self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('playlist'), 0)
             self.setContent('files')
@@ -139,6 +140,17 @@ class QobuzGUI:
             else:
                 self.showNotification(30008, 30021)
                 self.showCatetories()
+
+    def showPurchases(self):
+        r = self.Bootstrap.Core.getPurchases()
+        r.fetch_data()
+        if r.length() > 0:
+            r.add_to_directory()
+            self.setContent('files')
+        else:
+            self.showNotification(30008, 30021)
+            self.showCatetories()
+
 
     def showRecommendationsTypes(self):
         __language__ = self.Bootstrap.__language__
