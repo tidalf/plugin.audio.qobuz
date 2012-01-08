@@ -54,9 +54,9 @@ class QobuzGetPurchases(ICacheable):
         for track in self._raw_data:
             t = QobuzTagTrack(track)
             item = t.getXbmcItem('songs')
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&context_type=purchases"
             if 1:
                 action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
                 print "Show Album: " + action
-                item.addContextMenuItems([('Show album', action)], True)
+                item.addContextMenuItems([('Show album', action)], False)
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
