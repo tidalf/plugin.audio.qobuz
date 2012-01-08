@@ -50,7 +50,7 @@ class QobuzSearchTracks():
             if 1:
                 action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
                 print "Show Album: " + action
-                item.addContextMenuItems([('Show album', action)], False)
+                item.addContextMenuItems([('Show album', action)], True)
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
 
 

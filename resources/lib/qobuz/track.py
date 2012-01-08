@@ -94,36 +94,5 @@ class QobuzTrack(ICacheable):
         player.set_track_id(self.id)
         player.setApi(self.Core)
         item = self.getItem()
-        #xp.add( item.getProperty('stream'), item)
-#        item.setProperty('oldpath', item.getProperty('path'))
-#        item.setProperty('path', item.getProperty('stream'))
-        #player.play(item.getProperty('stream'), item, False)
-#        item.setProperty('path', item.getProperty('oldpath'))
-        #xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
-        #player.play(item.getProperty('stream'), item, False)
-        print 'Path: ' + item.getProperty('path')
-        item.setProperty('path_origin', item.getProperty('path'))
-        item.setPath(item.getProperty('stream'))
-        xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
-        #item.setProperty('path', item.getProperty('stream'))
-        #xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]),succeeded=True,listitem=item)
-        timeout = 30
-        info(self, "Waiting song to start")
-        while timeout > 0:
-            if player.isPlayingAudio == False:
-                time.sleep(.500)
-                timeout-=.500
-            else: timeout = 0
-        info(self, "Song started: " + item.getProperty('image'))
-        item.setPath(item.getProperty('path_origin'))
-        #item.setProperty('path', item.getProperty('stream'))
-#        item.setPath(item.getProperty('path'))
-#        item.setThumbnailImage(item.getProperty('image'))
-#        item.setIconImage(item.getProperty('image'))
-        #item.select(True)
-        xbmc.sleep(6000)
-        if player.isPlayingAudio():
-            self.Core.Api.report_streaming_start(self.id)
-        player.watchPlayback()
-        #player.onPlayBackEnded('stop_track('+str(self.id)+')')
+        player.play(item)
 

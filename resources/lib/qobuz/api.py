@@ -38,8 +38,8 @@ class QobuzApi:
         self.userid = None
         self.authtime = None
         self.token_validity_time = 3600
-        self.cacheDir = os.path.join(self.Core.Bootstrap.cacheDir,'auth.dat')
-        info(self, 'authCacheDir: ' + self.cacheDir)
+        self.cachePath = os.path.join(self.Core.Bootstrap.cacheDir,'auth.dat')
+        info(self, 'authCacheDir: ' + self.cachePath)
 
 
     def save_auth(self):
@@ -49,7 +49,7 @@ class QobuzApi:
         data['userid'] = self.userid
         f = None
         try:
-            f = open(self.cacheDir, 'wb')
+            f = open(self.cachePath, 'wb')
         except:
             warn(self, "Cannot open authentification cache for writing!")
             return False
@@ -62,34 +62,41 @@ class QobuzApi:
         return True
     
     def load_auth(self):
-        if not os.path.exists(self.cacheDir):
+        if not os.path.exists(self.cachePath):
             warn(self, "Caching directory doesn't exist")
-            return None
+            return False
         mtime = None
         try:
-            mtime = os.path.getmtime(self.cacheDir)
+            mtime = os.path.getmtime(self.cachePath)
         except:
-            warn(self,"Cannot stat cache file: " + self.cacheDir)
+            warn(self,"Cannot stat cache file: " + self.cachePath)
         if (time() - mtime) > self.token_validity_time:
             info(self,"Our authentification token must be invalid")
-            return None
+            return False
         f = None
         try:
             f = open(self.cacheDir, 'rb')
         except:
             warn(self, "Cannot open authentification cache for reading!")
-            return None
+            return False
         data = None
         try:
             data = pickle.load(f)
         except:
             warn(self, "Cannot load serialized data")
-            return None
+            return False
         self.authtime = data['authtime']
         self.authtoken = data['authtoken']
         self.userid = data['userid']
         return True
-            
+    
+    def delete_auth_cache(self):
+        try:
+            os.remove(self.cachePath)
+            return True
+        except: warn(self, "Cannot delete auth cache")
+        return False
+    
     def _api_request(self, params, uri):      
         self.conn = httplib.HTTPConnection("player.qobuz.com")
         self.conn.request("POST", uri, params, self.headers)
@@ -98,7 +105,13 @@ class QobuzApi:
         response_json = json.loads(response.read())
         try:
             if response_json['status'] == "error":
-                warn(self, "Something went wrong with request: " + uri + ' / ' + params)
+                warn(self, "Something went wrong with request: " 
+                     + uri + ' / ' + params)
+                pprint.pprint(response_json)
+                '''
+                    When something wrong we are deleting our auth token
+                '''
+                self.delete_auth_cache()
                 return None
         except: pass
         return response_json
@@ -107,12 +120,11 @@ class QobuzApi:
         if self.load_auth():
             info(self, 'Using authentification token from cache')
             return self.userid
-        params = urllib.urlencode({'x-api-auth-token':'null','email': user ,'hashed_password': hashlib.md5(password).hexdigest() })
+        params = urllib.urlencode({'x-api-auth-token':'null','email': user ,
+                                   'hashed_password': hashlib.md5(password).hexdigest() })
         data = self._api_request(params,"/api.json/0.1/user/login")
-        if not data:
-            return None
-        if not 'user' in data:
-            return None
+        if not data: return None
+        if not 'user' in data: return None
         self.authtoken = data['user']['session_id']
         self.userid = data['user']['id']
         self.authtime = time()
@@ -126,38 +138,34 @@ class QobuzApi:
                                    'format_id': format_id,
                                    'context_type':context_type,
                                    'context_id':context_id})
-        # add try catch here
-        done = False
-        while done == False:
-            try:
-                data = self._api_request(params,"/api.json/0.1/track/getStreamingUrl") 
-                done = True
-            except:
-                print "try again"
-            # xbmc.log(json.dumps(data))
-            url = data[u'streaming_url']
+        data = self._api_request(params,"/api.json/0.1/track/getStreamingUrl") 
         return data
             
 
     def get_track(self,trackid):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'track_id': trackid})
+        params = urllib.urlencode({'x-api-auth-token': self.authtoken,
+                                   'track_id': trackid})
         data = self._api_request(params,"/api.json/0.1/track/get")
         return data
 
     def get_user_playlists(self):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'user_id': self.userid})
+        params = urllib.urlencode({'x-api-auth-token': self.authtoken,
+                                   'user_id': self.userid })
         data = self._api_request(params,"/api.json/0.1/playlist/getUserPlaylists")
         return data
 
     def getPlaylistSongs(self,playlistID):
-        result = self._callRemote('getPlaylistSongs',{'playlistID' : playlistID});
+        result = self._callRemote('getPlaylistSongs', 
+                                  {'playlistID' : playlistID});
         if 'result' in result:
             return self._parseSongs(result)
         else:
             return []
 
     def get_playlist(self,playlist_id=39837):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'playlist_id':playlist_id,'extra':'tracks'})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken,
+                                   'playlist_id':playlist_id,
+                                   'extra':'tracks'})
         return self._api_request(params,"/api.json/0.1/playlist/get")
 
     def get_album_tracks(self,album_id):
@@ -169,38 +177,55 @@ class QobuzApi:
     
     def get_recommandations(self, genre_id, typer = "new-releases", limit = 100):
         if genre_id == 'null':
-            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'type': typer, 'limit': limit})
+            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                       'type': typer, 'limit': limit})
         else:
-            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'genre_id': genre_id, 'type': typer, 'limit': limit})
+            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                       'genre_id': genre_id, 
+                                       'type': typer, 
+                                       'limit': limit})
         
         return self._api_request(params,"/api.json/0.1/product/getRecommendations")
     
     # SEARCH #
     def search_tracks(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'tracks', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                   'query': query.encode("utf8","ignore"), 
+                                   'type': 'tracks', 
+                                   'limit': limit})
         return self._api_request(params,"/api.json/0.1/track/search")
 
     def search_albums(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'albums', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                   'query': query.encode("utf8","ignore"), 
+                                   'type': 'albums', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/product/search")
     
     def search_artists(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'query': query.encode("utf8","ignore"), 'type': 'artists', 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                   'query': query.encode("utf8","ignore"), 
+                                   'type': 'artists', 'limit': limit})
         return self._api_request(params,"/api.json/0.1/track/search")
     
     def get_albums_from_artist(self, id, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'artist_id': id, 'limit': limit})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                   'artist_id': id, 'limit': limit})
         return self._api_request(params,"/api.json/0.1/artist/get")
 
     # REPORT #    
     def report_streaming_start(self, track_id):
         print "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id) + "\n"
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'user_id': self.userid, 'track_id': track_id})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                   'user_id': self.userid, 
+                                   'track_id': track_id})
         return self._api_request(params,"/api.json/0.1/track/reportStreamingStart")        
 
-    def report_streaming_stop(self, track_id):
+    def report_streaming_stop(self, track_id, duration):
         print "Report Streaming stop for user:  " + str(self.userid) + ", track: " + str(track_id) + "\n"
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 'user_id': self.userid, 'track_id': track_id})
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                   'user_id': self.userid, 
+                                   'track_id': track_id,
+                                   'duration': duration})
         return self._api_request(params,"/api.json/0.1/track/reportStreamingEnd")
 
 if __name__ == '__main__':

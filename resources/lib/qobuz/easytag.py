@@ -369,7 +369,7 @@ class QobuzTagTrack(IQobuzTag):
             i.setProperty("IsPlayable",'false')
             label = '[Sample] ' + label
         else:
-            i.setProperty('Music','true')
+            i.setProperty('Music','false')
             i.setProperty("IsPlayable",'true')
         i.setLabel(label)
         return i
