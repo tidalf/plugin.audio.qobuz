@@ -25,6 +25,7 @@ from mydebug import log, info, warn
 from constants import *
 from icacheable import ICacheable
 from easytag import QobuzTagArtist
+from easytag import QobuzTagTrack
 
 """
     Class QobuzGetPurchases
@@ -42,30 +43,20 @@ class QobuzGetPurchases(ICacheable):
         
     def _fetch_data(self):
         return self.Core.Api.get_purchases(self.limit)
+    
+    def length(self):
+        if not self._raw_data:
+            return 0
+        return len(self._raw_data)
 
     def add_to_directory(self):
-        data = self.fetch_data()
         n = self.length()
-        info(self,"Found " + str(n) + " albums(s)")
-        h = int(sys.argv[1])
-        u = dir = None
-
-        for p in data:
-            #pprint.pprint(p)
-            artist = QobuzTagArtist(p)
-            a=artist.get_album()
-            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
-            item = xbmcgui.ListItem()
-            item.setLabel(artist.getArtist() + ' / ' + a.getTitle() 
-                          + " (" + str(a.getYear()) + ")")
-            item.setLabel2(a.getTitle())
-            item.setInfo(type="Music",infoLabels={ 
-                                                  "title": a.getTitle(), 
-                                                  "genre": a.getGenre(),
-                                                  "year" : int(a.getYear())})
-            item.setThumbnailImage(a.getImage())
-            xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
-                                        isFolder=True, totalItems=n)
-            
-        xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-
+        for track in self._raw_data:
+            t = QobuzTagTrack(track)
+            item = t.getXbmcItem('songs')
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id
+            if 1:
+                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
+                print "Show Album: " + action
+                item.addContextMenuItems([('Show album', action)], True)
+            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
