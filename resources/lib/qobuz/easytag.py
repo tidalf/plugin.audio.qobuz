@@ -321,7 +321,7 @@ class QobuzTagProduct(IQobuzTag):
         self.set('id', p['id'])
         self.set('artist', p['artist'])
         # fixme artist_id or ['artist']['id']?
-        self.set('artist_id', p['artist']['id'])
+        # self.set('artist_id', p['artist']['id'])
         self.set('genre', p['genre'])
         self.set('image_large', p['image']['large'])
         self.set('image_large', p['image']['small'])
