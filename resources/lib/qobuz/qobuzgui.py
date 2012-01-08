@@ -97,7 +97,7 @@ class QobuzGUI:
     """
     def searchAlbums(self):
         __language__ = self.Bootstrap.__language__
-        query = self._get_keyboard(default="",heading=__language__(30020))
+        query = self._get_keyboard(default="",heading=__language__(30022))
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchAlbums()
             s.search(query, self.Bootstrap.__addon__.getSetting('albumsearchlimit'))
@@ -115,7 +115,7 @@ class QobuzGUI:
     """
     def searchArtists(self):
         __language__ = self.Bootstrap.__language__
-        query = self._get_keyboard(default="",heading=__language__(30020))
+        query = self._get_keyboard(default="",heading=__language__(30024))
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchArtists()
             s.search(query, self.Bootstrap.__addon__.getSetting('artistsearchlimit'))
