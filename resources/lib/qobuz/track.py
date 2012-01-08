@@ -25,6 +25,7 @@ from mydebug import log, info, warn
 from utils import _sc
 from player import QobuzPlayer
 from easytag import QobuzTagTrack
+import pprint
 '''
  Class QobuzTrack 
 
@@ -69,8 +70,12 @@ class QobuzTrack(ICacheable):
             album_id and context?
         '''
         album_id = ''
+        #pprint.pprint(self._raw_data)
         t = QobuzTagTrack(self._raw_data)
         item = t.getXbmcItem()
+        if t.getStreamingType() != 'full':
+            warn(self, "This track is not playable: " + item.getLabel())
+            return item
         stream = self.Core.Api.get_track_url(self.id,
                                                     'playlist',
                                                     album_id,
@@ -80,6 +85,9 @@ class QobuzTrack(ICacheable):
             mimetype = 'audio/mpeg'
         item.setProperty('mimetype', mimetype)
         item.setProperty('stream', str(stream['streaming_url']))
+        item.setProperty('path', sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID)
+        item.setPath(sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID)
+        item.select(True)
         return item
     
     def stop(self, id):
@@ -90,9 +98,12 @@ class QobuzTrack(ICacheable):
     # Play this track
     def play(self):
         #global player
-        player = QobuzPlayer(xbmc.PLAYER_CORE_AUTO)
+        player = self.Core.Bootstrap.Player
         player.set_track_id(self.id)
         player.setApi(self.Core)
         item = self.getItem()
+        if not item.getProperty('stream'):
+            warn(self, "Player can't play track: " + item.getLabel())
+            return False
         player.play(item)
-
+        return True

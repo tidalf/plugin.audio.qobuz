@@ -60,6 +60,8 @@ class QobuzSearchAlbums():
             a = QobuzTagProduct(product['product'])
             item = a.getXbmcItem()
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(a.id)
+            item.setPath(u)
+            item.setProperty('path', u)
             xbmcplugin.addDirectoryItem(handle=self.Core.Bootstrap.__handle__, 
                                         url=u, listitem=item, isFolder=True, 
                                         totalItems=self.length())

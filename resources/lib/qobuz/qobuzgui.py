@@ -33,8 +33,11 @@ class QobuzGUI:
         self.setFanArt()
         return xbmcplugin.endOfDirectory(int(sys.argv[1]))
   
+    def showNotificationH(self, title, text):
+         xbmc.executebuiltin('XBMC.Notification(' + title + ',' + text+ ', 2000, ' + self.Bootstrap.Images.get('default') + ')')
+    
     def showNotification(self, title, text):
-        self.setFanArt()
+        self.setFanArt()   
         __language__ = self.Bootstrap.__language__
         xbmc.executebuiltin('XBMC.Notification(' + __language__(title) + ',' + __language__(text)+ ', 2000, ' + self.Bootstrap.Images.get('default') + ')')
 

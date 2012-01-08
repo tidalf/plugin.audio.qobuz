@@ -23,7 +23,7 @@ import constants
 from qobuz import QobuzCore
 from qobuzgui import QobuzGUI
 from mydebug import *
-
+from player import QobuzPlayer
 
 ''' Arguments parssing '''
 def get_params():
@@ -80,6 +80,7 @@ class QobuzBootstrap(object):
         self.bootstrapDirectories()
         self.Core = QobuzCore(self)
         self.GUI = QobuzGUI(self)
+        self.Player = QobuzPlayer()
         self.Images = QobuzImages(self)
         self.MODE = None
         self.ID = None

@@ -367,10 +367,11 @@ class QobuzTagTrack(IQobuzTag):
         i.setProperty('year', str(self.getYear()))
         if self.getStreamingType() != 'full':
             i.setProperty("IsPlayable",'false')
-            label = '[Sample] ' + label
+            i.setProperty('Music', 'false')
+            label = '[COLOR=FFFF0000][Sample][/COLOR] ' + label
         else:
             i.setProperty('Music','false')
-            i.setProperty("IsPlayable",'true')
+            i.setProperty("IsPlayable",'false')
         i.setLabel(label)
         return i
     
