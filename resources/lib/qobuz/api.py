@@ -187,6 +187,11 @@ class QobuzApi:
         
         return self._api_request(params,"/api.json/0.1/product/getRecommendations")
     
+    def get_purchases(self, limit = 100):
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+                                   'user_id': self.userid })
+        return self._api_request(params,"/api.json/0.1/purchase/getUserPurchases")
+    
     # SEARCH #
     def search_tracks(self, query, limit = 100):
         params = urllib.urlencode({'x-api-auth-token':self.authtoken, 

@@ -17,6 +17,7 @@
 import sys
 from constants import *
 import xbmcgui
+import xbmcaddon
 
 class IQobuzTag(object):
     
@@ -76,6 +77,19 @@ class IQobuzTag(object):
             except: 
                 try:
                     label.append(self.composer_name)
+                except: label.append('N/A')
+        return ''.join(label)
+    
+    def getArtistId(self):
+        label = []
+        try: 
+            label.append(self.artist_id)
+        except:
+            try:
+                label.append(self.interpreter_id)
+            except: 
+                try:
+                    label.append(self.composer_id)
                 except: label.append('N/A')
         return ''.join(label)
     
@@ -224,7 +238,10 @@ class QobuzTagArtist(IQobuzTag):
 
         
     def getArtist(self):
-        return self.name
+        try:
+            return self.name
+        except:
+            return "buh"   
     
     def get_album(self):
         return self.__album
@@ -303,6 +320,8 @@ class QobuzTagProduct(IQobuzTag):
     def parse_json(self, p):
         self.set('id', p['id'])
         self.set('artist', p['artist'])
+        # fixme artist_id or ['artist']['id']?
+        self.set('artist_id', p['artist']['id'])
         self.set('genre', p['genre'])
         self.set('image_large', p['image']['large'])
         self.set('image_large', p['image']['small'])
@@ -373,6 +392,13 @@ class QobuzTagTrack(IQobuzTag):
             i.setProperty('Music','false')
             i.setProperty("IsPlayable",'false')
         i.setLabel(label)
+        # add context menu items (for artist search)
+        albumfromthisartist=sys.argv[0]+"?id="+self.getArtistId()+"&mode="+str(MODE_ARTIST)
+        # can't use __language__ here... we have lost artistid also.
+        menuItems = []
+        menuItems.append(("Search for this artist", "XBMC.RunPlugin("+albumfromthisartist+")"))
+        i.addContextMenuItems(menuItems, replaceItems=False)
+        
         return i
     
     def get_album(self):
