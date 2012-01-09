@@ -261,13 +261,13 @@ class QobuzPlayer(xbmc.Player):
                     ''' 
                     Prefetch next streaming url
                     '''
-                    self.prefetch_next_url(self.Playlist.getposition())
+                    nextisreplaced = self.prefetch_next_url(self.Playlist.getposition())
             if not isNotified and playedTime > 6:
                 self.sendQobuzPlaybackStarted()
                 isNotified = True
             if math.trunc(math.floor(playedTime)) % 5 == 0:
                 info(self, 'Played time: ' + str(playedTime))
-                info(self, "Playlist:\n" + self.Playlist.to_s())
+                #info(self, "Playlist:\n" + self.Playlist.to_s())
             xbmc.sleep(1000)
         if playedTime > 6:
             self.sendQobuzPlaybackEnded(playedTime)
