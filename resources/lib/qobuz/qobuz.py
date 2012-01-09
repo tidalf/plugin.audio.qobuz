@@ -22,7 +22,7 @@ import xbmc
 
 from api import QobuzApi
 from mydebug import log, info, warn
-from icacheable import ICacheable
+#from icacheable import ICacheable
 
 """
  Class QobuzXbmc
