@@ -157,7 +157,7 @@ class QobuzPlayer(xbmc.Player):
         self.Playlist.replacePath(npos, item)
         return True
     
-    def play(self, item):   
+    def play(self, item):
         self.item = item
         if not item.getProperty('stream'):
             warn(self, "Non playable item: " + item.getLabel())
@@ -181,11 +181,14 @@ class QobuzPlayer(xbmc.Player):
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())
             return False
-        self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Playing song')
         #xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
+        self.startPlayingOn = time()
         #xbmc.executebuiltin('Container.Refresh()')
+        self.set_track_id(self.Core.Bootstrap.ID)
+        self.Core.Api.report_streaming_start(self.id)
+        self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Playing song')
         self.watchPlayback()
-        return True
+        exit(0)
     
     def set_track_id(self, id):
         if self.id:
@@ -205,6 +208,6 @@ class QobuzPlayer(xbmc.Player):
             except:
                 warn(self, 'Prefetching next url fail!')
             xbmc.sleep(1000)
-        self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'End of song')
+        self.sendQobuzPlaybackEnded()
+        #self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'End of song')
         info (self,"End of Playback detected")
-        exit(0)

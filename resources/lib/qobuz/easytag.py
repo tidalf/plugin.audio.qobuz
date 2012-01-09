@@ -408,7 +408,7 @@ class QobuzTagTrack(IQobuzTag):
         if self.getStreamingType() != 'full':
             i.setProperty("IsPlayable",'false')
             i.setProperty('Music', 'false')
-            label = '[COLOR=FFFF0011][Sample][/COLOR] [COLOR=CCAABBCC]' + label + '[/COLOR]'
+            label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
         else:
             i.setProperty('Music','true')
             i.setProperty("IsPlayable",'false')
