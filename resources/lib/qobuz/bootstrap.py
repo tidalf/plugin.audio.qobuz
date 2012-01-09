@@ -54,7 +54,6 @@ class QobuzImages():
                  'userplaylists', 'popularSongs', 'popularSongsArtist', 'song', 'default',
                  'genre-0', 'genre-80', 'genre-64']
         
-        
         for n in names:
             self.set(n)
             
@@ -167,8 +166,15 @@ class QobuzBootstrap(object):
                 context_type=urllib.unquote_plus(self.params["context_type"])
             except: 
                 context_type="playlist"
-            track = self.Core.getTrack(self.ID,context_type)
-            self.Player.play(track.getItem())
+            pos = None
+            try:
+                pos = self.POS
+            except:
+                warn(self, "Can't play track without position")
+                return False
+            #track = self.Core.getTrack(self.ID,context_type)
+            self.Player.play(self.ID, self.POS)#track.getItem())
+            return True
         
         elif self.MODE == MODE_ARTIST:
             info(self, "Displaying artist")

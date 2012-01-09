@@ -26,6 +26,7 @@ import pickle
 #from mutagen.flac import FLAC
 import pprint
 from time import time
+import math
 
 from mydebug import log, info, warn
 
@@ -40,6 +41,8 @@ class QobuzApi:
         self.token_validity_time = 3600
         self.cachePath = os.path.join(self.Core.Bootstrap.cacheDir,'auth.dat')
         info(self, 'authCacheDir: ' + self.cachePath)
+        self.retry_time = [1, 3, 5, 10]
+        self.retry_num = 0
 
 
     def save_auth(self):
@@ -226,6 +229,10 @@ class QobuzApi:
         return self._api_request(params,"/api.json/0.1/track/reportStreamingStart")        
 
     def report_streaming_stop(self, track_id, duration):
+        duration = math.floor(int(duration))
+        if duration < 5:
+            info(self, "Duration lesser than 5s, abort reporting")
+            return None
         token = ''
         try:
             token = self.authtoken

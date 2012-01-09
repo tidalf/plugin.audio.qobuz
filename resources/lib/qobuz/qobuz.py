@@ -67,6 +67,10 @@ class QobuzCore:
         from track import QobuzTrack
         return QobuzTrack(self,id,context_type)
     
+    def getTrackURL(self, id, type):
+        from track_streamurl import QobuzTrackURL
+        return QobuzTrackURL(self, id, type)
+    
     def getQobuzSearchTracks(self):
         from searchtracks import QobuzSearchTracks
         return QobuzSearchTracks(self)

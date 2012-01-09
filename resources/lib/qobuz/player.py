@@ -48,6 +48,24 @@ class QobuzPlayer_playlist(xbmc.PlayList):
         print "Current position: " + str(cpos)
         return cpos
     
+    def is_valid_position(self, cpos):
+        if cpos < 0:
+            warn(self, "Playlist index < 0")
+            return False
+        if cpos >= self.size():
+            warn(self, "Playlist index > 0")
+            return False
+        return True
+    
+    def prefetching_needed(self, pos):
+        if not self.is_valid_position(pos):
+            warn(self, "Playlist positon is not valid: " + pos)
+            return False
+        if 'http://' in self[pos].getfilename():
+            info(self, 'URL is already resolved')
+            return False
+        return True
+        
     def getNextPos(self, cpos):
         if self.size() == 0:
             return None
@@ -63,10 +81,9 @@ class QobuzPlayer_playlist(xbmc.PlayList):
         return self[npos]
         
     def replacePath(self, cpos, item):
-        if cpos > self.size():
-            warn(self, "Cannot replace item: out of bound")
+        if not self.is_valid_position(cpos):
+            warn(self, "Cannot replace url (index out of bound)")
             return False
-        
         cpath = self[cpos].getfilename()
         if not cpath:
             warn(self, 'Current path is empty, abort')
@@ -130,6 +147,9 @@ class QobuzPlayer(xbmc.Player):
         
     def onPlayBackStopped(self):
         pass
+    
+    def prefetch_url(self, id):
+        return self.Core.getTrackURL(id, 5)
         
     def prefetchNextURL(self, cpos):
         npos = self.Playlist.getNextPos(cpos)
@@ -153,17 +173,34 @@ class QobuzPlayer(xbmc.Player):
         self.Playlist.replacePath(npos, item)
         return True
     
-    def play(self, item):        
-        self.item = item
+    def play(self, id, pos):
+        pos = int(pos)
+        track = self.Core.getTrack(id)
+        self.item = track.getItem()
+        self.cpos = pos #int(self.Core.Bootstrap.params['pos'])
+        url = None
+        if self.Playlist.prefetching_needed(pos):
+            tu = self.prefetch_url(id)
+            if not tu:
+                warn(self, 'Cannot fetch streaming url')
+                return False
+            url = tu.get_data()['streaming_url']
+        else:
+            url = self.Playlist[pos].getfilename()
+        if not url:
+            warn("We don't have url to play track")
+            return False
+        self.item.setPath(url)
+        self.item.setProperty('mimetype', 'audio/flac')
+        self.item.setProperty('stream', url)
         if not self.item.getProperty('stream'):
             warn(self, "Non playable item: " + item.getLabel())
             self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Track is not playable')
             return False
         self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Starting song')
-        self.cpos = int(self.Core.Bootstrap.params['pos'])
-        self.Playlist.replacePath(self.cpos, item)
+        self.Playlist.replacePath(self.cpos, self.item)
         super(QobuzPlayer, self).playselected(self.cpos)
-        xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
+        xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=self.item)
         xbmc.executebuiltin('Dialog.Close(all, true)')
         timeout = 30
         info(self, "Waiting song to start")
@@ -174,7 +211,7 @@ class QobuzPlayer(xbmc.Player):
             else: 
                 break
         if timeout <= 0:
-            warn(self, "Player can't play track: " + item.getLabel())
+            warn(self, "Player can't play track: " + self.item.getLabel())
             return False
         self.set_track_id(self.Core.Bootstrap.ID)
         #self.prefetchNextURL(cpos + 1)
@@ -210,7 +247,7 @@ class QobuzPlayer(xbmc.Player):
                 isNotified = True
             if math.trunc(math.floor(playedTime)) % 5 == 0:
                 info(self, 'Played time: ' + str(playedTime))
-                #info(self, "Playlist:\n" + self.Playlist.to_s())
+                info(self, "Playlist:\n" + self.Playlist.to_s())
             xbmc.sleep(1000)
         if playedTime > 6:
             self.sendQobuzPlaybackEnded(playedTime)

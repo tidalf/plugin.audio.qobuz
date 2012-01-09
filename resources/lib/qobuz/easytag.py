@@ -20,12 +20,14 @@ import xbmcgui
 import xbmcaddon
 from mydebug import warn, info, log
 
+import pprint
+
 class IQobuzTag(object):
     
     def __init__(self, Core, json = None):
         self.__valid_tags = None
         self.__is_loaded = None
-        self.__json = json
+        self._json = json
         self.Core = Core
         
     def parse_json(self, json):
@@ -375,7 +377,7 @@ class QobuzTagTrack(IQobuzTag):
                              'composer_name', 'composer_id',
                              'track_number', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
-        self.json = None
+        #self.json = None
         self.__album = None
         self.parent = None
         if json:
@@ -404,10 +406,12 @@ class QobuzTagTrack(IQobuzTag):
             i.setProperty('genre', self.parent.getGenre())
         except: pass
         i.setProperty('artist', self.getArtist())
+        print "Streamtype: " + self.getStreamingType()
+        pprint.pprint(self._json)
         i.setProperty('year', str(self.getYear()))
         if self.getStreamingType() != 'full':
             i.setProperty("IsPlayable",'false')
-            i.setProperty('Music', 'false')
+            i.setProperty('Music', 'true')
             label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
         else:
             i.setProperty('Music','true')

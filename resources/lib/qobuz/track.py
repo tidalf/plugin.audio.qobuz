@@ -45,10 +45,7 @@ class QobuzTrack(ICacheable):
         self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_track')
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.format_id = 6
-        settings = xbmcaddon.Addon(id='plugin.audio.qobuz')
-        # Todo : Due to caching, streaming url can be mixed if settings are 
-        # changed
-        if settings.getSetting('streamtype') == 'mp3':
+        if self.Core.Bootstrap.__addon__.getSetting('streamtype') == 'mp3':
             self.format_id = 5
         self.fetch_data()
 
@@ -73,21 +70,20 @@ class QobuzTrack(ICacheable):
         #pprint.pprint(self._raw_data)
         t = QobuzTagTrack(self.Core, self._raw_data)
         item = t.getXbmcItem()
-        if t.getStreamingType() != 'full':
-            warn(self, "This track is not playable: " + item.getLabel())
-            return item
-        stream = self.Core.Api.get_track_url(self.id,
-                                                    self.context_type,
-                                                    album_id,
-                                                    self.format_id)
-        mimetype = 'audio/flac'
-        if self.format_id == 5:
-            mimetype = 'audio/mpeg'
-        item.setProperty('mimetype', mimetype)
-        item.setProperty('stream', str(stream['streaming_url']))
+#        stream = self.Core.Api.get_track_url(self.id,
+#                                                    self.context_type,
+#                                                    album_id,
+#                                                    self.format_id)
+#        mimetype = 'audio/flac'
+#        if self.format_id == 5:
+#            mimetype = 'audio/mpeg'
+#        item.setProperty('mimetype', mimetype)
+        #item.setProperty('stream', str(stream['streaming_url']))
+        pos = None
         try: 
             pos = str(self.Core.Bootstrap.params['pos'])
-        except:pass
+        except:
+            pos = 0
         path = sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID + "&pos=" + pos
         item.setProperty('path', path)
         item.setPath(path)
