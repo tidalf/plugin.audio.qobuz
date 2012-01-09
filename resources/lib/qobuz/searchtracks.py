@@ -50,7 +50,7 @@ class QobuzSearchTracks():
         for track in self._raw_data['results']['tracks']:
             t = QobuzTagTrack(self.Core, track)
             item = t.getXbmcItem('songs')
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)
+            u = self.Core.Bootstrap.build_url(MODE_SONG, t.id, i)
 #            if 1:
 #                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
 #                ret = sys.argv[0]+"?mode="+str(self.Core.Bootstrap.MODE)+"&id="+str(self.Core.Bootstrap.ID)

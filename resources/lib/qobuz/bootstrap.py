@@ -151,7 +151,16 @@ class QobuzBootstrap(object):
         except: pass
         for p in self.params:
             info(self, "Param: " + p + ' = ' + str(self.params[p]))
-         
+    
+    '''
+    
+    '''
+    def build_url(self, mode, id, pos):
+        req = sys.argv[0] + "?mode=" + str(mode)+"&id="+str(id)
+        if pos != None:
+            req += "&pos="+str(pos)
+        print "Build url: " + req
+        return req
     '''
         Execute methode based on MODE
     '''       
