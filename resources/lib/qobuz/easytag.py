@@ -352,7 +352,7 @@ class QobuzTagProduct(IQobuzTag):
 '''
 class QobuzTagTrack(IQobuzTag):
     
-    def __init__(self, json):
+    def __init__(self, json, core = ''):
         super(QobuzTagTrack, self).__init__(json)
         self.set_valid_tags(['playlist_track_id', 'position', 'id', 'title', 
                              'interpreter_name', 'interpreter_id', 
@@ -360,6 +360,7 @@ class QobuzTagTrack(IQobuzTag):
                              'track_number', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
         self.__album = None
+        self.Core = core
         if json:
             self.parse_json(json)
     
@@ -392,11 +393,12 @@ class QobuzTagTrack(IQobuzTag):
             i.setProperty("IsPlayable",'true')
         i.setLabel(label)
         # add context menu items (for artist search)
-        albumfromthisartist=sys.argv[0]+"?id="+self.getArtistId()+"&mode="+str(MODE_ARTIST)
+        albumfromthisartist='ActivateWindows(MusicFiles,'+sys.argv[0]+"?id="+self.getArtistId()+"&mode="+str(MODE_ARTIST)
         # can't use __language__ here... we have lost artistid also.
         menuItems = []
-        menuItems.append(("Search for this artist", "XBMC.RunPlugin("+albumfromthisartist+")"))
-        i.addContextMenuItems(menuItems, replaceItems=False)
+        # action='ActivateWindow(MusicFiles, '+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+')'
+        i.addContextMenuItems([('Show albums from this artist', albumfromthisartist)], True)
+        #i.addContextMenuItems(menuItems, replaceItems=False)
         
         return i
     
