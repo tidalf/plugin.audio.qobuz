@@ -99,11 +99,14 @@ class QobuzTrack(ICacheable):
     def play(self):
         #global player
         player = self.Core.Bootstrap.Player
-        player.set_track_id(self.id)
-        player.setApi(self.Core)
+        #player.set_track_id(self.id)
+        #player.setApi(self.Core)
+        print "Size: " + str(self.Core.Bootstrap.Playlist.size())
         item = self.getItem()
         if not item.getProperty('stream'):
             warn(self, "Player can't play track: " + item.getLabel())
             return False
-        player.play(item)
+        player.play()#(item.getProperty('stream'), item)
+        item.setPath(item.getProperty('stream'))
+        #xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
         return True

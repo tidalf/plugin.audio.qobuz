@@ -73,6 +73,7 @@ class QobuzImages():
 class QobuzBootstrap(object):
     
     def __init__(self, __addon__, __handle__):
+        #global Player
         self.__addon__ = __addon__
         self.__handle__ = __handle__
         info(self, "Handle: " + str(self.__handle__))
@@ -80,7 +81,7 @@ class QobuzBootstrap(object):
         self.bootstrapDirectories()
         self.Core = QobuzCore(self)
         self.GUI = QobuzGUI(self)
-        self.Player = QobuzPlayer()
+        #self.Player = Player#QobuzPlayer()
         self.Images = QobuzImages(self)
         self.MODE = None
         self.ID = None
@@ -157,6 +158,7 @@ class QobuzBootstrap(object):
             self.GUI.showArtist(str(self.ID))
 
         elif self.MODE == MODE_ALBUM:
+            #xbmc.executebuiltin('ActivateWindow(MusicFiles, plugin://plugin.audio.qobuz/)')
             info(self, "Displaying album")
             self.GUI.showProduct(str(self.ID))
             

@@ -43,25 +43,28 @@ class QobuzSearchTracks():
         return len(self._raw_data['results']['tracks'])
     
     def add_to_directory(self):
-        xp = self.Core.Bootstrap.Player.Playlist
+        xp = self.Core.Bootstrap.Playlist
         xp.clear()
         n = self.length()
         for track in self._raw_data['results']['tracks']:
             t = QobuzTagTrack(track)
             item = t.getXbmcItem('songs')
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id
-#            if 1:
-#                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
-#                
-#                action="RunScript("+xbmc.translatePath(sys.argv[0])+", " + str(MODE_ALBUM) + "," + str(t.get_album().id) + ")"
-#                print "Show Album: " + action
-#                item.addContextMenuItems([('Show album', action)], True)
+            if 1:
+                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
+                ret = sys.argv[0]+"?mode="+str(self.Core.Bootstrap.MODE)+"&id="+str(self.Core.Bootstrap.ID)
+                action='ActivateWindow(MusicFiles, '+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+','+ret+')'
+                #action="RunScript("+sys.argv[0]+", " + str(MODE_ALBUM) + "," + str(t.get_album().id) + ")"
+                print "Show Album: " + action
+                item.addContextMenuItems([('Show album', action)], True)
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
             pitem =  xbmcgui.ListItem(item.getLabel(), thumbnailImage=item.getProperty('image'))
-            print "Add item to playlist"
+            #print "Add item to playlist"
             #pitem.setProperty('Music','true')
             #pitem.setProperty("IsPlayable",'true')
+            item.setProperty("Music", 'true')
+            item.setProperty('IsPlayable', 'false')
             xp.add(u, item)
-            print "Playlist size: " + str(xp.size())
+            #print "Playlist size: " + str(xp.size())
 
 

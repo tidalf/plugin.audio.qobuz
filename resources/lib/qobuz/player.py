@@ -27,15 +27,22 @@ class QobuzPlayer_playlist(xbmc.PlayList):
         
     def getCurrentPos(self, item):
         cpath = item.getProperty('path')
+        cstream = item.getProperty('stream') 
         size  =  self.size()
         print "Current path: " + cpath
-        cpos = 0
+        cpos = -1
         for i in range(0, size):
+            print "Playlist path [" + str(i) + '] ' + self[i].getfilename()
             if cpath == self[i].getfilename():
+                cpos += 1
                 break
-            cpos += 1
+            elif cstream == self[i].getfilename():
+                cpos += 1
+                break
+            else:
+                cpos += 1
         print "Current position: " + str(cpos)
-        return cpos
+        return cpos + 1
     
     def getNextPos(self, cpos):
         if self.size() == 0:
@@ -50,9 +57,25 @@ class QobuzPlayer_playlist(xbmc.PlayList):
         return self[npos]
         
     def replacePath(self, cpos, item):
-        cpath = self[cpos].getfilename
-        playlist.add(url=item['stream'], listitem=item, index=cpos)
-        self.remove(path)
+        if cpos > self.size():
+            warn("Cannot replace item: out of bound")
+            return
+        cpath = self[cpos].getfilename()
+        if 'http' in cpath:
+            print "We already have correct url in playlist... abort"
+            return
+        item.setPath(item.getProperty('stream'))
+        item.setProperty('path', item.getProperty('stream'))
+        print "Paht replace: " + item.getProperty('path')
+        self.add(url=item.getProperty('stream'), listitem=item, index=cpos)
+        #self.remove(cpath)
+        
+    def to_s(self):
+        str = ''
+        size = self.size()
+        for i in range(0, size):
+            str += self[i].getfilename() + ' / ' + self[i].getdescription() + "\n"
+        return str
 
 class QobuzPlayer(xbmc.Player):
     def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
@@ -84,7 +107,7 @@ class QobuzPlayer(xbmc.Player):
     
     def onPlayBackStarted(self):
         print "Playback started"
-        self.Core.Api.report_streaming_start(self.id)
+        #self.Core.Api.report_streaming_start(self.id)
     
     def onPlayBackNext(self):
         print "Next track pushed"
@@ -99,30 +122,46 @@ class QobuzPlayer(xbmc.Player):
         pass
         
     def onPlayBackStopped(self):
-        print "User push stop..."
-        size = self.Playlist.size()
-        print "Playlist size: " + str(size)
-        #cpos = self.Playlist.getposition()
-        pitemnext = self.Playlist.getNextItem(self.item)
-        print "Next item to play: " + pitemnext.getfilename()
+        pass
+#        print "User push stop..."
+#        size = self.Playlist.size()
+#        print "Playlist size: " + str(size)
+#        #cpos = self.Playlist.getposition()
+#        pitemnext = self.Playlist.getNextItem(self.item)
+#        print "Next item to play: " + pitemnext.getfilename()
         
         
     
 
     
     def play(self, item):
+        print "Playlist:\n"
+        print self.Playlist.to_s()
         self.item = item
         if not item.getProperty('stream'):
             warn(self, "Non playable item: " + item.getLabel())
             self.Core.Bootstrap.GUI.showNotificationH('Unplayable track', '')
             return False
         cpos = self.Playlist.getCurrentPos(item)
+        if cpos == -1:
+            print "Could not find song in playlist"
+            return False
         print "Need to play track: " + str(cpos)
         self.Playlist.replacePath(cpos, item)
-        #item.setProperty('path_origin', item.getProperty('path'))
-        super(QobuzPlayer, self).play(item.getProperty('stream'), item)
-        #self.Player.play(self, item.getProperty('stream'), item)
+        #item.setPath(item.getProperty('stream'))
+        item.setProperty('path_origin', item.getProperty('path'))
+#        if self.isPlayingAudio() == True:
+#            print "Player is currently playing a song"
+#            super(QobuzPlayer, self).stop()
+#            while self.isPlayingAudio() == True:
+#                print "Sleeping wainting for song to play"
+#                xbmc.sleep(250)
+        super(QobuzPlayer, self).playselected(cpos)#item.getProperty('stream'), item)
+        item.setPath(item.getProperty('path_origin'))
+        #super(QobuzPlayer, self).resume()
         item.select(True)
+        xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
+        #self.Player.play(self, item.getProperty('stream'), item)
         timeout = 30
         info(self, "Waiting song to start")
         while timeout > 0:
@@ -135,13 +174,12 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Player can't play track: " + item.getLabel())
             return False
         item.setPath(item.getProperty('path_origin'))
-        xbmc.set
+        
         #if self.isPlayingAudio():
             
-        self.watchPlayback()
+        #self.watchPlayback()
         #self.sendQobuzPlaybackEnded()
         #self.run()
-        xbmc.sleep(2000)
         return True
     
     def set_track_id(self, id):
@@ -155,4 +193,4 @@ class QobuzPlayer(xbmc.Player):
             info(self, "Watching playback: " + str(self.getTime()))
             xbmc.sleep(1000)
         #xbmc.sleep(5000)
-        #info (self,"End of Playback detected")
+        info (self,"End of Playback detected")
