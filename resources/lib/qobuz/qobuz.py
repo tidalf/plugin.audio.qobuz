@@ -73,8 +73,8 @@ class QobuzCore:
     def getQobuzAlbum(self, id):
         return QobuzAlbum(self, id)
 
-    def getTrack(self,id):
-        return QobuzTrack(self,id)
+    def getTrack(self,id,context_type="playlist"):
+        return QobuzTrack(self,id,context_type)
     
     def getEncounteredAlbum(self):
         return QobuzEncounteredAlbum(self)

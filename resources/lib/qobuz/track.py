@@ -36,9 +36,10 @@ import pprint
 '''
 class QobuzTrack(ICacheable):
     # Constructor
-    def __init__(self,qob,id):
+    def __init__(self,qob,id,context_type='playlist'):
         self.Core = qob
         self.id = id
+        self.context_type = context_type
         self._raw_data = []
         self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir,
                                         'track-' + str(self.id) + '.dat')
@@ -77,7 +78,7 @@ class QobuzTrack(ICacheable):
             warn(self, "This track is not playable: " + item.getLabel())
             return item
         stream = self.Core.Api.get_track_url(self.id,
-                                                    'playlist',
+                                                    self.context_type,
                                                     album_id,
                                                     self.format_id)
         mimetype = 'audio/flac'

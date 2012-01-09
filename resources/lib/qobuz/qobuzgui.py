@@ -71,6 +71,7 @@ class QobuzGUI:
         self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, i.get('album'), 0)
         self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, i.get('album'), 0)
         self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, i.get('song'), 0)
+        self._add_dir(__language__(30101), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases', MODE_SHOW_RECO_T, i.get('song'), 0)
         self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('song'), 0)
         if (self.Bootstrap.Core.Api.userid != 0):
             self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('playlist'), 0)
