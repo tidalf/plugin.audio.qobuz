@@ -1,8 +1,23 @@
 This is a Qobuz plugin for XBMC
 -------------------------------
+The goal is to integrate access to the great Qobuz library directly from XBMC.
+
+Main Features : 
+---------------
+
+- Show playlist already filled using the standard players (web, desktop)
+- Show purchased products
+- Show recommended albums by genre and type  
+- Search by track name, album name and artist name
+- Integrate with xbmc gapless play
+- Support flac or mp3 play (using settings)
+- 
 
 Configuration:
 --------------
 
-- Valid Qobuz credentials must be entered (GUI settings)
-- You can switch stream format (FLAC/Mp3)
+- Enter valid Qobuz credentials using addon settings, 
+note: you need Hifi subscription to stream flac files and premium subscription to play mp3
+get yours here : http://www.qobuz.com/abonnement-streaming
+
+ 
