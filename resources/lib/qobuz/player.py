@@ -134,7 +134,7 @@ class QobuzPlayer(xbmc.Player):
     def prefetchNextURL(self, cpos):
         npos = self.Playlist.getNextPos(cpos)
         print "Npos: " + str(npos)
-        if not npos:
+        if npos == None or npos == -1:
             warn(self, "Cannot get next position")
             return False
         if 'http' in self.Playlist[npos].getfilename():
@@ -210,7 +210,7 @@ class QobuzPlayer(xbmc.Player):
                 isNotified = True
             if math.trunc(math.floor(playedTime)) % 5 == 0:
                 info(self, 'Played time: ' + str(playedTime))
-                info(self, "Playlist:\n" + self.Playlist.to_s())
+                #info(self, "Playlist:\n" + self.Playlist.to_s())
             xbmc.sleep(1000)
         if playedTime > 6:
             self.sendQobuzPlaybackEnded(playedTime)
