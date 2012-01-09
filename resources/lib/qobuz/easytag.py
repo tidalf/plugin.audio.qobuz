@@ -393,7 +393,7 @@ class QobuzTagTrack(IQobuzTag):
             i.setProperty("IsPlayable",'true')
         i.setLabel(label)
         # add context menu items (for artist search)
-        albumfromthisartist='ActivateWindows(MusicFiles,'+sys.argv[0]+"?id="+self.getArtistId()+"&mode="+str(MODE_ARTIST)
+        albumfromthisartist='ActivateWindow(MusicFiles,     '+sys.argv[0]+"?id="+str(self.getArtistId())+"&mode="+str(MODE_ARTIST)+')'
         # can't use __language__ here... we have lost artistid also.
         menuItems = []
         # action='ActivateWindow(MusicFiles, '+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+')'
