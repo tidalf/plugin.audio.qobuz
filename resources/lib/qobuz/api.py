@@ -230,7 +230,7 @@ class QobuzApi:
         try:
             token = self.authtoken
         except:
-            warn('No authentification toke')
+            warn(self, 'No authentification token')
             return None
         #info(self, "Report Streaming stop for user:  " + str(self.userid) + ", track: " + str(track_id))
         params = urllib.urlencode({'x-api-auth-token': token, 

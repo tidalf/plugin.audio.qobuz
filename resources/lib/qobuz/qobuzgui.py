@@ -186,6 +186,7 @@ class QobuzGUI:
         self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, i.get('genre-0'), 0)
         self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, i.get('genre-0'), 0)
         self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.get('genre-0'), 0)
+        xbmc.executebuiltin('Container.SetViewMode(icons)')
         self.setContent('files')
 
     # Get my playlists
@@ -194,6 +195,7 @@ class QobuzGUI:
             user_playlists = self.Bootstrap.Core.getUserPlaylists()
             user_playlists.add_to_directory()
             self.setContent('files')
+            xbmc.executebuiltin('Container.SetViewMode(thumbnails)')
         except:
             self.showNotification(30008, 30033)
             self.showCategories()
@@ -205,6 +207,7 @@ class QobuzGUI:
         if album.length() > 0:
             album.add_to_directory()
             self.setContent('songs')
+            xbmc.executebuiltin('Container.SetViewMode(thumbnails)')
         else:
             self.showNotification(30008, 30033)
             self.showCategories()
