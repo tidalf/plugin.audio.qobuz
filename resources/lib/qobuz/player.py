@@ -195,7 +195,7 @@ class QobuzPlayer(xbmc.Player):
             try:
                 playedTime = self.getTime()
             except:
-                warn(self, "Cannot getTime(), player may be not running")
+                warn(self, "Cannot getTime(), player may be not running") 
             timeleft = None
             if playedTime:
                 try:
