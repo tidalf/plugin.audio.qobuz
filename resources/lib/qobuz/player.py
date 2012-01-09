@@ -96,34 +96,31 @@ class QobuzPlayer(xbmc.Player):
         self.Core = None
         self.startPlayingOn = None
         self.item = None
-        self.threadLock = threading.Lock()
+        self.playedTime = None
     
     def setApi (self, Core):
         self.Core = Core
     
-    def playnext(self):
-        info(self, "Playing next track...")
+    #def playnext(self):
+    #info(self, "Playing next track...")
         
-    def sendQobuzPlaybackEnded(self):
-        duration = None
-        try:
-            duration = time() - self.startPlayingOn
-        except: 
-            warn(self, "Cannot calcul duration, don't send api/stop")
-            return
-        self.Core.Api.report_streaming_stop(self.id, self.playedTime)
+    def sendQobuzPlaybackEnded(self, duration):
+        self.Core.Api.report_streaming_stop(self.id, duration)
     
-    def onPlayBackStarted(self):
-        print "Playback started"
+    def sendQobuzPlaybackStarted(self,):
+        self.Core.Api.report_streaming_start(self.id)
     
-    def onPlayBackNext(self):
-        print "Next track pushed"
+#    def onPlayBackStarted(self):
+#        print "Playback started"
+#    
+##    def onPlayBackNext(self):
+##        print "Next track pushed"
+#        
+#    def onPlayBackEnded(self):
+#        print "End of playback reached"
         
-    def onPlayBackEnded(self):
-        print "End of playback reached"
-        
-    def onPlayBackResumed(self):
-        print "User pause playback"
+#    def onPlayBackResumed(self):
+#        print "User pause playback"
         
     def parsePluginPath(self, path):
         print "searchin in path: " + path
@@ -161,8 +158,14 @@ class QobuzPlayer(xbmc.Player):
     
     def play(self, item):        
         self.item = item
+        #self.threadLock.acquire()
+        timeout = 1000
         self.runWatch = False
-        self.threadLock.acquire()
+        while timeout > 0 and  self.isPlayingAudio():
+            xbmc.sleep(250)
+            timeout -= 250
+        if self.isPlayingAudio():
+            print "ANOTHER THREAD MAY BE RUNNING!!!"
         if not item.getProperty('stream'):
             warn(self, "Non playable item: " + item.getLabel())
             self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Track is not playable')
@@ -173,10 +176,10 @@ class QobuzPlayer(xbmc.Player):
         #xbmc.executebuiltin('Container.Update('+ item.getProperty('path') + ',' + item.getProperty('stream')+')')
         #xbmc.executebuiltin('Container.Refresh()')
         super(QobuzPlayer, self).playselected(self.cpos)
-        item.setPath(item.getProperty('path'))
+        #item.setPath(item.getProperty('path'))
         #xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
         timeout = 30
-        info(self, "Waiting song to start")
+        #info(self, "Waiting song to start")
         while timeout > 0:
             if self.isPlayingAudio() == False:
                 xbmc.sleep(1000)
@@ -187,16 +190,15 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Player can't play track: " + item.getLabel())
             return False
         #xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
-        self.startPlayingOn = time()
-        xbmc.executebuiltin('Dialog.Close(all, true)')
-        
+        #self.startPlayingOn = time()
+        #xbmc.executebuiltin('Dialog.Close(all, true)')
         self.set_track_id(self.Core.Bootstrap.ID)
-        self.Core.Api.report_streaming_start(self.id)
-        self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Playing song')
-        self.prefetchNextURL(self.cpos)
+        #self.Core.Api.report_streaming_start(self.id)
+        #self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Playing song')
+        #self.prefetchNextURL(self.cpos)
         self.watchPlayback()
+        #a = threading.Thread(None, self.watchPlayback, None, (), {'id':self.id})
         warn(self, 'stopping player for track: ' + self.item.getLabel())
-        self.threadLock.release()
         exit(0)
     
     def set_track_id(self, id):
@@ -205,21 +207,25 @@ class QobuzPlayer(xbmc.Player):
         self.id = id
     
             
-    def watchPlayback( self ):
+    def watchPlayback( self):
         nextisreplaced = False
-        self.runWatch = True
-        while self.runWatch and self.isPlayingAudio():
-            info(self, "Watching playback: " + str(self.getTime()))
+        isNotified = False
+        playedTime = None
+        while self.isPlayingAudio():
+            info(self, "Watching playback: " + str(playedTime))
             try:
                 timeleft = self.getTotalTime() - self.getTime()
                 if timeleft < 20:
                     if nextisreplaced == False:
                         nextisreplaced = self.prefetchNextURL(self.Playlist.getposition() + 1)
-                self.playedTime = self.getTime()
             except:
                 warn(self, 'Prefetching next url fail!')
+            if not isNotified and self.getTime() > 6:
+                self.sendQobuzPlaybackStarted()
+                isNotified = True
+            playedTime = self.getTime()
             xbmc.sleep(1000)
-        self.sendQobuzPlaybackEnded()
-        self.threadLock.release()
+        if playedTime > 6:
+            self.sendQobuzPlaybackEnded(playedTime)
         info (self,"End of Playback detected")
         exit(0)
