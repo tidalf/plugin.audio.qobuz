@@ -407,7 +407,7 @@ class QobuzTagTrack(IQobuzTag):
         except: pass
         i.setProperty('artist', self.getArtist())
         print "Streamtype: " + self.getStreamingType()
-        pprint.pprint(self._json)
+        #pprint.pprint(self._json)
         i.setProperty('year', str(self.getYear()))
         if self.getStreamingType() != 'full':
             i.setProperty("IsPlayable",'false')
