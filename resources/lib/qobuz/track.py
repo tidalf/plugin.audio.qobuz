@@ -85,7 +85,10 @@ class QobuzTrack(ICacheable):
             mimetype = 'audio/mpeg'
         item.setProperty('mimetype', mimetype)
         item.setProperty('stream', str(stream['streaming_url']))
-        path = sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID + "&pos=" + str(self.Core.Bootstrap.params['pos'])
+        try: 
+            pos = str(self.Core.Bootstrap.params['pos'])
+        except:pass
+        path = sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID + "&pos=" + pos
         item.setProperty('path', path)
         item.setPath(path)
         item.select(True)

@@ -21,9 +21,9 @@ import time
 #import urllib2
 import urllib
 import hashlib
-import mutagen 
+#import mutagen 
 import pickle
-from mutagen.flac import FLAC
+#from mutagen.flac import FLAC
 import pprint
 from time import time
 
