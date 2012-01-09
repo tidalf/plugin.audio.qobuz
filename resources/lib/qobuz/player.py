@@ -109,7 +109,7 @@ class QobuzPlayer(xbmc.Player):
         except: 
             warn(self, "Cannot calcul duration, don't send api/stop")
             return
-        self.Core.Api.report_streaming_stop(self.id, duration)
+        self.Core.Api.report_streaming_stop(self.id, self.playedTime)
     
     def onPlayBackStarted(self):
         print "Playback started"
@@ -166,7 +166,6 @@ class QobuzPlayer(xbmc.Player):
         self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Starting song')
         self.cpos = int(self.Core.Bootstrap.params['pos'])
         self.Playlist.replacePath(self.cpos, item)
-        self.prefetchNextURL(self.cpos)
         super(QobuzPlayer, self).playselected(self.cpos)
         item.setPath(item.getProperty('path'))
         xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
@@ -187,6 +186,7 @@ class QobuzPlayer(xbmc.Player):
         self.set_track_id(self.Core.Bootstrap.ID)
         self.Core.Api.report_streaming_start(self.id)
         self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Playing song')
+        self.prefetchNextURL(self.cpos)
         self.watchPlayback()
         exit(0)
     
@@ -205,6 +205,7 @@ class QobuzPlayer(xbmc.Player):
                 if timeleft < 20:
                     #if nextisreplaced == False:
                     nextisreplaced = self.prefetchNextURL(self.Playlist.getposition() + 1)
+                self.playedTime = self.getTime()
             except:
                 warn(self, 'Prefetching next url fail!')
             xbmc.sleep(1000)

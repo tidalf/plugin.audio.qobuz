@@ -30,39 +30,6 @@ __addonversion__ = __addon__.getAddonInfo('version')
 __addonid__      = __addon__.getAddonInfo('id')
 __cwd__          = __addon__.getAddonInfo('path')
 
-#Player = xbmc.Player()
-#Playlist = xbmc.PlayList(0)
-#__scriptid__ = "script.audio.qobuz"
-#__scriptname__ = "Qobuz"
-#__author__ = "Solver"
-#__url__ = "http://code.google.com/p/grooveshark-for-xbmc/"
-#__svn_url__ = ""
-#__credits__ = ""
-#__XBMC_Revision__ = "31000"
-#
-#try: #It's an XBOX/pre-dharma
-#    __cwd__ = os.getcwd()
-#    __settings__ = xbmc.Settings(path=__cwd__)
-#    __language__ = xbmc.Language(__cwd__.replace( ";", "" )).getLocalizedString
-#    __debugging__ = __settings__.getSetting("debug")
-#    __isXbox__ = True
-#    __version__ = "0.3.1"
-#    BASE_RESOURCE_PATH = xbmc.translatePath(os.path.join(__cwd__, 'resources', 'lib' ))
-#    print 'GrooveShark: Initialized as a XBOX plugin'
-#
-#except: #It's post-dharma
-#    import xbmcaddon
-#    __settings__ = xbmcaddon.Addon(id=__scriptid__)
-#    __language__ = __settings__.getLocalizedString
-#    __debugging__ = __settings__.getSetting("debug")
-#    __isXbox__ = False
-#    __version__ = __settings__.getAddonInfo('version')
-#    BASE_RESOURCE_PATH = xbmc.translatePath(os.path.join(__settings__.getAddonInfo('path'), 'resources', 'lib' ))
-#    __cwd__ = __settings__.getAddonInfo('path')
-#    print 'GrooveShark: Initialized as a post-dharma plugin'
-    #traceback.print_exc()
-    
-
 addonDir  = __addon__.getAddonInfo('path')
 libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 sys.path.append(libDir)

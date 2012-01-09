@@ -20,24 +20,10 @@ import sys
 import xbmcaddon
 import xbmc
 
-import tempfile
-
-from icacheable import ICacheable
 from api import QobuzApi
 from mydebug import log, info, warn
-from utils import _sc
-from track import QobuzTrack
 from icacheable import ICacheable
-from getrecommandation import QobuzGetRecommandation
-from getpurchases import QobuzGetPurchases
-from product import QobuzProduct
-from userplaylists import QobuzUserPlaylists
-from playlist import QobuzPlaylist
-from searchtracks import QobuzSearchTracks
-from searchalbums import QobuzSearchAlbums
-from searchartists import QobuzSearchArtists
-from currentplaylist import XbmcCurrentPlaylist
-from time import time
+
 """
  Class QobuzXbmc
 """
@@ -63,51 +49,48 @@ class QobuzCore:
         return self.Api.userid
 
     def getPlaylist(self,id):
+        from playlist import QobuzPlaylist
         return QobuzPlaylist(self, id)
 
     def getProduct(self,id):
+        from product import QobuzProduct
         return QobuzProduct(self, id)
 
     def getUserPlaylists(self):
+        from userplaylists import QobuzUserPlaylists
         return QobuzUserPlaylists(self)
 
     def getQobuzAlbum(self, id):
         return QobuzAlbum(self, id)
 
     def getTrack(self,id,context_type="playlist"):
+        from track import QobuzTrack
         return QobuzTrack(self,id,context_type)
     
-    def getEncounteredAlbum(self):
-        return QobuzEncounteredAlbum(self)
-    
     def getQobuzSearchTracks(self):
+        from searchtracks import QobuzSearchTracks
         return QobuzSearchTracks(self)
 
     def getQobuzSearchAlbums(self):
+        from searchalbums import QobuzSearchAlbums
         return QobuzSearchAlbums(self)
     
     def getQobuzSearchArtists(self):
+        from searchartists import QobuzSearchArtists
         return QobuzSearchArtists(self)
 
     def getProductsFromArtist(self):
+        from searchalbums import QobuzSearchAlbums
         return QobuzSearchAlbums(self)
 
-    def getXmbcCurrentPlaylist(self):
-        return XbmcCurrentPlaylist(self)
-    
-#    def watchPlayback( self ):
-#        if not self.player.isPlayingAudio():
-#            self.Timer.stop()
-#            exit(0)
-#        info(self, "Watching player: " + self.player.getPlayingFile())
-#        self.Timer = threading.Timer( 6, self.watchPlayback, () )
-#        self.Timer.start()
-
     def getRecommandation(self,genre_id):
+        from getrecommandation import QobuzGetRecommandation
         return QobuzGetRecommandation(self, genre_id)
 
     def getRecommandation(self, genre_id,type):
+        from getrecommandation import QobuzGetRecommandation
         return QobuzGetRecommandation(self, genre_id, type)
     
     def getPurchases(self):
+        from getpurchases import QobuzGetPurchases
         return QobuzGetPurchases(self)

@@ -168,7 +168,6 @@ class QobuzBootstrap(object):
             except: 
                 context_type="playlist"
             track = self.Core.getTrack(self.ID,context_type)
-            #track.play()
             self.Player.play(track.getItem())
         
         elif self.MODE == MODE_ARTIST:
