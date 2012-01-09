@@ -51,13 +51,13 @@ class QobuzSearchTracks():
             t = QobuzTagTrack(self.Core, track)
             item = t.getXbmcItem('songs')
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)
-            if 1:
-                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
-                ret = sys.argv[0]+"?mode="+str(self.Core.Bootstrap.MODE)+"&id="+str(self.Core.Bootstrap.ID)
-                action='ActivateWindow(MusicFiles, '+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+','+ret+')'
-                #action="RunScript("+sys.argv[0]+", " + str(MODE_ALBUM) + "," + str(t.get_album().id) + ")"
-                print "Show Album: " + action
-                item.addContextMenuItems([('Show album', action)], True)
+#            if 1:
+#                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
+#                ret = sys.argv[0]+"?mode="+str(self.Core.Bootstrap.MODE)+"&id="+str(self.Core.Bootstrap.ID)
+#                action='ActivateWindow(MusicFiles, '+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+','+ret+')'
+#                #action="RunScript("+sys.argv[0]+", " + str(MODE_ALBUM) + "," + str(t.get_album().id) + ")"
+#                print "Show Album: " + action
+#                item.addContextMenuItems([('Show album', action)], False)
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
             pitem =  xbmcgui.ListItem(item.getLabel(), thumbnailImage=item.getProperty('image'))
             #print "Add item to playlist"

@@ -138,13 +138,15 @@ class QobuzBootstrap(object):
         '''
         try:
             self.MODE = int(self.params['mode'])
-        except: pass
+        except: 
+            warn(self, "No 'mode' parameter")
         ''' 
         set id 
         '''
         try: 
             self.ID = str(self.params["id"])
-        except: pass
+        except: 
+            warn(self, "No 'id' parameter")
         try: 
             self.NAME = str(self.params["name"])
         except: pass
@@ -160,6 +162,7 @@ class QobuzBootstrap(object):
         
         elif self.MODE == MODE_SONG:
             info(self, "PLaying song")
+            self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Loading song...')
             try:
                 context_type=urllib.unquote_plus(self.params["context_type"])
             except: 

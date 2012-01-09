@@ -200,14 +200,14 @@ class QobuzGUI:
 
     # Get album
     def showProduct (self, id):
-        if 1:
-            print "SHOOOOOOW PRODUCT"
-            album = self.Bootstrap.Core.getProduct(id)
+        info(self, "showProduct(" + str(id) + ")")
+        album = self.Bootstrap.Core.getProduct(id)
+        if album.length() > 0:
             album.add_to_directory()
-            self.setContent('album')
-#        except:
-#            self.showNotification(30008, 30033)
-#            self.showCategories()
+            self.setContent('songs')
+        else:
+            self.showNotification(30008, 30033)
+            self.showCategories()
 
     def showArtist (self, id):
         try:

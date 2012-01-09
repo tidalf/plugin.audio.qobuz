@@ -69,17 +69,20 @@ class IQobuzTag(object):
         return None
     
     def getArtist(self):
-        label = []
+        label = ''
         try:
-            label.append(self.artist)
-        except:
-            try:
-                label.append(self.interpreter_name)
-            except: 
-                try:
-                    label.append(self.composer_name)
-                except: label.append('N/A')
-        return ''.join(label)
+            label = self.artist
+        except: pass
+        if label: return label
+        try:
+            label = self.interpreter_name
+        except: pass
+        if label: return label
+        try:
+            label =  self.composer_name
+        except: pass
+        if label: return label
+        return 'N/A'
     
     def getArtistId(self):
         label = []
@@ -236,7 +239,7 @@ class QobuzTagArtist(IQobuzTag):
         try:
             return self.name
         except:
-            return "N/A"   
+            return supper(QobuzTagArtis, self).getArtist()
     
     def get_album(self):
         return self.__album
@@ -313,9 +316,11 @@ class QobuzTagProduct(IQobuzTag):
         return i
     
     def parse_json(self, p):
+        print p
         self.set('id', p['id'])
         self.set('artist', p['artist'])
         # fixme artist_id or ['artist']['id']?
+
         # self.set('artist_id', p['artist']['id'])
         self.set('genre', p['genre'])
         self.set('image_large', p['image']['large'])
@@ -332,21 +337,30 @@ class QobuzTagProduct(IQobuzTag):
             self.set('type', p['type'])
         except: pass
         self.set('url', p['url'])
-        try:
-            if len(p['tracks']) > 0:
-                self.__tracks__ = []
-                for t in p['tracks']:
-                    image = ''
-                    try:
-                        image = t['image']['large']
-                    except:
-                        t['image'] = {}
-                        t['image']['large'] = p['image']['large']
-                    self.__tracks__.append(QobuzTagTrack(self.Core, t))
+        if not 'tracks' in p:
+            return
+        if len(p['tracks']) > 0:
+            self.__tracks__ = []
+            for t in p['tracks']:
+                image = ''
+                try:
+                    image = t['image']['large']
+                except:
+                    t['image'] = {}
+                    t['image']['large'] = p['image']['large']
+                release_date = ''
+                try:
+                    release_date = t['release_date']
+                except:
+                    t['release_date'] = p['release_date']
+                try:
+                      genre = t['release_date']
+                except:
+                    t['genre'] = p['genre']
+                print t   
+                self.__tracks__.append(QobuzTagTrack(self.Core, t, self))
             else:
                 warn(self, "NO TRACK FOR THIS PRODUCT (parse error)")
-        except: 
-            warn(self, "NO TRACK FOR THIS PRODUCT (parse error)")
         self._is_loaded = True
         
 
@@ -354,14 +368,16 @@ class QobuzTagProduct(IQobuzTag):
 '''
 class QobuzTagTrack(IQobuzTag):
     
-    def __init__(self, Core, json):
+    def __init__(self, Core, json, parent = None):
         super(QobuzTagTrack, self).__init__(Core, json)
         self.set_valid_tags(['playlist_track_id', 'position', 'id', 'title', 
                              'interpreter_name', 'interpreter_id', 
                              'composer_name', 'composer_id',
                              'track_number', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
+        self.json = None
         self.__album = None
+        self.parent = None
         if json:
             self.parse_json(json)
     
@@ -382,14 +398,17 @@ class QobuzTagTrack(IQobuzTag):
         else:
             raise "Unknown display context"
         i.setProperty('mimetype','audio/flac')
+        
         i.setProperty('album', self.getTitle())
-        i.setProperty('genre', self.getGenre())
+        try:
+            i.setProperty('genre', self.parent.getGenre())
+        except: pass
         i.setProperty('artist', self.getArtist())
         i.setProperty('year', str(self.getYear()))
         if self.getStreamingType() != 'full':
             i.setProperty("IsPlayable",'false')
             i.setProperty('Music', 'false')
-            label = '[COLOR=FFFF0000][Sample][/COLOR] [COLOR=grey]' + label + '[/COLOR]'
+            label = '[COLOR=FFFF0011][Sample][/COLOR] [COLOR=CCAABBCC]' + label + '[/COLOR]'
         else:
             i.setProperty('Music','true')
             i.setProperty("IsPlayable",'false')
@@ -397,9 +416,10 @@ class QobuzTagTrack(IQobuzTag):
         # add context menu items (for artist search)
         albumfromthisartist='ActivateWindow(MusicFiles,'+sys.argv[0]+"?id="+self.getArtistId()+"&mode="+str(MODE_ARTIST) + ')'
         # can't use __language__ here... we have lost artistid also.
+        #albumfromthisartist='RunScript(plugin.audio.qobuz,'+str(self.Core.Bootstrap.__handle__)+','+self.getArtistId()+','+str(MODE_ARTIST) + ')' 
         menuItems = []
         # action='ActivateWindow(MusicFiles, '+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+')'
-        i.addContextMenuItems([('Show albums from this artist', albumfromthisartist)], True)
+        i.addContextMenuItems([('Show albums from this artist', albumfromthisartist)], False)
         #i.addContextMenuItems(menuItems, replaceItems=False)
         
         return i
@@ -407,6 +427,12 @@ class QobuzTagTrack(IQobuzTag):
     def get_album(self):
         return self.__album
     
+    def getGenre(self):
+        genre = ''
+        try:
+            genre = self.parent.genre
+        except: return super(QobuzTagTrack, self).getGenre()
+        return genre
     def getLabel(self):
         label = []
         label.append(self.track_number)
