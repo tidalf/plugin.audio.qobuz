@@ -58,9 +58,12 @@ class QobuzImages():
         for n in names:
             self.set(n)
             
-    def set(self, name):
-        self.pool[name] = xbmc.translatePath(os.path.join(self.Bootstrap.resDir, 'img', name + '.png'))
-
+    def set(self, name, path = None, ext = ".png"):
+        if not path:
+            self.pool[name] = xbmc.translatePath(os.path.join(self.Bootstrap.resDir, 'img', name + ext))
+        else: 
+            self.pool[name] = xbmc.translatePath(os.path.join(self.Bootstrap.resDir, 'img', path, name + ext))
+                                                  
     def get(self, name):
         info(self, "Get img: " + self.pool[name])
         if name in self.pool:
@@ -81,10 +84,13 @@ class QobuzBootstrap(object):
         self.bootstrapDirectories()
         self.Core = QobuzCore(self)
         self.GUI = QobuzGUI(self)
-        #self.Player = Player#QobuzPlayer()
+        self.Player = QobuzPlayer()
+        self.Player.Core = self.Core
         self.Images = QobuzImages(self)
         self.MODE = None
         self.ID = None
+        self.POS = None
+        
         '''
             NAME can be used to set icon for each folder i think :)
             XBMC maintain a cache path/icon 
@@ -123,6 +129,10 @@ class QobuzBootstrap(object):
     '''
     def parse_sys_args(self):
         self.params = get_params()
+        try:
+            self.POS = self.params['pos']
+        except:
+            warn(self, "No 'pos' parameter (Song position in playlist)")
         ''' 
         set mode 
         '''
@@ -155,14 +165,14 @@ class QobuzBootstrap(object):
             except: 
                 context_type="playlist"
             track = self.Core.getTrack(self.ID,context_type)
-            track.play()
+            #track.play()
+            self.Player.play(track.getItem())
         
         elif self.MODE == MODE_ARTIST:
             info(self, "Displaying artist")
             self.GUI.showArtist(str(self.ID))
 
         elif self.MODE == MODE_ALBUM:
-            #xbmc.executebuiltin('ActivateWindow(MusicFiles, plugin://plugin.audio.qobuz/)')
             info(self, "Displaying album")
             self.GUI.showProduct(str(self.ID))
             
@@ -211,6 +221,10 @@ class QobuzBootstrap(object):
             except: pass
             self.GUI.showRecommendationsGenres(type)
 
+        elif self.MODE == MODE_CURRENTPLAYLIST:
+            info(self, "Displaying current playlist")
+            self.GUI.showCurrentPlaylist()
+            
         '''
             Directory Endin
         '''

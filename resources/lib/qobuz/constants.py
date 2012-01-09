@@ -14,9 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcaddon
-
-#Qob = None
 
 __debugging__ = 0
 
@@ -38,6 +35,7 @@ MODE_SHOW_RECOS = 15
 MODE_SHOW_RECO_T = 16
 MODE_SHOW_RECO_T_G = 17
 MODE_SHOW_PURCHASES = 18
+MODE_CURRENT_PLAYLIST = 19
 
 MODE_SONG = 30
 MODE_FAVORITE = 31
@@ -47,21 +45,3 @@ MODE_REMOVE_PLAYLIST = 34
 MODE_RENAME_PLAYLIST = 35
 MODE_REMOVE_PLAYLIST_SONG = 36
 MODE_ADD_PLAYLIST_SONG = 37
-#
-#ACTION_MOVE_LEFT = 1
-#ACTION_MOVE_UP = 3
-#ACTION_MOVE_DOWN = 4
-#ACTION_PAGE_UP = 5
-#ACTION_PAGE_DOWN = 6
-#ACTION_SELECT_ITEM = 7
-#ACTION_PREVIOUS_MENU = 10
-#
-## Formats for track labels
-#ARTIST_ALBUM_NAME_LABEL = 0
-#NAME_ALBUM_ARTIST_LABEL = 1
-#
-## Stream marking time (seconds)
-#STREAM_MARKING_TIME = 30
-#
-## Timeout
-#STREAM_TIMEOUT = 30

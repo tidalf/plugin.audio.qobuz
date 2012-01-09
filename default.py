@@ -30,8 +30,8 @@ __addonversion__ = __addon__.getAddonInfo('version')
 __addonid__      = __addon__.getAddonInfo('id')
 __cwd__          = __addon__.getAddonInfo('path')
 
-Player = xbmc.Player()
-Playlist = xbmc.PlayList(0)
+#Player = xbmc.Player()
+#Playlist = xbmc.PlayList(0)
 #__scriptid__ = "script.audio.qobuz"
 #__scriptname__ = "Qobuz"
 #__author__ = "Solver"
@@ -68,8 +68,6 @@ libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 sys.path.append(libDir)
 from qobuz.bootstrap import *
 Core = QobuzBootstrap(__addon__, int(sys.argv[1]))
-Core.Player = Player
-Core.Playlist = Playlist
 Core.parse_sys_args()
 Core.mode_dispatch()
 print "Script ENDED"

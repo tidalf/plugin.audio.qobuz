@@ -57,7 +57,7 @@ class QobuzSearchAlbums():
 
     def xbmc_directory_products(self):
         for product in self.get_data():
-            a = QobuzTagProduct(product['product'])
+            a = QobuzTagProduct(self.Core, product['product'])
             item = a.getXbmcItem()
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(a.id)
             item.setPath(u)
@@ -73,7 +73,7 @@ class QobuzSearchAlbums():
         h = int(sys.argv[1])
         artist = json['artist']['name']
         for p in json['artist']['albums']:
-            a = QobuzTagAlbum(p)
+            a = QobuzTagAlbum(self.Core, p)
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
             item = xbmcgui.ListItem()
             item.setLabel(a.getTitle() + "(" + str(a.getYear()) + ")")

@@ -36,6 +36,7 @@ from playlist import QobuzPlaylist
 from searchtracks import QobuzSearchTracks
 from searchalbums import QobuzSearchAlbums
 from searchartists import QobuzSearchArtists
+from currentplaylist import XbmcCurrentPlaylist
 from time import time
 """
  Class QobuzXbmc
@@ -91,13 +92,16 @@ class QobuzCore:
     def getProductsFromArtist(self):
         return QobuzSearchAlbums(self)
 
-    def watchPlayback( self ):
-        if not self.player.isPlayingAudio():
-            self.Timer.stop()
-            exit(0)
-        info(self, "Watching player: " + self.player.getPlayingFile())
-        self.Timer = threading.Timer( 6, self.watchPlayback, () )
-        self.Timer.start()
+    def getXmbcCurrentPlaylist(self):
+        return XbmcCurrentPlaylist(self)
+    
+#    def watchPlayback( self ):
+#        if not self.player.isPlayingAudio():
+#            self.Timer.stop()
+#            exit(0)
+#        info(self, "Watching player: " + self.player.getPlayingFile())
+#        self.Timer = threading.Timer( 6, self.watchPlayback, () )
+#        self.Timer.start()
 
     def getRecommandation(self,genre_id):
         return QobuzGetRecommandation(self, genre_id)

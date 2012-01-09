@@ -56,7 +56,7 @@ class QobuzGetRecommandation(ICacheable):
 
         for p in data:
             #pprint.pprint(p)
-            artist = QobuzTagArtist(p)
+            artist = QobuzTagArtist(self.Core, p)
             a=artist.get_album()
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
             item = xbmcgui.ListItem()

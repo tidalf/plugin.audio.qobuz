@@ -21,12 +21,12 @@ import xbmcplugin
 
 class XbmcCurrentPlaylist():
     
-    def __init__(self):
-        xbmc.log("Init")
-    
+    def __init__(self, Core):
+        self.Core = Core
+        
     def add_to_directory(self):
-        xp = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
-        print "Playlist size: " + str(xp.size())
+        xp = self.Core.Bootstrap.Player.PlayList(xbmc.PLAYLIST_MUSIC)
+        n = xp.size()
         for x in range(0, xp.size()):
             print "Filename: " + xp[x].getdescription()
             item = xbmcgui.ListItem(xp[x].getdescription())
@@ -34,9 +34,10 @@ class XbmcCurrentPlaylist():
                                                    "title":  xp[x].getdescription(),
                                                    "duration": xp[x].getduration(),
                                                    })
-            item.setPath(xp[x].getdescription())
-            item.setProperty('Music','true')
-            item.setProperty('IsPlayable','true');
-            item.setProperty('mimetype','audio/flac')
+            item.setPath(xp[x].filename())
+            #item.setProperty('Music','true')
+            #item.setProperty('IsPlayable','true');
+            #item.setProperty('mimetype','audio/flac')
             #item.setThumbnailImage(t['album']['image']['large'])
-            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]) ,url=xp[x].getfilename() ,listitem=item,isFolder=False,totalItems=xp.size())
+            self.Core.GUI.addDirectoryItem(self.Core.Bootstrap.__handle__, xp[x].getfilename(), item, False, xp.size())
+            #xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]) ,url=xp[x].getfilename(),item,False,n)

@@ -23,7 +23,6 @@ import xbmcplugin
 from icacheable import ICacheable
 from mydebug import log, info, warn
 from utils import _sc
-from player import QobuzPlayer
 from easytag import QobuzTagTrack
 import pprint
 '''
@@ -36,8 +35,8 @@ import pprint
 '''
 class QobuzTrack(ICacheable):
     # Constructor
-    def __init__(self,qob,id,context_type='playlist'):
-        self.Core = qob
+    def __init__(self, Core, id, context_type='playlist'):
+        self.Core = Core
         self.id = id
         self.context_type = context_type
         self._raw_data = []
@@ -72,7 +71,7 @@ class QobuzTrack(ICacheable):
         '''
         album_id = ''
         #pprint.pprint(self._raw_data)
-        t = QobuzTagTrack(self._raw_data)
+        t = QobuzTagTrack(self.Core, self._raw_data)
         item = t.getXbmcItem()
         if t.getStreamingType() != 'full':
             warn(self, "This track is not playable: " + item.getLabel())
@@ -86,8 +85,9 @@ class QobuzTrack(ICacheable):
             mimetype = 'audio/mpeg'
         item.setProperty('mimetype', mimetype)
         item.setProperty('stream', str(stream['streaming_url']))
-        item.setProperty('path', sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID)
-        item.setPath(sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID)
+        path = sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID + "&pos=" + str(self.Core.Bootstrap.params['pos'])
+        item.setProperty('path', path)
+        item.setPath(path)
         item.select(True)
         return item
     
@@ -100,14 +100,14 @@ class QobuzTrack(ICacheable):
     def play(self):
         #global player
         player = self.Core.Bootstrap.Player
-        #player.set_track_id(self.id)
-        #player.setApi(self.Core)
-        print "Size: " + str(self.Core.Bootstrap.Playlist.size())
+        player.set_track_id(self.id)
+        player.setApi(self.Core)
+        print "Size: " + str(player.Playlist.size())
         item = self.getItem()
         if not item.getProperty('stream'):
             warn(self, "Player can't play track: " + item.getLabel())
             return False
-        player.play()#(item.getProperty('stream'), item)
-        item.setPath(item.getProperty('stream'))
+        player.play( item)
+        #item.setPath(item.getProperty('stream'))
         #xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
         return True

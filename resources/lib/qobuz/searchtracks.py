@@ -43,13 +43,14 @@ class QobuzSearchTracks():
         return len(self._raw_data['results']['tracks'])
     
     def add_to_directory(self):
-        xp = self.Core.Bootstrap.Playlist
-        xp.clear()
         n = self.length()
+        xp = self.Core.Bootstrap.Player.Playlist
+        xp.clear()
+        i = 0
         for track in self._raw_data['results']['tracks']:
-            t = QobuzTagTrack(track)
+            t = QobuzTagTrack(self.Core, track)
             item = t.getXbmcItem('songs')
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)
             if 1:
                 action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
                 ret = sys.argv[0]+"?mode="+str(self.Core.Bootstrap.MODE)+"&id="+str(self.Core.Bootstrap.ID)
@@ -65,6 +66,7 @@ class QobuzSearchTracks():
             item.setProperty("Music", 'true')
             item.setProperty('IsPlayable', 'false')
             xp.add(u, item)
+            i = i + 1
             #print "Playlist size: " + str(xp.size())
 
 

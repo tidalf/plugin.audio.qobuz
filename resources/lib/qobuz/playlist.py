@@ -52,14 +52,21 @@ class QobuzPlaylist(ICacheable):
 
     def add_to_directory(self):
         n = self.length()
+        xp = self.Core.Bootstrap.Player.Playlist
+        xp.clear()
+        i = 0
         h = int(sys.argv[1])
-        p = QobuzTagPlaylist(self.get_data())
+        p = QobuzTagPlaylist(self.Core, self.get_data())
         for t in p.get_tracks():
             item = t.getXbmcItem('playlist')
             image = t.get_album().getImage()
             if image:
                 item.setThumbnailImage(image)
                 item.setIconImage(image)
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id    
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)   
             xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
+            item.setProperty("Music", 'true')
+            item.setProperty('IsPlayable', 'false')
+            xp.add(u, item)
+            i += 1
         xbmcplugin.setContent(h,'songs')

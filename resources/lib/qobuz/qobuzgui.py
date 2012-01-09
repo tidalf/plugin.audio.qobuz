@@ -18,8 +18,9 @@ import sys
 import urllib
 import xbmcplugin, xbmcgui, xbmc
 
-from constants import *
 
+from constants import *
+from mydebug import info, warn, log
 class QobuzGUI:
 
     def __init__( self, bootstrap):
@@ -34,8 +35,14 @@ class QobuzGUI:
         return xbmcplugin.endOfDirectory(int(sys.argv[1]))
   
     def showNotificationH(self, title, text):
-         xbmc.executebuiltin('XBMC.Notification(' + title + ',' + text+ ', 2000, ' + self.Bootstrap.Images.get('default') + ')')
-    
+        title = unicode(title, "utf-8", errors="replace")
+        text = unicode(text, "utf-8", errors="replace")
+        s = 'XBMC.Notification(' + title + ',' + text + ', 2000, ' + self.Bootstrap.Images.get('default') + ')'
+        try:
+            xbmc.executebuiltin(s)
+        except:
+            warn(self, "Notification failure")
+            
     def showNotification(self, title, text):
         self.setFanArt()   
         __language__ = self.Bootstrap.__language__
@@ -193,14 +200,14 @@ class QobuzGUI:
 
     # Get album
     def showProduct (self, id):
-        try:
+        if 1:
             print "SHOOOOOOW PRODUCT"
             album = self.Bootstrap.Core.getProduct(id)
             album.add_to_directory()
             self.setContent('album')
-        except:
-            self.showNotification(30008, 30033)
-            self.showCategories()
+#        except:
+#            self.showNotification(30008, 30033)
+#            self.showCategories()
 
     def showArtist (self, id):
         try:

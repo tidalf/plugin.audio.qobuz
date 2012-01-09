@@ -50,7 +50,7 @@ class QobuzUserPlaylists(ICacheable):
         log(self,"Found " + str(n) + " playlist(s)")
         h = int(sys.argv[1])
         for track in self.get_data():
-            t = QobuzTagUserPlaylist(track)
+            t = QobuzTagUserPlaylist(self.Core, track)
             u = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST) + "&id=" + t.id
             item = xbmcgui.ListItem()
             item.setLabel('[' + t.owner_name + '] - '+ t.name)

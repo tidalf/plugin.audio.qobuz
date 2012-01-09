@@ -51,12 +51,13 @@ class QobuzGetPurchases(ICacheable):
 
     def add_to_directory(self):
         n = self.length()
-        for track in self._raw_data:
-            t = QobuzTagTrack(track)
+        xp = self.Core.Bootstrap.Player.Playlist
+        xp.clear()
+        i = 0
+        for track in self._raw_data:    
+            t = QobuzTagTrack(self.Core, track)
             item = t.getXbmcItem('songs')
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&context_type=purchases"
-            if 1:
-                action="XBMC.RunPlugin("+sys.argv[0]+"?mode="+str(MODE_ALBUM)+"&id="+str(t.get_album().id)+")"
-                print "Show Album: " + action
-                item.addContextMenuItems([('Show album', action)], False)
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i) + "&context_type=purchases" 
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
+            xp.add(u, item)
+            i = i + 1
