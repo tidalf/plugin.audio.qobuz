@@ -91,7 +91,6 @@ class QobuzTrack(ICacheable):
         path = sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID + "&pos=" + pos
         item.setProperty('path', path)
         item.setPath(path)
-        item.select(True)
         return item
     
     def stop(self, id):
