@@ -25,7 +25,7 @@ from mydebug import log, info, warn
 from constants import *
 from icacheable import ICacheable
 from easytag import QobuzTagArtist
-
+from easytag import QobuzTagProduct
 """
     Class QobuzGetRecommendation
 """
@@ -55,19 +55,9 @@ class QobuzGetRecommandation(ICacheable):
         u = dir = None
 
         for p in data:
-            #pprint.pprint(p)
-            artist = QobuzTagArtist(self.Core, p)
-            a=artist.get_album()
-            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
-            item = xbmcgui.ListItem()
-            item.setLabel(artist.getArtist() + ' / ' + a.getTitle() 
-                          + " (" + str(a.getYear()) + ")")
-            item.setLabel2(a.getTitle())
-            item.setInfo(type="Music",infoLabels={ 
-                                                  "title": a.getTitle(), 
-                                                  "genre": a.getGenre(),
-                                                  "year" : int(a.getYear())})
-            item.setThumbnailImage(a.getImage())
+            album = QobuzTagProduct(self.Core, p)
+            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + album.id
+            item = album.getXbmcItem()
             xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
                                         isFolder=True, totalItems=n)
             

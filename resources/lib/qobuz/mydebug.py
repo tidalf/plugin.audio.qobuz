@@ -17,29 +17,32 @@
 import os
 
 import xbmc
+import xbmcaddon
 
 from utils import _sc
 
-__debugging__ = True
+__debugging__ = False
+if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
+    __debugging = True
 
 ###############################################################################
-# Loggin helper functions
+# Logging helper functions
 ###############################################################################
-def log(obj,msg,lvl="LOG"):
+def log(obj,msg, lvl = xbmc.LOGDEBUG):
     name = None
     try:
         name = obj.__class__.__name__
     except:
         name = type(obj)
-    xbmc.log(_sc('[' + lvl + '] [' + str(name) + "] " + msg))
+    xbmc.log(_sc('[' + str(name) + "] " + msg), lvl)
 
 def warn(obj,msg):
     if __debugging__:
-        log(obj,msg,'WARN')
+        log(obj,msg, xbmc.LOGERROR)
 
 def info(obj,msg):
     if __debugging__:
-        log(obj,msg,'INFO')
+        log(obj,msg, xbmc.LOGNOTICE)
 
 def error(obj,msg,code):
     log(obj,msg,'ERROR')

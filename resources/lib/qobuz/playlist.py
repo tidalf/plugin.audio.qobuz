@@ -26,7 +26,7 @@ from utils import _sc
 from constants import *
 from mydebug import * 
 from easytag import QobuzTagPlaylist
-
+from easytag import QobuzTagTrack
 '''
     Class QobuzPLaylist
 '''
@@ -57,16 +57,12 @@ class QobuzPlaylist(ICacheable):
         i = 0
         h = int(sys.argv[1])
         p = QobuzTagPlaylist(self.Core, self.get_data())
-        for t in p.get_tracks():
+        for t in p.get_childs():
+            if not isinstance(t, QobuzTagTrack):
+                continue
             item = t.getXbmcItem('playlist')
-            image = t.get_album().getImage()
-            if image:
-                item.setThumbnailImage(image)
-                item.setIconImage(image)
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)   
             xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
-            item.setProperty("Music", 'true')
-            item.setProperty('IsPlayable', 'false')
             xp.add(u, item)
             i += 1
         xbmcplugin.setContent(h,'songs')

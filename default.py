@@ -37,8 +37,8 @@ from qobuz.bootstrap import *
 Core = QobuzBootstrap(__addon__, int(sys.argv[1]))
 Core.parse_sys_args()
 Core.mode_dispatch()
-print "Script ENDED"
-exit(0)
+#exit(0)
+
 
 ## Mark song as playing or played
 #def markSong(songid, duration, streamKey, streamServerID):

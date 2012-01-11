@@ -24,7 +24,7 @@ from mydebug import log, info, warn
 import pprint
 
 from easytag import QobuzTagArtist
-
+from easytag import QobuzTagProduct
 ###############################################################################
 # Class QobuzSearchArtists
 ###############################################################################
@@ -58,6 +58,7 @@ class QobuzSearchArtists():
 
     def xbmc_directory_products(self):
         for p in self.get_data()['results']['artists']:
+            print p
             a = QobuzTagArtist(self.Core, p)
             u = sys.argv[0] + "?mode=" + str(MODE_ARTIST) + "&id=" + a.id
             item   = xbmcgui.ListItem()
@@ -67,7 +68,10 @@ class QobuzSearchArtists():
     def xbmc_directory_products_by_artist():
         artist = self.get_data()['artist']['name']
         for p in json['artist']['albums']:
+            print p
             a = QobuzTagAlbum(self.Core, p)
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
             item = a.getXbmcItem('album')
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, self.length())
+
+

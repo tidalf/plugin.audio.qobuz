@@ -27,6 +27,7 @@ from logging import *
 from utils import _sc
 from constants import *
 from easytag import QobuzTagProduct
+from easytag import QobuzTagTrack
 
 ###############################################################################
 # Class QobuzProduct
@@ -59,8 +60,10 @@ class QobuzProduct(ICacheable):
         i = 0
         h = int(sys.argv[1])
         p = QobuzTagProduct(self.Core, self.get_data())
-        #pprint.pprint(self.get_data())
-        for t in p.get_tracks():
+        print "PPLPZADLAPZDLAZPDL"
+        for t in p.get_childs():
+            if not isinstance(t, QobuzTagTrack):
+                continue
             item = t.getXbmcItem('album')
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, self.length())

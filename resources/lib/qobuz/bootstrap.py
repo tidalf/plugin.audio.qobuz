@@ -24,6 +24,10 @@ from qobuz import QobuzCore
 from qobuzgui import QobuzGUI
 from mydebug import *
 from player import QobuzPlayer
+from winmain import QobuzWindow
+
+
+import xbmcgui
 
 ''' Arguments parssing '''
 def get_params():
@@ -69,6 +73,35 @@ class QobuzImages():
             return self.pool[name]
         else:
             return ''
+
+import threading
+import time
+class Watcher(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.Terminated = False
+        self.name = "Watcher"
+        self._stopevent = threading.Event( )
+        
+    def run(self, player, id, pos):
+        if not player.play(id, pos):
+            return False
+        i = 0
+        while not self._stopevent.isSet():
+            try:
+                if player.isPlayingAudio():
+                    print "Player is playing: " + self.item.getLabel()
+                    player.watchPlayback()
+                    time.sleep()
+                else:
+                    self.stop()
+            except:
+                self.stop()
+                print "Player stopped"
+      
+    def stop(self):  
+        self._stopevent.set( )  
+
 '''
     QobuzBoostrap
 '''
@@ -89,7 +122,7 @@ class QobuzBootstrap(object):
         self.MODE = None
         self.ID = None
         self.POS = None
-        
+
         '''
             NAME can be used to set icon for each folder i think :)
             XBMC maintain a cache path/icon 
@@ -155,12 +188,18 @@ class QobuzBootstrap(object):
     '''
     
     '''
-    def build_url(self, mode, id, pos):
+    def build_url(self, mode, id, pos = None):
         req = sys.argv[0] + "?mode=" + str(mode)+"&id="+str(id)
         if pos != None:
             req += "&pos="+str(pos)
-        print "Build url: " + req
+        #print "Build url: " + req
         return req
+    
+    '''
+    
+    '''
+    def build_url_return(self):
+        return sys.argv[2]
     '''
         Execute methode based on MODE
     '''       
@@ -181,8 +220,10 @@ class QobuzBootstrap(object):
             except:
                 warn(self, "Can't play track without position")
                 return False
-            #track = self.Core.getTrack(self.ID,context_type)
-            self.Player.play(self.ID, self.POS)#track.getItem())
+            if self.Player.play(self.ID, self.POS):
+                t = Watcher()
+                t.run(self.Player, self.ID, self.POS)
+                exit(0)            
             return True
         
         elif self.MODE == MODE_ARTIST:
@@ -238,7 +279,7 @@ class QobuzBootstrap(object):
             except: pass
             self.GUI.showRecommendationsGenres(type)
 
-        elif self.MODE == MODE_CURRENTPLAYLIST:
+        elif self.MODE == MODE_CURRENT_PLAYLIST:
             info(self, "Displaying current playlist")
             self.GUI.showCurrentPlaylist()
             

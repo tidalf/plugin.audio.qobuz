@@ -73,11 +73,9 @@ class QobuzSearchAlbums():
         h = int(sys.argv[1])
         artist = json['artist']['name']
         for p in json['artist']['albums']:
-            a = QobuzTagAlbum(self.Core, p)
+            print p
+            a = QobuzTagProduct(self.Core, p)
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
-            item = xbmcgui.ListItem()
-            item.setLabel(a.getTitle() + "(" + str(a.getYear()) + ")")
-            item.setInfo(type="Music",infoLabels={"artist" : a.getArtist() })
-            item.setThumbnailImage(a.getImage())
+            item = a.getXbmcItem()
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, self.length())
         return self.length()

@@ -51,13 +51,11 @@ class QobuzTrack(ICacheable):
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        data = {}
-        data['info'] = self.Core.Api.get_track(self.id)
-        return data
+        return self.Core.Api.get_track(self.id)
         
     # Return track duration
     def get_duration(self):
-        (sh,sm,ss) = self._raw_data['info']['duration'].split(':')
+        (sh,sm,ss) = self._raw_data['duration'].split(':')
         return (int(sh) * 3600 + int(sm) * 60 + int(ss))
 
     # Build an XbmcItem based on json data
@@ -69,7 +67,7 @@ class QobuzTrack(ICacheable):
         album_id = ''
         #pprint.pprint(self._raw_data)
         t = QobuzTagTrack(self.Core, self._raw_data)
-        item = t.getXbmcItem()
+        item = t.getXbmcItem('songs')
 #        stream = self.Core.Api.get_track_url(self.id,
 #                                                    self.context_type,
 #                                                    album_id,
@@ -84,7 +82,7 @@ class QobuzTrack(ICacheable):
             pos = str(self.Core.Bootstrap.params['pos'])
         except:
             pos = 0
-        path = sys.argv[0] + "?mode=" + str(self.Core.Bootstrap.MODE) + "&id=" + self.Core.Bootstrap.ID + "&pos=" + pos
+        path = self.Core.Bootstrap.build_url(self.Core.Bootstrap.MODE, self.Core.Bootstrap.ID, self.Core.Bootstrap.POS)
         item.setProperty('path', path)
         item.setPath(path)
         return item

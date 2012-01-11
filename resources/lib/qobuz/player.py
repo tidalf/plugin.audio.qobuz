@@ -21,6 +21,7 @@ import xbmcgui
 from mydebug import info, warn, log
 from time import time
 from track import QobuzTrack
+from easytag import QobuzTagTrack
 import re
 import threading
 import math
@@ -28,7 +29,7 @@ import pprint
 
 class QobuzPlayer_playlist(xbmc.PlayList):
     def __init__(self, type = xbmc.PLAYLIST_MUSIC):
-        super(QobuzPlayer_playlist, self).__init__(type)
+        super(QobuzPlayer_playlist, self).__init__()
         
     def getCurrentPos(self, item):
         cpath = item.getProperty('path')
@@ -99,6 +100,8 @@ class QobuzPlayer_playlist(xbmc.PlayList):
         newitem = xbmcgui.ListItem(item.getProperty('path'), '', '', path=item.getProperty('stream'))
         self.remove(cpath)
         self.add(url=item.getProperty('stream'), listitem=item, index=cpos)
+        command = 'Container.update("%s","%s")' % ( cpath, item.getProperty('stream'))
+        #xbmc.executebuiltin(command)
         return True
     
     def to_s(self):
@@ -110,7 +113,7 @@ class QobuzPlayer_playlist(xbmc.PlayList):
 
 class QobuzPlayer(xbmc.Player):
     def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
-        super(QobuzPlayer, self).__init__(type)
+        super(QobuzPlayer, self).__init__()
         self.Playlist = QobuzPlayer_playlist( xbmc.PLAYLIST_MUSIC)
         self.id = None
         self.last_id = None
@@ -119,6 +122,9 @@ class QobuzPlayer(xbmc.Player):
         self.item = None
         self.playedTime = None
         self.watching = False
+        self.PLAYER_TYPE = 'PAPLAYER'
+        #xbmc.executebuiltin('PlayWith(DVDPLAYER)')
+        
     def setApi (self, Core):
         self.Core = Core
         
@@ -152,8 +158,16 @@ class QobuzPlayer(xbmc.Player):
         pass
     
     def prefetch_url(self, id):
-        tu = self.Core.getTrackURL(id, 6)
-        pprint.pprint(tu.get_data())
+        format = self.Core.Bootstrap.__addon__.getSetting('streamtype')
+        if format == 'flac':
+            format_id = 6
+        elif format == 'mp3':
+            format_id = 5
+        else:
+            warn(self, "Unknown format " + format + ", switching to FLAC")
+            format_id = 6
+        tu = self.Core.getTrackURL(id, format_id)
+        #pprint.pprint(tu.get_data())
         return tu
     
     def set_item_stream_type(self, item, turl):
@@ -161,8 +175,10 @@ class QobuzPlayer(xbmc.Player):
         u = url_data['streaming_url']
         mimetype = 'audio/flac'
         if url_data['format_id'] == 6:
+            xbmc.executebuiltin('PlayWith(PAPLAYER)')
             mimetype = 'audio/flac'
         if url_data['format_id'] == 5:
+            xbmc.executebuiltin('PlayWith(DVDPLAYER)')
             mimetype = "audio/mpeg"
         info(self, "Set mimetype: " + mimetype)
         item.setProperty('mimetype', mimetype)
@@ -170,8 +186,11 @@ class QobuzPlayer(xbmc.Player):
         path = self.Core.Bootstrap.build_url(b.MODE, b.ID, b.POS)
         info(self, "rebuild path: " + path)
         item.setPath(path)
+        item.setProperty('filename', path)
         item.setProperty('Path', path)
         item.setProperty('stream', u)
+        item.setProperty("IsPlayable", "true")
+        item.setProperty("Music", 'true')
         return item
     
     def prefetch_next_url(self, cpos):
@@ -192,7 +211,8 @@ class QobuzPlayer(xbmc.Player):
             return False
         t = QobuzTrack(self.Core, int(id))
         pprint.pprint(t)
-        item = t.getItem()
+        tag = QobuzTagTrack(self.Core, t.get_data())
+        item = tag.getXbmcItem('player')
         t = self.set_item_stream_type(item, tu)
         self.Playlist.replace_path(npos, item)
         return True
@@ -200,7 +220,13 @@ class QobuzPlayer(xbmc.Player):
     def play(self, id, pos):
         pos = int(pos)
         track = self.Core.getTrack(id)
-        self.item = track.getItem()
+        tag = QobuzTagTrack(self.Core, track.get_data())
+        self.item = tag.getXbmcItem('player')
+        b = self.Core.Bootstrap
+        path = b.build_url(b.MODE, b.POS, b.POS)
+        print "Setting path: " + path
+#        self.item.setPath(path)
+#        self.item.setProperty('path', path)
         self.cpos = pos #int(self.Core.Bootstrap.params['pos'])
         '''
             Prefetch current song streaming url
@@ -211,14 +237,18 @@ class QobuzPlayer(xbmc.Player):
             if not tu:
                 warn(self, 'Cannot fetch streaming url')
                 return False
-            url = tu.get_data()['streaming_url']
-            self.item = self.set_item_stream_type(self.item, tu)
+            url = ''
+            try:
+                url = tu.get_data()['streaming_url']
+                self.item = self.set_item_stream_type(self.item, tu)
+            except:
+                warn(self, "Track don't have streaming url... aborting")
         else:
             url = self.Playlist[pos].getfilename()
         if not url:
-            warn("We don't have url to play track")
+            warn(self, "We don't have url to play track")
             return False
-        
+        else: self.item.setProperty('stream', url)
         if not self.item.getProperty('stream'):
             warn(self, "Non playable item: " + self.item.getLabel())
             self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Track is not playable')
@@ -231,7 +261,9 @@ class QobuzPlayer(xbmc.Player):
         self.watching = False
         super(QobuzPlayer, self).playselected(self.cpos)
         xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=self.item)
-        xbmc.executebuiltin('Dialog.Close(all, true)')
+        #xbmc.executebuiltin('Dialog.Close(all,true)')
+        #xbmc.executebuiltin('Container.Update("'+self.item.getProperty('Path')+'","'+self.item.getProperty('stream')+'")')
+        #xbmc.executebuiltin('Control.SetFocus(-1,'+self.cpos+')')
         '''
             Waiting for song to start
         '''
@@ -247,11 +279,13 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Player can't play track: " + self.item.getLabel())
             return False
         self.set_track_id(self.Core.Bootstrap.ID)
+
         '''
             Watching playback
         '''
         self.watchPlayback()
         warn(self, 'stopping player for track: ' + self.item.getLabel())
+        return True
     
     def set_track_id(self, id):
         if self.id:
@@ -293,5 +327,6 @@ class QobuzPlayer(xbmc.Player):
             xbmc.sleep(250)
         if playedTime > 6:
             self.sendQobuzPlaybackEnded(playedTime)
+        
         info(self, "Stop watching playback (" + self.item.getLabel() + ' / ' + str(playedTime) + 's')
     

@@ -25,6 +25,7 @@ class QobuzGUI:
 
     def __init__( self, bootstrap):
         self.Bootstrap = bootstrap
+        info(self, 'Current view mode: ' + xbmc.getInfoLabel('Container.Viewmode'))
 
   
     '''
@@ -193,9 +194,10 @@ class QobuzGUI:
     def showUserPlaylists(self):
         try:
             user_playlists = self.Bootstrap.Core.getUserPlaylists()
+            xbmc.executebuiltin('Container.SetProperty(view, thumbnails)')
             user_playlists.add_to_directory()
             self.setContent('files')
-            xbmc.executebuiltin('Container.SetViewMode(thumbnails)')
+            
         except:
             self.showNotification(30008, 30033)
             self.showCategories()
@@ -207,24 +209,24 @@ class QobuzGUI:
         if album.length() > 0:
             album.add_to_directory()
             self.setContent('songs')
-            xbmc.executebuiltin('Container.SetViewMode(thumbnails)')
+            xbmc.executebuiltin('Container.SetViewMode("Media info")')
         else:
             self.showNotification(30008, 30033)
             self.showCategories()
 
     def showArtist (self, id):
-        try:
-            album = self.Bootstrap.Core.getProductsFromArtist()
-            album.get_by_artist(id)
-            if album.add_to_directory_by_artist() > 0:
-                self.setContent('artists')
-                return
-            else:
-               self.showNotification(30008, 30033)
-               self.showCategories() 
-        except:
+        album = self.Bootstrap.Core.getProductsFromArtist()
+        album.get_by_artist(id)
+        if album.add_to_directory_by_artist() > 0:
+            self.setContent('artists')
+            return
+        else:
             self.showNotification(30008, 30033)
-            self.showCategories()
+            self.showCategories() 
+
+#        except:
+#            self.showNotification(30008, 30033)
+#            self.showCategories()
 
     # Show selected playlist
     def showPlaylist(self, id):
@@ -233,6 +235,8 @@ class QobuzGUI:
             myplaylist = self.Bootstrap.Core.getPlaylist(id)
             myplaylist.add_to_directory()
             self.setContent('songs')
+            command = 'Container.SetViewMode(10501, Thumbnails)'
+            #xbmc.executebuiltin(command)
         else:
             dialog = xbmcgui.Dialog()
             dialog.ok(__language__(30008), __language__(30034), __language__(30040))

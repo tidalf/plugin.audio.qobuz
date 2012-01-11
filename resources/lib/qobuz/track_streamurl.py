@@ -40,7 +40,7 @@ class QobuzTrackURL(ICacheable):
         self.type = type
         self._raw_data = []
         self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir,
-                                        'track-' + str(self.id) + '-url-' + str(self.type) + '.dat')
+                                        'track-url-' + str(self.id) + '-' + str(self.type) + '.dat')
         self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_auth')
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.format_id = 6
