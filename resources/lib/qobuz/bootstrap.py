@@ -24,7 +24,7 @@ from qobuz import QobuzCore
 from qobuzgui import QobuzGUI
 from mydebug import *
 from player import QobuzPlayer
-from winmain import QobuzWindow
+#from winmain import QobuzWindow
 
 
 import xbmcgui

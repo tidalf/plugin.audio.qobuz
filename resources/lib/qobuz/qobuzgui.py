@@ -25,7 +25,7 @@ class QobuzGUI:
 
     def __init__( self, bootstrap):
         self.Bootstrap = bootstrap
-        info(self, 'Current view mode: ' + xbmc.getInfoLabel('Container.Viewmode'))
+        #info(self, 'Current view mode: ' + xbmc.getInfoLabel('Container.Viewmode'))
 
   
     '''

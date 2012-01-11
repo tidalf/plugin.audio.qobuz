@@ -23,7 +23,8 @@ from utils import _sc
 
 __debugging__ = False
 if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
-    __debugging = True
+    __debugging__ = True
+    print "Debug IS ON"
 
 ###############################################################################
 # Logging helper functions

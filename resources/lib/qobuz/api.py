@@ -78,7 +78,7 @@ class QobuzApi:
             return False
         f = None
         try:
-            f = open(self.cacheDir, 'rb')
+            f = open(self.cachePath, 'rb')
         except:
             warn(self, "Cannot open authentification cache for reading!")
             return False

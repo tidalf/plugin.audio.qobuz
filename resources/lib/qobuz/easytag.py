@@ -90,26 +90,11 @@ class IQobuzTag(object):
         return self.__is_loaded
     
     def getTitle(self):
-        v = 'N/A'
-        try:
-            v = self.title
-        except: pass
+        v = ''
+        try: v = self.title
+        except: return ''
         return v
     
-    def get_album(self):
-        return None
-    
-    def getChildValue(self, name):
-        value = ''
-        try:
-            value = self.get(name)
-        except:
-            for child in self.get_childs():
-                value = child.getValue(name)
-                if value:
-                    return value
-            return value
-
     def getArtistId(self):
         label = []
         try: 
@@ -275,6 +260,10 @@ class QobuzTagArtist(IQobuzTag):
     def getArtist(self, sep = ''):
         try: return self.name
         except: return ''        
+        
+    def getArtistId(self, sep = ''):
+        try: return self.id
+        except: return ''
 '''
 '''
 class QobuzTagAlbum(IQobuzTag):
@@ -587,7 +576,7 @@ class QobuzTagTrack(IQobuzTag):
         elif context == 'songs': 
             label = album + ' - ' + artist + ' - ' + title
         elif context == 'player':
-            label = 'Gabou'
+            label = str(track_number) + ' - ' + artist + ' - '  + title
         else:
             raise "Unknown display context"
         if self.getStreamingType() != 'full':
@@ -605,8 +594,12 @@ class QobuzTagTrack(IQobuzTag):
                                 'year': int(year),
                                 'comment': 'Qobuz Music Streaming Service'
                                 })
-        i.setProperty('IsPlayable', 'false')
-        i.setProperty('Music', 'true')
+        if context != 'player':
+            i.setProperty('IsPlayable', 'false')
+            i.setProperty('Music', 'true')
+        else:
+            i.setProperty('IsPlayable', 'true')
+            i.setProperty('Music', 'true')
         i.setThumbnailImage(image)
         i.setIconImage(image)
         i.setProperty('image', image)
