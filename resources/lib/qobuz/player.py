@@ -217,17 +217,27 @@ class QobuzPlayer(xbmc.Player):
         self.Playlist.replace_path(npos, item)
         return True
     
-    def play(self, id, pos):
-        pos = int(pos)
+    def skipsample(self, tag, pos):
+        skip = self.Core.Bootstrap.getSetting('skipsample')
+        if skip == 'true': skip = True
+        else: skip = False
+        if tag['streaming_type'] != 'full' and skip:
+            return self.Playlist.get_next_pos(pos)
+        return pos
+    
+    def get_track(self, id):
         track = self.Core.getTrack(id)
         tag = QobuzTagTrack(self.Core, track.get_data())
+        return (track, tag)
+            
+    def play(self, id, pos):
+        pos = int(pos)
+        (track, tag) = self.get_track(id)
         self.item = tag.getXbmcItem('player')
         b = self.Core.Bootstrap
         path = b.build_url(b.MODE, b.POS, b.POS)
         print "Setting path: " + path
-#        self.item.setPath(path)
-#        self.item.setProperty('path', path)
-        self.cpos = pos #int(self.Core.Bootstrap.params['pos'])
+        self.cpos = pos
         '''
             Prefetch current song streaming url
         '''

@@ -57,21 +57,27 @@ class QobuzSearchArtists():
         self.xbmc_directory_products_by_artist()
 
     def xbmc_directory_products(self):
-        for p in self.get_data()['results']['artists']:
+        data = self.get_data()['results']['artists']
+        n = self.length()
+        for p in data:
             print p
             a = QobuzTagArtist(self.Core, p)
             u = sys.argv[0] + "?mode=" + str(MODE_ARTIST) + "&id=" + a.id
             item   = xbmcgui.ListItem()
             item.setLabel(a.getArtist() )
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, self.length())
+            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, n)
+        return n,
 
     def xbmc_directory_products_by_artist():
-        artist = self.get_data()['artist']['name']
+        data = self.get_data()
+        artist = data['artist']['name']
+        n = self.length()
         for p in json['artist']['albums']:
             print p
             a = QobuzTagAlbum(self.Core, p)
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
             item = a.getXbmcItem('album')
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, self.length())
+            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, n)
+        return n
 
 

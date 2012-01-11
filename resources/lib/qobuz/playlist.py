@@ -35,11 +35,10 @@ class QobuzPlaylist(ICacheable):
     def __init__(self, Core, id):
         self.Core = Core
         self.id = id
-        self._raw_data = []
-        self.cache_path = os.path.join(
-                                        self.Core.Bootstrap.cacheDir,
-                                        'playlist-' + str(self.id) + '.dat')
-        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist')
+        super(QobuzPlaylist, self).__init__(self.Core.Bootstrap.cacheDir,
+                                            'playlist',
+                                            self.id)
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
@@ -66,3 +65,4 @@ class QobuzPlaylist(ICacheable):
             xp.add(u, item)
             i += 1
         xbmcplugin.setContent(h,'songs')
+        return n

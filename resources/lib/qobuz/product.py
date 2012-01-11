@@ -37,12 +37,10 @@ class QobuzProduct(ICacheable):
     def __init__(self, Core, id):
         self.Core = Core
         self.id = id
-        self._raw_data = []
-        self.cache_path = os.path.join(
-                                        self.Core.Bootstrap.cacheDir,
-                                        'product-' + str(self.id) + '.dat'
-        )
-        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_album')
+        super(QobuzProduct, self).__init__( self.Core.Bootstrap.cacheDir, 
+                                          'product',
+                                          self.id)
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_album'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
@@ -60,12 +58,12 @@ class QobuzProduct(ICacheable):
         i = 0
         h = int(sys.argv[1])
         p = QobuzTagProduct(self.Core, self.get_data())
-        print "PPLPZADLAPZDLAZPDL"
         for t in p.get_childs():
             if not isinstance(t, QobuzTagTrack):
                 continue
             item = t.getXbmcItem('album')
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, self.length())
+            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
             xp.add(u, item)
             i = i + 1
+        return n

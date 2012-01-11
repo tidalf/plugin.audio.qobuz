@@ -33,28 +33,28 @@ class QobuzGetRecommandation(ICacheable):
 
     def __init__(self, Core, genre_id, type ='new-releases', limit = 100):
         self.Core = Core
-        self._raw_data = []
-        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir, 
-                                       'recommandations-' 
-                                       + genre_id + '-' + type + '.dat')
-        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation')
-        info(self, "Cache duration: " + str(self.cache_refresh))
         self.genre_id = genre_id
         self.type = type
         self.limit = limit 
-        
+        super(QobuzGetRecommandation, self).__init__(self.Core.Bootstrap.cacheDir,
+                                                     'recommandations-' + type,
+                                                     genre_id)
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation'))
+        info(self, "Cache duration: " + str(self.cache_refresh))
+        self.fetch_data()
+      
     def _fetch_data(self):
         return self.Core.Api.get_recommandations(self.genre_id, 
                                                 self.type, self.limit)
-
+    def length(self):
+        return len(self.get_raw_data())
+    
     def add_to_directory(self):
-        data = self.fetch_data()
         n = self.length()
         info(self,"Found " + str(n) + " albums(s)")
         h = int(sys.argv[1])
         u = dir = None
-
-        for p in data:
+        for p in self.get_raw_data():
             album = QobuzTagProduct(self.Core, p)
             u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + album.id
             item = album.getXbmcItem()
@@ -62,4 +62,4 @@ class QobuzGetRecommandation(ICacheable):
                                         isFolder=True, totalItems=n)
             
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-
+        return n

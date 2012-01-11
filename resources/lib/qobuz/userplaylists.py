@@ -30,9 +30,11 @@ class QobuzUserPlaylists(ICacheable):
 
     def __init__(self, Core):
         self.Core = Core
-        self._raw_data = []
-        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir,'userplaylists.dat')
-        self.cache_refresh = 600
+        super(QobuzUserPlaylists, self).__init__(
+                                               self.Core.Bootstrap.cacheDir,
+                                               'userplaylists',
+                                               0)
+        self.set_cache_refresh(60)
         self.fetch_data()
 
     def _fetch_data(self):
@@ -59,5 +61,6 @@ class QobuzUserPlaylists(ICacheable):
             item.setProperty('IsPlayable','false');
             xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
+        return n
             
 

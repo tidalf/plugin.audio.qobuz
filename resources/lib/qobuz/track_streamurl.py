@@ -38,14 +38,14 @@ class QobuzTrackURL(ICacheable):
         self.Core = Core
         self.id = id
         self.type = type
-        self._raw_data = []
-        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir,
-                                        'track-url-' + str(self.id) + '-' + str(self.type) + '.dat')
-        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_auth')
-        info(self, "Cache duration: " + str(self.cache_refresh))
         self.format_id = 6
         if self.Core.Bootstrap.__addon__.getSetting('streamtype') == 'mp3':
             self.format_id = 5
+        super(QobuzTrackURL, self).__init__(self.Core.Bootstrap.cacheDir,
+                                            'track-url-' + str(self.format_id),
+                                            self.id)
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_auth'))
+        info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     # Methode called by parent class ICacheable when fresh data is needed

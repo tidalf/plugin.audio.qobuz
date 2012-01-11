@@ -38,15 +38,11 @@ class QobuzTrack(ICacheable):
     def __init__(self, Core, id, context_type='playlist'):
         self.Core = Core
         self.id = id
-        self.context_type = context_type
-        self._raw_data = []
-        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir,
-                                        'track-' + str(self.id) + '.dat')
-        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_track')
+        super(QobuzTrack, self).__init__(self.Core.Bootstrap.cacheDir,
+                                         'track',
+                                         self.id)
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_track'))
         info(self, "Cache duration: " + str(self.cache_refresh))
-        self.format_id = 6
-        if self.Core.Bootstrap.__addon__.getSetting('streamtype') == 'mp3':
-            self.format_id = 5
         self.fetch_data()
 
     # Methode called by parent class ICacheable when fresh data is needed
@@ -58,52 +54,3 @@ class QobuzTrack(ICacheable):
         (sh,sm,ss) = self._raw_data['duration'].split(':')
         return (int(sh) * 3600 + int(sm) * 60 + int(ss))
 
-    # Build an XbmcItem based on json data
-    def getItem(self):
-        '''
-            This hack work but we must stick with the real API and pass
-            album_id and context?
-        '''
-        album_id = ''
-        #pprint.pprint(self._raw_data)
-        t = QobuzTagTrack(self.Core, self._raw_data)
-        item = t.getXbmcItem('songs')
-#        stream = self.Core.Api.get_track_url(self.id,
-#                                                    self.context_type,
-#                                                    album_id,
-#                                                    self.format_id)
-#        mimetype = 'audio/flac'
-#        if self.format_id == 5:
-#            mimetype = 'audio/mpeg'
-#        item.setProperty('mimetype', mimetype)
-        #item.setProperty('stream', str(stream['streaming_url']))
-        pos = None
-        try: 
-            pos = str(self.Core.Bootstrap.params['pos'])
-        except:
-            pos = 0
-        path = self.Core.Bootstrap.build_url(self.Core.Bootstrap.MODE, self.Core.Bootstrap.ID, self.Core.Bootstrap.POS)
-        item.setProperty('path', path)
-        item.setPath(path)
-        return item
-    
-    def stop(self, id):
-        self.Core.Api.report_streaming_stop(self.id)
-    
-    
-    
-    # Play this track
-    def play(self):
-        #global player
-        player = self.Core.Bootstrap.Player
-        player.set_track_id(self.id)
-        player.setApi(self.Core)
-        print "Size: " + str(player.Playlist.size())
-        item = self.getItem()
-        if not item.getProperty('stream'):
-            warn(self, "Player can't play track: " + item.getLabel())
-            return False
-        player.play( item)
-        #item.setPath(item.getProperty('stream'))
-        #xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
-        return True

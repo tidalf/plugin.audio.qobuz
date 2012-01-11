@@ -34,12 +34,11 @@ class QobuzGetPurchases(ICacheable):
 
     def __init__(self, Core, limit = 100):
         self.Core = Core
-        self._raw_data = []
-        self.cache_path = os.path.join(self.Core.Bootstrap.cacheDir, 
-                                       'purchases.dat')
-        self.cache_refresh = self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation')
+        self.limit = limit
+        super(QobuzGetPurchases, self).__init__(self.Core.Bootstrap.cacheDir, 
+                                       'purchases')
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation'))
         info(self, "Cache duration: " + str(self.cache_refresh))
-        self.limit = limit 
         
     def _fetch_data(self):
         return self.Core.Api.get_purchases(self.limit)
@@ -61,3 +60,4 @@ class QobuzGetPurchases(ICacheable):
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
             xp.add(u, item)
             i = i + 1
+        return n

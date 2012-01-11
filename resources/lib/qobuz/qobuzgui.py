@@ -145,13 +145,12 @@ class QobuzGUI:
     def showRecommendations(self, type, genre_id):
         if (genre_id != ''):
             r = self.Bootstrap.Core.getRecommandation(genre_id, type)
-            r.fetch_data()
             if r.length() > 0:
                 r.add_to_directory()
                 self.setContent('files')
             else:
                 self.showNotification(30008, 30021)
-                self.showCatetories()
+                self.showCategories()
 
     def showPurchases(self):
         r = self.Bootstrap.Core.getPurchases()
@@ -161,7 +160,7 @@ class QobuzGUI:
             self.setContent('files')
         else:
             self.showNotification(30008, 30021)
-            self.showCatetories()
+            self.showCategories()
 
 
     def showRecommendationsTypes(self):
@@ -192,13 +191,11 @@ class QobuzGUI:
 
     # Get my playlists
     def showUserPlaylists(self):
-        try:
-            user_playlists = self.Bootstrap.Core.getUserPlaylists()
-            xbmc.executebuiltin('Container.SetProperty(view, thumbnails)')
-            user_playlists.add_to_directory()
+        user_playlists = self.Bootstrap.Core.getUserPlaylists()
+        xbmc.executebuiltin('Container.SetProperty(view, thumbnails)')
+        if user_playlists.add_to_directory() > 0:
             self.setContent('files')
-            
-        except:
+        else:
             self.showNotification(30008, 30033)
             self.showCategories()
 
@@ -219,7 +216,6 @@ class QobuzGUI:
         album.get_by_artist(id)
         if album.add_to_directory_by_artist() > 0:
             self.setContent('artists')
-            return
         else:
             self.showNotification(30008, 30033)
             self.showCategories() 

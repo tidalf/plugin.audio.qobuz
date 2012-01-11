@@ -58,5 +58,6 @@ class QobuzSearchTracks():
             item.setProperty('IsPlayable', 'false')
             xp.add(u, item)
             i = i + 1
+        return n
 
 

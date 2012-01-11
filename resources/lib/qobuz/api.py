@@ -138,7 +138,7 @@ class QobuzApi:
         except: pass
         return response_json
     
-    def login(self,user,password):
+    def login(self, user, password):
         if self.load_auth():
             info(self, 'Using authentification token from cache')
             return self.userid
