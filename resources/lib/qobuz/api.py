@@ -32,27 +32,38 @@ from mydebug import log, info, warn
 
 class QobuzApi:
 
-    def __init__(self, Core):
+    def __init__(self, Core = None):
         self.Core = Core
         self.headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
         self.authtoken = None
         self.userid = None
         self.authtime = None
         self.token_validity_time = 3600
-        self.cachePath = os.path.join(self.Core.Bootstrap.cacheDir,'auth.dat')
-        info(self, 'authCacheDir: ' + self.cachePath)
+        self.cachePath = None
+        if self.Core:
+            self.set_cache_path(os.path.join(self.Core.Bootstrap.cacheDir,'auth.dat'))
+            info(self, 'authCacheDir: ' + self.get_cache_path())
         self.retry_time = [1, 3, 5, 10]
         self.retry_num = 0
 
-
+    def set_cache_path(self, path):
+        self.cachePath = path
+        
+    def get_cache_path(self):
+        return self.cachePath
+    
     def save_auth(self):
+        cachePath = self.get_cache_path()
+        if not cachePath:
+            warn(self, "Cache path not defined (cannot save auth token)")
+            return False
         data = {}
         data['authtoken'] = self.authtoken
         data['authtime'] = self.authtime
         data['userid'] = self.userid
         f = None
         try:
-            f = open(self.cachePath, 'wb')
+            f = open(cachePath, 'wb')
         except:
             warn(self, "Cannot open authentification cache for writing!")
             return False
@@ -65,20 +76,25 @@ class QobuzApi:
         return True
     
     def load_auth(self):
-        if not os.path.exists(self.cachePath):
+        cachePath = self.get_cache_path()
+        if not cachePath:
+            warn(self, "Cache path not defined (need to login each time)")
+            return False
+        
+        if not os.path.exists(cachePath):
             warn(self, "Caching directory doesn't exist")
             return False
         mtime = None
         try:
-            mtime = os.path.getmtime(self.cachePath)
+            mtime = os.path.getmtime(cachePath)
         except:
-            warn(self,"Cannot stat cache file: " + self.cachePath)
+            warn(self,"Cannot stat cache file: " + cachePath)
         if (time() - mtime) > self.token_validity_time:
             info(self,"Our authentification token must be invalid")
             return False
         f = None
         try:
-            f = open(self.cachePath, 'rb')
+            f = open(cachePath, 'rb')
         except:
             warn(self, "Cannot open authentification cache for reading!")
             return False
@@ -94,8 +110,11 @@ class QobuzApi:
         return True
     
     def delete_auth_cache(self):
+        cachePath = self.get_cache_path()
+        if not cachePath:
+            return False
         try:
-            os.remove(self.cachePath)
+            os.remove(cachePath)
             return True
         except: warn(self, "Cannot delete auth cache")
         return False
