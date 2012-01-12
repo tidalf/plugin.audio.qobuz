@@ -11,7 +11,9 @@
 		<platform>all</platform>
 		<summary lang="en">Qobuz addon for XBMC.</summary>
 		<description lang="en">
-			Qobuz addon for XBMC. You should enter your Qobuz username and password in the addon settings.
+			Qobuz addon for XBMC. It enables access to Qobuz music streaming service
+			You should enter your Qobuz username and password in the addon settings.
+			(and you need a valid subscription)
 		</description>
 	</extension>
 </addon>

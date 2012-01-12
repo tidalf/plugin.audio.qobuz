@@ -1,6 +1,6 @@
 This is a Qobuz plugin for XBMC
 -------------------------------
-The goal is to integrate access to the great Qobuz library directly from XBMC.
+It enables access to Qobuz music streaming service directly from XBMC (http://xbmc.org)
 
 Main Features : 
 ---------------
@@ -16,8 +16,12 @@ Configuration:
 --------------
 
 - Just enter some valid Qobuz credentials using addon settings
+note: you need Hifi subscription to stream flac files or premium subscription to play mp3
 
-note: you need Hifi subscription to stream flac files and premium subscription to play mp3
-get yours here : http://www.qobuz.com/abonnement-streaming
+Known Issues:
+-------------
+- Xbmc library mode and playlists not supported
+- mp3 play is slow
 
-The authors are not affiliated with Qobuz (probably trademarked) 
+The authors are not affiliated with Qobuz
+
