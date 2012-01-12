@@ -83,15 +83,16 @@ class QobuzGetPurchases(ICacheable):
 #                    print "plop"
                 item = a.getXbmcItem()
                 albumid = a.id     
-                u = ""#sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(albumid)
+                u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(albumid)
                 item.setPath(u)
                 item.setProperty('path', u)
                     
                 xbmcplugin.addDirectoryItem(handle=self.Core.Bootstrap.__handle__, 
-                                                url=u, listitem=item, isFolder=False, 
-                                                totalItems=1)          
+                                                url=u, listitem=item, isFolder=True, 
+                                                totalItems=n)          
                 print "ADDED"           
-#            except:                             
+            albumseen[albumid] = 'true'
+            #except:                             
 #                    #log ('warn', "album not found...")
 #                    albumseen[albumid] = 'true'
                       
