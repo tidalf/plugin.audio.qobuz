@@ -128,6 +128,7 @@
     <string id="31006">Cache settings</string>
     <string id="31007">Cache settings</string>
     <string id="31008">Authentification cache duration</string>
+    <string id="31009">Erase cache</string>
     
     <!-- Stream -->
     <string id="32000">Stream type</string>

@@ -55,7 +55,7 @@ class QobuzUserPlaylists(ICacheable):
             t = QobuzTagUserPlaylist(self.Core, track)
             u = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST) + "&id=" + t.id
             item = xbmcgui.ListItem()
-            item.setLabel('[' + t.owner_name + '] - '+ t.name)
+            item.setLabel(t.owner_name + ' - ' + t.name)
             item.setInfo(type="Music",infoLabels={ "title": t.name })
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');

@@ -195,6 +195,23 @@ class QobuzBootstrap(object):
         #print "Build url: " + req
         return req
     
+    def erase_cache(self):
+        import re
+        if not self.cacheDir:
+            warn(self, "Cache directory not set")
+            return False
+        if not os.path.exists(self.cacheDir):
+            warn(self, "Cache directory doesn't seem to exist")
+            return False
+        list = os.listdir(self.cacheDir)
+        for f in list:
+            if not f.endswith('.dat'): 
+                continue
+            path = os.path.join(self.cacheDir, str(f))
+            if os.remove(path):
+                info(self, "Cache file deleted: " + path)
+            else:
+                warn(self, "Cannot remove cache file: " + path)
     '''
     
     '''
@@ -282,6 +299,10 @@ class QobuzBootstrap(object):
         elif self.MODE == MODE_CURRENT_PLAYLIST:
             info(self, "Displaying current playlist")
             self.GUI.showCurrentPlaylist()
+            
+        elif self.MODE == MODE_ERASE_CACHE:
+            info(self, "Erasing cache...")
+            self.erase_cache()
             
         '''
             Directory Endin

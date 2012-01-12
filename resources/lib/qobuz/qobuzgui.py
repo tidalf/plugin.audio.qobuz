@@ -84,6 +84,8 @@ class QobuzGUI:
         if (self.Bootstrap.Core.Api.userid != 0):
             self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('playlist'), 0)
             self.setContent('files')
+        
+
   
     """
     Search for songs
@@ -246,6 +248,7 @@ class QobuzGUI:
 
     # Add whatever directory
     def _add_dir(self, name, url, mode, iconimage, id, items=1):
+        __language__= self.Bootstrap.__language__
         if url == '':
             u=sys.argv[0]+"?mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
         else:
@@ -263,7 +266,10 @@ class QobuzGUI:
             menuItems.append((__language__(30077), "XBMC.RunPlugin("+rmplaylst+")"))
             mvplaylst=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
             menuItems.append((__language__(30078), "XBMC.RunPlugin("+mvplaylst+")"))
-
+        
+        erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
+        menuItems.append((__language__(31009), "XBMC.RunPlugin("+erasecache+")"))
+        
         dir.addContextMenuItems(menuItems, replaceItems=False)
-
+        
         return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)
