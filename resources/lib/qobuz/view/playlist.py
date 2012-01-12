@@ -62,7 +62,8 @@ class QobuzPlaylist(ICacheable):
             item = t.getXbmcItem('playlist')
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)   
             xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
-            xp.add(u, item)
+            xp.add(u, item, t.id)
             i += 1
+        xp.save()
         xbmcplugin.setContent(h,'songs')
         return n

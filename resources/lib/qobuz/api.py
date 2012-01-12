@@ -82,7 +82,7 @@ class QobuzApi:
             return False
         
         if not os.path.exists(cachePath):
-            warn(self, "Caching directory doesn't exist")
+            warn(self, "Caching directory doesn't exist: " + cachePath)
             return False
         mtime = None
         try:
@@ -104,6 +104,7 @@ class QobuzApi:
         except:
             warn(self, "Cannot load serialized data")
             return False
+        pprint.pprint(data)
         self.authtime = data['authtime']
         self.authtoken = data['authtoken']
         self.userid = data['userid']

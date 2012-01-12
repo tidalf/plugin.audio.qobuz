@@ -110,15 +110,30 @@ class ICacheable(object):
             f = open(cache,'rb')
         except:
             warn(self,"Cannot open cache file: " + cache)
-            return None
-        return pickle.load(f)
+            return None 
+        data = pickle.load(f)
+        f.close()
+        return data
 
+    def delete_cache(self):
+        cache = self.get_cache_path()
+        if not cache:
+            warn(self, "Cache path not set")
+            return False
+        if not os.path.exists(cache):
+            warn(self, "Cache path doesn't exist")
+            return False
+        if not os.remove(cache):
+            warn(self, "Cannot remove cache path: " + cache)
+            return False
+        return True
+    
     def _save_cache_data(self, data):
         cache = self.get_cache_path()
         f = open(cache,'wb')
-        pickle.dump(data,f,protocol=pickle.HIGHEST_PROTOCOL)
+        s = pickle.dump(data,f,protocol=pickle.HIGHEST_PROTOCOL)
         f.close()
-
+        return s
     def set_raw_data(self, raw):
         self._raw_data = raw
         

@@ -34,7 +34,7 @@ class QobuzUserPlaylists(ICacheable):
                                                self.Core.Bootstrap.cacheDir,
                                                'userplaylists',
                                                0)
-        self.set_cache_refresh(60)
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist'))
         self.fetch_data()
 
     def _fetch_data(self):
@@ -45,10 +45,13 @@ class QobuzUserPlaylists(ICacheable):
         return data
 
     def length(self):
+        if not self._raw_data:
+           return 0
         return len(self._raw_data)
 
     def add_to_directory(self):
         n = self.length()
+        if n < 1: return 0
         log(self,"Found " + str(n) + " playlist(s)")
         h = int(sys.argv[1])
         for track in self.get_data():

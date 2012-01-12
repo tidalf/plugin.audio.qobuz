@@ -37,8 +37,7 @@ sys.path.append(libDir)
 sys.path.append(qobuzDir)
 from bootstrap import QobuzBootstrap
 Core = QobuzBootstrap(__addon__, int(sys.argv[1]))
-Core.parse_sys_args()
-Core.mode_dispatch()
+
 
 #exit(0)
 ## Mark song as playing or played

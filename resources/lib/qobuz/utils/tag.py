@@ -301,7 +301,7 @@ class QobuzTagAlbum(IQobuzTag):
             self.add_child(genre)
         
         self._is_loaded = True
-
+        
     def getAlbum(self, sep = ''):
         try:
             return self.title
@@ -312,7 +312,6 @@ class QobuzTagAlbum(IQobuzTag):
             return self.id
         except: return ''
     
-        
     def getTitle(self, sep = ''):
         try: return self.title
         except: return ''
@@ -520,7 +519,6 @@ class QobuzTagTrack(IQobuzTag):
         self.set_valid_tags(['playlist_track_id', 'position', 'id', 'title', 
                              'track_number', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
-        self.__album = None
         self.parent = None
         if json:
             self.parse_json(json)
@@ -534,8 +532,10 @@ class QobuzTagTrack(IQobuzTag):
         label.append(self.title)
         return ''.join(label)
     
+        
     def parse_json(self, p):
         self.auto_parse_json(p)
+        #pprint.pprint(p)
         if 'album' in p:
             data = QobuzTagAlbum(self.get_core(), p['album'])
             self.add_child( data )
@@ -546,6 +546,7 @@ class QobuzTagTrack(IQobuzTag):
             data = QobuzTagComposer(self.get_core(), p['composer'])
             self.add_child( data )
         if 'image' in p:
+            print "Add image to child"
             data = QobuzTagImage(self.get_core(), p['image'])
             self.add_child( data )
             
@@ -611,10 +612,9 @@ class QobuzTagTrack(IQobuzTag):
         try: genre = self.get_parent().getGenre()
         except: genre = self.getGenre()
             
-        image = ''
-        
-        if self.get_parent(): image = self.get_parent().getImage()
-        else: image = self.getImage()
+        image = self.getImage()  
+        if not image and self.get_parent(): 
+            image = self.get_parent().getImage()
         
         title = self.getTitle()
         duration = self.getDuration()
@@ -645,10 +645,10 @@ class QobuzTagTrack(IQobuzTag):
                                 'comment': 'Qobuz Music Streaming Service'
                                 })
         if context != 'player':
-            i.setProperty('IsPlayable', 'false')
+            i.setProperty('IsPlayable', 'true')
             i.setProperty('Music', 'true')
         else:
-            i.setProperty('IsPlayable', 'true')
+            i.setProperty('IsPlayable', 'false')
             i.setProperty('Music', 'true')
         i.setThumbnailImage(image)
         i.setIconImage(image)
@@ -676,15 +676,16 @@ class QobuzTagPlaylist(IQobuzTag):
         if json:
             self.parse_json(json)
     
-    def get_user_playlist(self):
-        return self.__user_playlist
-    
-    def get_tracks(self):
-        return self.__tracks__
+#    def get_user_playlist(self):
+#        return self.__user_playlist
+#    
+#    def get_tracks(self):
+#        return self.__tracks__
     
     def parse_json(self, p):
-        self.__user_playlist = QobuzTagUserPlaylist(self.Core, p)
+        #self.__user_playlist = QobuzTagUserPlaylist(self.Core, p)
         for track in p['tracks']:
+            #print "Add track"
             self.add_child(QobuzTagTrack(self.Core, track, self))
         self._is_loaded = True
 
