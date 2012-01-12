@@ -1,3 +1,10 @@
+0.0.4
+-----
+* improve caching
+* generic tagging
+* album view for purchases
+* context menu for cache cleaning
+
 0.0.3
 -----
 * add stop/start for Qobuz accounting

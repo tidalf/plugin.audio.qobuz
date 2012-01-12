@@ -11,13 +11,13 @@ Main Features :
 - Search by track name, album name and artist name
 - Integrate with xbmc gapless play
 - Support flac or mp3 play (using settings)
-- 
 
 Configuration:
 --------------
 
-- Enter valid Qobuz credentials using addon settings, 
+- Just enter some valid Qobuz credentials using addon settings
+
 note: you need Hifi subscription to stream flac files and premium subscription to play mp3
 get yours here : http://www.qobuz.com/abonnement-streaming
 
- 
+The authors are not affiliated with Qobuz (probably trademarked) 
