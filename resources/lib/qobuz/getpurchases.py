@@ -54,10 +54,11 @@ class QobuzGetPurchases(ICacheable):
         print "Len: " +str(n)
         #i = 0
         albumseen = {}
- 
+        needsave = False
         for track in self._raw_data:    
             t = QobuzTagTrack(self.Core, track)
-
+            if 'BLACK_ID' in track:
+                continue
             pprint.pprint(t)
             albumid = t.getAlbumId()
             log ('warn',albumid)
@@ -72,6 +73,8 @@ class QobuzGetPurchases(ICacheable):
                     print "Album ID " + str(albumid)
                     album = self.Core.getProduct(str(albumid))
                 except:
+                    track['BLACK_ID'] = 'true'
+                    needsave = True
                     print "cannot get product"
                     continue
                 if 1:
@@ -107,7 +110,7 @@ class QobuzGetPurchases(ICacheable):
         
         
         #for product in self.get_data():
-            
-
+        if needsave:
+            self._save_cache_data(self._raw_data)
         return n
 
