@@ -75,6 +75,8 @@ class IQobuzTag(object):
             elif isinstance(value, bool):
                 if value: v = '1'
                 else: v = '0'
+        if v == 'None':
+            return
         self.__dict__[key] = v
     
     def auto_parse_json(self, json):
