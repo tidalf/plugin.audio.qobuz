@@ -44,7 +44,7 @@ class QobuzPlaylist(ICacheable):
         
     def add(self, url, item, id):
         data = self.get_raw_data()
-        pos = len(data) - 1
+        pos = len(data)
         #print "Add track " + str(id) + "[" + str(pos) + "]\n"
         self.get_raw_data().append({
                          'id': id,
