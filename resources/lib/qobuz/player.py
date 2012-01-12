@@ -44,7 +44,7 @@ class QobuzPlaylist(ICacheable):
         
     def add(self, url, item, id):
         data = self.get_raw_data()
-        pos = len(data)
+        pos = len(data) - 1
         #print "Add track " + str(id) + "[" + str(pos) + "]\n"
         self.get_raw_data().append({
                          'id': id,
@@ -125,12 +125,13 @@ class QobuzPlaylist(ICacheable):
         t['streaming_url'] = data['streaming_url']
         t['streaming_type'] = data['streaming_type']
         t['format_id'] = data['format_id']
-        if t['format_id'] == 6:
+        if int(data['format_id']) == 6:
             t['format_name'] = 'flac'
             t['mimetype'] = 'audio/flac'
         else:
             t['format_name'] = 'mp3'
             t['mimetype'] = 'audio/mpeg'
+#        t['mimetype'] = 'audio/mpeg'
         t['request_format_id'] = format_id
         t['request_format_type'] = format
         print "Set resolved to : " + t['streaming_url']
@@ -268,7 +269,8 @@ class QobuzPlayer_playlist(xbmc.PlayList):
             return True
         item.setPath(cpath)
         print "Path replace: " + item.getProperty('path')
-        newitem = xbmcgui.ListItem(item.getProperty('path'), '', '', path=item.getProperty('streaming_url'))
+        item.setPath(item.getProperty('streaming_url'))
+#        newitem = xbmcgui.ListItem(item.getProperty('path'), '', '', path=item.getProperty('streaming_url'))
         self.remove(cpath)
         super(QobuzPlayer_playlist, self).add(url=item.getProperty('streaming_url'), listitem=item, index=cpos)
         command = 'Container.update("%s","%s")' % ( cpath, item.getProperty('streaming_url'))
@@ -404,6 +406,7 @@ class QobuzPlayer(xbmc.Player):
 #        return (track, tag)
             
     def play(self, id, pos):
+        pos = int(pos)
         #self.data.load()
         print "PLaylist data"
         #self.Playlist.data.load()
@@ -415,7 +418,7 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Track not found [" + str(id) + "]")
             return False
         print "Track id: " + str(plt['id']) + ' at position ' + str(plt['index'])
-        self.cpos = plt['index']
+        self.cpos = int(plt['index'])
         self.item = self.Playlist.resolve_url_at_pos(plt['index'])
         if not self.item:
             warn(self, "Could not play track with id " + str(id))
@@ -426,8 +429,11 @@ class QobuzPlayer(xbmc.Player):
         self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Starting song')
         self.watching = False
         print "Playing track number: " + str(self.cpos)
-        super(QobuzPlayer, self).playselected(self.cpos)
-        
+#        super(QobuzPlayer, self).playselected(self.cpos)
+        print "URl: " + self.item.getProperty('streaming_url')
+        print "Filename: " + self.Playlist[self.cpos].getfilename()
+        print self.Playlist.to_s()
+        super(QobuzPlayer, self).play(self.item.getProperty('streaming_url'))
         xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=self.item)
         return
         #xbmc.executebuiltin('Dialog.Close(all,true)')
