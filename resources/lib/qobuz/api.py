@@ -190,12 +190,12 @@ class QobuzApi:
                                    'extra':'tracks'})
         return self._api_request(params,"/api.json/0.1/playlist/get")
 
-    def get_album_tracks(self,album_id):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'product_id':album_id})
+    def get_album_tracks(self,album_id,context_type='plalist'):
+        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'product_id':album_id,'context_type':context_type})
         return self._api_request(params,"/api.json/0.1/product/get")
 
-    def get_product(self, id):
-        return self.get_album_tracks(id)
+    def get_product(self, id, context_type = "playlist"):
+        return self.get_album_tracks(id,context_type)
     
     def get_recommandations(self, genre_id, typer = "new-releases", limit = 100):
         if genre_id == 'null':

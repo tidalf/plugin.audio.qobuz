@@ -201,9 +201,9 @@ class QobuzGUI:
             self.showCategories()
 
     # Get album
-    def showProduct (self, id):
+    def showProduct (self, id, context_type = "playlist"):
         info(self, "showProduct(" + str(id) + ")")
-        album = self.Bootstrap.Core.getProduct(id)
+        album = self.Bootstrap.Core.getProduct(id,context_type)
         if album.length() > 0:
             album.add_to_directory()
             self.setContent('songs')

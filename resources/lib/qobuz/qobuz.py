@@ -52,9 +52,9 @@ class QobuzCore:
         from playlist import QobuzPlaylist
         return QobuzPlaylist(self, id)
 
-    def getProduct(self,id):
+    def getProduct(self,id, context_type = "playlist"):
         from product import QobuzProduct
-        return QobuzProduct(self, id)
+        return QobuzProduct(self, id, context_type)
 
     def getUserPlaylists(self):
         from userplaylists import QobuzUserPlaylists

@@ -34,9 +34,10 @@ from easytag import QobuzTagTrack
 ###############################################################################
 class QobuzProduct(ICacheable):
 
-    def __init__(self, Core, id):
+    def __init__(self, Core, id, context_type = "playlist" ):
         self.Core = Core
         self.id = id
+        self.context_type = context_type
         super(QobuzProduct, self).__init__( self.Core.Bootstrap.cacheDir, 
                                           'product',
                                           self.id)
@@ -45,7 +46,7 @@ class QobuzProduct(ICacheable):
         self.fetch_data()
 
     def _fetch_data(self):
-        data = self.Core.Api.get_product(str(self.id))['product']
+        data = self.Core.Api.get_product(str(self.id),self.context_type)['product']
         return data
 
     def length(self):
@@ -62,7 +63,7 @@ class QobuzProduct(ICacheable):
             if not isinstance(t, QobuzTagTrack):
                 continue
             item = t.getXbmcItem('album')
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i)
+            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i) + "&context_type=" + self.context_type
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
             xp.add(u, item)
             i = i + 1

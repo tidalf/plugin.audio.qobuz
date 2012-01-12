@@ -86,7 +86,7 @@ class QobuzGetPurchases(ICacheable):
 #                    print "plop"
                 item = a.getXbmcItem()
                 albumid = a.id     
-                u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(albumid)
+                u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(albumid) + "&context_type=purchased"
                 item.setPath(u)
                 item.setProperty('path', u)
                     

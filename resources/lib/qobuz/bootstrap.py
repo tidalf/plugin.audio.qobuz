@@ -249,7 +249,11 @@ class QobuzBootstrap(object):
 
         elif self.MODE == MODE_ALBUM:
             info(self, "Displaying album")
-            self.GUI.showProduct(str(self.ID))
+            try:
+                context_type=urllib.unquote_plus(self.params["context_type"])
+            except: 
+                context_type="playlist"            
+            self.GUI.showProduct(str(self.ID),context_type)
             
         elif self.MODE == MODE_USERPLAYLISTS:
             info(self, 'Displaying userplaylist')
