@@ -16,15 +16,17 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import pprint
+
 import xbmcgui
 import xbmcplugin
-from utils import _sc
+
+#from utils import _sc
 from constants import *
-from mydebug import log, info, warn
-from easytag import QobuzTagProduct
-from easytag import QobuzTagAlbum
-from icacheable import ICacheable
-import pprint
+from debug import log, info, warn
+from utils.tag import QobuzTagProduct
+from utils.tag import QobuzTagAlbum
+from utils.icacheable import ICacheable
 
 '''
     Class QobuzSearchAlbums

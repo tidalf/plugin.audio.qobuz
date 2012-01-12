@@ -15,15 +15,17 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
+import pprint
+
 import xbmcgui
 import xbmcplugin
 import xbmc
-from utils import _sc
+
+#from utils import _sc
 from constants import *
-from mydebug import log, info, warn
-from easytag import QobuzTagTrack
-from easytag import QobuzTagSearch
-import pprint
+from debug import log, info, warn
+from utils.tag import QobuzTagTrack
+from utils.tag import QobuzTagSearch
 
 ###############################################################################
 # Class QobuzSearchTracks 

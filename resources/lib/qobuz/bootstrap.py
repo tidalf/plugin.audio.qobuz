@@ -20,9 +20,9 @@ import xbmc
 
 from constants import *
 import constants
-from qobuz import QobuzCore
-from qobuzgui import QobuzGUI
-from mydebug import *
+from core import QobuzCore
+from gui import QobuzGUI
+from debug import *
 from player import QobuzPlayer
 #from winmain import QobuzWindow
 
@@ -238,10 +238,10 @@ class QobuzBootstrap(object):
                 warn(self, "Can't play track without position")
                 return False
             if self.Player.play(self.ID, self.POS):
-                t = Watcher()
-                t.run(self.Player, self.ID, self.POS)
-                exit(0)            
-            return True
+                #t = Watcher()
+                #t.run(self.Player, self.ID, self.POS)
+                #exit(0)            
+                return True
         
         elif self.MODE == MODE_ARTIST:
             info(self, "Displaying artist")

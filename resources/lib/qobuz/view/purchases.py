@@ -21,12 +21,12 @@ import xbmcplugin
 
 import pprint
 
-from mydebug import log, info, warn
+from debug import log, info, warn
 from constants import *
-from icacheable import ICacheable
-from easytag import QobuzTagArtist
-from easytag import QobuzTagTrack
-from easytag import  QobuzTagProduct
+from utils.icacheable import ICacheable
+from utils.tag import QobuzTagArtist
+from utils.tag import QobuzTagTrack
+from utils.tag import QobuzTagProduct
 
 """
     Class QobuzGetPurchases
@@ -55,17 +55,23 @@ class QobuzGetPurchases(ICacheable):
         #i = 0
         albumseen = {}
         needsave = False
-        for track in self._raw_data:    
+        for track in self._raw_data:   
+            print "plop" 
             t = QobuzTagTrack(self.Core, track)
             if 'BLACK_ID' in track:
                 continue
-            pprint.pprint(t)
+            print "plop2"
+            #pprint.pprint(t)
             albumid = t.getAlbumId()
             log ('warn',albumid)
             isseen = 'false'
-            try:
-                 isseen = albumseen[albumid]
-            except: pass
+            if albumid in albumseen:
+                print "Album already seen"
+                continue
+#            try:
+#                 isseen = albumseen[albumid]
+#            except: pass
+            print "Plop"
             if isseen == 'false':
                    #if  albumseen[albumid] is false:
                 log ('warn','album never seen try to add it')
@@ -77,13 +83,7 @@ class QobuzGetPurchases(ICacheable):
                     needsave = True
                     print "cannot get product"
                     continue
-                if 1:
-                    print "Plop1"
-                    a = QobuzTagProduct(self.Core, album.get_raw_data())
-#                except:
-#                    print "Cannot tag product"
-#                    continue
-#                    print "plop"
+                a = QobuzTagProduct(self.Core, album.get_raw_data())
                 item = a.getXbmcItem()
                 albumid = a.id     
                 u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(albumid) + "&context_type=purchased"
@@ -92,24 +92,8 @@ class QobuzGetPurchases(ICacheable):
                     
                 xbmcplugin.addDirectoryItem(handle=self.Core.Bootstrap.__handle__, 
                                                 url=u, listitem=item, isFolder=True, 
-                                                totalItems=n)          
-                print "ADDED"           
-            albumseen[albumid] = 'true'
-            #except:                             
-#                    #log ('warn', "album not found...")
-#                    albumseen[albumid] = 'true'
-                      
-           #except:pass
-           
-            
-           #item = t.getXbmcItem('songs')
-           #u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i) + "&context_type=purchases" 
-           #self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
-           #xp.add(u, item)
-           #i = i + 1
-        
-        
-        #for product in self.get_data():
+                                                totalItems=n)           
+                albumseen[albumid] = 'true'
         if needsave:
             self._save_cache_data(self._raw_data)
         return n

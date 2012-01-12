@@ -19,10 +19,10 @@ import sys
 import xbmcplugin
 import xbmcgui
 
-from icacheable import ICacheable
-from mydebug import log, info, warn
+from utils.icacheable import ICacheable
+from debug import log, info, warn
 from constants import *
-from easytag import IQobuzTag, QobuzTagUserPlaylist
+from utils.tag import IQobuzTag, QobuzTagUserPlaylist
 '''
     Class QobuzUserPLaylists
 '''

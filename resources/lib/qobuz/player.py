@@ -15,17 +15,20 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
+from time import time
+#import re
+#import threading
+import math
+import pprint
+
 import xbmc
 import xbmcplugin
 import xbmcgui
-from mydebug import info, warn, log
-from time import time
-from track import QobuzTrack
-from easytag import QobuzTagTrack
-import re
-import threading
-import math
-import pprint
+
+from debug import info, warn, log
+from data.track import QobuzTrack
+from utils.tag import QobuzTagTrack
+
 
 class QobuzPlayer_playlist(xbmc.PlayList):
     def __init__(self, type = xbmc.PLAYLIST_MUSIC):

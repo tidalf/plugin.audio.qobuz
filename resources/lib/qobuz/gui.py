@@ -16,18 +16,19 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import urllib
-import xbmcplugin, xbmcgui, xbmc
 
+import xbmcplugin
+import xbmcgui
+import xbmc
 
 from constants import *
-from mydebug import info, warn, log
+from debug import info, warn, log
+
 class QobuzGUI:
 
     def __init__( self, bootstrap):
         self.Bootstrap = bootstrap
-        #info(self, 'Current view mode: ' + xbmc.getInfoLabel('Container.Viewmode'))
 
-  
     '''
     Must be called at the end for folder to be displayed
     '''

@@ -17,7 +17,7 @@
 import os
 import time
 import pickle
-from mydebug import log,info,warn
+from debug import log,info,warn
 
 class ICacheable2(object):
     def __init(self):

@@ -21,11 +21,11 @@ import xbmcplugin
 
 import pprint
 
-from mydebug import log, info, warn
+from debug import log, info, warn
 from constants import *
-from icacheable import ICacheable
-from easytag import QobuzTagArtist
-from easytag import QobuzTagProduct
+from utils.icacheable import ICacheable
+from utils.tag import QobuzTagArtist
+from utils.tag import QobuzTagProduct
 """
     Class QobuzGetRecommendation
 """

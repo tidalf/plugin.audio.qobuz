@@ -16,38 +16,43 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import os
+
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
-from icacheable import ICacheable
-from mydebug import log, info, warn
-from utils import _sc
+
+from utils.icacheable import ICacheable
+from debug import log, info, warn
+from utils.string import _sc
+from utils.tag import QobuzTagTrack
 import pprint
 '''
- Class QobuzTrackURL
+ Class QobuzTrack 
 
- @summary: Manage one qobuz track streaming url
+ @summary: Manage one qobuz track
  @param qob: parent
  @param id: track id
- @return: New QobuzTrackURL
+ @return: New QobuzTrack 
 '''
-class QobuzTrackURL(ICacheable):
+class QobuzTrack(ICacheable):
     # Constructor
-    def __init__(self, Core, id, type):
+    def __init__(self, Core, id, context_type='playlist'):
         self.Core = Core
         self.id = id
-        self.type = type
-        self.format_id = 6
-        if self.Core.Bootstrap.__addon__.getSetting('streamtype') == 'mp3':
-            self.format_id = 5
-        super(QobuzTrackURL, self).__init__(self.Core.Bootstrap.cacheDir,
-                                            'track-url-' + str(self.format_id),
-                                            self.id)
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_auth'))
+        super(QobuzTrack, self).__init__(self.Core.Bootstrap.cacheDir,
+                                         'track',
+                                         self.id)
+        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_track'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        return self.Core.Api.get_track_url(self.id, 'playlist', '',  self.format_id)
+        return self.Core.Api.get_track(self.id)
+        
+    # Return track duration
+    def get_duration(self):
+        (sh,sm,ss) = self._raw_data['duration'].split(':')
+        return (int(sh) * 3600 + int(sm) * 60 + int(ss))
+

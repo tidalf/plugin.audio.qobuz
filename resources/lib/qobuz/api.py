@@ -28,7 +28,7 @@ import pprint
 from time import time
 import math
 
-from mydebug import log, info, warn
+from debug import log, info, warn
 
 class QobuzApi:
 

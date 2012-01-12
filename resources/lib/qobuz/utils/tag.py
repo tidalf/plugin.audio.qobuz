@@ -14,13 +14,16 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
 import sys
-from constants import *
+import pprint
+
 import xbmcgui
 import xbmcaddon
-from mydebug import warn, info, log
 
-import pprint
+from debug import warn, info, log
+from constants import *
+
 
 class IQobuzTag(object):
     

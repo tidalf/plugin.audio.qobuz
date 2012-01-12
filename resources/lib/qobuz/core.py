@@ -21,7 +21,7 @@ import xbmcaddon
 import xbmc
 
 from api import QobuzApi
-from mydebug import log, info, warn
+from debug import log, info, warn
 #from icacheable import ICacheable
 
 """
@@ -49,52 +49,52 @@ class QobuzCore:
         return self.Api.userid
 
     def getPlaylist(self,id):
-        from playlist import QobuzPlaylist
+        from view.playlist import QobuzPlaylist
         return QobuzPlaylist(self, id)
 
     def getProduct(self,id, context_type = "playlist"):
-        from product import QobuzProduct
+        from view.product import QobuzProduct
         return QobuzProduct(self, id, context_type)
 
     def getUserPlaylists(self):
-        from userplaylists import QobuzUserPlaylists
+        from view.userplaylists import QobuzUserPlaylists
         return QobuzUserPlaylists(self)
 
-    def getQobuzAlbum(self, id):
-        return QobuzAlbum(self, id)
+#    def getQobuzAlbum(self, id):
+#        return QobuzAlbum(self, id)
 
     def getTrack(self,id,context_type="playlist"):
-        from track import QobuzTrack
+        from data.track import QobuzTrack
         return QobuzTrack(self,id,context_type)
     
     def getTrackURL(self, id, type):
-        from track_streamurl import QobuzTrackURL
+        from data.track_streamurl import QobuzTrackURL
         return QobuzTrackURL(self, id, type)
     
     def getQobuzSearchTracks(self):
-        from searchtracks import QobuzSearchTracks
+        from search.tracks import QobuzSearchTracks
         return QobuzSearchTracks(self)
 
     def getQobuzSearchAlbums(self):
-        from searchalbums import QobuzSearchAlbums
+        from search.albums import QobuzSearchAlbums
         return QobuzSearchAlbums(self)
     
     def getQobuzSearchArtists(self):
-        from searchartists import QobuzSearchArtists
+        from search.artists import QobuzSearchArtists
         return QobuzSearchArtists(self)
 
     def getProductsFromArtist(self):
-        from searchalbums import QobuzSearchAlbums
+        from search.albums import QobuzSearchAlbums
         return QobuzSearchAlbums(self)
 
     def getRecommandation(self,genre_id):
-        from getrecommandation import QobuzGetRecommandation
+        from view.recommandation import QobuzGetRecommandation
         return QobuzGetRecommandation(self, genre_id)
 
     def getRecommandation(self, genre_id,type):
-        from getrecommandation import QobuzGetRecommandation
+        from view.recommandation import QobuzGetRecommandation
         return QobuzGetRecommandation(self, genre_id, type)
     
     def getPurchases(self):
-        from getpurchases import QobuzGetPurchases
+        from view.purchases import QobuzGetPurchases
         return QobuzGetPurchases(self)

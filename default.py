@@ -32,14 +32,15 @@ __cwd__          = __addon__.getAddonInfo('path')
 
 addonDir  = __addon__.getAddonInfo('path')
 libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
+qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
-from qobuz.bootstrap import *
+sys.path.append(qobuzDir)
+from bootstrap import QobuzBootstrap
 Core = QobuzBootstrap(__addon__, int(sys.argv[1]))
 Core.parse_sys_args()
 Core.mode_dispatch()
+
 #exit(0)
-
-
 ## Mark song as playing or played
 #def markSong(songid, duration, streamKey, streamServerID):
 #     global songMarkTime
