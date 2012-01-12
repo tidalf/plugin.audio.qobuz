@@ -26,6 +26,7 @@ from constants import *
 from icacheable import ICacheable
 from easytag import QobuzTagArtist
 from easytag import QobuzTagTrack
+from easytag import  QobuzTagProduct
 
 """
     Class QobuzGetPurchases
@@ -50,14 +51,62 @@ class QobuzGetPurchases(ICacheable):
 
     def add_to_directory(self):
         n = self.length()
-        xp = self.Core.Bootstrap.Player.Playlist
-        xp.clear()
-        i = 0
+        print "Len: " +str(n)
+        #i = 0
+        albumseen = {}
+ 
         for track in self._raw_data:    
             t = QobuzTagTrack(self.Core, track)
-            item = t.getXbmcItem('songs')
-            u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i) + "&context_type=purchases" 
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
-            xp.add(u, item)
-            i = i + 1
+
+            pprint.pprint(t)
+            albumid = t.getAlbumId()
+            log ('warn',albumid)
+            isseen = 'false'
+            try:
+                 isseen = albumseen[albumid]
+            except: pass
+            if isseen == 'false':
+                   #if  albumseen[albumid] is false:
+                log ('warn','album never seen try to add it')
+                try:
+                    print "Album ID " + str(albumid)
+                    album = self.Core.getProduct(str(albumid))
+                except:
+                    print "cannot get product"
+                    continue
+                if 1:
+                    print "Plop1"
+                    a = QobuzTagProduct(self.Core, album.get_raw_data())
+#                except:
+#                    print "Cannot tag product"
+#                    continue
+#                    print "plop"
+                item = a.getXbmcItem()
+                albumid = a.id     
+                u = ""#sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(albumid)
+                item.setPath(u)
+                item.setProperty('path', u)
+                    
+                xbmcplugin.addDirectoryItem(handle=self.Core.Bootstrap.__handle__, 
+                                                url=u, listitem=item, isFolder=False, 
+                                                totalItems=1)          
+                print "ADDED"           
+#            except:                             
+#                    #log ('warn', "album not found...")
+#                    albumseen[albumid] = 'true'
+                      
+           #except:pass
+           
+            
+           #item = t.getXbmcItem('songs')
+           #u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i) + "&context_type=purchases" 
+           #self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
+           #xp.add(u, item)
+           #i = i + 1
+        
+        
+        #for product in self.get_data():
+            
+
         return n
+

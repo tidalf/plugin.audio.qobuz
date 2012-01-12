@@ -145,8 +145,7 @@ class QobuzGUI:
     def showRecommendations(self, type, genre_id):
         if (genre_id != ''):
             r = self.Bootstrap.Core.getRecommandation(genre_id, type)
-            if r.length() > 0:
-                r.add_to_directory()
+            if r.add_to_directory() > 0:
                 self.setContent('files')
             else:
                 self.showNotification(30008, 30021)

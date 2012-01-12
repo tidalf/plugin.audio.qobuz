@@ -140,6 +140,14 @@ class IQobuzTag(object):
             if data: return data 
         return data
     
+    def getAlbumId(self, sep = ''):
+        data = ''
+        childs = self.get_childs()
+        for c in childs:
+            data = c.getAlbumId(sep)
+            if data: return data 
+        return data
+    
     def getArtist(self, sep = ''):
         data = ''
         childs = self.get_childs()
@@ -271,7 +279,7 @@ class QobuzTagAlbum(IQobuzTag):
     def __init__(self, Core, json):
         super(QobuzTagAlbum, self).__init__(Core, json)
         self.set_valid_tags(['id', 'title', 'genre', 'label', 
-                             'release_date'])
+                             'release_date', 'released_at'])
         if json:
             self.parse_json(json)
     
@@ -293,6 +301,12 @@ class QobuzTagAlbum(IQobuzTag):
         try:
             return self.title
         except: return ''
+    
+    def getAlbumId(self, sep = ''):
+        try:
+            return self.id
+        except: return ''
+    
         
     def getTitle(self, sep = ''):
         try: return self.title
@@ -302,8 +316,15 @@ class QobuzTagAlbum(IQobuzTag):
         try:
             return self.release_date
         except:
-            return ''
-        
+            try: 
+                return self.released_date
+            except:
+                return ''
+    def getId(self, sep = ''):
+        try: 
+            return self.id
+        except:
+            return ''        
 
 '''
 '''
@@ -344,6 +365,15 @@ class QobuzTagProduct(IQobuzTag):
                 album += c.getAlbum(sep)
                 if sep: album += sep
         return album
+    
+    def getAlbumId(self, sep =''):
+        albumid = ''
+        try: return self.id
+        except: 
+            for c in self.get_childs():
+                albumid += c.getAlbumId(sep)
+                if sep: albumid += sep
+        return albumid
                 
     def getArtist(self, sep = ''):
         artist = ''
@@ -381,6 +411,15 @@ class QobuzTagProduct(IQobuzTag):
                 album += c.getAlbum(sep)
                 if sep: album += sep
         return album
+
+    def getAlbumId(self, sep = ''):
+        albumid = ''
+        try: return self.id
+        except:
+            for c in self.get_childs():
+                albumid += c.getAlbumId(sep)
+                if sep: albumid += sep
+        return albumid
     
     def parse_json(self, p):
         self.auto_parse_json(p)
@@ -523,7 +562,7 @@ class QobuzTagTrack(IQobuzTag):
         try: return self.title
         except: return ''
         
-    def getArtist(self):
+    def getArtist(self, sep = ''):
         artist = ''
         artist = self.getInterpreter()
         if artist:
@@ -536,6 +575,13 @@ class QobuzTagTrack(IQobuzTag):
         if not album and parent:
             album = parent.title
         return album
+    
+    def getAlbumId(self, sep = ''):
+        albumid = super(QobuzTagTrack, self).getAlbumId(sep)
+        parent = self.get_parent()
+        if not albumid and parent:
+            albumid = parent.id
+        return albumid
     
     def getStreamingType(self, sep = ''):
         try: return self.streaming_type
