@@ -429,14 +429,15 @@ class QobuzPlayer(xbmc.Player):
         self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Starting song')
         self.watching = False
         print "Playing track number: " + str(self.cpos)
-#        super(QobuzPlayer, self).playselected(self.cpos)
+#        
         print "URl: " + self.item.getProperty('streaming_url')
         print "Filename: " + self.Playlist[self.cpos].getfilename()
         print self.Playlist.to_s()
-        super(QobuzPlayer, self).play(self.item.getProperty('streaming_url'))
+#        super(QobuzPlayer, self).playselected(self.cpos)
+#        super(QobuzPlayer, self).play(self.item.getProperty('streaming_url'))
         xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=self.item)
-        return
-        #xbmc.executebuiltin('Dialog.Close(all,true)')
+#        return
+        xbmc.executebuiltin('Dialog.Close(all,true)')
         #xbmc.executebuiltin('Container.Update("'+self.item.getProperty('Path')+'","'+self.item.getProperty('stream')+'")')
         #xbmc.executebuiltin('Control.SetFocus('+str(self.cpos)+')')
         '''
