@@ -117,12 +117,12 @@ class QobuzBootstrap(object):
         self.Core = QobuzCore(self)
         self.GUI = QobuzGUI(self)
         self.Player = QobuzPlayer()
-        self.Player.Core = self.Core
+        self.Player.setCore(self.Core)
         self.Images = QobuzImages(self)
         self.MODE = None
         self.ID = None
         self.POS = None
-
+        self.parse_sys_args()
         '''
             NAME can be used to set icon for each folder i think :)
             XBMC maintain a cache path/icon 
@@ -132,6 +132,7 @@ class QobuzBootstrap(object):
         if not self.Core.login():
             self.GUI.showLoginFailure()
             exit(1)
+        self.mode_dispatch()
     
     '''
         Initialize needed directories
