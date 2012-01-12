@@ -378,12 +378,11 @@ class QobuzTagProduct(IQobuzTag):
         return albumid
                 
     def getArtist(self, sep = ''):
-        artist = ''
         try: return self.artist
         except:
             for c in self.get_childs():
-                artist += c.getArtist(sep)
-                if sep: artist += sep
+                artist = c.getArtist(sep)
+                if artist: return artist
         return artist
     
     def getGenre(self, sep = ''):
