@@ -44,6 +44,7 @@ from utils.pid import Pid
 service_name = 'Qobuz URL Resolver'
 
 API = QobuzApi()
+API.set_cache_path(os.path.join(__addon__cachepath__, "auth.dat"))
 
 def log(msg, lvl = xbmc.LOGNOTICE):
     xbmc.log(service_name + ': ' + str(msg), lvl)
