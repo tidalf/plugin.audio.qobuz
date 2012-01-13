@@ -117,7 +117,6 @@ class QobuzApi:
         return False
     
     def _api_request(self, params, uri):      
-        info(self, "Get " + uri + ' / ' + params)
         url = "http://player.qobuz.com"
         r = requests.post(url + uri, data = params)
         response_json = json.loads(r.content)
