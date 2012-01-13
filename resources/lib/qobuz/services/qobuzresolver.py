@@ -22,7 +22,13 @@ import re
 import xbmcaddon
 import xbmc
 
-__addon__ = xbmcaddon.Addon(id='plugin.audio.qobuz')
+__sleep__ = 5
+__addon_name__ = 'plugin.audio.qobuz'
+__addon_url__ = 'plugin://' + __addon_name__ + '/'
+__addon__ = xbmcaddon.Addon(id=__addon_name__)
+__addon__cachepath__ = xbmc.translatePath('special://temp/'+__addon_name__+'/')
+__pid_file__ = 'qobuzresolver.pid'
+
 addonDir  = __addon__.getAddonInfo('path')
 libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
@@ -33,12 +39,13 @@ sys.path.append(qobuzDir)
 from api import QobuzApi
 from utils.tag import QobuzTagTrack
 from data.track import QobuzTrack
+from utils.pid import Pid
 
 service_name = 'Qobuz URL Resolver'
 
 API = QobuzApi()
 
-def log(msg, lvl = xbmc.LOGDEBUG):
+def log(msg, lvl = xbmc.LOGNOTICE):
     xbmc.log(service_name + ': ' + str(msg), lvl)
 
 def login():
@@ -68,7 +75,7 @@ def replace_playlist_path(playlist, cpos, item):
         if not cpath:
             print "Current path is empty, abort\n"
             return False
-        if not cpath.startswith('plugin://'): 
+        if not cpath.startswith(__addon_url__): 
             print "We already have correct url in playlist... abort"
             return True
         item.setPath(cpath)
@@ -97,7 +104,7 @@ def get_xbmc_item(p_item, pos, id, stream_url, filename):
 '''
 '''
 def parse_filename_for_id(filename):
-    match = re.search('^plugin://plugin.audio.qobuz/?.*id=(\d+).*$', filename)
+    match = re.search('^'+__addon_url__+'?.*id=(\d+).*$', filename)
     if not match:
         return None
     return match.group(1)
@@ -146,7 +153,7 @@ def watch_playlist(player, playlist):
     if not item:
         log("No url to resolve at position " + str(position))
         return 
-    if not item.getfilename().startswith('plugin://'):
+    if not item.getfilename().startswith(__addon_url__):
         #print "We don't need to resolve this url"
         return False
     return resolve_position(player, playlist, item, position)
@@ -155,18 +162,31 @@ def watch_playlist(player, playlist):
 '''
     Our watcher infinite loop
     We are put all our work in a try/catch block so our have
-    lesser chance to die. Pid file is not unliked on crash ...
+    lesser chance to die. Pid file is not unlinked on crash ...
+    TODO: If plugin has never been launched cache path doesn't exist,
+    our pid file can't be created, our service die ...
 '''
 def watcher():
+    pid_path = os.path.join(__addon__cachepath__, __pid_file__)
+    pid_id =  os.getpid()
+    pid = Pid(pid_path, pid_id)
     playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
     player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
-    pid = str(os.getpid())
-    pidFile = os.path.join(xbmc.translatePath('special://temp/'), 'qobuzresolver.pid')
-    if os.path.isfile(pidFile):
-        print "%s already exists, exiting" % pidFile
-        sys.exit(1)
+    if pid.exists():
+        if (pid.age() > (__sleep__ * 10)):
+            log("Pid file exist but is old... removing")
+            if not pid.remove():
+                log("Cannot remove pid: " + pid.file)
+                log("Exiting...")
+                sys.exit(1)
+        else:
+            log("Pid file exists, exiting")
+            sys.exit(1)
     else:
-        file(pidFile, 'w').write(pid)
+        if not pid.create():
+            log('Cannot create pid file: ' + pid.file)
+            log('Exiting...')
+            sys.exit(1) 
     log("Starting")
     while (not xbmc.abortRequested):
         try:
@@ -179,12 +199,13 @@ def watcher():
                     log('Something goes wrong with our resolver!')
         except:
             log('We are not playing audio!')
-        time.sleep(5)
-    log("Removing pid: " + pidFile)
-    os.unlink(pidFile)
+        if not pid.touch():
+            log('Cannot touch pid file: ' + pid.file)
+        time.sleep(__sleep__)
+    if not pid.remove():
+        log("Cannot remove pid file: " + pid.file)
     log("Exiting...")
     sys.exit(0)
-
 
 if __name__ == "__main__":
     watcher()

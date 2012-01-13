@@ -89,7 +89,7 @@ class QobuzGUI:
         self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('song'), 0)
         if (self.Bootstrap.Core.Api.userid != 0):
             self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('playlist'), 0)
-            self.setContent('files')
+        self.setContent('albums')
         
 
   
