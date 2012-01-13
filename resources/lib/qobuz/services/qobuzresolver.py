@@ -50,40 +50,40 @@ def log(msg, lvl = xbmc.LOGNOTICE):
     xbmc.log(service_name + ': ' + str(msg), lvl)
 
 def login():
-        user =  __addon__.getSetting('username')
-        password = __addon__.getSetting('password')
-        if not user or not password:
-            log("You need to enter login/password in Qobuz Addon Settings")
-            return False
-        log("Login as user: " + str(user))
-        return API.login( user, password)
+    user =  __addon__.getSetting('username')
+    password = __addon__.getSetting('password')
+    if not user or not password:
+        log("You need to enter login/password in Qobuz Addon Settings")
+        return False
+    log("Login as user: " + str(user))
+    return API.login( user, password)
 
 '''
 '''
 def replace_playlist_path(playlist, cpos, item):
-        try:
-            i = playlist[cpos]
-        except:
-            log("Invalid playlist position: " + str(i))
-            return False
-        cpath = ''
-        try:
-            cpath = playlist[cpos].getfilename()
-        except:
-            print "Cannot get playlist filename\n"
-            return False
-        
-        if not cpath:
-            print "Current path is empty, abort\n"
-            return False
-        if not cpath.startswith(__addon_url__): 
-            print "We already have correct url in playlist... abort"
-            return True
-        item.setPath(cpath)
-        item.setPath(item.getProperty('streaming_url'))
-        playlist.remove(cpath)
-        playlist.add(url=item.getProperty('streaming_url'), listitem=item, index=cpos)
+    try:
+        i = playlist[cpos]
+    except:
+        log("Invalid playlist position: " + str(i))
+        return False
+    cpath = ''
+    try:
+        cpath = playlist[cpos].getfilename()
+    except:
+        print "Cannot get playlist filename\n"
+        return False
+    
+    if not cpath:
+        print "Current path is empty, abort\n"
+        return False
+    if not cpath.startswith(__addon_url__): 
+        print "We already have correct url in playlist... abort"
         return True
+    item.setPath(cpath)
+    item.setPath(item.getProperty('streaming_url'))
+    playlist.remove(cpath)
+    playlist.add(url=item.getProperty('streaming_url'), listitem=item, index=cpos)
+    return True
 
 '''
 '''

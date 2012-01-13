@@ -15,7 +15,6 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>..
 import os
-#from utils import _sc
 __debugging__ = False
 
 ourlog = None

@@ -15,15 +15,11 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os
-import httplib
 import json
 import time
-#import urllib2
-import urllib
+import requests
 import hashlib
-#import mutagen 
 import pickle
-#from mutagen.flac import FLAC
 import pprint
 from time import time
 import math
@@ -34,7 +30,6 @@ class QobuzApi:
 
     def __init__(self, Core = None):
         self.Core = Core
-        self.headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
         self.authtoken = None
         self.userid = None
         self.authtime = None
@@ -121,11 +116,9 @@ class QobuzApi:
         return False
     
     def _api_request(self, params, uri):      
-        self.conn = httplib.HTTPConnection("player.qobuz.com")
-        self.conn.request("POST", uri, params, self.headers)
-        info(self, "Get " + uri + ' / ' + params)
-        response = self.conn.getresponse()
-        response_json = json.loads(response.read())
+        url = "http://player.qobuz.com"
+        r = requests.post(url + uri, data = params)
+        response_json = json.loads(r.content)
         try:
             if response_json['status'] == "error":
                 warn(self, "Something went wrong with request: " 
@@ -143,8 +136,9 @@ class QobuzApi:
         if self.load_auth():
             info(self, 'Using authentification token from cache')
             return self.userid
-        params = urllib.urlencode({'x-api-auth-token':'null','email': user ,
-                                   'hashed_password': hashlib.md5(password).hexdigest() })
+        params = {'x-api-auth-token':'null','email': user ,
+                                   'hashed_password': hashlib.md5(password).hexdigest() }
+        
         data = self._api_request(params,"/api.json/0.1/user/login")
         if not data: return None
         if not 'user' in data: return None
@@ -155,25 +149,25 @@ class QobuzApi:
         return self.userid
     
     def get_track_url(self,track_id,context_type,context_id ,format_id = 6):
-        params = urllib.urlencode({
+        params = {
                                    'x-api-auth-token':self.authtoken,
                                    'track_id': track_id ,
                                    'format_id': format_id,
                                    'context_type':context_type,
-                                   'context_id':context_id})
+                                   'context_id':context_id}
         data = self._api_request(params,"/api.json/0.1/track/getStreamingUrl") 
         return data
             
 
     def get_track(self,trackid):
-        params = urllib.urlencode({'x-api-auth-token': self.authtoken,
-                                   'track_id': trackid})
+        params = {'x-api-auth-token': self.authtoken,
+                                   'track_id': trackid}
         data = self._api_request(params,"/api.json/0.1/track/get")
         return data
 
     def get_user_playlists(self):
-        params = urllib.urlencode({'x-api-auth-token': self.authtoken,
-                                   'user_id': self.userid })
+        params = {'x-api-auth-token': self.authtoken,
+                                   'user_id': self.userid }
         data = self._api_request(params,"/api.json/0.1/playlist/getUserPlaylists")
         return data
 
@@ -186,13 +180,13 @@ class QobuzApi:
             return []
 
     def get_playlist(self,playlist_id=39837):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,
+        params = {'x-api-auth-token':self.authtoken,
                                    'playlist_id':playlist_id,
-                                   'extra':'tracks'})
+                                   'extra':'tracks'}
         return self._api_request(params,"/api.json/0.1/playlist/get")
 
     def get_album_tracks(self,album_id,context_type='plalist'):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken,'product_id':album_id,'context_type':context_type})
+        params = {'x-api-auth-token':self.authtoken,'product_id':album_id,'context_type':context_type}
         return self._api_request(params,"/api.json/0.1/product/get")
 
     def get_product(self, id, context_type = "playlist"):
@@ -200,52 +194,52 @@ class QobuzApi:
     
     def get_recommandations(self, genre_id, typer = "new-releases", limit = 100):
         if genre_id == 'null':
-            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
-                                       'type': typer, 'limit': limit})
+            params = {'x-api-auth-token':self.authtoken, 
+                                       'type': typer, 'limit': limit}
         else:
-            params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+            params = {'x-api-auth-token':self.authtoken, 
                                        'genre_id': genre_id, 
                                        'type': typer, 
-                                       'limit': limit})
+                                       'limit': limit}
         
         return self._api_request(params,"/api.json/0.1/product/getRecommendations")
     
     def get_purchases(self, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
-                                   'user_id': self.userid })
+        params = {'x-api-auth-token':self.authtoken, 
+                                   'user_id': self.userid }
         return self._api_request(params,"/api.json/0.1/purchase/getUserPurchases")
     
     # SEARCH #
     def search_tracks(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+        params = {'x-api-auth-token':self.authtoken, 
                                    'query': query.encode("utf8","ignore"), 
                                    'type': 'tracks', 
-                                   'limit': limit})
+                                   'limit': limit}
         return self._api_request(params,"/api.json/0.1/track/search")
 
     def search_albums(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+        params = {'x-api-auth-token':self.authtoken, 
                                    'query': query.encode("utf8","ignore"), 
-                                   'type': 'albums', 'limit': limit})
+                                   'type': 'albums', 'limit': limit}
         return self._api_request(params,"/api.json/0.1/product/search")
     
     def search_artists(self, query, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+        params = {'x-api-auth-token':self.authtoken, 
                                    'query': query.encode("utf8","ignore"), 
-                                   'type': 'artists', 'limit': limit})
+                                   'type': 'artists', 'limit': limit}
         return self._api_request(params,"/api.json/0.1/track/search")
     
     def get_albums_from_artist(self, id, limit = 100):
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
-                                   'artist_id': id, 'limit': limit})
+        params = {'x-api-auth-token':self.authtoken, 
+                                   'artist_id': id, 'limit': limit}
         return self._api_request(params,"/api.json/0.1/artist/get")
 
     # REPORT #    
     def report_streaming_start(self, track_id):
         #info(self, "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id))
-        params = urllib.urlencode({'x-api-auth-token':self.authtoken, 
+        params = {'x-api-auth-token':self.authtoken, 
                                    'user_id': self.userid, 
-                                   'track_id': track_id})
+                                   'track_id': track_id}
         return self._api_request(params,"/api.json/0.1/track/reportStreamingStart")        
 
     def report_streaming_stop(self, track_id, duration):
@@ -260,10 +254,10 @@ class QobuzApi:
             warn(self, 'No authentification token')
             return None
         #info(self, "Report Streaming stop for user:  " + str(self.userid) + ", track: " + str(track_id))
-        params = urllib.urlencode({'x-api-auth-token': token, 
+        params = {'x-api-auth-token': token, 
                                    'user_id': self.userid, 
                                    'track_id': track_id,
-                                   'duration': duration})
+                                   'duration': duration}
         return self._api_request(params,"/api.json/0.1/track/reportStreamingEnd")
 
 if __name__ == '__main__':

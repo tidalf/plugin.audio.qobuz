@@ -23,9 +23,7 @@
 	<string id="30002">Song search limit</string>
 	<string id="30003">Album search limit</string>
 	<string id="30004">Artist search limit</string>
-	<string id="30005">Number of songs per page</string>
-	<string id="30006">Search for artist's albums...</string>
-	<string id="30007">No Qobuz service</string>
+s	<string id="30007">No Qobuz service</string>
 	<string id="30008">Qobuz XBMC</string>
 	<string id="30009">Unable to connect with Qobuz.</string>
 	<string id="30010">Please try again later</string>			
