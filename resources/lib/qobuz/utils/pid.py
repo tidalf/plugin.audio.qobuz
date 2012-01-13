@@ -1,7 +1,6 @@
 import sys
 import os
 import time
-import platform
 
 class Pid():
 
@@ -21,7 +20,6 @@ class Pid():
         if not fd:
             return False
         if not os.write(fd, str(self.pid)):
-            os.close(fd)
             return False
         os.close(fd)
         return True
@@ -33,7 +31,6 @@ class Pid():
         if not fd:
             return False
         if not os.write(fd, str(self.pid)):
-            os.close(fd)
             return False
         os.close(fd)
         return True
@@ -42,12 +39,6 @@ class Pid():
         if not self.exists():
             return False
         os.unlink(self.file)
-        try:
-            name = platform.system()
-            print "Platform: " + name
-            if name == 'Windows':
-                time.sleep(1)
-        except: pass
         return not self.exists()
     
     def age(self):
