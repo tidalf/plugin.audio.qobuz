@@ -28,13 +28,18 @@ class QobuzGUI:
 
     def __init__( self, bootstrap):
         self.Bootstrap = bootstrap
+        xbmcplugin.setProperty(int(sys.argv[1]), 'Music', 'Qobuz')
+        
 
     '''
     Must be called at the end for folder to be displayed
     '''
     def endOfDirectory(self):
         self.setFanArt()
-        return xbmcplugin.endOfDirectory(int(sys.argv[1]))
+        xbmcplugin.setContent(int(sys.argv[1]), 'songs')
+        xbmcplugin.setPluginFanart(int(sys.argv[1]), 'special://home/addons/plugin.audio.qobuz/fanart.jpg', color2='0xFFFF3300')
+        xbmc.executebuiltin('SetProperty(View,Thumbnails)')
+        return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
   
     def showNotificationH(self, title, text):
         title = unicode(title, "utf-8", errors="replace")
@@ -94,6 +99,7 @@ class QobuzGUI:
     def searchSongs(self):
         __language__ = self.Bootstrap.__language__
         query = self._get_keyboard(default="",heading=__language__(30020))
+        query = query.strip()
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchTracks()
             s.search(query, self.Bootstrap.__addon__.getSetting('songsearchlimit'))
@@ -112,6 +118,7 @@ class QobuzGUI:
     def searchAlbums(self):
         __language__ = self.Bootstrap.__language__
         query = self._get_keyboard(default="",heading=__language__(30022))
+        query = query.strip()
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchAlbums()
             s.search(query, self.Bootstrap.__addon__.getSetting('albumsearchlimit'))
@@ -130,6 +137,7 @@ class QobuzGUI:
     def searchArtists(self):
         __language__ = self.Bootstrap.__language__
         query = self._get_keyboard(default="",heading=__language__(30024))
+        query = query.strip()
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchArtists()
             s.search(query, self.Bootstrap.__addon__.getSetting('artistsearchlimit'))
@@ -188,7 +196,6 @@ class QobuzGUI:
         self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, i.get('genre-0'), 0)
         self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, i.get('genre-0'), 0)
         self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.get('genre-0'), 0)
-        xbmc.executebuiltin('Container.SetViewMode(icons)')
         self.setContent('files')
 
     # Get my playlists

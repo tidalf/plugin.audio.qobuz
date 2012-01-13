@@ -17,14 +17,15 @@
 import sys
 import xbmcgui
 import xbmcplugin
-from utils import _sc
+
+#from utils import _sc
 from constants import *
-from mydebug import log, info, warn
+from debug import log, info, warn
 
 import pprint
 
-from easytag import QobuzTagArtist
-from easytag import QobuzTagProduct
+from utils.tag import QobuzTagArtist
+from utils.tag import QobuzTagProduct
 ###############################################################################
 # Class QobuzSearchArtists
 ###############################################################################

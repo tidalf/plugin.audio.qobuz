@@ -56,8 +56,8 @@ class QobuzProduct(ICacheable):
 
     def add_to_directory(self):
         n = self.length()
-        xp = self.Core.Bootstrap.Player.Playlist
-        xp.clear()
+#        xp = self.Core.Bootstrap.Player.Playlist
+#        xp.clear()
         i = 0
         h = int(sys.argv[1])
         p = QobuzTagProduct(self.Core, self.get_data())
@@ -67,6 +67,7 @@ class QobuzProduct(ICacheable):
             item = t.getXbmcItem('album')
             u = sys.argv[0] + "?mode=" + str(MODE_SONG) + "&id=" + t.id + "&pos=" + str(i) + "&context_type=" + self.context_type
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
-            xp.add(u, item)
+#            xp.add(u, item, int(t.id))
             i = i + 1
+#        xp.save()
         return n

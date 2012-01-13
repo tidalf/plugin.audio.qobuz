@@ -19,6 +19,7 @@ import time
 import pickle
 from debug import log,info,warn
 
+
 class ICacheable2(object):
     def __init(self):
         self._raw_data = None
@@ -123,8 +124,15 @@ class ICacheable(object):
         if not os.path.exists(cache):
             warn(self, "Cache path doesn't exist")
             return False
-        if not os.remove(cache):
+        if not os.unlink(cache):
             warn(self, "Cannot remove cache path: " + cache)
+            timeout = 3
+            while timeout > 0: 
+                if not os.path.exists(cache):
+                    break
+                warn(self, 'Waiting for cache to be deleted...')
+                time.sleep(.250)
+                timeout -= .250
             return False
         return True
     
@@ -134,6 +142,7 @@ class ICacheable(object):
         s = pickle.dump(data,f,protocol=pickle.HIGHEST_PROTOCOL)
         f.close()
         return s
+    
     def set_raw_data(self, raw):
         self._raw_data = raw
         

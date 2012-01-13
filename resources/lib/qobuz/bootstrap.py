@@ -209,7 +209,7 @@ class QobuzBootstrap(object):
             if not f.endswith('.dat'): 
                 continue
             path = os.path.join(self.cacheDir, str(f))
-            if os.remove(path):
+            if os.unlink(path):
                 info(self, "Cache file deleted: " + path)
             else:
                 warn(self, "Cannot remove cache file: " + path)

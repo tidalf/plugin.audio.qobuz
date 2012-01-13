@@ -60,6 +60,5 @@ class QobuzGetRecommandation(ICacheable):
             item = album.getXbmcItem()
             xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
                                         isFolder=True, totalItems=n)
-            
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
         return n

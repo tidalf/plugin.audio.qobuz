@@ -522,7 +522,7 @@ class QobuzTagTrack(IQobuzTag):
         self.parent = None
         if json:
             self.parse_json(json)
-    
+
     def getLabel(self):
         label = []
         label.append(self.track_number)
@@ -531,11 +531,9 @@ class QobuzTagTrack(IQobuzTag):
         label.append(' - ')
         label.append(self.title)
         return ''.join(label)
-    
-        
+
     def parse_json(self, p):
         self.auto_parse_json(p)
-        #pprint.pprint(p)
         if 'album' in p:
             data = QobuzTagAlbum(self.get_core(), p['album'])
             self.add_child( data )
@@ -551,47 +549,49 @@ class QobuzTagTrack(IQobuzTag):
             self.add_child( data )
             
         self._is_loaded = True
-        
+
     def getDuration(self, sep = 0):
         try:
             (sh,sm,ss) = self.duration.split(':')
         except:
             return 0
         return (int(sh) * 3600 + int(sm) * 60 + int(ss))
-    
+
     def getTrackNumber(self, sep = ''):
         try: return int(self.track_number)
         except: return 0
-    
+
     def getTitle(self, sep = ''):
         try: return self.title
         except: return ''
-        
+
     def getArtist(self, sep = ''):
         artist = ''
         artist = self.getInterpreter()
         if artist:
             return artist
         return self.getComposer()
-    
+
     def getAlbum(self, sep = ''):
         album = super(QobuzTagTrack, self).getAlbum(sep)
         parent = self.get_parent()
         if not album and parent:
-            album = parent.title
+            try:
+                album = parent.title
+            except: pass
         return album
-    
+
     def getAlbumId(self, sep = ''):
         albumid = super(QobuzTagTrack, self).getAlbumId(sep)
         parent = self.get_parent()
         if not albumid and parent:
             albumid = parent.id
         return albumid
-    
+
     def getStreamingType(self, sep = ''):
         try: return self.streaming_type
         except: return ''
-        
+
     def getXbmcItem(self, context = 'album'):
         parent = self.get_parent()
         i = xbmcgui.ListItem()
@@ -599,9 +599,7 @@ class QobuzTagTrack(IQobuzTag):
         artist = self.getArtist()
         track_number = self.getTrackNumber()
         date = ''
-        if parent: 
-            date = parent.getDate()
-        
+        if parent: date = parent.getDate()
         else: date = self.getDate()
         year = 0
         if date:
@@ -609,13 +607,13 @@ class QobuzTagTrack(IQobuzTag):
                 year = date.split('-')[0]
             except: pass
         genre = ''
-        try: genre = self.get_parent().getGenre()
+        try: genre = parent.getGenre()
         except: genre = self.getGenre()
             
         image = self.getImage()  
-        if not image and self.get_parent(): 
-            image = self.get_parent().getImage()
-        
+        if not image and parent: 
+            image = parent.getImage()
+
         title = self.getTitle()
         duration = self.getDuration()
         label = ''
@@ -631,10 +629,10 @@ class QobuzTagTrack(IQobuzTag):
             raise "Unknown display context"
         if self.getStreamingType() != 'full':
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
-        
+
         i.setLabel(label)
         i.setInfo(type = 'music',
-                  infoLabels = {
+                  infoLabels = {'songid': str(self.id),
                                 'title': title,
                                 'artist': artist,
                                 'genre': genre,
@@ -656,39 +654,29 @@ class QobuzTagTrack(IQobuzTag):
         '''
             Context Menu
         '''
-        b = self.Core.Bootstrap
-        retstr = sys.argv[2]
-        go = b.build_url(MODE_ARTIST, self.getArtistId())
-        albumfromthisartist= ('Show albums from this artist', 'ActivateWindow(Music,'+go+','+retstr+')')
-        i.addContextMenuItems([albumfromthisartist], False)
+#        #b = self.Core.Bootstrap
+#        retstr = sys.argv[2]
+#        go = 'http://plugin.audio.qobuz/?mode='+MODE_ARTIST+'&id='+self.getArtistId()
+#        albumfromthisartist= ('Show albums from this artist', 'ActivateWindow(Music,'+go+','+retstr+')')
+#        i.addContextMenuItems([albumfromthisartist], False)
         return i
-    
 
 '''
 '''
 class QobuzTagPlaylist(IQobuzTag):
-    
     def __init__(self, Core, json, parent = None):
         super(QobuzTagPlaylist, self).__init__(Core, json, parent)
         self.set_valid_tags([])
-        self.__user_playlist = None
-        self.__tracks__ = []
         if json:
             self.parse_json(json)
     
-#    def get_user_playlist(self):
-#        return self.__user_playlist
-#    
-#    def get_tracks(self):
-#        return self.__tracks__
-    
     def parse_json(self, p):
-        #self.__user_playlist = QobuzTagUserPlaylist(self.Core, p)
         for track in p['tracks']:
-            #print "Add track"
             self.add_child(QobuzTagTrack(self.Core, track, self))
         self._is_loaded = True
 
+'''
+'''
 class QobuzTagSearch(IQobuzTag):
     
     def __init__(self, Core, json):
