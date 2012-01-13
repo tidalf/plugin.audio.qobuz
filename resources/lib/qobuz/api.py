@@ -30,7 +30,6 @@ class QobuzApi:
 
     def __init__(self, Core = None):
         self.Core = Core
-        self.headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
         self.authtoken = None
         self.userid = None
         self.authtime = None

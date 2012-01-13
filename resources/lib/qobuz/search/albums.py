@@ -21,7 +21,6 @@ import pprint
 import xbmcgui
 import xbmcplugin
 
-#from utils import _sc
 from constants import *
 from debug import log, info, warn
 from utils.tag import QobuzTagProduct
@@ -69,7 +68,6 @@ class QobuzSearchAlbums():
                                         url=u, listitem=item, isFolder=True, 
                                         totalItems=n)
         return n
-
 
     def xbmc_directory_products_by_artist(self):
         n = self.length()
