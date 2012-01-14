@@ -48,7 +48,7 @@ class QobuzSearchTracks():
     def add_to_directory(self):
         n = self.length()
         i = 0
-        ts = QobuzTagSearch(self.Core, self._raw_data['results'])
+        ts = QobuzTagSearch(self._raw_data['results'])
         childs = ts.get_childs()
         for track in childs:
             item = track.getXbmcItem('playlist')

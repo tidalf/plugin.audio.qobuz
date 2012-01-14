@@ -52,14 +52,13 @@ class QobuzUserPlaylists(ICacheable):
     def add_to_directory(self):
         n = self.length()
         if n < 1: return 0
-        log(self,"Found " + str(n) + " playlist(s)")
         h = int(sys.argv[1])
-        for track in self.get_data():
-            t = QobuzTagUserPlaylist(self.Core, track)
-            u = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST) + "&id=" + t.id
+        for json_track in self.get_data():
+            tag_track = QobuzTagUserPlaylist(json_track)
+            u = self.Core.Bootstrap.build_url(MODE_PLAYLIST, tag_track.id)
             item = xbmcgui.ListItem()
-            item.setLabel(t.owner_name + ' - ' + t.name)
-            item.setInfo(type="Music",infoLabels={ "title": t.name })
+            item.setLabel(tag_track.owner_name + ' - ' + tag_track.name)
+            item.setInfo(type="Music",infoLabels={ "title": tag_track.name })
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');
             xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)

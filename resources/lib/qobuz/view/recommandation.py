@@ -51,12 +51,10 @@ class QobuzGetRecommandation(ICacheable):
     
     def add_to_directory(self):
         n = self.length()
-        info(self,"Found " + str(n) + " albums(s)")
         h = int(sys.argv[1])
-        u = dir = None
-        for p in self.get_raw_data():
-            album = QobuzTagProduct(self.Core, p)
-            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + album.id
+        for json_product in self.get_raw_data():
+            album = QobuzTagProduct(json_product)
+            u = self.Core.Bootstrap.build_url(MODE_ALBUM, album.id)
             item = album.getXbmcItem()
             xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
                                         isFolder=True, totalItems=n)

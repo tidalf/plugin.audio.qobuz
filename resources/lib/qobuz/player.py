@@ -64,7 +64,7 @@ class QobuzPlayable():
         if not track:
             warn(self, "Cannot get QobuzTrack with id: " + str(self.id))
             return None
-        tag = QobuzTagTrack(self.Core, track.get_data())
+        tag = QobuzTagTrack(track.get_data())
         item = tag.getXbmcItem('player')
         item.setProperty('streaming_url', self.data_url['streaming_url'])
         item.setPath(self.data_url['streaming_url'])
@@ -86,7 +86,7 @@ class QobuzPlayer(xbmc.Player):
     def sendQobuzPlaybackStarted(self,):
         self.Core.Api.report_streaming_start(self.id)
         
-    def play(self, id, pos):
+    def play(self, id):
         print "Need to play song with id: " + str(id)
         playable = QobuzPlayable(self.Core, id)
         if not playable.get_stream():

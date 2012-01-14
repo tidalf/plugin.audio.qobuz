@@ -51,45 +51,28 @@ class QobuzGetPurchases(ICacheable):
 
     def add_to_directory(self):
         n = self.length()
-        print "Len: " +str(n)
-        #i = 0
         albumseen = {}
         needsave = False
         for track in self._raw_data:   
-            print "plop" 
-            t = QobuzTagTrack(self.Core, track)
+            t = QobuzTagTrack(track)
             if 'BLACK_ID' in track:
                 continue
-            print "plop2"
-            #pprint.pprint(t)
             albumid = t.getAlbumId()
-            log ('warn',albumid)
             isseen = 'false'
             if albumid in albumseen:
-                print "Album already seen"
                 continue
-#            try:
-#                 isseen = albumseen[albumid]
-#            except: pass
-            print "Plop"
             if isseen == 'false':
-                   #if  albumseen[albumid] is false:
                 log ('warn','album never seen try to add it')
                 try:
-                    print "Album ID " + str(albumid)
                     album = self.Core.getProduct(str(albumid))
                 except:
                     track['BLACK_ID'] = 'true'
                     needsave = True
-                    print "cannot get product"
                     continue
-                a = QobuzTagProduct(self.Core, album.get_raw_data())
+                a = QobuzTagProduct(album.get_raw_data())
                 item = a.getXbmcItem()
                 albumid = a.id     
-                u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + str(albumid) + "&context_type=purchased"
-                item.setPath(u)
-                item.setProperty('path', u)
-                    
+                u = self.Core.Bootstrap.build_url(MODE_ALBUM, albumid)
                 xbmcplugin.addDirectoryItem(handle=self.Core.Bootstrap.__handle__, 
                                                 url=u, listitem=item, isFolder=True, 
                                                 totalItems=n)           

@@ -232,15 +232,7 @@ class QobuzBootstrap(object):
             except: 
                 context_type="playlist"
             pos = None
-            try:
-                pos = self.POS
-            except:
-                warn(self, "Can't play track without position")
-                return False
-            if self.Player.play(self.ID, self.POS):
-                #t = Watcher()
-                #t.run(self.Player, self.ID, self.POS)
-                #exit(0)            
+            if self.Player.play(self.ID):      
                 return True
         
         elif self.MODE == MODE_ARTIST:

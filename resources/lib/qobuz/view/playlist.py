@@ -53,7 +53,7 @@ class QobuzPlaylist(ICacheable):
         n = self.length()
         i = 0
         h = int(sys.argv[1])
-        p = QobuzTagPlaylist(self.Core, self.get_data())
+        p = QobuzTagPlaylist(self.get_data())
         for t in p.get_childs():
             if not isinstance(t, QobuzTagTrack):
                 continue

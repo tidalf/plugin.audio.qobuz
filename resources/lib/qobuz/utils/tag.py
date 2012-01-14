@@ -27,12 +27,11 @@ from constants import *
 
 class IQobuzTag(object):
     
-    def __init__(self, Core, json = None, parent = None):
+    def __init__(self, json = None, parent = None):
         self.__valid_tags = None
         self.__is_loaded = None
         self._json = json
         self._parent = parent
-        self.Core = Core
         self._childs = []
         
     def add_child(self, child):
@@ -40,9 +39,6 @@ class IQobuzTag(object):
     
     def get_childs(self):
         return self._childs
-    
-    def get_core(self):
-        return self.Core
     
     def get_parent(self):
         return self._parent
@@ -225,8 +221,8 @@ class IQobuzTag(object):
 '''
 class QobuzTagUserPlaylist(IQobuzTag):
     
-    def __init__(self, Core, json):
-        super(QobuzTagUserPlaylist, self).__init__(Core, json)
+    def __init__(self, json):
+        super(QobuzTagUserPlaylist, self).__init__(json)
         self.set_valid_tags(['id', 'name', 'description', 'position', 
                              'created_at', 'updated_at', 'is_public', 
                              'is_collaborative', 'owner_id', 'owner_name', 'length'])
@@ -259,8 +255,8 @@ class QobuzTagUserPlaylist(IQobuzTag):
 
 class QobuzTagArtist(IQobuzTag):
     
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagArtist, self).__init__(Core, json, parent)
+    def __init__(self, json, parent = None):
+        super(QobuzTagArtist, self).__init__(json, parent)
         self.set_valid_tags(['id', 'name'])
         self.__album = None
         if json:
@@ -281,8 +277,8 @@ class QobuzTagArtist(IQobuzTag):
 '''
 class QobuzTagAlbum(IQobuzTag):
     
-    def __init__(self, Core, json):
-        super(QobuzTagAlbum, self).__init__(Core, json)
+    def __init__(self, json):
+        super(QobuzTagAlbum, self).__init__(json)
         self.set_valid_tags(['id', 'title', 'genre', 'label', 
                              'release_date', 'released_at'])
         if json:
@@ -291,13 +287,13 @@ class QobuzTagAlbum(IQobuzTag):
     def parse_json(self, p):
         self.auto_parse_json(p)
         if 'image' in p:
-            image = QobuzTagImage(self.get_core(), p['image'])
+            image = QobuzTagImage(p['image'])
             self.add_child(image)
         if 'label' in p:
-            label = QobuzTagLabel(self.get_core(), p['label'])
+            label = QobuzTagLabel(p['label'])
             self.add_child(label)
         if 'genre' in p:
-            genre = QobuzTagGenre(self.get_core(), p['genre'])
+            genre = QobuzTagGenre(p['genre'])
             self.add_child(genre)
         
         self._is_loaded = True
@@ -334,8 +330,8 @@ class QobuzTagAlbum(IQobuzTag):
 '''
 class QobuzTagProduct(IQobuzTag):
     
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagProduct, self).__init__(Core, json, parent)
+    def __init__(self, json, parent = None):
+        super(QobuzTagProduct, self).__init__(json, parent)
         self.set_valid_tags(['id', 'artist', 'genre', 'description', 
                             'label', 'price', 'release_date', 'relevancy', 
                             'title', 'type', 'url', 'subtitle', 'goodies', 
@@ -427,16 +423,16 @@ class QobuzTagProduct(IQobuzTag):
     def parse_json(self, p):
         self.auto_parse_json(p)
         if 'image' in p:
-            self.add_child(QobuzTagImage(self.Core, p['image'], self))
+            self.add_child(QobuzTagImage(p['image'], self))
         if 'genre' in p:
             genre = ''
-            tag = QobuzTagGenre(self.Core, p['genre'], self)
+            tag = QobuzTagGenre(p['genre'], self)
             genre = tag.getGenre()
             if genre:
                 self.add_child(tag)
         if 'artist' in p:
             artist = ''
-            tag = QobuzTagArtist(self.Core, p['artist'], self)
+            tag = QobuzTagArtist(p['artist'], self)
             artist = tag.getArtist()
             if artist:
                 self.add_child(tag)
@@ -445,13 +441,13 @@ class QobuzTagProduct(IQobuzTag):
 
         if 'tracks' in p:
             for track in p['tracks']:
-                self.add_child(QobuzTagTrack(self.Core, track, self))
+                self.add_child(QobuzTagTrack(track, self))
         self._is_loaded = True
         
 
 class QobuzTagInterpreter(IQobuzTag):
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagInterpreter, self).__init__(Core, json, parent = None)
+    def __init__(self, json, parent = None):
+        super(QobuzTagInterpreter, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
         if json:
             self.auto_parse_json(json)
@@ -461,8 +457,8 @@ class QobuzTagInterpreter(IQobuzTag):
         except: return ''
 
 class QobuzTagComposer(IQobuzTag):
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagComposer, self).__init__(Core, json, parent = None)
+    def __init__(self, json, parent = None):
+        super(QobuzTagComposer, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
         self.parent = None
         if json:
@@ -473,8 +469,8 @@ class QobuzTagComposer(IQobuzTag):
         except: return ''
 
 class QobuzTagGenre(IQobuzTag):
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagGenre, self).__init__(Core, json, parent = None)
+    def __init__(self, json, parent = None):
+        super(QobuzTagGenre, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
         self.parent = None
         if json:
@@ -488,16 +484,16 @@ class QobuzTagGenre(IQobuzTag):
         except: return ''
 
 class QobuzTagLabel(IQobuzTag):
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagLabel, self).__init__(Core, json, parent = None)
+    def __init__(self, json, parent = None):
+        super(QobuzTagLabel, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
         self.parent = None
         if json:
             self.auto_parse_json(json)
 
 class QobuzTagImage(IQobuzTag):
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagImage, self).__init__(Core, json, parent = None)
+    def __init__(self, json, parent = None):
+        super(QobuzTagImage, self).__init__(json, parent = None)
         self.set_valid_tags(['large', 'small', 'thumbnail'])
         self.parent = None
         if json:
@@ -514,8 +510,8 @@ class QobuzTagImage(IQobuzTag):
 '''
 class QobuzTagTrack(IQobuzTag):
     
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagTrack, self).__init__(Core, json, parent)
+    def __init__(self, json, parent = None):
+        super(QobuzTagTrack, self).__init__(json, parent)
         self.set_valid_tags(['playlist_track_id', 'position', 'id', 'title', 
                              'track_number', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
@@ -535,17 +531,17 @@ class QobuzTagTrack(IQobuzTag):
     def parse_json(self, p):
         self.auto_parse_json(p)
         if 'album' in p:
-            data = QobuzTagAlbum(self.get_core(), p['album'])
+            data = QobuzTagAlbum(p['album'])
             self.add_child( data )
         if 'interpreter' in p:
-            data = QobuzTagInterpreter(self.get_core(), p['interpreter'])
+            data = QobuzTagInterpreter(p['interpreter'])
             self.add_child( data )
         if 'composer' in p:
-            data = QobuzTagComposer(self.get_core(), p['composer'])
+            data = QobuzTagComposer(p['composer'])
             self.add_child( data )
         if 'image' in p:
             print "Add image to child"
-            data = QobuzTagImage(self.get_core(), p['image'])
+            data = QobuzTagImage(p['image'])
             self.add_child( data )
             
         self._is_loaded = True
@@ -666,29 +662,29 @@ class QobuzTagTrack(IQobuzTag):
 '''
 '''
 class QobuzTagPlaylist(IQobuzTag):
-    def __init__(self, Core, json, parent = None):
-        super(QobuzTagPlaylist, self).__init__(Core, json, parent)
+    def __init__(self, json, parent = None):
+        super(QobuzTagPlaylist, self).__init__(json, parent)
         self.set_valid_tags([])
         if json:
             self.parse_json(json)
     
     def parse_json(self, p):
         for track in p['tracks']:
-            self.add_child(QobuzTagTrack(self.Core, track, self))
+            self.add_child(QobuzTagTrack(track, self))
         self._is_loaded = True
 
 '''
 '''
 class QobuzTagSearch(IQobuzTag):
     
-    def __init__(self, Core, json):
-        super(QobuzTagSearch, self).__init__(Core, json)
+    def __init__(self, json):
+        super(QobuzTagSearch, self).__init__(json)
         self.__tracks__ = []
         if json:
             self.parse_json(json)
         
     def parse_json(self, p):
         for track in p['tracks']:
-            self.add_child(QobuzTagTrack(self.get_core(), track, self))
+            self.add_child(QobuzTagTrack(track, self))
         self._is_loaded = True
 

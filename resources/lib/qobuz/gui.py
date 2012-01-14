@@ -35,10 +35,10 @@ class QobuzGUI:
     Must be called at the end for folder to be displayed
     '''
     def endOfDirectory(self):
-        self.setFanArt()
-        xbmcplugin.setContent(int(sys.argv[1]), 'files')
-        xbmcplugin.setPluginFanart(int(sys.argv[1]), 'special://home/addons/plugin.audio.qobuz/fanart.jpg', color2='0xFFFF3300')
-        xbmc.executebuiltin('SetProperty(View,Thumbnails)')
+#        self.setFanArt()
+#        xbmcplugin.setContent(int(sys.argv[1]), 'songs')
+#        xbmcplugin.setPluginFanart(int(sys.argv[1]), 'special://home/addons/plugin.audio.qobuz/fanart.jpg', color2='0xFFFF3300')
+#        xbmc.executebuiltin('SetProperty(View,Thumbnails)')
         ''' SEARCH '''
         if self.Bootstrap.MODE and self.Bootstrap.MODE <= 5: 
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)

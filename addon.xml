@@ -6,7 +6,7 @@
 		<!-- <import addon="script.module.simplejson"/> -->
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
-		<provides>video</provides>
+		<provides>music</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<platform>all</platform>
