@@ -146,6 +146,8 @@ def resolve_position(player, playlist, item, pos):
 
 '''
     Do we have something to resolve
+    Return: None if ok
+            positon on error
 '''
 def watch_playlist(player, playlist):
     size = playlist.size()
@@ -183,6 +185,9 @@ def watcher():
     pid = Pid(pid_path, pid_id)
     playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
     player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+    current_pos = None
+    previous_pos = None
+    watch_retry = 3
     if pid.exists():
         if (pid.age() > (__sleep__ * 10)):
             log("Pid file exist but is old... removing")

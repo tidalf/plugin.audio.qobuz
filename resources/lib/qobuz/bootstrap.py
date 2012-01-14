@@ -121,7 +121,7 @@ class QobuzBootstrap(object):
         self.Images = QobuzImages(self)
         self.MODE = None
         self.ID = None
-        self.POS = None
+        self.META = None
         self.parse_sys_args()
         '''
             NAME can be used to set icon for each folder i think :)
@@ -181,7 +181,7 @@ class QobuzBootstrap(object):
         except: 
             warn(self, "No 'id' parameter")
         try: 
-            self.NAME = str(self.params["name"])
+            self.META = str(self.params["meta"])
         except: pass
         for p in self.params:
             info(self, "Param: " + p + ' = ' + str(self.params[p]))
@@ -190,10 +190,9 @@ class QobuzBootstrap(object):
     
     '''
     def build_url(self, mode, id, pos = None):
-        req = sys.argv[0] + "?mode=" + str(mode)+"&id="+str(id)
-        if pos != None:
-            req += "&pos="+str(pos)
-        #print "Build url: " + req
+        req = sys.argv[0] + "?&mode=" + str(mode)+"&id="+str(id)
+        if self.META:
+            req += "&meta=1"
         return req
     
     def erase_cache(self):

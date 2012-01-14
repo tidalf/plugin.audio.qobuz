@@ -6,18 +6,15 @@
 		<!-- <import addon="script.module.simplejson"/> -->
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
-		<provides>audio</provides>
+		<provides>video</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<platform>all</platform>
 		<summary lang="en">Qobuz addon for XBMC.</summary>
 		<description lang="en">
-			Qobuz addon for XBMC. It enables access
-			to Qobuz music streaming service
-			You should enter your Qobuz username
-			and password in the addon settings.
-			(and you need a valid
-			subscription)
+Qobuz addon for XBMC. It enables accessto Qobuz music streaming service
+You should enter your Qobuz username and password in the addon settings.
+(and you need a valid subscription)
 		</description>
 	</extension>
 	<extension point="xbmc.service" library="resources/lib/qobuz/services/qobuzresolver.py">

@@ -36,11 +36,14 @@ class QobuzGUI:
     '''
     def endOfDirectory(self):
         self.setFanArt()
-        xbmcplugin.setContent(int(sys.argv[1]), 'songs')
+        xbmcplugin.setContent(int(sys.argv[1]), 'files')
         xbmcplugin.setPluginFanart(int(sys.argv[1]), 'special://home/addons/plugin.audio.qobuz/fanart.jpg', color2='0xFFFF3300')
         xbmc.executebuiltin('SetProperty(View,Thumbnails)')
-        return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
-  
+        ''' SEARCH '''
+        if self.Bootstrap.MODE and self.Bootstrap.MODE <= 5: 
+            return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
+        else:
+            return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
     def showNotificationH(self, title, text):
         title = unicode(title, "utf-8", errors="replace")
         text = unicode(text, "utf-8", errors="replace")
@@ -81,9 +84,10 @@ class QobuzGUI:
     def showCategories(self):
         i = self.Bootstrap.Images
         __language__ = self.Bootstrap.__language__
-        self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, i.get('song'), 0)
-        self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, i.get('album'), 0)
-        self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, i.get('album'), 0)
+        if not self.Bootstrap.META:
+            self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, i.get('song'), 0)
+            self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, i.get('album'), 0)
+            self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, i.get('album'), 0)
         self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, i.get('song'), 0)
         self._add_dir(__language__(30101), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases', MODE_SHOW_RECO_T, i.get('song'), 0)
         self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('song'), 0)
@@ -258,7 +262,7 @@ class QobuzGUI:
     def _add_dir(self, name, url, mode, iconimage, id, items=1):
         __language__= self.Bootstrap.__language__
         if url == '':
-            u=sys.argv[0]+"?mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
+            u=self.Bootstrap.build_url(mode, id)
         else:
             u = url
         dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
@@ -266,14 +270,14 @@ class QobuzGUI:
 
         # Custom menu items
         menuItems = []
-        if mode == MODE_ALBUM:
-            mkplaylst=sys.argv[0]+"?mode="+str(MODE_MAKE_PLAYLIST)+"&name="+name+"&id="+str(id)
-            menuItems.append((__language__(30076), "XBMC.RunPlugin("+mkplaylst+")"))
-        if mode == MODE_PLAYLIST:
-            rmplaylst=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
-            menuItems.append((__language__(30077), "XBMC.RunPlugin("+rmplaylst+")"))
-            mvplaylst=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
-            menuItems.append((__language__(30078), "XBMC.RunPlugin("+mvplaylst+")"))
+#        if mode == MODE_ALBUM:
+#            mkplaylst=sys.argv[0]+"?mode="+str(MODE_MAKE_PLAYLIST)+"&name="+name+"&id="+str(id)
+#            menuItems.append((__language__(30076), "XBMC.RunPlugin("+mkplaylst+")"))
+#        if mode == MODE_PLAYLIST:
+#            rmplaylst=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
+#            menuItems.append((__language__(30077), "XBMC.RunPlugin("+rmplaylst+")"))
+#            mvplaylst=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
+#            menuItems.append((__language__(30078), "XBMC.RunPlugin("+mvplaylst+")"))
         
         erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
         menuItems.append((__language__(31009), "XBMC.RunPlugin("+erasecache+")"))

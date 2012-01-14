@@ -63,7 +63,7 @@ class QobuzSearchArtists():
         for p in data:
             print p
             a = QobuzTagArtist(self.Core, p)
-            u = sys.argv[0] + "?mode=" + str(MODE_ARTIST) + "&id=" + a.id
+            u = self.Core.Bootstrap.build_url(MODE_ARTIST, a.id)
             item   = xbmcgui.ListItem()
             item.setLabel(a.getArtist() )
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, n)
@@ -76,7 +76,7 @@ class QobuzSearchArtists():
         for p in json['artist']['albums']:
             print p
             a = QobuzTagAlbum(self.Core, p)
-            u = sys.argv[0] + "?mode=" + str(MODE_ALBUM) + "&id=" + a.id
+            u = self.Core.Bootstrap.build_url(MODE_ALBUM, a.id)
             item = a.getXbmcItem('album')
             self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, n)
         return n
