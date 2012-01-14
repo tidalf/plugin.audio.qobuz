@@ -119,17 +119,19 @@ class QobuzApi:
         url = "http://player.qobuz.com"
         r = requests.post(url + uri, data = params)
         response_json = json.loads(r.content)
+        error = None
         try:
-            if response_json['status'] == "error":
-                warn(self, "Something went wrong with request: " 
-                     + uri + ' / ' + params)
-                pprint.pprint(response_json)
-                '''
-                    When something wrong we are deleting our auth token
-                '''
-                self.delete_auth_cache()
-                return None
+            error = response_json['status']
         except: pass
+        if error == 'error':
+            warn(self, "Something went wrong with request: " 
+                     + uri + "\n"  + pprint.pformat(params) + "\n" + pprint.pformat(response_json))
+            
+            '''
+            When something wrong we are deleting our auth token
+                '''
+            self.delete_auth_cache()
+            return None
         return response_json
     
     def login(self, user, password):

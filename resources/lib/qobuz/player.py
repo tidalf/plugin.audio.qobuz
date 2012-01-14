@@ -43,9 +43,12 @@ class QobuzPlayable():
             self.pref_format_id = 5
         self.tag = QobuzTrackURL(self.Core, self.id, self.pref_format_id)
         self.data_url = self.tag.get_data()
+        print "Dataurl: " + str(self.data_url)
         if not self.data_url:
             warn(self, "Cannot resolve url for track id: " + str(id))
             return False
+        #print "Plop"
+        #pprint.pprint(self.data_url)
         if int(self.data_url['format_id']) == 6:
             self.format_name = 'flac'
             self.mimetype = 'audio/flac'
@@ -56,6 +59,8 @@ class QobuzPlayable():
     
     def getXbmcItem(self):    
         track = QobuzTrack(self.Core, self.id)
+        print "Track data:\n"
+        pprint.pprint(track.get_data())
         if not track:
             warn(self, "Cannot get QobuzTrack with id: " + str(self.id))
             return None
@@ -69,7 +74,7 @@ class QobuzPlayable():
         return item
     
 class QobuzPlayer(xbmc.Player):
-    def __init__(self, type = xbmc.PLAYER_CORE_DVDPLAYER):
+    def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
         super(QobuzPlayer, self).__init__()
         
     def setCore (self, Core):

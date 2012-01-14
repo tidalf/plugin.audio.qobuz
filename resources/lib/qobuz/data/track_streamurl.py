@@ -52,4 +52,4 @@ class QobuzTrackURL(ICacheable):
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        return self.Core.Api.get_track_url(self.id, 'playlist', '',  self.format_id)
+        return self.Core.Api.get_track_url(self.id, 'playlist', 0,  self.format_id)

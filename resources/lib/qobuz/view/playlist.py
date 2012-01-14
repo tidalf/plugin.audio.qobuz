@@ -58,8 +58,9 @@ class QobuzPlaylist(ICacheable):
             if not isinstance(t, QobuzTagTrack):
                 continue
             item = t.getXbmcItem('playlist')
-            u = self.Core.Bootstrap.build_url(MODE_SONG, str(t.id), i)   
-            xbmcplugin.addDirectoryItem(handle=h ,url=u ,listitem=item,isFolder=False,totalItems=n)
+            u = self.Core.Bootstrap.build_url(MODE_SONG, str(t.id), i)
+            item.setPath(u) 
+            xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, isFolder=False,totalItems=1)
             i += 1
         xbmcplugin.setContent(h,'songs')
         return n

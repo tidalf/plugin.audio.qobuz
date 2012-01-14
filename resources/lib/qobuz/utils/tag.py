@@ -644,10 +644,12 @@ class QobuzTagTrack(IQobuzTag):
                                 })
         if context != 'player':
             i.setProperty('IsPlayable', 'true')
-            i.setProperty('Music', 'true')
+            #i.setProperty('Music', 'true')
         else:
             i.setProperty('IsPlayable', 'true')
-            i.setProperty('Music', 'true')
+            #i.setProperty('Music', 'true')
+        i.setProperty('mimetype', 'audio/flac')
+        i.setProperty('IsFolder', 'false')
         i.setThumbnailImage(image)
         i.setIconImage(image)
         i.setProperty('image', image)

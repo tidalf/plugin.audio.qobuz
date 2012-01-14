@@ -97,7 +97,17 @@ def get_xbmc_item(p_item, pos, id, stream_url, filename):
     item = tag.getXbmcItem('player')
     item.setProperty('url', filename)
     item.setProperty('streaming_url', stream_url['streaming_url'])
-    item.setProperty('mimetype', 'audio/flac')
+    format_id = int(stream_url['format_id'])
+    if format_id == 6:
+        log("Setting mime type to audio/flac")
+        item.setProperty('mimetype', 'audio/flac')
+    elif format_id == 5:
+        log("Setting mime type to audio/mpeg")
+        item.setProperty('mimetype', 'audio/mpeg')
+    else:
+        log("Unknown format type: " + str(format_id))
+        log("Setting mime type to audio/flac")
+        item.setProperty('mimetype', 'audio/flac')
     item.setProperty('IsPlayable', 'true')
     item.setProperty('Music', 'true')
     return item
