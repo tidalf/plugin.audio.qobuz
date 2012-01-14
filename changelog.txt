@@ -1,3 +1,7 @@
+0.0.5
+-----
+* player rewrite (use a backgound process to resolv urls)
+
 0.0.4
 -----
 * improve caching

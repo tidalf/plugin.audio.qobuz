@@ -9,7 +9,7 @@ Main Features :
 - Show purchased products
 - Show recommended albums by genre and type  
 - Search by track name, album name and artist name
-- Integrate with xbmc gapless play
+- Integrate with xbmc gapless play (using a background resolver)
 - Support flac or mp3 play (using settings)
 
 Configuration:
