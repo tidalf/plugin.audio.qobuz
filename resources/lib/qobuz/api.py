@@ -264,7 +264,7 @@ class QobuzApi:
         params = {'x-api-auth-token': token, 
                                    'track_ids': track_ids,
                                    'playlist_id': playlist_id}
-        log("info","adding " + trackid + "to playlist" )
+        log("info","adding " + trackid + "to playlist" + playlist_id )
         return self._api_request(params,"/api.json/0.1/playlist/addTracks")
      
     # TOBECHECKED 
@@ -272,10 +272,10 @@ class QobuzApi:
         params = {'x-api-auth-token': token, 
                                    'playlist_track_id': playlist_track_id,
                                    'playlist_id': playlist_id}
-        log("info","adding " + trackid + "to playlist" )
+        log("info","deleting " + playlist_track_id + "from playlist" + playlist_id )
         return self._api_request(params,"/api.json/0.1/playlist/deleteTracks")
     
-    def playlist_create (self, playlist_name, track_ids, description='', album_id='', is_public='on', is_collaborative='off' ):
+    def playlist_create (self, playlist_name, track_ids='', description='', album_id='', is_public='on', is_collaborative='off' ):
         params = {'x-api-auth-token': token, 
                                    'name': playlist_name,
                                    'is_public':on,
@@ -286,14 +286,14 @@ class QobuzApi:
                                    'spotify_track_uris':'',
                                    'deezer_playlist_url':''}
                                           
-        log("info","adding " + track_id + "to new playlist" + playlist_name )
+        log("info","creating new playlist" + playlist_name + "with (or without) tracks :", tracks_ids )
         #&is_public=on&spotify_track_uris=&deezer_playlist_url=&track_ids=1068442%2C1068443%2C1068444&album_id=&is_collaborative=off
         return self._api_request(params,"/api.json/0.1/playlist/create")
 
     def playlist_delete (self, playlist_id):
         params = {'x-api-auth-token': token, 
                                    'playlist_id': playlist_id}
-        log("info","adding " + trackid + "to playlist" )
+        log("info","deleting playlist: " + playlist_id )
         return self._api_request(params,"/api.json/0.1/playlist/delete")
   
     def playlist_update (self, playlist_id, name, description='', album_id='', is_public='on', is_collaborative='off' ):
@@ -307,7 +307,7 @@ class QobuzApi:
                                    'playlist_id': playlist_id}
         #name=John+Coltrane+Quartet&description=John+Coltrane+Quartet&is_public=on&spotify_track_uris=&deezer_playlist_url=&playlist_id=78237&is_collaborative=off
 
-        log("info","adding " + trackid + "to playlist" )
+        log("info","updating playlist " + playlist_id )
         return self._api_request(params,"/api.json/0.1/playlist/update")
 
 if __name__ == '__main__':
