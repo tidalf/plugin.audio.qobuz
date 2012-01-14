@@ -16,6 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import os
+import random
 import xbmcgui
 import xbmcplugin
 
@@ -26,6 +27,8 @@ from constants import *
 from utils.icacheable import ICacheable
 from utils.tag import QobuzTagArtist
 from utils.tag import QobuzTagProduct
+from data.genre_image import QobuzGenreImage
+
 """
     Class QobuzGetRecommendation
 """
@@ -49,14 +52,27 @@ class QobuzGetRecommandation(ICacheable):
     def length(self):
         return len(self.get_raw_data())
     
+    def set_image_genre(self, image):
+        info(self, "Set image genre to: " + image)
+        cache = QobuzGenreImage(self.Core)
+        cache.set(self.genre_id, image)
+        
     def add_to_directory(self):
         n = self.length()
         h = int(sys.argv[1])
+        rand = random.randint(0, n)
+        i = 0
         for json_product in self.get_raw_data():
             album = QobuzTagProduct(json_product)
+            if i == rand:
+                image = album.getImage()
+                if image:
+                    self.set_image_genre(image)
             u = self.Core.Bootstrap.build_url(MODE_ALBUM, album.id)
             item = album.getXbmcItem()
+
             xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
                                         isFolder=True, totalItems=n)
+            i += 1
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
         return n

@@ -102,7 +102,7 @@ class ICacheable(object):
         except:
             warn(self,"Cannot stat cache file: " + cache)
         refresh = self.get_cache_refresh()
-        if refresh:
+        if refresh and refresh != -1:
             if (time.time() - mtime) > refresh:
                 info(self,"Refreshing cache")
                 return None
@@ -159,7 +159,7 @@ class ICacheable(object):
         if not data:
             info(self,"Fetching new data")
             data = self._fetch_data()
-            if not data:
+            if data == None:
                 warn(self, "Cache empty and cannot fetch new data ...")
                 return None
             self._save_cache_data(data)
