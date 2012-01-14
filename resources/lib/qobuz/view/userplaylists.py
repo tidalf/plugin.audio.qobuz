@@ -23,22 +23,23 @@ from utils.icacheable import ICacheable
 from debug import log, info, warn
 from constants import *
 from utils.tag import IQobuzTag, QobuzTagUserPlaylist
+
 '''
     Class QobuzUserPLaylists
 '''
 class QobuzUserPlaylists(ICacheable):
 
-    def __init__(self, Core):
-        self.Core = Core
+    def __init__(self, Api, cache_path, cache_refresh):
+        self.Api = Api
         super(QobuzUserPlaylists, self).__init__(
-                                               self.Core.Bootstrap.cacheDir,
+                                               cache_path,
                                                'userplaylists',
                                                0)
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist'))
+        self.set_cache_refresh(cache_refresh)
         self.fetch_data()
 
     def _fetch_data(self):
-        raw_data = self.Core.Api.get_user_playlists()
+        raw_data = self.Api.get_user_playlists()
         data = []
         for p in raw_data:
             data.append(p['playlist'])
@@ -49,6 +50,15 @@ class QobuzUserPlaylists(ICacheable):
            return 0
         return len(self._raw_data)
 
+
+class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
+    def __init__(self, Core):
+        self.Core = Core
+        super(QobuzUserPlaylistsXbmc, self).__init__(
+                self.Core.Api,
+                self.Core.Bootstrap.cacheDir,
+                self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist'))
+      
     def add_to_directory(self):
         n = self.length()
         if n < 1: return 0

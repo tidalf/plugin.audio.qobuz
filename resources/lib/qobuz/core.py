@@ -57,8 +57,8 @@ class QobuzCore:
         return QobuzProduct(self, id, context_type)
 
     def getUserPlaylists(self):
-        from view.userplaylists import QobuzUserPlaylists
-        return QobuzUserPlaylists(self)
+        from view.userplaylists import QobuzUserPlaylistsXbmc
+        return QobuzUserPlaylistsXbmc(self, )
 
 #    def getQobuzAlbum(self, id):
 #        return QobuzAlbum(self, id)
