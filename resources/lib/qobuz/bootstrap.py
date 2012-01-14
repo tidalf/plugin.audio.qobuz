@@ -137,10 +137,6 @@ class QobuzBootstrap(object):
     '''
     def parse_sys_args(self):
         self.params = get_params()
-        try:
-            self.POS = self.params['pos']
-        except:
-            warn(self, "No 'pos' parameter (Song position in playlist)")
         ''' 
         set mode 
         '''

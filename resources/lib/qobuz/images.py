@@ -7,7 +7,7 @@ class QobuzImages():
     
     def get(self, name, path = '', ext = 'png'):
         path = os.path.join(self.base_path, path, name + '.' + ext)
-        print "Path: " + path + "\n"
+        #print "Path: " + path + "\n"
         return path
     
     def genre(self, name):

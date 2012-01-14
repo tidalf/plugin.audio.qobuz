@@ -55,18 +55,20 @@ class QobuzGetRecommandation(ICacheable):
     def set_image_genre(self, image):
         info(self, "Set image genre to: " + image)
         cache = QobuzGenreImage(self.Core)
-        cache.set(self.genre_id, image)
+        cache.set(self.type, self.genre_id, image)
         
     def add_to_directory(self):
         n = self.length()
         h = int(sys.argv[1])
         rand = random.randint(0, n)
+        print "rand: " + str(rand)
         i = 0
         for json_product in self.get_raw_data():
             album = QobuzTagProduct(json_product)
             if i == rand:
                 image = album.getImage()
                 if image:
+                    print "Image: " + image
                     self.set_image_genre(image)
             u = self.Core.Bootstrap.build_url(MODE_ALBUM, album.id)
             item = album.getXbmcItem()

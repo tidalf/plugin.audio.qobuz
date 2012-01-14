@@ -42,6 +42,8 @@ class QobuzGUI:
         ''' SEARCH '''
         if self.Bootstrap.MODE and self.Bootstrap.MODE <= 5: 
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
+        elif self.Bootstrap.MODE == MODE_SHOW_RECO_T_G:
+             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=False)
         else:
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
     def showNotificationH(self, title, text):
@@ -59,7 +61,7 @@ class QobuzGUI:
         xbmc.executebuiltin('XBMC.Notification(' + __language__(title) + ',' + __language__(text)+ ', 2000, ' + self.Bootstrap.Images.get('default') + ')')
 
     def setFanArt(self, fanart = 'fanart'):
-        xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('fanart'))
+        xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('default'))
       
     def setContent(self, content):
         '''
@@ -180,32 +182,32 @@ class QobuzGUI:
     def showRecommendationsTypes(self):
         __language__ = self.Bootstrap.__language__
         i = self.Bootstrap.Images
-        xbmcplugin.setPluginFanart(int(sys.argv[1]), i.get('fanart'))
+        #xbmcplugin.setPluginFanart(int(sys.argv[1]), i.get('fanart'))
         self._add_dir(__language__(30083), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=press-awards','', i.get('song'), 0)
         self._add_dir(__language__(30084), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases','', i.get('song'), 0)
         self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', i.get('song'), 0)
         self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', i.get('song'), 0)
-        self.setContent('files')
+        self.setContent('songs')
      
     def showRecommendationsGenres(self, type):
         from data.genre_image import QobuzGenreImage
         import time
         import math
-        ti = '?'+str(time.time())
+        ti = '?t='+str(int(time.time()))
         genre = QobuzGenreImage(self.Bootstrap.Core)
         __language__ = self.Bootstrap.__language__
         i = self.Bootstrap.Images
-        self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, genre.get(112)+ti, 0)
-        self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, genre.get(64)+ti, 0)
-        self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, genre.get(80)+ti, 0)
-        self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, genre.get(6)+ti, 0)
-        self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, genre.get(64)+ti, 0)
-        self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, genre.get(94)+ti, 0)
-        self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, genre.get(2)+ti, 0)
-        self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, genre.get(91)+ti, 0)
-        self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, genre.get(10)+ti, 0)
-        self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.genre(0)+ti, 0)
-        self.setContent('files')
+        self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, genre.get(type, 112)+ti, 10)
+        self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, genre.get(type, 64)+ti, 10)
+        self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, genre.get(type, 80)+ti, 10)
+        self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, genre.get(type, 6)+ti, 10)
+        self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, genre.get(type, 64)+ti, 10)
+        self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, genre.get(type, 94)+ti, 10)
+        self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, genre.get(type, 2)+ti, 10)
+        self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, genre.get(type, 91)+ti, 10)
+        self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, genre.get(type, 10)+ti, 10)
+        self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.genre(0)+ti, 10)
+        self.setContent('songs')
 
     # Get my playlists
     def showUserPlaylists(self):
@@ -264,7 +266,7 @@ class QobuzGUI:
         return ''
 
     # Add whatever directory
-    def _add_dir(self, name, url, mode, iconimage, id, items=1):
+    def _add_dir(self, name, url, mode, iconimage, id, items=0):
         __language__= self.Bootstrap.__language__
         if url == '':
             u=self.Bootstrap.build_url(mode, id)
@@ -272,7 +274,8 @@ class QobuzGUI:
             u = url
         dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
         dir.setInfo( type="Music", infoLabels={ "title": name } )
-
+#        dir.setThumbnailImage(iconimage)
+#        dir.setIconImage(iconimage)
         # Custom menu items
         menuItems = []
 #        if mode == MODE_ALBUM:

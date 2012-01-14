@@ -32,13 +32,14 @@ class QobuzGenreImage(ICacheable):
     def _fetch_data(self):
         return {}
 
-    def set(self, genre_id, image):
+    def set(self, type, genre_id, image):
         data = self.get_data()
-        data[str(genre_id)] = image
+        name = str(type) + '-' + str(genre_id)
+        data[name] = image
         self._save_cache_data(data)
     
-    def get(self, genre_id):
-        genre_id = str(genre_id)
+    def get(self, type, genre_id):
+        genre_id = str(type) + '-' + str(genre_id)
         data = self.get_data()
         if genre_id in data:
             return data[genre_id]
