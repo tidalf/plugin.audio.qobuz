@@ -189,7 +189,7 @@ class IQobuzTag(object):
             if data: return data
         return data
     
-    def getXbmcItem(self):
+    def getXbmcItem(self, pos = 0):
         date = 0
         try:
             date = self.getDate('#').split('#')[0]
@@ -205,6 +205,7 @@ class IQobuzTag(object):
         else: genre = self.getGenre()
         i = xbmcgui.ListItem(self.getTitle())
         i.setInfo(type='music', infoLabels = {
+                                              'count': pos,
                                              'title': self.getTitle(),
                                              'artist': self.getArtist(),
                                              'genre': self.getGenre(),
@@ -212,6 +213,7 @@ class IQobuzTag(object):
                                              'year': int(year),
                                              'comment': 'Qobuz Music Streaming (qobuz.com)'
                                              })
+        i.setProperty("IsPlayable", "false")
         image = self.getImage()
         if image:
             i.setThumbnailImage(image)
@@ -345,17 +347,17 @@ class QobuzTagProduct(IQobuzTag):
     def get_tracks(self):
         return self.__tracks__
     
-    def getXbmcItem(self):
-        i = super(QobuzTagProduct, self).getXbmcItem()
-        genre = self.getGenre()
-        if genre:
-            genre = ' [' + genre + ']'
-        i.setLabel(self.getArtist() + ' - ' + self.getTitle() + genre)
-        i.setInfo(type = 'music', infoLabels = {
-                                               'album': self.getAlbum()
-                                               })
-        
-        return i
+#    def getXbmcItem(self):
+#        i = super(QobuzTagProduct, self).getXbmcItem()
+#        genre = self.getGenre()
+#        if genre:
+#            genre = ' [' + genre + ']'
+#        i.setLabel(self.getArtist() + ' - ' + self.getTitle() + genre)
+#        i.setInfo(type = 'music', infoLabels = {
+#                                               'album': self.getAlbum()
+#                                               })
+#        
+#        return i
     
     def getAlbum(self, sep =''):
         album = ''
@@ -588,7 +590,7 @@ class QobuzTagTrack(IQobuzTag):
         try: return self.streaming_type
         except: return ''
 
-    def getXbmcItem(self, context = 'album'):
+    def getXbmcItem(self, context = 'album', pos = 0):
         parent = self.get_parent()
         i = xbmcgui.ListItem()
         album = self.getAlbum()
@@ -628,7 +630,8 @@ class QobuzTagTrack(IQobuzTag):
 
         i.setLabel(label)
         i.setInfo(type = 'music',
-                  infoLabels = {'songid': str(self.id),
+                  infoLabels = {'count': pos,
+                                'songid': str(self.id),
                                 'title': title,
                                 'artist': artist,
                                 'genre': genre,
@@ -638,13 +641,9 @@ class QobuzTagTrack(IQobuzTag):
                                 'year': int(year),
                                 'comment': 'Qobuz Music Streaming Service'
                                 })
-        if context != 'player':
-            i.setProperty('IsPlayable', 'true')
-            #i.setProperty('Music', 'true')
-        else:
-            i.setProperty('IsPlayable', 'true')
-            #i.setProperty('Music', 'true')
-        i.setProperty('mimetype', 'audio/flac')
+        
+        i.setProperty('IsPlayable', 'true')
+        i.setProperty('Music', 'true')
         i.setProperty('IsFolder', 'false')
         i.setThumbnailImage(image)
         i.setIconImage(image)

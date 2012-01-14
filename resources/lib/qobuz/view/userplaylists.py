@@ -63,15 +63,17 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
         n = self.length()
         if n < 1: return 0
         h = int(sys.argv[1])
+        i = 1
         for json_track in self.get_data():
             tag_track = QobuzTagUserPlaylist(json_track)
             u = self.Core.Bootstrap.build_url(MODE_PLAYLIST, tag_track.id)
             item = xbmcgui.ListItem()
             item.setLabel(tag_track.owner_name + ' - ' + tag_track.name)
-            item.setInfo(type="Music",infoLabels={ "title": tag_track.name })
+            item.setInfo(type="Music",infoLabels={ "title": tag_track.name, "count": i })
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');
             xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
+            i = i + 1
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
         return n
             

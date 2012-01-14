@@ -93,7 +93,7 @@ def get_xbmc_item(p_item, pos, id, stream_url, filename):
     if not track:
         log("Cannot get QobuzTrack with id: " + str(id))
         return None
-    tag = QobuzTagTrack(Core, track)
+    tag = QobuzTagTrack(track)
     item = tag.getXbmcItem('player')
     item.setProperty('url', filename)
     item.setProperty('streaming_url', stream_url['streaming_url'])
