@@ -25,7 +25,7 @@ from gui import QobuzGUI
 from debug import *
 from player import QobuzPlayer
 #from winmain import QobuzWindow
-
+from images import QobuzImages
 
 import xbmcgui
 
@@ -48,31 +48,6 @@ def get_params():
             if (len(splitparams))==2:
                 param[splitparams[0]]=splitparams[1]
     return param
-
-class QobuzImages():
-    def __init__(self, bootstrap):
-        self.pool = {}
-        self.Bootstrap = bootstrap
-        self.pool['fanart'] = xbmc.translatePath(os.path.join(self.Bootstrap.baseDir, 'fanart.jpg'))
-        names = ['album', 'artist', 'artistalbum', 'favorites', 'playlist', 
-                 'userplaylists', 'popularSongs', 'popularSongsArtist', 'song', 'default',
-                 'genre-0', 'genre-80', 'genre-64']
-        
-        for n in names:
-            self.set(n)
-            
-    def set(self, name, path = None, ext = ".png"):
-        if not path:
-            self.pool[name] = xbmc.translatePath(os.path.join(self.Bootstrap.resDir, 'img', name + ext))
-        else: 
-            self.pool[name] = xbmc.translatePath(os.path.join(self.Bootstrap.resDir, 'img', path, name + ext))
-                                                  
-    def get(self, name):
-        info(self, "Get img: " + self.pool[name])
-        if name in self.pool:
-            return self.pool[name]
-        else:
-            return ''
 
 import threading
 import time
@@ -118,7 +93,7 @@ class QobuzBootstrap(object):
         self.GUI = QobuzGUI(self)
         self.Player = QobuzPlayer()
         self.Player.setCore(self.Core)
-        self.Images = QobuzImages(self)
+        self.Images = QobuzImages(self.imgDir)
         self.MODE = None
         self.ID = None
         self.META = None
@@ -140,8 +115,8 @@ class QobuzBootstrap(object):
     def bootstrapDirectories(self):
         self.baseDir = self.__addon__.getAddonInfo('path')
         self.cacheDir = os.path.join(xbmc.translatePath('special://temp/'),  os.path.basename(self.baseDir))
-        self.imgDir = xbmc.translatePath(os.path.join(self.baseDir, 'img'))
         self.resDir =  xbmc.translatePath(os.path.join(self.baseDir, 'resources'))
+        self.imgDir = xbmc.translatePath(os.path.join(self.resDir, 'img'))
         self.mkdir('cache', self.cacheDir)
     
     '''
