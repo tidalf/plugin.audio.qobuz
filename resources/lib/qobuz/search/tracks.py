@@ -45,16 +45,14 @@ class QobuzSearchTracks():
             return 0
         return len(self._raw_data['results']['tracks'])
     
-    def add_to_directory(self):
-        n = self.length()
-        i = 0
+    def get_items(self):
         ts = QobuzTagSearch(self._raw_data['results'])
         childs = ts.get_childs()
+        list = []
         for track in childs:
             item = track.getXbmcItem('playlist')
             u = self.Core.Bootstrap.build_url(MODE_SONG, int(track.id))
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
-            i = i + 1
-        return n
+            list.append((u, item, False))
+        return list
 
 

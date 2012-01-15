@@ -59,11 +59,10 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
                 self.Core.Bootstrap.cacheDir,
                 self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist'))
       
-    def add_to_directory(self):
-        n = self.length()
-        if n < 1: return 0
+    def get_items(self):
         h = int(sys.argv[1])
         i = 1
+        list = []
         for json_track in self.get_data():
             tag_track = QobuzTagUserPlaylist(json_track)
             u = self.Core.Bootstrap.build_url(MODE_PLAYLIST, tag_track.id)
@@ -72,10 +71,8 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
             item.setInfo(type="Music",infoLabels={ "title": tag_track.name, "count": i })
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');
-            xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
-            #self.Core.Bootstrap.WIN.addItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
+            list.append((u, item, True))
             i = i + 1
-        xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-        return n
+        return list
             
 

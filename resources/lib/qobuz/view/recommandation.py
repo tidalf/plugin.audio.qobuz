@@ -57,24 +57,20 @@ class QobuzGetRecommandation(ICacheable):
         cache = QobuzGenreImage(self.Core)
         cache.set(self.type, self.genre_id, image)
         
-    def add_to_directory(self):
+    def get_items(self):
         n = self.length()
         h = int(sys.argv[1])
         rand = random.randint(0, n)
-        print "rand: " + str(rand)
         i = 0
+        list = []
         for json_product in self.get_raw_data():
             album = QobuzTagProduct(json_product)
             if i == rand:
                 image = album.getImage()
                 if image:
-                    print "Image: " + image
                     self.set_image_genre(image)
             u = self.Core.Bootstrap.build_url(MODE_ALBUM, album.id)
             item = album.getXbmcItem()
-
-            xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, 
-                                        isFolder=True, totalItems=n)
+            list.append((u, item, True))
             i += 1
-        xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
-        return n
+        return list

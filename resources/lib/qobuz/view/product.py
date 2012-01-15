@@ -54,14 +54,13 @@ class QobuzProduct(ICacheable):
     def length(self):
         return len(self._raw_data['tracks'])
 
-    def add_to_directory(self):
-        n = self.length()
-        h = int(sys.argv[1])
+    def get_items(self):
         tag_product = QobuzTagProduct(self.get_data())
+        list = []
         for tag_track in tag_product.get_childs():
             if not isinstance(tag_track, QobuzTagTrack):
                 continue
             item = tag_track.getXbmcItem('album')
             u = self.Core.Bootstrap.build_url(MODE_SONG, tag_track.id)
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, False, n)
-        return n
+            list.append((u, item, False))
+        return list

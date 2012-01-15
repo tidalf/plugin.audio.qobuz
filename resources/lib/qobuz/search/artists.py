@@ -51,33 +51,32 @@ class QobuzSearchArtists():
         except: return 0
         return len(self._raw_data['results']['artists'])
     
-    def add_to_directory(self):
-        self.xbmc_directory_products()
+    def get_items(self):
+        return self._directory_products()
     
-    def add_to_directory_by_artist(self):
-        self.xbmc_directory_products_by_artist()
+    def get_items_by_artist(self):
+        return self._directory_products_by_artist()
 
-    def xbmc_directory_products(self):
+    def _directory_products(self):
         data = self.get_data()['results']['artists']
-        n = self.length()
+        list = []
         for json_artist in data:
             tag_artist = QobuzTagArtist(json_artist)
             u = self.Core.Bootstrap.build_url(MODE_ARTIST, tag_artist.id)
             item   = xbmcgui.ListItem()
-            print "Artist: " + tag_artist.getArtist()
             item.setLabel(tag_artist.getArtist() )
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, n)
-        return n,
+            list.append((u, item, True))
+        return list
 
-    def xbmc_directory_products_by_artist():
+    def _directory_products_by_artist():
         data = self.get_data()
         artist = data['artist']['name']
-        n = self.length()
+        list = []
         for json_album in json['artist']['albums']:
             tag_album = QobuzTagAlbum(json_album)
             u = self.Core.Bootstrap.build_url(MODE_ALBUM, tag_album.id)
             item = tag_album.getXbmcItem('album')
-            self.Core.Bootstrap.GUI.addDirectoryItem(u , item, True, n)
-        return n
+            list.append((u, item, True))
+        return list
 
 

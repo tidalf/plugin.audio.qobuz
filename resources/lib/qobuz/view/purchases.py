@@ -40,6 +40,7 @@ class QobuzGetPurchases(ICacheable):
                                        'purchases')
         self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation'))
         info(self, "Cache duration: " + str(self.cache_refresh))
+        self.fetch_data()
         
     def _fetch_data(self):
         return self.Core.Api.get_purchases(self.limit)
@@ -49,10 +50,11 @@ class QobuzGetPurchases(ICacheable):
             return 0
         return len(self._raw_data)
 
-    def add_to_directory(self):
+    def get_items(self):
         n = self.length()
         albumseen = {}
         needsave = False
+        list = []
         for track in self._raw_data:   
             t = QobuzTagTrack(track)
             if 'BLACK_ID' in track:
@@ -72,12 +74,11 @@ class QobuzGetPurchases(ICacheable):
                 a = QobuzTagProduct(album.get_raw_data())
                 item = a.getXbmcItem()
                 albumid = a.id     
+                
                 u = self.Core.Bootstrap.build_url(MODE_ALBUM, albumid)
-                xbmcplugin.addDirectoryItem(handle=self.Core.Bootstrap.__handle__, 
-                                                url=u, listitem=item, isFolder=True, 
-                                                totalItems=n)           
+                list.append((u, item, True))        
                 albumseen[albumid] = 'true'
         if needsave:
             self._save_cache_data(self._raw_data)
-        return n
+        return list
 

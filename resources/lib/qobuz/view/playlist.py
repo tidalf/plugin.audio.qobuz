@@ -22,7 +22,6 @@ import xbmcgui
 import xbmcplugin
 
 from utils.icacheable import ICacheable
-#from utils.string import _sc
 from constants import *
 from debug import * 
 from utils.tag import QobuzTagPlaylist
@@ -49,18 +48,14 @@ class QobuzPlaylist(ICacheable):
     def length(self):
         return len(self._raw_data['tracks'])
 
-    def add_to_directory(self):
-        n = self.length()
-        i = 0
-        h = int(sys.argv[1])
+    def get_items(self):
         p = QobuzTagPlaylist(self.get_data())
+        list = []
         for t in p.get_childs():
             if not isinstance(t, QobuzTagTrack):
                 continue
             item = t.getXbmcItem('playlist')
-            u = self.Core.Bootstrap.build_url(MODE_SONG, str(t.id), i)
+            u = self.Core.Bootstrap.build_url(MODE_SONG, str(t.id))
             item.setPath(u) 
-            xbmcplugin.addDirectoryItem(handle=h, url=u, listitem=item, isFolder=False,totalItems=1)
-            i += 1
-        xbmcplugin.setContent(h,'songs')
-        return n
+            list.append((u, item, False))
+        return list

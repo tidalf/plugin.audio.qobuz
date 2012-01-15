@@ -24,6 +24,9 @@ import xbmc
 from constants import *
 from debug import info, warn, log
 
+'''
+    CLASS QobuzGUI
+'''
 class QobuzGUI:
 
     def __init__( self, bootstrap):
@@ -46,6 +49,10 @@ class QobuzGUI:
              return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=False)
         else:
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
+    
+    '''
+        SHOW Notification (HUMAN ONE / NO i8n)
+    '''
     def showNotificationH(self, title, text):
         title = unicode(title, "utf-8", errors="replace")
         text = unicode(text, "utf-8", errors="replace")
@@ -55,14 +62,23 @@ class QobuzGUI:
         except:
             warn(self, "Notification failure")
             
+    '''
+        SHOW Notification
+    '''
     def showNotification(self, title, text):
         self.setFanArt()   
         __language__ = self.Bootstrap.__language__
         xbmc.executebuiltin('XBMC.Notification(' + __language__(title) + ',' + __language__(text)+ ', 2000, ' + self.Bootstrap.Images.get('default') + ')')
 
+    '''
+        SET FanArt
+    '''
     def setFanArt(self, fanart = 'fanart'):
         xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('default'))
       
+    '''
+        SET Content
+    '''
     def setContent(self, content):
         '''
         *Note, You can use the above as keywords for arguments.
@@ -70,18 +86,22 @@ class QobuzGUI:
         http://xbmc.sourceforge.net/python-docs/xbmcplugin.html
         '''
         xbmcplugin.setContent(self.Bootstrap.__handle__, content)
-  
+
+    '''
+        MUST BE REMOVED ?
+    '''  
     def addDirectoryItem(self, u, item, bFolder, len):
         xbmcplugin.addDirectoryItem(handle=self.Bootstrap.__handle__, 
                                     url=u, listitem=item, isFolder=bFolder, 
                                     totalItems=len)
-    
+
     def showLoginFailure(self):
         __language__ = self.Bootstrap.__language__
         dialog = xbmcgui.Dialog()
         dialog.ok(__language__(30008), __language__(30034), __language__(30040))
+        
     '''
-    Top-level menu
+        Top-level menu
     '''
     def showCategories(self):
         i = self.Bootstrap.Images
@@ -98,9 +118,8 @@ class QobuzGUI:
         self.setContent('albums')
         
 
-  
     """
-    Search for songs
+        SEARCH for songs
     """
     def searchSongs(self):
         __language__ = self.Bootstrap.__language__
@@ -109,17 +128,16 @@ class QobuzGUI:
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchTracks()
             s.search(query, self.Bootstrap.__addon__.getSetting('songsearchlimit'))
-            if s.length() > 0:
-                s.add_to_directory()
-                self.setContent('songs')
-            else:
-                self.showNotification(30008, 30021);
+            list = s.get_items()
+            if s.length() < 1:
                 self.searchSongs()
+                return
+            self.add_to_directory(list)
         else:
             self.showCategories()
   
     """
-    Search for Albums
+        SEARCH for Albums
     """
     def searchAlbums(self):
         __language__ = self.Bootstrap.__language__
@@ -128,17 +146,17 @@ class QobuzGUI:
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchAlbums()
             s.search(query, self.Bootstrap.__addon__.getSetting('albumsearchlimit'))
-            if s.length() > 0:
-                if s.add_to_directory() > 0:
-                    self.setContent('albums')
-                    return
-            self.showNotification(30008, 30021)
-            self.searchAlbums()
+            if s.length() < 1:
+                self.showNotification(30008, 30021)
+                self.searchAlbums()
+                return
+            list = s.get_items()
+            self.add_to_directory(list)
         else:
             self.showCategories()
 
     """
-      Search for Artists
+        SEARCH for Artists
     """
     def searchArtists(self):
         __language__ = self.Bootstrap.__language__
@@ -147,12 +165,12 @@ class QobuzGUI:
         if (query != ''):
             s = self.Bootstrap.Core.getQobuzSearchArtists()
             s.search(query, self.Bootstrap.__addon__.getSetting('artistsearchlimit'))
-            if s.length() > 0:
-                s.add_to_directory()
-                self.setContent('artists')
-            else:
+            if s.length() < 1:
                 self.showNotification(30008, 30021)
                 self.searchAlbums()
+                return
+            list = s.get_items()
+            self.add_to_directory(list)
         else:
             self.showCategories()
 
@@ -162,23 +180,23 @@ class QobuzGUI:
     def showRecommendations(self, type, genre_id):
         if (genre_id != ''):
             r = self.Bootstrap.Core.getRecommandation(genre_id, type)
-            if r.add_to_directory() > 0:
-                self.setContent('files')
-            else:
-                self.showNotification(30008, 30021)
-                self.showCategories()
-
-    def showPurchases(self):
-        r = self.Bootstrap.Core.getPurchases()
-        r.fetch_data()
-        if r.length() > 0:
-            r.add_to_directory()
-            self.setContent('files')
+            list = r.get_items()
+            self.add_to_directory(list)
         else:
-            self.showNotification(30008, 30021)
+            self.showNotificationH('Qobuz', 'No genre_id for recommandation')
             self.showCategories()
 
+    '''
+        SHOW Purchases
+    '''
+    def showPurchases(self):
+        r = self.Bootstrap.Core.getPurchases()
+        list = r.get_items()
+        self.add_to_directory(list)
 
+    '''
+        SHOW Recommandations Types
+    '''
     def showRecommendationsTypes(self):
         __language__ = self.Bootstrap.__language__
         i = self.Bootstrap.Images
@@ -188,7 +206,10 @@ class QobuzGUI:
         self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', i.get('song'), 0)
         self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', i.get('song'), 0)
         self.setContent('songs')
-     
+
+    '''
+        SHOW Recommandations Genre
+    '''
     def showRecommendationsGenres(self, type):
         from data.genre_image import QobuzGenreImage
         import time
@@ -210,53 +231,59 @@ class QobuzGUI:
         self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.genre(0)+ti, 10)
         self.setContent('songs')
 
-    # Get my playlists
+    '''
+        Add to directory
+    '''
+    def add_to_directory(self, list):
+        n = len(list)
+        if n < 1:
+            self.showNotificationH("Qobuz", "Empty directory")
+            return
+        h = int(sys.argv[1])
+        xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
+    
+    '''
+        SHOW User Playlists
+    '''
     def showUserPlaylists(self):
         user_playlists = self.Bootstrap.Core.getUserPlaylists()
-        xbmc.executebuiltin('Container.SetProperty(view, thumbnails)')
-        if user_playlists.add_to_directory() > 0:
-            self.setContent('files')
-        else:
-            self.showNotification(30008, 30033)
-            self.showCategories()
-
-    # Get album
-    def showProduct (self, id, context_type = "playlist"):
-        info(self, "showProduct(" + str(id) + ")")
-        album = self.Bootstrap.Core.getProduct(id,context_type)
-        if album.length() > 0:
-            album.add_to_directory()
-            self.setContent('songs')
-            xbmc.executebuiltin('Container.SetViewMode("Media info")')
-        else:
-            self.showNotification(30008, 30033)
-            self.showCategories()
-
-    def showArtist (self, id):
-        album = self.Bootstrap.Core.getProductsFromArtist()
-        album.get_by_artist(id)
-        if album.add_to_directory_by_artist() > 0:
-            self.setContent('artists')
-        else:
-            self.showNotification(30008, 30033)
-            self.showCategories() 
-
-#        except:
-#            self.showNotification(30008, 30033)
-#            self.showCategories()
-
-    # Show selected playlist
+        list = user_playlists.get_items()
+        self.add_to_directory(list)
+        
+    '''
+        SHOW Playlist
+    '''
     def showPlaylist(self, id):
         userid = self.Bootstrap.Core.Api.userid
         if (userid != 0):
             myplaylist = self.Bootstrap.Core.getPlaylist(id)
-            myplaylist.add_to_directory()
-            self.setContent('songs')
-            command = 'Container.SetViewMode(10501, Thumbnails)'
-            #xbmc.executebuiltin(command)
+            list = myplaylist.get_items()
+            self.add_to_directory(list)
         else:
             dialog = xbmcgui.Dialog()
             dialog.ok(__language__(30008), __language__(30034), __language__(30040))
+
+    '''
+        SHOW Product
+    '''
+    def showProduct (self, id, context_type = "playlist"):
+        info(self, "showProduct(" + str(id) + ")")
+        album = self.Bootstrap.Core.getProduct(id,context_type)
+        list = album.get_items()
+        self.add_to_directory(list)
+
+    '''
+        SHOW Artsit
+    '''
+    def showArtist (self, id):
+        album = self.Bootstrap.Core.getProductsFromArtist()
+        album.search_by_artist(id)
+        if album.length() < 1:
+            self.showNotification(30008, 30033)
+            self.showCategories() 
+            return
+        list = album.get_items_by_artist()
+        self.add_to_directory(list)
 
     # Get keyboard input
     def _get_keyboard(self, default="", heading="", hidden=False):
