@@ -16,7 +16,9 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys, os
 import urllib
+
 import xbmc
+import xbmcgui
 
 from constants import *
 import constants
@@ -97,6 +99,14 @@ class QobuzBootstrap(object):
         self.MODE = None
         self.ID = None
         self.META = None
+        self.WINID = xbmcgui.getCurrentWindowId()
+        print "\nWINDOOOOOOWS ID: " + str(self.WINID) + "\n"
+        #self.WIN = xbmcgui.WindowXML(self,strXMLname='MyMusicSongs.xml', strFallbackPath='plop', strDefaultName='Default', forceFallback=False)
+        self.WIN = xbmcgui.Window(self.WINID)
+        #self.WIN.clearProperties()
+        #self.WIN.addControl(xbmcgui.ControlLabel(500, 250, 125, 75, 'DEMO DEMO DEMO', angle=45)) 
+        #self.WIN.getControl(50).addItem("...")
+            
         self.parse_sys_args()
         '''
             NAME can be used to set icon for each folder i think :)
@@ -192,6 +202,8 @@ class QobuzBootstrap(object):
         Execute methode based on MODE
     '''       
     def mode_dispatch(self):
+   
+             
         if not self.MODE:
             self.GUI.showCategories()
         
@@ -220,17 +232,25 @@ class QobuzBootstrap(object):
             
         elif self.MODE == MODE_USERPLAYLISTS:
             info(self, 'Displaying userplaylist')
+  
             self.GUI.showUserPlaylists()
     
         elif self.MODE == MODE_SEARCH_SONGS:
+            ''' http://wiki.xbmc.org/index.php?title=Window_IDs '''
+            if self.WINID != 10501:
+                return
             info(self, 'Searching songs')
             self.GUI.searchSongs()    
         
         elif self.MODE == MODE_SEARCH_ALBUMS:
+            if self.WINID != 10501:
+                return
             info(self, "Search albums")
             self.GUI.searchAlbums()
             
         elif self.MODE == MODE_SEARCH_ARTISTS:
+            if self.WINID != 10501:
+                return
             info(self, "Search artists")
             self.GUI.searchArtists()
      
@@ -271,6 +291,13 @@ class QobuzBootstrap(object):
             info(self, "Erasing cache...")
             self.erase_cache()
             
+        elif self.MODE == MODE_MANAGE_PLAYLIST:
+            from widget.playlist import QobuzGui_Playlist
+            winpath =os.path.join(self.baseDir, 'skins', 'PAL')
+            print 'Path: ' + winpath
+            p = QobuzGui_Playlist('FileManager.xml', winpath, 'Default', False)
+            p.doModal()
+            exit(0)
         '''
             Directory Endin
         '''

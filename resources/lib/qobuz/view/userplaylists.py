@@ -73,6 +73,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');
             xbmcplugin.addDirectoryItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
+            #self.Core.Bootstrap.WIN.addItem(handle=h,url=u,listitem=item,isFolder=True,totalItems=n)
             i = i + 1
         xbmcplugin.addSortMethod(h,xbmcplugin.SORT_METHOD_LABEL)
         return n

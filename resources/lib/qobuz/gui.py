@@ -201,12 +201,12 @@ class QobuzGUI:
         self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, genre.get(type, 64)+ti, 10)
         self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, genre.get(type, 80)+ti, 10)
         self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, genre.get(type, 6)+ti, 10)
-        self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, genre.get(type, 64)+ti, 10)
+        self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, genre.get(type, 64)+ti, 10)
         self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, genre.get(type, 94)+ti, 10)
         self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, genre.get(type, 2)+ti, 10)
         self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, genre.get(type, 91)+ti, 10)
         self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, genre.get(type, 10)+ti, 10)
-        self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.genre(0)+ti, 10)
+        self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=123',MODE_SHOW_RECO_T_G, i.genre(0)+ti, 10)
         self.setContent('songs')
 
     # Get my playlists
@@ -287,9 +287,16 @@ class QobuzGUI:
 #            mvplaylst=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
 #            menuItems.append((__language__(30078), "XBMC.RunPlugin("+mvplaylst+")"))
         
+        ''' MANAGE PLAYLIST '''
+        manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
+        menuItems.append((__language__(31010), "XBMC.RunPlugin("+manageplaylist+")"))
+        ''' ERASE CACHE '''
         erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
         menuItems.append((__language__(31009), "XBMC.RunPlugin("+erasecache+")"))
-        
-        dir.addContextMenuItems(menuItems, replaceItems=False)
-        
+        dir.setPath(u)
+        dir.setProperty('path', u)
+        dir.addContextMenuItems(menuItems, replaceItems=True)
+        #dir.setProperty('IsFolder', 'true')
+        #exit(0)
+        #self.Bootstrap.WIN.getControl(50).addItem(dir)
         return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)

@@ -30,4 +30,7 @@ qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
 sys.path.append(qobuzDir)
 from bootstrap import QobuzBootstrap
+
+#except:
+#    print "Cannot use sqlite database\n"
 Core = QobuzBootstrap(__addon__, int(sys.argv[1]))
