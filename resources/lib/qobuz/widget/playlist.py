@@ -13,13 +13,32 @@ ACTION_SELECT = 7
 ACTION_FOCUS = 0
 ACTION_PREVIOUS_MENU = 10
 ACTION_CONTEXT = 117
+ACTION_BACK = 92
 
 ACTION_MOUSE_FOCUS = 107
 ACTION_MOUSE_SELECT = 100
-class QobuzGui_PlaylistItem():
-    pass
+
+class QobuzGui_Context(xbmcgui.WindowXMLDialog):
+    def __init__(self,strXMLname, strFallbackPath, strDefaultName, forceFallback):
+        # Changing the three varibles passed won't change, anything
+        # Doing strXMLname = "bah.xml" will not change anything.
+        # don't put GUI sensitive stuff here (as the xml hasn't been read yet
+        # Idea to initialize your variables here
+        self.xmlName = strXMLname
+        self.fallbackPath = strFallbackPath
+        self.defaultName = strDefaultName
+        pass
     
-class QobuzGui_Playlist(xbmcgui.WindowXMLDialog):
+    def onInit(self):
+        ctl = self.getControl(1000)
+        button = xbmcgui.ControlButton(100, 250, 200, 50, 'Status', font='font14')
+        ctl.addItem('plop')
+        pass
+    
+    def addButton(self):
+        pass
+    
+class QobuzGui_Playlist(xbmcgui.WindowXML):
     def __init__(self,strXMLname, strFallbackPath, strDefaultName, forceFallback):
         # Changing the three varibles passed won't change, anything
         # Doing strXMLname = "bah.xml" will not change anything.
@@ -55,7 +74,20 @@ class QobuzGui_Playlist(xbmcgui.WindowXMLDialog):
             self.close()
             return 
         self.add_userplaylists_items()
-        self.setFocus(self)
+        
+    
+    def onClick(self, controlID):
+        """
+            Notice: onClick not onControl
+            Notice: it gives the ID of the control not the control object
+        """
+        super(QobuzGui_Playlist, self).onClick(controlID)
+        pass
+ 
+    def onFocus(self, controlID):
+        super(QobuzGui_Playlist, self).onFocus(controlID)
+        pass
+    
     
     def set_core(self, Core):
         self.Core = Core
@@ -76,7 +108,7 @@ class QobuzGui_Playlist(xbmcgui.WindowXMLDialog):
                 path = l[0]
                 item.setPath(path)
                 item.setProperty('path', path)
-                item.setIconImage(self.Core.Bootstrap.baseDir + 'default.tbn')
+                item.setIconImage(self.Core.Bootstrap.baseDir + '/default.tbn')
                 print "Path: " + item.getProperty('path')
                 self.control_playlist.addItem(item)
     
@@ -96,15 +128,14 @@ class QobuzGui_Playlist(xbmcgui.WindowXMLDialog):
         print 'Action Id: ' + str(action.getId())
         if action == ACTION_PREVIOUS_MENU:
             self.close()
-#        pl = self.control_playlist
-#        item = pl.getSelectedItem()
-#        if action == ACTION_FOCUS or action == ACTION_MOUSE_FOCUS:
-#            item.select(True)
-#        elif action == ACTION_SELECT or action == ACTION_MOUSE_SELECT:
-#            print "Item selected: " + item.getLabel() + "\n"
+        if action == ACTION_BACK:
+            self.close()
+        if action == ACTION_CONTEXT:
+            print "Context menu wanted!"
+            self.showContextMenu('item')
+
+
+    def showContextMenu(self, item):
+        d = QobuzGui_Context('Qobuz_DialogContextMenu.xml', self.Core.Bootstrap.baseDir, 'Default', True)
+        d.doModal()
         
-        super(QobuzGui_Playlist, self).onAction(action)
-#            print "Select\n"
-#            i = self.list_plugin.getSelectedItem()
-#            print('You selected: ' + i.getLabel() + ' / ' + i.getProperty('path'))
-#            xbmc.executebuiltin("XBMC.RunPlugin("+os.sys.argv[1]+'/'+i.getProperty('path')+")")
