@@ -43,7 +43,7 @@ class QobuzPlayable():
             self.pref_format_id = 5
         self.tag = QobuzTrackURL(self.Core, self.id, self.pref_format_id)
         self.data_url = self.tag.get_data()
-        print "Dataurl: " + str(self.data_url)
+        #print "Dataurl: " + str(self.data_url)
         if not self.data_url:
             warn(self, "Cannot resolve url for track id: " + str(id))
             return False
@@ -57,13 +57,21 @@ class QobuzPlayable():
             self.mimetype = 'audio/mpeg'
         return True
     
-    def getXbmcItem(self):    
+    def getXbmcItem(self):  
         track = QobuzTrack(self.Core, self.id)
-        print "Track data:\n"
-        pprint.pprint(track.get_data())
-        if not track:
-            warn(self, "Cannot get QobuzTrack with id: " + str(self.id))
-            return None
+        try:
+            db = self.Core.Bootstrap.Db
+            db_track = db.insert_track(track.get_data())
+            if db_track:
+                pc = db_track['played_count']
+                if not pc: pc = 1
+                else: pc += 1
+                db.update_track(db_track['track_id'], 'played_count', pc)
+                db.update_track(db_track['track_id'], 'last_played_on', int(time()))
+                if not track:
+                    warn(self, "Cannot get QobuzTrack with id: " + str(self.id))
+                    #return None
+        except: warn(self, 'SQLite Error while tracking track :)')
         tag = QobuzTagTrack(track.get_data())
         item = tag.getXbmcItem('player')
         item.setProperty('streaming_url', self.data_url['streaming_url'])
@@ -112,7 +120,7 @@ class QobuzPlayer(xbmc.Player):
             else: 
                 break
         if timeout <= 0:
-            warn(self, "Player can't play track: " + self.item.getLabel())
+            warn(self, "Player can't play track: " + item.getLabel())
             super(QobuzPlayer, self).play(item.getProperty('path'))
             return False
         return True

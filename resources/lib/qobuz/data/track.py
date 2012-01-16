@@ -49,8 +49,9 @@ class QobuzTrack(ICacheable):
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        return self.Core.Api.get_track(self.id)
-        
+        json = self.Core.Api.get_track(self.id)
+        return json
+    
     # Return track duration
     def get_duration(self):
         (sh,sm,ss) = self._raw_data['duration'].split(':')

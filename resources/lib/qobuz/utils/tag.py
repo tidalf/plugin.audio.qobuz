@@ -542,10 +542,9 @@ class QobuzTagTrack(IQobuzTag):
             data = QobuzTagComposer(p['composer'])
             self.add_child( data )
         if 'image' in p:
-            print "Add image to child"
+            #print "Add image to child"
             data = QobuzTagImage(p['image'])
             self.add_child( data )
-            
         self._is_loaded = True
 
     def getDuration(self, sep = 0):

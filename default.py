@@ -14,6 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
 import os
 import sys
 import xbmcaddon
@@ -30,7 +31,6 @@ qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
 sys.path.append(qobuzDir)
 from bootstrap import QobuzBootstrap
-
-#except:
-#    print "Cannot use sqlite database\n"
 Core = QobuzBootstrap(__addon__, int(sys.argv[1]))
+if Core.Db:
+    Core.Db.close()

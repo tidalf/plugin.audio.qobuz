@@ -96,6 +96,14 @@ class QobuzBootstrap(object):
         self.Player = QobuzPlayer()
         self.Player.setCore(self.Core)
         self.Images = QobuzImages(self.imgDir)
+        try:
+            from utils.db import QobuzDb
+            self.Db = QobuzDb(self.cacheDir, 'qobuz.db3')
+        except:
+            self.Db = None
+        if not self.Db.open():
+            warn(self, "Cannot open sql database")
+            exit(0)
         self.MODE = None
         self.ID = None
         self.META = None
@@ -147,6 +155,8 @@ class QobuzBootstrap(object):
     '''
     def parse_sys_args(self):
         self.params = get_params()
+        if self.WINID != 10501:
+            self.params['meta'] = '1'
         ''' 
         set mode 
         '''
@@ -166,6 +176,7 @@ class QobuzBootstrap(object):
         except: pass
         for p in self.params:
             info(self, "Param: " + p + ' = ' + str(self.params[p]))
+
     
     '''
     
@@ -293,9 +304,10 @@ class QobuzBootstrap(object):
             
         elif self.MODE == MODE_MANAGE_PLAYLIST:
             from widget.playlist import QobuzGui_Playlist
-            winpath =os.path.join(self.baseDir, 'skins', 'PAL')
-            print 'Path: ' + winpath
-            p = QobuzGui_Playlist('FileManager.xml', winpath, 'Default', False)
+            #winpath =os.path.join(self.baseDir)
+            #print 'Path: ' + winpath
+            p = QobuzGui_Playlist('Qobuz_MyMusicPlaylist.xml', self.baseDir, 'Default', True)
+            p.set_core(self.Core)
             p.doModal()
             exit(0)
         '''
