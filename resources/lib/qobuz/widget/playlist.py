@@ -50,12 +50,12 @@ class QobuzGui_Playlist(xbmcgui.WindowXMLDialog):
             self.control_playlist = self.getControl(301)
         except: pass
         print "Control: " + str(self.control_playlist)
-
+        self.control_playlist = self
         if not self.control_playlist:
             self.close()
             return 
         self.add_userplaylists_items()
-        self.setFocus(self.control_playlist)
+        self.setFocus(self)
     
     def set_core(self, Core):
         self.Core = Core
@@ -94,14 +94,14 @@ class QobuzGui_Playlist(xbmcgui.WindowXMLDialog):
              
     def onAction(self, action):
         print 'Action Id: ' + str(action.getId())
-        pl = self.control_playlist
-        item = pl.getSelectedItem()
         if action == ACTION_PREVIOUS_MENU:
             self.close()
-        if action == ACTION_FOCUS or action == ACTION_MOUSE_FOCUS:
-            item.select(True)
-        if action == ACTION_SELECT or action == ACTION_MOUSE_SELECT:
-            print "Item selected: " + item.getLabel() + "\n"
+#        pl = self.control_playlist
+#        item = pl.getSelectedItem()
+#        if action == ACTION_FOCUS or action == ACTION_MOUSE_FOCUS:
+#            item.select(True)
+#        elif action == ACTION_SELECT or action == ACTION_MOUSE_SELECT:
+#            print "Item selected: " + item.getLabel() + "\n"
         
         super(QobuzGui_Playlist, self).onAction(action)
 #            print "Select\n"
