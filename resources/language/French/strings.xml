@@ -16,7 +16,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 -->
-<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <strings>
 	<string id="37000">Utilisateur</string>
 	<string id="37001">Mot de passe</string>

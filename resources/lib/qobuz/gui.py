@@ -304,7 +304,7 @@ class QobuzGUI:
         else:
             u = url
         dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
-        dir.setInfo( type="Music", infoLabels={ "title": name } )
+        dir.setInfo( type="Music", infoLabels={ "title": name.encode('utf8', 'ignore') } )
 #        dir.setThumbnailImage(iconimage)
 #        dir.setIconImage(iconimage)
         # Custom menu items
