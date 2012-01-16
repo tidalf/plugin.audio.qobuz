@@ -72,7 +72,7 @@ class QobuzGUI:
         SET FanArt
     '''
     def setPluginFanArt(self, fanart = 'fanart'):
-        xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('fanArt'))
+        xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('fanArt'), '0x00000000')
       
     '''
         SET Content
@@ -246,7 +246,6 @@ class QobuzGUI:
         if context == 'artists':
             content_type = 'artists'
         xbmcplugin.setContent(int(sys.argv[1]), content_type)
-
         xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM)
