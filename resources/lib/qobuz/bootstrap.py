@@ -29,6 +29,8 @@ import qobuz
 
 import xbmcgui
 
+import pprint
+
 ''' Arguments parssing '''
 def get_params():
     param=[]
@@ -142,6 +144,7 @@ class QobuzBootstrap(object):
         info(self, "\nWINDOOOOOOWS ID: " + str(self.WINID) + "\n")
         self.WIN = xbmcgui.Window(self.WINID)
         self.params = get_params()
+        pprint.pprint(self.params)
         if self.WINID != 10501:
             self.params['meta'] = '1'
         ''' 

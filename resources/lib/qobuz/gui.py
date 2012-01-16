@@ -251,6 +251,8 @@ class QobuzGUI:
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ARTIST)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TITLE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_GENRE)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_EPISODE)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TRACKNUM)
         
     
     '''

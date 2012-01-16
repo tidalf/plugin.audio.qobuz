@@ -103,6 +103,7 @@ class QobuzPlayer(xbmc.Player):
             PLaying track
         '''
         qobuz.gui.showNotificationH(lang(34000), item.getLabel())
+        #super(QobuzPlayer, self).play(item.getProperty('streaming_url'))
         xbmcplugin.setResolvedUrl(handle=qobuz.boot.handle,succeeded=True,listitem=item)
         xbmc.executebuiltin('Dialog.Close(all,true)')
         '''
@@ -118,5 +119,6 @@ class QobuzPlayer(xbmc.Player):
                 break
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())
+            
             return False
         return True

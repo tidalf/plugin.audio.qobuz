@@ -648,6 +648,7 @@ class QobuzTagTrack(IQobuzTag):
         i.setProperty('IsPlayable', 'true')
         i.setProperty('Music', 'true')
         i.setProperty('IsFolder', 'false')
+        i.setProperty('IsInternetStream', 'true')
         i.setThumbnailImage(image)
         i.setIconImage(image)
         i.setProperty('image', image)
