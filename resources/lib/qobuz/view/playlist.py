@@ -55,6 +55,7 @@ class QobuzPlaylist(ICacheable):
             if not isinstance(t, QobuzTagTrack):
                 continue
             item = t.getXbmcItem('playlist')
+            print "Label:" + item.getLabel()
             u = self.Core.Bootstrap.build_url(MODE_SONG, str(t.id))
             item.setPath(u) 
             list.append((u, item, False))

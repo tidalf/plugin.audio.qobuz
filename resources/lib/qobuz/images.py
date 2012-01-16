@@ -4,10 +4,18 @@ class QobuzImages():
 
     def __init__(self, base_path):
         self.base_path = base_path
-    
+        self.images = {}
+        self.add('fanArt',  os.path.join(base_path, '..', '..',  'fanart.jpg'))
+        
+    def add(self, name, filename):
+        print 'Add image %s: %s\n' % (name, filename)
+        self.images[name] = filename
+        
     def get(self, name, path = '', ext = 'png'):
+        if name in self.images:
+            return self.images[name]
         path = os.path.join(self.base_path, path, name + '.' + ext)
-        #print "Path: " + path + "\n"
+        self.add(name, path)
         return path
     
     def genre(self, name):
@@ -19,3 +27,6 @@ class QobuzImages():
             elif name == 80:
                 name = 'jazz'
         return self.get(name, 'genres')
+    
+    def getFanArt(self):
+        return self.fanArt

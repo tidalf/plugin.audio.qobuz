@@ -133,6 +133,9 @@ s	<string id="30007">No Qobuz service</string>
     <!-- Stream -->
     <string id="32000">Stream type</string>
     <string id="32001">Skip sample</string>
+    
+    <!-- URL Resolver -->
+    <string id="33000">Resolver enable</string>
 </strings>
 
 

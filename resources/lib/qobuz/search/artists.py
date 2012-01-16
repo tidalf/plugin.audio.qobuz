@@ -65,6 +65,7 @@ class QobuzSearchArtists():
             u = self.Core.Bootstrap.build_url(MODE_ARTIST, tag_artist.id)
             item   = xbmcgui.ListItem()
             item.setLabel(tag_artist.getArtist() )
+            item.setProperty('fanart_image', self.Core.Bootstrap.Images.get('fanArt'))
             list.append((u, item, True))
         return list
 
@@ -76,6 +77,7 @@ class QobuzSearchArtists():
             tag_album = QobuzTagAlbum(json_album)
             u = self.Core.Bootstrap.build_url(MODE_ALBUM, tag_album.id)
             item = tag_album.getXbmcItem('album')
+            item.setProperty('fanart_image', self.Core.Bootstrap.Images.get('fanArt'))
             list.append((u, item, True))
         return list
 

@@ -32,11 +32,11 @@
 	<string id="30012">Faire</string>
 	<string id="30013">Recheche de chansons...</string>
 	<string id="30014">Recherche d'albums...</string>
-	<string id="30015">Recheche d'artistes...</string>
+	<string id="30015">Recherche d'artistes...</string>
 	<string id="30016">Chanson Qobuz populaire par artiste...</string>
 	<string id="30017">Chanson Qobuz populaire</string>
 	<string id="30018">Mes favoris Qobuz</string>
-	<string id="30019">Mes listes de lecture Qobuz</string>
+	<string id="30019">Mes listes de lecture</string>
 	<string id="30020">Chercher des chansons avec Qobuz</string>
 	<string id="30021">Pas de chansons pour cette recherche</string>
 	<string id="30022">Chercher des albums avec Qobuz</string>
@@ -45,7 +45,7 @@
 	<string id="30025">Pas d'artiste pour cette recherche</string>
 	<string id="30026">Nom d'utilisateur</string>
 	<string id="30027">Aucune liste de lecture Qobuz trouvée</string>
-	<string id="30028">Recherche d'artistes par album avec Qobuz</string>
+	<string id="30028">Recherche d'artistes par album</string>
 	<string id="30029">Aucun album pour cette recherche</string>
 	<string id="30030">Aucun artiste pour cette recherche</string>
 	<string id="30031">Vous n'avez pas de favoris</string>
@@ -115,6 +115,8 @@
     <string id="30095">Classique</string>
     <string id="30097">Reggae</string>
     <string id="30096">Tous</string>
+    <string id="30100">Voir les achats</string>
+    <string id="30101">Voir les nouveautées</string>
 </strings>
 
 

@@ -65,6 +65,7 @@ class QobuzGetRecommandation(ICacheable):
         list = []
         for json_product in self.get_raw_data():
             album = QobuzTagProduct(json_product)
+            pprint.pprint(json_product)
             if i == rand:
                 image = album.getImage()
                 if image:

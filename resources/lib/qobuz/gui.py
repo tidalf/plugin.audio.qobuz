@@ -14,6 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+import os
 import sys
 import urllib
 
@@ -89,13 +90,13 @@ class QobuzGUI:
 
     '''
         MUST BE REMOVED ?
-    '''  
-    def addDirectoryItem(self, u, item, bFolder, len):
-        h = self.Bootstrap.__handle__
-        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
-        xbmcplugin.addDirectoryItem(handle=h, 
-                                    url=u, listitem=item, isFolder=bFolder, 
-                                    totalItems=len)
+#    '''  
+#    def addDirectoryItem(self, u, item, bFolder, len):
+#        h = self.Bootstrap.__handle__
+#        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
+#        xbmcplugin.addDirectoryItem(handle=h, 
+#                                    url=u, listitem=item, isFolder=bFolder, 
+#                                    totalItems=len)
 
     def showLoginFailure(self):
         __language__ = self.Bootstrap.__language__
@@ -236,14 +237,26 @@ class QobuzGUI:
     '''
         Add to directory
     '''
-    def add_to_directory(self, list):
+    def add_to_directory(self, list, context = 'playlist'):
         n = len(list)
         if n < 1:
             self.showNotificationH("Qobuz", "Empty directory")
             return
         h = int(sys.argv[1])
-        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
+        content_type = 'songs'
+        if context == 'playlist':
+            content_type = 'albums'
+        if context == 'artists':
+            content_type = 'artists'
+        xbmcplugin.setContent(int(sys.argv[1]), content_type)
+
         xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ARTIST)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TITLE)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_GENRE)
+        
     
     '''
         SHOW User Playlists
@@ -305,6 +318,7 @@ class QobuzGUI:
             u = url
         dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
         dir.setInfo( type="Music", infoLabels={ "title": name.encode('utf8', 'ignore') } )
+        dir.setProperty('fanart_image', os.path.join(self.Bootstrap.baseDir, 'fanart.jpg'))
 #        dir.setThumbnailImage(iconimage)
 #        dir.setIconImage(iconimage)
         # Custom menu items

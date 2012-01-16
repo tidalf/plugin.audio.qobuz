@@ -218,6 +218,7 @@ class IQobuzTag(object):
         if image:
             i.setThumbnailImage(image)
             i.setIconImage(image)
+            i.setProperty('fanart_image', image)
         return i
 '''
 '''
@@ -591,7 +592,6 @@ class QobuzTagTrack(IQobuzTag):
 
     def getXbmcItem(self, context = 'album', pos = 0):
         parent = self.get_parent()
-        i = xbmcgui.ListItem()
         album = self.getAlbum()
         artist = self.getArtist()
         track_number = self.getTrackNumber()
@@ -626,8 +626,12 @@ class QobuzTagTrack(IQobuzTag):
             raise "Unknown display context"
         if self.getStreamingType() != 'full':
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
-
+        print "Set label: " + label
+        i = xbmcgui.ListItem(label, label, image, image)
+        i.setProperty('title', label)
+        i.setProperty('fanart_image', image)
         i.setLabel(label)
+        i.setLabel2(label)
         i.setInfo(type = 'music',
                   infoLabels = {'count': pos,
                                 'songid': str(self.id),
