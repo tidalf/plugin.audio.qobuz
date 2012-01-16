@@ -103,12 +103,14 @@ class QobuzGui_Playlist(xbmcgui.WindowXML):
     def add_userplaylists_items(self):
         pl = QobuzUserPlaylistsXbmc(self.Core)
         list = pl.get_items()
+        image = self.Core.Bootstrap.baseDir + '/default.tbn'
         for l in list:
                 item = l[1]
                 path = l[0]
                 item.setPath(path)
                 item.setProperty('path', path)
-                item.setIconImage(self.Core.Bootstrap.baseDir + '/default.tbn')
+                item.setIconImage(image)
+                item.setThumbnailImage(image)
                 print "Path: " + item.getProperty('path')
                 self.control_playlist.addItem(item)
     
