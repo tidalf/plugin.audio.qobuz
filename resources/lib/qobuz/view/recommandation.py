@@ -62,7 +62,6 @@ class QobuzGetRecommandation(ICacheable):
         n = self.length()
         h = int(sys.argv[1])
         rand = random.randint(0, n)
-        print "Random: " + str(rand) 
         getnewimage = random.randint(0, 1)
         fanArt = qobuz.image.access.get('fanArt')
         i = 0

@@ -67,7 +67,7 @@ class QobuzBootstrap(object):
         self.bootstrap_image()
         self.bootstrap_gui()
         self.bootstrap_player()
-        self.bootstrap_db()
+        #self.bootstrap_db()
         self.bootstrap_sys_args()
         
         if not qobuz.core.login():

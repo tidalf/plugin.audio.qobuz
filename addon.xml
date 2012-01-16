@@ -17,7 +17,7 @@ Qobuz addon for XBMC. It enables accessto Qobuz music streaming service. You sho
 addon Qobuz pour XBMC. Il permet d'accéder à l'ensemble du service streaming de Qobuz. Vous devez fournir un nom d'utilisateur ainsi qu'un mot de passe dans les paramètres de l'addon (et un abonnement valide)
 		</description>
 	</extension>
-	<extension point="xbmc.service" library="resources/lib/qobuz/services/qobuzresolver.py">
+	<extension point="xbmc.service" library="resources/lib/qobuz/services/qobuzresolver.py" start='login'>
 	</extension>
 </addon>
 

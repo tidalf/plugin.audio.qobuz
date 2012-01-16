@@ -32,8 +32,8 @@ sys.path.append(libDir)
 sys.path.append(qobuzDir)
 
 from bootstrap import QobuzBootstrap
+import qobuz
 boot = QobuzBootstrap(__addon__, int(sys.argv[1]))
 boot.bootstrap_app()
-import qobuz
-if qobuz.db:
-    qobuz.db.close()
+try: qobuz.db.close()
+except: pass

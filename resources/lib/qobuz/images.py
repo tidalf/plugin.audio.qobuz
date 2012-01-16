@@ -11,7 +11,6 @@ class QobuzImage_access():
         self.add('qobuzIconRed', os.path.join(qobuz.path.base, 'default_red.png'))
         
     def add(self, name, filename):
-        print 'Add image %s: %s\n' % (name, filename)
         self.images[name] = filename
         
     def get(self, name, path = '', ext = 'png'):
@@ -51,7 +50,6 @@ class QobuzImage_cache(ICacheable):
     def set(self, type, genre_id, image):
         data = self.get_data()
         name = str(type).strip() + '-' + str(genre_id).strip()
-        print "NEW NAME: " + name + ": " + image
         data[name] = image
         self._save_cache_data(data)
         return image

@@ -20,34 +20,51 @@ class Pid():
         fd = os.open(self.file, os.O_WRONLY|os.O_EXCL|os.O_CREAT)
         if not fd:
             return False
-        if not os.write(fd, str(self.pid)):
+        try:
+            os.write(fd, str(self.pid))
+        finally:
+            #f.flush()
+            os.fsync(fd)
             os.close(fd)
-            return False
-        os.close(fd)
         return True
     
     def touch(self):
         if not self.exists():
             return False
-        fd = os.open(self.file, os.O_WRONLY)
+        try:
+            fd = os.open(self.file, os.O_WRONLY)
+        except: return False
         if not fd:
             return False
-        if not os.write(fd, str(self.pid)):
+        try:
+            os.write(fd, str(self.pid))
+        finally:
+            #f.flush()
+            os.fsync(fd)
             os.close(fd)
-            return False
-        os.close(fd)
         return True
     
     def remove(self):
         if not self.exists():
             return False
-        os.unlink(self.file)
+        newname = self.file + str(int(time.time()))
+        print "New name: " + newname
         try:
-            name = platform.system()
-            print "Platform: " + name
-            if name == 'Windows':
-                time.sleep(1)
-        except: pass
+            os.rename(self.file, newname)
+        except: return False
+        #self.file = newname
+        os.unlink(newname)
+#        try:
+#            name = platform.system()
+#            print "Platform: " + name
+#            if name == 'Windows':
+#                timeout = 10
+#                while timeout > 0:
+#                    if not self.exists():
+#                        return True
+#                    timeout-=1
+#                    time.sleep(1)
+#        except: pass
         return not self.exists()
     
     def age(self):

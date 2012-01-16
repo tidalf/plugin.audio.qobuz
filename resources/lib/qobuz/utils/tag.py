@@ -544,7 +544,6 @@ class QobuzTagTrack(IQobuzTag):
             data = QobuzTagComposer(p['composer'])
             self.add_child( data )
         if 'image' in p:
-            #print "Add image to child"
             data = QobuzTagImage(p['image'])
             self.add_child( data )
         self._is_loaded = True
@@ -627,7 +626,6 @@ class QobuzTagTrack(IQobuzTag):
             raise "Unknown display context"
         if self.getStreamingType() != 'full':
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
-        print "Set label: " + label
         i = xbmcgui.ListItem(label, label, image, image)
         if fanArt:
             i.setProperty('fanart_image', core.image.access.get('fanArt'))

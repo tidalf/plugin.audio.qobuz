@@ -18,8 +18,10 @@ import os
 import sys
 import time
 import re
+import atexit
 import xbmcaddon
 import xbmc
+import signal
 
 __addon_name__   = 'plugin.audio.qobuz'
 __addon_url__    = 'plugin://' + __addon_name__ + '/'
@@ -187,20 +189,28 @@ def watch_playlist(player, playlist):
     TODO: If plugin has never been launched cache path doesn't exist,
     our pid file can't be created, our service die ...
 '''
+    
+pid_path = os.path.join(qobuz.path.cache, __pid_file__)
+pid_id =  os.getpid()
+pid = Pid(pid_path, pid_id)
+playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
+player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+current_pos = None
+previous_pos = None
+
+
 def watcher():
-    pid_path = os.path.join(qobuz.path.cache, __pid_file__)
-    pid_id =  os.getpid()
-    pid = Pid(pid_path, pid_id)
-    playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
-    player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
-    current_pos = None
-    previous_pos = None
+
     watch_retry = 3
     if pid.exists():
-        if (pid.age() > (__sleep__ * 10)):
+        if (pid.age() > (__sleep__ * 20)):
             log("Pid file exist but is old... removing")
             if not pid.remove():
                 log("Cannot remove pid: " + pid.file)
+                log("Exiting...")
+                sys.exit(1)
+            elif not pid.create():
+                log("Cannot create pid: " + pid.file)
                 log("Exiting...")
                 sys.exit(1)
         else:
@@ -212,8 +222,16 @@ def watcher():
             log('Exiting...')
             sys.exit(1) 
     log("Starting")
+    __timetowork__ = __sleep__
     while (not xbmc.abortRequested):
+        if __timetowork__ > 0:
+            __timetowork__-=.250
+            time.sleep(.250)
+            continue
+        else:
+            __timetowork__ = __sleep__
         try:
+            log("Working...")
             pl_size = playlist.size()
             if pl_size > 0 and player.isPlayingAudio():
                 try:
@@ -225,11 +243,15 @@ def watcher():
             log('We are not playing audio!')
         if not pid.touch():
             log('Cannot touch pid file: ' + pid.file)
-        time.sleep(__sleep__)
+        else:
+            log('Touching pid file: ' + pid.file)
     if not pid.remove():
         log("Cannot remove pid file: " + pid.file)
     log("Exiting...")
-    sys.exit(0)
+
+
+
+atexit.register(pid.remove)
 
 if __name__ == "__main__":
     watcher()
