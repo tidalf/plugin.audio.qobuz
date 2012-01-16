@@ -92,10 +92,11 @@ class QobuzBootstrap(object):
         self.__language__ = __addon__.getLocalizedString
         self.bootstrapDirectories()
         self.Core = QobuzCore(self)
+        self.Images = QobuzImages(self.imgDir)
         self.GUI = QobuzGUI(self)
         self.Player = QobuzPlayer()
         self.Player.setCore(self.Core)
-        self.Images = QobuzImages(self.imgDir)
+
         try:
             from utils.db import QobuzDb
             self.Db = QobuzDb(self.cacheDir, 'qobuz.db3')
@@ -220,7 +221,7 @@ class QobuzBootstrap(object):
         
         elif self.MODE == MODE_SONG:
             info(self, "PLaying song")
-            self.Core.Bootstrap.GUI.showNotificationH('Qobuz Player', 'Loading song...')
+            self.Core.Bootstrap.GUI.showNotification(34000, 34001)
             try:
                 context_type=urllib.unquote_plus(self.params["context_type"])
             except: 

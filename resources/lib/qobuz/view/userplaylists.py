@@ -63,6 +63,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
         h = int(sys.argv[1])
         i = 1
         list = []
+        image = self.Core.Bootstrap.Images.get('qobuzIcon')
         for json_track in self.get_data():
             tag = QobuzTagUserPlaylist(json_track)
             u = self.Core.Bootstrap.build_url(MODE_PLAYLIST, tag.id)
@@ -72,6 +73,8 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');
             item.setProperty('fanart_image', self.Core.Bootstrap.Images.get('fanArt'))
+            item.setThumbnailImage(image)
+            item.setIconImage(image)
             list.append((u, item, True))
             i = i + 1
         return list

@@ -41,6 +41,13 @@ from utils.tag import QobuzTagTrack
 from data.track import QobuzTrack
 from utils.pid import Pid
 
+
+class QobuzResolver():
+    
+    def __init__(self):
+        pass
+
+        
 service_name = 'Qobuz URL Resolver'
 
 API = QobuzApi()

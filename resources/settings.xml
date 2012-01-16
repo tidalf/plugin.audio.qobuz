@@ -24,6 +24,7 @@
    </category>
    <category label="Other">
         <setting id="debug" label="Debug" type="bool" default="false" />
+        <setting id="resolver_enabled" label="33000" type="bool" defaul="true" />
    </category>   	
 
 </settings>

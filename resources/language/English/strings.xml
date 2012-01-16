@@ -136,6 +136,11 @@ s	<string id="30007">No Qobuz service</string>
     
     <!-- URL Resolver -->
     <string id="33000">Resolver enable</string>
+    
+    <!-- Qobuz Player -->
+    <string id="34000">Qobuz Player</string>
+    <string id="34001">Playing song</string>
+    <string id="34002">Fail to play song</string>
 </strings>
 
 

@@ -32,21 +32,18 @@ class QobuzGUI:
 
     def __init__( self, bootstrap):
         self.Bootstrap = bootstrap
-        xbmcplugin.setProperty(int(sys.argv[1]), 'Music', 'Qobuz')
+        self.setPluginFanArt()
         
 
     '''
     Must be called at the end for folder to be displayed
     '''
     def endOfDirectory(self):
-#        self.setFanArt()
-#        xbmcplugin.setContent(int(sys.argv[1]), 'songs')
-#        xbmcplugin.setPluginFanart(int(sys.argv[1]), 'special://home/addons/plugin.audio.qobuz/fanart.jpg', color2='0xFFFF3300')
-#        xbmc.executebuiltin('SetProperty(View,Thumbnails)')
+        MODE = self.Bootstrap.MODE
         ''' SEARCH '''
-        if self.Bootstrap.MODE and self.Bootstrap.MODE <= 5: 
+        if MODE and MODE <= 5: 
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
-        elif self.Bootstrap.MODE == MODE_SHOW_RECO_T_G:
+        elif MODE == MODE_SHOW_RECO_T_G:
              return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=False)
         else:
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
@@ -54,10 +51,10 @@ class QobuzGUI:
     '''
         SHOW Notification (HUMAN ONE / NO i8n)
     '''
-    def showNotificationH(self, title, text):
-        title = unicode(title, "utf-8", errors="replace")
-        text = unicode(text, "utf-8", errors="replace")
-        s = 'XBMC.Notification(' + title + ',' + text + ', 2000, ' + self.Bootstrap.Images.get('default') + ')'
+    def showNotificationH(self, title, text, image = 'qobuzIcon'):
+        title = str(title) 
+        text = str(text)
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, self.Bootstrap.Images.get(image)) 
         try:
             xbmc.executebuiltin(s)
         except:
@@ -66,16 +63,16 @@ class QobuzGUI:
     '''
         SHOW Notification
     '''
-    def showNotification(self, title, text):
-        self.setFanArt()   
-        __language__ = self.Bootstrap.__language__
-        xbmc.executebuiltin('XBMC.Notification(' + __language__(title) + ',' + __language__(text)+ ', 2000, ' + self.Bootstrap.Images.get('default') + ')')
+    def showNotification(self, title, text, image = 'qobuzIcon'):
+        l = self.Bootstrap.__language__
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, self.Bootstrap.Images.get(image)) 
+        xbmc.executebuiltin(s)
 
     '''
         SET FanArt
     '''
-    def setFanArt(self, fanart = 'fanart'):
-        xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('default'))
+    def setPluginFanArt(self, fanart = 'fanart'):
+        xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('fanArt'))
       
     '''
         SET Content
