@@ -23,78 +23,76 @@ import xbmc
 from api import QobuzApi
 from debug import log, info, warn
 #from icacheable import ICacheable
-
+import qobuz
 """
  Class QobuzXbmc
 """
 class QobuzCore:
     
-    def __init__(self, bootstrap):
-        self.Bootstrap = bootstrap
-        self.Api = QobuzApi(self)
+    def __init__(self):
         self.data = ""
         self.conn = ""
     
     def login(self):
-        __addon__ = self.Bootstrap.__addon__
+        __addon__ = qobuz.addon
         user =  __addon__.getSetting('username')
         password = __addon__.getSetting('password')
         if not user or not password:
             return False
         info(self, "Try to login as user: " + user)
-        return self.Api.login( user,
+        return qobuz.api.login( user,
                                __addon__.getSetting('password'))
 
     def is_logged(self):
-        return self.Api.userid
+        return qobuz.api.userid
 
     def getPlaylist(self,id):
         from view.playlist import QobuzPlaylist
-        return QobuzPlaylist(self, id)
+        return QobuzPlaylist(id)
 
     def getProduct(self,id, context_type = "playlist"):
         from view.product import QobuzProduct
-        return QobuzProduct(self, id, context_type)
+        return QobuzProduct(id, context_type)
 
     def getUserPlaylists(self):
         from view.userplaylists import QobuzUserPlaylistsXbmc
-        return QobuzUserPlaylistsXbmc(self, )
+        return QobuzUserPlaylistsXbmc()
 
 #    def getQobuzAlbum(self, id):
 #        return QobuzAlbum(self, id)
 
     def getTrack(self,id,context_type="playlist"):
         from data.track import QobuzTrack
-        return QobuzTrack(self,id,context_type)
+        return QobuzTrack(id, context_type)
     
     def getTrackURL(self, id, type):
         from data.track_streamurl import QobuzTrackURL
-        return QobuzTrackURL(self, id, type)
+        return QobuzTrackURL(id, type)
     
     def getQobuzSearchTracks(self):
         from search.tracks import QobuzSearchTracks
-        return QobuzSearchTracks(self)
+        return QobuzSearchTracks()
 
     def getQobuzSearchAlbums(self):
         from search.albums import QobuzSearchAlbums
-        return QobuzSearchAlbums(self)
+        return QobuzSearchAlbums()
     
     def getQobuzSearchArtists(self):
         from search.artists import QobuzSearchArtists
-        return QobuzSearchArtists(self)
+        return QobuzSearchArtists()
 
     def getProductsFromArtist(self):
         from search.albums import QobuzSearchAlbums
-        return QobuzSearchAlbums(self)
+        return QobuzSearchAlbums()
 
     def getRecommandation(self,genre_id):
         from view.recommandation import QobuzGetRecommandation
-        return QobuzGetRecommandation(self, genre_id)
+        return QobuzGetRecommandation( genre_id)
 
     def getRecommandation(self, genre_id,type):
         from view.recommandation import QobuzGetRecommandation
-        return QobuzGetRecommandation(self, genre_id, type)
+        return QobuzGetRecommandation( genre_id, type)
     
     def getPurchases(self):
         from view.purchases import QobuzGetPurchases
-        return QobuzGetPurchases(self)
+        return QobuzGetPurchases()

@@ -25,13 +25,13 @@ import xbmc
 from constants import *
 from debug import info, warn, log
 
+import qobuz
 '''
     CLASS QobuzGUI
 '''
 class QobuzGUI:
 
-    def __init__( self, bootstrap):
-        self.Bootstrap = bootstrap
+    def __init__( self):
         self.setPluginFanArt()
         
 
@@ -39,12 +39,12 @@ class QobuzGUI:
     Must be called at the end for folder to be displayed
     '''
     def endOfDirectory(self):
-        MODE = self.Bootstrap.MODE
+        MODE = qobuz.boot.MODE
         ''' SEARCH '''
-        if MODE and MODE <= 5: 
-            return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
+        if MODE > 30: 
+            return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=True, cacheToDisc=False)
         elif MODE == MODE_SHOW_RECO_T_G:
-             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=False)
+            return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=False)
         else:
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=True)
     
@@ -54,7 +54,7 @@ class QobuzGUI:
     def showNotificationH(self, title, text, image = 'qobuzIcon'):
         title = str(title) 
         text = str(text)
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, self.Bootstrap.Images.get(image)) 
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, qobuz.image.access.get(image)) 
         try:
             xbmc.executebuiltin(s)
         except:
@@ -64,15 +64,15 @@ class QobuzGUI:
         SHOW Notification
     '''
     def showNotification(self, title, text, image = 'qobuzIcon'):
-        l = self.Bootstrap.__language__
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, self.Bootstrap.Images.get(image)) 
+        l = qobuz.lang
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, qobuz.image.access.get(image)) 
         xbmc.executebuiltin(s)
 
     '''
         SET FanArt
     '''
     def setPluginFanArt(self, fanart = 'fanart'):
-        xbmcplugin.setPluginFanart(self.Bootstrap.__handle__,  self.Bootstrap.Images.get('fanArt'), '0x00000000')
+        xbmcplugin.setPluginFanart(qobuz.boot.handle,  qobuz.image.access.get('fanArt'), '0x00000000')
       
     '''
         SET Content
@@ -83,7 +83,7 @@ class QobuzGUI:
         content: files, songs, artists, albums, movies, tvshows, episodes, musicvideos
         http://xbmc.sourceforge.net/python-docs/xbmcplugin.html
         '''
-        xbmcplugin.setContent(self.Bootstrap.__handle__, content)
+        xbmcplugin.setContent(qobuz.boot.handle, content)
 
     '''
         MUST BE REMOVED ?
@@ -96,7 +96,7 @@ class QobuzGUI:
 #                                    totalItems=len)
 
     def showLoginFailure(self):
-        __language__ = self.Bootstrap.__language__
+        __language__ = qobuz.lang
         dialog = xbmcgui.Dialog()
         dialog.ok(__language__(30008), __language__(30034), __language__(30040))
         
@@ -104,17 +104,17 @@ class QobuzGUI:
         Top-level menu
     '''
     def showCategories(self):
-        i = self.Bootstrap.Images
-        __language__ = self.Bootstrap.__language__
-        if not self.Bootstrap.META:
+        i = qobuz.image.access
+        __language__ = qobuz.lang
+        if not qobuz.boot.META:
             self._add_dir(__language__(30013), '', MODE_SEARCH_SONGS, i.get('song'), 0)
             self._add_dir(__language__(30014), '', MODE_SEARCH_ALBUMS, i.get('album'), 0)
-            self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, i.get('album'), 0)
-        self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, i.get('song'), 0)
-        self._add_dir(__language__(30101), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases', MODE_SHOW_RECO_T, i.get('song'), 0)
-        self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('song'), 0)
-        if (self.Bootstrap.Core.Api.userid != 0):
-            self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('playlist'), 0)
+            self._add_dir(__language__(30015), '', MODE_SEARCH_ARTISTS, i.get('artist'), 0)
+        self._add_dir(__language__(30082), '', MODE_SHOW_RECOS, i.get('playlist'), 0)
+        self._add_dir(__language__(30101), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases', MODE_SHOW_RECO_T, i.get('playlist'), 0)
+        self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('album'), 0)
+        if (qobuz.api.userid != 0):
+            self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('usersplaylists'), 0)
         self.setContent('albums')
         
 
@@ -122,12 +122,12 @@ class QobuzGUI:
         SEARCH for songs
     """
     def searchSongs(self):
-        __language__ = self.Bootstrap.__language__
+        __language__ = qobuz.lang
         query = self._get_keyboard(default="",heading=__language__(30020))
         query = query.strip()
         if (query != ''):
-            s = self.Bootstrap.Core.getQobuzSearchTracks()
-            s.search(query, self.Bootstrap.__addon__.getSetting('songsearchlimit'))
+            s = qobuz.core.getQobuzSearchTracks()
+            s.search(query, qobuz.addon.getSetting('songsearchlimit'))
             list = s.get_items()
             if s.length() < 1:
                 self.searchSongs()
@@ -140,12 +140,12 @@ class QobuzGUI:
         SEARCH for Albums
     """
     def searchAlbums(self):
-        __language__ = self.Bootstrap.__language__
+        __language__ = qobuz.lang
         query = self._get_keyboard(default="",heading=__language__(30022))
         query = query.strip()
         if (query != ''):
-            s = self.Bootstrap.Core.getQobuzSearchAlbums()
-            s.search(query, self.Bootstrap.__addon__.getSetting('albumsearchlimit'))
+            s = qobuz.core.getQobuzSearchAlbums()
+            s.search(query, qobuz.addon.getSetting('albumsearchlimit'))
             if s.length() < 1:
                 self.showNotification(30008, 30021)
                 self.searchAlbums()
@@ -159,12 +159,12 @@ class QobuzGUI:
         SEARCH for Artists
     """
     def searchArtists(self):
-        __language__ = self.Bootstrap.__language__
+        __language__ = qobuz.lang
         query = self._get_keyboard(default="",heading=__language__(30024))
         query = query.strip()
         if (query != ''):
-            s = self.Bootstrap.Core.getQobuzSearchArtists()
-            s.search(query, self.Bootstrap.__addon__.getSetting('artistsearchlimit'))
+            s = qobuz.core.getQobuzSearchArtists()
+            s.search(query, qobuz.addon.getSetting('artistsearchlimit'))
             if s.length() < 1:
                 self.showNotification(30008, 30021)
                 self.searchAlbums()
@@ -179,7 +179,7 @@ class QobuzGUI:
     """
     def showRecommendations(self, type, genre_id):
         if (genre_id != ''):
-            r = self.Bootstrap.Core.getRecommandation(genre_id, type)
+            r = qobuz.core.getRecommandation(genre_id, type)
             list = r.get_items()
             self.add_to_directory(list)
         else:
@@ -190,7 +190,7 @@ class QobuzGUI:
         SHOW Purchases
     '''
     def showPurchases(self):
-        r = self.Bootstrap.Core.getPurchases()
+        r = qobuz.core.getPurchases()
         list = r.get_items()
         self.add_to_directory(list)
 
@@ -198,8 +198,8 @@ class QobuzGUI:
         SHOW Recommandations Types
     '''
     def showRecommendationsTypes(self):
-        __language__ = self.Bootstrap.__language__
-        i = self.Bootstrap.Images
+        __language__ = qobuz.lang
+        i = qobuz.image.access
         #xbmcplugin.setPluginFanart(int(sys.argv[1]), i.get('fanart'))
         self._add_dir(__language__(30083), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=press-awards','', i.get('song'), 0)
         self._add_dir(__language__(30084), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases','', i.get('song'), 0)
@@ -211,24 +211,22 @@ class QobuzGUI:
         SHOW Recommandations Genre
     '''
     def showRecommendationsGenres(self, type):
-        from data.genre_image import QobuzGenreImage
         import time
         import math
         ti = '?t='+str(int(time.time()))
-        genre = QobuzGenreImage(self.Bootstrap.Core)
-        __language__ = self.Bootstrap.__language__
-        i = self.Bootstrap.Images
-        self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, genre.get(type, 112)+ti, 10)
-        self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, genre.get(type, 64)+ti, 10)
-        self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, genre.get(type, 80)+ti, 10)
-        self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, genre.get(type, 6)+ti, 10)
-        self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, genre.get(type, 64)+ti, 10)
-        self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, genre.get(type, 94)+ti, 10)
-        self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, genre.get(type, 2)+ti, 10)
-        self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, genre.get(type, 91)+ti, 10)
-        self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, genre.get(type, 10)+ti, 10)
-        self._add_dir(__language__(30097), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=123',MODE_SHOW_RECO_T_G, genre.get(type, 123)+ti, 10)
-        self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.genre(0)+ti, 10)
+        __language__ = qobuz.lang
+        i = qobuz.image
+        self._add_dir(__language__(30087), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=112',MODE_SHOW_RECO_T_G, i.cache.get(type, 112)+ti, 10)
+        self._add_dir(__language__(30088), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=64',MODE_SHOW_RECO_T_G, i.cache.get(type, 64)+ti, 10)
+        self._add_dir(__language__(30089), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=80',MODE_SHOW_RECO_T_G, i.cache.get(type, 80)+ti, 10)
+        self._add_dir(__language__(30090), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=6',MODE_SHOW_RECO_T_G, i.cache.get(type, 6)+ti, 10)
+        self._add_dir(__language__(30091), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=127',MODE_SHOW_RECO_T_G, i.cache.get(type, 127)+ti, 10)
+        self._add_dir(__language__(30092), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=94',MODE_SHOW_RECO_T_G, i.cache.get(type, 94)+ti, 10)
+        self._add_dir(__language__(30093), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=2',MODE_SHOW_RECO_T_G, i.cache.get(type, 2)+ti, 10)
+        self._add_dir(__language__(30094), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=91',MODE_SHOW_RECO_T_G, i.cache.get(type, 91)+ti, 10)
+        self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, i.cache.get(type, 10)+ti, 10)
+        self._add_dir(__language__(30097), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=123',MODE_SHOW_RECO_T_G, i.cache.get(type, 123)+ti, 10)
+        self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.access.get('default')+ti, 10)
         self.setContent('songs')
 
     '''
@@ -258,7 +256,7 @@ class QobuzGUI:
         SHOW User Playlists
     '''
     def showUserPlaylists(self):
-        user_playlists = self.Bootstrap.Core.getUserPlaylists()
+        user_playlists = qobuz.core.getUserPlaylists()
         list = user_playlists.get_items()
         self.add_to_directory(list)
         
@@ -266,9 +264,9 @@ class QobuzGUI:
         SHOW Playlist
     '''
     def showPlaylist(self, id):
-        userid = self.Bootstrap.Core.Api.userid
+        userid = qobuz.api.userid
         if (userid != 0):
-            myplaylist = self.Bootstrap.Core.getPlaylist(id)
+            myplaylist = qobuz.core.getPlaylist(id)
             list = myplaylist.get_items()
             self.add_to_directory(list)
         else:
@@ -280,7 +278,7 @@ class QobuzGUI:
     '''
     def showProduct (self, id, context_type = "playlist"):
         info(self, "showProduct(" + str(id) + ")")
-        album = self.Bootstrap.Core.getProduct(id,context_type)
+        album = qobuz.core.getProduct(id,context_type)
         list = album.get_items()
         self.add_to_directory(list)
 
@@ -288,7 +286,7 @@ class QobuzGUI:
         SHOW Artsit
     '''
     def showArtist (self, id):
-        album = self.Bootstrap.Core.getProductsFromArtist()
+        album = qobuz.core.getProductsFromArtist()
         album.search_by_artist(id)
         if album.length() < 1:
             self.showNotification(30008, 30033)
@@ -307,14 +305,14 @@ class QobuzGUI:
 
     # Add whatever directory
     def _add_dir(self, name, url, mode, iconimage, id, items=0):
-        __language__= self.Bootstrap.__language__
+        __language__= qobuz.lang
         if url == '':
-            u=self.Bootstrap.build_url(mode, id)
+            u=qobuz.boot.build_url(mode, id)
         else:
             u = url
         dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
         dir.setInfo( type="Music", infoLabels={ "title": name.encode('utf8', 'ignore') } )
-        dir.setProperty('fanart_image', os.path.join(self.Bootstrap.baseDir, 'fanart.jpg'))
+        dir.setProperty('fanart_image', os.path.join(qobuz.path.base, 'fanart.jpg'))
 #        dir.setThumbnailImage(iconimage)
 #        dir.setIconImage(iconimage)
         # Custom menu items
@@ -337,7 +335,4 @@ class QobuzGUI:
         dir.setPath(u)
         dir.setProperty('path', u)
         dir.addContextMenuItems(menuItems, replaceItems=True)
-        #dir.setProperty('IsFolder', 'true')
-        #exit(0)
-        #self.Bootstrap.WIN.getControl(50).addItem(dir)
         return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)

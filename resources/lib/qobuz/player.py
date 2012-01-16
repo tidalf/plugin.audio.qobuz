@@ -29,19 +29,18 @@ from debug import info, warn, log
 from data.track import QobuzTrack
 from utils.tag import QobuzTagTrack
 from data.track_streamurl import QobuzTrackURL
-
+import qobuz
 
 class QobuzPlayable():
-    def __init__(self, Core, id):
-        self.Core = Core
+    def __init__(self, id):
         self.id = id
         
     def get_stream(self):
-        self.pref_format = self.Core.Bootstrap.__addon__.getSetting('streamtype')
+        self.pref_format = qobuz.addon.getSetting('streamtype')
         self.pref_format_id = 6
         if self.pref_format == 'mp3':
             self.pref_format_id = 5
-        self.tag = QobuzTrackURL(self.Core, self.id, self.pref_format_id)
+        self.tag = QobuzTrackURL(self.id, self.pref_format_id)
         self.data_url = self.tag.get_data()
         #print "Dataurl: " + str(self.data_url)
         if not self.data_url:
@@ -58,9 +57,9 @@ class QobuzPlayable():
         return True
     
     def getXbmcItem(self):  
-        track = QobuzTrack(self.Core, self.id)
+        track = QobuzTrack(self.id)
         try:
-            db = self.Core.Bootstrap.Db
+            db = qobuz.db
             db_track = db.insert_track(track.get_data())
             if db_track:
                 pc = db_track['played_count']
@@ -85,29 +84,26 @@ class QobuzPlayer(xbmc.Player):
     def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
         super(QobuzPlayer, self).__init__()
         
-    def setCore (self, Core):
-        self.Core = Core
-        
     def sendQobuzPlaybackEnded(self, duration):
-        self.Core.Api.report_streaming_stop(self.id, duration)
+        qobuz.api.report_streaming_stop(self.id, duration)
     
     def sendQobuzPlaybackStarted(self,):
-        self.Core.Api.report_streaming_start(self.id)
+        qobuz.api.report_streaming_start(self.id)
         
     def play(self, id):
-        lang = self.Core.Bootstrap.__language__
+        lang = qobuz.lang
         info(self, "We need to play song with id: " + str(id))
-        playable = QobuzPlayable(self.Core, id)
+        playable = QobuzPlayable(id)
         if not playable.get_stream():
             warn(self, "Cannot get stream url for track with id: " + str(id))
-            self.Core.Bootstrap.GUI.showNotification(34000, 34002)
+            qobuz.gui.showNotification(34000, 34002)
             return False
         item = playable.getXbmcItem()
         '''
             PLaying track
         '''
-        self.Core.Bootstrap.GUI.showNotificationH(lang(34000), item.getLabel())
-        xbmcplugin.setResolvedUrl(handle=self.Core.Bootstrap.__handle__,succeeded=True,listitem=item)
+        qobuz.gui.showNotificationH(lang(34000), item.getLabel())
+        xbmcplugin.setResolvedUrl(handle=qobuz.boot.handle,succeeded=True,listitem=item)
         xbmc.executebuiltin('Dialog.Close(all,true)')
         '''
             Waiting for song to start
@@ -122,10 +118,5 @@ class QobuzPlayer(xbmc.Player):
                 break
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())
-            #super(QobuzPlayer, self).play(item.getProperty('path'))
             return False
-        return True
-        '''
-            Watching playback
-        '''
         return True

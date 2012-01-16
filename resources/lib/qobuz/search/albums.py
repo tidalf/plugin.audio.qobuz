@@ -26,25 +26,24 @@ from debug import log, info, warn
 from utils.tag import QobuzTagProduct
 from utils.tag import QobuzTagAlbum
 from utils.icacheable import ICacheable
-
+import qobuz
 '''
     Class QobuzSearchAlbums
 '''
 class QobuzSearchAlbums():
 
-    def __init__(self, Core,):
-        self.Core = Core
+    def __init__(self):
         self._raw_data = []
         
     def get_data(self):
         return self._raw_data
     
     def search(self, query, limit = 100):
-        self._raw_data = self.Core.Api.search_albums(query, limit)
+        self._raw_data = qobuz.api.search_albums(query, limit)
         return self
     
     def search_by_artist(self,id, limit = 100):
-        self._raw_data = self.Core.Api.get_albums_from_artist(id, limit)
+        self._raw_data = qobuz.api.get_albums_from_artist(id, limit)
         return self
         
     def length(self):
@@ -61,7 +60,7 @@ class QobuzSearchAlbums():
         for product in self.get_data():
             tag_product = QobuzTagProduct(product['product'])
             item = tag_product.getXbmcItem()
-            u = self.Core.Bootstrap.build_url(MODE_ALBUM, tag_product.id)
+            u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
             list.append((u, item, True))
         return list
 
@@ -71,7 +70,7 @@ class QobuzSearchAlbums():
         list = []
         for json_album in json['artist']['albums']:
             tag_product = QobuzTagProduct(json_album)
-            u = self.Core.Bootstrap.build_url(MODE_ALBUM, tag_product.id)
+            u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
             item = tag_product.getXbmcItem()
             list.append((u, item, True))
         return list

@@ -14,29 +14,34 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 import os
-import time 
+import sys
+import time
 import re
-
 import xbmcaddon
 import xbmc
 
-__sleep__ = 5
-__addon_name__ = 'plugin.audio.qobuz'
-__addon_url__ = 'plugin://' + __addon_name__ + '/'
-__addon__ = xbmcaddon.Addon(id=__addon_name__)
-__addon__cachepath__ = xbmc.translatePath('special://temp/'+__addon_name__+'/')
-__pid_file__ = 'qobuzresolver.pid'
+__addon_name__   = 'plugin.audio.qobuz'
+__addon_url__    = 'plugin://' + __addon_name__ + '/'
+__addon__        = xbmcaddon.Addon(id=__addon_name__)
+__addonversion__ = __addon__.getAddonInfo('version')
+__addonid__      = __addon__.getAddonInfo('id')
+__cwd__          = __addon__.getAddonInfo('path')
 
 addonDir  = __addon__.getAddonInfo('path')
 libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
 sys.path.append(qobuzDir)
+import qobuz
+from bootstrap import QobuzBootstrap
+boot = QobuzBootstrap(__addon__, 0)
+boot.bootstrap_api()
+boot.bootstrap_core()
 
+__pid_file__ = 'qobuzresolver.pid'
+__sleep__ = 5
 
-from api import QobuzApi
 from utils.tag import QobuzTagTrack
 from data.track import QobuzTrack
 from utils.pid import Pid
@@ -50,20 +55,17 @@ class QobuzResolver():
         
 service_name = 'Qobuz URL Resolver'
 
-API = QobuzApi()
-API.set_cache_path(os.path.join(__addon__cachepath__, "auth.dat"))
-
 def log(msg, lvl = xbmc.LOGNOTICE):
     xbmc.log(service_name + ': ' + str(msg), lvl)
 
 def login():
-    user =  __addon__.getSetting('username')
-    password = __addon__.getSetting('password')
+    user =  qobuz.addon.getSetting('username')
+    password = qobuz.addon.getSetting('password')
     if not user or not password:
         log("You need to enter login/password in Qobuz Addon Settings")
         return False
     log("Login as user: " + str(user))
-    return API.login( user, password)
+    return qobuz.api.login( user, password)
 
 '''
 '''
@@ -95,8 +97,7 @@ def replace_playlist_path(playlist, cpos, item):
 '''
 '''
 def get_xbmc_item(p_item, pos, id, stream_url, filename):
-    Core = None
-    track = API.get_track(id)
+    track = qobuz.api.get_track(id)
     if not track:
         log("Cannot get QobuzTrack with id: " + str(id))
         return None
@@ -142,7 +143,7 @@ def resolve_position(player, playlist, item, pos):
     if not login():
         log("Login to Qobuz fail, abort...")
         return None
-    stream_url = API.get_track_url(id, 'playlist', 0, 6)
+    stream_url = qobuz.api.get_track_url(id, 'playlist', 0, 6)
     if not stream_url:
         log("Cannot retrieve streaming url!")
         return None
@@ -187,7 +188,7 @@ def watch_playlist(player, playlist):
     our pid file can't be created, our service die ...
 '''
 def watcher():
-    pid_path = os.path.join(__addon__cachepath__, __pid_file__)
+    pid_path = os.path.join(qobuz.path.cache, __pid_file__)
     pid_id =  os.getpid()
     pid = Pid(pid_path, pid_id)
     playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)

@@ -27,23 +27,22 @@ from utils.icacheable import ICacheable
 from utils.tag import QobuzTagArtist
 from utils.tag import QobuzTagTrack
 from utils.tag import QobuzTagProduct
-
+import qobuz
 """
     Class QobuzGetPurchases
 """
 class QobuzGetPurchases(ICacheable):
 
-    def __init__(self, Core, limit = 100):
-        self.Core = Core
+    def __init__(self, limit = 100):
         self.limit = limit
-        super(QobuzGetPurchases, self).__init__(self.Core.Bootstrap.cacheDir, 
+        super(QobuzGetPurchases, self).__init__(qobuz.path.cache, 
                                        'purchases')
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation'))
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommandation'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
         
     def _fetch_data(self):
-        return self.Core.Api.get_purchases(self.limit)
+        return qobuz.api.get_purchases(self.limit)
     
     def length(self):
         if not self._raw_data:
@@ -66,7 +65,7 @@ class QobuzGetPurchases(ICacheable):
             if isseen == 'false':
                 log ('warn','album never seen try to add it')
                 try:
-                    album = self.Core.getProduct(str(albumid))
+                    album = qobuz.core.getProduct(str(albumid))
                 except:
                     track['BLACK_ID'] = 'true'
                     needsave = True
@@ -75,7 +74,7 @@ class QobuzGetPurchases(ICacheable):
                 item = a.getXbmcItem()
                 albumid = a.id     
                 
-                u = self.Core.Bootstrap.build_url(MODE_ALBUM, albumid)
+                u = qobuz.boot.build_url(MODE_ALBUM, albumid)
                 list.append((u, item, True))        
                 albumseen[albumid] = 'true'
         if needsave:

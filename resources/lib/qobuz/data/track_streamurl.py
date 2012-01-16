@@ -26,6 +26,7 @@ from utils.icacheable import ICacheable
 from debug import log, info, warn
 #from utils import _sc
 import pprint
+import qobuz
 '''
  Class QobuzTrackURL
 
@@ -36,20 +37,19 @@ import pprint
 '''
 class QobuzTrackURL(ICacheable):
     # Constructor
-    def __init__(self, Core, id, type):
-        self.Core = Core
+    def __init__(self, id, type):
         self.id = id
         self.type = type
         self.format_id = 6
-        if self.Core.Bootstrap.__addon__.getSetting('streamtype') == 'mp3':
+        if qobuz.addon.getSetting('streamtype') == 'mp3':
             self.format_id = 5
-        super(QobuzTrackURL, self).__init__(self.Core.Bootstrap.cacheDir,
+        super(QobuzTrackURL, self).__init__(qobuz.path.cache,
                                             'track-url-' + str(self.format_id),
                                             self.id)
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_auth'))
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_auth'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        return self.Core.Api.get_track_url(self.id, 'playlist', 0,  self.format_id)
+        return qobuz.api.get_track_url(self.id, 'playlist', 0,  self.format_id)

@@ -30,7 +30,10 @@ libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
 sys.path.append(qobuzDir)
+
 from bootstrap import QobuzBootstrap
-Core = QobuzBootstrap(__addon__, int(sys.argv[1]))
-if Core.Db:
-    Core.Db.close()
+boot = QobuzBootstrap(__addon__, int(sys.argv[1]))
+boot.bootstrap_app()
+import qobuz
+if qobuz.db:
+    qobuz.db.close()

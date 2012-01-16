@@ -26,23 +26,23 @@ from constants import *
 from debug import * 
 from utils.tag import QobuzTagPlaylist
 from utils.tag import QobuzTagTrack
+import qobuz
 '''
     Class QobuzPLaylist
 '''
 class QobuzPlaylist(ICacheable):
 
-    def __init__(self, Core, id):
-        self.Core = Core
+    def __init__(self,id):
         self.id = id
-        super(QobuzPlaylist, self).__init__(self.Core.Bootstrap.cacheDir,
+        super(QobuzPlaylist, self).__init__(qobuz.path.cache,
                                             'playlist',
                                             self.id)
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist'))
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
-        data = self.Core.Api.get_playlist(self.id)['playlist']
+        data = qobuz.api.get_playlist(self.id)['playlist']
         return data
 
     def length(self):
@@ -56,7 +56,7 @@ class QobuzPlaylist(ICacheable):
                 continue
             item = t.getXbmcItem('playlist')
             print "Label:" + item.getLabel()
-            u = self.Core.Bootstrap.build_url(MODE_SONG, str(t.id))
+            u = qobuz.boot.build_url(MODE_SONG, str(t.id))
             item.setPath(u) 
             list.append((u, item, False))
         return list

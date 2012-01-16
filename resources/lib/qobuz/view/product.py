@@ -30,25 +30,25 @@ from debug import *
 from constants import *
 from utils.tag import QobuzTagProduct
 from utils.tag import QobuzTagTrack
+import qobuz
 
 ###############################################################################
 # Class QobuzProduct
 ###############################################################################
 class QobuzProduct(ICacheable):
 
-    def __init__(self, Core, id, context_type = "playlist" ):
-        self.Core = Core
+    def __init__(self, id, context_type = "playlist" ):
         self.id = id
         self.context_type = context_type
-        super(QobuzProduct, self).__init__( self.Core.Bootstrap.cacheDir, 
+        super(QobuzProduct, self).__init__( qobuz.path.cache, 
                                           'product',
                                           self.id)
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_album'))
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_album'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
-        data = self.Core.Api.get_product(str(self.id),self.context_type)['product']
+        data = qobuz.api.get_product(str(self.id), self.context_type)['product']
         return data
 
     def length(self):
@@ -61,6 +61,6 @@ class QobuzProduct(ICacheable):
             if not isinstance(tag_track, QobuzTagTrack):
                 continue
             item = tag_track.getXbmcItem('album')
-            u = self.Core.Bootstrap.build_url(MODE_SONG, tag_track.id)
+            u = qobuz.boot.build_url(MODE_SONG, tag_track.id)
             list.append((u, item, False))
         return list

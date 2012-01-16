@@ -27,6 +27,7 @@ from debug import log, info, warn
 from utils.string import _sc
 from utils.tag import QobuzTagTrack
 import pprint
+import qobuz
 '''
  Class QobuzTrack 
 
@@ -37,19 +38,18 @@ import pprint
 '''
 class QobuzTrack(ICacheable):
     # Constructor
-    def __init__(self, Core, id, context_type='playlist'):
-        self.Core = Core
+    def __init__(self, id, context_type='playlist'):
         self.id = id
-        super(QobuzTrack, self).__init__(self.Core.Bootstrap.cacheDir,
+        super(QobuzTrack, self).__init__(qobuz.path.cache,
                                          'track',
                                          self.id)
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_track'))
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_track'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        json = self.Core.Api.get_track(self.id)
+        json = qobuz.api.get_track(self.id)
         return json
     
     # Return track duration

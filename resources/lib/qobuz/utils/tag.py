@@ -189,7 +189,7 @@ class IQobuzTag(object):
             if data: return data
         return data
     
-    def getXbmcItem(self, pos = 0):
+    def getXbmcItem(self, context = 'album', pos = 0, fanArt = ''):
         date = 0
         try:
             date = self.getDate('#').split('#')[0]
@@ -218,7 +218,8 @@ class IQobuzTag(object):
         if image:
             i.setThumbnailImage(image)
             i.setIconImage(image)
-            i.setProperty('fanart_image', image)
+        if fanArt:
+            i.setProperty('fanart_image', fanArt)
         return i
 '''
 '''
@@ -590,7 +591,7 @@ class QobuzTagTrack(IQobuzTag):
         try: return self.streaming_type
         except: return ''
 
-    def getXbmcItem(self, context = 'album', pos = 0):
+    def getXbmcItem(self, context = 'album', pos = 0, fanArt = ''):
         parent = self.get_parent()
         album = self.getAlbum()
         artist = self.getArtist()
@@ -628,8 +629,9 @@ class QobuzTagTrack(IQobuzTag):
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
         print "Set label: " + label
         i = xbmcgui.ListItem(label, label, image, image)
+        if fanArt:
+            i.setProperty('fanart_image', core.image.access.get('fanArt'))
         i.setProperty('title', label)
-        i.setProperty('fanart_image', image)
         i.setLabel(label)
         i.setLabel2(label)
         i.setInfo(type = 'music',
@@ -654,7 +656,6 @@ class QobuzTagTrack(IQobuzTag):
         '''
             Context Menu
         '''
-#        #b = self.Core.Bootstrap
 #        retstr = sys.argv[2]
 #        go = 'http://plugin.audio.qobuz/?mode='+MODE_ARTIST+'&id='+self.getArtistId()
 #        albumfromthisartist= ('Show albums from this artist', 'ActivateWindow(Music,'+go+','+retstr+')')

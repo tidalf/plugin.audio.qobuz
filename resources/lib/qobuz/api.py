@@ -24,20 +24,18 @@ import pprint
 from time import time
 import math
 
+import qobuz
 from debug import log, info, warn
 
 class QobuzApi:
 
-    def __init__(self, Core = None):
-        self.Core = Core
+    def __init__(self):
         self.authtoken = None
         self.userid = None
         self.authtime = None
         self.token_validity_time = 3600
-        self.cachePath = None
-        if self.Core:
-            self.set_cache_path(os.path.join(self.Core.Bootstrap.cacheDir,'auth.dat'))
-            info(self, 'authCacheDir: ' + self.get_cache_path())
+        self.set_cache_path(os.path.join(qobuz.path.cache,'auth.dat'))
+        info(self, 'authCacheDir: ' + self.get_cache_path())
         self.retry_time = [1, 3, 5, 10]
         self.retry_num = 0
 
@@ -196,7 +194,7 @@ class QobuzApi:
     
     def get_recommandations(self, genre_id, typer = "new-releases", limit = 100):
         if genre_id == 'null':
-            params = {'x-api-auth-token':self.authtoken, 
+            params = {'x-api-auth-token': self.authtoken, 
                                        'type': typer, 'limit': limit}
         else:
             params = {'x-api-auth-token':self.authtoken, 

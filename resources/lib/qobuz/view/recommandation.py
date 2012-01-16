@@ -27,51 +27,55 @@ from constants import *
 from utils.icacheable import ICacheable
 from utils.tag import QobuzTagArtist
 from utils.tag import QobuzTagProduct
-from data.genre_image import QobuzGenreImage
-
+import qobuz
 """
     Class QobuzGetRecommendation
 """
 class QobuzGetRecommandation(ICacheable):
 
-    def __init__(self, Core, genre_id, type ='new-releases', limit = 100):
-        self.Core = Core
+    def __init__(self, genre_id, type ='new-releases', limit = 100):
         self.genre_id = genre_id
         self.type = type
         self.limit = limit 
-        super(QobuzGetRecommandation, self).__init__(self.Core.Bootstrap.cacheDir,
+        super(QobuzGetRecommandation, self).__init__(qobuz.path.cache,
                                                      'recommandations-' + type,
                                                      genre_id)
-        self.set_cache_refresh(self.Core.Bootstrap.__addon__.getSetting('cache_duration_recommandation'))
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommandation'))
         info(self, "Cache duration: " + str(self.cache_refresh))
+        self.cacheImage = qobuz.image.cache
         self.fetch_data()
       
     def _fetch_data(self):
-        return self.Core.Api.get_recommandations(self.genre_id, 
-                                                self.type, self.limit)
+        return qobuz.api.get_recommandations(self.genre_id, 
+                                             self.type, 
+                                             self.limit)
     def length(self):
         return len(self.get_raw_data())
     
+    def get_image(self):
+        return self.cacheImage.get(self.type, self.genre_id)
+    
     def set_image_genre(self, image):
-        info(self, "Set image genre to: " + image)
-        cache = QobuzGenreImage(self.Core)
-        cache.set(self.type, self.genre_id, image)
+        return self.cacheImage.set(self.type, self.genre_id, image)
         
     def get_items(self):
         n = self.length()
         h = int(sys.argv[1])
         rand = random.randint(0, n)
+        print "Random: " + str(rand) 
+        getnewimage = random.randint(0, 1)
+        fanArt = qobuz.image.access.get('fanArt')
         i = 0
         list = []
+        image = self.get_image()
+        if not image: getnewimage = True
         for json_product in self.get_raw_data():
             album = QobuzTagProduct(json_product)
-            pprint.pprint(json_product)
-            if i == rand:
-                image = album.getImage()
-                if image:
-                    self.set_image_genre(image)
-            u = self.Core.Bootstrap.build_url(MODE_ALBUM, album.id)
-            item = album.getXbmcItem()
+            if getnewimage and i == rand:
+                image = self.set_image_genre(json_product['image']['large'])
+                getnewimage = False
+            u = qobuz.boot.build_url(MODE_ALBUM, album.id)
+            item = album.getXbmcItem('playlist', i, fanArt)
             list.append((u, item, True))
             i += 1
         return list

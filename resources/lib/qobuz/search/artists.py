@@ -26,20 +26,20 @@ import pprint
 
 from utils.tag import QobuzTagArtist
 from utils.tag import QobuzTagProduct
+import qobuz
 ###############################################################################
 # Class QobuzSearchArtists
 ###############################################################################
 class QobuzSearchArtists():
 
-    def __init__(self, Core):
-        self.Core = Core
+    def __init__(self):
         self._raw_data = []
         
     def get_data(self):
         return self._raw_data
     
     def search(self, query, limit = 100):
-        self._raw_data = self.Core.Api.search_artists(query, limit)
+        self._raw_data = qobuz.api.search_artists(query, limit)
         return self
         
     def length(self):
@@ -60,17 +60,17 @@ class QobuzSearchArtists():
     def _directory_products(self):
         data = self.get_data()['results']['artists']
         list = []
-        image = self.Core.Bootstrap.Images.get('qobuzIcon')
+        image = qobuz.image.access.get('qobuzIcon')
         for json_artist in data:
             tag_artist = QobuzTagArtist(json_artist)
-            u = self.Core.Bootstrap.build_url(MODE_ARTIST, tag_artist.id)
+            u = qobuz.boot.build_url(MODE_ARTIST, tag_artist.id)
             item   = xbmcgui.ListItem()
             item.setLabel(tag_artist.getArtist() )
             if not item.getProperty('fanart_image'):
                 item.setProperty('fanart_image', image)
                 item.setIconImage( image)
                 item.setThumbnailImage(image)
-            item.setProperty('fanart_image', self.Core.Bootstrap.Images.get('fanArt'))
+            item.setProperty('fanart_image', qobuz.image.access.get('fanArt'))
             list.append((u, item, True))
         return list
 
@@ -78,10 +78,10 @@ class QobuzSearchArtists():
         data = self.get_data()
         artist = data['artist']['name']
         list = []
-        image = self.Core.Bootstrap.Images.get('qobuzIcon')
+        image = qobuz.image.access.get('qobuzIcon')
         for json_album in json['artist']['albums']:
             tag_album = QobuzTagAlbum(json_album)
-            u = self.Core.Bootstrap.build_url(MODE_ALBUM, tag_album.id)
+            u = qobuz.boot.build_url(MODE_ALBUM, tag_album.id)
             item = tag_album.getXbmcItem('album')
             if not item.getProperty('fanart_image'):
                 item.setProperty('fanart_image', image)

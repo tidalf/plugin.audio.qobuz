@@ -23,7 +23,7 @@ from utils.icacheable import ICacheable
 from debug import log, info, warn
 from constants import *
 from utils.tag import IQobuzTag, QobuzTagUserPlaylist
-
+import qobuz
 '''
     Class QobuzUserPLaylists
 '''
@@ -52,27 +52,27 @@ class QobuzUserPlaylists(ICacheable):
 
 
 class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
-    def __init__(self, Core):
-        self.Core = Core
+    def __init__(self):
         super(QobuzUserPlaylistsXbmc, self).__init__(
-                self.Core.Api,
-                self.Core.Bootstrap.cacheDir,
-                self.Core.Bootstrap.__addon__.getSetting('cache_duration_userplaylist'))
+                qobuz.api,
+                qobuz.path.cache,
+                qobuz.addon.getSetting('cache_duration_userplaylist'))
       
     def get_items(self):
         h = int(sys.argv[1])
         i = 1
         list = []
-        image = self.Core.Bootstrap.Images.get('qobuzIcon')
+        image = qobuz.image.access.get('qobuzIcon')
+        fanArt = qobuz.image.access.get('fanArt')
         for json_track in self.get_data():
             tag = QobuzTagUserPlaylist(json_track)
-            u = self.Core.Bootstrap.build_url(MODE_PLAYLIST, tag.id)
+            u = qobuz.boot.build_url(MODE_PLAYLIST, tag.id)
             item = xbmcgui.ListItem(tag.name)
             item.setLabel(tag.owner_name + ' - ' + tag.name)
             item.setInfo(type="Music",infoLabels={ "title": tag.name, "count": i })
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');
-            item.setProperty('fanart_image', self.Core.Bootstrap.Images.get('fanArt'))
+            item.setProperty('fanart_image', fanArt)
             item.setThumbnailImage(image)
             item.setIconImage(image)
             list.append((u, item, True))

@@ -26,18 +26,18 @@ from constants import *
 from debug import log, info, warn
 from utils.tag import QobuzTagTrack
 from utils.tag import QobuzTagSearch
+import qobuz
 
 ###############################################################################
 # Class QobuzSearchTracks 
 ###############################################################################
 class QobuzSearchTracks():
 
-    def __init__(self, Core):
-        self.Core = Core
+    def __init__(self):
         self._raw_data = {}
         
     def search(self, query, limit = 100):
-        self._raw_data = self.Core.Api.search_tracks(query, limit)
+        self._raw_data = qobuz.api.search_tracks(query, limit)
         return self
         
     def length(self):
@@ -51,7 +51,7 @@ class QobuzSearchTracks():
         list = []
         for track in childs:
             item = track.getXbmcItem('playlist')
-            u = self.Core.Bootstrap.build_url(MODE_SONG, int(track.id))
+            u = qobuz.boot.build_url(MODE_SONG, int(track.id))
             list.append((u, item, False))
         return list
 

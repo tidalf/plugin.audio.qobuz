@@ -14,42 +14,14 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
-__debugging__ = 0
-
-MODE_SEARCH_SONGS = 1
-MODE_SEARCH_ALBUMS = 2
-MODE_SEARCH_ARTISTS = 3
-MODE_SEARCH_ARTISTS_ALBUMS = 4
-MODE_SEARCH_PLAYLISTS = 5
-
-MODE_ARTIST_POPULAR = 6
-MODE_POPULAR_SONGS = 7
-MODE_FAVORITES = 8
-MODE_USERPLAYLISTS = 9
-MODE_ALBUM = 10
-MODE_ARTIST = 11
-MODE_PLAYLIST = 12
-MODE_SONG_PAGE = 13
-MODE_SIMILAR_ARTISTS = 14
-MODE_SHOW_RECOS = 15
-MODE_SHOW_RECO_T = 16
-MODE_SHOW_RECO_T_G = 17
-MODE_SHOW_PURCHASES = 18
-MODE_CURRENT_PLAYLIST = 19
-
-
-MODE_SONG = 30
-MODE_FAVORITE = 31
-MODE_UNFAVORITE = 32
-MODE_MAKE_PLAYLIST = 33
-MODE_REMOVE_PLAYLIST = 34
-MODE_RENAME_PLAYLIST = 35
-MODE_REMOVE_PLAYLIST_SONG = 36
-MODE_ADD_PLAYLIST_SONG = 37
-MODE_ERASE_CACHE = 38
-
-MODE_MANAGE_PLAYLIST = 50
-MODE_PLAYLIST_REMOVE = 51
-
-image = None
+addon  = None
+debug  = None
+path   = None
+image  = None
+player = None
+lang   = None
+gui    = None
+api    = None
+core   = None
+db     = None
+boot   = None

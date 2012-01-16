@@ -22,12 +22,10 @@ import xbmcgui
 
 from constants import *
 import constants
-from core import QobuzCore
-from gui import QobuzGUI
+
 from debug import *
-from player import QobuzPlayer
-#from winmain import QobuzWindow
-from images import QobuzImages
+
+import qobuz
 
 import xbmcgui
 
@@ -51,110 +49,98 @@ def get_params():
                 param[splitparams[0]]=splitparams[1]
     return param
 
-import threading
-import time
-class Watcher(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.Terminated = False
-        self.name = "Watcher"
-        self._stopevent = threading.Event( )
-        
-    def run(self, player, id, pos):
-        if not player.play(id, pos):
-            return False
-        i = 0
-        while not self._stopevent.isSet():
-            try:
-                if player.isPlayingAudio():
-                    print "Player is playing: " + self.item.getLabel()
-                    player.watchPlayback()
-                    time.sleep()
-                else:
-                    self.stop()
-            except:
-                self.stop()
-                print "Player stopped"
-      
-    def stop(self):  
-        self._stopevent.set( )  
-
 '''
-    QobuzBoostrap
+    QobuzBootstrap
 '''
 class QobuzBootstrap(object):
     
     def __init__(self, __addon__, __handle__):
-        #global Player
-        self.__addon__ = __addon__
-        self.__handle__ = __handle__
-        info(self, "Handle: " + str(self.__handle__))
-        self.__language__ = __addon__.getLocalizedString
-        self.bootstrapDirectories()
-        self.Core = QobuzCore(self)
-        self.Images = QobuzImages(self.imgDir)
-        self.GUI = QobuzGUI(self)
-        self.Player = QobuzPlayer()
-        self.Player.setCore(self.Core)
+        qobuz.addon = __addon__
+        self.handle = __handle__
+        qobuz.lang = qobuz.addon.getLocalizedString
+        self.bootstrap_directories()
+        qobuz.boot = self
+    
+    def bootstrap_app(self):
+        self.bootstrap_api()
+        self.bootstrap_core()
+        self.bootstrap_image()
+        self.bootstrap_gui()
+        self.bootstrap_player()
+        self.bootstrap_db()
+        self.bootstrap_sys_args()
+        
+        if not qobuz.core.login():
+            qobuz.gui.showLoginFailure()
+            exit(1)
+        self.mode_dispatch()
 
+    def bootstrap_directories(self):
+        class path ():
+            def __init__(s):
+                s.base = qobuz.addon.getAddonInfo('path')
+                
+            def _set_dir(s):
+                s.cache = os.path.join(xbmc.translatePath('special://temp/'),  os.path.basename(qobuz.path.base))
+                s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
+                s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
+                s.mkdir('cache', s.base)
+            '''
+            Make dir
+            '''
+            def mkdir(self, name, dir):
+                    info(self, name + ': ' + dir)
+                    if os.path.isdir(dir) == False:
+                        try:
+                            os.makedirs(dir)
+                        except:
+                            warn("Cannot create directory: " + dir)
+                            exit(2)
+                        info(self, "Directory created: " + dir)
+        qobuz.path = path()
+        qobuz.path._set_dir()
+
+    def bootstrap_api(self):
+        from api import QobuzApi
+        qobuz.api = QobuzApi()
+        
+    def bootstrap_core(self):
+        from core import QobuzCore
+        qobuz.core = QobuzCore()
+    
+    def bootstrap_image(self):
+        from images import QobuzImage
+        qobuz.image = QobuzImage()
+        
+    def bootstrap_gui(self):
+        from gui import QobuzGUI
+        qobuz.gui = QobuzGUI()
+        
+    def bootstrap_player(self):
+        from player import QobuzPlayer
+        qobuz.player = QobuzPlayer()
+    
+    def bootstrap_db(self):
         try:
             from utils.db import QobuzDb
-            self.Db = QobuzDb(self.cacheDir, 'qobuz.db3')
+            qobuz.db = QobuzDb(qobuz.path.cache, 'qobuz.db3')
         except:
-            self.Db = None
-        if not self.Db.open():
+            qobuz.db = None
+        if not qobuz.db.open():
             warn(self, "Cannot open sql database")
             exit(0)
+
+    '''
+        Parse system parameters
+    '''
+    def bootstrap_sys_args(self):
         self.MODE = None
         self.ID = None
         self.META = None
         self.WINID = xbmcgui.getCurrentWindowId()
-        print "\nWINDOOOOOOWS ID: " + str(self.WINID) + "\n"
-        #self.WIN = xbmcgui.WindowXML(self,strXMLname='MyMusicSongs.xml', strFallbackPath='plop', strDefaultName='Default', forceFallback=False)
+        #self.NAME = None
+        info(self, "\nWINDOOOOOOWS ID: " + str(self.WINID) + "\n")
         self.WIN = xbmcgui.Window(self.WINID)
-        #self.WIN.clearProperties()
-        #self.WIN.addControl(xbmcgui.ControlLabel(500, 250, 125, 75, 'DEMO DEMO DEMO', angle=45)) 
-        #self.WIN.getControl(50).addItem("...")
-            
-        self.parse_sys_args()
-        '''
-            NAME can be used to set icon for each folder i think :)
-            XBMC maintain a cache path/icon 
-            http://wiki.xbmc.org/index.php?title=Thumbnails
-        '''
-        self.NAME = None
-        if not self.Core.login():
-            self.GUI.showLoginFailure()
-            exit(1)
-        self.mode_dispatch()
-    
-    '''
-        Initialize needed directories
-    '''
-    def bootstrapDirectories(self):
-        self.baseDir = self.__addon__.getAddonInfo('path')
-        self.cacheDir = os.path.join(xbmc.translatePath('special://temp/'),  os.path.basename(self.baseDir))
-        self.resDir =  xbmc.translatePath(os.path.join(self.baseDir, 'resources'))
-        self.imgDir = xbmc.translatePath(os.path.join(self.resDir, 'img'))
-        self.mkdir('cache', self.cacheDir)
-    
-    '''
-        Make dir
-    '''
-    def mkdir(self, name, dir):
-        info(self, name + ': ' + dir)
-        if os.path.isdir(dir) == False:
-            try:
-                os.makedirs(dir)
-            except:
-                warn("Cannot create directory: " + dir)
-                exit(2)
-            info(self, "Directory created: " + dir)
-            
-    '''
-        Parse system parameters
-    '''
-    def parse_sys_args(self):
         self.params = get_params()
         if self.WINID != 10501:
             self.params['meta'] = '1'
@@ -190,17 +176,18 @@ class QobuzBootstrap(object):
     
     def erase_cache(self):
         import re
-        if not self.cacheDir:
+        cache = qobuz.path.cache
+        if not cache:
             warn(self, "Cache directory not set")
             return False
-        if not os.path.exists(self.cacheDir):
+        if not os.path.exists(cache):
             warn(self, "Cache directory doesn't seem to exist")
             return False
-        list = os.listdir(self.cacheDir)
+        list = os.listdir(cache)
         for f in list:
             if not f.endswith('.dat'): 
                 continue
-            path = os.path.join(self.cacheDir, str(f))
+            path = os.path.join(cache, str(f))
             if os.unlink(path):
                 info(self, "Cache file deleted: " + path)
             else:
@@ -214,25 +201,23 @@ class QobuzBootstrap(object):
         Execute methode based on MODE
     '''       
     def mode_dispatch(self):
-   
-             
         if not self.MODE:
-            self.GUI.showCategories()
+            qobuz.gui.showCategories()
         
         elif self.MODE == MODE_SONG:
             info(self, "PLaying song")
-            self.Core.Bootstrap.GUI.showNotification(34000, 34001)
+            qobuz.gui.showNotification(34000, 34001)
             try:
                 context_type=urllib.unquote_plus(self.params["context_type"])
             except: 
                 context_type="playlist"
             pos = None
-            if self.Player.play(self.ID):      
+            if qobuz.player.play(self.ID):      
                 return True
         
         elif self.MODE == MODE_ARTIST:
             info(self, "Displaying artist")
-            self.GUI.showArtist(str(self.ID))
+            qobuz.gui.showArtist(str(self.ID))
 
         elif self.MODE == MODE_ALBUM:
             info(self, "Displaying album")
@@ -240,43 +225,42 @@ class QobuzBootstrap(object):
                 context_type=urllib.unquote_plus(self.params["context_type"])
             except: 
                 context_type="playlist"            
-            self.GUI.showProduct(str(self.ID),context_type)
+            qobuz.gui.showProduct(str(self.ID),context_type)
             
         elif self.MODE == MODE_USERPLAYLISTS:
             info(self, 'Displaying userplaylist')
-  
-            self.GUI.showUserPlaylists()
+            qobuz.gui.showUserPlaylists()
     
         elif self.MODE == MODE_SEARCH_SONGS:
             ''' http://wiki.xbmc.org/index.php?title=Window_IDs '''
             if self.WINID != 10501:
                 return
             info(self, 'Searching songs')
-            self.GUI.searchSongs()    
+            qobuz.gui.searchSongs()    
         
         elif self.MODE == MODE_SEARCH_ALBUMS:
             if self.WINID != 10501:
                 return
             info(self, "Search albums")
-            self.GUI.searchAlbums()
+            qobuz.gui.searchAlbums()
             
         elif self.MODE == MODE_SEARCH_ARTISTS:
             if self.WINID != 10501:
                 return
             info(self, "Search artists")
-            self.GUI.searchArtists()
+            qobuz.gui.searchArtists()
      
         elif self.MODE == MODE_PLAYLIST:
             info(self, 'Displaying playlist')
-            self.GUI.showPlaylist(str(self.ID))
+            qobuz.gui.showPlaylist(str(self.ID))
             
         elif self.MODE == MODE_SHOW_RECOS:
             info(self, "Displaying recommendations")
-            self.GUI.showRecommendationsTypes()
+            qobuz.gui.showRecommendationsTypes()
 
         elif self.MODE == MODE_SHOW_PURCHASES:
             info(self, "Displaying purchases")
-            self.GUI.showPurchases()
+            qobuz.gui.showPurchases()
         
         elif self.MODE == MODE_SHOW_RECO_T_G:
             info(self, "Displaying recommendations T/G")
@@ -285,7 +269,7 @@ class QobuzBootstrap(object):
                 type=urllib.unquote_plus(self.params["type"])
                 genre=urllib.unquote_plus(self.params["genre"])
             except: pass
-            self.GUI.showRecommendations(type, genre)
+            qobuz.gui.showRecommendations(type, genre)
         
         elif self.MODE == MODE_SHOW_RECO_T:
             info(self, "Displaying recommendations T")
@@ -293,11 +277,11 @@ class QobuzBootstrap(object):
             try:
                 type=urllib.unquote_plus(self.params["type"])
             except: pass
-            self.GUI.showRecommendationsGenres(type)
+            qobuz.gui.showRecommendationsGenres(type)
 
         elif self.MODE == MODE_CURRENT_PLAYLIST:
             info(self, "Displaying current playlist")
-            self.GUI.showCurrentPlaylist()
+            qobuz.gui.showCurrentPlaylist()
             
         elif self.MODE == MODE_ERASE_CACHE:
             info(self, "Erasing cache...")
@@ -305,8 +289,6 @@ class QobuzBootstrap(object):
             
         elif self.MODE == MODE_MANAGE_PLAYLIST:
             from widget.playlist import QobuzGui_Playlist
-            #winpath =os.path.join(self.baseDir)
-            #print 'Path: ' + winpath
             p = QobuzGui_Playlist('Qobuz_MyMusicPlaylist.xml', self.baseDir, 'Default', True)
             p.set_core(self.Core)
             p.doModal()
@@ -315,5 +297,5 @@ class QobuzBootstrap(object):
             Directory Endin
         '''
         if self.MODE < MODE_SONG:
-            self.GUI.endOfDirectory()
+            qobuz.gui.endOfDirectory()
         
