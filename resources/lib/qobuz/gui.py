@@ -91,7 +91,9 @@ class QobuzGUI:
         MUST BE REMOVED ?
     '''  
     def addDirectoryItem(self, u, item, bFolder, len):
-        xbmcplugin.addDirectoryItem(handle=self.Bootstrap.__handle__, 
+        h = self.Bootstrap.__handle__
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addDirectoryItem(handle=h, 
                                     url=u, listitem=item, isFolder=bFolder, 
                                     totalItems=len)
 
@@ -240,6 +242,7 @@ class QobuzGUI:
             self.showNotificationH("Qobuz", "Empty directory")
             return
         h = int(sys.argv[1])
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
     
     '''
