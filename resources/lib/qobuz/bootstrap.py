@@ -232,21 +232,23 @@ class QobuzBootstrap(object):
             qobuz.gui.showUserPlaylists()
     
         elif self.MODE == MODE_SEARCH_SONGS:
-            ''' http://wiki.xbmc.org/index.php?title=Window_IDs '''
-            if self.WINID != 10501:
-                return
+            if qobuz.addon.getSetting('search_enabled') == 'false':
+                info(self, "Search is disabled!")
+                return False
             info(self, 'Searching songs')
             qobuz.gui.searchSongs()    
         
         elif self.MODE == MODE_SEARCH_ALBUMS:
-            if self.WINID != 10501:
-                return
+            if qobuz.addon.getSetting('search_enabled') == 'false':
+                info(self, "Search is disabled!")
+                return False
             info(self, "Search albums")
             qobuz.gui.searchAlbums()
             
         elif self.MODE == MODE_SEARCH_ARTISTS:
-            if self.WINID != 10501:
-                return
+            if qobuz.addon.getSetting('search_enabled') == 'false':
+                info(self, "Search is disabled!")
+                return False
             info(self, "Search artists")
             qobuz.gui.searchArtists()
      
