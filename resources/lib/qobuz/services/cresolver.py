@@ -176,7 +176,15 @@ class Service_url_resolver():
         
     def watch(self):
         print self.playlist_to_s()
-        
+        login = False
+        try:
+            login = qobuz.core.login()
+        except:
+            print "Exception: Cannot login to Qobuz Service..."
+            return False
+        if not login:
+            print "Cannot login to Qobuz Service..."
+            return False
         size = self.get_playlist_size()
         if size == None:
             return False
@@ -186,6 +194,7 @@ class Service_url_resolver():
         if self.last_track_number == None:
             self.last_track_number = cposition
         nposition = self.get_next_position(cposition)
+        print "Nposition: " + str(nposition)
         if nposition == None:
             return False
         if not self.position_need_resolve(nposition):
