@@ -176,15 +176,6 @@ class Service_url_resolver():
         
     def watch(self):
         print self.playlist_to_s()
-        login = False
-        try:
-            login = qobuz.core.login()
-        except:
-            print "Exception: Cannot login to Qobuz Service..."
-            return False
-        if not login:
-            print "Cannot login to Qobuz Service..."
-            return False
         size = self.get_playlist_size()
         if size == None:
             return False
@@ -220,6 +211,15 @@ class Service_url_resolver():
             q_item = QobuzListItem_track(id)
         except:
             print "Cannot get QobuzListItem"
+            return False
+        login = False
+        try:
+            login = qobuz.core.login()
+        except:
+            print "Exception: Cannot login to Qobuz Service..."
+            return False
+        if not login:
+            print "Cannot login to Qobuz Service..."
             return False
         try:
             q_item.fetch_stream_url(self.streaming_format)
