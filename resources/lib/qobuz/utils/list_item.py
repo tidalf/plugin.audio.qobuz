@@ -39,7 +39,7 @@ class QobuzListItem_track(QobuzListItem):
         self.display_context = 'album'
         self.fanart_image = ''
         
-    def set_requ_stream(self, format):
+    def set_requ_stream(self, format = 'flac'): 
         sfid = None
         if format == 'flac':
             sfid = 6
