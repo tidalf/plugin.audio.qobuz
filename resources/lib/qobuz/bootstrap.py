@@ -83,15 +83,16 @@ class QobuzBootstrap(object):
                 s.base = qobuz.addon.getAddonInfo('path')
                 
             def _set_dir(s):
-                s.cache = os.path.join(xbmc.translatePath('special://temp/'),  os.path.basename(qobuz.path.base))
+                s.temp = xbmc.translatePath('special://temp/')
+                s.cache = os.path.join(s.temp, 'plugin.audio.qobuz')
                 s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
                 s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
-                s.mkdir('cache', s.base)
+
             '''
             Make dir
             '''
-            def mkdir(self, dir):
-                info(self, "Creating directoy: " + dir)
+            def mkdir(s, dir):
+                info(self, "Creating directoy: " +  dir)
                 if os.path.isdir(dir) == False:
                     try:
                         os.makedirs(dir)
@@ -101,7 +102,7 @@ class QobuzBootstrap(object):
                     info(self, "Directory created: " + dir)
         qobuz.path = path()
         qobuz.path._set_dir()
-        qobuz.path.mkdir(qobuz.path.cache, dir)
+        qobuz.path.mkdir(qobuz.path.cache)
 
     def bootstrap_debug(self):
         from debug import log, warn, error, info
