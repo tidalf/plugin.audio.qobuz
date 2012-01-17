@@ -90,17 +90,18 @@ class QobuzBootstrap(object):
             '''
             Make dir
             '''
-            def mkdir(self, name, dir):
-                    info(self, name + ': ' + dir)
-                    if os.path.isdir(dir) == False:
-                        try:
-                            os.makedirs(dir)
-                        except:
-                            warn("Cannot create directory: " + dir)
-                            exit(2)
-                        info(self, "Directory created: " + dir)
+            def mkdir(self, dir):
+                info(self, "Creating directoy: " + dir)
+                if os.path.isdir(dir) == False:
+                    try:
+                        os.makedirs(dir)
+                    except:
+                        warn("Cannot create directory: " + dir)
+                        exit(2)
+                    info(self, "Directory created: " + dir)
         qobuz.path = path()
         qobuz.path._set_dir()
+        qobuz.path.mkdir(qobuz.path.cache, dir)
 
     def bootstrap_debug(self):
         from debug import log, warn, error, info
