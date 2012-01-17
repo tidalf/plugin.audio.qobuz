@@ -9,6 +9,7 @@ class Pid():
         self.pid = pid
         self.file = file
         self.auto_remove_old_pid = 0
+        self.new_name = self.file + str(int(time.time()))
         
     def exists(self):
         if os.path.isfile(self.file):
@@ -51,13 +52,11 @@ class Pid():
                 ret = False
             finally:
                 ret = True
-                try:
-                    os.fsync(fo)
+                try: os.fsync(fo)
                 except:
                     print "Cannot synch pid write!"
                     ret = False
-                try:
-                    fo.close()
+                try: fo.close()
                 except:
                     print "Cannot close file!"
                     ret = False
@@ -66,18 +65,18 @@ class Pid():
 
     
     def remove(self):
+        print "Resolver TRY to remove pid"
         ret = False
         if not self.exists():
-            print "Cannot remove existing pid\n"
+            print "Resolver Cannot remove existing pid\n"
             return False
-        newname = self.file + str(int(time.time()))
-        print "New name: " + newname
         try:
-            ret = os.rename(self.file, newname)
+            ret = os.rename(self.file, self.new_name)
         except: 
-            print "Cannot rename pid file!"
+            print "Resolver Cannot rename pid file!"
             return False
-        os.unlink(newname)
+        print "Resolver Try unlinking"
+        os.unlink(self.new_name)
         return not self.exists()
     
     def age(self):
