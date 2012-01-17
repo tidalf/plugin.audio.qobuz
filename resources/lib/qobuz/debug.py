@@ -31,7 +31,7 @@ try:
     LOGDEBUG = xbmc.LOGDEBUG
     LOGNOTICE = xbmc.LOGNOTICE
     LOGERROR = xbmc.LOGERROR
-    LOGSEVERE = xbmx.LOGSEVERE
+    LOGSEVERE = xbmc.LOGSEVERE
     __debugging__ = True
     if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         __debugging__ = True
@@ -68,6 +68,7 @@ def info(obj,msg):
 def crit(obj, msg):
     log(obj, msg, LOGSEVERE)
     
-def error(obj,msg,code):
-    log(obj,msg,'ERROR')
-    os.sys.exit(code)
+def error(obj, msg):
+    log(obj, msg, LOGSEVERE)
+    log(obj, 'Exiting...', LOGSEVERE)
+    os.sys.exit(1)

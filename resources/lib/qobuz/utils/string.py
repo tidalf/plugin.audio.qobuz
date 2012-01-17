@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-def _sc(str):
-    if not str: 
-        str = 'NA'
-    return str
+#def _sc(str):
+#    if not str: 
+#        str = 'NA'
+#    return str

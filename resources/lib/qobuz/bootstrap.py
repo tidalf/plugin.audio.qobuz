@@ -102,6 +102,16 @@ class QobuzBootstrap(object):
         qobuz.path = path()
         qobuz.path._set_dir()
 
+    def bootstrap_debug(self):
+        from debug import log, warn, error, info
+        class d():
+            def __init__(s):
+                s.log = log
+                s.warn = warn
+                s.error = error
+                s.info = info
+        qobuz.debug = d()
+        
     def bootstrap_api(self):
         from api import QobuzApi
         qobuz.api = QobuzApi()
@@ -299,8 +309,8 @@ class QobuzBootstrap(object):
             p.doModal()
             exit(0)
         '''
-            Directory Endin
+            Directory Ending
         '''
         if self.MODE < MODE_SONG:
             qobuz.gui.endOfDirectory()
-        
+

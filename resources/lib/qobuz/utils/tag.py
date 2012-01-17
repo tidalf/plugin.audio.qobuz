@@ -22,9 +22,8 @@ import xbmcgui
 import xbmcaddon
 
 from debug import warn, info, log
-from constants import *
-
-
+from constants import *    
+    
 class IQobuzTag(object):
     
     def __init__(self, json = None, parent = None):
@@ -345,21 +344,8 @@ class QobuzTagProduct(IQobuzTag):
         if json:
             self.parse_json(json)
 
-        
     def get_tracks(self):
         return self.__tracks__
-    
-#    def getXbmcItem(self):
-#        i = super(QobuzTagProduct, self).getXbmcItem()
-#        genre = self.getGenre()
-#        if genre:
-#            genre = ' [' + genre + ']'
-#        i.setLabel(self.getArtist() + ' - ' + self.getTitle() + genre)
-#        i.setInfo(type = 'music', infoLabels = {
-#                                               'album': self.getAlbum()
-#                                               })
-#        
-#        return i
     
     def getAlbum(self, sep =''):
         album = ''
@@ -510,7 +496,9 @@ class QobuzTagImage(IQobuzTag):
             except:
                 try: return self.thumbnail
                 except: return ''
-'''
+
+            
+'''    
 '''
 class QobuzTagTrack(IQobuzTag):
     
@@ -588,8 +576,8 @@ class QobuzTagTrack(IQobuzTag):
 
     def getStreamingType(self, sep = ''):
         try: return self.streaming_type
-        except: return ''
-
+        except: return ''        
+    
     def getXbmcItem(self, context = 'album', pos = 0, fanArt = ''):
         parent = self.get_parent()
         album = self.getAlbum()
@@ -647,18 +635,9 @@ class QobuzTagTrack(IQobuzTag):
         
         i.setProperty('IsPlayable', 'true')
         i.setProperty('Music', 'true')
-        i.setProperty('IsFolder', 'false')
-        i.setProperty('IsInternetStream', 'true')
         i.setThumbnailImage(image)
         i.setIconImage(image)
         i.setProperty('image', image)
-        '''
-            Context Menu
-        '''
-#        retstr = sys.argv[2]
-#        go = 'http://plugin.audio.qobuz/?mode='+MODE_ARTIST+'&id='+self.getArtistId()
-#        albumfromthisartist= ('Show albums from this artist', 'ActivateWindow(Music,'+go+','+retstr+')')
-#        i.addContextMenuItems([albumfromthisartist], False)
         return i
 
 '''

@@ -181,6 +181,15 @@ def watch_playlist(player, playlist):
         return False
     return resolve_position(player, playlist, item, position)
 
+def gui_setting_enabled(pid):
+    e = qobuz.addon.getSetting('resolver_enabled')
+    if not e:
+        log("We are not logged... Exiting!")
+        return False
+    elif e != 'true':
+        log("Disabled from GUI settings... Exiting!")
+        return False
+    return True
 
 '''
     Our watcher infinite loop
@@ -189,49 +198,49 @@ def watch_playlist(player, playlist):
     TODO: If plugin has never been launched cache path doesn't exist,
     our pid file can't be created, our service die ...
 '''
-    
+'''
+    MAIN
+'''
 pid_path = os.path.join(qobuz.path.cache, __pid_file__)
 pid_id =  os.getpid()
 pid = Pid(pid_path, pid_id)
+pid.set_old_pid_age(__sleep__ * 5)
 playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
 player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 current_pos = None
 previous_pos = None
 
-
 def watcher():
-
     watch_retry = 3
-    if pid.exists():
-        if (pid.age() > (__sleep__ * 20)):
-            log("Pid file exist but is old... removing")
-            if not pid.remove():
-                log("Cannot remove pid: " + pid.file)
-                log("Exiting...")
-                sys.exit(1)
-            elif not pid.create():
-                log("Cannot create pid: " + pid.file)
-                log("Exiting...")
-                sys.exit(1)
-        else:
-            log("Pid file exists, exiting")
-            sys.exit(1)
-    else:
-        if not pid.create():
-            log('Cannot create pid file: ' + pid.file)
-            log('Exiting...')
-            sys.exit(1) 
+    if not pid.can_i_run():
+        log("PID exists... exiting!")
+        exit(0)
+    if not pid.create():
+        log("Cannot create PID")
+        exit(0)
     log("Starting")
     __timetowork__ = __sleep__
-    while (not xbmc.abortRequested):
+    run = True
+    while (run):
+        run = False
+        try:
+            run = not xbmc.abortRequested
+        except:
+            run = False
+            log("Cannot get xbmc.abortRequested value... exiting!")
+            pid.remove()
+            exit(0)
+        if not gui_setting_enabled(pid):
+            log("Disabled from GUI... exiting!")
+            pid.remove()
+            exit(0)
         if __timetowork__ > 0:
-            __timetowork__-=.250
-            time.sleep(.250)
+            __timetowork__-=1
+            time.sleep(1)
             continue
         else:
             __timetowork__ = __sleep__
         try:
-            log("Working...")
             pl_size = playlist.size()
             if pl_size > 0 and player.isPlayingAudio():
                 try:
@@ -254,6 +263,8 @@ def watcher():
 atexit.register(pid.remove)
 
 if __name__ == "__main__":
+    if not gui_setting_enabled(pid):
+        exit(0)
     watcher()
         
     

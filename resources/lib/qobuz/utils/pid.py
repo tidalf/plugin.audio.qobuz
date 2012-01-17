@@ -8,11 +8,25 @@ class Pid():
     def __init__(self, file, pid):
         self.pid = pid
         self.file = file
+        self.auto_remove_old_pid = 0
         
     def exists(self):
         if os.path.isfile(self.file):
             return True
         else: return False
+    
+    def set_old_pid_age(self, age):
+        self.auto_remove_old_pid = int(age)
+    
+    def can_i_run(self):
+        exists = self.exists()
+        if not exists:
+            return True
+        if not self.auto_remove_old_pid:
+            return False
+        if self.age() > self.auto_remove_old_pid:
+            return self.remove()
+        return False
     
     def create(self):
         if self.exists():
@@ -51,20 +65,10 @@ class Pid():
         print "New name: " + newname
         try:
             os.rename(self.file, newname)
-        except: return False
-        #self.file = newname
+        except: 
+            print "Cannot rename pid file "
+            return False
         os.unlink(newname)
-#        try:
-#            name = platform.system()
-#            print "Platform: " + name
-#            if name == 'Windows':
-#                timeout = 10
-#                while timeout > 0:
-#                    if not self.exists():
-#                        return True
-#                    timeout-=1
-#                    time.sleep(1)
-#        except: pass
         return not self.exists()
     
     def age(self):
@@ -75,6 +79,7 @@ class Pid():
         if age > 0:
             return age
         return 0.1
+    
 
 if __name__ == "__main__":
     import time

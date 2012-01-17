@@ -42,7 +42,7 @@ class QobuzGUI:
         MODE = qobuz.boot.MODE
         ''' SEARCH '''
         if MODE > 30: 
-            return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=True, cacheToDisc=False)
+            return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=False)
         elif MODE == MODE_SHOW_RECO_T_G:
             return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True, updateListing=False, cacheToDisc=False)
         else:
@@ -246,13 +246,16 @@ class QobuzGUI:
             content_type = 'artists'
         xbmcplugin.setContent(int(sys.argv[1]), content_type)
         xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
-        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM_IGNORE_THE)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TRACKNUM)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ARTIST)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TITLE)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_GENRE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_EPISODE)
-        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TRACKNUM)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_FILE)
+        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_PLAYLIST_ORDER)
         
     
     '''

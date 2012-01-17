@@ -24,7 +24,7 @@ import xbmcplugin
 
 from utils.icacheable import ICacheable
 from debug import log, info, warn
-from utils.string import _sc
+#from utils.string import _sc
 from utils.tag import QobuzTagTrack
 import pprint
 import qobuz
@@ -37,7 +37,7 @@ import qobuz
  @return: New QobuzTrack 
 '''
 class QobuzTrack(ICacheable):
-    # Constructor
+
     def __init__(self, id, context_type='playlist'):
         self.id = id
         super(QobuzTrack, self).__init__(qobuz.path.cache,
@@ -47,13 +47,11 @@ class QobuzTrack(ICacheable):
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
-    # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
         json = qobuz.api.get_track(self.id)
         return json
     
-    # Return track duration
-    def get_duration(self):
-        (sh,sm,ss) = self._raw_data['duration'].split(':')
-        return (int(sh) * 3600 + int(sm) * 60 + int(ss))
+#    def get_duration(self):
+#        (sh,sm,ss) = self._raw_data['duration'].split(':')
+#        return (int(sh) * 3600 + int(sm) * 60 + int(ss))
 
