@@ -43,7 +43,15 @@ class Service_url_resolver():
             print "Cannot set streaming format"
             return False
         return True
-        
+    def playlist_to_s(self):
+        s = ''
+        try:
+            size = self.get_playlist_size()
+            for i in range(0, size):
+                s += self.playlist[i].getfilename() + "\n"
+        except:
+            print "Cannot list items in playlist"
+        return s
     def set_player(self):
         try:
             self.player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
@@ -167,6 +175,8 @@ class Service_url_resolver():
         return False
         
     def watch(self):
+        print self.playlist_to_s()
+        
         size = self.get_playlist_size()
         if size == None:
             return False
