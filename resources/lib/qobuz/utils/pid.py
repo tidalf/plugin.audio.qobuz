@@ -29,44 +29,53 @@ class Pid():
         return False
     
     def create(self):
-        if self.exists():
-            return False
-        fd = os.open(self.file, os.O_WRONLY|os.O_EXCL|os.O_CREAT)
-        if not fd:
-            return False
-        try:
-            os.write(fd, str(self.pid))
-        finally:
-            #f.flush()
-            os.fsync(fd)
-            os.close(fd)
-        return True
+        return self._write(os.O_WRONLY|os.O_EXCL|os.O_CREAT)
     
     def touch(self):
-        if not self.exists():
-            return False
+        return self._write(os.O_WRONLY)
+    
+    def _write(self, flag):
+        ret = False
+        fd = None
         try:
-            fd = os.open(self.file, os.O_WRONLY)
-        except: return False
-        if not fd:
+            fd = os.open(self.file, flag)
+        except:
+            print "Cannot open file for writing"
             return False
-        try:
-            os.write(fd, str(self.pid))
-        finally:
-            #f.flush()
-            os.fsync(fd)
-            os.close(fd)
-        return True
+        with os.fdopen(fd, 'w') as fo:
+            try:
+                fo.write(str(self.pid))
+                fo.flush()
+            except:
+                print "Cannot write to pid file"
+                ret = False
+            finally:
+                ret = True
+                try:
+                    os.fsync(fo)
+                except:
+                    print "Cannot synch pid write!"
+                    ret = False
+                try:
+                    fo.close()
+                except:
+                    print "Cannot close file!"
+                    ret = False
+        return ret
+            
+
     
     def remove(self):
+        ret = False
         if not self.exists():
+            print "Cannot remove existing pid\n"
             return False
         newname = self.file + str(int(time.time()))
         print "New name: " + newname
         try:
-            os.rename(self.file, newname)
+            ret = os.rename(self.file, newname)
         except: 
-            print "Cannot rename pid file "
+            print "Cannot rename pid file!"
             return False
         os.unlink(newname)
         return not self.exists()

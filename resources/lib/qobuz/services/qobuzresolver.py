@@ -58,8 +58,12 @@ class QobuzResolver():
 service_name = 'Qobuz URL Resolver'
 
 def log(msg, lvl = xbmc.LOGNOTICE):
-    xbmc.log(service_name + ': ' + str(msg), lvl)
-
+    msg = service_name + ': ' + str(msg)
+    try:
+        xbmc.log(msg, lvl)
+    except:
+        print msg + "\n"
+        
 def login():
     user =  qobuz.addon.getSetting('username')
     password = qobuz.addon.getSetting('password')
@@ -182,7 +186,11 @@ def watch_playlist(player, playlist):
     return resolve_position(player, playlist, item, position)
 
 def gui_setting_enabled(pid):
-    e = qobuz.addon.getSetting('resolver_enabled')
+    e = None
+    try:
+        e = qobuz.addon.getSetting('resolver_enabled')
+    except:
+        print "Cannot get addon setting..."
     if not e:
         log("We are not logged... Exiting!")
         return False
@@ -209,7 +217,7 @@ playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
 player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 current_pos = None
 previous_pos = None
-
+    
 def watcher():
     watch_retry = 3
     if not pid.can_i_run():
@@ -228,6 +236,10 @@ def watcher():
         except:
             run = False
             log("Cannot get xbmc.abortRequested value... exiting!")
+            pid.remove()
+            exit(0)
+        if not run:
+            print "Not running removing pid"
             pid.remove()
             exit(0)
         if not gui_setting_enabled(pid):
