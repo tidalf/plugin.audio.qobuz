@@ -76,7 +76,13 @@ class Pid():
             print "Resolver Cannot rename pid file!"
             return False
         print "Resolver Try unlinking"
-        os.unlink(self.new_name)
+        retry = 3
+        while retry > 0:
+            os.unlink(self.new_name)
+            time.sleep(1)
+            if not self.exists():
+                break
+            retry-=1
         return not self.exists()
     
     def age(self):

@@ -157,6 +157,7 @@ class Service_url_resolver():
     def do_we_try_resolve(self, pos):
         if pos != self.last_track_number:
             self.retry = 3
+            self.last_track_number = pos
             return True
         if self.retry > 0:
             print "We are trying again to resolve this item:" + str(self.retry)
@@ -177,12 +178,12 @@ class Service_url_resolver():
         nposition = self.get_next_position(cposition)
         if nposition == None:
             return False
-        if not self.do_we_try_resolve(nposition):
-            print "We dont try to resolve this position again"
-            return False
         if not self.position_need_resolve(nposition):
             print "Don't need to resolve this position"
             return True
+        if not self.do_we_try_resolve(nposition):
+            print "We dont try to resolve this position again"
+            return False
         pl_item = self.get_item_at_pos(nposition)
         if not pl_item:
             return False
