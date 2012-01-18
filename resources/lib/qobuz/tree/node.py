@@ -16,21 +16,13 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import pprint
 import qobuz
-
-class __NodeFlag():
-    def __init__(self): 
-        self.DONTFETCHTRACK = 1
-        self.TYPE_NODE = 512
-        self.TYPE_TRACK = 1024
-        self.TYPE_PLAYLIST = 2048
-        self.TYPE_USERPLAYLISTS = 4096
-
-NodeFlag = __NodeFlag()
+from constants import *
+from flag import NodeFlag
 
 '''
     NODE
 '''
-class Node(object):
+class node(object):
     
     def __init__(self, parent = None):
         self.parent = parent
@@ -40,7 +32,14 @@ class Node(object):
         self.type = NodeFlag.TYPE_NODE
         self.json = None
         self.id = None
+        self.url = None
     
+    def setUrl(self):
+        url = 'plugin://plugin.audio.qobuz/?mode='+str(MODE_NODE)+"&nt="+str(self.type)
+        if self.id != None:
+            url += "&nid="+str(self.id)
+        self.url = url
+         
     def setId(self, id):
         self.id = id
         
@@ -86,9 +85,13 @@ class Node(object):
             return True
         if lvl != -1:
             lvl -= 1
+        self._build_down(lvl, flag)
         log("Building node: " + self.getLabel())
         for c in self.childs:
             c.build_down(lvl, flag)
+            
+    def _build_down(self, lvl, flag):
+        pass
     
     def count_node(self, flag = NodeFlag.TYPE_NODE):
         total = 0
@@ -98,72 +101,13 @@ class Node(object):
             total += c.count_node(flag)
         return total
 
-'''
-    NODE TRACK
-'''
-from data.track import QobuzTrack
-class Node_track(Node):
-    
-    def __init__(self, parent = None):
-        super(Node_track, self).__init__(parent)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_TRACK
+    def get_xbmc_item(self, list):
+        for c in self.childs:
+            c.get_xbmc_item(list)
         
-    def build_down(self, lvl, flag = None):
-        self.setLabel("Track ID[" + self.getId() + "] " + self.getLabel())
-        if not (flag & NodeFlag.DONTFETCHTRACK):
-            o = QobuzTrack(self.id)
-            self.setJson(o.get_data())
-        super(Node_track, self).build_down(lvl, flag)
-
-'''
-    NODE PLAYLIST
-'''
-from view.playlist import QobuzPlaylist
-class Node_playlist(Node):
-    
-    def __init__(self, parent = None):
-        super(Node_playlist, self).__init__(parent)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PLAYLIST
-        
-    def build_down(self, lvl, flag = None):
-        self.setLabel("Playlist ID: " + self.getId())
-        o = QobuzPlaylist(self.id)
-        self.setJson(o.get_data())
-        for track in self.getJson()['tracks']:
-            c = Node_track()
-            c.setId(track['id'])
-            c.setLabel(track['title'])
-            self.add_child(c)
-        super(Node_playlist, self).build_down(lvl, flag)
-
-'''
-    NODE USER PLAYLISTS
-'''
-from view.userplaylists import QobuzUserPlaylists
-class Node_userplaylists(Node):
-    
-    def __init__(self, parent = None):
-        super(Node_userplaylists, self).__init__(parent)
-        self.label  = 'User Playlists'
-        self.label2 = 'Keep your current playlist'
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
-    
-    
-    def build_down(self, lvl, flag = None):
-        o = QobuzUserPlaylists(qobuz.api, qobuz.path.cache, -1)
-        self.setJson(o.get_data())
-        pprint.pprint(self.getJson())
-        for playlist in self.getJson():
-            pprint.pprint(playlist)
-            c = Node_playlist()
-            c.setId(playlist['id'])
-            c.setLabel(playlist['name'])
-            self.add_child(c)
-        super(Node_userplaylists, self).build_down(lvl, flag)
-
 
 def log(msg):
-    print "TESTNODE: " + msg.encode('ascii', 'ignore') + "\n"
+        print "TESTNODE: " + msg.encode('ascii', 'ignore') + "\n"
         
         
 class test_node():
@@ -172,10 +116,11 @@ class test_node():
         pass
     
     def run(self):
+        from node_userplaylists import node_userplaylists
         log('-'*80+"\n")
-        root = Node()
+        root = node()
         root.setLabel('root')
-        root.add_child(Node_userplaylists())
+        root.add_child(node_userplaylists())
         root.build_down(-1, NodeFlag.TYPE_TRACK| NodeFlag.DONTFETCHTRACK)
         log("Total Node          : " + str(root.count_node(NodeFlag.TYPE_NODE)))
         log("Total User Playlists: " + str(root.count_node(NodeFlag.TYPE_USERPLAYLISTS)))

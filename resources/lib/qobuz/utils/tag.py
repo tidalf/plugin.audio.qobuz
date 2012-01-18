@@ -189,6 +189,9 @@ class IQobuzTag(object):
             if data: return data
         return data
     
+    def getLabel(self):
+        return self.getTitle()
+    
     def getXbmcItem(self, fanArt = ''):
         date = 0
         try:
@@ -204,6 +207,7 @@ class IQobuzTag(object):
             genre = self.get_parent().getGenre()
         else: genre = self.getGenre()
         i = xbmcgui.ListItem(self.getTitle())
+        i.setLabel(self.getLabel())
         i.setInfo(type='music', infoLabels = {
                                               #'count': pos,
                                              'title': self.getTitle(),
@@ -627,7 +631,7 @@ class QobuzTagTrack(IQobuzTag):
         #i.setLabel2(label)
         i.setInfo(type = 'music',
                   infoLabels = {'count': pos,
-                                'songid': str(self.id),
+                                #'songid': str(self.id),
                                 'title': title,
                                 'artist': artist,
                                 'genre': genre,
@@ -651,11 +655,25 @@ class QobuzTagTrack(IQobuzTag):
 class QobuzTagPlaylist(IQobuzTag):
     def __init__(self, json, parent = None):
         super(QobuzTagPlaylist, self).__init__(json, parent)
-        self.set_valid_tags([])
+        self.set_valid_tags(['name', 'id', 'is_collaborative', 'is_public'])
         if json:
             self.parse_json(json)
     
+    def getLabel(self):
+        name = ''
+        try:
+            name = self.owner + ' - ' + self.name
+        except: pass
+        ispub = 'prv'
+        if self.is_public:
+            ispub = 'pub' 
+        return '[' + ispub + '] ' + name
+    
     def parse_json(self, p):
+        self.auto_parse_json(p)
+        self.set('owner', p['owner']['name'])
+        if not 'tracks' in p:
+            return 
         for track in p['tracks']:
             self.add_child(QobuzTagTrack(track, self))
         self._is_loaded = True

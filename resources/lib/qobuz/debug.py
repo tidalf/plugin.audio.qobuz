@@ -35,6 +35,8 @@ try:
     __debugging__ = True
     if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         __debugging__ = True
+    else:
+        __debugging__ = False
         
 except: 
     LOGDEBUG = '[DEBUG]'

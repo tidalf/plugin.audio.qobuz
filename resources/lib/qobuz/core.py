@@ -47,15 +47,15 @@ class QobuzCore:
         return qobuz.api.userid
 
     def getPlaylist(self,id):
-        from view.playlist import QobuzPlaylist
+        from data.playlist import QobuzPlaylist
         return QobuzPlaylist(id)
 
     def getProduct(self,id, context_type = "playlist"):
-        from view.product import QobuzProduct
+        from data.product import QobuzProduct
         return QobuzProduct(id, context_type)
 
     def getUserPlaylists(self):
-        from view.userplaylists import QobuzUserPlaylistsXbmc
+        from data.userplaylists import QobuzUserPlaylistsXbmc
         return QobuzUserPlaylistsXbmc()
 
     def getTrack(self,id,context_type="playlist"):
@@ -83,7 +83,7 @@ class QobuzCore:
         return QobuzSearchAlbums()
 
     def getRecommandation(self,genre_id):
-        from view.recommandation import QobuzGetRecommandation
+        from data.recommandation import QobuzGetRecommandation
         return QobuzGetRecommandation( genre_id)
 
     def getRecommandation(self, genre_id,type):
@@ -91,5 +91,5 @@ class QobuzCore:
         return QobuzGetRecommandation( genre_id, type)
     
     def getPurchases(self):
-        from view.purchases import QobuzGetPurchases
+        from data.purchases import QobuzGetPurchases
         return QobuzGetPurchases()

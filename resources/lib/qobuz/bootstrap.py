@@ -55,7 +55,6 @@ class QobuzBootstrap(object):
     def __init__(self, __addon__, __handle__):
         qobuz.addon = __addon__
         self.handle = __handle__
-        #qobuz.lang = qobuz.addon.getLocalizedString
 
         qobuz.boot = self
     
@@ -309,6 +308,18 @@ class QobuzBootstrap(object):
             from tree.node import test_node
             t = test_node()
             t.run()
+        
+        elif self.MODE == MODE_NODE:
+            from tree.renderer import renderer
+            nt = None
+            try:
+                nt = int(self.params['nt'])
+            except:
+                print "No node type...abort"
+                return False
+            print "Node type: " + str(nt)
+            r = renderer(nt, None, 0)
+            r.display()
         '''
             Directory Ending
         '''
