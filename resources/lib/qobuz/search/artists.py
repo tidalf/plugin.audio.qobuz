@@ -55,8 +55,13 @@ class QobuzSearchArtists():
         return self._directory_products_by_artist()
 
     def _directory_products(self):
-        data = self.get_data()['results']['artists']
         list = []
+        data = self.get_data()
+        try:
+            data = data['results']['artists']
+        except:
+            warn(self, "No artist result")
+            return list
         image = qobuz.image.access.get('qobuzIcon')
         for json_artist in data:
             tag_artist = QobuzTagArtist(json_artist)
@@ -68,9 +73,13 @@ class QobuzSearchArtists():
         return list
 
     def _directory_products_by_artist():
-        data = self.get_data()
-        artist = data['artist']['name']
         list = []
+        data = self.get_data()
+        artist = None
+        try:
+            artist = data['artist']['name']
+        except:
+            warn(self, "No artist result")
         image = qobuz.image.access.get('qobuzIcon')
         for json_album in json['artist']['albums']:
             tag_album = QobuzTagAlbum(json_album)

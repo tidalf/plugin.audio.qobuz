@@ -209,8 +209,10 @@ class QobuzBootstrap(object):
         Execute methode based on MODE
     '''       
     def mode_dispatch(self):
+        ret = False
+        
         if not self.MODE:
-            qobuz.gui.showCategories()
+            ret = qobuz.gui.showCategories()
         
         elif self.MODE == MODE_SONG:
             info(self, "PLaying song")
@@ -225,7 +227,7 @@ class QobuzBootstrap(object):
         
         elif self.MODE == MODE_ARTIST:
             info(self, "Displaying artist")
-            qobuz.gui.showArtist(str(self.ID))
+            ret = qobuz.gui.showArtist(str(self.ID))
 
         elif self.MODE == MODE_ALBUM:
             info(self, "Displaying album")
@@ -233,44 +235,44 @@ class QobuzBootstrap(object):
                 context_type=urllib.unquote_plus(self.params["context_type"])
             except: 
                 context_type="playlist"            
-            qobuz.gui.showProduct(str(self.ID),context_type)
+            ret = qobuz.gui.showProduct(str(self.ID),context_type)
             
         elif self.MODE == MODE_USERPLAYLISTS:
             info(self, 'Displaying userplaylist')
-            qobuz.gui.showUserPlaylists()
+            ret = qobuz.gui.showUserPlaylists()
     
         elif self.MODE == MODE_SEARCH_SONGS:
             if qobuz.addon.getSetting('search_enabled') == 'false':
                 info(self, "Search is disabled!")
                 return False
             info(self, 'Searching songs')
-            qobuz.gui.searchSongs()    
+            ret =qobuz.gui.searchSongs()    
         
         elif self.MODE == MODE_SEARCH_ALBUMS:
             if qobuz.addon.getSetting('search_enabled') == 'false':
                 info(self, "Search is disabled!")
                 return False
             info(self, "Search albums")
-            qobuz.gui.searchAlbums()
+            ret = qobuz.gui.searchAlbums()
             
         elif self.MODE == MODE_SEARCH_ARTISTS:
             if qobuz.addon.getSetting('search_enabled') == 'false':
                 info(self, "Search is disabled!")
                 return False
             info(self, "Search artists")
-            qobuz.gui.searchArtists()
+            ret = qobuz.gui.searchArtists()
      
         elif self.MODE == MODE_PLAYLIST:
             info(self, 'Displaying playlist')
-            qobuz.gui.showPlaylist(str(self.ID))
+            ret = qobuz.gui.showPlaylist(str(self.ID))
             
         elif self.MODE == MODE_SHOW_RECOS:
             info(self, "Displaying recommendations")
-            qobuz.gui.showRecommendationsTypes()
+            ret = qobuz.gui.showRecommendationsTypes()
 
         elif self.MODE == MODE_SHOW_PURCHASES:
             info(self, "Displaying purchases")
-            qobuz.gui.showPurchases()
+            ret = qobuz.gui.showPurchases()
         
         elif self.MODE == MODE_SHOW_RECO_T_G:
             info(self, "Displaying recommendations T/G")
@@ -279,7 +281,7 @@ class QobuzBootstrap(object):
                 type=urllib.unquote_plus(self.params["type"])
                 genre=urllib.unquote_plus(self.params["genre"])
             except: pass
-            qobuz.gui.showRecommendations(type, genre)
+            ret = qobuz.gui.showRecommendations(type, genre)
         
         elif self.MODE == MODE_SHOW_RECO_T:
             info(self, "Displaying recommendations T")
@@ -287,11 +289,11 @@ class QobuzBootstrap(object):
             try:
                 type=urllib.unquote_plus(self.params["type"])
             except: pass
-            qobuz.gui.showRecommendationsGenres(type)
+            ret = qobuz.gui.showRecommendationsGenres(type)
 
         elif self.MODE == MODE_CURRENT_PLAYLIST:
             info(self, "Displaying current playlist")
-            qobuz.gui.showCurrentPlaylist()
+            ret = qobuz.gui.showCurrentPlaylist()
             
         elif self.MODE == MODE_ERASE_CACHE:
             info(self, "Erasing cache...")
@@ -323,6 +325,6 @@ class QobuzBootstrap(object):
         '''
             Directory Ending
         '''
-        if self.MODE < MODE_SONG:
+        if ret: #self.MODE < MODE_SONG:
             qobuz.gui.endOfDirectory()
 

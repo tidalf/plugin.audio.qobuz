@@ -23,7 +23,7 @@
 	<string id="30002">Song search limit</string>
 	<string id="30003">Album search limit</string>
 	<string id="30004">Artist search limit</string>
-s	<string id="30007">No Qobuz service</string>
+	<string id="30007">No Qobuz service</string>
 	<string id="30008">Qobuz XBMC</string>
 	<string id="30009">Unable to connect with Qobuz.</string>
 	<string id="30010">Please try again later</string>			
@@ -118,6 +118,8 @@ s	<string id="30007">No Qobuz service</string>
     <string id="30097">Reggae</string>
     <string id="30100">Show Purchases</string>
     <string id="30101">Show News</string>
+ 
+    
     <!-- Cache -->
     <string id="31000">Time in minute for various Qobuz data to be held in cache
     - 0 No cache</string>
@@ -146,6 +148,13 @@ s	<string id="30007">No Qobuz service</string>
     
     <!-- Search -->
     <string id="35000">Search enable</string>
+    <string id="35001">No matching song</string>
+    <string id="35002">No matching album</string>
+    <string id="35003">No matching artist</string>
+    
+    <!-- Notification -->
+    <string id="36000">Qobuz</string>
+    <string id="36001">Empty directory</string>
 </strings>
 
 

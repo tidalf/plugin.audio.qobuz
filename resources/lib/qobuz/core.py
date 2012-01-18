@@ -87,7 +87,7 @@ class QobuzCore:
         return QobuzGetRecommandation( genre_id)
 
     def getRecommandation(self, genre_id,type):
-        from view.recommandation import QobuzGetRecommandation
+        from data.recommandation import QobuzGetRecommandation
         return QobuzGetRecommandation( genre_id, type)
     
     def getPurchases(self):

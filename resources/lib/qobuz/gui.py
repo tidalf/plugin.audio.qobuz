@@ -122,12 +122,14 @@ class QobuzGUI:
             s = qobuz.core.getQobuzSearchTracks()
             s.search(query, qobuz.addon.getSetting('songsearchlimit'))
             list = s.get_items()
-            if s.length() < 1:
+            if len(list) < 1:
+                self.showNotification(36000, 35001)
                 self.searchSongs()
-                return
+                return False
             self.add_to_directory(list)
+            return True
         else:
-            self.showCategories()
+            return self.showCategories()
   
     """
         SEARCH for Albums
@@ -139,14 +141,15 @@ class QobuzGUI:
         if (query != ''):
             s = qobuz.core.getQobuzSearchAlbums()
             s.search(query, qobuz.addon.getSetting('albumsearchlimit'))
-            if s.length() < 1:
-                self.showNotification(30008, 30021)
-                self.searchAlbums()
-                return
             list = s.get_items()
+            if len(list) < 1:
+                self.showNotification(36000, 35002)
+                self.searchAlbums()
+                return False
             self.add_to_directory(list)
+            return True
         else:
-            self.showCategories()
+            return self.showCategories()
 
     """
         SEARCH for Artists
@@ -158,14 +161,15 @@ class QobuzGUI:
         if (query != ''):
             s = qobuz.core.getQobuzSearchArtists()
             s.search(query, qobuz.addon.getSetting('artistsearchlimit'))
-            if s.length() < 1:
-                self.showNotification(30008, 30021)
-                self.searchAlbums()
-                return
             list = s.get_items()
+            if len(list) < 1:
+                self.showNotification(36000, 35003)
+                self.searchArtists()
+                return False
             self.add_to_directory(list)
+            return True
         else:
-            self.showCategories()
+            return self.showCategories()
 
     """
       Show Recommendations 
@@ -174,10 +178,15 @@ class QobuzGUI:
         if (genre_id != ''):
             r = qobuz.core.getRecommandation(genre_id, type)
             list = r.get_items()
+            if len(list) < 1:
+                self.showNotification(36000, 36001)
+                return False
             self.add_to_directory(list)
+            return True
         else:
             self.showNotificationH('Qobuz', 'No genre_id for recommandation')
-            self.showCategories()
+            return self.showCategories()
+        
 
     '''
         SHOW Purchases
@@ -185,8 +194,12 @@ class QobuzGUI:
     def showPurchases(self):
         r = qobuz.core.getPurchases()
         list = r.get_items()
+        if len(list) < 1:
+            self.showNotification(36000, 36001)
+            return False
         self.add_to_directory(list)
-
+        return True
+    
     '''
         SHOW Recommandations Types
     '''
@@ -198,6 +211,7 @@ class QobuzGUI:
         self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', i.get('song'), 0)
         self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', i.get('song'), 0)
         self.setContent('songs')
+        return True
 
     '''
         SHOW Recommandations Genre
@@ -220,6 +234,7 @@ class QobuzGUI:
         self._add_dir(__language__(30097), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=123',MODE_SHOW_RECO_T_G, i.cache.get(type, 123)+ti, 10)
         self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.access.get('default')+ti, 10)
         self.setContent('songs')
+        return True
 
     '''
         Add to directory
@@ -228,7 +243,7 @@ class QobuzGUI:
         n = len(list)
         if n < 1:
             self.showNotificationH("Qobuz", "Empty directory")
-            return
+            return False
         h = int(sys.argv[1])
         content_type = 'songs'
         if context == 'playlist':
@@ -248,6 +263,7 @@ class QobuzGUI:
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_FILE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_PLAYLIST_ORDER)
         xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
+        return True
 
         
     
@@ -257,8 +273,12 @@ class QobuzGUI:
     def showUserPlaylists(self):
         user_playlists = qobuz.core.getUserPlaylists()
         list = user_playlists.get_items()
+        if len(list) < 1:
+            self.showNotification(36000, 36001)
+            return False
         self.add_to_directory(list)
-        
+        return True
+    
     '''
         SHOW Playlist
     '''
@@ -267,11 +287,16 @@ class QobuzGUI:
         if (userid != 0):
             myplaylist = qobuz.core.getPlaylist(id)
             list = myplaylist.get_items()
+            if len(list) < 1:
+                self.showNotification(36000, 36001)
+                return False
             self.add_to_directory(list)
+            return True
         else:
             dialog = xbmcgui.Dialog()
             dialog.ok(__language__(30008), __language__(30034), __language__(30040))
-
+        return False
+    
     '''
         SHOW Product
     '''
@@ -279,7 +304,11 @@ class QobuzGUI:
         info(self, "showProduct(" + str(id) + ")")
         album = qobuz.core.getProduct(id,context_type)
         list = album.get_items()
+        if len(list) < 1:
+            self.showNotification(36000, 36001)
+            return False
         self.add_to_directory(list)
+        return True
 
     '''
         SHOW Artsit
@@ -289,20 +318,24 @@ class QobuzGUI:
         album.search_by_artist(id)
         if album.length() < 1:
             self.showNotification(30008, 30033)
-            self.showCategories() 
-            return
+            return False
         list = album.get_items_by_artist()
         self.add_to_directory(list)
+        return True
 
-    # Get keyboard input
+    '''
+        Get keyboard input
+    '''
     def _get_keyboard(self, default="", heading="", hidden=False):
         kb = xbmc.Keyboard(default, heading, hidden)
         kb.doModal()
         if (kb.isConfirmed()):
             return unicode(kb.getText(), "utf-8")
         return ''
-
-    # Add whatever directory
+    
+    '''
+        Add directory
+    '''
     def _add_dir(self, name, url, mode, iconimage, id, items=0):
         __language__= qobuz.lang
         if url == '':
