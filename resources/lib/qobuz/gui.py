@@ -244,8 +244,8 @@ class QobuzGUI:
             content_type = 'albums'
         if context == 'artists':
             content_type = 'artists'
-        xbmcplugin.setContent(int(sys.argv[1]), content_type)
-        xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
+
+        xbmcplugin.setContent(int(sys.argv[1]), 'albums')
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM_IGNORE_THE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TRACKNUM)
@@ -256,6 +256,8 @@ class QobuzGUI:
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_EPISODE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_FILE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_PLAYLIST_ORDER)
+        xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
+
         
     
     '''

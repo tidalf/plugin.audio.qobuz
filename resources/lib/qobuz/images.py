@@ -6,9 +6,9 @@ class QobuzImage_access():
 
     def __init__(self):
         self.images = {}
-        self.add('fanArt',    os.path.join(qobuz.path.base, '..', '..',  'fanart.jpg'))
-        self.add('qobuzIcon', os.path.join(qobuz.path.base, 'default.png'))
-        self.add('qobuzIconRed', os.path.join(qobuz.path.base, 'default_red.png'))
+        self.add('fanArt',    os.path.join(qobuz.path.image, '..', '..',  'fanart.jpg'))
+        self.add('qobuzIcon', os.path.join(qobuz.path.image, 'default.png'))
+        self.add('qobuzIconRed', os.path.join(qobuz.path.image, 'default_red.png'))
         
     def add(self, name, filename):
         self.images[name] = filename
@@ -16,7 +16,7 @@ class QobuzImage_access():
     def get(self, name, path = '', ext = 'png'):
         if name in self.images:
             return self.images[name]
-        path = os.path.join(qobuz.path.base, path, name + '.' + ext)
+        path = os.path.join(qobuz.path.image, path, name + '.' + ext)
         self.add(name, path)
         return path
     
