@@ -38,6 +38,8 @@ sys.path.append(qobuzDir)
 import qobuz
 from bootstrap import QobuzBootstrap
 boot = QobuzBootstrap(__addon__, 0)
+boot.bootstrap_directories()
+boot.bootstrap_lang()
 boot.bootstrap_api()
 boot.bootstrap_core()
 

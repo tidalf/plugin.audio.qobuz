@@ -17,19 +17,14 @@
 import sys, os
 import urllib
 
-import xbmc
-import xbmcgui
+import pprint
 
+import xbmc
+    
 from constants import *
 import constants
-
 from debug import *
-
 import qobuz
-
-import xbmcgui
-
-import pprint
 
 ''' Arguments parssing '''
 def get_params():
@@ -37,6 +32,7 @@ def get_params():
     paramstring=sys.argv[2]
     if constants.__debugging__ :
         xbmc.log(paramstring)
+        pass
     if len(paramstring)>=2:
         params=sys.argv[2]
         cleanedparams=params.replace('?','')
@@ -59,11 +55,13 @@ class QobuzBootstrap(object):
     def __init__(self, __addon__, __handle__):
         qobuz.addon = __addon__
         self.handle = __handle__
-        qobuz.lang = qobuz.addon.getLocalizedString
-        self.bootstrap_directories()
+        #qobuz.lang = qobuz.addon.getLocalizedString
+
         qobuz.boot = self
     
     def bootstrap_app(self):
+        self.bootstrap_directories()
+        self.bootstrap_lang()
         self.bootstrap_api()
         self.bootstrap_core()
         self.bootstrap_image()
@@ -76,7 +74,10 @@ class QobuzBootstrap(object):
             qobuz.gui.showLoginFailure()
             exit(1)
         self.mode_dispatch()
-
+    
+    def bootstrap_lang(self):
+        qobuz.lang = qobuz.addon.getLocalizedString
+         
     def bootstrap_directories(self):
         class path ():
             def __init__(s):
@@ -151,10 +152,10 @@ class QobuzBootstrap(object):
         self.MODE = None
         self.ID = None
         self.META = None
-        self.WINID = xbmcgui.getCurrentWindowId()
-        #self.NAME = None
-        info(self, "\nWINDOOOOOOWS ID: " + str(self.WINID) + "\n")
-        self.WIN = xbmcgui.Window(self.WINID)
+#        self.WINID = xbmcgui.getCurrentWindowId()
+#        #self.NAME = None
+#        info(self, "\nWINDOOOOOOWS ID: " + str(self.WINID) + "\n")
+#        self.WIN = xbmcgui.Window(self.WINID)
         self.params = get_params()
         pprint.pprint(self.params)
 #        if self.WINID != 10501:
@@ -310,6 +311,11 @@ class QobuzBootstrap(object):
             p.set_core(self.Core)
             p.doModal()
             exit(0)
+        
+        elif self.MODE == MODE_TEST:
+            from tree.node import test_node
+            t = test_node()
+            t.run()
         '''
             Directory Ending
         '''

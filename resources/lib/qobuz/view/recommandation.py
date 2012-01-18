@@ -74,7 +74,7 @@ class QobuzGetRecommandation(ICacheable):
                 image = self.set_image_genre(json_product['image']['large'])
                 getnewimage = False
             u = qobuz.boot.build_url(MODE_ALBUM, album.id)
-            item = album.getXbmcItem('playlist', i, fanArt)
+            item = album.getXbmcItem( fanArt)
             list.append((u, item, True))
             i += 1
         return list

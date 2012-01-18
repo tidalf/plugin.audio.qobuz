@@ -340,6 +340,9 @@ class QobuzGUI:
         ''' ERASE CACHE '''
         erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
         menuItems.append((__language__(31009), "XBMC.RunPlugin("+erasecache+")"))
+        ''' Test Node '''
+        erasecache=sys.argv[0]+"?mode="+str(MODE_TEST)
+        menuItems.append(('Test NODE', "XBMC.RunPlugin("+erasecache+")"))
         dir.setPath(u)
         dir.setProperty('path', u)
         dir.addContextMenuItems(menuItems, replaceItems=True)
