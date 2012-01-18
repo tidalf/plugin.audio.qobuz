@@ -344,7 +344,7 @@ class QobuzTagProduct(IQobuzTag):
                             'label', 'price', 'release_date', 'relevancy', 
                             'title', 'type', 'url', 'subtitle', 'goodies', 
                             'release_date', 'awards', 'url', 'added_date', 'length'
-                            'added_date'])
+                            'added_date', 'released_at', 'subtitle'])
         self.__tracks__ = None
         if json:
             self.parse_json(json)
@@ -354,11 +354,11 @@ class QobuzTagProduct(IQobuzTag):
     
     def getAlbum(self, sep =''):
         album = ''
-        try: return self.Subtitle
+        try: return self.subtitle
         except: 
             for c in self.get_childs():
-                album += c.getAlbum(sep)
-                if sep: album += sep
+                album = c.getAlbum(sep)
+                if album: return album
         return album
     
     def getAlbumId(self, sep =''):
@@ -388,7 +388,11 @@ class QobuzTagProduct(IQobuzTag):
     def getDate(self, sep = 0):
         try: 
             return self.release_date
-        except: return ''
+        except: 
+            try:
+                return self.released_at
+            except: pass
+        return ''
         
     def getTitle(self, sep = ''):
         try: return self.title
