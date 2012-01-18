@@ -57,7 +57,7 @@ class QobuzSearchAlbums():
         data = self.get_data()
         if not data:
             return list
-        for product in self.get_data():
+        for product in data:
             tag_product = QobuzTagProduct(product['product'])
             item = tag_product.getXbmcItem('fanArt')
             u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)

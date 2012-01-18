@@ -31,14 +31,13 @@
    <category label="38002">
    <setting id="search_enabled" label="35000" type="bool" default="true" />
    <setting type="sep" />
-   <!-- <setting id="songsearchlimit" type="labelenum" label="30002" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" /> -->
-   <setting label="30002" type="slider" id="songsearchlimit" default="100" option="int" range="10,10,100" format=""/>
-   <!-- <setting id="albumsearchlimit" type="labelenum" label="30003" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" /> -->
-   <setting label="30003" type="slider" id="albumsearchlimit" default="100" option="int" range="10,10,100" format=""/>
-   <!-- <setting id="artistsearchlimit" type="labelenum" label="30004" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" /> -->
-   <setting label="30004" type="slider" id="artistsearchlimit" default="100" option="int" range="10,10,100" format=""/>
+   <setting id="songsearchlimit" type="labelenum" label="30002" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" /> -->
+   <!-- <setting label="30002" type="slider" id="songsearchlimit" default="100" option="int" range="10,10,100" format="%1i"/>-->
+   <setting id="albumsearchlimit" type="labelenum" label="30003" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" />
+   <!-- <setting label="30003" type="slider" id="albumsearchlimit" default="100" option="int" range="10,10,100" format="%1i"/>-->
+   <setting id="artistsearchlimit" type="labelenum" label="30004" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" /> 
+   <!-- <setting label="30004" type="slider" id="artistsearchlimit" default="100" option="int" range="10,10,100" format="%1i"/> -->
    
-   <!-- <setting id="songspagelimit" type="labelenum" label="30005" default="10" values="10|20|30|40|50|60|70|80|90|100|200|500" /> -->
    </category>
    <!-- Cache -->
     <category label="31006">

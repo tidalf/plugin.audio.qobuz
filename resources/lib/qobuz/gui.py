@@ -251,7 +251,7 @@ class QobuzGUI:
         if context == 'artists':
             content_type = 'artists'
 
-        xbmcplugin.setContent(int(sys.argv[1]), 'albums')
+        #xbmcplugin.setContent(int(sys.argv[1]), 'albums')
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM_IGNORE_THE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TRACKNUM)
