@@ -362,6 +362,9 @@ class QobuzTagProduct(IQobuzTag):
                 if album: return album
         return album
     
+    def getLabel(self):
+        return self.getArtist() + ' - ' + self.getAlbum()
+    
     def getAlbumId(self, sep =''):
         albumid = ''
         try: return self.id
