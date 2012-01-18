@@ -50,7 +50,7 @@ class QobuzSearchTracks():
         childs = ts.get_childs()
         list = []
         for track in childs:
-            item = track.getXbmcItem('playlist')
+            item = track.getXbmcItem('playlist', 'fanArt')
             u = qobuz.boot.build_url(MODE_SONG, int(track.id))
             list.append((u, item, False))
         return list

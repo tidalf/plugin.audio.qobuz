@@ -23,7 +23,9 @@ import xbmcaddon
 
 from debug import warn, info, log
 from constants import *    
-    
+
+import qobuz
+
 class IQobuzTag(object):
     
     def __init__(self, json = None, parent = None):
@@ -188,7 +190,7 @@ class IQobuzTag(object):
             if data: return data
         return data
     
-    def getXbmcItem(self, context = 'album', pos = 0, fanArt = ''):
+    def getXbmcItem(self, fanArt = ''):
         date = 0
         try:
             date = self.getDate('#').split('#')[0]
@@ -204,7 +206,7 @@ class IQobuzTag(object):
         else: genre = self.getGenre()
         i = xbmcgui.ListItem(self.getTitle())
         i.setInfo(type='music', infoLabels = {
-                                              'count': pos,
+                                              #'count': pos,
                                              'title': self.getTitle(),
                                              'artist': self.getArtist(),
                                              'genre': self.getGenre(),
@@ -213,12 +215,12 @@ class IQobuzTag(object):
                                              'comment': 'Qobuz Music Streaming (qobuz.com)'
                                              })
         i.setProperty("IsPlayable", "false")
+        if fanArt:
+            i.setProperty('fanart_image', qobuz.image.access.get(fanArt))
         image = self.getImage()
         if image:
             i.setThumbnailImage(image)
             i.setIconImage(image)
-        if fanArt:
-            i.setProperty('fanart_image', fanArt)
         return i
 '''
 '''
@@ -578,7 +580,7 @@ class QobuzTagTrack(IQobuzTag):
         try: return self.streaming_type
         except: return ''        
     
-    def getXbmcItem(self, context = 'album', pos = 0, fanArt = ''):
+    def getXbmcItem(self, context = 'album', pos = 0, fanArt = 'fanArt'):
         parent = self.get_parent()
         album = self.getAlbum()
         artist = self.getArtist()
@@ -619,9 +621,11 @@ class QobuzTagTrack(IQobuzTag):
     
         if self.getStreamingType() != 'full':
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
+            duration = 60
+        
         i = xbmcgui.ListItem(label, label, image, image)
         if fanArt:
-            i.setProperty('fanart_image', core.image.access.get('fanArt'))
+            i.setProperty('fanart_image', qobuz.image.access.get(fanArt))
         i.setProperty('title', label)
         i.setLabel(label)
         #i.setLabel2(label)

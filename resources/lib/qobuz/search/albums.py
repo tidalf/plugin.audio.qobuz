@@ -59,7 +59,7 @@ class QobuzSearchAlbums():
         list = []
         for product in self.get_data():
             tag_product = QobuzTagProduct(product['product'])
-            item = tag_product.getXbmcItem()
+            item = tag_product.getXbmcItem('fanArt')
             u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
             list.append((u, item, True))
         return list
@@ -71,6 +71,6 @@ class QobuzSearchAlbums():
         for json_album in json['artist']['albums']:
             tag_product = QobuzTagProduct(json_album)
             u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
-            item = tag_product.getXbmcItem()
+            item = tag_product.getXbmcItem('fanArt')
             list.append((u, item, True))
         return list

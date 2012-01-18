@@ -64,12 +64,11 @@ class QobuzSearchArtists():
         for json_artist in data:
             tag_artist = QobuzTagArtist(json_artist)
             u = qobuz.boot.build_url(MODE_ARTIST, tag_artist.id)
-            item   = xbmcgui.ListItem()
+            item   = xbmcgui.ListItem('fanArt')
             item.setLabel(tag_artist.getArtist() )
-            if not item.getProperty('fanart_image'):
-                item.setProperty('fanart_image', image)
-                item.setIconImage( image)
-                item.setThumbnailImage(image)
+#            if not item.getProperty('fanart_image'):
+#                item.setIconImage( image)
+#                item.setThumbnailImage(image)
             item.setProperty('fanart_image', qobuz.image.access.get('fanArt'))
             list.append((u, item, True))
         return list
@@ -82,7 +81,7 @@ class QobuzSearchArtists():
         for json_album in json['artist']['albums']:
             tag_album = QobuzTagAlbum(json_album)
             u = qobuz.boot.build_url(MODE_ALBUM, tag_album.id)
-            item = tag_album.getXbmcItem('album')
+            item = tag_album.getXbmcItem('fanArt')
             if not item.getProperty('fanart_image'):
                 item.setProperty('fanart_image', image)
                 item.setIconImage( image)

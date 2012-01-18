@@ -60,7 +60,7 @@ class QobuzProduct(ICacheable):
         for tag_track in tag_product.get_childs():
             if not isinstance(tag_track, QobuzTagTrack):
                 continue
-            item = tag_track.getXbmcItem('album')
+            item = tag_track.getXbmcItem('album', 1)
             u = qobuz.boot.build_url(MODE_SONG, tag_track.id)
             list.append((u, item, False))
         return list
