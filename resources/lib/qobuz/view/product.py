@@ -18,15 +18,8 @@ import os
 import sys
 import pprint
 
-import xbmcaddon
-import xbmcplugin
-import xbmcgui
-import xbmc
-
-
 from utils.icacheable import ICacheable
 from debug import *
-#from utils import _sc
 from constants import *
 from utils.tag import QobuzTagProduct
 from utils.tag import QobuzTagTrack

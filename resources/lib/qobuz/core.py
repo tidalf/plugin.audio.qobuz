@@ -22,8 +22,8 @@ import xbmc
 
 from api import QobuzApi
 from debug import log, info, warn
-#from icacheable import ICacheable
 import qobuz
+
 """
  Class QobuzXbmc
 """
@@ -57,9 +57,6 @@ class QobuzCore:
     def getUserPlaylists(self):
         from view.userplaylists import QobuzUserPlaylistsXbmc
         return QobuzUserPlaylistsXbmc()
-
-#    def getQobuzAlbum(self, id):
-#        return QobuzAlbum(self, id)
 
     def getTrack(self,id,context_type="playlist"):
         from data.track import QobuzTrack

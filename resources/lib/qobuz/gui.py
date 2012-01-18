@@ -14,6 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
 import os
 import sys
 import urllib
@@ -84,16 +85,6 @@ class QobuzGUI:
         http://xbmc.sourceforge.net/python-docs/xbmcplugin.html
         '''
         xbmcplugin.setContent(qobuz.boot.handle, content)
-
-    '''
-        MUST BE REMOVED ?
-#    '''  
-#    def addDirectoryItem(self, u, item, bFolder, len):
-#        h = self.Bootstrap.__handle__
-#        xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_LABEL)
-#        xbmcplugin.addDirectoryItem(handle=h, 
-#                                    url=u, listitem=item, isFolder=bFolder, 
-#                                    totalItems=len)
 
     def showLoginFailure(self):
         __language__ = qobuz.lang
@@ -201,7 +192,6 @@ class QobuzGUI:
     def showRecommendationsTypes(self):
         __language__ = qobuz.lang
         i = qobuz.image.access
-        #xbmcplugin.setPluginFanart(int(sys.argv[1]), i.get('fanart'))
         self._add_dir(__language__(30083), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=press-awards','', i.get('song'), 0)
         self._add_dir(__language__(30084), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases','', i.get('song'), 0)
         self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', i.get('song'), 0)
@@ -320,20 +310,8 @@ class QobuzGUI:
             u = url
         dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
         dir.setInfo( type="Music", infoLabels={ "title": name.encode('utf8', 'ignore') } )
-        dir.setProperty('fanart_image', os.path.join(qobuz.path.base, 'fanart.jpg'))
-#        dir.setThumbnailImage(iconimage)
-#        dir.setIconImage(iconimage)
-        # Custom menu items
+        dir.setProperty('fanart_image', qobuz.image.access.get('fanArt'))
         menuItems = []
-#        if mode == MODE_ALBUM:
-#            mkplaylst=sys.argv[0]+"?mode="+str(MODE_MAKE_PLAYLIST)+"&name="+name+"&id="+str(id)
-#            menuItems.append((__language__(30076), "XBMC.RunPlugin("+mkplaylst+")"))
-#        if mode == MODE_PLAYLIST:
-#            rmplaylst=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
-#            menuItems.append((__language__(30077), "XBMC.RunPlugin("+rmplaylst+")"))
-#            mvplaylst=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+"&name="+urllib.quote_plus(name)+"&id="+str(id)
-#            menuItems.append((__language__(30078), "XBMC.RunPlugin("+mvplaylst+")"))
-        
         ''' MANAGE PLAYLIST '''
         manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
         menuItems.append((__language__(31010), "XBMC.RunPlugin("+manageplaylist+")"))

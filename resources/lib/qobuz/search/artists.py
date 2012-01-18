@@ -15,15 +15,12 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
-import xbmcgui
-import xbmcplugin
-
-#from utils import _sc
-from constants import *
-from debug import log, info, warn
-
 import pprint
 
+import xbmcgui
+
+from constants import *
+from debug import log, info, warn
 from utils.tag import QobuzTagArtist
 from utils.tag import QobuzTagProduct
 import qobuz
@@ -66,9 +63,6 @@ class QobuzSearchArtists():
             u = qobuz.boot.build_url(MODE_ARTIST, tag_artist.id)
             item   = xbmcgui.ListItem('fanArt')
             item.setLabel(tag_artist.getArtist() )
-#            if not item.getProperty('fanart_image'):
-#                item.setIconImage( image)
-#                item.setThumbnailImage(image)
             item.setProperty('fanart_image', qobuz.image.access.get('fanArt'))
             list.append((u, item, True))
         return list

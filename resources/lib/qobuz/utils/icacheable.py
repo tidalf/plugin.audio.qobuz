@@ -176,7 +176,3 @@ class ICacheable(object):
         assert("Must be overloaded")
         exit(0)
 
-#    def to_s(self):
-#        str = "Cache refresh: " + repr(self.cache_refresh) + "\n"
-#        str += "Cache path: " + self.cache_path + "\n"
-#        return str

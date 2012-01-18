@@ -152,14 +152,8 @@ class QobuzBootstrap(object):
         self.MODE = None
         self.ID = None
         self.META = None
-#        self.WINID = xbmcgui.getCurrentWindowId()
-#        #self.NAME = None
-#        info(self, "\nWINDOOOOOOWS ID: " + str(self.WINID) + "\n")
-#        self.WIN = xbmcgui.Window(self.WINID)
         self.params = get_params()
-        pprint.pprint(self.params)
-#        if self.WINID != 10501:
-#            self.params['meta'] = '1'
+        
         ''' 
         set mode 
         '''
@@ -179,7 +173,6 @@ class QobuzBootstrap(object):
         except: pass
         for p in self.params:
             info(self, "Param: " + p + ' = ' + str(self.params[p]))
-
     
     '''
     

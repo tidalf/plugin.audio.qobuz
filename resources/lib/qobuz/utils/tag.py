@@ -86,8 +86,7 @@ class IQobuzTag(object):
                 self.set(tag, json[tag])
             except:
                 pass
-                #warn(self, "Could not set tag: " + tag)
-    
+
     def is_loaded(self):
         return self.__is_loaded
     
@@ -377,9 +376,6 @@ class QobuzTagProduct(IQobuzTag):
     
     def getGenre(self, sep = ''):
         genre = super(QobuzTagProduct, self).getGenre()
-#        for c in self.get_childs():
-#            genre += c.getGenre(sep)
-#        if sep: genre += sep
         if not genre:
             try: genre = self.genre
             except : pass

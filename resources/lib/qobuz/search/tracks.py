@@ -17,11 +17,6 @@
 import sys
 import pprint
 
-import xbmcgui
-import xbmcplugin
-import xbmc
-
-#from utils import _sc
 from constants import *
 from debug import log, info, warn
 from utils.tag import QobuzTagTrack

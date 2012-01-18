@@ -17,9 +17,6 @@
 
 import os
 import sys
-import xbmc
-import xbmcgui
-import xbmcplugin
 
 from utils.icacheable import ICacheable
 from constants import *

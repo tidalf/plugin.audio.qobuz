@@ -17,14 +17,8 @@
 import sys
 import os
 
-import xbmc
-import xbmcaddon
-import xbmcgui
-import xbmcplugin
-
 from utils.icacheable import ICacheable
 from debug import log, info, warn
-#from utils import _sc
 import pprint
 import qobuz
 '''

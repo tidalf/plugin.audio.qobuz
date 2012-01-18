@@ -17,14 +17,8 @@
 import sys
 import os
 
-import xbmc
-import xbmcaddon
-import xbmcgui
-import xbmcplugin
-
 from utils.icacheable import ICacheable
 from debug import log, info, warn
-#from utils.string import _sc
 from utils.tag import QobuzTagTrack
 import pprint
 import qobuz
@@ -50,8 +44,4 @@ class QobuzTrack(ICacheable):
     def _fetch_data(self):
         json = qobuz.api.get_track(self.id)
         return json
-    
-#    def get_duration(self):
-#        (sh,sm,ss) = self._raw_data['duration'].split(':')
-#        return (int(sh) * 3600 + int(sm) * 60 + int(ss))
 
