@@ -216,7 +216,8 @@ class QobuzBootstrap(object):
         
         elif self.MODE == MODE_SONG:
             info(self, "PLaying song")
-            qobuz.gui.showNotification(34000, 34001)
+            if qobuz.addon.getSetting('notification_playingsong') == 'true':
+                qobuz.gui.showNotification(34000, 34001)
             try:
                 context_type=urllib.unquote_plus(self.params["context_type"])
             except: 

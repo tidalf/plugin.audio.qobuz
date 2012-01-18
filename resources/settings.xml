@@ -50,6 +50,12 @@
         <setting id="cache_duration_userplaylist" type="labelenum" label="31005" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
         <setting id="cache_duration_auth" type="labelenum" label="31008" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
    </category>
+   <!-- Notification -->
+   <category label="36002">
+        <setting id="notification_playingsong" label="36003" type="bool" default="false" />
+        
+   </category>      
+   
    <!-- Other -->
    <category label="38003">
         <setting id="debug" label="Debug" type="bool" default="false" />

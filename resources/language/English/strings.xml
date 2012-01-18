@@ -154,6 +154,8 @@
     <!-- Notification -->
     <string id="36000">Qobuz</string>
     <string id="36001">Empty directory</string>
+    <string id="36002">Notification</string>
+    <string id="36003">Playing song</string>
 
     <!-- Sort -->
     <string id="37000">Sort enabled</string>

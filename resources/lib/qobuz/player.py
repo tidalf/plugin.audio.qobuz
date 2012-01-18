@@ -57,7 +57,8 @@ class QobuzPlayer(xbmc.Player):
         '''
             PLaying track
         '''
-        qobuz.gui.showNotificationH(lang(34000), item.getLabel())
+        if qobuz.addon.getSetting('notification_playingsong') == 'true':
+            qobuz.gui.showNotificationH(lang(34000), item.getLabel())
         '''
             We are called from playlist...
         '''

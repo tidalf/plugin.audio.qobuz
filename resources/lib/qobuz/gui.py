@@ -107,8 +107,6 @@ class QobuzGUI:
         self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('album'), 0)
         if (qobuz.api.userid != 0):
             self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('usersplaylists'), 0)
-            #self._add_dir("UPL2", 'plugin://plugin.audio.qobuz/?mode='+str(MODE_NODE)+"&nt=4096", MODE_NODE, i.get('usersplaylists'), 0)
-        self.setContent('albums')
         return True
 
     """
@@ -210,7 +208,6 @@ class QobuzGUI:
         self._add_dir(__language__(30084), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=new-releases','', i.get('song'), 0)
         self._add_dir(__language__(30085), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=best-sellers','', i.get('song'), 0)
         self._add_dir(__language__(30086), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T)+'&type=editor-picks','', i.get('song'), 0)
-        self.setContent('songs')
         return True
 
     '''
@@ -233,7 +230,6 @@ class QobuzGUI:
         self._add_dir(__language__(30095), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=10',MODE_SHOW_RECO_T_G, i.cache.get(type, 10)+ti, 10)
         self._add_dir(__language__(30097), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=123',MODE_SHOW_RECO_T_G, i.cache.get(type, 123)+ti, 10)
         self._add_dir(__language__(30096), sys.argv[0]+'?mode='+str(MODE_SHOW_RECO_T_G)+'&type='+type+'&genre=null',MODE_SHOW_RECO_T_G, i.access.get('default')+ti, 10)
-        self.setContent('songs')
         return True
 
     '''
@@ -251,7 +247,6 @@ class QobuzGUI:
         if context == 'artists':
             content_type = 'artists'
 
-        #xbmcplugin.setContent(int(sys.argv[1]), 'albums')
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_ALBUM_IGNORE_THE)
         xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_TRACKNUM)
@@ -346,22 +341,22 @@ class QobuzGUI:
         dir.setInfo( type="Music", infoLabels={ "title": name.encode('utf8', 'ignore') } )
         dir.setProperty('fanart_image', qobuz.image.access.get('fanArt'))
         menuItems = []
-        ''' MANAGE PLAYLIST '''
-        manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
-        menuItems.append((__language__(31010), "XBMC.RunPlugin("+manageplaylist+")"))
+#        ''' MANAGE PLAYLIST '''
+#        manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
+#        menuItems.append((__language__(31010), "XBMC.RunPlugin("+manageplaylist+")"))
         ''' ERASE CACHE '''
         erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
         menuItems.append((__language__(31009), "XBMC.RunPlugin("+erasecache+")"))
         
-        ''' Test Node '''
-        cmd=sys.argv[0]+"?mode="+str(MODE_TEST)
-        menuItems.append(('Test NODE', "XBMC.RunPlugin("+cmd+")"))
-        
-        ''' Test Node '''
-        cmd=sys.argv[0]+"?mode="+str(MODE_NODE)+"&nt=4096"
-        menuItems.append(('Test Node Playlist', "XBMC.RunPlugin("+cmd+")"))
+#        ''' Test Node '''
+#        cmd=sys.argv[0]+"?mode="+str(MODE_TEST)
+#        menuItems.append(('Test NODE', "XBMC.RunPlugin("+cmd+")"))
+#        
+#        ''' Test Node '''
+#        cmd=sys.argv[0]+"?mode="+str(MODE_NODE)+"&nt=4096"
+#        menuItems.append(('Test Node Playlist', "XBMC.RunPlugin("+cmd+")"))
         
         dir.setPath(u)
         dir.setProperty('path', u)
-        dir.addContextMenuItems(menuItems, replaceItems=True)
+        dir.addContextMenuItems(menuItems, replaceItems=False)
         return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)
