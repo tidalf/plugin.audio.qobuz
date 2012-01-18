@@ -69,6 +69,7 @@ class QobuzSearchArtists():
             item   = xbmcgui.ListItem('fanArt')
             item.setLabel(tag_artist.getArtist() )
             item.setProperty('fanart_image', qobuz.image.access.get('fanArt'))
+            qobuz.gui.setContextMenu(item)
             list.append((u, item, True))
         return list
 

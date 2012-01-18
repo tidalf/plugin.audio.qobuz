@@ -116,13 +116,16 @@ class QobuzListItem_track(QobuzListItem):
             warn(self, "Cannot get track data")
             return False
         tag = QobuzTagTrack(data)
-        item = tag.getXbmcItem(self.display_context, 0, self.fanart_image)
+        print "Sbim"
+        item = tag.getXbmcItem(self.display_context, 0, 'fanArt')
+        print "Sbam"
         item.setPath(self.stream_url)
         item.setProperty('streaming_url', self.stream_url)
         item.setProperty('streaming_type', self.stream_type)
         item.setProperty('streaming_format', str(self.stream_format_id))
         item.setProperty('mimetype', self.mimetype)
         item.setProperty('IsPlayable', 'true')
+        print "Plop!"
         return item
         
     def to_s(self):

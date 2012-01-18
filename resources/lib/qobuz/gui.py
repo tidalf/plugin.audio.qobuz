@@ -78,13 +78,13 @@ class QobuzGUI:
     '''
         SET Content
     '''
-    def setContent(self, content):
-        '''
-        *Note, You can use the above as keywords for arguments.
-        content: files, songs, artists, albums, movies, tvshows, episodes, musicvideos
-        http://xbmc.sourceforge.net/python-docs/xbmcplugin.html
-        '''
-        xbmcplugin.setContent(qobuz.boot.handle, content)
+#    def setContent(self, content):
+#        '''
+#        *Note, You can use the above as keywords for arguments.
+#        content: files, songs, artists, albums, movies, tvshows, episodes, musicvideos
+#        http://xbmc.sourceforge.net/python-docs/xbmcplugin.html
+#        '''
+#        xbmcplugin.setContent(qobuz.boot.handle, content)
 
     def showLoginFailure(self):
         __language__ = qobuz.lang

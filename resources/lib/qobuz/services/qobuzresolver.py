@@ -42,6 +42,8 @@ boot.bootstrap_directories()
 boot.bootstrap_lang()
 boot.bootstrap_api()
 boot.bootstrap_core()
+boot.bootstrap_image()
+boot.bootstrap_gui()
 
 __pid_file__ = 'qobuzresolver.pid'
 __sleep__ = 5
