@@ -55,6 +55,7 @@ class QobuzApi:
         data['authtoken'] = self.authtoken
         data['authtime'] = self.authtime
         data['userid'] = self.userid
+        data['username'] = self.username
         f = None
         try:
             f = open(cachePath, 'wb')
@@ -69,6 +70,14 @@ class QobuzApi:
             return False
         return True
     
+    def delete_user_data(self):
+        try: 
+            from utils.cache import cache_manager
+            c = cache_manager()
+            c.delete_user_data()
+        except:
+            warn(self, "Cannot remove user data from cache")
+            
     def load_auth(self):
         cachePath = self.get_cache_path()
         if not cachePath:
@@ -97,6 +106,11 @@ class QobuzApi:
             data = pickle.load(f)
         except:
             warn(self, "Cannot load serialized data")
+            return False
+        f.close()
+        if self.username != data['username']:
+            warn(self, "Username in cache is not the same as the one in settings... discard cache")
+            self.delete_user_data()
             return False
         self.authtime = data['authtime']
         self.authtoken = data['authtoken']
@@ -133,6 +147,7 @@ class QobuzApi:
         return response_json
     
     def login(self, user, password):
+        self.username = user
         if self.load_auth():
             info(self, 'Using authentification token from cache')
             return self.userid
