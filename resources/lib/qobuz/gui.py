@@ -107,7 +107,7 @@ class QobuzGUI:
         self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('album'), 0)
         if (qobuz.api.userid != 0):
             self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('usersplaylists'), 0)
-            self._add_dir("UPL2", 'plugin://plugin.audio.qobuz/?mode='+str(MODE_NODE)+"&nt=4096", MODE_NODE, i.get('usersplaylists'), 0)
+            #self._add_dir("UPL2", 'plugin://plugin.audio.qobuz/?mode='+str(MODE_NODE)+"&nt=4096", MODE_NODE, i.get('usersplaylists'), 0)
         self.setContent('albums')
         return True
 

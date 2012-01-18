@@ -97,7 +97,6 @@ class QobuzApi:
         except:
             warn(self, "Cannot load serialized data")
             return False
-        pprint.pprint(data)
         self.authtime = data['authtime']
         self.authtoken = data['authtoken']
         self.userid = data['userid']
