@@ -121,14 +121,13 @@
  
     
     <!-- Cache -->
-    <string id="31000">Time in minute for various Qobuz data to be held in cache
-    - 0 No cache</string>
+    <string id="31000">Time in minute for various Qobuz data to be held in cache[CR][I]- Set to zero to disable caching[/I]</string>
     <string id="31001">Album cache duration</string>
     <string id="31002">Artist cache duration</string>
     <string id="31003">Track cache duration</string>
     <string id="31004">Recommendation cache duration</string>
     <string id="31005">User playlist cache duration</string>
-    <string id="31006">Cache settings</string>
+    <string id="31006">Cache</string>
     <string id="31007">Cache settings</string>
     <string id="31008">Authentification cache duration</string>
     <string id="31009">Erase cache</string>
@@ -155,6 +154,16 @@
     <!-- Notification -->
     <string id="36000">Qobuz</string>
     <string id="36001">Empty directory</string>
+
+    <!-- Sort -->
+    <string id="37000">Sort enabled</string>
+    
+    <!-- Settings  -->
+     <string id="38000">User credentials</string>
+     <string id="38001">Stream</string>
+     <string id="38002">Search</string>
+     <string id="38003">Other</string>
+     
 </strings>
 
 

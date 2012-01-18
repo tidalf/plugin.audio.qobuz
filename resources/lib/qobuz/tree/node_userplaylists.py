@@ -8,7 +8,7 @@ from debug import info
 '''
     NODE USER PLAYLISTS
 '''
-from view.userplaylists import QobuzUserPlaylists
+from data.userplaylists import QobuzUserPlaylists
 from utils.tag import QobuzTagUserPlaylist
 from node_playlist import node_playlist
 

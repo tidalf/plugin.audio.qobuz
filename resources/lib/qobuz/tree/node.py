@@ -34,6 +34,13 @@ class node(object):
         self.id = None
         self.url = None
     
+    def to_s(self):
+        s = "[Node][" + str(self.type) + "\n"
+        s+= "     id: " + str(self.id) + "\n"
+        s+= " Label : " + str(self.label) + "\n"
+        s+= " label2: " + str(self.label2) + "\n"
+        return s
+    
     def setUrl(self):
         url = 'plugin://plugin.audio.qobuz/?mode='+str(MODE_NODE)+"&nt="+str(self.type)
         if self.id != None:

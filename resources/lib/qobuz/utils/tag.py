@@ -664,10 +664,13 @@ class QobuzTagPlaylist(IQobuzTag):
         try:
             name = self.owner + ' - ' + self.name
         except: pass
-        ispub = 'prv'
-        if self.is_public:
-            ispub = 'pub' 
-        return '[' + ispub + '] ' + name
+        ispub = ''
+        try:
+            ispub = '[prv] '
+            if self.is_public:
+                ispub = '[pub] ' 
+        except: pass
+        return ispub + name
     
     def parse_json(self, p):
         self.auto_parse_json(p)

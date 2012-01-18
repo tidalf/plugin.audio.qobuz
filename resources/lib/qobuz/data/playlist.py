@@ -39,10 +39,14 @@ class QobuzPlaylist(ICacheable):
         self.fetch_data()
 
     def _fetch_data(self):
-        data = qobuz.api.get_playlist(self.id)['playlist']
-        return data
+        data = qobuz.api.get_playlist(self.id)
+        if not data:
+            return None
+        return data['playlist']
 
     def length(self):
+        if not 'tracks' in self._raw_data:
+            return 0
         return len(self._raw_data['tracks'])
 
     def get_items(self):
