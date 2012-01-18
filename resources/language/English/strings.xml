@@ -51,12 +51,12 @@
 	<string id="30032">No popular songs.</string>
 	<string id="30033">You have no Qobuz playlists.</string>
 	<string id="30034">You must be logged in</string>
-	<string id="30035">to see your Qobuz playlists.</string>
+	<string id="30035">to access your Qobuz playlists</string>
 	<string id="30036">Added to favorites</string>
 	<string id="30037">to add favorites.</string>
 	<string id="30038">Removed from Qobuz favorites</string>
 	<string id="30039">to remove Qobuz favorites.</string>	
-	<string id="30040">to get Qobuz playlists.</string>	
+	<string id="30040">to access Qobuz Music Streaming service[CR][I]Please check your credantials in the addon settings[CR]or retry later[/I]</string>	
 	<string id="30041">Search for popular songs for artist powered by Qobuz</string>
 	<string id="30042">No popular songs.</string>
 	<string id="30043">No matching artists.</string>

@@ -88,9 +88,11 @@ class QobuzGUI:
 
     def showLoginFailure(self):
         __language__ = qobuz.lang
+        xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False, updateListing=False, cacheToDisc=False)
         dialog = xbmcgui.Dialog()
-        dialog.ok(__language__(30008), __language__(30034), __language__(30040))
-        
+        dialog.ok(__language__(30008), __language__(30034), __language__(30040))        
+        xbmc.executebuiltin('ActivateWindow(home)')
+        sys.exit(0)
     '''
         Top-level menu
     '''

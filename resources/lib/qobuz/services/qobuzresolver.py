@@ -139,6 +139,10 @@ def watcher():
                 print "Cannot resolve track!"
             else:
                 print "Track resolved"
+        except ServiceError as e:
+            if e.arg == 'login':
+                print "Login error...abort!"
+                run = False
         except:
             log("Resolver fail to watch playlist!")
         if not pid.touch():

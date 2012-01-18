@@ -22,6 +22,12 @@ from utils.pid import Pid
 from utils.list_item import QobuzListItem_track
 import qobuz
 
+class ServiceError(Exception):
+    pass
+#     def __init__(self, value):
+#         self.value = value
+#     def __str__(self):
+#        return repr(self.value)
 class Service_url_resolver():
     
     def __init__(self):
@@ -219,6 +225,7 @@ class Service_url_resolver():
             login = qobuz.core.login()
         except:
             print "Exception: Cannot login to Qobuz Service..."
+            raise ServiceError('login')
             return False
         if not login:
             print "Cannot login to Qobuz Service..."
