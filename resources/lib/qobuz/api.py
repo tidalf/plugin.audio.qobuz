@@ -30,6 +30,7 @@ from debug import log, info, warn
 class QobuzApi:
 
     def __init__(self):
+        self.username = None
         self.authtoken = None
         self.userid = None
         self.authtime = None

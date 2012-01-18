@@ -41,11 +41,16 @@ class QobuzSearchTracks():
         return len(self._raw_data['results']['tracks'])
     
     def get_items(self):
-        ts = QobuzTagSearch(self._raw_data['results'])
-        childs = ts.get_childs()
         list = []
+        data = self._raw_data
+        if not data:
+            return list
+        if not 'results' in data:
+            return list
+        ts = QobuzTagSearch(data['results'])
+        childs = ts.get_childs()
         for track in childs:
-            item = track.getXbmcItem('playlist', 'fanArt')
+            item = track.getXbmcItem('playlist', 0, 'fanArt')
             u = qobuz.boot.build_url(MODE_SONG, int(track.id))
             list.append((u, item, False))
         return list
