@@ -328,6 +328,24 @@ class QobuzGUI:
             return unicode(kb.getText(), "utf-8")
         return ''
     
+    def setContextMenu(self, item, context = 'all'):
+        menuItems = []
+#        ''' MANAGE PLAYLIST '''
+#        manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
+#        menuItems.append((__language__(31010), "XBMC.RunPlugin("+manageplaylist+")"))
+        ''' ERASE CACHE '''
+        erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
+        menuItems.append((qobuz.lang(31009), "XBMC.RunPlugin("+erasecache+")"))
+        
+#        ''' Test Node '''
+#        cmd=sys.argv[0]+"?mode="+str(MODE_TEST)
+#        menuItems.append(('Test NODE', "XBMC.RunPlugin("+cmd+")"))
+#        
+#        ''' Test Node '''
+#        cmd=sys.argv[0]+"?mode="+str(MODE_NODE)+"&nt=4096"
+#        menuItems.append(('Test Node Playlist', "XBMC.RunPlugin("+cmd+")"))
+        item.addContextMenuItems(menuItems, replaceItems=False)
+    
     '''
         Add directory
     '''
@@ -340,23 +358,8 @@ class QobuzGUI:
         dir=xbmcgui.ListItem(name, iconImage=iconimage, thumbnailImage=iconimage)
         dir.setInfo( type="Music", infoLabels={ "title": name.encode('utf8', 'ignore') } )
         dir.setProperty('fanart_image', qobuz.image.access.get('fanArt'))
-        menuItems = []
-#        ''' MANAGE PLAYLIST '''
-#        manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
-#        menuItems.append((__language__(31010), "XBMC.RunPlugin("+manageplaylist+")"))
-        ''' ERASE CACHE '''
-        erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
-        menuItems.append((__language__(31009), "XBMC.RunPlugin("+erasecache+")"))
-        
-#        ''' Test Node '''
-#        cmd=sys.argv[0]+"?mode="+str(MODE_TEST)
-#        menuItems.append(('Test NODE', "XBMC.RunPlugin("+cmd+")"))
-#        
-#        ''' Test Node '''
-#        cmd=sys.argv[0]+"?mode="+str(MODE_NODE)+"&nt=4096"
-#        menuItems.append(('Test Node Playlist', "XBMC.RunPlugin("+cmd+")"))
-        
         dir.setPath(u)
+        self.setContextMenu(dir)
         dir.setProperty('path', u)
-        dir.addContextMenuItems(menuItems, replaceItems=False)
+
         return xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=dir,isFolder=True, totalItems=items)

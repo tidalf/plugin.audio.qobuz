@@ -224,6 +224,7 @@ class IQobuzTag(object):
         if image:
             i.setThumbnailImage(image)
             i.setIconImage(image)
+        qobuz.gui.setContextMenu(i)
         return i
 '''
 '''
@@ -652,6 +653,7 @@ class QobuzTagTrack(IQobuzTag):
         i.setThumbnailImage(image)
         i.setIconImage(image)
         i.setProperty('image', image)
+        qobuz.gui.setContextMenu(i)
         return i
 
 '''
