@@ -54,6 +54,9 @@ class QobuzSearchAlbums():
 
     def _directory_products(self):
         list = []
+        data = self.get_data()
+        if not data:
+            return list
         for product in self.get_data():
             tag_product = QobuzTagProduct(product['product'])
             item = tag_product.getXbmcItem('fanArt')
@@ -63,8 +66,12 @@ class QobuzSearchAlbums():
 
     def _directory_products_by_artist(self):
         json = self.get_data()
-        artist = json['artist']['name']
+        artist = None
         list = []
+        try:
+            artist = json['artist']['name']
+        except:
+            return list
         for json_album in json['artist']['albums']:
             tag_product = QobuzTagProduct(json_album)
             u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
