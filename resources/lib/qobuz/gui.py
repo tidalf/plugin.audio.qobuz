@@ -27,6 +27,7 @@ from constants import *
 from debug import info, warn, log
 
 import qobuz
+
 '''
     CLASS QobuzGUI
 '''
@@ -54,7 +55,7 @@ class QobuzGUI:
     Must be called at the end for folder to be displayed
     '''
     def endOfDirectory(self, succeeded = True):
-        return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=succeeded, updateListing=True, cacheToDisc=True)
+        return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=succeeded, updateListing=False, cacheToDisc=True)
     
     '''
         SHOW Notification (HUMAN ONE / NO i8n)

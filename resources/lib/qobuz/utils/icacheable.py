@@ -106,14 +106,10 @@ class ICacheable(object):
             if (time.time() - mtime) > refresh:
                 info(self,"Refreshing cache")
                 return None
-        f = None
-        try:
+        data = None
+        with open(cache, 'rb') as f:
             f = open(cache,'rb')
-        except:
-            warn(self,"Cannot open cache file: " + cache)
-            return None 
-        data = pickle.load(f)
-        f.close()
+            data = pickle.load(f)
         return data
 
     def delete_cache(self):
@@ -138,9 +134,11 @@ class ICacheable(object):
     
     def _save_cache_data(self, data):
         cache = self.get_cache_path()
-        f = open(cache,'wb')
-        s = pickle.dump(data,f,protocol=pickle.HIGHEST_PROTOCOL)
-        f.close()
+        s = None
+        with open(cache, 'wb') as f:
+            s = pickle.dump(data,f,protocol=pickle.HIGHEST_PROTOCOL)
+            f.flush()
+            os.fsync(f)
         return s
     
     def set_raw_data(self, raw):
@@ -157,10 +155,10 @@ class ICacheable(object):
         info(self,"Fetching data: " + cache)
         data = self._load_cache_data()
         if not data:
-            info(self,"Fetching new data")
+            info(self,"No data cached, fetching new one")
             data = self._fetch_data()
             if data == None:
-                warn(self, "Cache empty and cannot fetch new data ...")
+                warn(self, "Cache empty and fetching new data fail")
                 return None
             self._save_cache_data(data)
         self.set_raw_data(data)
@@ -174,5 +172,4 @@ class ICacheable(object):
 
     def length(self):
         assert("Must be overloaded")
-        exit(0)
 

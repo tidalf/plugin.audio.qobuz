@@ -64,10 +64,12 @@ class QobuzApi:
             return False
         try:
             pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
-            f.close()
         except:
             warn(self, 'Cannot save authentification')
             return False
+        f.flush()
+        os.fsync(f)
+        f.close()
         return True
     
     def delete_user_data(self):

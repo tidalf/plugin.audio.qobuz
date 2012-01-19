@@ -87,7 +87,6 @@ class QobuzBootstrap(object):
                 s.cache = os.path.join(s.profile, 'cache')
                 s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
                 s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
-
             '''
             Make dir
             '''
@@ -183,23 +182,10 @@ class QobuzBootstrap(object):
         return req
     
     def erase_cache(self):
-        import re
-        cache = qobuz.path.cache
-        if not cache:
-            warn(self, "Cache directory not set")
-            return False
-        if not os.path.exists(cache):
-            warn(self, "Cache directory doesn't seem to exist")
-            return False
-        list = os.listdir(cache)
-        for f in list:
-            if not f.endswith('.dat'): 
-                continue
-            path = os.path.join(cache, str(f))
-            if os.unlink(path):
-                info(self, "Cache file deleted: " + path)
-            else:
-                warn(self, "Cannot remove cache file: " + path)
+        from utils.cache import cache_manager
+        cm = cache_manager()
+        cm.delete_all_data()
+        
     '''
     
     '''
