@@ -54,7 +54,7 @@ class QobuzGUI:
     Must be called at the end for folder to be displayed
     '''
     def endOfDirectory(self, succeeded = True):
-        return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=succeeded, updateListing=False, cacheToDisc=True)
+        return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=succeeded, updateListing=True, cacheToDisc=True)
     
     '''
         SHOW Notification (HUMAN ONE / NO i8n)
@@ -168,7 +168,7 @@ class QobuzGUI:
             xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_EPISODE)
             xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_FILE)
             xbmcplugin.addSortMethod(h, xbmcplugin.SORT_METHOD_PLAYLIST_ORDER)
-        xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=n)
+        xbmcplugin.addDirectoryItems(handle=h, items=list, totalItems=100)
         return True
 
     '''
@@ -275,6 +275,7 @@ class QobuzGUI:
         SHOW Purchases
     '''
     def showPurchases(self):
+        self.set_content_type('albums')
         r = qobuz.core.getPurchases()
         list = r.get_items()
         if len(list) < 1:

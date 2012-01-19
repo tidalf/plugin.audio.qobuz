@@ -648,6 +648,7 @@ class QobuzTagTrack(IQobuzTag):
                                 'genre': genre,
                                 'tracknumber': track_number,
                                 'discnumber': media_number,
+                                'filename': i.getLabel2(),
                                 'album': album,
                                 'duration': duration,
                                 'year': int(year),
