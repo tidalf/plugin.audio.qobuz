@@ -41,15 +41,18 @@ class QobuzProduct(ICacheable):
         self.fetch_data()
 
     def _fetch_data(self):
-        data = qobuz.api.get_product(str(self.id), self.context_type)['product']
-        return data
+        data = qobuz.api.get_product(str(self.id), self.context_type)
+        if not data: return None
+        return data['product']
 
     def length(self):
         return len(self._raw_data['tracks'])
 
     def get_items(self):
-        tag_product = QobuzTagProduct(self.get_data())
         list = []
+        data = self.get_data()
+        if not data: return list
+        tag_product = QobuzTagProduct(self.get_data())
         for tag_track in tag_product.get_childs():
             if not isinstance(tag_track, QobuzTagTrack):
                 continue

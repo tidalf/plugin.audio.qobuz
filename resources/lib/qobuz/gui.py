@@ -38,6 +38,7 @@ class QobuzGUI:
         self.setPluginCategory()
         self.sort_enabled = True
         self.content_type = None
+        xbmc.enableNavSounds(False)
         
 
     def set_sort_enabled(self, b):
@@ -50,7 +51,19 @@ class QobuzGUI:
             return False
         self.content_type = ctx
         return True
-        
+    
+    def set_view_mode(self, view):
+        viewmode = {'list': 50, 
+                    #'icons': 52, 
+                    'biglist': 51,
+                    'thumbnail': 500,
+                    'mediainfo': 506 }
+        if view not in viewmode:
+            warn(self, "Try to set invalid view mode: " + str(view))
+            view = 'list'
+        s = 'Container.setViewMode(%i)' % (int(viewmode[view]))
+        xbmc.executebuiltin(s)
+        return True
     '''
     Must be called at the end for folder to be displayed
     '''
@@ -183,6 +196,7 @@ class QobuzGUI:
     '''
     def showCategories(self):
         self.set_content_type('files')
+        self.set_view_mode('icons')
         i = qobuz.image.access
         __language__ = qobuz.lang
         if qobuz.addon.getSetting('search_enabled') == 'true':

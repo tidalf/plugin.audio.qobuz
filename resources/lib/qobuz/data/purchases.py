@@ -55,6 +55,8 @@ class QobuzGetPurchases(ICacheable):
         albumseen = {}
         needsave = False
         list = []
+        # Qobuz free tracks with invalid product id
+        blackid = ['0000020110926', '0000201011300']
         for track in self._raw_data:
             t = QobuzTagTrack(track)
             album = t.get_childs_with_type(type(QobuzTagAlbum))
@@ -62,9 +64,12 @@ class QobuzGetPurchases(ICacheable):
                     warn(self, "No album for this track")
                     continue
             album = album[0]
+            if album.id in blackid:
+                continue
             if album.id in albumseen:
                 continue
-            item = album.getXbmcItem()
+            print "AlbumID: " + str(album.id)
+            item = album.getXbmcItem('fanArt')
             item.setInfo('music', infoLabels = { 'artist': t.getArtist(), 'year': t.getYear()})
             u = qobuz.boot.build_url(MODE_ALBUM, album.id)
             list.append((u, item, True))        

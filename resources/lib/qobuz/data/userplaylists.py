@@ -40,9 +40,9 @@ class QobuzUserPlaylists(ICacheable):
 
     def _fetch_data(self):
         raw_data = self.Api.get_user_playlists()
+        if not raw_data: return None
         data = []
-        for p in raw_data:
-            data.append(p['playlist'])
+        for p in raw_data: data.append(p['playlist'])
         return data
 
     def length(self):
@@ -67,6 +67,8 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
     def get_items(self):
         i = 1
         list = []
+        data = self.get_data()
+        if not data: return list
         account_owner = qobuz.addon.getSetting('username')
         fanArt = qobuz.image.access.get('fanArt')
         for json_track in self.get_data():
