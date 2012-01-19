@@ -16,6 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os
 import sys
+import xbmc
 import xbmcplugin
 import xbmcgui
 
@@ -71,6 +72,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
         if not data: return list
         account_owner = qobuz.addon.getSetting('username')
         fanArt = qobuz.image.access.get('fanArt')
+        profileThumb = xbmc.getInfoImage('System.ProfileThumb')
         for json_track in self.get_data():
             tag = QobuzTagUserPlaylist(json_track)
             u = qobuz.boot.build_url(MODE_PLAYLIST, tag.id)
@@ -82,7 +84,10 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
                 owner += ' - '
             image = qobuz.image.cache.get('userplaylists', tag.name)
             if not image:
-                image = qobuz.image.access.get('qobuzIcon')
+                if profileThumb and not owner:
+                    image = profileThumb
+                else:
+                    image = qobuz.image.access.get('qobuzIcon')
             item.setThumbnailImage(image)
             item.setIconImage(image)
             item.setLabel(owner + tag.name)
