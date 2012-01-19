@@ -17,6 +17,7 @@
 
 import os
 import sys
+import random
 
 from utils.icacheable import ICacheable
 from constants import *
@@ -36,6 +37,7 @@ class QobuzPlaylist(ICacheable):
                                             self.id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
         info(self, "Cache duration: " + str(self.cache_refresh))
+        self.cacheImage = qobuz.image.cache
         self.fetch_data()
 
     def _fetch_data(self):
@@ -49,14 +51,32 @@ class QobuzPlaylist(ICacheable):
             return 0
         return len(self._raw_data['tracks'])
 
+    def get_image(self, name):
+        return self.cacheImage.get('userplaylists', name)
+    
+    def set_image_genre(self, name, image):
+        return self.cacheImage.set('userplaylists', name, image)
+    
     def get_items(self):
-        p = QobuzTagPlaylist(self.get_data())
         list = []
+        n = self.length()
+        if n < 0:
+            return list
+        p = QobuzTagPlaylist(self.get_data())
+        rand = random.randint(0, n)
+        needimage = False
+        if not self.get_image(p.name):
+            needimage = True
+        i = 0
         for t in p.get_childs():
             if not isinstance(t, QobuzTagTrack):
                 continue
             item = t.getXbmcItem('playlist')
+            if needimage and i == rand:
+                self.set_image_genre(p.name, t.getImage())
+                needimage = False
             u = qobuz.boot.build_url(MODE_SONG, str(t.id))
             item.setPath(u) 
             list.append((u, item, False))
+            i += 1
         return list

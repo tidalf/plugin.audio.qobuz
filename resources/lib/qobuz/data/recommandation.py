@@ -60,7 +60,6 @@ class QobuzGetRecommandation(ICacheable):
         
     def get_items(self):
         n = self.length()
-        h = int(sys.argv[1])
         rand = random.randint(0, n)
         getnewimage = random.randint(0, 1)
         i = 0
