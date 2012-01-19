@@ -597,6 +597,9 @@ class QobuzTagTrack(IQobuzTag):
         try:
             media_number = self.media_number
         except: pass
+        if int(media_number) > 1:
+            qobuz.gui.set_sort_enabled(False)
+            
         date = ''
         if parent: date = parent.getDate()
         else: date = self.getDate()
@@ -636,7 +639,7 @@ class QobuzTagTrack(IQobuzTag):
             i.setProperty('fanart_image', qobuz.image.access.get(fanArt))
         i.setProperty('title', label)
         i.setLabel(label)
-        #i.setLabel2(label)
+        i.setLabel2(media_number + ' - ' + str(track_number) + ' - ' + album + ' - ' + artist + ' - ' + title)
         i.setInfo(type = 'music',
                   infoLabels = {'count': pos,
                                 #'songid': str(self.id),
@@ -653,6 +656,7 @@ class QobuzTagTrack(IQobuzTag):
         i.setProperty('DiscNumber', media_number)
         i.setProperty('IsPlayable', 'true')
         i.setProperty('Music', 'true')
+        i.setProperty('IsInternetStream', 'false')
         i.setThumbnailImage(image)
         i.setIconImage(image)
         i.setProperty('image', image)

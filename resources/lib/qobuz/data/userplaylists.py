@@ -80,6 +80,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
             item.setProperty('Music','true')
             item.setProperty('IsPlayable','false');
             item.setProperty('fanart_image', fanArt)
+            qobuz.gui.setContextMenu(item)
             list.append((u, item, True))
             i = i + 1
         return list

@@ -83,8 +83,8 @@ class QobuzBootstrap(object):
                 s.base = qobuz.addon.getAddonInfo('path')
                 
             def _set_dir(s):
-                s.temp = xbmc.translatePath('special://temp/')
-                s.cache = os.path.join(s.temp, 'plugin.audio.qobuz')
+                s.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', 'plugin.audio.qobuz')
+                s.cache = os.path.join(s.profile, 'cache')
                 s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
                 s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
 
