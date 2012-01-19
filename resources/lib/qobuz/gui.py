@@ -60,10 +60,13 @@ class QobuzGUI:
     '''
         SHOW Notification (HUMAN ONE / NO i8n)
     '''
-    def showNotificationH(self, title, text, image = 'qobuzIcon'):
+    def showNotificationH(self, title, text, image = None):
+        if not image:
+            image = qobuz.image.access.get('qobuzIcon')
+        print "Image:" + image
         title = str(title) 
         text = str(text)
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, qobuz.image.access.get(image)) 
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, image) 
         try:
             xbmc.executebuiltin(s)
         except:
@@ -72,9 +75,12 @@ class QobuzGUI:
     '''
         SHOW Notification
     '''
-    def showNotification(self, title, text, image = 'qobuzIcon'):
+    def showNotification(self, title, text, image = None):
+        if not image:
+            image = qobuz.image.access.get('qobuzIcon')
+        print "Image:" + image
         l = qobuz.lang
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, qobuz.image.access.get(image)) 
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image) 
         xbmc.executebuiltin(s)
 
     '''
