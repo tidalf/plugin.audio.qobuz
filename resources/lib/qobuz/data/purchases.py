@@ -27,6 +27,7 @@ from utils.icacheable import ICacheable
 from utils.tag import QobuzTagArtist
 from utils.tag import QobuzTagTrack
 from utils.tag import QobuzTagProduct
+from utils.tag import QobuzTagAlbum
 import qobuz
 """
     Class QobuzGetPurchases
@@ -54,30 +55,19 @@ class QobuzGetPurchases(ICacheable):
         albumseen = {}
         needsave = False
         list = []
-        for track in self._raw_data:   
+        for track in self._raw_data:
             t = QobuzTagTrack(track)
-            if 'BLACK_ID' in track:
-                continue
-            albumid = t.getAlbumId()
-            isseen = 'false'
-            if albumid in albumseen:
-                continue
-            if isseen == 'false':
-                log ('warn','album never seen try to add it')
-                try:
-                    album = qobuz.core.getProduct(str(albumid))
-                except:
-                    track['BLACK_ID'] = 'true'
-                    needsave = True
+            album = t.get_childs_with_type(type(QobuzTagAlbum))
+            if not album:
+                    warn(self, "No album for this track")
                     continue
-                a = QobuzTagProduct(album.get_raw_data())
-                item = a.getXbmcItem()
-                albumid = a.id     
-                
-                u = qobuz.boot.build_url(MODE_ALBUM, albumid)
-                list.append((u, item, True))        
-                albumseen[albumid] = 'true'
-        if needsave:
-            self._save_cache_data(self._raw_data)
+            album = album[0]
+            if album.id in albumseen:
+                continue
+            item = album.getXbmcItem()
+            item.setInfo('music', infoLabels = { 'artist': t.getArtist(), 'year': t.getYear()})
+            u = qobuz.boot.build_url(MODE_ALBUM, album.id)
+            list.append((u, item, True))        
+            albumseen[album.id] = 'true'
         return list
 

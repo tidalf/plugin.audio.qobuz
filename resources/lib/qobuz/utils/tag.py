@@ -41,6 +41,14 @@ class IQobuzTag(object):
     def get_childs(self):
         return self._childs
     
+    def get_childs_with_type(self, otype):
+        list = []
+        for c in self._childs:
+            if isinstance(c, otype):
+                continue
+            list.append(c)
+        return list
+    
     def get_parent(self):
         return self._parent
     
@@ -588,6 +596,21 @@ class QobuzTagTrack(IQobuzTag):
         try: return self.streaming_type
         except: return ''        
     
+    def _getDate(self):
+        parent = self.get_parent()
+        date = None
+        if parent: date = parent.getDate()
+        else: date = self.getDate()
+        return date
+    
+    def getYear(self):
+        date = self._getDate()
+        year = 0
+        if not date: return year
+        try: year = int(date.split('-')[0])
+        except: pass
+        return year
+        
     def getXbmcItem(self, context = 'album', pos = 0, fanArt = 'fanArt'):
         parent = self.get_parent()
         album = self.getAlbum()
@@ -600,14 +623,6 @@ class QobuzTagTrack(IQobuzTag):
         if int(media_number) > 1:
             qobuz.gui.set_sort_enabled(False)
             
-        date = ''
-        if parent: date = parent.getDate()
-        else: date = self.getDate()
-        year = 0
-        if date:
-            try:
-                year = date.split('-')[0]
-            except: pass
         genre = ''
         try: genre = parent.getGenre()
         except: genre = self.getGenre()
@@ -651,7 +666,7 @@ class QobuzTagTrack(IQobuzTag):
                                 'filename': i.getLabel2(),
                                 'album': album,
                                 'duration': duration,
-                                'year': int(year),
+                                'year': self.getYear(),
                                 'comment': 'Qobuz Music Streaming Service'
                                 })
         i.setProperty('DiscNumber', media_number)
