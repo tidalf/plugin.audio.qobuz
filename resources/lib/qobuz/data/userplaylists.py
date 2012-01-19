@@ -73,7 +73,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
         account_owner = qobuz.addon.getSetting('username')
         fanArt = qobuz.image.access.get('fanArt')
         profileThumb = xbmc.getInfoImage('System.ProfileThumb')
-        for json_track in self.get_data():
+        for json_track in data:
             tag = QobuzTagUserPlaylist(json_track)
             u = qobuz.boot.build_url(MODE_PLAYLIST, tag.id)
             item = xbmcgui.ListItem(tag.name)
@@ -82,7 +82,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
                 owner = ''
             else: 
                 owner += ' - '
-            image = qobuz.image.cache.get('userplaylists', tag.name)
+            image = qobuz.image.cache.get('userplaylists', tag.id)
             if not image:
                 if profileThumb and not owner:
                     image = profileThumb

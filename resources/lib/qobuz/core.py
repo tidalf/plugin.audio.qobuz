@@ -34,17 +34,29 @@ class QobuzCore:
         self.conn = ""
     
     def login(self):
-        __addon__ = qobuz.addon
-        user =  __addon__.getSetting('username')
-        password = __addon__.getSetting('password')
-        if not user or not password:
+        username = qobuz.addon.getSetting('username')
+        password = qobuz.addon.getSetting('password')
+        if not username or not password:
             return False
-        info(self, "Try to login as user: " + user)
-        return qobuz.api.login( user,
-                               __addon__.getSetting('password'))
+        auth =  qobuz.api.login(username, password)
+        if not auth: return False
+        if auth.get_data()['user']['login'] != username:
+            warn(self, "User login mismatch")
+            auth.delete_cache()
+            self.delete_user_data()
+            return False
+        return auth
+
+    def delete_user_data(self):
+        try: 
+            from utils.cache import cache_manager
+            c = cache_manager()
+            c.delete_user_data()
+        except:
+            warn(self, "Cannot remove user data from cache")
 
     def is_logged(self):
-        return qobuz.api.userid
+        return qobuz.api.auth
 
     def getPlaylist(self,id):
         from data.playlist import QobuzPlaylist

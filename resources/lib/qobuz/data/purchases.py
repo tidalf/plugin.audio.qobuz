@@ -51,10 +51,13 @@ class QobuzGetPurchases(ICacheable):
         return len(self._raw_data)
 
     def get_items(self):
+        list = []
+        data = self.get_data()
+        if not data:
+            return list
         n = self.length()
         albumseen = {}
         needsave = False
-        list = []
         # Qobuz free tracks with invalid product id
         blackid = ['0000020110926', '0000201011300']
         for track in self._raw_data:

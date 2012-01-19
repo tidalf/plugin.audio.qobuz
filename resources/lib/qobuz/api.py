@@ -30,104 +30,12 @@ from debug import log, info, warn
 class QobuzApi:
 
     def __init__(self):
-        self.username = None
+        self.auth = None
         self.authtoken = None
         self.userid = None
-        self.authtime = None
         self.token_validity_time = 3600
-        self.set_cache_path(os.path.join(qobuz.path.cache,'auth.dat'))
-        info(self, 'authCacheDir: ' + self.get_cache_path())
         self.retry_time = [1, 3, 5, 10]
         self.retry_num = 0
-
-    def set_cache_path(self, path):
-        self.cachePath = path
-        
-    def get_cache_path(self):
-        return self.cachePath
-    
-    def save_auth(self):
-        cachePath = self.get_cache_path()
-        if not cachePath:
-            warn(self, "Cache path not defined (cannot save auth token)")
-            return False
-        data = {}
-        data['authtoken'] = self.authtoken
-        data['authtime'] = self.authtime
-        data['userid'] = self.userid
-        data['username'] = self.username
-        f = None
-        try:
-            f = open(cachePath, 'wb')
-        except:
-            warn(self, "Cannot open authentification cache for writing!")
-            return False
-        try:
-            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
-        except:
-            warn(self, 'Cannot save authentification')
-            return False
-        f.flush()
-        os.fsync(f)
-        f.close()
-        return True
-    
-    def delete_user_data(self):
-        try: 
-            from utils.cache import cache_manager
-            c = cache_manager()
-            c.delete_user_data()
-        except:
-            warn(self, "Cannot remove user data from cache")
-            
-    def load_auth(self):
-        cachePath = self.get_cache_path()
-        if not cachePath:
-            warn(self, "Cache path not defined (need to login each time)")
-            return False
-        
-        if not os.path.exists(cachePath):
-            warn(self, "Caching directory doesn't exist: " + cachePath)
-            return False
-        mtime = None
-        try:
-            mtime = os.path.getmtime(cachePath)
-        except:
-            warn(self,"Cannot stat cache file: " + cachePath)
-        if (time() - mtime) > self.token_validity_time:
-            info(self,"Our authentification token must be invalid")
-            return False
-        f = None
-        try:
-            f = open(cachePath, 'rb')
-        except:
-            warn(self, "Cannot open authentification cache for reading!")
-            return False
-        data = None
-        try:
-            data = pickle.load(f)
-        except:
-            warn(self, "Cannot load serialized data")
-            return False
-        f.close()
-        if self.username != data['username']:
-            warn(self, "Username in cache is not the same as the one in settings... discard cache")
-            self.delete_user_data()
-            return False
-        self.authtime = data['authtime']
-        self.authtoken = data['authtoken']
-        self.userid = data['userid']
-        return True
-    
-    def delete_auth_cache(self):
-        cachePath = self.get_cache_path()
-        if not cachePath:
-            return False
-        try:
-            os.remove(cachePath)
-            return True
-        except: warn(self, "Cannot delete auth cache")
-        return False
     
     def _api_request(self, params, uri):      
         url = "http://player.qobuz.com"
@@ -144,26 +52,20 @@ class QobuzApi:
             '''
             When something wrong we are deleting our auth token
                 '''
-            self.delete_auth_cache()
+            self.auth.delete_cache()
             return None
         return response_json
     
     def login(self, user, password):
-        self.username = user
-        if self.load_auth():
-            info(self, 'Using authentification token from cache')
-            return self.userid
-        params = {'x-api-auth-token':'null','email': user ,
-                                   'hashed_password': hashlib.md5(password).hexdigest() }
-        
-        data = self._api_request(params,"/api.json/0.1/user/login")
-        if not data: return None
-        if not 'user' in data: return None
+        from data.auth import QobuzAuth
+        auth = QobuzAuth(user, password)
+        data = auth.get_data()
+        if not data:
+            return False
         self.authtoken = data['user']['session_id']
         self.userid = data['user']['id']
-        self.authtime = time()
-        self.save_auth()
-        return self.userid
+        self.auth = auth
+        return auth
     
     def get_track_url(self,track_id,context_type,context_id ,format_id = 6):
         params = {

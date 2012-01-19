@@ -24,6 +24,7 @@ import xbmc
 from constants import *
 import constants
 from debug import *
+
 import qobuz
 
 ''' Arguments parssing '''
@@ -69,7 +70,8 @@ class QobuzBootstrap(object):
         #self.bootstrap_db()
         self.bootstrap_sys_args()
         
-        if not qobuz.core.login():
+        self.auth = qobuz.core.login()
+        if not self.auth:
             qobuz.gui.showLoginFailure()
             exit(1)
         self.mode_dispatch()

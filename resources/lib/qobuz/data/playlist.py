@@ -72,7 +72,7 @@ class QobuzPlaylist(ICacheable):
                 continue
             item = t.getXbmcItem('playlist')
             if needimage and i == rand:
-                self.set_image_genre(p.name, t.getImage())
+                self.set_image_genre(p.id, t.getImage())
                 needimage = False
             u = qobuz.boot.build_url(MODE_SONG, str(t.id))
             item.setPath(u) 
