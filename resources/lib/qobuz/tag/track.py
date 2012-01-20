@@ -28,8 +28,7 @@ class TagTrack(ITag):
         self.set_valid_tags(['playlist_track_id', 'position', 'id', 'title', 
                              'track_number', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
-        if json:
-            self.parse_json(json)
+        if json: self.parse_json(json)
 
     def getLabel(self):
         label = []
@@ -59,8 +58,7 @@ class TagTrack(ITag):
     def getDuration(self, sep = 0):
         try:
             (sh,sm,ss) = self.duration.split(':')
-        except:
-            return 0
+        except: return 0
         return (int(sh) * 3600 + int(sm) * 60 + int(ss))
 
     def getTrackNumber(self, sep = ''):
@@ -84,7 +82,6 @@ class TagTrack(ITag):
     
     def getAlbum(self, sep = ''):
         album = super(TagTrack, self).getAlbum(sep)
-        print "Album " + album
         parent = self.get_parent()
         if not album and parent:
             try: album = parent.title

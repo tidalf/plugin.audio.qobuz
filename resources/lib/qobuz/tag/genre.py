@@ -21,9 +21,7 @@ class TagGenre(ITag):
     def __init__(self, json, parent = None):
         super(TagGenre, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
-        self.parent = None
-        if json:
-            self.auto_parse_json(json)
+        if json: self.auto_parse_json(json)
             
     def getGenre(self, sep = ''):
         try:

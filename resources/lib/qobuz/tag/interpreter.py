@@ -21,8 +21,7 @@ class TagInterpreter(ITag):
     def __init__(self, json, parent = None):
         super(TagInterpreter, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
-        if json:
-            self.auto_parse_json(json)
+        if json: self.auto_parse_json(json)
 
     def getInterpreter(self, sep = ''):
         try: return self.name

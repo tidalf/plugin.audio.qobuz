@@ -30,9 +30,7 @@ class TagProduct(ITag):
                             'title', 'type', 'url', 'subtitle', 'goodies', 
                             'release_date', 'awards', 'url', 'added_date', 'length'
                             'added_date', 'released_at', 'subtitle'])
-        self.__tracks__ = None
-        if json:
-            self.parse_json(json)
+        if json: self.parse_json(json)
 
     def get_tracks(self):
         return self.__tracks__

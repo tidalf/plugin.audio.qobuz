@@ -22,13 +22,7 @@ class TagArtist(ITag):
     def __init__(self, json, parent = None):
         super(TagArtist, self).__init__(json, parent)
         self.set_valid_tags(['id', 'name'])
-        self.__album = None
-        if json:
-            self.parse_json(json)
-
-    def parse_json(self, p):
-        self.auto_parse_json(p)
-
+        if json: self.auto_parse_json(json)
 
     def getArtist(self, sep = ''):
         try: return self.name

@@ -23,8 +23,7 @@ class TagSearch(ITag):
     def __init__(self, json):
         super(TagSearch, self).__init__(json)
         self.__tracks__ = []
-        if json:
-            self.parse_json(json)
+        if json: self.parse_json(json)
         
     def parse_json(self, p):
         for track in p['tracks']:

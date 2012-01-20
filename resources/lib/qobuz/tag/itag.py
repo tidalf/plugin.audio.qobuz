@@ -65,16 +65,16 @@ class ITag(object):
             assert("Invalid tag:" + key)
         v = ''
         try:
-            v = str(value)
+            v = value.encode('utf8', 'ignore')
         except:
             if isinstance(value, basestring):
-                v = value.encode('utf8', 'replace')
+                v = value.encode('utf8', 'ignore')
             elif isinstance(value, bool):
                 if value: v = '1'
                 else: v = '0'
         if v == 'None':
             return
-        self.__dict__[key] = v
+        self.__dict__[key] = v.decode('utf8', 'ignore')
     
     def auto_parse_json(self, json):
         valid_tags = self.get_valid_tags()
@@ -185,6 +185,14 @@ class ITag(object):
             data = c.getTitle(sep) 
             if data: return data
         return data
+    
+    def getOwner(self, sep = ''):
+        data = ''
+        childs = self.get_childs()
+        for c in childs:
+            data = c.getOwner(sep) 
+            if data: return data
+        return data    
     
     def getLabel(self):
         return self.getTitle()

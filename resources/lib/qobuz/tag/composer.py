@@ -18,12 +18,11 @@
 from tag.itag import ITag
 
 class TagComposer(ITag):
+    
     def __init__(self, json, parent = None):
         super(TagComposer, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
-        self.parent = None
-        if json:
-            self.auto_parse_json(json)
+        if json: self.auto_parse_json(json)
         
     def getComposer(self, sep = ''):
         try: return self.name

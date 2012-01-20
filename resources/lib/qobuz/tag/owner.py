@@ -16,33 +16,14 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 from tag.itag import ITag
-from tag.track import TagTrack
 
-class TagPlaylist(ITag):
+class TagOwner(ITag):
     
     def __init__(self, json, parent = None):
-        super(TagPlaylist, self).__init__(json, parent)
-        self.set_valid_tags(['name', 'id', 'is_collaborative', 'is_public'])
-        if json: self.parse_json(json)
-    
-    def getLabel(self):
-        name = ''
-        try:
-            name = self.owner + ' - ' + self.name
-        except: pass
-        ispub = ''
-        try:
-            ispub = '[prv] '
-            if self.is_public:
-                ispub = '[pub] ' 
-        except: pass
-        return ispub + name
-    
-    def parse_json(self, p):
-        self.auto_parse_json(p)
-        self.set('owner', p['owner']['name'])
-        if not 'tracks' in p:
-            return 
-        for track in p['tracks']:
-            self.add_child(TagTrack(track, self))
-        self._is_loaded = True
+        super(TagOwner, self).__init__(json, parent)
+        self.set_valid_tags(['id', 'name'])
+        if json: self.auto_parse_json(json)
+
+    def getOwner(self, sep = ''):
+        try: return self.name
+        except: return ''

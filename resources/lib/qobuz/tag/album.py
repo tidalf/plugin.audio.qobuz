@@ -44,13 +44,11 @@ class TagAlbum(ITag):
         self._is_loaded = True
         
     def getAlbum(self, sep = ''):
-        try:
-            return self.title
+        try: return self.title
         except: return ''
     
     def getAlbumId(self, sep = ''):
-        try:
-            return self.id
+        try: return self.id
         except: return ''
     
     def getTitle(self, sep = ''):
@@ -58,15 +56,11 @@ class TagAlbum(ITag):
         except: return ''
         
     def getDate(self, sep = ''):
-        try:
-            return self.release_date
+        try: return self.release_date
         except:
-            try: 
-                return self.released_date
-            except:
-                return ''
+            try: return self.released_date
+            except: return ''
+    
     def getId(self, sep = ''):
-        try: 
-            return self.id
-        except:
-            return ''        
+        try: return self.id
+        except: return ''        

@@ -78,7 +78,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
             tag = TagUserPlaylists(json_track)
             u = qobuz.boot.build_url(MODE_PLAYLIST, tag.id)
             item = xbmcgui.ListItem(tag.name)
-            owner = tag.owner_name
+            owner = tag.getOwner()
             if owner == account_owner: 
                 owner = ''
             else: 
