@@ -20,11 +20,12 @@ import xbmc
 import xbmcplugin
 import xbmcgui
 
+import qobuz
 from utils.icacheable import ICacheable
 from debug import log, info, warn
 from constants import *
-from utils.tag import IQobuzTag, QobuzTagUserPlaylist
-import qobuz
+from tag.userplaylists import TagUserPlaylists
+
 '''
     Class QobuzUserPLaylists
 '''
@@ -74,7 +75,7 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
         fanArt = qobuz.image.access.get('fanArt')
         profileThumb = xbmc.getInfoImage('System.ProfileThumb')
         for json_track in data:
-            tag = QobuzTagUserPlaylist(json_track)
+            tag = TagUserPlaylists(json_track)
             u = qobuz.boot.build_url(MODE_PLAYLIST, tag.id)
             item = xbmcgui.ListItem(tag.name)
             owner = tag.owner_name

@@ -21,8 +21,8 @@ import xbmcgui
 
 from constants import *
 from debug import log, info, warn
-from utils.tag import QobuzTagArtist
-from utils.tag import QobuzTagProduct
+from tag.artist import TagArtist
+from tag.product import TagProduct
 import qobuz
 ###############################################################################
 # Class QobuzSearchArtists
@@ -64,7 +64,7 @@ class QobuzSearchArtists():
             return list
         image = qobuz.image.access.get('qobuzIcon')
         for json_artist in data:
-            tag_artist = QobuzTagArtist(json_artist)
+            tag_artist = TagArtist(json_artist)
             u = qobuz.boot.build_url(MODE_ARTIST, tag_artist.id)
             item   = xbmcgui.ListItem('fanArt')
             item.setLabel(tag_artist.getArtist() )
@@ -83,7 +83,7 @@ class QobuzSearchArtists():
             warn(self, "No artist result")
         image = qobuz.image.access.get('qobuzIcon')
         for json_album in json['artist']['albums']:
-            tag_album = QobuzTagAlbum(json_album)
+            tag_album = TagAlbum(json_album)
             u = qobuz.boot.build_url(MODE_ALBUM, tag_album.id)
             item = tag_album.getXbmcItem('fanArt')
             if not item.getProperty('fanart_image'):

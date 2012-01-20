@@ -19,9 +19,10 @@ import os
 
 from utils.icacheable import ICacheable
 from debug import log, info, warn
-from utils.tag import QobuzTagTrack
+
 import pprint
 import qobuz
+
 '''
  Class QobuzTrack 
 

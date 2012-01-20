@@ -19,8 +19,8 @@ import pprint
 
 from constants import *
 from debug import log, info, warn
-from utils.tag import QobuzTagTrack
-from utils.tag import QobuzTagSearch
+#from tag.track import TagTrack
+from tag.search import TagSearch
 import qobuz
 
 ###############################################################################
@@ -47,7 +47,7 @@ class QobuzSearchTracks():
             return list
         if not 'results' in data:
             return list
-        ts = QobuzTagSearch(data['results'])
+        ts = TagSearch(data['results'])
         childs = ts.get_childs()
         for track in childs:
             item = track.getXbmcItem('playlist', 0, 'fanArt')

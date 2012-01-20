@@ -223,7 +223,6 @@ class Service_url_resolver():
         login = False
         try:
             login = qobuz.core.login()
-            if not qobuz.api.auf: login = False
         except:
             print "Exception: Cannot login to Qobuz Service..."
             raise ServiceError('login')

@@ -1,0 +1,379 @@
+<window id="4500" type="dialog">
+	<defaultcontrol always="true">302</defaultcontrol>
+	<allowoverlay>false</allowoverlay>
+	<coordinates>
+		<system>1</system>
+		<!-- <posx>185</posx> -->
+		<!-- <posy>105</posy> -->
+	</coordinates>
+
+	<include>dialogeffect</include>
+
+	<controls>
+		<include>CommonMusicBackground</include>
+		<include>CommonMediaPlayingBackground</include>
+		<!-- <include>ContentPanelBackgrounds</include> -->
+		<control type="group">
+			<include>Window_OpenClose_Animation</include>
+			<include>CommonRootView</include> <!-- view id = 50 -->
+			<include>FullWidthList</include> <!-- view id = 51 -->
+			<include>MusicInfoListView</include> <!-- view id = 506 -->
+		</control>
+		<control type="group">
+			<include>VisibleFadeEffect</include>
+			<visible>!Window.IsVisible(MusicInformation)</visible>
+			<control type="image">
+				<description>background image</description>
+				<posx>0</posx>
+				<posy>0</posy>
+				<width>910</width>
+				<height>510</height>
+				<texture border="40">DialogBack.png</texture>
+			</control>
+			<control type="image">
+				<description>Dialog Header image</description>
+				<posx>40</posx>
+				<posy>16</posy>
+				<width>830</width>
+				<height>40</height>
+				<texture>dialogheader.png</texture>
+			</control>
+			<control type="label" id="301">
+				<description>header label</description>
+				<posx>40</posx>
+				<posy>20</posy>
+				<width>830</width>
+				<height>30</height>
+				<font>font13_title</font>
+				<label>Edit playlist</label>
+				<align>center</align>
+				<aligny>center</aligny>
+				<textcolor>selected</textcolor>
+				<shadowcolor>black</shadowcolor>
+			</control>
+			<control type="button">
+				<description>Close Window button</description>
+				<posx>820</posx>
+				<posy>14</posy>
+				<width>64</width>
+				<height>32</height>
+				<label>-</label>
+				<font>-</font>
+				<onclick>PreviousMenu</onclick>
+				<texturefocus>DialogCloseButton-focus.png</texturefocus>
+				<texturenofocus>DialogCloseButton.png</texturenofocus>
+				<onleft>3</onleft>
+				<onright>3</onright>
+				<onup>3</onup>
+				<ondown>3</ondown>
+				<visible>system.getbool(input.enablemouse)</visible>
+			</control>
+			<control type="label">
+				<description>Song Title value</description>
+				<posx>40</posx>
+				<posy>60</posy>
+				<width>830</width>
+				<height>30</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>font13</font>
+				<label>[B]$INFO[ListItem.Title][/B]</label>
+				<textcolor>white</textcolor>
+				<scroll>true</scroll>
+			</control>
+			<control type="image">
+				<posx>40</posx>
+				<posy>120</posy>
+				<width>200</width>
+				<height>200</height>
+				<aspectratio aligny="bottom">keep</aspectratio>
+				<texture>$INFO[ListItem.Icon]</texture>
+			</control>
+			<control type="image">
+				<posx>40</posx>
+				<posy>320</posy>
+				<width>200</width>
+				<height>200</height>
+				<aspectratio aligny="top">keep</aspectratio>
+				<texture flipy="true" diffuse="diffuse_mirror2.png">$INFO[ListItem.Icon]</texture>
+			</control>
+			<control type="group">
+			             <system>1</system>
+                <posx>185</posx>
+                <posy>205</posy>
+				<!-- <posx>250</posx> <posy>120</posy> -->
+				<!-- NAME -->
+				<control type="label">
+					<description>PLAYLIST NAME</description>
+					<posx>150</posx>
+					<posy>0</posy>
+					<width>150</width>
+					<height>25</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>font13</font>
+					<textcolor>blue</textcolor>
+					<label>Name:</label>
+					<text>TEXT</text>
+				</control>
+				<control type="edit" id="302">
+					<description>PLAYLIST NAME VALUE</description>
+					<posx>150</posx>
+					<posy>0</posy>
+					<width>300</width>
+					<height>25</height>
+					<visible>true</visible>
+					<aligny>center</aligny>
+					<label></label>
+					<scrollout>true</scrollout>
+					<hinttext></hinttext>
+					<ondown>303</ondown>
+					<onup>350</onup>
+					<onright>352</onright>
+					<onleft>350</onleft>
+					<pulseonselect>true</pulseonselect>
+				</control>
+				<!-- DESCRIPTION -->
+				<control type="label">
+					<description>Playlist Description</description>
+					<posx>150</posx>
+					<posy>30</posy>
+					<width>150</width>
+					<height>25</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>font13</font>
+					<textcolor>blue</textcolor>
+					<label>Description:</label>
+				</control>
+				<control type="edit" id="303">
+					<description>Playlist description Value</description>
+					<posx>150</posx>
+					<posy>30</posy>
+					<width>300</width>
+					<height>25</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>font13</font>
+					<textcolor>white</textcolor>
+					<label></label>
+					<scrollout>true</scrollout>
+					<pauseatend>2000</pauseatend>
+					<hinttext></hinttext>
+					<ondown>304</ondown>
+					<onup>302</onup>
+					<onright>352</onright>
+					<onleft>350</onleft>
+					<pulseonselect>true</pulseonselect>
+				</control>
+				<!-- IS PUBLIC -->
+				<control type="label">
+					<description>LABEL IS PUBLIC</description>
+					<posx>150</posx>
+					<posy>60</posy>
+					<width>150</width>
+					<height>25</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>font13</font>
+					<textcolor>blue</textcolor>
+					<label>Public:</label>
+				</control>
+				<control type="radiobutton" id="304">
+					<description>Playlist is_public radio</description>
+					<type>radiobutton</type>
+					<posx>150</posx>
+					<posy>60</posy>
+					<width>300</width>
+					<height>25</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>font13</font>
+					<textcolor>blue</textcolor>
+					<label></label>
+					<scrollout></scrollout>
+					<pauseatend>2000</pauseatend>
+					<ondown>305</ondown>
+					<onup>303</onup>
+					<onright>352</onright>
+					<onleft>350</onleft>
+					<pulseonselect>true</pulseonselect>
+				</control>
+				<!-- COOPERATIVE -->
+				<control type="label">
+					<description>LABEL COLLABORATIVE</description>
+					<posx>150</posx>
+					<posy>90</posy>
+					<width>150</width>
+					<height>25</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>font13</font>
+					<textcolor>blue</textcolor>
+					<label>Collaborative:</label>
+				</control>
+				<control type="radiobutton" id="305">
+					<description>Playlist cooperative radio</description>
+					<type>radiobutton</type>
+					<posx>150</posx>
+					<posy>90</posy>
+					<width>300</width>
+					<height>25</height>
+					<align>left</align>
+					<aligny>center</aligny>
+					<font>font13</font>
+					<textcolor>blue</textcolor>
+					<label></label>
+					<scrollout></scrollout>
+					<pauseatend>2000</pauseatend>
+					<onup>304</onup>
+					<ondown>350</ondown>
+					<onright>352</onright>
+					<onleft>350</onleft>
+					<pulseonselect>true</pulseonselect>
+				</control>
+			</control>
+			<control type="group" id="9000">
+				<posx>40</posx>
+				<posy>445</posy>
+				<control type="button" id="350">
+					<description>Ok button</description>
+					<posx>0</posx>
+					<posy>0</posy>
+					<width>200</width>
+					<height>40</height>
+					<label>186</label>
+					<font>font12_title</font>
+					<align>center</align>
+					<onup>305</onup>
+					<ondown>351</ondown>
+					<onright>351</onright>
+					<onleft>352</onleft>
+				</control>
+				<control type="button" id="351">
+					<description>Update button</description>
+					<posx>210</posx>
+					<posy>0</posy>
+					<width>200</width>
+					<height>40</height>
+					<label>Update</label>
+					<font>font12_title</font>
+					<align>center</align>
+
+					<onup>305</onup>
+					<ondown>352</ondown>
+					<onright>352</onright>
+					<onleft>350</onleft>
+				</control>
+				<control type="button" id="352">
+					<description>Cancel button</description>
+					<posx>640</posx>
+					<posy>0</posy>
+					<width>200</width>
+					<height>40</height>
+					<label>Cancel</label>
+					<font>font12_title</font>
+					<align>center</align>
+					<onup>305</onup>
+					<ondown>350</ondown>
+					<onright>350</onright>
+					<onleft>351</onleft>
+				</control>
+			</control>
+
+		</control>
+		<control type="group">
+			<posx>-250</posx>
+			<include>SideBladeLeft</include>
+			<control type="grouplist" id="9000">
+				<posx>0</posx>
+				<posy>110</posy>
+				<width>250</width>
+				<height>600</height>
+				<onleft>9000</onleft>
+				<onright>50</onright>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onback>50</onback>
+				<itemgap>0</itemgap>
+				<control type="label" id="200">
+					<width>250</width>
+					<height>35</height>
+					<font>font12caps</font>
+					<label>31006</label>
+					<textcolor>blue</textcolor>
+					<align>center</align>
+					<aligny>center</aligny>
+				</control>
+				<control type="button" id="2">
+					<description>View As button</description>
+					<textwidth>235</textwidth>
+					<include>ButtonCommonValues</include>
+					<label>-</label>
+				</control>
+				<control type="label" id="201">
+					<width>250</width>
+					<height>35</height>
+					<font>font12caps</font>
+					<label>31026</label>
+					<textcolor>blue</textcolor>
+					<align>center</align>
+					<aligny>center</aligny>
+				</control>
+				<control type="radiobutton" id="20">
+					<description>Shuffle button</description>
+					<include>ButtonCommonValues</include>
+					<label>191</label>
+				</control>
+				<control type="button" id="26">
+					<description>Repeat button</description>
+					<textwidth>235</textwidth>
+					<include>ButtonCommonValues</include>
+					<label>-</label>
+				</control>
+				<control type="button" id="21">
+					<description>Save button</description>
+					<label>190</label>
+					<textwidth>235</textwidth>
+					<include>ButtonCommonValues</include>
+				</control>
+				<control type="button" id="22">
+					<description>Clear button</description>
+					<label>192</label>
+					<onclick>ReplaceWindow(music)</onclick>
+					<textwidth>235</textwidth>
+					<include>ButtonCommonValues</include>
+				</control>
+				<include>CommonNowPlaying_Controls</include>
+			</control>
+		</control>
+		<include>CommonPageCount</include>
+		<include>CommonNowPlaying</include>
+		<include>BehindDialogFadeOut</include>
+		<include>ScrollOffsetLabel</include>
+		<control type="group">
+			<posx>60</posx>
+			<posy>0</posy>
+			<animation effect="slide" end="-310,0" time="400" tween="quadratic"
+				easing="out"
+				condition="Window.Next(Home) | Window.Next(1111) | Window.Next(AddonBrowser)">WindowClose</animation>
+			<animation effect="slide" start="-310,0" time="400" tween="quadratic"
+				easing="out"
+				condition="Window.Previous(Home) | Window.Previous(1111) | Window.Previous(AddonBrowser)">WindowOpen</animation>
+			<control type="image">
+				<posx>0</posx>
+				<posy>0</posy>
+				<width>250</width>
+				<height>35</height>
+				<texture border="0,0,32,0">header.png</texture>
+			</control>
+			<control type="label" id="400">
+				<include>WindowTitleCommons</include>
+				<posx>220</posx>
+				<label>Update Playlist</label>
+			</control>
+		</control>
+		<include>WindowTitleHomeButton</include>
+		<include>Clock</include>
+	</controls>
+</window>

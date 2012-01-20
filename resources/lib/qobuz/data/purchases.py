@@ -24,10 +24,10 @@ import pprint
 from debug import log, info, warn
 from constants import *
 from utils.icacheable import ICacheable
-from utils.tag import QobuzTagArtist
-from utils.tag import QobuzTagTrack
-from utils.tag import QobuzTagProduct
-from utils.tag import QobuzTagAlbum
+#from tag.artist import TagArtist
+from tag.track import TagTrack
+#from tag.product import TagProduct
+from tag.album import TagAlbum
 import qobuz
 """
     Class QobuzGetPurchases
@@ -61,8 +61,8 @@ class QobuzGetPurchases(ICacheable):
         # Qobuz free tracks with invalid product id
         blackid = ['0000020110926', '0000201011300']
         for track in self._raw_data:
-            t = QobuzTagTrack(track)
-            album = t.get_childs_with_type(type(QobuzTagAlbum))
+            t = TagTrack(track)
+            album = t.get_childs_with_type(type(TagAlbum))
             if not album:
                     warn(self, "No album for this track")
                     continue

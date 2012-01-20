@@ -22,8 +22,8 @@ import random
 from utils.icacheable import ICacheable
 from constants import *
 from debug import * 
-from utils.tag import QobuzTagPlaylist
-from utils.tag import QobuzTagTrack
+from tag.playlist import TagPlaylist
+from tag.track import TagTrack
 import qobuz
 '''
     Class QobuzPLaylist
@@ -62,14 +62,14 @@ class QobuzPlaylist(ICacheable):
         n = self.length()
         if n < 0:
             return list
-        p = QobuzTagPlaylist(self.get_data())
+        p = TagPlaylist(self.get_data())
         rand = random.randint(0, n)
         needimage = False
         if not self.get_image(p.name):
             needimage = True
         i = 0
         for t in p.get_childs():
-            if not isinstance(t, QobuzTagTrack):
+            if not isinstance(t, TagTrack):
                 continue
             item = t.getXbmcItem('playlist')
             if needimage and i == rand:

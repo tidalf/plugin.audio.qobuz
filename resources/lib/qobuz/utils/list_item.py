@@ -19,7 +19,7 @@ import pprint
 from debug import warn, log, error
 from data.track_streamurl import QobuzTrackURL
 from data.track import QobuzTrack
-from utils.tag import QobuzTagTrack
+from tag.track import TagTrack
 
 class QobuzListItem(object):
     def __init__(self):
@@ -115,7 +115,7 @@ class QobuzListItem_track(QobuzListItem):
         if not data:
             warn(self, "Cannot get track data")
             return False
-        tag = QobuzTagTrack(data)
+        tag = TagTrack(data)
         item = tag.getXbmcItem(self.display_context, 0, 'fanArt')
         item.setPath(self.stream_url)
         item.setProperty('streaming_url', self.stream_url)

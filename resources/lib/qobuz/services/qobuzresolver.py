@@ -48,8 +48,6 @@ boot.bootstrap_gui()
 __pid_file__ = 'qobuzresolver.pid'
 __sleep__ = 5
 
-from utils.tag import QobuzTagTrack
-from data.track import QobuzTrack
 from utils.pid import Pid
 from services.cresolver import Service_url_resolver
         

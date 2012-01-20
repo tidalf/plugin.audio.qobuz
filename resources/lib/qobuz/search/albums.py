@@ -20,8 +20,8 @@ import pprint
 
 from constants import *
 from debug import log, info, warn
-from utils.tag import QobuzTagProduct
-from utils.tag import QobuzTagAlbum
+from tag.product import TagProduct
+from tag.album import TagAlbum
 from utils.icacheable import ICacheable
 import qobuz
 '''
@@ -58,7 +58,7 @@ class QobuzSearchAlbums():
         if not data:
             return list
         for product in data:
-            tag_product = QobuzTagProduct(product['product'])
+            tag_product = TagProduct(product['product'])
             item = tag_product.getXbmcItem('fanArt')
             u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
             list.append((u, item, True))
@@ -73,7 +73,7 @@ class QobuzSearchAlbums():
         except:
             return list
         for json_album in json['artist']['albums']:
-            tag_product = QobuzTagProduct(json_album)
+            tag_product = TagProduct(json_album)
             u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
             item = tag_product.getXbmcItem('fanArt')
             list.append((u, item, True))

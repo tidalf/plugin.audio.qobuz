@@ -14,3 +14,26 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
+from tag.itag import ITag
+
+class TagArtist(ITag):
+    
+    def __init__(self, json, parent = None):
+        super(TagArtist, self).__init__(json, parent)
+        self.set_valid_tags(['id', 'name'])
+        self.__album = None
+        if json:
+            self.parse_json(json)
+
+    def parse_json(self, p):
+        self.auto_parse_json(p)
+
+
+    def getArtist(self, sep = ''):
+        try: return self.name
+        except: return ''        
+        
+    def getArtistId(self, sep = ''):
+        try: return self.id
+        except: return ''

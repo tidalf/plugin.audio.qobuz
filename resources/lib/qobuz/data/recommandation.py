@@ -25,8 +25,8 @@ import pprint
 from debug import log, info, warn
 from constants import *
 from utils.icacheable import ICacheable
-from utils.tag import QobuzTagArtist
-from utils.tag import QobuzTagProduct
+#from tag.artist import TagArtist
+from tag.product import TagProduct
 import qobuz
 """
     Class QobuzGetRecommendation
@@ -67,7 +67,7 @@ class QobuzGetRecommandation(ICacheable):
         image = self.get_image()
         if not image: getnewimage = True
         for json_product in self.get_raw_data():
-            album = QobuzTagProduct(json_product)
+            album = TagProduct(json_product)
             if getnewimage and i == rand:
                 image = self.set_image_genre(json_product['image']['large'])
                 getnewimage = False

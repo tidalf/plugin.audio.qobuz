@@ -14,3 +14,13 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
+from tag.itag import ITag
+
+class TagLabel(ITag):
+    def __init__(self, json, parent = None):
+        super(TagLabel, self).__init__(json, parent = None)
+        self.set_valid_tags(['name', 'id'])
+        self.parent = None
+        if json:
+            self.auto_parse_json(json)

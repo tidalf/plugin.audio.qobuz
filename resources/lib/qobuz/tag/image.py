@@ -14,3 +14,22 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
+from tag.itag import ITag
+
+class TagImage(ITag):
+    
+    def __init__(self, json, parent = None):
+        super(TagImage, self).__init__(json, parent = None)
+        self.set_valid_tags(['large', 'small', 'thumbnail'])
+        self.parent = None
+        if json:
+            self.auto_parse_json(json)
+            
+    def getImage(self, sep = ''):
+        try: return self.large
+        except:
+            try: return self.small
+            except:
+                try: return self.thumbnail
+                except: return ''

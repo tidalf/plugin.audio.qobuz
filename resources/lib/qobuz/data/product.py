@@ -21,8 +21,8 @@ import pprint
 from utils.icacheable import ICacheable
 from debug import *
 from constants import *
-from utils.tag import QobuzTagProduct
-from utils.tag import QobuzTagTrack
+from tag.product import TagProduct
+from tag.track import TagTrack
 import qobuz
 
 ###############################################################################
@@ -52,10 +52,10 @@ class QobuzProduct(ICacheable):
         list = []
         data = self.get_data()
         if not data: return list
-        tag_product = QobuzTagProduct(data)
+        tag_product = TagProduct(data)
         pprint.pprint(data)
         for tag_track in tag_product.get_childs():
-            if not isinstance(tag_track, QobuzTagTrack):
+            if not isinstance(tag_track, TagTrack):
                 continue
             item = tag_track.getXbmcItem('album', 1)
             u = qobuz.boot.build_url(MODE_SONG, tag_track.id)
