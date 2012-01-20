@@ -79,7 +79,7 @@ class IQobuzTag(object):
             v = str(value)
         except:
             if isinstance(value, basestring):
-                v = value.decode('utf8', 'replace')
+                v = value.encode('utf8', 'replace')
             elif isinstance(value, bool):
                 if value: v = '1'
                 else: v = '0'
