@@ -139,6 +139,8 @@ class QobuzGui_Playlist(xbmcgui.WindowXML):
 
 
     def showContextMenu(self, item):
-        d = QobuzGui_Context('DialogContextMenu.xml', qobuz.path.base, 'Default', True)
-        d.doModal()
+#        d = QobuzGui_Context('DialogContextMenu.xml', qobuz.path.base, 'Default', True)
+#        d.doModal()
+        xbmcgui.Dialog().select('Playlist Option', ['Delete', 'Create', 'Rename'])
+        
         

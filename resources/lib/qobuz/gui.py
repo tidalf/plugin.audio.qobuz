@@ -109,6 +109,7 @@ class QobuzGUI:
         SET Content
     '''        
     def setContent(self):
+        info(self, "Set content: " + self.content_type)
         xbmcplugin.setContent(handle=qobuz.boot.handle, content=self.content_type)
 
     def showLoginFailure(self):
