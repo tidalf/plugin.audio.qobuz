@@ -292,6 +292,7 @@ class QobuzBootstrap(object):
             from widget.playlist import QobuzGui_Playlist
             p = QobuzGui_Playlist('Qobuz_MyMusicPlaylist.xml', qobuz.path.base, 'Default', True)
             p.doModal()
+            del p
             exit(0)
         
         elif self.MODE == MODE_TEST:

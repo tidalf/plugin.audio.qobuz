@@ -52,7 +52,8 @@ class QobuzProduct(ICacheable):
         list = []
         data = self.get_data()
         if not data: return list
-        tag_product = QobuzTagProduct(self.get_data())
+        tag_product = QobuzTagProduct(data)
+        pprint.pprint(data)
         for tag_track in tag_product.get_childs():
             if not isinstance(tag_track, QobuzTagTrack):
                 continue

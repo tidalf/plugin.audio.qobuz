@@ -91,6 +91,14 @@ class QobuzUserPlaylistsXbmc(QobuzUserPlaylists):
             item.setThumbnailImage(image)
             item.setIconImage(image)
             item.setLabel(owner + tag.name)
+            item.setProperty('name', tag.name)
+            item.setProperty('playlist_id', tag.id)
+            item.setProperty('is_public', tag.is_public)
+            item.setProperty('is_collaborative', tag.is_collaborative)
+            description = ''
+            try: description = tag.description
+            except: pass
+            item.setProperty('description', description)
             item.setInfo(type="Music",infoLabels={ "title": tag.name, "count": i })
             item.setProperty('Music','false')
             item.setProperty('IsPlayable','false');

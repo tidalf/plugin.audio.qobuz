@@ -5,8 +5,11 @@ import pprint
 import xbmc, xbmcgui, xbmcplugin
 from constants import *
 
-from data.userplaylists import QobuzUserPlaylistsXbmc
 import qobuz
+from debug import warn, info
+from data.userplaylists import QobuzUserPlaylistsXbmc
+from data.playlist import QobuzPlaylist
+
 
 __pluginpath__ = 'plugin://plugin.audio.qobuz/'
 
@@ -38,13 +41,44 @@ class QobuzGui_Context(xbmcgui.WindowXMLDialog):
     
     def addButton(self):
         pass
-    
+
+'''
+    Edit a playlist
+'''
+class playlist_edit(xbmcgui.WindowXMLDialog):
+        def __init__(self, strXMLname, strFallbackPath, strDefaultName, forceFallback):
+            pass        
+        
+        def set_item(self, item):
+            self.item = item
+            
+        def onInit(self):
+#            if not self.item:
+#                print "Cannot edit playlist without item"
+#                return False
+#            return True
+#            self.clearProperties()
+            self.ctl_name = self.getControl(302)
+            self.ctl_name.setText(self.item.getProperty('name'))
+            self.ctl_description = self.getControl(303)
+            self.ctl_description.setText(self.item.getProperty('description'))
+            
+            pass
+        
+        def onAction(self, action):
+            if action == ACTION_PREVIOUS_MENU:
+                self.close()
+                
+            
 class QobuzGui_Playlist(xbmcgui.WindowXML):
     def __init__(self,strXMLname, strFallbackPath, strDefaultName, forceFallback):
         # Changing the three varibles passed won't change, anything
         # Doing strXMLname = "bah.xml" will not change anything.
         # don't put GUI sensitive stuff here (as the xml hasn't been read yet
         # Idea to initialize your variables here
+        self.xmlName = strXMLname
+        self.fallbackPath = strFallbackPath
+        self.defaultName = strDefaultName
         pass
  
     def calculateResolution(self):
@@ -138,9 +172,77 @@ class QobuzGui_Playlist(xbmcgui.WindowXML):
             self.showContextMenu('item')
 
 
+    def action_edit(self, item, position):
+        w = playlist_edit('DialogEditPlaylist.xml', self.fallbackPath, self.defaultName, True)
+        w.set_item(item)
+        w.doModal()
+        del w
+        
+    def action_rename(self):
+        position = self.getCurrentListPosition()
+        item = self.getListItem(position)
+        oldname = item.getProperty('name').strip()
+        print "Renaming item with name: " + oldname
+        id = int(item.getProperty('playlist_id'))
+        if not id:
+            warn(self, "Cannot rename playlist without id")
+            return False
+        heading = "Renaming playlist: " + item.getLabel()
+        kb = xbmc.Keyboard(item.getLabel(), heading, False)
+        kb.doModal()
+        if not kb.isConfirmed():
+            print "Renaming canceled"
+            return False
+        newname = kb.getText().strip()
+        if oldname == newname:
+            print "Same name"
+            return True
+        ret = qobuz.api.playlist_update(id, 
+                                        newname, 
+                                        item.getProperty('description'),
+                                        '',
+                                        item.getProperty('is_public'),
+                                        item.getProperty('is_collaborative')
+                                        )
+        if not ret:
+            qobuz.gui.showNotificationH('Playlist Manager', 'Cannot rename playlist')
+            warn(self, "Cannot rename playlist")
+            return False
+        pl = QobuzUserPlaylistsXbmc()
+        pl.delete_cache()
+        item.setLabel(newname)
+        self.removeItem(position)
+        self.addItem(item, position)
+        return True
+    
+    def action_create(self):
+        kb = xbmc.Keyboard("", "Creating playlist", False)
+        kb.doModal()
+        if not kb.isConfirmed():
+            print "Create canceled"
+            return False
+        name = kb.getText().strip()
+        ret = qobuz.api.playlist_create()
+        
     def showContextMenu(self, item):
-#        d = QobuzGui_Context('DialogContextMenu.xml', qobuz.path.base, 'Default', True)
-#        d.doModal()
-        xbmcgui.Dialog().select('Playlist Option', ['Delete', 'Create', 'Rename'])
+        options = [('edit', 'Editer')] #('delete', 'Delete'), ('create', 'Create'), ]
+        
+        optionstring = []
+        for l in options:
+            optionstring.append(l[1])
+        diag = xbmcgui.Dialog()
+        isel = diag.select('Playlist Option', optionstring)
+        del diag
+        print "Item Selected: " + str(options[isel][0])
+        if isel == -1:
+            print "Nothing selected"
+            return True
+        position = self.getCurrentListPosition()
+        litem = self.getListItem(position)
+        action = options[isel][0]
+        if action == 'edit':
+            self.action_edit(litem, position)
+        if action == 'create':
+            self.action_create()
         
         

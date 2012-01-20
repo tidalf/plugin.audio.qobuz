@@ -220,18 +220,20 @@ class QobuzApi:
         return self._api_request(params,"/api.json/0.1/playlist/delete")
   
     def playlist_update (self, playlist_id, name, description='', album_id='', is_public='on', is_collaborative='off' ):
-        params = {'x-api-auth-token': token, 
-                                   'name': playlist_name,
-                                   'is_public':on,
-                                   'is_collaborative':is_collaborative,
-                                   'description':description,
-                                   'spotify_track_uris':'',
-                                   'deezer_playlist_url':'',
-                                   'playlist_id': playlist_id}
+        params = {'x-api-auth-token': self.authtoken, 
+                                   'name'               : name,
+                                   'is_public'          : is_public,
+                                   'is_collaborative'   : is_collaborative,
+                                   'description'        : description,
+                                   'spotify_track_uris' : '',
+                                   'deezer_playlist_url': '',
+                                   'playlist_id'        : playlist_id }
         #name=John+Coltrane+Quartet&description=John+Coltrane+Quartet&is_public=on&spotify_track_uris=&deezer_playlist_url=&playlist_id=78237&is_collaborative=off
 
-        log("info","updating playlist " + playlist_id )
-        return self._api_request(params,"/api.json/0.1/playlist/update")
+        log("info","updating playlist " + str(playlist_id) )
+        res =  self._api_request(params,"/api.json/0.1/playlist/update")
+        pprint.pprint(res)
+        return res
 
 if __name__ == '__main__':
     pass

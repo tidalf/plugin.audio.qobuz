@@ -18,7 +18,7 @@ import os
 import time
 import pickle
 from debug import log,info,warn
-
+from  file.write import safe_write
 
 class ICacheable2(object):
     def __init(self):
@@ -114,23 +114,8 @@ class ICacheable(object):
 
     def delete_cache(self):
         cache = self.get_cache_path()
-        if not cache:
-            warn(self, "Cache path not set")
-            return False
-        if not os.path.exists(cache):
-            warn(self, "Cache path doesn't exist")
-            return False
-        if not os.unlink(cache):
-            warn(self, "Cannot remove cache path: " + cache)
-            timeout = 3
-            while timeout > 0: 
-                if not os.path.exists(cache):
-                    break
-                warn(self, 'Waiting for cache to be deleted...')
-                time.sleep(.250)
-                timeout -= .250
-            return False
-        return True
+        sf = safe_write()
+        return sf.unlink(cache)
     
     def _save_cache_data(self, data):
         cache = self.get_cache_path()

@@ -89,7 +89,8 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Player can't play track: " + item.getLabel())
             return False
         if watchPlayback:
-            self.watchPlayback()
+            pass
+            #self.watchPlayback()
         return True
 
     def watchPlayback(self):

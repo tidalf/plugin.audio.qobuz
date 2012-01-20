@@ -38,7 +38,7 @@ class QobuzPlaylist(ICacheable):
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
         info(self, "Cache duration: " + str(self.cache_refresh))
         self.cacheImage = qobuz.image.cache
-        self.fetch_data()
+        
 
     def _fetch_data(self):
         data = qobuz.api.get_playlist(self.id)
@@ -57,6 +57,7 @@ class QobuzPlaylist(ICacheable):
         return self.cacheImage.set('userplaylists', name, image)
     
     def get_items(self):
+        self.fetch_data()
         list = []
         n = self.length()
         if n < 0:
