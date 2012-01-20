@@ -33,6 +33,7 @@ class QobuzApi:
         self.auth = None
         self.authtoken = None
         self.userid = None
+        self.auf = None
         self.token_validity_time = 3600
         self.retry_time = [1, 3, 5, 10]
         self.retry_num = 0
@@ -65,6 +66,8 @@ class QobuzApi:
         self.authtoken = data['user']['session_id']
         self.userid = data['user']['id']
         self.auth = auth
+        self.auf = data['user']['credential']['allowed_audio_format_ids']
+        print "\n" + pprint.pformat(data) + "\n"
         return auth
     
     def get_track_url(self,track_id,context_type,context_id ,format_id = 6):

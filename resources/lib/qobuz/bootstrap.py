@@ -290,8 +290,7 @@ class QobuzBootstrap(object):
             
         elif self.MODE == MODE_MANAGE_PLAYLIST:
             from widget.playlist import QobuzGui_Playlist
-            p = QobuzGui_Playlist('Qobuz_MyMusicPlaylist.xml', self.baseDir, 'Default', True)
-            p.set_core(self.Core)
+            p = QobuzGui_Playlist('Qobuz_MyMusicPlaylist.xml', qobuz.path.base, 'Default', True)
             p.doModal()
             exit(0)
         

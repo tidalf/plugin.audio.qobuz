@@ -54,6 +54,10 @@ class QobuzPlayer(xbmc.Player):
             qobuz.gui.showNotification(34000, 34002)
             return False
         item = mytrack.get_xbmc_list_item()
+        watchPlayback = False
+        if not qobuz.api.auf: 
+            item.setInfo('music', infoLabels = { 'duration': 60 })
+            watchPlayback = True
         '''
             PLaying track
         '''
@@ -84,4 +88,24 @@ class QobuzPlayer(xbmc.Player):
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())
             return False
+        if watchPlayback:
+            self.watchPlayback()
         return True
+
+    def watchPlayback(self):
+        print "Start watching playback"
+        playNext = False
+        while (not playNext) and self.isPlayingAudio():
+            print "Watching playback"
+            try:
+                print "Time: " + str(self.getTime())
+                if self.getTime() > 60:
+                    print "Playing next..."
+                    playNext = True
+                    break
+            except: pass
+            xbmc.sleep(500)
+        self.playnext()
+        exit(0)
+            
+            

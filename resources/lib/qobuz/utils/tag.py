@@ -648,7 +648,8 @@ class QobuzTagTrack(IQobuzTag):
         if self.getStreamingType() != 'full':
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
             duration = 60
-        
+        if not qobuz.api.auf:
+            duration = 60
         i = xbmcgui.ListItem(label, label, image, image)
         if fanArt:
             i.setProperty('fanart_image', qobuz.image.access.get(fanArt))

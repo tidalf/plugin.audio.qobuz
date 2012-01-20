@@ -134,8 +134,8 @@ class QobuzGUI:
     def setContextMenu(self, item, context = 'all'):
         menuItems = []
 #        ''' MANAGE PLAYLIST '''
-#        manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
-#        menuItems.append((__language__(31010), "XBMC.RunPlugin("+manageplaylist+")"))
+        manageplaylist=sys.argv[0]+"?mode="+str(MODE_MANAGE_PLAYLIST)
+        menuItems.append((qobuz.lang(31010), "XBMC.RunPlugin("+manageplaylist+")"))
         ''' ERASE CACHE '''
         erasecache=sys.argv[0]+"?mode="+str(MODE_ERASE_CACHE)
         menuItems.append((qobuz.lang(31009), "XBMC.RunPlugin("+erasecache+")"))

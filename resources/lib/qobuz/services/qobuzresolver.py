@@ -153,9 +153,10 @@ def watcher():
         log("Cannot remove pid file: " + pid.file)
     log("Exiting...")
 
-
+'''
+    MAIN
+'''
 #atexit.register(pid.remove)
-
 if __name__ == "__main__":
     if not gui_setting_enabled(pid):
         exit(0)

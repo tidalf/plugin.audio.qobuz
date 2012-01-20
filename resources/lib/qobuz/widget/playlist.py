@@ -5,7 +5,8 @@ import pprint
 import xbmc, xbmcgui, xbmcplugin
 from constants import *
 
-from view.userplaylists import QobuzUserPlaylistsXbmc
+from data.userplaylists import QobuzUserPlaylistsXbmc
+import qobuz
 
 __pluginpath__ = 'plugin://plugin.audio.qobuz/'
 
@@ -69,10 +70,10 @@ class QobuzGui_Playlist(xbmcgui.WindowXML):
             self.control_playlist = self.getControl(301)
         except: pass
         print "Control: " + str(self.control_playlist)
-        self.control_playlist = self
-        if not self.control_playlist:
-            self.close()
-            return 
+        #self.control_playlist = self
+#        if not self.control_playlist:
+#            self.close()
+#            return 
         self.add_userplaylists_items()
         
     
@@ -101,18 +102,18 @@ class QobuzGui_Playlist(xbmcgui.WindowXML):
         item.addContextMenuItems(menuItems, replaceItems=False)
     
     def add_userplaylists_items(self):
-        pl = QobuzUserPlaylistsXbmc(self.Core)
+        pl = QobuzUserPlaylistsXbmc()
         list = pl.get_items()
-        image = self.Core.Bootstrap.baseDir + '/default.tbn'
+        #image = self.Core.Bootstrap.baseDir + '/default.tbn'
         for l in list:
                 item = l[1]
                 path = l[0]
                 item.setPath(path)
                 item.setProperty('path', path)
-                item.setIconImage(image)
-                item.setThumbnailImage(image)
+#                item.setIconImage(image)
+#                item.setThumbnailImage(image)
                 print "Path: " + item.getProperty('path')
-                self.control_playlist.addItem(item)
+                self.addItem(item)
     
     def onKey(self, key):
         print "On key: " + str(key)
@@ -138,6 +139,6 @@ class QobuzGui_Playlist(xbmcgui.WindowXML):
 
 
     def showContextMenu(self, item):
-        d = QobuzGui_Context('Qobuz_DialogContextMenu.xml', self.Core.Bootstrap.baseDir, 'Default', True)
+        d = QobuzGui_Context('DialogContextMenu.xml', qobuz.path.base, 'Default', True)
         d.doModal()
         

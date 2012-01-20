@@ -47,7 +47,9 @@ class QobuzAuth(ICacheable):
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
         if not data['user']['id']: return None
-        data['email'] = ''
+        data['user']['email'] = ''
+        data['user']['firstname'] = ''
+        data['user']['lastname'] = ''
         print "Returning data"
         return data
 
