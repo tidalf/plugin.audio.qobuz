@@ -89,7 +89,7 @@ class ICacheable(object):
         return os.path.join(self.cache_path, self.cache_object_path)
     
     def set_cache_refresh(self, refresh):
-        self.cache_refresh = refresh
+        self.cache_refresh = int(refresh)
         
     def _load_cache_data(self):
         cache = self.get_cache_path()
@@ -103,7 +103,9 @@ class ICacheable(object):
             warn(self,"Cannot stat cache file: " + cache)
         refresh = self.get_cache_refresh()
         if refresh and refresh != -1:
-            if (time.time() - mtime) > refresh:
+            diff = time.time() - mtime
+            if diff > refresh:
+                print "Refresh"
                 debug(self,"Refreshing cache")
                 return None
         data = None
