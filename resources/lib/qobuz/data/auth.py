@@ -17,10 +17,12 @@
 import sys
 import os
 import hashlib
+import pprint
+
+import qobuz
 from utils.icacheable import ICacheable
 from debug import *
-import pprint
-import qobuz
+from utils.cache import cache_manager
 '''
  Class QobuzAuth
 
@@ -36,6 +38,10 @@ class QobuzAuth(ICacheable):
         debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
+    def hook_pre_refresh(self):
+        c = cache_manager()
+        c.delete_token_data()
+        
     def _fetch_data(self):
         params = {'x-api-auth-token': 'null',
                   'email': self.login ,

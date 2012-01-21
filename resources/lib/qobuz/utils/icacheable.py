@@ -91,6 +91,9 @@ class ICacheable(object):
     def set_cache_refresh(self, refresh):
         self.cache_refresh = int(refresh)
         
+    def hook_pre_refresh(self):
+        pass
+    
     def _load_cache_data(self):
         cache = self.get_cache_path()
         debug(self,"Load: " + cache)
@@ -107,6 +110,7 @@ class ICacheable(object):
             if diff > refresh:
                 print "Refresh"
                 debug(self,"Refreshing cache")
+                self.hook_pre_refresh()
                 return None
         data = None
         with open(cache, 'rb') as f:
