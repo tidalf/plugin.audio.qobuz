@@ -37,7 +37,7 @@ class QobuzProduct(ICacheable):
                                           'product',
                                           self.id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_album'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
@@ -53,7 +53,6 @@ class QobuzProduct(ICacheable):
         data = self.get_data()
         if not data: return list
         tag_product = TagProduct(data)
-        pprint.pprint(data)
         for tag_track in tag_product.get_childs():
             if not isinstance(tag_track, TagTrack):
                 continue

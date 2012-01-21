@@ -36,7 +36,7 @@ class QobuzPlaylist(ICacheable):
                                             'playlist',
                                             self.id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.cacheImage = qobuz.image.cache
         
 

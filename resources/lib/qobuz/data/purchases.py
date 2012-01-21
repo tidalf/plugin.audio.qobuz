@@ -21,12 +21,10 @@ import xbmcplugin
 
 import pprint
 
-from debug import log, info, warn
+from debug import *
 from constants import *
 from utils.icacheable import ICacheable
-#from tag.artist import TagArtist
 from tag.track import TagTrack
-#from tag.product import TagProduct
 from tag.album import TagAlbum
 import qobuz
 """
@@ -39,7 +37,7 @@ class QobuzGetPurchases(ICacheable):
         super(QobuzGetPurchases, self).__init__(qobuz.path.cache, 
                                        'purchases')
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommandation'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
         
     def _fetch_data(self):
@@ -71,7 +69,6 @@ class QobuzGetPurchases(ICacheable):
                 continue
             if album.id in albumseen:
                 continue
-            print "AlbumID: " + str(album.id)
             item = album.getXbmcItem('fanArt')
             item.setInfo('music', infoLabels = { 'artist': t.getArtist(), 'year': t.getYear()})
             u = qobuz.boot.build_url(MODE_ALBUM, album.id)

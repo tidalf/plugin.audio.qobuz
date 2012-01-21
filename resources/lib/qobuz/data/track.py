@@ -18,7 +18,7 @@ import sys
 import os
 
 from utils.icacheable import ICacheable
-from debug import log, info, warn
+from debug import *
 
 import pprint
 import qobuz
@@ -39,7 +39,7 @@ class QobuzTrack(ICacheable):
                                          'track',
                                          self.id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_track'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):

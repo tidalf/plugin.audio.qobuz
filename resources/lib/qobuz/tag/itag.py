@@ -225,7 +225,6 @@ class ITag(object):
                                              'comment': 'Qobuz Music Streaming (qobuz.com)'
                                              })
         i.setProperty('qobuz_id', self.id)
-        print "Set ID: " + self.id
         i.setProperty("IsPlayable", "false")
         if fanArt:
             i.setProperty('fanart_image', qobuz.image.access.get(fanArt))

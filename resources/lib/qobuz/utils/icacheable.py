@@ -17,7 +17,7 @@
 import os
 import time
 import pickle
-from debug import log,info,warn
+from debug import log,info,warn, debug
 from  file.write import safe_write
 
 class ICacheable2(object):
@@ -77,7 +77,7 @@ class ICacheable(object):
             self.cache_object_id = id
             self.cache_object_path += '-' + self.cache_object_id 
         self.cache_object_path += '.dat'
-        info(self, "Cache for " + name + " set to: " + self.cache_object_path)
+        debug(self, "Cache for " + name + " set to: " + self.cache_object_path)
     
     def get_cache_refresh(self):
         return self.cache_refresh
@@ -93,7 +93,7 @@ class ICacheable(object):
         
     def _load_cache_data(self):
         cache = self.get_cache_path()
-        info(self,"Load: " + cache)
+        debug(self,"Load: " + cache)
         if not os.path.exists(cache):
             return None
         mtime = None
@@ -104,7 +104,7 @@ class ICacheable(object):
         refresh = self.get_cache_refresh()
         if refresh and refresh != -1:
             if (time.time() - mtime) > refresh:
-                info(self,"Refreshing cache")
+                debug(self,"Refreshing cache")
                 return None
         data = None
         with open(cache, 'rb') as f:
@@ -137,10 +137,10 @@ class ICacheable(object):
         if not cache:
             warn(self, "No cache path, cannot fetch data")
             return None
-        info(self,"Fetching data: " + cache)
+        debug(self,"Fetching data: " + cache)
         data = self._load_cache_data()
         if not data:
-            info(self,"No data cached, fetching new one")
+            debug(self,"No data cached, fetching new one")
             data = self._fetch_data()
             if data == None:
                 warn(self, "Cache empty and fetching new data fail")

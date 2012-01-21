@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from debug import log, info, warn
+from debug import *
 from utils.icacheable import ICacheable
 import qobuz
 
@@ -59,7 +59,7 @@ class QobuzImage_cache(ICacheable):
         super(QobuzImage_cache, self).__init__(qobuz.path.cache,
                                                      'images-genres')
         self.set_cache_refresh(-1)
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
         
     def _fetch_data(self):

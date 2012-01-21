@@ -22,7 +22,7 @@ import xbmcgui
 
 import qobuz
 from utils.icacheable import ICacheable
-from debug import log, info, warn
+from debug import *
 from constants import *
 from tag.userplaylists import TagUserPlaylists
 

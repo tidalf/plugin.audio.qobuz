@@ -24,7 +24,7 @@ import xbmcgui
 import xbmc
 
 from constants import *
-from debug import info, warn, log
+from debug import *
 
 import qobuz
 
@@ -54,9 +54,9 @@ class QobuzGUI:
     
     def set_view_mode(self, view):
         viewmode = {'list': 50, 
-                    #'icons': 52, 
+                    'icons': 52, 
                     'biglist': 51,
-                    'thumbnail': 500,
+                    'thumbnails': 500,
                     'mediainfo': 506 }
         if view not in viewmode:
             warn(self, "Try to set invalid view mode: " + str(view))
@@ -64,6 +64,7 @@ class QobuzGUI:
         s = 'Container.setViewMode(%i)' % (int(viewmode[view]))
         xbmc.executebuiltin(s)
         return True
+    
     '''
     Must be called at the end for folder to be displayed
     '''
@@ -76,7 +77,6 @@ class QobuzGUI:
     def showNotificationH(self, title, text, image = None):
         if not image:
             image = qobuz.image.access.get('qobuzIcon')
-        print "Image:" + image
         title = str(title) 
         text = str(text)
         s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, image) 
@@ -91,7 +91,6 @@ class QobuzGUI:
     def showNotification(self, title, text, image = None):
         if not image:
             image = qobuz.image.access.get('qobuzIcon')
-        print "Image:" + image
         l = qobuz.lang
         s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image) 
         xbmc.executebuiltin(s)
@@ -109,7 +108,7 @@ class QobuzGUI:
         SET Content
     '''        
     def setContent(self):
-        info(self, "Set content: " + self.content_type)
+        debug(self, "Set content: " + self.content_type)
         xbmcplugin.setContent(handle=qobuz.boot.handle, content=self.content_type)
 
     def showLoginFailure(self):
@@ -324,6 +323,7 @@ class QobuzGUI:
     '''
     def showRecommendationsGenres(self, type):
         self.set_content_type('files')
+        self.set_view_mode('thumbnails')
         import time
         import math
         ti = '?t='+str(int(time.time()))
@@ -354,6 +354,7 @@ class QobuzGUI:
     '''
     def showUserPlaylists(self):
         self.set_content_type('files')
+        self.set_view_mode('thumbnails')
         user_playlists = qobuz.core.getUserPlaylists()
         list = user_playlists.get_items()
         if len(list) < 1:
@@ -367,6 +368,7 @@ class QobuzGUI:
     '''
     def showPlaylist(self, id):
         self.set_content_type('songs')
+        self.set_view_mode('thumbnails')
         userid = qobuz.api.userid
         if (userid != 0):
             myplaylist = qobuz.core.getPlaylist(id)

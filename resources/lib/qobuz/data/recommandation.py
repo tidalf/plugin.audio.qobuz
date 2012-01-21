@@ -22,7 +22,7 @@ import xbmcplugin
 
 import pprint
 
-from debug import log, info, warn
+from debug import *
 from constants import *
 from utils.icacheable import ICacheable
 #from tag.artist import TagArtist
@@ -41,7 +41,7 @@ class QobuzGetRecommandation(ICacheable):
                                                      'recommandations-' + type,
                                                      genre_id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommandation'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.cacheImage = qobuz.image.cache
         self.fetch_data()
       

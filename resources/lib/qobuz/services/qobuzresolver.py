@@ -35,8 +35,11 @@ libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
 sys.path.append(qobuzDir)
+
 import qobuz
 from bootstrap import QobuzBootstrap
+from debug import *
+
 boot = QobuzBootstrap(__addon__, 0)
 boot.bootstrap_directories()
 boot.bootstrap_lang()
@@ -45,6 +48,7 @@ boot.bootstrap_core()
 boot.bootstrap_image()
 boot.bootstrap_gui()
 
+_sname_ = 'Qobuz Resolver'
 __pid_file__ = 'qobuzresolver.pid'
 __sleep__ = 5
 
@@ -53,12 +57,12 @@ from services.cresolver import Service_url_resolver
         
 service_name = 'Qobuz URL Resolver'
 
-def log(msg, lvl = xbmc.LOGNOTICE):
-    msg = service_name + ': ' + str(msg)
-    try:
-        xbmc.log(msg, lvl)
-    except:
-        print msg + "\n"
+#def log(msg, lvl = xbmc.LOGDEBUG):
+#    msg = service_name + ': ' + str(msg)
+#    try:
+#        xbmc.log(msg, lvl)
+#    except:
+#        print msg + "\n"
         
 
 def gui_setting_enabled(pid):
@@ -66,12 +70,12 @@ def gui_setting_enabled(pid):
     try:
         e = qobuz.addon.getSetting('resolver_enabled')
     except:
-        print "Cannot get addon setting..."
+        error(_sname_, "Cannot get addon setting...")
     if not e:
-        log("We are not logged... Exiting!")
+        info(_sname_, "We are not logged... Exiting!")
         return False
     elif e != 'true':
-        log("Disabled from GUI settings... Exiting!")
+        info(_sname_, "Disabled from GUI settings... Exiting!")
         return False
     return True
 
@@ -92,21 +96,21 @@ pid.set_old_pid_age(__sleep__ * 5)
 resolver = Service_url_resolver()
 
 if not resolver.set_player():
-    print "Cannot setup player... exiting!"
+    warn(_sname_, "Cannot setup player... exiting!")
     exit(1)
 if not resolver.set_playlist():
-    print "Cannot setup playlist... exiting!"
-    exit(1)
+    log(_sname_, "Cannot setup playlist... exiting!")
+    warn(1)
     
 def watcher():
     watch_retry = 3
     if not pid.can_i_run():
-        log("PID exists... exiting!")
+        warn(_sname_, "PID exists... exiting!")
         exit(0)
     if not pid.create():
-        log("Cannot create PID")
+        warn(_sname_, "Cannot create PID")
         exit(0)
-    log("Starting")
+    info(_sname_, "Starting")
     __timetowork__ = __sleep__
     run = True
     while (run):
@@ -115,15 +119,15 @@ def watcher():
             run = not xbmc.abortRequested
         except:
             run = False
-            log("Cannot get xbmc.abortRequested value... exiting!")
+            warn(_sname_, "Cannot get xbmc.abortRequested value... exiting!")
             pid.remove()
             exit(0)
         if not run:
-            log("Not running removing pid")
+            debug(_sname_, "Not running removing pid")
             pid.remove()
             exit(0)
         if not gui_setting_enabled(pid):
-            log("Disabled from GUI... exiting!")
+            info(_sname_, "Disabled from GUI... exiting!")
             pid.remove()
             exit(0)
         if __timetowork__ > 0:
@@ -134,22 +138,20 @@ def watcher():
             __timetowork__ = __sleep__
         try:
             if not resolver.watch():
-                print "Cannot resolve track!"
-            else:
-                print "Track resolved"
+                warn(_sname_, "Cannot resolve track!")
         except ServiceError as e:
             if e.arg == 'login':
-                print "Login error...abort!"
+                warn(_sname_, "Login error...abort!")
                 run = False
         except:
-            log("Resolver fail to watch playlist!")
+            warn(_sname_, "Resolver fail to watch playlist!")
         if not pid.touch():
-            log('Cannot touch pid file: ' + pid.file)
+            log(_sname_, 'Cannot touch pid file: ' + pid.file)
         else:
-            log('Touching pid file: ' + pid.file)
+            debug(_sname_, 'Touching pid file: ' + pid.file)
     if not pid.remove():
-        log("Cannot remove pid file: " + pid.file)
-    log("Exiting...")
+        warn(_sname_, "Cannot remove pid file: " + pid.file)
+    info(_sname_, "Exiting...")
 
 '''
     MAIN

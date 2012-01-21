@@ -18,7 +18,7 @@ import sys
 import os
 import hashlib
 from utils.icacheable import ICacheable
-from debug import log, info, warn
+from debug import *
 import pprint
 import qobuz
 '''
@@ -33,7 +33,7 @@ class QobuzAuth(ICacheable):
         super(QobuzAuth, self).__init__(qobuz.path.cache,
                                          'auth')
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_auth'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
@@ -42,14 +42,11 @@ class QobuzAuth(ICacheable):
                   'hashed_password': hashlib.md5(self.password).hexdigest() }
         data = qobuz.api._api_request(params, "/api.json/0.1/user/login")
         if not data: return None
-        print "PLOP"
-        pprint.pprint(data)
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
         if not data['user']['id']: return None
         data['user']['email'] = ''
         data['user']['firstname'] = ''
         data['user']['lastname'] = ''
-        print "Returning data"
         return data
 

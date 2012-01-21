@@ -165,8 +165,9 @@ class TagTrack(ITag):
         i.setLabel(label)
         i.setLabel2(str(media_number) + ' - ' + str(track_number) + ' - ' + album + ' - ' + artist + ' - ' + title)
         i.setInfo(type = 'music',
-                  infoLabels = {'count': pos,
-                                #'songid': str(self.id),
+                  infoLabels = {
+                                'count': int(self.id),
+                                'track_id': str(self.id),
                                 'title': title,
                                 'artist': artist,
                                 'genre': genre,

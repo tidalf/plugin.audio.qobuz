@@ -81,17 +81,15 @@ class Pid():
 
     
     def remove(self):
-        print "Resolver TRY to remove pid"
         ret = False
         if not self.exists():
-            print "Resolver Cannot remove existing pid\n"
+            print "Cannot remove existing pid\n"
             return False
         try:
             ret = os.rename(self.file, self.new_name)
         except: 
-            print "Resolver Cannot rename pid file!"
+            print "Cannot rename pid file!"
             return False
-        print "Resolver Try unlinking"
         retry = 3
         while retry > 0:
             os.unlink(self.new_name)

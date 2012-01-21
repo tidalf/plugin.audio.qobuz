@@ -31,9 +31,6 @@ import qobuz
 def get_params():
     param=[]
     paramstring=sys.argv[2]
-    if constants.__debugging__ :
-        xbmc.log(paramstring)
-        pass
     if len(paramstring)>=2:
         params=sys.argv[2]
         cleanedparams=params.replace('?','')
@@ -93,7 +90,6 @@ class QobuzBootstrap(object):
             Make dir
             '''
             def mkdir(s, dir):
-                info(self, "Creating directoy: " +  dir)
                 if os.path.isdir(dir) == False:
                     try:
                         os.makedirs(dir)
@@ -172,7 +168,7 @@ class QobuzBootstrap(object):
             self.META = str(self.params["meta"])
         except: pass
         for p in self.params:
-            info(self, "Param: " + p + ' = ' + str(self.params[p]))
+            debug(self, "Param: " + p + ' = ' + str(self.params[p]))
     
     '''
     

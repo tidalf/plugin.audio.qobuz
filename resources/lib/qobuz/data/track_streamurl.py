@@ -18,7 +18,7 @@ import sys
 import os
 
 from utils.icacheable import ICacheable
-from debug import log, info, warn
+from debug import *
 import pprint
 import qobuz
 '''
@@ -41,7 +41,7 @@ class QobuzTrackURL(ICacheable):
                                             'track-url-' + str(self.format_id),
                                             self.id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_auth'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     # Methode called by parent class ICacheable when fresh data is needed

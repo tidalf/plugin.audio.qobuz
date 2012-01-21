@@ -21,6 +21,7 @@ import re
 from utils.pid import Pid
 from utils.list_item import QobuzListItem_track
 import qobuz
+from debug import *
 
 class ServiceError(Exception):
     pass
@@ -28,6 +29,7 @@ class ServiceError(Exception):
 #         self.value = value
 #     def __str__(self):
 #        return repr(self.value)
+
 class Service_url_resolver():
     
     def __init__(self):
@@ -118,7 +120,6 @@ class Service_url_resolver():
         return False
     
     def get_id_from_filename(self, file):
-        print "Try to extract id from: " + file
         match = re.search('^'+self.need_resolve_startswith+'?.*id=(\d+).*$', file)
         if not match:
             return None
@@ -138,7 +139,6 @@ class Service_url_resolver():
             print "Cannot get playlist filename"
             return False
         if not cpath.startswith(self.need_resolve_startswith):
-            print "Don't need to resolve this path: " + cpath
             return False
         item.setPath(item.getProperty('streaming_url'))
         try:
@@ -186,21 +186,18 @@ class Service_url_resolver():
     def watch(self):
         size = self.get_playlist_size()
         if size == None:
-            return False
+            return True
         cposition = self.get_playing_song_position()
         if cposition == None:
             return False
         if self.last_track_number == None:
             self.last_track_number = cposition
         nposition = self.get_next_position(cposition)
-        print "Nposition: " + str(nposition)
         if nposition == None:
             return False
         if not self.position_need_resolve(nposition):
-            print "Don't need to resolve this position"
             return True
         if not self.do_we_try_resolve(nposition):
-            print "We dont try to resolve this position again"
             return False
         pl_item = self.get_item_at_pos(nposition)
         if not pl_item:
@@ -243,12 +240,4 @@ class Service_url_resolver():
             return False
         if not self.replace_playlist_path(nposition, x_item):
             print "Cannot replace item in playlist"
-        print "Item replaced"
         return True
-        
-        
-        
-        
-        
-            
-        

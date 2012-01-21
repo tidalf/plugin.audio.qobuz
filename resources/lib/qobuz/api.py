@@ -25,7 +25,7 @@ from time import time
 import math
 
 import qobuz
-from debug import log, info, warn
+from debug import *
 
 class QobuzApi:
 
@@ -67,7 +67,6 @@ class QobuzApi:
         self.userid = data['user']['id']
         self.auth = auth
         self.auf = data['user']['credential']['allowed_audio_format_ids']
-        print "\n" + pprint.pformat(data) + "\n"
         return auth
     
     def get_track_url(self,track_id,context_type,context_id ,format_id = 6):
@@ -155,7 +154,6 @@ class QobuzApi:
         params = {'x-api-auth-token':self.authtoken, 
                                    'artist_id': id, 'limit': limit}
         data = self._api_request(params,"/api.json/0.1/artist/get")
-        pprint.pprint(data)
         return data
     # REPORT #    
     def report_streaming_start(self, track_id):
@@ -232,7 +230,6 @@ class QobuzApi:
 
         log("info","updating playlist " + str(playlist_id) )
         res =  self._api_request(params,"/api.json/0.1/playlist/update")
-        pprint.pprint(res)
         return res
 
 if __name__ == '__main__':

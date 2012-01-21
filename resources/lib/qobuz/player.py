@@ -25,13 +25,10 @@ import xbmc
 import xbmcplugin
 import xbmcgui
 
-from debug import info, warn, log
 import qobuz
+from debug import *
 from utils.list_item import QobuzListItem_track
-#from data.track import QobuzTrack
-#from tag.track import TagTrack
-#from data.track_streamurl import QobuzTrackURL
-    
+
 class QobuzPlayer(xbmc.Player):
     
     def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
@@ -45,10 +42,8 @@ class QobuzPlayer(xbmc.Player):
         
     def play(self, id):
         lang = qobuz.lang
-        info(self, "We need to play song with id: " + str(id))
         mytrack = QobuzListItem_track(id)
         mytrack.fetch_stream_url(qobuz.addon.getSetting('streamtype'))
-        info(self, mytrack.to_s())
         if not mytrack.get_stream_url():
             warn(self, "Cannot get stream url for track with id: " + str(id))
             qobuz.gui.showNotification(34000, 34002)
@@ -87,5 +82,3 @@ class QobuzPlayer(xbmc.Player):
             return False
         return True
 
-            
-            

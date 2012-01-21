@@ -51,14 +51,17 @@ except:
 ###############################################################################
 # Logging helper functions
 ###############################################################################
-def log(obj,msg, lvl = LOGNOTICE):
+def log(obj, msg, lvl = LOGNOTICE):
     if not __debugging__:
         return 
     name = None
-    try:
-        name = obj.__class__.__name__
-    except:
-        name = type(obj)
+    if isinstance(obj, basestring):
+        name = obj
+    else:
+        try:
+            name = obj.__class__.__name__
+        except:
+            name = type(obj)
     ourlog('[' + str(name) + "] " + msg, lvl)
 
 def warn(obj,msg):
@@ -67,6 +70,9 @@ def warn(obj,msg):
 def info(obj,msg):
     log(obj,msg, LOGNOTICE)
 
+def debug(obj, msg):
+    log(obj, msg, LOGDEBUG)
+    
 def crit(obj, msg):
     log(obj, msg, LOGSEVERE)
     

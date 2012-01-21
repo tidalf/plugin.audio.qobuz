@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 import pprint
-from debug import warn, log, error
+from debug import *
 from data.track_streamurl import QobuzTrackURL
 from data.track import QobuzTrack
 from tag.track import TagTrack
@@ -103,7 +103,6 @@ class QobuzListItem_track(QobuzListItem):
             warn(self, "Cannot fetch streaming url for track: " 
                  + str(self.track_id))
             return False
-        pprint.pprint(data)
         return self.set_stream_url(data['format_id'], data['streaming_url'], data['streaming_type'])
         
     def get_stream_url(self):

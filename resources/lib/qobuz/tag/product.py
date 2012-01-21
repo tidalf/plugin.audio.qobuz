@@ -42,7 +42,6 @@ class TagProduct(ITag):
             for c in self.get_childs():
                 album = c.getAlbum(sep)
                 if album: break
-        print "Album: " + album
         return album
     
     def getLabel(self):
