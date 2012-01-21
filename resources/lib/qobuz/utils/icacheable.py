@@ -89,7 +89,7 @@ class ICacheable(object):
         return os.path.join(self.cache_path, self.cache_object_path)
     
     def set_cache_refresh(self, refresh):
-        self.cache_refresh = int(refresh)
+        self.cache_refresh = int(refresh) * 60
         
     def hook_pre_refresh(self):
         pass
