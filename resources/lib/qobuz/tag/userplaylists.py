@@ -14,6 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+import pprint
 
 from tag.itag import ITag
 from tag.owner import TagOwner
@@ -27,6 +28,7 @@ class TagUserPlaylists(ITag):
         if json: self.parse_json(json)
     
     def parse_json(self, p):
+
         self.auto_parse_json(p)
         if 'owner' in p:
             owner = TagOwner(p['owner'], self)

@@ -22,11 +22,13 @@ from constants import *
 from flag import NodeFlag
 from node import node
 from debug import info
+from tag.userplaylists import TagUserPlaylists
+from tag.playlist import TagPlaylist
 '''
     NODE USER PLAYLISTS
 '''
 from data.userplaylists import QobuzUserPlaylists
-from utils.tag import QobuzTagUserPlaylist
+from tag.userplaylists import TagUserPlaylists
 from node_playlist import node_playlist
 
 class node_userplaylists(node):
@@ -39,7 +41,6 @@ class node_userplaylists(node):
     
     
     def _build_down(self, lvl, flag = None):
-        info(self, "Build Down")
         o = QobuzUserPlaylists(qobuz.api, qobuz.path.cache, -1)
         self.setJson(o.get_data())
         for playlist in self.getJson():
@@ -47,8 +48,14 @@ class node_userplaylists(node):
             c.setId(playlist['id'])
             c.setLabel(playlist['name'])
             c.setJson(playlist)
+            c.setUrl()
             self.add_child(c)
 
-    def get_xbmc_item(self, list):
+    def _get_xbmc_items(self, list, lvl, flag):
         for c in self.childs:
-            c.get_xbmc_item(list)
+            tag = TagPlaylist(c.getJson())
+            item = tag.getXbmcItem()
+            url = c.getUrl()
+            item.setPath(url)
+            list.append((url, item, True))
+    

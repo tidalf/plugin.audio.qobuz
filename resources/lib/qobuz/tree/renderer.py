@@ -56,10 +56,11 @@ class renderer():
         if not self.set_root_node():
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
             return False
-        self.root.build_down(1, 0)
+        depth = 1
+        self.root.build_down(depth, 0)
         list = []
         info(self, self.to_s())
-        self.root.get_xbmc_item(list)
+        self.root.get_xbmc_items(list, depth, 0)
         size = len(list)
         xbmcplugin.addDirectoryItems(handle=int(sys.argv[1]), items=list, totalItems=size)
         xbmcplugin.endOfDirectory(handle=qobuz.boot.handle, succeeded=True, updateListing=False, cacheToDisc=True)

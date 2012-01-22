@@ -90,8 +90,10 @@ class ICacheable(object):
     
     def set_cache_refresh(self, refresh):
         r = int(refresh)
-        if r != -1:
+        if r > 0:
             r = r * 60
+        else:
+            r = -1
         self.cache_refresh = r 
         
     def hook_pre_refresh(self):

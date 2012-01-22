@@ -18,7 +18,7 @@
 class ITag(object):
     
     def __init__(self, json = None, parent = None):
-        self.__valid_tags = None
+        self._valid_tags = None
         self.__is_loaded = None
         self._json = json
         self._parent = parent
@@ -48,20 +48,20 @@ class ITag(object):
         assert("load_json must be overloaded")
     
     def set_valid_tags(self, tags):
-        self.__valid_tags = tags
+        self._valid_tags = tags
     
     def get_valid_tags(self):
-        return self.__valid_tags
+        return self._valid_tags
     
     def get(self, key):
         if not self.is_loaded():
             assert("Json is not loaded")
-        if key not in self.__valid_tags:
+        if key not in self._valid_tags:
             assert("Invalid tag: " + key)
         return self.__dict__[key]
     
     def set(self, key, value):
-        if key not in self.__valid_tags:
+        if key not in self._valid_tags:
             assert("Invalid tag:" + key)
         v = ''
         try:

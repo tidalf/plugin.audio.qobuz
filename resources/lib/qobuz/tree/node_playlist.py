@@ -25,7 +25,8 @@ from debug import info
     NODE PLAYLIST
 '''
 from data.playlist import QobuzPlaylist
-from utils.tag import QobuzTagPlaylist
+from tag.playlist import TagPlaylist
+from tag.track import TagTrack
 from node_track import node_track
 
 class node_playlist(node):
@@ -37,19 +38,24 @@ class node_playlist(node):
     def _build_down(self, lvl, flag = None):
         self.setLabel("Playlist ID: " + str(self.getId()))
         o = QobuzPlaylist(self.id)
-        self.setJson(o.get_data())
-        data = self.getJson()
-        if not data:
-            return False
-        for track in self.getJson()['tracks']:
+        o.fetch_data()
+        data = o.get_data()
+        self.setJson(data)
+        self.setId(data['id'])
+        for track in data['tracks']:
             c = node_track()
+            c.setJson(track)
             c.setId(track['id'])
             c.setLabel(track['title'])
+            c.setUrl()
             self.add_child(c)
         return True
-    def get_xbmc_item(self, list):
-        t = QobuzTagPlaylist(self.getJson())
-        self.setUrl()
-        list.append((self.url, t.getXbmcItem(), True))
+    
+    def _get_xbmc_items(self, list, lvl, flag):
         for c in self.childs:
-            c.get_xbmc_item(list)
+            tag = TagTrack(c.getJson())
+            item = tag.getXbmcItem()
+            list.append((item.getProperty('path'), item, False))
+
+
+            

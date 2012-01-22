@@ -18,6 +18,7 @@ import pprint
 import qobuz
 from constants import *
 from flag import NodeFlag
+from debug import *
 
 '''
     NODE
@@ -46,7 +47,10 @@ class node(object):
         if self.id != None:
             url += "&nid="+str(self.id)
         self.url = url
-         
+    
+    def getUrl(self):
+        return self.url
+    
     def setId(self, id):
         self.id = id
         
@@ -83,22 +87,27 @@ class node(object):
     
     def getType(self):
         return self.type
-        
+    
+    def _build_down(self, lvl, flag):
+        assert(False)
+    
     def build_down(self, lvl, flag = NodeFlag.TYPE_NODE):
-        if self.type & flag:
-            log("Stop building on flag...")
         if lvl != -1 and lvl < 1:
-            log("Stop building with " + self.getLabel())
             return True
+        self._build_down(lvl, flag)
         if lvl != -1:
             lvl -= 1
-        self._build_down(lvl, flag)
-        log("Building node: " + self.getLabel())
         for c in self.childs:
             c.build_down(lvl, flag)
+
             
-    def _build_down(self, lvl, flag):
-        pass
+    def _build_down_childs(self, lvl, flag):
+        assert(False)
+    
+    def build_down_childs(self, lvl, flag):
+        self._build_down_childs(lvl, flag) 
+            
+
     
     def count_node(self, flag = NodeFlag.TYPE_NODE):
         total = 0
@@ -108,9 +117,16 @@ class node(object):
             total += c.count_node(flag)
         return total
 
-    def get_xbmc_item(self, list):
+    def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE):
+        if lvl != -1 and lvl < 1:
+            #log("Dont get xbmc item for child")
+            return True
+        self._get_xbmc_items(list, lvl, flag)
+        if lvl != -1:
+            lvl -= 1
+        #self._get_xbmc_items_child(list, lvl, flag)
         for c in self.childs:
-            c.get_xbmc_item(list)
+            c.get_xbmc_items(list, lvl, flag)
         
 
 def log(msg):

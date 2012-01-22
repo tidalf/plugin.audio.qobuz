@@ -199,7 +199,7 @@ class QobuzBootstrap(object):
             ret = qobuz.gui.showCategories()
         
         elif self.MODE == MODE_SONG:
-            info(self, "PLaying song")
+            info(self, "Playing song")
             if qobuz.addon.getSetting('notification_playingsong') == 'true':
                 qobuz.gui.showNotification(34000, 34001)
             try:
@@ -305,7 +305,10 @@ class QobuzBootstrap(object):
                 print "No node type...abort"
                 return False
             print "Node type: " + str(nt)
-            r = renderer(nt, None, 0)
+            id = None
+            try: id = int(self.params['nid'])
+            except: pass
+            r = renderer(nt, id, 0)
             r.display()
         '''
             Directory Ending

@@ -117,6 +117,7 @@ class TagTrack(ITag):
     def getXbmcItem(self, context = 'album', pos = 0, fanArt = 'fanArt'):
         import xbmcgui
         import qobuz
+        from constants import *
         parent = self.get_parent()
         album = self.getAlbum()
         artist = self.getArtist()
@@ -183,6 +184,9 @@ class TagTrack(ITag):
         i.setProperty('IsPlayable', 'true')
         i.setProperty('Music', 'true')
         i.setProperty('IsInternetStream', 'false')
+        path = qobuz.boot.build_url(MODE_SONG, self.id)
+        i.setProperty('path', path)
+        i.setPath(path)
         i.setThumbnailImage(image)
         i.setIconImage(image)
         i.setProperty('image', image)
