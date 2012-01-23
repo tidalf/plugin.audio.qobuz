@@ -21,5 +21,7 @@ class __NodeFlag():
         self.TYPE_TRACK = 1024
         self.TYPE_PLAYLIST = 2048
         self.TYPE_USERPLAYLISTS = 4096
+        self.TYPE_RECOMMANDATION = 8192
+        self.TYPE_ROOT = 16384
 
 NodeFlag = __NodeFlag()

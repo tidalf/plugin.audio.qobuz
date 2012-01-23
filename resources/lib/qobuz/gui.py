@@ -209,7 +209,7 @@ class QobuzGUI:
         self._add_dir(__language__(30100), '', MODE_SHOW_PURCHASES, i.get('album'), 0)
         if (qobuz.api.userid != 0):
             self._add_dir(__language__(30019), '', MODE_USERPLAYLISTS, i.get('usersplaylists'), 0)
-        self._add_dir("Test NODE: User Playlist", sys.argv[0]+"?mode="+str(MODE_NODE)+"&nt=4096", MODE_NODE, i.get('album'), 0)
+        self._add_dir("Test NODE: Root NODE", sys.argv[0]+"?mode="+str(MODE_NODE)+"&nt=16384", MODE_NODE, i.get('album'), 0)
         return True
 
     """

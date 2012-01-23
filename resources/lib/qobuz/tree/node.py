@@ -34,6 +34,7 @@ class node(object):
         self.json = None
         self.id = None
         self.url = None
+        self.parameters = None
     
     def to_s(self):
         s = "[Node][" + str(self.type) + "\n"
@@ -41,6 +42,15 @@ class node(object):
         s+= " Label : " + str(self.label) + "\n"
         s+= " label2: " + str(self.label2) + "\n"
         return s
+    
+    def setParameters(self, params):
+        self.parameters = params
+        
+    def getParameter(self, name):
+        try:
+            return self.parameters[name]
+        except: pass
+        return None
     
     def setUrl(self):
         url = 'plugin://plugin.audio.qobuz/?mode='+str(MODE_NODE)+"&nt="+str(self.type)
@@ -101,11 +111,11 @@ class node(object):
             c.build_down(lvl, flag)
 
             
-    def _build_down_childs(self, lvl, flag):
-        assert(False)
-    
-    def build_down_childs(self, lvl, flag):
-        self._build_down_childs(lvl, flag) 
+#    def _build_down_childs(self, lvl, flag):
+#        assert(False)
+#    
+#    def build_down_childs(self, lvl, flag):
+#        self._build_down_childs(lvl, flag) 
             
 
     

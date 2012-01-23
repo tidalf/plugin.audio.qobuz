@@ -41,15 +41,23 @@ class renderer():
         return s
     
     def set_root_node(self):
-        if self.node_type & NodeFlag.TYPE_USERPLAYLISTS:
+        if self.node_type & NodeFlag.TYPE_ROOT:
+            from node_root import node_root
+            self.root = node_root()
+        elif self.node_type & NodeFlag.TYPE_USERPLAYLISTS:
             from node_userplaylists import node_userplaylists
             self.root = node_userplaylists()
         elif self.node_type & NodeFlag.TYPE_PLAYLIST:
             from node_playlist import node_playlist
             self.root = node_playlist()
+        elif self.node_type & NodeFlag.TYPE_RECOMMANDATION:
+            from node_recos import node_recos
+            self.root = node_recos()
         else:
+            print "Nothing to display"
             return False
         self.root.setId(self.node_id)
+        self.root.setParameters(qobuz.boot.params)
         return True
     
     def display(self):
