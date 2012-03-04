@@ -1,0 +1,72 @@
+<!--
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
+#     This file is part of xbmc-qobuz.
+#
+#     xbmc-qobuz is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     xbmc-qobuz is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+-->
+<settings>
+   <!-- Credentials -->
+   <category label="38000">
+   <setting id="username" type="text" label="37000" default=""/>
+   <setting id="password" type="text" option="hidden" label="37001" default="" />
+   </category>
+   <!-- Stream -->
+   <category label="38001">
+    <setting id="streamtype" label="32000" type="labelenum" values="flac|mp3" default="flac"/>
+    <!-- <setting id="skipsample" label="32001" type="bool" defaul="true" /> -->
+   </category>
+   <!-- Limits -->
+   <category label="38002">
+   <setting id="search_enabled" label="35000" type="bool" default="true" />
+   <setting type="sep" />
+   <setting id="songsearchlimit" type="labelenum" label="30002" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" /> -->
+   <!-- <setting label="30002" type="slider" id="songsearchlimit" default="100" option="int" range="10,10,100" format="%1i"/>-->
+   <setting id="albumsearchlimit" type="labelenum" label="30003" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" />
+   <!-- <setting label="30003" type="slider" id="albumsearchlimit" default="100" option="int" range="10,10,100" format="%1i"/>-->
+   <setting id="artistsearchlimit" type="labelenum" label="30004" default="100" values="5|10|15|20|25|30|40|50|60|70|80|90|100" /> 
+   <!-- <setting label="30004" type="slider" id="artistsearchlimit" default="100" option="int" range="10,10,100" format="%1i"/> -->
+   
+   </category>
+   <!-- Cache -->
+    <category label="31006">
+     <setting label="31000" type="text" default="" enable="false"/>
+        <setting type="sep" />
+        <setting id="cache_duration_album" type="labelenum" label="31001" default="1440" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_artist" type="labelenum" label="31002" default="1440" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_track" type="labelenum" label="31003" default="1440" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_recommandation" type="labelenum" label="31004" default="1440" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_userplaylist" type="labelenum" label="31005" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
+        <setting id="cache_duration_auth" type="labelenum" label="31008" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
+   </category>
+   <!-- Notification -->
+   <category label="36002">
+        <setting id="notification_playingsong" label="36003" type="bool" default="false" />
+        
+   </category>
+         
+   <!-- Colors -->
+   <category label="Colors (r)">
+        <setting id="color_ctxitem" label="Context menu item" type="text" default="55AAAAFF" />
+        <setting id="color_recospath" label="Context menu item" type="text" default="55AAAAFF" />
+        <setting id="color_notowner" label="Context menu item" type="text" default="55AAAAFF" />
+        
+   </category>       
+   <!-- Other -->
+   <category label="38003">
+        <setting id="debug" label="Debug" type="bool" default="false" />
+        <setting id="resolver_enabled" label="33000" type="bool" default="true" />
+   </category>   	
+
+</settings>
