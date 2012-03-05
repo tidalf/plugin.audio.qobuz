@@ -53,8 +53,9 @@ class Xbmc_renderer():
             from node.user_playlists import Node_user_playlists
             root = Node_user_playlists(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_PLAYLIST:
-            from node_playlist import node_playlist
-            root = node_playlist(None, qobuz.boot.params)
+            print "SET ROOT NODE: PLAYLIST"
+            from node.playlist import Node_playlist
+            root = Node_playlist(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_RECOMMANDATION:
             from node_recos import node_recos
             root = node_recos(None, qobuz.boot.params)

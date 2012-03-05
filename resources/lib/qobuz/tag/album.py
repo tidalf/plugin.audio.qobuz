@@ -15,15 +15,15 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-from tag.itag import ITag
-from tag.image import TagImage
-from tag.label import TagLabel
-from tag.genre import TagGenre
+from itag import ITag
+from image import Tag_image
+from label import Tag_label
+from genre import Tag_genre
 
-class TagAlbum(ITag):
+class Tag_album(ITag):
     
     def __init__(self, json):
-        super(TagAlbum, self).__init__(json)
+        super(Tag_album, self).__init__(json)
         self.set_valid_tags(['id', 'title', 'genre', 'label', 
                              'release_date', 'released_at'])
         if json:
@@ -32,13 +32,13 @@ class TagAlbum(ITag):
     def parse_json(self, p):
         self.auto_parse_json(p)
         if 'image' in p:
-            image = TagImage(p['image'])
+            image = Tag_image(p['image'])
             self.add_child(image)
         if 'label' in p:
-            label = TagLabel(p['label'])
+            label = Tag_label(p['label'])
             self.add_child(label)
         if 'genre' in p:
-            genre = TagGenre(p['genre'])
+            genre = Tag_genre(p['genre'])
             self.add_child(genre)
         
         self._is_loaded = True

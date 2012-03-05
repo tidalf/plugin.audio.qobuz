@@ -22,8 +22,7 @@ import random
 from utils.icacheable import ICacheable
 from constants import *
 from debug import * 
-from tag.playlist import TagPlaylist
-from tag.track import TagTrack
+
 import qobuz
 '''
     Class QobuzPLaylist
@@ -58,27 +57,27 @@ class Cache_playlist(ICacheable):
         id = 'userplaylist' + name
         return self.cacheImage.set(id, image)
     
-    def get_items(self):
-        self.fetch_data()
-        list = []
-        n = self.length()
-        if n < 0:
-            return list
-        p = TagPlaylist(self.get_data())
-        rand = random.randint(0, n)
-        needimage = False
-        if not self.get_image(p.name):
-            needimage = True
-        i = 0
-        for t in p.get_childs():
-            if not isinstance(t, TagTrack):
-                continue
-            item = t.getXbmcItem('playlist')
-            if needimage and i == rand:
-                self.set_image_genre(p.id, t.getImage())
-                needimage = False
-            u = qobuz.boot.build_url(MODE_SONG, str(t.id))
-            item.setPath(u) 
-            list.append((u, item, False))
-            i += 1
-        return list
+#    def get_items(self):
+#        self.fetch_data()
+#        list = []
+#        n = self.length()
+#        if n < 0:
+#            return list
+#        p = TagPlaylist(self.get_data())
+#        rand = random.randint(0, n)
+#        needimage = False
+#        if not self.get_image(p.name):
+#            needimage = True
+#        i = 0
+#        for t in p.get_childs():
+#            if not isinstance(t, TagTrack):
+#                continue
+#            item = t.getXbmcItem('playlist')
+#            if needimage and i == rand:
+#                self.set_image_genre(p.id, t.getImage())
+#                needimage = False
+#            u = qobuz.boot.build_url(MODE_SONG, str(t.id))
+#            item.setPath(u) 
+#            list.append((u, item, False))
+#            i += 1
+#        return list

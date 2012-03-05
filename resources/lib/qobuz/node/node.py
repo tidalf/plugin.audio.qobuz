@@ -37,8 +37,12 @@ class Node(object):
         self.label = ""
         self.label2 = ""
         self.url = None
+        self.b_is_folder = True
+        self.tag = None
         #self.bfolder = True
        
+    def set_is_folder(self, b):
+        self.b_is_folder = True if b else False
     def get_cached_data(self):
         warn(self, "get_cached_data must be overloaded!")
         pass
@@ -56,10 +60,7 @@ class Node(object):
         return self.icon
     
     def is_folder(self):
-        if not self.childs: return False
-        if self.get_childs() > 0:
-            return True
-        return False
+        return self.b_is_folder
     
     def to_s(self):
         s = "[Node][" + str(self.type) + "\n"
@@ -79,8 +80,8 @@ class Node(object):
     
     def set_url(self):
         url = 'plugin://plugin.audio.qobuz2/?mode='+str(Mode.VIEW)+"&nt="+str(self.type)
-        if self.id != None:
-            url += "&nid="+str(self.id)
+        if self.tag and self.tag.id != None:
+            url += "&nid="+str(self.tag.id)
         self.url = url
     
     def get_url(self):
@@ -214,7 +215,8 @@ class Node(object):
         '''
         Add our items to the context menu
         '''
-        item.addContextMenuItems(menuItems, replaceItems=False)        
+        if len(menuItems) > 0:
+            item.addContextMenuItems(menuItems, replaceItems=False)        
     
     def hook_attach_context_menu(self, item, type, id, menuItems, color):
         pass

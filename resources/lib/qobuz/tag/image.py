@@ -15,9 +15,9 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-from tag.itag import ITag
+from itag import ITag
 
-class TagImage(ITag):
+class Tag_image(ITag):
     
     def __init__(self, json, parent = None):
         super(TagImage, self).__init__(json, parent = None)

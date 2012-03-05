@@ -17,9 +17,9 @@
 
 from tag.itag import ITag
 
-class TagGenre(ITag):
+class Tag_genre(ITag):
     def __init__(self, json, parent = None):
-        super(TagGenre, self).__init__(json, parent = None)
+        super(Tag_genre, self).__init__(json, parent = None)
         self.set_valid_tags(['name', 'id'])
         if json: self.auto_parse_json(json)
             

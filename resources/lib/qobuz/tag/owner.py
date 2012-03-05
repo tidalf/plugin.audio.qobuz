@@ -19,11 +19,9 @@ from tag.itag import ITag
 
 class Tag_owner(ITag):
     
-    def __init__(self, json, parent = None):
-        super(Tag_owner, self).__init__(json, parent)
+    def __init__(self):
+        super(Tag_owner, self).__init__()
         self.set_valid_tags(['id', 'name'])
-        if json: self.auto_parse_json(json)
 
-    def getOwner(self, sep = ''):
-        try: return self.name
-        except: return ''
+    def get_name(self):
+        return self.name

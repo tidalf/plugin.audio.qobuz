@@ -27,6 +27,7 @@ from debug import *
 '''
 from playlist import Node_playlist
 from tag.user_playlists import Tag_user_playlists
+from tag.playlist import Tag_playlist
 
 class Node_user_playlists(Node):
     
@@ -58,11 +59,14 @@ class Node_user_playlists(Node):
     
     def _build_down(self, lvl, flag = None):
         if not self.tag.fetch():
-            error(self, "Cannot fetch data for user playlist")
-        for p in self.tag.get_json()['playlist']:
+            error(self, "Cannot fetch data for user playlist") 
+        for p in self.tag.get_json():
             node = Node_playlist()
             node.tag.set_json(p)
-#        print "user_playlist: " + build_down
+            node.tag.parse_json(node.tag.get_json())
+            node.set_url()
+            self.add_child(node)
+#         print "user_playlist: " + build_down
 #        return True
 #        o = Cache_user_playlists(qobuz.api, qobuz.path.cache, -1)
 #        self.set_json(o.get_data())
@@ -82,43 +86,44 @@ class Node_user_playlists(Node):
     def _get_xbmc_items(self, list, lvl, flag):
         username = qobuz.addon.getSetting('username')
         color = qobuz.addon.getSetting('color_notowner')
-        for c in self.childs:
-            tag = TagPlaylist(c.get_json())
-            item = tag.getXbmcItem()
-            if tag.getOwner() != username:
-                item.setLabel(''.join([qobuz.utils.color(color, tag.getOwner()), ' - ', tag.getName()]))
+        for playlist in self.childs:
+            item = playlist.make_XbmcListItem()#tag.getXbmcItem()
+            #print "URL: " + item.getProperty('Path')
+            if playlist.tag.get_owner() != username:
+                item.setLabel(''.join([qobuz.utils.color(color, playlist.tag.get_owner()), ' - ', playlist.tag.get_name()]))
             else:
-                self.attach_context_menu(item, NodeFlag.TYPE_PLAYLIST, tag.id)
-            if c.is_current():
-                label = item.getLabel()
-                item.setLabel(qobuz.utils.color(color, '-> ') + label + qobuz.utils.color(color, ' <-'))
-            url = c.get_url()
-
-            item.setPath(url)
-            list.append((url, item, True))
+                self.attach_context_menu(item, NodeFlag.TYPE_PLAYLIST, playlist.tag.id)
+            #if playlist.is_current():
+#                label = item.getLabel()
+#                item.setLabel(qobuz.utils.color(color, '-> ') + label + qobuz.utils.color(color, ' <-')
+#            print "plop"
+#            print "append: " + item.getLabel()
+#            print "url   ; " + item.getProperty('Path')
+            #print "URL2: " + playlist.get_url()
+            list.append((playlist.get_url(), item, playlist.is_folder()))
         return True
-            
-    def hook_attach_context_menu(self, item, type, id, menuItems, color):
-        import sys
-        ''' RENAME '''
-        url=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+'&nt='+str(type)
-        if id: url+='&nid='+id
-        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Rename'), "XBMC.RunPlugin("+url+")"))
-        
-        ''' DELETE '''
-        url=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+'&nt='+str(type)
-        if id: url+='&nid='+id
-        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Delete'), "XBMC.RunPlugin("+url+")"))
-        
-        ''' SET AS CURRENT '''
-        url=sys.argv[0]+"?mode="+str(MODE_SELECT_CURRENT_PLAYLIST)+'&nt='+str(type)
-        if id: url+='&nid='+id
-        menuItems.append((qobuz.utils.color(color, 'Set as current: ' + item.getLabel()), "XBMC.RunPlugin("+url+")"))
-        
-        ''' CREATE '''
-        url=sys.argv[0]+"?mode="+str(MODE_CREATE_PLAYLIST)+'&nt='+str(type)
-        if id: url+='&nid='+id
-        menuItems.append((qobuz.utils.color(color, 'Create'), "XBMC.RunPlugin("+url+")"))
+
+#    def hook_attach_context_menu(self, item, type, id, menuItems, color):
+#        import sys
+#        ''' RENAME '''
+#        url=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+'&nt='+str(type)
+#        if id: url+='&nid='+id
+#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Rename'), "XBMC.RunPlugin("+url+")"))
+#        
+#        ''' DELETE '''
+#        url=sys.argv[0]+"?mode="+str(MODE_REMOVE_PLAYLIST)+'&nt='+str(type)
+#        if id: url+='&nid='+id
+#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Delete'), "XBMC.RunPlugin("+url+")"))
+#        
+#        ''' SET AS CURRENT '''
+#        url=sys.argv[0]+"?mode="+str(MODE_SELECT_CURRENT_PLAYLIST)+'&nt='+str(type)
+#        if id: url+='&nid='+id
+#        menuItems.append((qobuz.utils.color(color, 'Set as current: ' + item.getLabel()), "XBMC.RunPlugin("+url+")"))
+#        
+#        ''' CREATE '''
+#        url=sys.argv[0]+"?mode="+str(MODE_CREATE_PLAYLIST)+'&nt='+str(type)
+#        if id: url+='&nid='+id
+#        menuItems.append((qobuz.utils.color(color, 'Create'), "XBMC.RunPlugin("+url+")"))
         
         ''' Display by '''
 #        display_by = 'songs'

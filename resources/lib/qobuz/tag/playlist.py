@@ -16,24 +16,31 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import pprint                       
 
+from cache.playlist import Cache_playlist
+
 from itag import ITag
 from track import Tag_track
 from owner import Tag_owner
 
-class TagPlaylist(ITag):
+
+class Tag_playlist(ITag):
     
-    def __init__(self, json, parent = None):
-        super(TagPlaylist, self).__init__(json, parent)
+    def __init__(self):
+        super(Tag_playlist, self).__init__()
         #pprint.pprint(json)
         self.set_valid_tags(['name', 'description', 'id', 'is_collaborative', 'is_public'])
-        if json: self.parse_json(json)
-    
+        self.cache = None
+        
     def getLabel(self):
         name = self.name
         return name
     
-    def getName(self):
+    def get_name(self):
         return self.name
+    
+    def get_owner(self):
+        try: return self.owner.name
+        except: return ''
     
     def getIsPublic(self):
         is_public = False
@@ -57,18 +64,19 @@ class TagPlaylist(ITag):
         except: pass
         return desc
     
+    def set_id(self, p_id):
+        self.set_cache_with_id(p_id)
+        return super(Tag_playlist, self).set_id(p_id)
+        
+    def set_cache_with_id(self, id):
+        self.cache = Cache_playlist(id)
+    
     def parse_json(self, p):
         self.auto_parse_json(p)
         if 'owner' in p:
-            c = TagOwner(p['owner'])
-            self.add_child(c)
-        self.set('owner', p['owner']['name'])
-        if not 'tracks' in p:
-            return 
-        for track in p['tracks']:
-            self.add_child(TagTrack(track, self))
-        self._is_loaded = True
-    
+            c = Tag_owner()
+            c.set_json(p['owner'])
+            self.owner = c 
 #    def getXbmcItem(self, fanArt = ''):
 #        item = super(TagPlaylist, self).getXbmcItem(fanArt)
 #        owner = ''

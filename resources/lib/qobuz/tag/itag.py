@@ -15,13 +15,21 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
+from debug import info, warn, error
+
 class ITag(object):
     
     def __init__(self):
         self._valid_tags = None
         self._json = None
         self.cache = None
-      
+        self.id = None
+    
+    def set_id(self, id):
+        if not id: self.id = None
+        if self.id != id: self.id = id
+        return self.id
+    
     def get_raw_data(self):
         return self._json
     
@@ -39,9 +47,13 @@ class ITag(object):
     
     def set_json(self, json):
         self._json = json
+        if json:
+            self.auto_parse_json(self._json)
     
     def fetch(self):
-        if not self.cache: return False
+        if not self.cache: 
+            warn(self, "Print cache is not set get, cannot fetch data!")
+            return False
         self.set_json(self.cache.fetch_data())
         if self.get_json():
             return self.parse_json(self.get_json())
@@ -79,115 +91,6 @@ class ITag(object):
                 pass
         return True
 
-    def getTitle(self):
-        v = ''
-        try: v = self.title
-        except: return ''
-        return v
-    
-    def getArtistId(self):
-        label = []
-        try: 
-            label.append(self.artist_id)
-        except:
-            try:
-                label.append(self.interpreter_id)
-            except: 
-                try:
-                    label.append(self.composer_id)
-                except: label.append('N/A')
-        return ''.join(label)
-    
-    def getGenre(self, sep = ''):
-        genre = ''
-        childs = self.get_childs()
-        for c in childs:
-            genre = c.getGenre(sep)
-            if genre: return genre
-        return genre
-    
-    def getImage(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getImage(sep)
-            if data: return data
-        return data
-    
-    def getDate(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getDate(sep)
-            if data: return data
-        return data
-
-    def getAlbum(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getAlbum(sep)
-            if data: return data 
-        return data
-    
-    def getAlbumId(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getAlbumId(sep)
-            if data: return data 
-        return data
-    
-    def getArtist(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getArtist(sep)
-            if data: return data
-        return data
-    
-    def getComposer(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getComposer(sep)
-            if data: return data
-        return data
-
-    def getInterpreter(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getInterpreter(sep)
-            if data: return data
-        return data
-    
-    def getDuration(self, sep = ''):
-        data = 0
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getDuration(sep) 
-            if data: return data
-        return data
-    
-    def getTitle(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getTitle(sep) 
-            if data: return data
-        return data
-    
-    def getOwner(self, sep = ''):
-        data = ''
-        childs = self.get_childs()
-        for c in childs:
-            data = c.getOwner(sep) 
-            if data: return data
-        return data    
-    
-    def getLabel(self):
-        return self.getTitle()
     
     def getXbmcItem(self, fanArt = ''):
         import xbmcgui
@@ -201,10 +104,7 @@ class ITag(object):
             try:
                 year = date.split('-')[0]
             except: pass
-        genre = ''
-        if self.get_parent():
-            genre = self.get_parent().getGenre()
-        else: genre = self.getGenre()
+        genre = self.getGenre()
         i = xbmcgui.ListItem(self.getTitle())
         i.setLabel(self.getLabel())
         i.setInfo(type='file', infoLabels = {
