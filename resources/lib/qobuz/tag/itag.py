@@ -26,6 +26,7 @@ class ITag(object):
         self.id = None
     
     def set_id(self, id):
+        info(self, "Set_id: " + str(id))
         if not id: self.id = None
         if self.id != id: self.id = id
         return self.id
@@ -43,21 +44,27 @@ class ITag(object):
         return self._valid_tags
     
     def get_json(self):
+        if self.cache:
+            return self.cache.get_data()
         return self._json
     
     def set_json(self, json):
         self._json = json
         if json:
-            self.auto_parse_json(self._json)
+            self.parse_json(self._json)
     
     def fetch(self):
+        info(self, "Fetching data")
         if not self.cache: 
             warn(self, "Print cache is not set get, cannot fetch data!")
             return False
-        self.set_json(self.cache.fetch_data())
-        if self.get_json():
-            return self.parse_json(self.get_json())
-        return False
+        data = self.cache.fetch_data()
+        if not data:
+            warn(self, "Cannot fetch data from cache")
+            return False
+        print repr(data)
+        self.parse_json(data)
+        return True
         
     def get(self, key):
         if not self.is_loaded():

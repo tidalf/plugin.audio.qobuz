@@ -25,8 +25,7 @@ from debug import info, warn, error
     NODE PLAYLIST
 '''
 from cache.playlist import Cache_playlist
-from tag.playlist import Tag_playlist
-from tag.track import Tag_track
+from track import Node_track
 
 class Node_playlist(Node):
     
@@ -36,13 +35,14 @@ class Node_playlist(Node):
         self.current_playlist_id = None
         self.b_is_current = False
         self.set_content_type('songs')
-        self.tag = Tag_playlist()
+#        self.tag = Tag_playlist()
         self.label = ""
         self.label2 = ""
         self.url = None
         self.thumb = ''
         self.icon = ''
         self.set_is_folder(True)
+        self.cache = None
         
     def set_is_current(self, b):
         self.b_is_current = b
@@ -50,41 +50,40 @@ class Node_playlist(Node):
     def is_current(self):
         return self.b_is_current
     
-    def _build_down(self, lvl, flag = None):
-        self.tag.set_id(self.id)
-        if not self.tag.fetch():
-            error(self, "Cannot fetch data for playlist id: " + self.id)
-        o = Cache_playlist(self.id)
-        data = o.fetch_data()
-        if self.id != data['id']:
-            error(self, "Playlist id mismatch ???? ABORT")
-        #data = o.get_data()
-        self.tag.set_json(data)
-        if tag.id: self.set_id(tag.id)
-    
-        for track in data['tracks']:
-            c = node_track()
-            c.set_json(track)
-            c.set_id(track['id'])
-            c.set_label(track['title'])
-            c.set_url()
-            self.add_child(c)
+    def _set_cache(self):
+        id = self.get_id()
+        if not id:
+            try: id = self.get_parameter('nid')
+            except: pass
+        if not id:
+            error(self, "Cannot set cache without id")
+            return False
+        self.cache = Cache_playlist(id)
         return True
     
+    def _build_down(self, lvl, flag = None):
+        info(self, "Build-down playlist")
+        if not self._set_cache():
+            error(self, "Cannot set cache!")
+            return False
+        data = self.cache.fetch_data()
+        if not data:
+            warn(self, "Build-down: Cannot fetch playlist data")
+            return False
+        self.set_data(data)
+        for track in data['tracks']:
+            node = Node_track()
+            node.set_data(track)
+            self.add_child(node)
+            
     def _get_xbmc_items(self, list, lvl, flag):
         if len(self.childs) < 1:
             qobuz.gui.notification(36000, 36001)
             return False
-        for c in self.childs:
-            tag = TagTrack(c.get_json())
-            item = tag.getXbmcItem()
-            if self.is_current():
-                label = item.getLabel()
-                label = '-> ' + label + ' <-'
-                qobuz.utils.color('FFFF0000', label)
-                item.setLabel(label)
-            self.attach_context_menu(item, NodeFlag.TYPE_TRACK, tag.id)
-            list.append((item.getProperty('path'), item, False))
+        for track in self.childs:
+            item = track.make_XbmcListItem()#tag.getXbmcItem()
+            #print "LABEL: " + item.getLabel()
+            list.append((track.get_url(), item, False))
         return True
 
     def hook_attach_context_menu(self, item, type, id, menuItems, color):
@@ -99,11 +98,20 @@ class Node_playlist(Node):
     def getLabel(self):
         return self.tag.get_name()
     
+    def get_name(self):
+        if self._data and 'name' in self._data:
+            return self._data['name']
+        return ''
+    
+    def get_owner(self):
+        if self._data and 'owner' in self._data:
+            return self._data['owner']['name']
+        
     def make_XbmcListItem(self):
         import xbmcgui
         #print "url: " + self.get_url()
-        item = xbmcgui.ListItem(self.tag.get_name(),
-                                self.tag.owner.get_name(),
+        item = xbmcgui.ListItem(self.get_name(),
+                                self.get_owner(),
                                 self.get_icon(),
                                 self.get_thumbnail(),
                                 self.get_url())

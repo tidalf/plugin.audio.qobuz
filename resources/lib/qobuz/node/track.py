@@ -17,14 +17,13 @@
 import pprint
 
 import qobuz
-from constants import *
+from constants import Mode
 from flag import NodeFlag
 from node import Node
 '''
     NODE TRACK
 '''
-from cache.track import Cache_track
-from tag.track import TagTrack
+from tag.track import Tag_track
 
 class Node_track(Node):
     
@@ -32,27 +31,103 @@ class Node_track(Node):
         super(Node_track, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_TRACK
         self.set_content_type('songs')
+        self.set_is_folder(False)
         
     def _build_down(self, lvl, flag = None):
         if flag & NodeFlag.DONTFETCHTRACK:
             #print "Don't fetch track data"
             return False
-        o = QobuzTrack(self.id)
-        data = o.get_data()
-        self.set_json(data)
-        self.set_id(data['id'])
-        
+     
     def _get_xbmc_items(self, list, lvl, flag):
-        t = TagTrack(self.get_json())
-        self.set_url()
-        item =  t.getXbmcItem(context = 'album', pos = 0, fanArt = 'fanArt')
-        self.attach_context_menu(item, NodeFlag.TYPE_TRACK)
-        list.append((item.getProperty('path'),item , False))
-        return True
-        
-    def _get_tag_items(self, list, lvl, flag):
-        #print "Get track data!"
-        data = self.get_json()
-        if not data: return False
-        list.append(data)
+        pass
+    
+    def get_label(self, format = "%a - %t"):
+        format = format.replace("%a", self.get_artist())
+        format = format.replace("%t", self.get_title())
+        format = format.replace("%A", self.get_album())
+        format = format.replace("%n", self.get_track_number())
+        format = format.replace("%g", self.get_genre())
+        return format
+    
+    def get_composer(self):
+        return self.get_property(('composer', 'name'))
+    
+    def get_interpreter(self):
+        return self.get_property(('interpreter', 'name'))
+    
+    def get_album(self):
+        return self.get_property(('album', 'title'))
+    
+    def get_image(self):
+        image = self.get_property(('album', 'image', 'large'))
+        if image:
+            return image.replace('_230.jpg', '_600.jpg')
+        return ''
+    
+    def get_playlist_track_id(self):
+        return self.get_property(('playlist_track_id'))
+    
+    def get_streaming_type(self):
+        return self.get_property(('streaming_type'))
+    
+    def get_position(self):
+        return self.get_property(('position'))
+    
+    def get_title(self):
+        return self.get_property('title')
+    
+    def get_genre(self):
+        return self.get_property(('album', 'genre', 'name'))
+    
+    def get_artist(self):
+        s = self.get_interpreter()
+        if s: return s
+        return self.get_composer()
+    
+    def get_track_number(self):
+        return self.get_property(('track_number'))
+    
+    def get_media_number(self):
+        return self.get_property(('media_number'))
+    
+    def get_duration(self):
+        duration = self.get_property(('duration'))
+        if duration:
+            (sh,sm,ss) = duration.strip().split(':')
+            return (int(sh) * 3600 + int(sm) * 60 + int(ss))
+        return -1
+    
+    def make_XbmcListItem(self):
+        import xbmcgui
+        self.set_url(Mode.PLAY)
+        print repr(self.get_data())
+#        print "URL: " + self.get_url()
+#        print "Label: " + self.get_label()
+#        print repr(self._data)
+        item = xbmcgui.ListItem(self.get_label(),
+                                self.get_label(),
+                                self.get_image(),
+                                self.get_image(),
+                                self.get_url())
+        item.setPath(self.get_url())
+        track_number = self.get_track_number()
+        if not track_number: track_number = 0
+        else: track_number = int(track_number)
+        item.setInfo(type = 'music',
+                     infoLabels = {
+                                   'track_id': self.get_id(),
+                                   'title': self.get_title(),
+                                   'album': self.get_album(),
+                                   'genre': self.get_genre(),
+                                   'artist': self.get_artist(),
+                                   'tracknumber': track_number,
+                                   #'discnumber': self.get_media_number(),
+                                   'duration': self.get_duration(),
+                                   'comment': "Qobuz Music Streaming Service"
+                                   
+                                   })
+        item.setProperty('IsPlayable', 'true')
+        item.setProperty('IsInternetStream', 'true')
+        item.setProperty('Music', 'true')
+        return item
         

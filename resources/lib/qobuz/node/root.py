@@ -44,7 +44,6 @@ class Node_root(Node):
         
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
-        childs = self.get_childs()
         for child in self.get_childs():
             item = xbmcgui.ListItem(
                                     child.get_label(), 

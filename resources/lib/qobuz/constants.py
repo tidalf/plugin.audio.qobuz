@@ -20,7 +20,7 @@ __debugging__ = 0
 class __Mode():
     def __init__(self): 
         self.VIEW = 1
-#        self.TYPE_NODE = 512
+        self.PLAY = 512
 #        self.TYPE_TRACK = 1024
 #        self.TYPE_PLAYLIST = 2048
 #        self.TYPE_USERPLAYLISTS = 4096

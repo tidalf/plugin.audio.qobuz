@@ -16,8 +16,8 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import pprint                       
 
+from debug import info, warn, error
 from cache.playlist import Cache_playlist
-
 from itag import ITag
 from track import Tag_track
 from owner import Tag_owner
@@ -69,6 +69,7 @@ class Tag_playlist(ITag):
         return super(Tag_playlist, self).set_id(p_id)
         
     def set_cache_with_id(self, id):
+        info(self, "set_cache_with_id" + str(id))
         self.cache = Cache_playlist(id)
     
     def parse_json(self, p):

@@ -25,9 +25,9 @@ from debug import *
 '''
     NODE USER PLAYLISTS
 '''
+
+from cache.user_playlists import Cache_user_playlists
 from playlist import Node_playlist
-from tag.user_playlists import Tag_user_playlists
-from tag.playlist import Tag_playlist
 
 class Node_user_playlists(Node):
     
@@ -42,57 +42,40 @@ class Node_user_playlists(Node):
         if not display_by: display_by = 'songs'
         self.set_display_by(display_by)
         self.set_url()
-        self.tag = Tag_user_playlists()
+        self.cache = Cache_user_playlists()
         
     def set_display_by(self, type):
         vtype = ('product', 'songs')
         if not type in vtype:
             error(self, "Invalid display by: " + type)
         self.display_by = type
-    
-    def get_url(self):
-        print "URL - User playlist: " + self.url
-        return self.url
-    
+        
     def get_display_by(self):
         return self.display_by
     
     def _build_down(self, lvl, flag = None):
-        if not self.tag.fetch():
-            error(self, "Cannot fetch data for user playlist") 
-        for p in self.tag.get_json():
+        info(self, "Build-down: user playlists")
+        data = self.cache.fetch_data()
+        if not data:
+            warn(self, "Build-down: Cannot fetch user playlists data")
+            return False
+        self.set_data(data)
+        print "DATA: " + repr(data)
+        for playlist in data:
             node = Node_playlist()
-            node.tag.set_json(p)
-            node.tag.parse_json(node.tag.get_json())
-            node.set_url()
+            node.set_data(playlist)
             self.add_child(node)
-#         print "user_playlist: " + build_down
-#        return True
-#        o = Cache_user_playlists(qobuz.api, qobuz.path.cache, -1)
-#        self.set_json(o.get_data())
-#        current_playlist_id = Cache_current_playlist().get_id()
-#        print "Current ID: " + str(current_playlist_id)
-#        for playlist in self.get_json():
-#
-#            c = Node_playlist()
-#            c.set_id(playlist['id'])
-#            if current_playlist_id and int(playlist['id']) == current_playlist_id:
-#                c.set_is_current(True)
-#            c.set_label(playlist['name'])
-#            c.set_json(playlist)
-#            c.set_url()
-#            self.add_child(c)
-
+            
     def _get_xbmc_items(self, list, lvl, flag):
         username = qobuz.addon.getSetting('username')
         color = qobuz.addon.getSetting('color_notowner')
         for playlist in self.childs:
             item = playlist.make_XbmcListItem()#tag.getXbmcItem()
             #print "URL: " + item.getProperty('Path')
-            if playlist.tag.get_owner() != username:
-                item.setLabel(''.join([qobuz.utils.color(color, playlist.tag.get_owner()), ' - ', playlist.tag.get_name()]))
+            if playlist.get_owner() != username:
+                item.setLabel(''.join([qobuz.utils.color(color, playlist.get_owner()), ' - ', playlist.get_name()]))
             else:
-                self.attach_context_menu(item, NodeFlag.TYPE_PLAYLIST, playlist.tag.id)
+                self.attach_context_menu(item, NodeFlag.TYPE_PLAYLIST, playlist.get_id())
             #if playlist.is_current():
 #                label = item.getLabel()
 #                item.setLabel(qobuz.utils.color(color, '-> ') + label + qobuz.utils.color(color, ' <-')

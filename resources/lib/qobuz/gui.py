@@ -97,9 +97,13 @@ class QobuzGUI:
 #        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image) 
 #        xbmc.executebuiltin(s)
 #
-#    def notification(self, title, text, image = None):
-#        self.showNotification(title, text, image)
-#        
+    def notification(self, title, text, image=None):
+        if not image:
+            image = qobuz.image.access.get('qobuzIcon')
+        l = qobuz.lang
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image) 
+        xbmc.executebuiltin(s)
+        
 #    '''
 #        SET FanArt
 #    '''

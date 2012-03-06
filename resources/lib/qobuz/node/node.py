@@ -26,7 +26,6 @@ from debug import *
 class Node(object):
     
     def __init__(self, parent = None, parameters = None):
-        self.id = None
         self.parameters = parameters
         self.parent = parent
         self.type = NodeFlag.TYPE_NODE
@@ -38,11 +37,42 @@ class Node(object):
         self.label2 = ""
         self.url = None
         self.b_is_folder = True
-        self.tag = None
-        #self.bfolder = True
-       
+        self._data = None
+    
+    def set_data(self, data):
+        self._data = data
+        
+    def get_data(self):
+        return self._data
+    
+    def get_property(self, path):
+        print "Get property: " + repr(path)
+#        print "type: " + str(type(path))
+        if not self._data:
+            return ''
+        
+        if isinstance(path, basestring):
+            print "Got a string not tuple"
+            if path in self._data and self._data[path] and self._data[path] != 'None': 
+                return self._data[path].encode('utf8', 'ignore')
+            return ''
+        
+        root = self._data
+        for i in range(0, len(path)):
+#            print "root: " + repr(root)
+#            print "PAth: " + path[i]
+            if not path[i] in root:
+                return ''
+            root = root[path[i]]
+            
+        if root and root != 'None':
+#            print "Return: " + repr(root)
+            return root.encode('utf8', 'replace')
+        return ''
+        
     def set_is_folder(self, b):
         self.b_is_folder = True if b else False
+    
     def get_cached_data(self):
         warn(self, "get_cached_data must be overloaded!")
         pass
@@ -78,10 +108,11 @@ class Node(object):
         except: pass
         return None
     
-    def set_url(self):
-        url = 'plugin://plugin.audio.qobuz2/?mode='+str(Mode.VIEW)+"&nt="+str(self.type)
-        if self.tag and self.tag.id != None:
-            url += "&nid="+str(self.tag.id)
+    def set_url(self, mode = Mode.VIEW):
+        url = 'plugin://plugin.audio.qobuz2/?mode='+str(mode)+"&nt="+str(self.type)
+        id = self.get_id()
+        if id:
+            url += "&nid="+str(id)
         self.url = url
     
     def get_url(self):
@@ -92,7 +123,9 @@ class Node(object):
         self.id = id    
         
     def get_id(self):
-        return self.id
+        if self._data and 'id' in self._data:
+            return self._data['id']
+        return None
         
     def add_child(self, child):
         child.set_parent(self)

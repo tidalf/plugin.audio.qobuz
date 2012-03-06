@@ -26,13 +26,21 @@ import pprint
 
 class Tag_track(ITag):
     
-    def __init__(self, json, parent = None):
-        super(TagTrack, self).__init__(json, parent)
+    def __init__(self):
+        super(TagTrack, self).__init__()
         self.set_valid_tags(['playlist_track_id', 'position', 'id', 'title', 
                              'track_number', 'media_number', 'duration',
                              'created_at', 'streaming_type'])
-        if json: self.parse_json(json)
 
+    
+    def set_id(self, p_id):
+        self.set_cache_with_id(p_id)
+        return super(Tag_playlist, self).set_id(p_id)
+        
+    def set_cache_with_id(self, id):
+        info(self, "set_cache_with_id" + str(id))
+        self.cache = Cache_track(id)
+    
     def getLabel(self):
         label = []
         label.append(self.track_number)
