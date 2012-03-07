@@ -66,47 +66,4 @@ class Cache_user_playlists(Cache_user_playlists_toremove):
     def set_image_genre(self, id, image):
         return self.cacheImage.set(name, image)
 
-    def get_items(self):
-        i = 1
-        list = []
-        data = self.get_data()
-        if not data: return list
-        account_owner = qobuz.addon.getSetting('username')
-        fanArt = qobuz.image.access.get('fanArt')
-        profileThumb = xbmc.getInfoImage('System.ProfileThumb')
-        for json_track in data:
-            tag = TagUserPlaylists(json_track)
-            u = qobuz.boot.build_url(MODE_PLAYLIST, tag.id)
-            item = xbmcgui.ListItem(tag.name)
-            owner = tag.getOwner()
-            if owner == account_owner:
-                owner = ''
-            else:
-                owner += ' - '
-            image = self.get_image('userplaylist' + str(tag.id))
-            if not image:
-                if profileThumb and not owner:
-                    image = profileThumb
-                else:
-                    image = qobuz.image.access.get('qobuzIcon')
-            item.setThumbnailImage(image)
-            item.setIconImage(image)
-            item.setLabel(owner + tag.name)
-            item.setProperty('name', tag.name)
-            item.setProperty('playlist_id', tag.id)
-            item.setProperty('is_public', tag.is_public)
-            item.setProperty('is_collaborative', tag.is_collaborative)
-            description = ''
-            try: description = tag.description
-            except: pass
-            item.setProperty('description', description)
-            item.setInfo(type = "Music", infoLabels = { "title": tag.name, "count": i })
-            item.setProperty('Music', 'false')
-            item.setProperty('IsPlayable', 'false');
-            item.setProperty('fanart_image', fanArt)
-            qobuz.gui.setContextMenu(item)
-            list.append((u, item, True))
-            i = i + 1
-        return list
-
 

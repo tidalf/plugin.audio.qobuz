@@ -45,16 +45,3 @@ class Cache_product(ICacheable):
 
     def length(self):
         return len(self._raw_data['tracks'])
-
-    def get_items(self):
-        list = []
-        data = self.get_data()
-        if not data: return list
-        tag_product = TagProduct(data)
-        for tag_track in tag_product.get_childs():
-            if not isinstance(tag_track, TagTrack):
-                continue
-            item = tag_track.getXbmcItem('album', 1)
-            u = qobuz.boot.build_url(MODE_SONG, tag_track.id)
-            list.append((u, item, False))
-        return list

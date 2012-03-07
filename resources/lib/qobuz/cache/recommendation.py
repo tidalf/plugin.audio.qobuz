@@ -56,21 +56,3 @@ class Cache_recommendation(ICacheable):
     def set_image_genre(self, image):
         return self.cacheImage.set(self.type + str(self.genre_id), image)
 
-    def get_items(self):
-        n = self.length()
-        rand = random.randint(0, n)
-        getnewimage = random.randint(0, 1)
-        i = 0
-        list = []
-        image = self.get_image()
-        if not image: getnewimage = True
-        for json_product in self.get_raw_data():
-            album = TagProduct(json_product)
-            if getnewimage and i == rand:
-                image = self.set_image_genre(json_product['image']['large'])
-                getnewimage = False
-            u = qobuz.boot.build_url(MODE_ALBUM, album.id)
-            item = album.getXbmcItem('fanArt')
-            list.append((u, item, True))
-            i += 1
-        return list

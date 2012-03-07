@@ -252,23 +252,4 @@ class Node(object):
 
     def log(msg):
         print "TESTNODE: " + msg.encode('ascii', 'ignore') + "\n"
-
-
-#class test_node():
-#    
-#    def __init__(self):
-#        pass
-#    
-#    def run(self):
-#        from node_userplaylists import node_userplaylists
-#        log('-'*80+"\n")
-#        root = node()
-#        root.set_label('root')
-#        root.add_child(node_userplaylists())
-#        root.build_down(-1, NodeFlag.TYPE_TRACK| NodeFlag.DONTFETCHTRACK)
-#        log("Total Node          : " + str(root.count_node(NodeFlag.TYPE_NODE)))
-#        log("Total User Playlists: " + str(root.count_node(NodeFlag.TYPE_USERPLAYLISTS)))
-#        log("Total PLaylist      : " + str(root.count_node(NodeFlag.TYPE_PLAYLIST)))
-#        log("Total Track         : " + str(root.count_node(NodeFlag.TYPE_TRACK)))
-#        log('-'*80+"\n")
-#        
+  
