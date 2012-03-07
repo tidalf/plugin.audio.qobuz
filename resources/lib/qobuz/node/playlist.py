@@ -59,6 +59,7 @@ class Node_playlist(Node):
             error(self, "Cannot set cache without id")
             return False
         self.cache = Cache_playlist(id)
+        self.set_id(id)
         return True
 
     def _build_down(self, lvl, flag = None):

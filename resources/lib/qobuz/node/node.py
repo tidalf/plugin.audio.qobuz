@@ -14,6 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+import sys
 import pprint
 import qobuz
 from constants import Mode
@@ -95,6 +96,12 @@ class Node(object):
         s += " label2: " + str(self.label2) + "\n"
         return s
 
+    def set_parent(self, parent):
+        self.parent = parent
+        
+    def get_parent(self):
+        return self.parent
+    
     def set_parameters(self, params):
         self.parameters = params
 
@@ -105,12 +112,11 @@ class Node(object):
         return None
 
     def set_url(self, mode = Mode.VIEW):
-        url = 'plugin://plugin.audio.qobuz2/?mode=' + str(mode) + "&nt=" + str(self.type) # TODO: fixme
+        url = sys.argv[0] + '?mode=' + str(mode) + "&nt=" + str(self.type)
         id = self.get_id()
-        if id:
-            url += "&nid=" + str(id)
+        if id: url += "&nid=" + str(id)
         self.url = url
-
+        
     def get_url(self):
         if not self.url: self.set_url()
         return self.url

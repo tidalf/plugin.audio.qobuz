@@ -21,7 +21,7 @@ import qobuz
 from constants import *
 from flag import NodeFlag
 from node import Node
-from debug import info
+from debug import info, warn, error
 '''
     NODE PRODUCT
 '''
@@ -32,19 +32,94 @@ from track import Node_track
 class Node_product(Node):
 
     def __init__(self, parent = None, params = None):
-        super(Node_product, self).__init__(parent)
+        super(Node_product, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PRODUCT
         self.set_content_type('songs')
+        self.cache = None
 
 
+    def _set_cache(self):
+        id = self.get_id()
+        if not id:
+            try: id = self.get_parameter('nid')
+            except: pass
+        if not id:
+            error(self, "Cannot set product cache without id")
+            return False
+        self.cache = Cache_product(id)
+        self.set_id(id)
+        return True
+    
     def _build_down(self, lvl, flag = None):
-        pass
+        if not self._set_cache():
+            errot(self, "Cannot set product cache")
+            return False
+        data = self.cache.fetch_data()
+        if not data:
+            warn(self, "Cannot fetch product data")
+            return False
+        self.set_data(data)
+        print repr(data)
+        for track in data['tracks']:
+            node = Node_track()
+            node.set_data(track)
+            self.add_child(node)
 
     def _get_xbmc_items(self, list, lvl, flag):
-        pass
+        if len(self.childs) < 1:
+            qobuz.gui.notification(36000, 36001)
+            return False
+        for track in self.childs:
+            item = track.make_XbmcListItem()#tag.getXbmcItem()
+            list.append((track.get_url(), item, False))
+        return True
 
     def _get_tag_items(self, list, lvl, flag):
         pass
 
+    
+    def make_XbmcListItem(self):
+        import xbmcgui
+        self.set_url()
+        print repr(self.get_data())
+        item = xbmcgui.ListItem(
+                                self.get_label(),
+                                self.get_label2(),
+                                self.get_image(),
+                                self.get_image(),
+                                self.get_url(),                         
+                                )
+        return item
 
-
+    ''' 
+    PROPERTIES 
+    '''
+    def get_artist(self):
+        return self.get_property(('artist', 'name'))
+    
+    def get_title(self):
+        title =  self.get_property('title')
+        if not title: title = self.get_property('subtitle')
+        return title
+    
+    def get_image(self):
+        return self.get_property(('image', 'large'))
+    
+    def get_label(self):
+        label = ''.join((self.get_artist(), ' - ', self.get_title()))
+        return label
+    
+    def get_label2(self):
+        return self.get_label()
+    
+    def get_genre(self):
+        return self.get_property(('genre', 'name'))
+    
+    
+    def get_year(self):
+        date = self.get_property('release_date')
+        year = 0
+        try: year = int(date.split('-')[0])
+        except: pass
+        return year
+    

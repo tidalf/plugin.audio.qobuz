@@ -71,13 +71,18 @@ class Node_track(Node):
         return self.get_property(('interpreter', 'name'))
 
     def get_album(self):
-        return self.get_property(('album', 'title'))
-
+        album = self.get_property(('album', 'title'))
+        if album: return album
+        if not self.parent: return ''
+        if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+            return self.parent.get_title()
+            
     def get_image(self):
         image = self.get_property(('album', 'image', 'large'))
-        if image:
-            return image.replace('_230.jpg', '_600.jpg')
-        return ''
+        if image: return image.replace('_230.jpg', '_600.jpg')
+        if not self.parent: return ''
+        if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+            return self.parent.get_image()
 
     def get_playlist_track_id(self):
         return self.get_property(('playlist_track_id'))
@@ -92,7 +97,11 @@ class Node_track(Node):
         return self.get_property('title')
 
     def get_genre(self):
-        return self.get_property(('album', 'genre', 'name'))
+        genre = self.get_property(('album', 'genre', 'name'))
+        if genre: return genre
+        if not self.parent: return ''
+        if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+            return self.parent.get_genre()
 
     def get_artist(self):
         s = self.get_interpreter()
@@ -114,6 +123,8 @@ class Node_track(Node):
 
     def get_year(self):
         date = self.get_property(('album', 'release_date'))
+        if not date and self.parent and self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+            return self.parent.get_year()
         year = 0
         try: year = int(date.split('-')[0])
         except: pass

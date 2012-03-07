@@ -36,19 +36,19 @@ class Node_recommendation(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_recommendation, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_RECOMMANDATION
-        genre_id = self.get_parameter('genre_id')
+        genre_id = self.get_parameter('genre-id')
         if genre_id != None: self.genre_id = int(genre_id)
         else: self.genre_id = None
-        self.genre_type = self.get_parameter('genre_type')
+        self.genre_type = self.get_parameter('genre-type')
         self.set_url()
         self.set_label("Recommendation")
 
     def set_url(self):
         url = sys.argv[0] + '/?mode=' + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_RECOMMANDATION)
         if self.genre_type:
-            url += '&genre_type=' + self.genre_type
+            url += '&genre-type=' + self.genre_type
         if self.genre_id:
-            url += '&genre_id=' + str(self.genre_id)
+            url += '&genre-id=' + str(self.genre_id)
         self.url = url
 
     def setGenreType(self, type):
@@ -111,34 +111,30 @@ class Node_recommendation(Node):
         color = qobuz.addon.getSetting('color_recospath')
         for t in self.get_childs():
             item = xbmcgui.ListItem(qobuz.utils.color(color, self.genre_type) + ' / ' + t.get_label(), '', '', '', t.get_url())
-            self.attach_context_menu(item, NodeFlag.TYPE_RECOMMANDATION)
+            #self.attach_context_menu(item, NodeFlag.TYPE_RECOMMANDATION)
             list.append((t.get_url(), item, True))
         return True
 
 
 # TYPE GENRE
     def _build_down_type_genre(self, lvl, flag):
-        o = QobuzGetRecommandation(self.genre_id, self.genre_type)
-        data = o.get_data()
-        if not data: return
-        self.set_json(data)
+        self.cache = Cache_recommendation(self.genre_id, self.genre_type)
+        data = self.cache.fetch_data()
+        if not data: 
+            warn(self, "Cannot fetch data for recommendation")
+            return False
+        self.set_data(data)
         for product in data:
-            c = node_product()
-            c.set_json(product)
-            c.set_id(product['id'])
-            c.set_label(product['title'])
-            c.set_url()
-            self.add_child(c)
+            node = Node_product()
+            node.set_data(product)
+            self.add_child(node)
         return True
 
     def _get_xbmc_items_type_genre(self, list , lvl, flag):
         print "TypeGenre xbmc item"
-        for p in self.get_childs():
-            tag_product = TagProduct(p.get_json())
-            item = tag_product.getXbmcItem()
-            self.attach_context_menu(item, NodeFlag.TYPE_PRODUCT, tag_product.id)
-            url = p.get_url()
-            list.append((url, item, True))
+        for product in self.get_childs():
+            item = product.make_XbmcListItem()
+            list.append((product.get_url(), item, product.is_folder()))
         return True
 
 # DISPATCH
@@ -166,9 +162,9 @@ class Node_recommendation(Node):
         ''' Add to current playlist '''
         url = sys.argv[0] + "?mode=" + str(MODE_ADD_TO_CURRENT_PLAYLIST) + '&nt=' + str(NodeFlag.TYPE_PRODUCT)
         if self.genre_id:
-            url += '&genre_id=' + str(self.genre_id)
+            url += '&genre-id=' + str(self.genre_id)
         if self.genre_type:
-            url += '&genre_type=' + str(self.genre_type)
+            url += '&genre-type=' + str(self.genre_type)
         url += "&nid=" + str(id)
         print "URL add current: " + url
         menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Add to current playlist'), "XBMC.RunPlugin(" + url + ")"))

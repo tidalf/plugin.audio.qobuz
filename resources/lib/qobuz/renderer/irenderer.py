@@ -52,12 +52,12 @@ class IRenderer(object):
             from node.playlist import Node_playlist
             root = Node_playlist(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_RECOMMANDATION:
-            from node.recommendation import Node_recommmendation
+            from node.recommendation import Node_recommendation
             root = Node_recommendation(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_PRODUCT:
             print "Render product"
-            from node_product import node_product
-            root = node_product(None, qobuz.boot.params)
+            from node.product import Node_product
+            root = Node_product(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_VIRTUAL_PLAYLIST:
             from node_virtual_playlist import node_virtual_playlist
             root = node_virtual_playlist(None, qobuz.boot.params)
