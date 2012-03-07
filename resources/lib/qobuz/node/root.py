@@ -41,14 +41,19 @@ class Node_root(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
 
     def _build_down(self, lvl, flag = None):
+#        search_artist = Node_search()
+#        search_artist.set_search_type('artists')
+#        self.add_child(search_artist)
+        
         userplaylists = Node_user_playlists()
         self.add_child(userplaylists)
-        reco = Node_recommendation()
+        reco = Node_recommendation(None)
         self.add_child(reco)
-        search
+        
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
         for child in self.get_childs():
+            print "URL: " + child.get_url()
             item = xbmcgui.ListItem(
                                     child.get_label(),
                                     child.get_label2(),

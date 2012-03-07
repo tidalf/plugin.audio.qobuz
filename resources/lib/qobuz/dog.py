@@ -10,6 +10,7 @@ class dog():
                              'genre-type': '^(editor-picks|best-sellers|press-awards|new-releases)$',
                              'genre-id'  : '^\d+$',
                              'url'       : '^.*$',
+                             'search-type': "^(artists|songs|albums)$"
                              }
 
     ''' Match value against regexp '''

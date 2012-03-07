@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*- 
 #     Copyright 2011 Joachim Basmaison, Cyril Leclerc
 #
 #     This file is part of xbmc-qobuz.
@@ -65,8 +64,9 @@ class IRenderer(object):
             from node_purchases import node_purchases
             root = node_purchases(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_SEARCH:
-            from node_search import node_search
-            root = node_search(None, qobuz.boot.params)
+            from node.search import Node_search
+            root = Node_search(None, qobuz.boot.params)
+            root.set_search_type(qobuz.boot.params['search-type'])
         else:
             print "Nothing to display"
             return False

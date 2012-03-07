@@ -109,6 +109,9 @@ class Node(object):
     def set_parameters(self, params):
         self.parameters = params
 
+    def set_parameter(self, name, value):
+        self.parameters[name] = value
+        
     def get_parameter(self, name):
         try:
             return self.parameters[name]
@@ -120,6 +123,7 @@ class Node(object):
         id = self.get_id()
         if id: url += "&nid=" + str(id)
         self.url = url
+        return self.url
         
     def get_url(self):
         if not self.url: self.set_url()

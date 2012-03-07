@@ -44,7 +44,7 @@ class Node_recommendation(Node):
         self.set_label("Recommendation")
 
     def set_url(self):
-        url = sys.argv[0] + '/?mode=' + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_RECOMMANDATION)
+        url = sys.argv[0] + '?mode=' + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_RECOMMANDATION)
         if self.genre_type:
             url += '&genre-type=' + self.genre_type
         if self.genre_id:

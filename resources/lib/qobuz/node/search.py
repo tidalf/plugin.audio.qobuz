@@ -3,16 +3,34 @@ from debug import info, warn, error
 from flag import NodeFlag
 from node import Node
 import qobuz
-
-class node_search(Node):
+from constants import Mode
+#from search.artists import Search_artists
+            
+class Node_search(Node):
 
     def __init__(self, parent = None, params = None):
-        super(node_search, self).__init__(parent, params)
+        super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
+        self.search_type = None
 
+    def get_label(self):
+        if self.search_type == 'artists':
+            return "Searching artist"
+    
+    def set_search_type(self, st):
+        print "Set search type: " + st
+        self.search_type = st
+        
+    def get_search_type(self):
+        return self.search_type
+    
+    def set_url(self, mode = Mode.VIEW):
+        url = super(Node_search, self).set_url()
+        url += '&search-type=' + self.get_search_type()
+        self.url = url
+        
     def _get_xbmc_items(self, list, lvl, flag):
-
-        stype = self.get_parameter('search-type')
+        stype = self.get_search_type()
         search = None
         limit = None
         if stype == 'songs':
@@ -29,7 +47,8 @@ class node_search(Node):
             self.set_content_type('albums')
         elif stype == 'artists':
             print "Searching artists"
-            search = qobuz.core.getQobuzSearchArtists()
+            from search.artists import Search_artists
+            search = Search_artists()
             limit = qobuz.addon.getSetting('artistsearchlimit')
             heading = qobuz.lang(30015)
             self.set_content_type('files')
