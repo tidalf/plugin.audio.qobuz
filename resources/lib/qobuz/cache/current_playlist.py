@@ -7,7 +7,7 @@ from utils.icacheable import ICacheable
 from cache.playlist import Cache_playlist
 
 class Cache_current_playlist(ICacheable):
-    
+
     def __init__(self):
         super(Cache_current_playlist, self).__init__(qobuz.path.cache,
                                             'current-playlist')
@@ -15,15 +15,15 @@ class Cache_current_playlist(ICacheable):
         self.set_cache_refresh(-1)
         debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
-        
+
     def _fetch_data(self):
         return self.data
-        
+
     def _load_cache_data(self):
         data = super(Cache_current_playlist, self)._load_cache_data()
         self.data = data
         return data
-    
+
     def set_id(self, id):
         print "Setting id for current playlist: " + str(id)
         if self.data and 'id' in self.data and self.data['id'] == id:
@@ -37,9 +37,9 @@ class Cache_current_playlist(ICacheable):
         self.data = playlist.get_raw_data()
         #print repr(self.data)
         self.save()
-        
-        
-        
+
+
+
     def get_id(self):
         if not self.data:
             return None
@@ -51,4 +51,4 @@ class Cache_current_playlist(ICacheable):
 
     def save(self):
         self._save_cache_data(self.data)
-            
+

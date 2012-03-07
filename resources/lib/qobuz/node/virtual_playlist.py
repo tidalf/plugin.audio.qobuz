@@ -30,11 +30,11 @@ from tag.track import TagTrack
 from node_track import node_track
 
 class node_virtual_playlist(node):
-    
+
     def __init__(self, parent = None, parameters = None):
         super(node_virtual_playlist, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_VIRTUAL_PLAYLIST
-        
+
     def _build_down(self, lvl, flag = None):
         o = cache_virtual_playlist()
         data = o.get_data()
@@ -49,7 +49,7 @@ class node_virtual_playlist(node):
             c.set_url()
             self.add_child(c)
         return True
-    
+
     def _get_xbmc_items(self, list, lvl, flag):
         for c in self.childs:
             tag = TagTrack(c.get_json())
@@ -58,4 +58,3 @@ class node_virtual_playlist(node):
         return True
 
 
-            

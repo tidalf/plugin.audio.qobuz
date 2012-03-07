@@ -30,10 +30,10 @@ from cache.user_playlists import Cache_user_playlists
 from playlist import Node_playlist
 
 class Node_user_playlists(Node):
-    
+
     def __init__(self, parent = None, parameters = None):
         super(Node_user_playlists, self).__init__(parent, parameters)
-        self.label  = qobuz.utils.lang(30019)
+        self.label = qobuz.utils.lang(30019)
         self.icon = self.thumb = qobuz.image.access.get('userplaylists')
         self.label2 = 'Keep your current playlist'
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
@@ -43,16 +43,16 @@ class Node_user_playlists(Node):
         self.set_display_by(display_by)
         self.set_url()
         self.cache = Cache_user_playlists()
-        
+
     def set_display_by(self, type):
         vtype = ('product', 'songs')
         if not type in vtype:
             error(self, "Invalid display by: " + type)
         self.display_by = type
-        
+
     def get_display_by(self):
         return self.display_by
-    
+
     def _build_down(self, lvl, flag = None):
         info(self, "Build-down: user playlists")
         data = self.cache.fetch_data()
@@ -65,7 +65,7 @@ class Node_user_playlists(Node):
             node = Node_playlist()
             node.set_data(playlist)
             self.add_child(node)
-            
+
     def _get_xbmc_items(self, list, lvl, flag):
         username = qobuz.addon.getSetting('username')
         color = qobuz.addon.getSetting('color_notowner')
@@ -107,14 +107,14 @@ class Node_user_playlists(Node):
 #        url=sys.argv[0]+"?mode="+str(MODE_CREATE_PLAYLIST)+'&nt='+str(type)
 #        if id: url+='&nid='+id
 #        menuItems.append((qobuz.utils.color(color, 'Create'), "XBMC.RunPlugin("+url+")"))
-        
+
         ''' Display by '''
 #        display_by = 'songs'
 #        if self.display_by == 'songs':
 #            display_by = 'product'
 #        url=sys.argv[0]+"?mode="+str(MODE_NODE)+'&nt='+str(self.type)+'&display-by='+display_by
 #        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Display by: ' + display_by), "XBMC.RunPlugin("+url+")"))
-    
 
-        
-    
+
+
+

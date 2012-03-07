@@ -18,10 +18,10 @@
 import os
 
 __debugging__ = True
-ourlog    = None
-LOGDEBUG  = None
+ourlog = None
+LOGDEBUG = None
 LOGNOTICE = None
-LOGERROR  = None
+LOGERROR = None
 LOGSEVERE = None
 
 try:
@@ -33,27 +33,27 @@ try:
     LOGERROR = xbmc.LOGERROR
     LOGSEVERE = xbmc.LOGSEVERE
     __debugging__ = True
-    if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
+    if xbmcaddon.Addon(id = 'plugin.audio.qobuz').getSetting('debug') == 'true':
         __debugging__ = True
     else:
         __debugging__ = False
-        
-except: 
+
+except:
     LOGDEBUG = '[DEBUG]'
     LOGNOTICE = '[NOTICE]'
     LOGERROR = '[ERROR]'
     LOGSEVERE = '[SEVERE]'
-    
-    def logfunc(msg, lvl): 
+
+    def logfunc(msg, lvl):
         print lvl + msg
-    ourlog = logfunc  
+    ourlog = logfunc
 
 ###############################################################################
 # Logging helper functions
 ###############################################################################
 def log(obj, msg, lvl = LOGNOTICE):
     if not __debugging__:
-        return 
+        return
     name = None
     if isinstance(obj, basestring):
         name = obj
@@ -64,18 +64,18 @@ def log(obj, msg, lvl = LOGNOTICE):
             name = type(obj)
     ourlog('[' + str(name) + "] " + msg, lvl)
 
-def warn(obj,msg):
-    log(obj,msg, LOGERROR)
+def warn(obj, msg):
+    log(obj, msg, LOGERROR)
 
-def info(obj,msg):
-    log(obj,msg, LOGNOTICE)
+def info(obj, msg):
+    log(obj, msg, LOGNOTICE)
 
 def debug(obj, msg):
     log(obj, msg, LOGDEBUG)
-    
+
 def crit(obj, msg):
     log(obj, msg, LOGSEVERE)
-    
+
 def error(obj, msg):
     log(obj, msg, LOGSEVERE)
     log(obj, 'Exiting...', LOGSEVERE)

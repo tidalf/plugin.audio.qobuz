@@ -5,13 +5,13 @@ from node import Node
 import qobuz
 
 class node_search(Node):
-    
+
     def __init__(self, parent = None, params = None):
         super(node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
-    
+
     def _get_xbmc_items(self, list, lvl, flag):
-        
+
         stype = self.get_parameter('search-type')
         search = None
         limit = None
@@ -50,12 +50,11 @@ class node_search(Node):
             return False
         list.extend(slist)
         return True
-    
-    def _get_keyboard(self, default="", heading="", hidden=False):
+
+    def _get_keyboard(self, default = "", heading = "", hidden = False):
         import xbmc
         kb = xbmc.Keyboard(default, heading, hidden)
         kb.doModal()
         if (kb.isConfirmed()):
             return unicode(kb.getText(), "utf-8")
         return ''
-            

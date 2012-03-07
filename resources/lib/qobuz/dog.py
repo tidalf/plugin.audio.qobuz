@@ -1,7 +1,7 @@
 import re
 
 class dog():
-    
+
     def __init__(self):
         self.allowed_keys = {
                              'mode'      : '^\d{1,10}$',
@@ -18,11 +18,11 @@ class dog():
 #                             'tracks_id' : '^\d{1,20}$',
 #                             'search-type': '^(songs|albums|artists)$',
 #                             'display-by': '^(songs|product)$',
-                             }            
-    
+                             }
+
     ''' Match value against regexp '''
     def kv_is_ok(self, key, value):
-        print key  + ' - ' + value
+        print key + ' - ' + value
         if key not in self.allowed_keys:
             return False
         match = None
@@ -30,4 +30,4 @@ class dog():
         except: pass
         if match == None:
             return False
-        return True 
+        return True

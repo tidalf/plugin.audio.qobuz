@@ -25,18 +25,18 @@ from file.write import safe_write
 class cache_manager():
     def __init__(self):
         pass
-    
+
     def delete(self, path):
         if not os.path.exists(path):
             return False
         sw = safe_write()
         info(self, "Unlinking " + path)
         return sw.unlink(path)
-    
+
     def delete_file(self, name):
         path = os.path.join(qobuz.path.cache, name + ".dat")
         return self.delete(path)
-          
+
     def delete_user_data(self):
         cache = qobuz.path.cache
         if not self._cache_path_exists(cache):
@@ -44,7 +44,7 @@ class cache_manager():
         list = os.listdir(cache)
         ldel = []
         for f in list:
-            if not f.endswith('.dat'): 
+            if not f.endswith('.dat'):
                 continue
             if f == 'auth.dat':
                 ldel.append(f)
@@ -59,7 +59,7 @@ class cache_manager():
             elif f == 'purchases.dat':
                 ldel.append(f)
         self._delete_files(cache, ldel)
-    
+
     def delete_token_data(self):
         cache = qobuz.path.cache
         if not self._cache_path_exists(cache):
@@ -67,14 +67,14 @@ class cache_manager():
         list = os.listdir(cache)
         ldel = []
         for f in list:
-            if not f.endswith('.dat'): 
+            if not f.endswith('.dat'):
                 continue
             if f == 'auth.dat':
                 ldel.append(f)
             elif f.startswith('track-url'):
                 ldel.append(f)
-        self._delete_files(cache, ldel)          
-            
+        self._delete_files(cache, ldel)
+
     def _cache_path_exists(self, path):
         if not path:
             warn(self, "Cache directory is not set")
@@ -83,14 +83,14 @@ class cache_manager():
             warn(self, "Cache directory doesn't seem to exist")
             return False
         return True
-        
+
     def _delete_files(self, base_path, list):
         sw = safe_write()
         for f in list:
             info(self, "Deleting file: " + f)
             path = os.path.join(base_path, f)
             sw.unlink(path)
-            
+
     def delete_all_data(self):
         cache = qobuz.path.cache
         if not self._cache_path_exists(cache):
@@ -102,4 +102,3 @@ class cache_manager():
                 continue
             ldel.append(f)
         self._delete_files(cache, ldel)
-    

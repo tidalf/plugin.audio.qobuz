@@ -15,13 +15,36 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-from tag.itag import ITag
+import pprint
 
-class Tag_owner(ITag):
-    
-    def __init__(self):
-        super(Tag_owner, self).__init__()
-        self.set_valid_tags(['id', 'name'])
+import qobuz
+from constants import *
+from flag import NodeFlag
+from node import Node
+from debug import info
+'''
+    NODE PRODUCT
+'''
+from cache.product import Cache_product
 
-    def get_name(self):
-        return self.name
+from track import Node_track
+
+class Node_product(Node):
+
+    def __init__(self, parent = None, params = None):
+        super(Node_product, self).__init__(parent)
+        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PRODUCT
+        self.set_content_type('songs')
+
+
+    def _build_down(self, lvl, flag = None):
+        pass
+
+    def _get_xbmc_items(self, list, lvl, flag):
+        pass
+
+    def _get_tag_items(self, list, lvl, flag):
+        pass
+
+
+

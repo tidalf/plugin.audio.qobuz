@@ -21,13 +21,13 @@ import random
 import string
 
 class safe_write():
-    
+
     def __init__(self):
         pass
-    
-    def generate_filename(self, size=8, chars=string.ascii_letters + string.digits):
+
+    def generate_filename(self, size = 8, chars = string.ascii_letters + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
-                                                          
+
     def _write(self, path, flag, data):
         ret = False
         with os.open(path, flag) as fd:
@@ -36,10 +36,10 @@ class safe_write():
                 #fo.flush()
                 #os.fsync(fd)
                 ret = True
-   
+
         return ret
-        
-    
+
+
     def _unlink(self, path):
         if not os.path.exists(path):
             return False
@@ -51,7 +51,7 @@ class safe_write():
             time.sleep(.250)
             retry -= 1
         return False
-    
+
     def _safe_unlink(self, path):
          if not os.path.exists(path):
              return True
@@ -64,15 +64,15 @@ class safe_write():
              print "Cannot rename file"
              return False
          return self._unlink(newpath)
-         
+
     def write(self, path, data):
         if os.path.exists(path):
             return False
-        return self._write(path, os.O_WRONLY|os.O_EXCL|os.O_CREAT, data)
-    
+        return self._write(path, os.O_WRONLY | os.O_EXCL | os.O_CREAT, data)
+
     def unlink(self, path):
         return self._safe_unlink(path)
-    
+
 if __name__ == "__main__":
     sf = safe_write()
     file = "C:\Users\sho\AppData\Local\Temp\safe_write\unlink.txt"
@@ -80,5 +80,4 @@ if __name__ == "__main__":
         print "Cannot write file"
     if not sf._safe_unlink(file):
         print "Cannot delete file"
-        
-        
+

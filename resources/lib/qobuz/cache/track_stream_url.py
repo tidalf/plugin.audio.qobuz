@@ -18,7 +18,7 @@ import sys
 import os
 
 from utils.icacheable import ICacheable
-from debug import *
+from debug import info, warn, error, debug
 import pprint
 import qobuz
 '''
@@ -46,4 +46,4 @@ class Cache_track_stream_url(ICacheable):
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        return qobuz.api.get_track_url(self.id, 'playlist', 0,  self.format_id)
+        return qobuz.api.get_track_url(self.id, 'playlist', 0, self.format_id)

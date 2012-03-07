@@ -24,7 +24,8 @@ from constants import *
 
 from flag import NodeFlag
 from node import Node
-from user_playlists import Node_user_playlists 
+from user_playlists import Node_user_playlists
+from recommendation import Node_recommendation
 
 '''
     NODE ROOT
@@ -33,28 +34,30 @@ from user_playlists import Node_user_playlists
 '''
 
 class Node_root(Node):
-    
+
     def __init__(self, parent = None, parameters = None):
         super(Node_root, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
-        
+
     def _build_down(self, lvl, flag = None):
         userplaylists = Node_user_playlists()
         self.add_child(userplaylists)
-        
+        reco = Node_recommendation()
+        self.add_child(reco)
+
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
         for child in self.get_childs():
             item = xbmcgui.ListItem(
-                                    child.get_label(), 
-                                    child.get_label2(), 
-                                    child.get_icon(), 
-                                    child.get_thumbnail(), 
+                                    child.get_label(),
+                                    child.get_label2(),
+                                    child.get_icon(),
+                                    child.get_thumbnail(),
                                     child.get_url()
                                     )
             item.setProperty('IsFolder', 'true' if child.is_folder() else 'false')
             item.setIconImage(child.get_icon())
             item.setThumbnailImage(child.get_thumbnail())
-            list.append(( child.get_url(), item, child.is_folder() ))
+            list.append((child.get_url(), item, child.is_folder()))
         return True
 

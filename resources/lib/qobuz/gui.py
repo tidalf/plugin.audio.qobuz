@@ -34,102 +34,31 @@ import qobuz
 '''
 class QobuzGUI:
 
-    def __init__( self):
+    def __init__(self):
         pass
-#        self.setPluginFanArt()
-#        self.setPluginCategory()
-#        self.sort_enabled = True
-#        self.content_type = None
-#        xbmc.enableNavSounds(False)
-#        
-#
-#    def set_sort_enabled(self, b):
-#        self.sort_enabled = b
-#        
-#    def set_content_type(self, ctx):
-#        contexts = ['files', 'songs', 'artists', 'albums', 'movies', 'tvshows', 'episodes', 'musicvideos']
-#        if ctx not in contexts:
-#            warn(self, "Invalid content type")
-#            return False
-#        self.content_type = ctx
-#        return True
-#    
-#    def set_view_mode(self, view):
-#        viewmode = {'list': 50, 
-#                    'icons': 52, 
-#                    'biglist': 51,
-#                    'thumbnails': 500,
-#                    'mediainfo': 506 }
-#        if view not in viewmode:
-#            warn(self, "Try to set invalid view mode: " + str(view))
-#            view = 'list'
-#        s = 'Container.setViewMode(%i)' % (int(viewmode[view]))
-#        xbmc.executebuiltin(s)
-#        return True
-#    
-#    '''
-#    Must be called at the end for folder to be displayed
-#    '''
-#    def endOfDirectory(self, succeeded = True):
-#        return xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=succeeded, updateListing=False, cacheToDisc=True)
-#    
-#    '''
-#        SHOW Notification (HUMAN ONE / NO i8n)
-#    '''
-#    def showNotificationH(self, title, text, image = None):
-#        if not image:
-#            image = qobuz.image.access.get('qobuzIcon')
-#        title = str(title) 
-#        text = str(text)
-#        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, image) 
-#        try:
-#            xbmc.executebuiltin(s)
-#        except:
-#            warn(self, "Notification failure")
-#            
-#    '''
-#        SHOW Notification
-#    '''
-#    def showNotification(self, title, text, image = None):
-#        if not image:
-#            image = qobuz.image.access.get('qobuzIcon')
-#        l = qobuz.lang
-#        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image) 
-#        xbmc.executebuiltin(s)
-#
-    def notification(self, title, text, image=None):
-        if not image:
-            image = qobuz.image.access.get('qobuzIcon')
-        l = qobuz.lang
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image) 
+
+    def notifyH(self, title, text, image = None):
+        if not image: image = qobuz.image.access.get('qobuzIcon')
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, image)
         xbmc.executebuiltin(s)
-        
-#    '''
-#        SET FanArt
-#    '''
-#    def setPluginFanArt(self, fanart = 'fanart'):
-#        xbmcplugin.setPluginFanart(qobuz.boot.handle,  qobuz.image.access.get('fanArt'), '0xFFFFFFFF', '0xFFFF3300', '0xFF000000')
-#      
-#    def setPluginCategory(self):
-#        xbmcplugin.setPluginCategory(handle=qobuz.boot.handle, category="Music Streaming")
-#
-#    '''
-#        SET Content
-#    '''        
-#    def setContent(self):
-#        debug(self, "Set content: " + self.content_type)
-#        xbmcplugin.setContent(handle=qobuz.boot.handle, content=self.content_type)
-#
+
+    def notify(self, title, text, image = None):
+        if not image: image = qobuz.image.access.get('qobuzIcon')
+        l = qobuz.lang
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image)
+        xbmc.executebuiltin(s)
+
     def show_login_failure(self):
         __language__ = qobuz.lang
         dialog = xbmcgui.Dialog()
         if dialog.yesno(__language__(30008), __language__(30034), __language__(30040)):
             qobuz.addon.openSettings()
-            xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False, updateListing=True, cacheToDisc=False)
+            xbmcplugin.endOfDirectory(handle = int(sys.argv[1]), succeeded = False, updateListing = True, cacheToDisc = False)
             return self.boot.dispatch()
-        else:        
+        else:
             xbmc.executebuiltin('ActivateWindow(home)')
             return False
+        
 #    '''
 #        Get keyboard input
 #    '''

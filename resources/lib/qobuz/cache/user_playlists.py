@@ -59,13 +59,13 @@ class Cache_user_playlists(Cache_user_playlists_toremove):
                 qobuz.path.cache,
                 qobuz.addon.getSetting('cache_duration_userplaylist'))
         self.cacheImage = qobuz.image.cache
-    
+
     def get_image(self, id):
         return self.cacheImage.get(id)
-    
+
     def set_image_genre(self, id, image):
-        return self.cacheImage.set(name,  image)
-    
+        return self.cacheImage.set(name, image)
+
     def get_items(self):
         i = 1
         list = []
@@ -79,9 +79,9 @@ class Cache_user_playlists(Cache_user_playlists_toremove):
             u = qobuz.boot.build_url(MODE_PLAYLIST, tag.id)
             item = xbmcgui.ListItem(tag.name)
             owner = tag.getOwner()
-            if owner == account_owner: 
+            if owner == account_owner:
                 owner = ''
-            else: 
+            else:
                 owner += ' - '
             image = self.get_image('userplaylist' + str(tag.id))
             if not image:
@@ -100,13 +100,13 @@ class Cache_user_playlists(Cache_user_playlists_toremove):
             try: description = tag.description
             except: pass
             item.setProperty('description', description)
-            item.setInfo(type="Music",infoLabels={ "title": tag.name, "count": i })
-            item.setProperty('Music','false')
-            item.setProperty('IsPlayable','false');
+            item.setInfo(type = "Music", infoLabels = { "title": tag.name, "count": i })
+            item.setProperty('Music', 'false')
+            item.setProperty('IsPlayable', 'false');
             item.setProperty('fanart_image', fanArt)
             qobuz.gui.setContextMenu(item)
             list.append((u, item, True))
             i = i + 1
         return list
-            
+
 

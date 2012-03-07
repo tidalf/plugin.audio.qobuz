@@ -28,20 +28,20 @@ import qobuz
  Class QobuzXbmc
 """
 class QobuzCore:
-    
+
     def __init__(self):
         self.data = ""
         self.conn = ""
-    
+
     def is_logged(self):
         return qobuz.api.auth
-    
+
     def login(self):
         username = qobuz.addon.getSetting('username')
         password = qobuz.addon.getSetting('password')
         if not username or not password:
             return None
-        auth =  qobuz.api.login(username, password)
+        auth = qobuz.api.login(username, password)
         if not auth: return None
         if auth.get_data()['user']['login'] != username:
             warn(self, "User login mismatch")
@@ -51,7 +51,7 @@ class QobuzCore:
         return auth
 
     def delete_user_data(self):
-        try: 
+        try:
             from utils.cache import cache_manager
             c = cache_manager()
             c.delete_user_data()

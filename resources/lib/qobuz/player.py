@@ -27,41 +27,42 @@ import xbmcgui
 
 import qobuz
 from debug import *
+
 from utils.list_item import QobuzListItem_track
 
 class QobuzPlayer(xbmc.Player):
-    
+
     def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
         super(QobuzPlayer, self).__init__()
-        
+
     def sendQobuzPlaybackEnded(self, duration):
         qobuz.api.report_streaming_stop(self.id, duration)
-    
+
     def sendQobuzPlaybackStarted(self,):
         qobuz.api.report_streaming_start(self.id)
-        
+
     def play(self, id):
         lang = qobuz.lang
         mytrack = QobuzListItem_track(id)
         mytrack.fetch_stream_url(qobuz.addon.getSetting('streamtype'))
         if not mytrack.get_stream_url():
             warn(self, "Cannot get stream url for track with id: " + str(id))
-            qobuz.gui.showNotification(34000, 34002)
+            qobuz.gui.notification(34000, 34002)
             return False
         item = mytrack.get_xbmc_list_item()
         watchPlayback = False
         '''
             PLaying track
         '''
-        if qobuz.addon.getSetting('notification_playingsong') == 'true':
-            qobuz.gui.showNotificationH(lang(34000), item.getLabel(), item.getProperty('image'))
+#        if qobuz.addon.getSetting('notification_playingsong') == 'true':
+#            qobuz.gui.showNotificationH(lang(34000), item.getLabel(), item.getProperty('image'))
         '''
             We are called from playlist...
         '''
         if qobuz.boot.handle == -1:
             super(QobuzPlayer, self).play(item.getProperty('streaming_url'), item, False)
         else:
-            xbmcplugin.setResolvedUrl(handle=qobuz.boot.handle,succeeded=True,listitem=item)
+            xbmcplugin.setResolvedUrl(handle = qobuz.boot.handle, succeeded = True, listitem = item)
         '''
             May be a bad idea!!!
         '''
@@ -74,8 +75,8 @@ class QobuzPlayer(xbmc.Player):
         while timeout > 0:
             if self.isPlayingAudio() == False:
                 xbmc.sleep(250)
-                timeout-=0.250
-            else: 
+                timeout -= 0.250
+            else:
                 break
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())

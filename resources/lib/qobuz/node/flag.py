@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 class __NodeFlag():
-    def __init__(self): 
+    def __init__(self):
         self.DONTFETCHTRACK = 1
         self.TYPE_NODE = 512
         self.TYPE_TRACK = 1024
@@ -27,5 +27,13 @@ class __NodeFlag():
         self.TYPE_VIRTUAL_PLAYLIST = 65536
         self.TYPE_PURCHASES = 131072
         self.TYPE_SEARCH = 262144
+
+    def to_string(self, flag):
+        if flag == self.NODE: return "Node"
+        elif flag == self.TRACK: return "Track"
+        elif flag == self.PLAYLIST: return "Playlist"
+        elif flag == self.USERPLAYLISTS: return "UserPlaylists"
+        elif flag == self.RECOMMANDATIONS: return "Recommendations"
+        else: return "Unknow flag: " + str(flag)
 
 NodeFlag = __NodeFlag()

@@ -21,7 +21,7 @@ import random
 
 from utils.icacheable import ICacheable
 from constants import *
-from debug import * 
+from debug import *
 
 import qobuz
 '''
@@ -29,7 +29,7 @@ import qobuz
 '''
 class Cache_playlist(ICacheable):
 
-    def __init__(self,id):
+    def __init__(self, id):
         self.id = id
         super(Cache_playlist, self).__init__(qobuz.path.cache,
                                             'playlist',
@@ -37,7 +37,7 @@ class Cache_playlist(ICacheable):
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
         debug(self, "Cache duration: " + str(self.cache_refresh))
         self.cacheImage = qobuz.image.cache
-        
+
 
     def _fetch_data(self):
         data = qobuz.api.get_playlist(self.id)
@@ -52,11 +52,11 @@ class Cache_playlist(ICacheable):
     def get_image(self, name):
         id = 'userplaylist' + name
         return self.cacheImage.get(id)
-    
+
     def set_image_genre(self, name, image):
         id = 'userplaylist' + name
         return self.cacheImage.set(id, image)
-    
+
 #    def get_items(self):
 #        self.fetch_data()
 #        list = []

@@ -24,20 +24,20 @@ class QobuzImage_access():
 
     def __init__(self):
         self.images = {}
-        self.add('fanArt',    os.path.join(qobuz.path.image, '..', '..',  'fanart.jpg'))
+        self.add('fanArt', os.path.join(qobuz.path.image, '..', '..', 'fanart.jpg'))
         self.add('qobuzIcon', os.path.join(qobuz.path.image, 'default.png'))
         self.add('qobuzIconRed', os.path.join(qobuz.path.image, 'default_red.png'))
-        
+
     def add(self, name, filename):
         self.images[name] = filename
-        
+
     def get(self, name, path = '', ext = 'png'):
         if name in self.images:
             return self.images[name]
         path = os.path.join(qobuz.path.image, path, name + '.' + ext)
         self.add(name, path)
         return path
-    
+
     def genre(self, name):
         if isinstance(name, int):
             if name == 0:
@@ -47,10 +47,10 @@ class QobuzImage_access():
             elif name == 80:
                 name = 'jazz'
         return self.get('genre.name', 'genres')
-    
+
     def getFanArt(self):
         return self.fanArt
-    
+
     import random
 
 class QobuzImage_cache(ICacheable):
@@ -61,7 +61,7 @@ class QobuzImage_cache(ICacheable):
         self.set_cache_refresh(-1)
         debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
-        
+
     def _fetch_data(self):
         return {}
 
@@ -70,15 +70,15 @@ class QobuzImage_cache(ICacheable):
         data[id] = image
         self._save_cache_data(data)
         return image
-    
+
     def get(self, id):
         data = self.get_data()
         if id in data:
             return data[id]
         return ''
-    
+
 class QobuzImage():
-    
+
     def __init__(self):
         self.access = QobuzImage_access()
         self.cache = QobuzImage_cache()

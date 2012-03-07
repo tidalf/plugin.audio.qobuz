@@ -16,15 +16,17 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 import pprint
-from debug import *
+from debug import info, warn, error
+
+import qobuz
 from cache.track_stream_url import Cache_track_stream_url
 from cache.track import Cache_track
-from tag.track import TagTrack
+from node.track import Node_track
 
 class QobuzListItem(object):
     def __init__(self):
         pass
-        
+
 class QobuzListItem_track(QobuzListItem):
     def __init__(self, track_id):
         #super(QobuzListItem_track, self).__init__()
@@ -38,8 +40,8 @@ class QobuzListItem_track(QobuzListItem):
         self.stream_type = None
         self.display_context = 'album'
         self.fanart_image = ''
-        
-    def set_requ_stream(self, format = 'flac'): 
+
+    def set_requ_stream(self, format = 'flac'):
         sfid = None
         if format == 'flac':
             sfid = 6
@@ -51,7 +53,7 @@ class QobuzListItem_track(QobuzListItem):
         self.req_stream_format = format
         self.req_stream_format_id = sfid
         return True
-    
+
     def set_requ_stream_id(self, id):
         id = int(id)
         sf = None
@@ -90,32 +92,34 @@ class QobuzListItem_track(QobuzListItem):
         self.stream_format_id = sfid
         self.stream_type = stream_type
         return True
-        
+
     def fetch_stream_url(self, stream_type):
         self.set_requ_stream(stream_type)
         if not self.track_id:
             error(self, "Track id not set")
         if not self.req_stream_format_id:
             error(self, "No stream format id set...")
-        turl = QobuzTrackURL(self.track_id, self.req_stream_format_id)
+        turl = Cache_track_stream_url(self.track_id, self.req_stream_format_id)
         data = turl.get_data()
         if not data:
-            warn(self, "Cannot fetch streaming url for track: " 
+            warn(self, "Cannot fetch streaming url for track: "
                  + str(self.track_id))
             return False
         return self.set_stream_url(data['format_id'], data['streaming_url'], data['streaming_type'])
-        
+
     def get_stream_url(self):
         return self.stream_url
-    
+
     def get_xbmc_list_item(self):
-        track = QobuzTrack(self.track_id)
+        track = Cache_track(self.track_id)
         data = track.get_data()
         if not data:
             warn(self, "Cannot get track data")
             return False
-        tag = TagTrack(data)
-        item = tag.getXbmcItem(self.display_context, 0, 'fanArt')
+        node = Node_track(None, qobuz.boot.params)
+        node._set_cache()
+        node.set_url()
+        item = node.make_XbmcListItem()
         item.setPath(self.stream_url)
         item.setProperty('streaming_url', self.stream_url)
         item.setProperty('streaming_type', self.stream_type)
@@ -123,6 +127,6 @@ class QobuzListItem_track(QobuzListItem):
         item.setProperty('mimetype', self.mimetype)
         item.setProperty('IsPlayable', 'true')
         return item
-        
+
     def to_s(self):
        return pprint.pformat(self.__dict__)

@@ -18,7 +18,7 @@
 __debugging__ = 0
 
 class __Mode():
-    def __init__(self): 
+    def __init__(self):
         self.VIEW = 1
         self.PLAY = 512
 #        self.TYPE_TRACK = 1024

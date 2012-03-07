@@ -30,6 +30,7 @@ libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
 sys.path.append(qobuzDir)
+#sys.path.append(os.path.join(qobuzDir, 'cache'))
 
 from bootstrap import QobuzBootstrap
 import qobuz

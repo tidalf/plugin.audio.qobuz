@@ -33,7 +33,7 @@ import qobuz
 '''
 class Cache_track(ICacheable):
 
-    def __init__(self, id, context_type='playlist'):
+    def __init__(self, id, context_type = 'playlist'):
         self.id = id
         super(Cache_track, self).__init__(qobuz.path.cache,
                                          'track',

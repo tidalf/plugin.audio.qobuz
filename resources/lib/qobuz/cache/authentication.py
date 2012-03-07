@@ -41,7 +41,7 @@ class Cache_authentication(ICacheable):
     def hook_pre_refresh(self):
         c = cache_manager()
         c.delete_token_data()
-        
+
     def _fetch_data(self):
         params = {'x-api-auth-token': 'null',
                   'email': self.login ,

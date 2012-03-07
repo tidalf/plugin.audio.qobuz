@@ -24,39 +24,39 @@ from debug import *
     NODE
 '''
 class Node(object):
-    
+
     def __init__(self, parent = None, parameters = None):
         self.parameters = parameters
         self.parent = parent
         self.type = NodeFlag.TYPE_NODE
         self.content_type = "files"
         self.icon = ""
-        self.thumb = "" 
+        self.thumb = ""
         self.childs = []
         self.label = ""
         self.label2 = ""
         self.url = None
         self.b_is_folder = True
         self._data = None
-    
+
     def set_data(self, data):
         self._data = data
-        
+
     def get_data(self):
         return self._data
-    
+
     def get_property(self, path):
-        print "Get property: " + repr(path)
+        #print "Get property: " + repr(path)
 #        print "type: " + str(type(path))
         if not self._data:
             return ''
-        
+
         if isinstance(path, basestring):
-            print "Got a string not tuple"
-            if path in self._data and self._data[path] and self._data[path] != 'None': 
+         #   print "Got a string not tuple"
+            if path in self._data and self._data[path] and self._data[path] != 'None':
                 return self._data[path].encode('utf8', 'ignore')
             return ''
-        
+
         root = self._data
         for i in range(0, len(path)):
 #            print "root: " + repr(root)
@@ -64,74 +64,70 @@ class Node(object):
             if not path[i] in root:
                 return ''
             root = root[path[i]]
-            
+
         if root and root != 'None':
 #            print "Return: " + repr(root)
             return root.encode('utf8', 'replace')
         return ''
-        
+
     def set_is_folder(self, b):
         self.b_is_folder = True if b else False
-    
-    def get_cached_data(self):
-        warn(self, "get_cached_data must be overloaded!")
-        pass
-    
+
     def set_content_type(self, ct):
         self.content_type = ct
-        
+
     def get_content_type(self):
         return self.content_type
-    
+
     def get_thumbnail(self):
         return self.thumb
-    
+
     def get_icon(self):
         return self.icon
-    
+
     def is_folder(self):
         return self.b_is_folder
-    
+
     def to_s(self):
         s = "[Node][" + str(self.type) + "\n"
-        s+= "     id: " + str(self.id) + "\n"
-        s+= " Label : " + str(self.label) + "\n"
-        s+= " label2: " + str(self.label2) + "\n"
+        s += "     id: " + str(self.id) + "\n"
+        s += " Label : " + str(self.label) + "\n"
+        s += " label2: " + str(self.label2) + "\n"
         return s
-    
+
     def set_parameters(self, params):
         self.parameters = params
-        
+
     def get_parameter(self, name):
         try:
             return self.parameters[name]
         except: pass
         return None
-    
+
     def set_url(self, mode = Mode.VIEW):
-        url = 'plugin://plugin.audio.qobuz2/?mode='+str(mode)+"&nt="+str(self.type)
+        url = 'plugin://plugin.audio.qobuz2/?mode=' + str(mode) + "&nt=" + str(self.type) # TODO: fixme
         id = self.get_id()
         if id:
-            url += "&nid="+str(id)
+            url += "&nid=" + str(id)
         self.url = url
-    
+
     def get_url(self):
         if not self.url: self.set_url()
         return self.url
-        
+
     def set_id(self, id):
-        self.id = id    
-        
+        self.id = id
+
     def get_id(self):
         if self._data and 'id' in self._data:
             return self._data['id']
         return None
-        
+
     def add_child(self, child):
         child.set_parent(self)
         child.set_parameters(self.parameters)
         self.childs.append(child)
-    
+
     def get_childs(self):
         return self.childs
 
@@ -141,35 +137,35 @@ class Node(object):
             if c.getType() == type:
                 list.append(c)
         return list
-    
+
     def set_parent(self, parent):
         self.parent = parent
-        
+
     def set_label(self, label):
         self.label = label
-        
+
     def set_label2(self, label):
         self.label2 = label
 
     def get_label(self):
         return self.label
-    
+
     def get_label2(self):
         return self.label2
-    
+
     def set_type(self, type):
         self.type = type
-    
+
     def get_type(self):
         return self.type
-    
-    
+
+
     '''
         build_down:
         This method fetch data from cache recursively and build our tree
         Node without cached data don't need to overload this method
     '''
-    
+
     def build_down(self, lvl, flag = NodeFlag.TYPE_NODE):
         #info(self, lvl*'#' + ' build_down (' + str(NodeFlag.TYPE_NODE) + ')')
         if lvl != -1 and lvl < 1:
@@ -186,11 +182,11 @@ class Node(object):
         This method is called by build_down method, each object who 
         inherit from node object can implement their own code. Lot of object
         simply fetch data from qobuz (cached data)
-    ''' 
+    '''
     def _build_down(self, lvl, flag):
         ''' Can be overloaded '''
         pass
-    
+
     '''
         get_xbmc_items:
         This method return all xbmc items needed by xbmc.* routines
@@ -207,20 +203,20 @@ class Node(object):
             if not c.get_xbmc_items(list, lvl, flag):
                 return False
         return True
-    
-    
+
+
     '''
         count_node:
         Just a helper function who scan a builded tree and count nodes
     '''
     def count_node(self, flag = NodeFlag.TYPE_NODE):
         total = 0
-        if self.type & flag: 
+        if self.type & flag:
             total = 1
         for c in self.childs:
             total += c.count_node(flag)
         return total
-    
+
     def get_tag_items(self, list, lvl, flag = NodeFlag.TYPE_NODE):
         if lvl != -1 and lvl < 1:
             return True
@@ -229,18 +225,18 @@ class Node(object):
             lvl -= 1
         for c in self.childs:
             c.get_tag_items(list, lvl, flag)
-         
-       
+
+
     def attach_context_menu(self, item, type, id = None):
         import sys
         color = qobuz.addon.getSetting('color_ctxitem')
         menuItems = []
-        
+
         ''' Show playlist '''
         # addtopl=sys.argv[0]+"?mode="+str(MODE_NODE)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) # Do not work
         # if id: addtopl+='&nid='+id
         # menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.RunAddon("+addtopl+")"))
-        
+
 #        ''' 
 #        Give a chance to our siblings to attach their items
 #        '''
@@ -249,15 +245,15 @@ class Node(object):
         Add our items to the context menu
         '''
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=False)        
-    
+            item.addContextMenuItems(menuItems, replaceItems = False)
+
     def hook_attach_context_menu(self, item, type, id, menuItems, color):
         pass
-    
+
     def log(msg):
         print "TESTNODE: " + msg.encode('ascii', 'ignore') + "\n"
-        
-        
+
+
 #class test_node():
 #    
 #    def __init__(self):

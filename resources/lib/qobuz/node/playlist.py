@@ -28,7 +28,7 @@ from cache.playlist import Cache_playlist
 from track import Node_track
 
 class Node_playlist(Node):
-    
+
     def __init__(self, parent = None, parameters = None):
         super(Node_playlist, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PLAYLIST
@@ -43,13 +43,13 @@ class Node_playlist(Node):
         self.icon = ''
         self.set_is_folder(True)
         self.cache = None
-        
+
     def set_is_current(self, b):
         self.b_is_current = b
-        
+
     def is_current(self):
         return self.b_is_current
-    
+
     def _set_cache(self):
         id = self.get_id()
         if not id:
@@ -60,7 +60,7 @@ class Node_playlist(Node):
             return False
         self.cache = Cache_playlist(id)
         return True
-    
+
     def _build_down(self, lvl, flag = None):
         info(self, "Build-down playlist")
         if not self._set_cache():
@@ -75,7 +75,7 @@ class Node_playlist(Node):
             node = Node_track()
             node.set_data(track)
             self.add_child(node)
-            
+
     def _get_xbmc_items(self, list, lvl, flag):
         if len(self.childs) < 1:
             qobuz.gui.notification(36000, 36001)
@@ -90,23 +90,23 @@ class Node_playlist(Node):
         import sys
         ''' DELETE '''
         print "removing track id: " + str(id)
-        url=sys.argv[0]+"?mode="+str(MODE_PLAYLIST_REMOVE_TRACK)+'&nt='+str(type)+'&tracks_id=' + str(id)
-        if self.id: url+='&nid='+str(self.id)
-        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Remove track from playlist'), "XBMC.RunPlugin("+url+")"))
-            
-    
+        url = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST_REMOVE_TRACK) + '&nt=' + str(type) + '&tracks_id=' + str(id)
+        if self.id: url += '&nid=' + str(self.id)
+        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Remove track from playlist'), "XBMC.RunPlugin(" + url + ")"))
+
+
     def getLabel(self):
         return self.tag.get_name()
-    
+
     def get_name(self):
         if self._data and 'name' in self._data:
             return self._data['name']
         return ''
-    
+
     def get_owner(self):
         if self._data and 'owner' in self._data:
             return self._data['owner']['name']
-        
+
     def make_XbmcListItem(self):
         import xbmcgui
         #print "url: " + self.get_url()
@@ -118,8 +118,8 @@ class Node_playlist(Node):
         #item.setPath(self.get_url())
         #item.setProperty('Path', self.get_url())
         return item
-        
-        
+
+
     def remove_tracks(self, tracks_id):
         import qobuz
         info(self, "Removing tracks: " + tracks_id)
@@ -128,5 +128,5 @@ class Node_playlist(Node):
             return False
         info(self, "Tracks removed from playlist: " + str(self.id))
         return True
-    
+
 
