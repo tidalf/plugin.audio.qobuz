@@ -71,6 +71,7 @@ class Node_product(Node):
             return False
         for track in self.childs:
             item = track.make_XbmcListItem()#tag.getXbmcItem()
+            self.attach_context_menu(item, self.type, self.get_id())
             list.append((track.get_url(), item, False))
         return True
 
@@ -122,4 +123,8 @@ class Node_product(Node):
         try: year = int(date.split('-')[0])
         except: pass
         return year
+    
+    def get_description(self):
+        return self.get_property('description')
+    
     

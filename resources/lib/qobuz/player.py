@@ -28,7 +28,9 @@ import xbmcgui
 import qobuz
 from debug import *
 
-from utils.list_item import QobuzListItem_track
+from node.track import Node_track
+
+#from utils.list_item import QobuzListItem_track
 
 class QobuzPlayer(xbmc.Player):
 
@@ -42,14 +44,18 @@ class QobuzPlayer(xbmc.Player):
         qobuz.api.report_streaming_start(self.id)
 
     def play(self, id):
+        info(self, "Playing track: " + str(id))
+        node = Node_track()
+        node.set_id(id)
+        node._set_cache()
+        node.set_data(node.cache.fetch_data())
+        print node.to_s()
+        print "URL: " + node.get_streaming_url()
+    
         lang = qobuz.lang
-        mytrack = QobuzListItem_track(id)
-        mytrack.fetch_stream_url(qobuz.addon.getSetting('streamtype'))
-        if not mytrack.get_stream_url():
-            warn(self, "Cannot get stream url for track with id: " + str(id))
-            qobuz.gui.notification(34000, 34002)
-            return False
-        item = mytrack.get_xbmc_list_item()
+        item = node.make_XbmcListItem()
+        item.setProperty('mimetype', node.get_mimetype())
+        item.setPath(node.get_streaming_url())
         watchPlayback = False
         '''
             PLaying track
@@ -60,7 +66,7 @@ class QobuzPlayer(xbmc.Player):
             We are called from playlist...
         '''
         if qobuz.boot.handle == -1:
-            super(QobuzPlayer, self).play(item.getProperty('streaming_url'), item, False)
+            super(QobuzPlayer, self).play(node.get_streaming_url(), item, False)
         else:
             xbmcplugin.setResolvedUrl(handle = qobuz.boot.handle, succeeded = True, listitem = item)
         '''

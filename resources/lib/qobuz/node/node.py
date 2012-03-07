@@ -39,7 +39,8 @@ class Node(object):
         self.url = None
         self.b_is_folder = True
         self._data = None
-
+        self.id = None
+        
     def set_data(self, data):
         self._data = data
 
@@ -91,9 +92,12 @@ class Node(object):
 
     def to_s(self):
         s = "[Node][" + str(self.type) + "\n"
-        s += "     id: " + str(self.id) + "\n"
+        s += " id: " + str(self.id) + "\n"
         s += " Label : " + str(self.label) + "\n"
         s += " label2: " + str(self.label2) + "\n"
+        data = self.get_data()
+        if data:
+            s+= 'data:' + pprint.pformat(data)
         return s
 
     def set_parent(self, parent):
@@ -127,7 +131,7 @@ class Node(object):
     def get_id(self):
         if self._data and 'id' in self._data:
             return self._data['id']
-        return None
+        return self.id
 
     def add_child(self, child):
         child.set_parent(self)
@@ -235,9 +239,18 @@ class Node(object):
 
     def attach_context_menu(self, item, type, id = None):
         import sys
+        import urllib
         color = qobuz.addon.getSetting('color_ctxitem')
         menuItems = []
-
+        
+        ''' ERASE CACHE '''
+        erasecache=sys.argv[0]+"?mode="+str(Mode.ERASE_CACHE)
+        menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
+        
+        ''' SCAN '''
+        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + urllib.quote(sys.argv[2]) 
+        menuItems.append((qobuz.utils.color(color, "Scan"), "XBMC.RunPlugin("+url+")"))                                                             
+        
         ''' Show playlist '''
         # addtopl=sys.argv[0]+"?mode="+str(MODE_NODE)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) # Do not work
         # if id: addtopl+='&nid='+id

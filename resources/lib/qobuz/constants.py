@@ -20,15 +20,8 @@ __debugging__ = 0
 class __Mode():
     def __init__(self):
         self.VIEW = 1
-        self.PLAY = 512
-#        self.TYPE_TRACK = 1024
-#        self.TYPE_PLAYLIST = 2048
-#        self.TYPE_USERPLAYLISTS = 4096
-#        self.TYPE_RECOMMANDATION = 8192
-#        self.TYPE_ROOT = 16384
-#        self.TYPE_PRODUCT = 32768
-#        self.TYPE_VIRTUAL_PLAYLIST = 65536
-#        self.TYPE_PURCHASES = 131072
-#        self.TYPE_SEARCH = 262144
+        self.PLAY = 2
+        self.ERASE_CACHE = 3
+        self.LIBRARY_SCAN = 4
 
 Mode = __Mode()

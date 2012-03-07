@@ -9,6 +9,7 @@ class dog():
                              'nt'        : '^\d{1,10}$',
                              'genre-type': '^(editor-picks|best-sellers|press-awards|new-releases)$',
                              'genre-id'  : '^\d+$',
+                             'url'       : '^.*$',
                              }
 
     ''' Match value against regexp '''

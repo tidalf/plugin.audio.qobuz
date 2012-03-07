@@ -84,16 +84,17 @@ class Node_playlist(Node):
         for track in self.childs:
             item = track.make_XbmcListItem()#tag.getXbmcItem()
             #print "LABEL: " + item.getLabel()
+            self.attach_context_menu(item, self.get_type(), self.get_id())
             list.append((track.get_url(), item, False))
         return True
 
     def hook_attach_context_menu(self, item, type, id, menuItems, color):
         import sys
         ''' DELETE '''
-        print "removing track id: " + str(id)
-        url = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST_REMOVE_TRACK) + '&nt=' + str(type) + '&tracks_id=' + str(id)
-        if self.id: url += '&nid=' + str(self.id)
-        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Remove track from playlist'), "XBMC.RunPlugin(" + url + ")"))
+#        print "removing track id: " + str(id)
+#        url = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST_REMOVE_TRACK) + '&nt=' + str(type) + '&tracks_id=' + str(id)
+#        if self.id: url += '&nid=' + str(self.id)
+#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Remove track from playlist'), "XBMC.RunPlugin(" + url + ")"))
 
 
     def getLabel(self):
@@ -107,7 +108,10 @@ class Node_playlist(Node):
     def get_owner(self):
         if self._data and 'owner' in self._data:
             return self._data['owner']['name']
-
+    
+    def get_description(self):
+        return self.get_property('description')
+    
     def make_XbmcListItem(self):
         import xbmcgui
         #print "url: " + self.get_url()

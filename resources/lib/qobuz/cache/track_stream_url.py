@@ -31,9 +31,8 @@ import qobuz
 '''
 class Cache_track_stream_url(ICacheable):
     # Constructor
-    def __init__(self, id, type):
+    def __init__(self, id):
         self.id = id
-        self.type = type
         self.format_id = 6
         if qobuz.addon.getSetting('streamtype') == 'mp3':
             self.format_id = 5

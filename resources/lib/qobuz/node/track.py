@@ -21,6 +21,9 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from cache.track import Cache_track
+from cache.track_stream_url import Cache_track_stream_url
+from debug import info, warn, error
+#from gettext import re
 '''
     NODE TRACK
 '''
@@ -33,6 +36,7 @@ class Node_track(Node):
         self.set_content_type('songs')
         self.set_is_folder(False)
         self.cache = None
+        self.cache_url = None
 
     def _build_down(self, lvl, flag = None):
         if flag & NodeFlag.DONTFETCHTRACK:
@@ -44,16 +48,16 @@ class Node_track(Node):
 
     def _set_cache(self):
         id = self.get_id()
+        print "ID: " + str(id )
         if not id:
             try:
                 id = self.get_parameter('nid')
-                print "PLOPPPP: " + str(id)
             except: pass
         if not id:
             error(self, "Cannot set cache without id")
             return False
         self.set_id(id)
-        self.cache = Cache_Track(id)
+        self.cache = Cache_track(id)
         return True
 
     def get_label(self, format = "%a - %t"):
@@ -130,7 +134,33 @@ class Node_track(Node):
         except: pass
         return year
 
-
+    def  get_description(self):
+        if self.parent: return self.parent.get_description()
+        return ''
+    
+    def _set_cache_streaming_url(self):
+        if not self.cache_url:
+            self.cache_url = Cache_track_stream_url(self.get_id())
+        self.cache_url.fetch_data()
+        
+        
+    def get_streaming_url(self):
+        self._set_cache_streaming_url()
+        data = self.cache_url.get_data()
+        print repr(data)
+        return data['streaming_url']
+    
+    def get_mimetype(self):
+        self._set_cache_streaming_url()
+        data = self.cache_url.get_data()
+        format = int(data['format_id'])
+        mime = ''
+        if format == 6:
+            mime = 'audio/flac'
+        else:
+            mime = 'audio/mpeg'
+        return mime
+        
     def make_XbmcListItem(self):
         import xbmcgui
         self.set_url(Mode.PLAY)
@@ -138,8 +168,18 @@ class Node_track(Node):
 #        print "URL: " + self.get_url()
 #        print "Label: " + self.get_label()
 #        print repr(self._data)
-        item = xbmcgui.ListItem(self.get_label(),
-                                self.get_label(),
+        media_number = self.get_media_number()
+        if not media_number: media_number = 1
+        else: media_number = int(media_number)
+        
+        duration = self.get_duration()
+        label = self.get_label()
+        if self.get_streaming_type() == 'sample':
+            duration = 60
+            label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
+            
+        item = xbmcgui.ListItem(label,
+                                label,
                                 self.get_image(),
                                 self.get_image(),
                                 self.get_url())
@@ -147,20 +187,20 @@ class Node_track(Node):
         track_number = self.get_track_number()
         if not track_number: track_number = 0
         else: track_number = int(track_number)
-        item.setInfo(type = 'music',
-                     infoLabels = {
+        
+        item.setInfo(type = 'music', infoLabels = {
                                    'track_id': self.get_id(),
                                    'title': self.get_title(),
                                    'album': self.get_album(),
                                    'genre': self.get_genre(),
                                    'artist': self.get_artist(),
                                    'tracknumber': track_number,
-                                   #'discnumber': self.get_media_number(),
-                                   'duration': self.get_duration(),
+                                   'discnumber': media_number,
+                                   'duration': duration,
                                    'year': self.get_year(),
-                                   'comment': "Qobuz Music Streaming Service"
-
+                                   'comment': self.get_description()
                                    })
+            
         item.setProperty('IsPlayable', 'true')
         item.setProperty('IsInternetStream', 'true')
         item.setProperty('Music', 'true')

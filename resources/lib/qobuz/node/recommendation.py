@@ -81,6 +81,7 @@ class Node_recommendation(Node):
     def _get_xbmc_items_type(self, list, lvl, flag):
         for t in self.get_childs():
             item = xbmcgui.ListItem(t.get_label(), '', '', '', t.get_url())
+            self.attach_context_menu(item, self.type, None)
             list.append((t.get_url(), item, True))
         return True
 
@@ -111,7 +112,7 @@ class Node_recommendation(Node):
         color = qobuz.addon.getSetting('color_recospath')
         for t in self.get_childs():
             item = xbmcgui.ListItem(qobuz.utils.color(color, self.genre_type) + ' / ' + t.get_label(), '', '', '', t.get_url())
-            #self.attach_context_menu(item, NodeFlag.TYPE_RECOMMANDATION)
+            self.attach_context_menu(item, self.type, None)
             list.append((t.get_url(), item, True))
         return True
 
@@ -134,6 +135,7 @@ class Node_recommendation(Node):
         print "TypeGenre xbmc item"
         for product in self.get_childs():
             item = product.make_XbmcListItem()
+            self.attach_context_menu(item, self.type, None)
             list.append((product.get_url(), item, product.is_folder()))
         return True
 
@@ -158,23 +160,24 @@ class Node_recommendation(Node):
         return self._get_xbmc_items_type_genre(list, lvl, flag)
 
     def hook_attach_context_menu(self, item, type, id, menuItems, color):
-        import sys
-        ''' Add to current playlist '''
-        url = sys.argv[0] + "?mode=" + str(MODE_ADD_TO_CURRENT_PLAYLIST) + '&nt=' + str(NodeFlag.TYPE_PRODUCT)
-        if self.genre_id:
-            url += '&genre-id=' + str(self.genre_id)
-        if self.genre_type:
-            url += '&genre-type=' + str(self.genre_type)
-        url += "&nid=" + str(id)
-        print "URL add current: " + url
-        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Add to current playlist'), "XBMC.RunPlugin(" + url + ")"))
-
-        ''' Creating new playlist with current node '''
-        ''' Add to current playlist '''
-        url = sys.argv[0] + "?mode=" + str(MODE_ADD_AS_NEW_PLAYLIST) + '&nt=' + str(NodeFlag.TYPE_PRODUCT)
-        url += "&nid=" + str(id)
-        print "URL: " + url
-        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Add as new playlist'), "XBMC.RunPlugin(" + url + ")"))
+        pass
+#        import sys
+#        ''' Add to current playlist '''
+#        url = sys.argv[0] + "?mode=" + str(MODE_ADD_TO_CURRENT_PLAYLIST) + '&nt=' + str(NodeFlag.TYPE_PRODUCT)
+#        if self.genre_id:
+#            url += '&genre-id=' + str(self.genre_id)
+#        if self.genre_type:
+#            url += '&genre-type=' + str(self.genre_type)
+#        url += "&nid=" + str(id)
+#        print "URL add current: " + url
+#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Add to current playlist'), "XBMC.RunPlugin(" + url + ")"))
+#
+#        ''' Creating new playlist with current node '''
+#        ''' Add to current playlist '''
+#        url = sys.argv[0] + "?mode=" + str(MODE_ADD_AS_NEW_PLAYLIST) + '&nt=' + str(NodeFlag.TYPE_PRODUCT)
+#        url += "&nid=" + str(id)
+#        print "URL: " + url
+#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Add as new playlist'), "XBMC.RunPlugin(" + url + ")"))
 #        addtopl=sys.argv[0]+"?mode="+str(MODE_ADD_TO_NEW_PLAYLIST)+'&nt='+str(type)
 #        if id: addtopl+='&nid='+id
 #        menuItems.append((qobuz.utils.color(color, 'Create as new playlist'), "XBMC.RunPlugin("+addtopl+")"))

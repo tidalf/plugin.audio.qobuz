@@ -26,6 +26,7 @@ from flag import NodeFlag
 from node import Node
 from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
+from search import Node_search
 
 '''
     NODE ROOT
@@ -44,7 +45,7 @@ class Node_root(Node):
         self.add_child(userplaylists)
         reco = Node_recommendation()
         self.add_child(reco)
-
+        search
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
         for child in self.get_childs():
@@ -58,6 +59,7 @@ class Node_root(Node):
             item.setProperty('IsFolder', 'true' if child.is_folder() else 'false')
             item.setIconImage(child.get_icon())
             item.setThumbnailImage(child.get_thumbnail())
+            self.attach_context_menu(item, None, None)
             list.append((child.get_url(), item, child.is_folder()))
         return True
 

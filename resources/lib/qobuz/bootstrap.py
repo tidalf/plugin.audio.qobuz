@@ -146,7 +146,7 @@ class QobuzBootstrap(object):
         qobuz.gui = QobuzGUI()
 
     def bootstrap_player(self):
-        warn(self, "REWRITE! need to bootstrap player")
+        #warn(self, "REWRITE! need to bootstrap player")
         from player import QobuzPlayer
         qobuz.player = QobuzPlayer()
 
@@ -229,3 +229,14 @@ class QobuzBootstrap(object):
                 context_type = "playlist"
             if qobuz.player.play(self.params['nid']):
                 return True
+        elif self.MODE == Mode.ERASE_CACHE:
+            self.erase_cache()
+            
+        elif self.MODE == Mode.LIBRARY_SCAN:
+            import urllib 
+            s = 'UpdateLibrary("music", "'+sys.argv[0] + urllib.unquote(self.params['url'])+'")'
+            info(self, s)
+            xbmc.executebuiltin(s)
+            
+        else:
+            error(self, "Unknow mode: " + str(self.MODE))
