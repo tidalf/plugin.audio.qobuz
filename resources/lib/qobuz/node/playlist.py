@@ -17,7 +17,7 @@
 import pprint
 
 import qobuz
-from constants import *
+from constants import Mode
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error
@@ -79,13 +79,14 @@ class Node_playlist(Node):
 
     def _get_xbmc_items(self, list, lvl, flag):
         if len(self.childs) < 1:
-            qobuz.gui.notification(36000, 36001)
+            qobuz.gui.notify(36000, 36001)
             return False
         for track in self.childs:
             item = track.make_XbmcListItem()#tag.getXbmcItem()
             #print "LABEL: " + item.getLabel()
-            self.attach_context_menu(item, self.get_type(), self.get_id())
-            list.append((track.get_url(), item, False))
+            self.attach_context_menu(item, track)
+            url = track.get_url(Mode.PLAY)
+            list.append((url, item, False))
         return True
 
     def hook_attach_context_menu(self, item, type, id, menuItems, color):
@@ -114,7 +115,6 @@ class Node_playlist(Node):
     
     def make_XbmcListItem(self):
         import xbmcgui
-        #print "url: " + self.get_url()
         item = xbmcgui.ListItem(self.get_name(),
                                 self.get_owner(),
                                 self.get_icon(),

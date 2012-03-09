@@ -20,55 +20,45 @@ import pprint
 import qobuz
 from constants import *
 from flag import NodeFlag
-from tree.node import Node
-from debug import info
-from tag.track import TagTrack
-from tag.product import TagProduct
+from node import Node
+from debug import info, warn, error, debug
+#from tag.track import TagTrack
+#from tag.product import TagProduct
 '''
     NODE PURCHASES
 '''
-from data.purchases import QobuzGetPurchases
-from data.product import QobuzProduct
-from tag.product import TagProduct
-from tag.album import TagAlbum
-from node_product import node_product
+from cache.purchases import Cache_purchases
+from cache.product import Cache_product
+#from tag.product import TagProduct
+#from tag.album import TagAlbum
+from product import Node_product
 
-class node_purchases(Node):
+class Node_purchases(Node):
 
     def __init__(self, parent = None, params = None):
-        super(node_purchases, self).__init__(parent)
-        self.label = 'Product'
-        self.label2 = 'Keep your current playlist'
+        super(Node_purchases, self).__init__(parent)
+        self.label = qobuz.lang(30100)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
         self.set_content_type('albums')
+        self.cache = Cache_purchases()
 
     def _build_down(self, lvl, flag = None):
-        o = QobuzGetPurchases()
-        data = o.get_data()
-        print "DATA: " + repr(data)
-        if not data: return
-        self.set_json(data)
-        for a in o.filter_products(o._raw_data):
-            p = node_product(a[0].id)
-            p.set_id(a[0].id)
-            product_json = a[1].get_json()['album']
-            p.set_json(product_json)
-            p.set_url()
-            self.add_child(p)
+        data = self.fetch_data()
+        print "DATA: " + pprint.pformat(data)
+        if not data: 
+            error(self, "Cannot fetch purchases data")
+            return False
+        self.set_data(data)
+        for product in self.cache.filter_products(self.cache.get_data()):
+            self.add_child(product)
 
     def _get_xbmc_items(self, list, lvl, flag):
         if len(self.childs) < 1:
+            qobuz.gui.notify(36000, 36001)
             return False
-        for c in self.childs:
-            pre_tag = TagProduct(c.get_json())
-            cache = QobuzProduct(pre_tag.id)
-            tag = TagProduct(cache.get_data())
-            item = tag.getXbmcItem()
-            url = c.get_url()
-            print "URL: " + url
-            item.setPath(url)
-            print "Path: " + item.getProperty('Path')
-            item.setProperty('path', url)
-            #item.setLabel(''.join((tag.getArtist(), ' - ', tag.getAlbum())))
-            list.append((item.getProperty('path'), item, True))
+        for product in self.childs:
+            if product.filter(flag): continue
+            item = product.make_XbmcListItem()#tag.getXbmcItem()
+            self.attach_context_menu(item, product)
+            list.append((product.get_url(Mode.VIEW), item, product.is_folder()))
         return True

@@ -27,7 +27,7 @@ from node import Node
 from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
 from search import Node_search
-
+from purchases import Node_purchases
 '''
     NODE ROOT
     
@@ -41,18 +41,17 @@ class Node_root(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
 
     def _build_down(self, lvl, flag = None):
-#        search_artist = Node_search()
-#        search_artist.set_search_type('artists')
-#        self.add_child(search_artist)
-        
-        userplaylists = Node_user_playlists()
-        self.add_child(userplaylists)
-        reco = Node_recommendation(None)
-        self.add_child(reco)
+        self.add_child(Node_user_playlists())
+        self.add_child(Node_recommendation())
+        self.add_child(Node_purchases())
+        search_album = Node_search()
+        search_album.set_search_type('albums')
+        self.add_child(search_album)
         
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
         for child in self.get_childs():
+            if self.filter(flag): continue
             print "URL: " + child.get_url()
             item = xbmcgui.ListItem(
                                     child.get_label(),
@@ -64,7 +63,7 @@ class Node_root(Node):
             item.setProperty('IsFolder', 'true' if child.is_folder() else 'false')
             item.setIconImage(child.get_icon())
             item.setThumbnailImage(child.get_thumbnail())
-            self.attach_context_menu(item, None, None)
+            self.attach_context_menu(item, child)
             list.append((child.get_url(), item, child.is_folder()))
         return True
 

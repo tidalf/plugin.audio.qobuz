@@ -17,6 +17,7 @@
 import os
 import time
 import pickle
+import hashlib
 
 from debug import log, info, warn, debug
 from  file.write import safe_write
@@ -25,15 +26,20 @@ class ICacheable(object):
     '''
         Interface ICacheable
     '''
-    def __init__(self, path, name, id = None):
+    def __init__(self, path, name, id = None, hash_path = True):
         self._raw_data = None
         self.cache_refresh = 0
         self.cache_path = None
         self.cache_object_id = None
         self.cache_object_path = None
         self.cache_object_name = None
+        self.set_hashing_path(hash_path)
         self.set_cache_path(path, name, id)
-
+        
+    def set_hashing_path(self, b):
+        if b: self.hashing_path = True
+        else: self.hashing_path = False
+        
     def set_cache_path(self, path, name, id):
         if not name:
             warn(self, "Cannot set path without name or id")
@@ -45,6 +51,17 @@ class ICacheable(object):
             id = str(id)
             self.cache_object_id = id
             self.cache_object_path += '-' + self.cache_object_id
+        if self.hashing_path:
+            hash = hashlib.new('SHA1')
+            hash.update(self.cache_object_path)
+            digest = hash.hexdigest()
+            newdir = digest[0:2]
+            print "NEWdir: " + newdir
+            self.cache_path = os.path.join(path, newdir)
+            self.cache_object_path = digest
+            if not os.path.exists(self.cache_path):
+                try: os.mkdir(self.cache_path)
+                except: warn(self, "Cannot make directory: " + self.cache_path)
         self.cache_object_path += '.dat'
         debug(self, "Cache for " + name + " set to: " + self.cache_object_path)
 
@@ -89,7 +106,11 @@ class ICacheable(object):
         data = None
         with open(cache, 'rb') as f:
             f = open(cache, 'rb')
-            data = pickle.load(f)
+            try:
+                data = pickle.load(f)
+            except: 
+                warn(self, "Picke can't load data from file")
+                return None 
         return data
 
     def delete_cache(self):

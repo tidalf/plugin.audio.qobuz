@@ -33,7 +33,7 @@ class Cache_authentication(ICacheable):
         self.login = login
         self.password = password
         super(Cache_authentication, self).__init__(qobuz.path.cache,
-                                         'auth')
+                                         'authentication', None, False)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_auth'))
         debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()

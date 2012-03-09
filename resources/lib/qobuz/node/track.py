@@ -42,13 +42,14 @@ class Node_track(Node):
         if flag & NodeFlag.DONTFETCHTRACK:
             #print "Don't fetch track data"
             return False
+        return True
 
     def _get_xbmc_items(self, list, lvl, flag):
-        pass
+        return True
 
     def _set_cache(self):
         id = self.get_id()
-        print "ID: " + str(id )
+        #print "ID: " + str(id )
         if not id:
             try:
                 id = self.get_parameter('nid')
@@ -163,11 +164,12 @@ class Node_track(Node):
         
     def make_XbmcListItem(self):
         import xbmcgui
-        self.set_url(Mode.PLAY)
+
 #        print repr(self.get_data())
 #        print "URL: " + self.get_url()
 #        print "Label: " + self.get_label()
 #        print repr(self._data)
+
         media_number = self.get_media_number()
         if not media_number: media_number = 1
         else: media_number = int(media_number)
@@ -178,12 +180,14 @@ class Node_track(Node):
             duration = 60
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
             
+        url = self.get_url(Mode.PLAY)
+        #print "TRACK url: " + url
         item = xbmcgui.ListItem(label,
                                 label,
                                 self.get_image(),
                                 self.get_image(),
-                                self.get_url())
-        item.setPath(self.get_url())
+                                url)
+        item.setPath(url)                        
         track_number = self.get_track_number()
         if not track_number: track_number = 0
         else: track_number = int(track_number)
@@ -200,7 +204,6 @@ class Node_track(Node):
                                    'year': self.get_year(),
                                    'comment': self.get_description()
                                    })
-            
         item.setProperty('IsPlayable', 'true')
         item.setProperty('IsInternetStream', 'true')
         item.setProperty('Music', 'true')

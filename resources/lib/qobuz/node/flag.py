@@ -21,7 +21,7 @@ class __NodeFlag():
         self.TYPE_TRACK = 1024
         self.TYPE_PLAYLIST = 2048
         self.TYPE_USERPLAYLISTS = 4096
-        self.TYPE_RECOMMANDATION = 8192
+        self.TYPE_RECOMMENDATION = 8192
         self.TYPE_ROOT = 16384
         self.TYPE_PRODUCT = 32768
         self.TYPE_VIRTUAL_PLAYLIST = 65536
@@ -29,11 +29,14 @@ class __NodeFlag():
         self.TYPE_SEARCH = 262144
 
     def to_string(self, flag):
-        if flag == self.NODE: return "Node"
-        elif flag == self.TRACK: return "Track"
-        elif flag == self.PLAYLIST: return "Playlist"
-        elif flag == self.USERPLAYLISTS: return "UserPlaylists"
-        elif flag == self.RECOMMANDATIONS: return "Recommendations"
+        if flag == self.TYPE_NODE: return "node"
+        elif flag == self.TYPE_TRACK: return "track"
+        elif flag == self.TYPE_PLAYLIST: return "playlist"
+        elif flag == self.TYPE_USERPLAYLISTS: return "userplaylists"
+        elif flag == self.TYPE_RECOMMENDATION: return "recommendations"
+        elif flag == self.TYPE_ROOT: return "root"
+        elif flag == self.TYPE_PRODUCT: return "product"
+        elif flag == self.TYPE_PURCHASES: return "purchases"
         else: return "Unknow flag: " + str(flag)
 
 NodeFlag = __NodeFlag()

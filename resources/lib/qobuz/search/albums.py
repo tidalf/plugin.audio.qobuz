@@ -15,19 +15,14 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-import pprint
-
-from constants import *
-from debug import log, info, warn
-from tag.product import TagProduct
-from tag.album import TagAlbum
-from utils.icacheable import ICacheable
 import qobuz
+from debug import log, info, warn
+from utils.icacheable import ICacheable
+
 '''
     Class QobuzSearchAlbums
 '''
-class QobuzSearchAlbums():
+class Search_albums():
 
     def __init__(self):
         self._raw_data = []
@@ -45,36 +40,3 @@ class QobuzSearchAlbums():
         
     def length(self):
         return len(self._raw_data)
-    
-    def get_items(self):
-        return self._directory_products()
-    
-    def get_items_by_artist(self):
-        return self._directory_products_by_artist()
-
-    def _directory_products(self):
-        list = []
-        data = self.get_data()
-        if not data:
-            return list
-        for product in data:
-            tag_product = TagProduct(product['product'])
-            item = tag_product.getXbmcItem('fanArt')
-            u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
-            list.append((u, item, True))
-        return list
-
-    def _directory_products_by_artist(self):
-        json = self.get_data()
-        artist = None
-        list = []
-        try:
-            artist = json['artist']['name']
-        except:
-            return list
-        for json_album in json['artist']['albums']:
-            tag_product = TagProduct(json_album)
-            u = qobuz.boot.build_url(MODE_ALBUM, tag_product.id)
-            item = tag_product.getXbmcItem('fanArt')
-            list.append((u, item, True))
-        return list

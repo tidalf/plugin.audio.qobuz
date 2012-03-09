@@ -41,7 +41,6 @@ class Node_user_playlists(Node):
         display_by = self.get_parameter('display-by')
         if not display_by: display_by = 'songs'
         self.set_display_by(display_by)
-        self.set_url()
         self.cache = Cache_user_playlists()
 
     def set_display_by(self, type):
@@ -75,7 +74,7 @@ class Node_user_playlists(Node):
             if playlist.get_owner() != username:
                 item.setLabel(''.join([qobuz.utils.color(color, playlist.get_owner()), ' - ', playlist.get_name()]))
             else:
-                self.attach_context_menu(item, NodeFlag.TYPE_PLAYLIST, playlist.get_id())
+                self.attach_context_menu(item, playlist)
             #if playlist.is_current():
 #                label = item.getLabel()
 #                item.setLabel(qobuz.utils.color(color, '-> ') + label + qobuz.utils.color(color, ' <-')

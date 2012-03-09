@@ -38,7 +38,7 @@ class Cache_track_stream_url(ICacheable):
             self.format_id = 5
         super(Cache_track_stream_url, self).__init__(qobuz.path.cache,
                                             'track-url-' + str(self.format_id),
-                                            self.id)
+                                            self.id, False)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_auth'))
         debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()

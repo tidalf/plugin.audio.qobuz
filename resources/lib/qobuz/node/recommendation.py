@@ -26,6 +26,7 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from product import Node_product
+from debug import info, warn, error
 '''
     NODE RECOS
 '''
@@ -35,21 +36,20 @@ class Node_recommendation(Node):
 
     def __init__(self, parent = None, parameters = None):
         super(Node_recommendation, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_RECOMMANDATION
+        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_RECOMMENDATION
         genre_id = self.get_parameter('genre-id')
         if genre_id != None: self.genre_id = int(genre_id)
         else: self.genre_id = None
         self.genre_type = self.get_parameter('genre-type')
-        self.set_url()
         self.set_label("Recommendation")
 
-    def set_url(self):
-        url = sys.argv[0] + '?mode=' + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_RECOMMANDATION)
+    def make_url(self, mode = Mode.VIEW):
+        url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
         if self.genre_type:
             url += '&genre-type=' + self.genre_type
         if self.genre_id:
             url += '&genre-id=' + str(self.genre_id)
-        self.url = url
+        return url
 
     def setGenreType(self, type):
         self.genre_type = type
@@ -75,13 +75,14 @@ class Node_recommendation(Node):
             self.add_child(node)
             node.setGenreType(t[0])
             node.set_label(t[1])
-            node.set_url()
+            #node.set_url()
 
 
     def _get_xbmc_items_type(self, list, lvl, flag):
         for t in self.get_childs():
+            if self.filter(flag): continue
             item = xbmcgui.ListItem(t.get_label(), '', '', '', t.get_url())
-            self.attach_context_menu(item, self.type, None)
+            self.attach_context_menu(item, t )
             list.append((t.get_url(), item, True))
         return True
 
@@ -105,14 +106,14 @@ class Node_recommendation(Node):
             node.setGenreType(self.getGenreType())
             node.setGenreId(t[0])
             node.set_label(t[1])
-            node.set_url()
             self.add_child(node)
 
     def _get_xbmc_items_genre(self, list, lvl, flag):
         color = qobuz.addon.getSetting('color_recospath')
         for t in self.get_childs():
+            if self.filter(flag): continue
             item = xbmcgui.ListItem(qobuz.utils.color(color, self.genre_type) + ' / ' + t.get_label(), '', '', '', t.get_url())
-            self.attach_context_menu(item, self.type, None)
+            self.attach_context_menu(item, t)
             list.append((t.get_url(), item, True))
         return True
 
@@ -134,8 +135,9 @@ class Node_recommendation(Node):
     def _get_xbmc_items_type_genre(self, list , lvl, flag):
         print "TypeGenre xbmc item"
         for product in self.get_childs():
+            if self.filter(flag): continue
             item = product.make_XbmcListItem()
-            self.attach_context_menu(item, self.type, None)
+            self.attach_context_menu(item, product)
             list.append((product.get_url(), item, product.is_folder()))
         return True
 

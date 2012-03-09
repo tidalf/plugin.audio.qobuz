@@ -94,7 +94,7 @@ class QobuzBootstrap(object):
                 s.base = qobuz.addon.getAddonInfo('path')
 
             def _set_dir(s):
-                s.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', 'plugin.audio.qobuz')
+                s.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', qobuz.addon.getAddonInfo('id'))
                 s.cache = os.path.join(s.profile, 'cache')
                 s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
                 s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
@@ -202,23 +202,8 @@ class QobuzBootstrap(object):
     '''
     def dispatch(self):
         ret = False
-        if self.MODE == Mode.VIEW:
-            info(self, "Displaying node")
-            from renderer.xbmc import Xbmc_renderer as renderer
-            nt = None
-            try:
-                nt = int(self.params['nt'])
-            except:
-                print "No node type...abort"
-                return False
-            print "Node type: " + str(nt)
-            id = None
-            try: id = self.params['nid']
-            except: pass
-            r = renderer(nt, id, 0)
-            r.display()
 
-        elif self.MODE == Mode.PLAY:
+        if self.MODE == Mode.PLAY:
             info(self, "Playing song")
             self.bootstrap_player()
             if qobuz.addon.getSetting('notification_playingsong') == 'true':
@@ -229,14 +214,61 @@ class QobuzBootstrap(object):
                 context_type = "playlist"
             if qobuz.player.play(self.params['nid']):
                 return True
+            return False
         elif self.MODE == Mode.ERASE_CACHE:
             self.erase_cache()
+            return True
             
+        from renderer.xbmc import Xbmc_renderer as renderer
+        
+        nt = None
+        try: nt = int(self.params['nt'])
+        except:
+            print "No node type...abort"
+            return False
+        print "Node type: " + str(nt)
+        
+        id = None
+        try: id = self.params['nid']        
+        except: pass
+        
+        depth = 1
+        try: depth = int(self.params['depth'])
+        except: pass
+        
+        view_filter = 0
+        try: view_filter = int(self.params['view-filter'])
+        except: pass
+        
+        if self.MODE == Mode.VIEW:
+            info(self, "Displaying node")
+            r = renderer(nt, id)
+            r.set_depth(depth)
+            r.set_filter(view_filter)
+            return r.display()
+            
+#        elif self.MODE == Mode.LIBRARY_SCAN:
+#            
+#            info(self, "Scanning mode")
+#            r = renderer(nt, id, -1)
+#            return r.display()
+#            
+#
+#            
         elif self.MODE == Mode.LIBRARY_SCAN:
             import urllib 
-            s = 'UpdateLibrary("music", "'+sys.argv[0] + urllib.unquote(self.params['url'])+'")'
-            info(self, s)
+            from node.flag import NodeFlag
+            #s = 'UpdateLibrary("music", "'+sys.argv[0] + urllib.unquote(self.params['url'])+'")'
+            s = 'UpdateLibrary("music", "' + sys.argv[0] + "?nt=" + self.params['nt'] + "&mode=" + str(Mode.VIEW) + "&view-filter=" + str(NodeFlag.TYPE_TRACK) + "&depth=-1"
+            if 'nid' in self.params and self.params['nid']  != "None": 
+                s += "&nid=" + self.params['nid']
+            if 'genre-type' in self.params: s+= "&genre-type=" + self.params['genre-type']
+            if 'genre-id' in self.params: s+= "&genre-id=" + self.params['genre-id']
+            s+= '")'
+            #print "SCAN: " + s
+            #info(self, s)
             xbmc.executebuiltin(s)
-            
-        else:
-            error(self, "Unknow mode: " + str(self.MODE))
+            return False
+#            
+#        else:
+#            error(self, "Unknow mode: " + str(self.MODE))

@@ -46,7 +46,11 @@ class Node(object):
 
     def get_data(self):
         return self._data
-
+    
+    def fetch_data(self):
+        if not self.cache: return None
+        return self.cache.fetch_data()
+    
     def get_property(self, path):
         #print "Get property: " + repr(path)
 #        print "type: " + str(type(path))
@@ -118,16 +122,18 @@ class Node(object):
         except: pass
         return None
 
-    def set_url(self, mode = Mode.VIEW):
+    def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + "&nt=" + str(self.type)
         id = self.get_id()
-        if id: url += "&nid=" + str(id)
-        self.url = url
-        return self.url
-        
-    def get_url(self):
-        if not self.url: self.set_url()
-        return self.url
+        if id and id != 'None': url += "&nid=" + str(id)
+        return url
+    
+    def set_url(self, url):
+      self.url = url
+      return self.url
+    
+    def get_url(self, mode = Mode.VIEW):
+        return self.set_url(self.make_url(mode))
 
     def set_id(self, id):
         self.id = id
@@ -152,9 +158,6 @@ class Node(object):
                 list.append(c)
         return list
 
-    def set_parent(self, parent):
-        self.parent = parent
-
     def set_label(self, label):
         self.label = label
 
@@ -173,6 +176,16 @@ class Node(object):
     def get_type(self):
         return self.type
 
+
+    def filter(self, flag):
+        if not flag: 
+            #print "No flag: accept item"
+            return False
+        if flag & self.get_type(): 
+            #print "FLAG is ok: accept item"
+            return False
+        #print "FLAG fail: removing item"
+        return True
 
     '''
         build_down:
@@ -208,7 +221,7 @@ class Node(object):
     '''
     def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE):
         if lvl != -1 and lvl < 1:
-            return True
+            return False
         if not self._get_xbmc_items(list, lvl, flag):
             return False
         if lvl != -1:
@@ -231,17 +244,8 @@ class Node(object):
             total += c.count_node(flag)
         return total
 
-    def get_tag_items(self, list, lvl, flag = NodeFlag.TYPE_NODE):
-        if lvl != -1 and lvl < 1:
-            return True
-        self._get_tag_items(list, lvl, flag)
-        if lvl != -1:
-            lvl -= 1
-        for c in self.childs:
-            c.get_tag_items(list, lvl, flag)
 
-
-    def attach_context_menu(self, item, type, id = None):
+    def attach_context_menu(self, item, node):
         import sys
         import urllib
         color = qobuz.addon.getSetting('color_ctxitem')
@@ -252,7 +256,11 @@ class Node(object):
         menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
         
         ''' SCAN '''
-        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + urllib.quote(sys.argv[2]) 
+#        #url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + urllib.quote(sys.argv[2])
+#        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&nt=" + str(type) 
+#        if id and id != "None": url+= "&nid=" + str(id)
+        url = node.make_url(Mode.LIBRARY_SCAN)
+       # print "scan URL: " + url
         menuItems.append((qobuz.utils.color(color, "Scan"), "XBMC.RunPlugin("+url+")"))                                                             
         
         ''' Show playlist '''
@@ -263,7 +271,7 @@ class Node(object):
 #        ''' 
 #        Give a chance to our siblings to attach their items
 #        '''
-        self.hook_attach_context_menu(item, type, id, menuItems, color)
+        self.hook_attach_context_menu(item, node.get_type(), node.get_id(), menuItems, color)
         '''
         Add our items to the context menu
         '''
@@ -272,7 +280,4 @@ class Node(object):
 
     def hook_attach_context_menu(self, item, type, id, menuItems, color):
         pass
-
-    def log(msg):
-        print "TESTNODE: " + msg.encode('ascii', 'ignore') + "\n"
   

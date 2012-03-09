@@ -35,7 +35,7 @@ class Cache_user_playlists_toremove(ICacheable):
         super(Cache_user_playlists_toremove, self).__init__(
                                                cache_path,
                                                'userplaylists',
-                                               0)
+                                               None, False)
         self.set_cache_refresh(cache_refresh)
         self.fetch_data()
 

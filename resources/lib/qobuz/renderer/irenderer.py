@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import qobuz
 from node.flag import NodeFlag
-from debug import info, warn
+from debug import info, warn, error, debug
 
 class IRenderer(object):
 
@@ -33,36 +33,42 @@ class IRenderer(object):
         if self.root:
             s += self.root.to_s()
         return s
-
+    
+    def set_depth(self, d):
+        self.depth = d
+        
+    def set_filter(self, filter):
+        self.filter = filter
+    
     def set_root_node(self):
         root = None
+        debug(self, 'Setting root node: ' 
+                   + str(self.node_type) 
+                   + ' / ' + NodeFlag.to_string(self.flag))
         if self.node_type & NodeFlag.TYPE_ROOT:
             from node.root import Node_root
             root = Node_root(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_TRACK:
-            from node_track import node_track
-            root = node_track(None, qobuz.boot.params)
+            from node.track import Node_track
+            root = Node_track(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_USERPLAYLISTS:
-            print "SET ROOT NODE: USER PLAYLISTS"
             from node.user_playlists import Node_user_playlists
             root = Node_user_playlists(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_PLAYLIST:
-            print "SET ROOT NODE: PLAYLIST"
             from node.playlist import Node_playlist
             root = Node_playlist(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_RECOMMANDATION:
+        elif self.node_type & NodeFlag.TYPE_RECOMMENDATION:
             from node.recommendation import Node_recommendation
             root = Node_recommendation(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_PRODUCT:
-            print "Render product"
             from node.product import Node_product
             root = Node_product(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_VIRTUAL_PLAYLIST:
             from node_virtual_playlist import node_virtual_playlist
             root = node_virtual_playlist(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_PURCHASES:
-            from node_purchases import node_purchases
-            root = node_purchases(None, qobuz.boot.params)
+            from node.purchases import Node_purchases
+            root = Node_purchases(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_SEARCH:
             from node.search import Node_search
             root = Node_search(None, qobuz.boot.params)
@@ -71,6 +77,6 @@ class IRenderer(object):
             print "Nothing to display"
             return False
         root.set_id(self.node_id)
-        root.set_url()
+        root.get_url()
         self.root = root
         return True

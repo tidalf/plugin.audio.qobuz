@@ -52,14 +52,13 @@ class Node_product(Node):
     
     def _build_down(self, lvl, flag = None):
         if not self._set_cache():
-            errot(self, "Cannot set product cache")
+            error(self, "Cannot set product cache")
             return False
         data = self.cache.fetch_data()
         if not data:
             warn(self, "Cannot fetch product data")
             return False
         self.set_data(data)
-        print repr(data)
         for track in data['tracks']:
             node = Node_track()
             node.set_data(track)
@@ -67,22 +66,17 @@ class Node_product(Node):
 
     def _get_xbmc_items(self, list, lvl, flag):
         if len(self.childs) < 1:
-            qobuz.gui.notification(36000, 36001)
+            qobuz.gui.notify(36000, 36001)
             return False
         for track in self.childs:
+            if track.filter(flag): continue
             item = track.make_XbmcListItem()#tag.getXbmcItem()
-            self.attach_context_menu(item, self.type, self.get_id())
-            list.append((track.get_url(), item, False))
+            self.attach_context_menu(item, track)
+            list.append((track.get_url(Mode.PLAY), item, False))
         return True
-
-    def _get_tag_items(self, list, lvl, flag):
-        pass
-
     
     def make_XbmcListItem(self):
         import xbmcgui
-        self.set_url()
-        print repr(self.get_data())
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),
@@ -96,7 +90,12 @@ class Node_product(Node):
     PROPERTIES 
     '''
     def get_artist(self):
-        return self.get_property(('artist', 'name'))
+        a = self.get_property(('artist', 'name'))
+        if a: return a
+        a = self.get_property(('interpreter', 'name'))
+        if a: return a
+        a = self.get_property(('composer', 'name'))
+        return a
     
     def get_title(self):
         title =  self.get_property('title')

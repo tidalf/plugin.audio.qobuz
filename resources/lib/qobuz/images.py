@@ -60,7 +60,7 @@ class QobuzImage_cache(ICacheable):
                                                      'images-cache')
         self.set_cache_refresh(-1)
         debug(self, "Cache duration: " + str(self.cache_refresh))
-        self.fetch_data()
+        #self.fetch_data()
 
     def _fetch_data(self):
         return {}

@@ -1,21 +1,41 @@
-
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
+#     This file is part of xbmc-qobuz.
+#
+#     xbmc-qobuz is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     xbmc-qobuz is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+import sys
 from debug import info, warn, error
 from flag import NodeFlag
 from node import Node
 import qobuz
 from constants import Mode
-#from search.artists import Search_artists
+from search.albums import Search_albums
             
 class Node_search(Node):
 
     def __init__(self, parent = None, params = None):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
-        self.search_type = None
+        self.search_type = 'albums'
 
     def get_label(self):
         if self.search_type == 'artists':
             return "Searching artist"
+        elif self.search_type == 'albums':
+            return "Searching albums"
+        elif self.search_type == 'songs':
+            return "Searching for songs"
     
     def set_search_type(self, st):
         print "Set search type: " + st
@@ -23,11 +43,12 @@ class Node_search(Node):
         
     def get_search_type(self):
         return self.search_type
+
     
-    def set_url(self, mode = Mode.VIEW):
-        url = super(Node_search, self).set_url()
-        url += '&search-type=' + self.get_search_type()
-        self.url = url
+    def make_url(self, mode = Mode.VIEW):
+        url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
+        url += '&search-type=' + self.search_type
+        return url
         
     def _get_xbmc_items(self, list, lvl, flag):
         stype = self.get_search_type()
@@ -41,7 +62,7 @@ class Node_search(Node):
             self.set_content_type('songs')
         elif stype == 'albums':
             print "Searching albums"
-            search = qobuz.core.getQobuzSearchAlbums()
+            search = Search_albums()
             limit = qobuz.addon.getSetting('albumsearchlimit')
             heading = qobuz.lang(30014)
             self.set_content_type('albums')
