@@ -14,13 +14,16 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
+import sys 
+import qobuz
 from debug import info, warn, error
 from flag import NodeFlag
 from node import Node
-import qobuz
+from product import Node_product
 from constants import Mode
-from search.albums import Search_albums
+import pprint
+
+#from search.artists import Search_artists
             
 class Node_search(Node):
 
@@ -36,7 +39,7 @@ class Node_search(Node):
             return "Searching albums"
         elif self.search_type == 'songs':
             return "Searching for songs"
-    
+
     def set_search_type(self, st):
         print "Set search type: " + st
         self.search_type = st
@@ -44,13 +47,12 @@ class Node_search(Node):
     def get_search_type(self):
         return self.search_type
 
-    
     def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
         url += '&search-type=' + self.search_type
         return url
-        
-    def _get_xbmc_items(self, list, lvl, flag):
+
+    def _get_xbmc_items(self, p_list, lvl, flag):
         stype = self.get_search_type()
         search = None
         limit = None
@@ -61,6 +63,7 @@ class Node_search(Node):
             heading = qobuz.lang(30013)
             self.set_content_type('songs')
         elif stype == 'albums':
+            from qobuz.search.albums import Search_albums
             print "Searching albums"
             search = Search_albums()
             limit = qobuz.addon.getSetting('albumsearchlimit')
@@ -82,14 +85,21 @@ class Node_search(Node):
                 return False
         query.strip()
         print "Query: " + query
-        search.search(query, limit)
-        slist = search.get_items()
-        if len(slist) < 1:
-            qobuz.gui.notification(36000, 35001)
-            self._get_xbmc_items(list, lvl, flag)
-            return False
-        list.extend(slist)
-        return True
+        data = search.search(query, limit).get_data()
+        if self.search_type == 'albums':
+            for json_product in data:
+                json_product = json_product['product']
+                artist = json_product['artist']
+                print "Artist: " + artist.encode('utf8', 'ignore')
+                json_product['artist'] = { }
+                json_product['artist']['name'] = artist
+                print pprint.pformat(json_product)
+                product = Node_product()
+                product.set_data(json_product)
+                item = product.make_XbmcListItem()
+                self.attach_context_menu(item, product)
+                p_list.append((product.get_url(), item, product.is_folder()))
+        return p_list
 
     def _get_keyboard(self, default = "", heading = "", hidden = False):
         import xbmc

@@ -29,6 +29,7 @@ class __NodeFlag():
         self.TYPE_SEARCH = 262144
 
     def to_string(self, flag):
+        if not flag: return "No Flag"
         if flag == self.TYPE_NODE: return "node"
         elif flag == self.TYPE_TRACK: return "track"
         elif flag == self.TYPE_PLAYLIST: return "playlist"

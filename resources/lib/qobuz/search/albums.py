@@ -17,7 +17,6 @@
 
 import qobuz
 from debug import log, info, warn
-from utils.icacheable import ICacheable
 
 '''
     Class QobuzSearchAlbums
@@ -26,17 +25,17 @@ class Search_albums():
 
     def __init__(self):
         self._raw_data = []
-        
+
     def get_data(self):
         return self._raw_data
-    
+
     def search(self, query, limit = 100):
         self._raw_data = qobuz.api.search_albums(query, limit)
         return self
-    
-    def search_by_artist(self,id, limit = 100):
-        self._raw_data = qobuz.api.get_albums_from_artist(id, limit)
+
+    def search_by_artist(self, p_id, limit = 100):
+        self._raw_data = qobuz.api.get_albums_from_artist(p_id, limit)
         return self
-        
+
     def length(self):
         return len(self._raw_data)

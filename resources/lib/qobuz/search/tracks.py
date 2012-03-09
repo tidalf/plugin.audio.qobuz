@@ -19,14 +19,12 @@ import pprint
 
 from constants import *
 from debug import log, info, warn
-#from tag.track import TagTrack
-from tag.search import TagSearch
 import qobuz
 
 ###############################################################################
 # Class QobuzSearchTracks 
 ###############################################################################
-class QobuzSearchTracks():
+class Search_tracks():
 
     def __init__(self):
         self._raw_data = {}
@@ -39,20 +37,6 @@ class QobuzSearchTracks():
         if not self._raw_data['results']:
             return 0
         return len(self._raw_data['results']['tracks'])
-    
-    def get_items(self):
-        list = []
-        data = self._raw_data
-        if not data:
-            return list
-        if not 'results' in data:
-            return list
-        ts = TagSearch(data['results'])
-        childs = ts.get_childs()
-        for track in childs:
-            item = track.getXbmcItem('playlist', 0, 'fanArt')
-            u = qobuz.boot.build_url(MODE_SONG, int(track.id))
-            list.append((u, item, False))
-        return list
+
 
 

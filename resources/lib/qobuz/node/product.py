@@ -84,6 +84,10 @@ class Node_product(Node):
                                 self.get_image(),
                                 self.get_url(),                         
                                 )
+        item.setInfo('music', infoLabels = {
+                                            'genre': self.get_genre(),
+                                            'year': self.get_year()
+                                            })
         return item
 
     ''' 
