@@ -21,6 +21,7 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from track import Node_track
+from artist import Node_artist
 from constants import Mode
 import pprint
 
@@ -116,9 +117,16 @@ class Node_search(Node):
                 self.attach_context_menu(item, track)
                 p_list.append((track.get_url(Mode.PLAY), item, track.is_folder()))
                  
-        elif self.search_type == 'artist':
+        elif self.search_type == 'artists':
             print "NOT IMPLEMENTED (search artists)"
-            
+            for jartist in data['results']['artists']:
+                print "ARTIST JSON"
+                pprint.pprint(jartist)
+                artist = Node_artist()
+                artist.set_data(jartist)
+                item = artist.make_XbmcListItem()
+                self.attach_context_menu(item, artist)
+                p_list.append((artist.get_url(), item, artist.is_folder()))
         return p_list
 
     def notify_data_result(self, data):

@@ -20,41 +20,56 @@ import pprint
 import xbmcgui
 
 import qobuz
-from constants import *
+from constants import Mode
 
 from flag import NodeFlag
 from node import Node
-from user_playlists import Node_user_playlists
-from recommendation import Node_recommendation
-from search import Node_search
-from purchases import Node_purchases
+from product import Node_product
+from debug import info, warn, error, debug
 '''
-    NODE ROOT
-    
-    Sibling of root are playlist, recos, search, purchases...
+    NODE ARTIST
 '''
 
-class Node_root(Node):
+class Node_artist(Node):
 
     def __init__(self, parent = None, parameters = None):
-        super(Node_root, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
-        print "JJA"
+        super(Node_artist, self).__init__(parent, parameters)
+        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ARTIST
 
+    
+    def get_label(self):
+        return self.get_artist()
+    
+    def get_artist(self):
+        return self.get_property('name')
+    
+    def get_label2(self):
+        return self.get_slug()
+    
+    def get_slug(self):
+        return self.get_property('slug')
+    
     def _build_down(self, lvl, flag = None):
-        self.add_child(Node_user_playlists())
-        self.add_child(Node_recommendation())
-        self.add_child(Node_purchases())
-        search = Node_search()
-        search.set_search_type('albums')
-        self.add_child(search)
-        search = Node_search()
-        search.set_search_type('songs')
-        self.add_child(search)
-        search = Node_search()
-        search.set_search_type('artists')
-        self.add_child(search)
-        
+        data = qobuz.api.get_albums_from_artist(self.get_id(), qobuz.addon.getSetting('artistsearchlimit'))
+        if not data:
+            warn(self, "Cannot fetch albums for artist: " + self.get_label())
+        print "ARTIST"
+        pprint.pprint(data)
+        for jproduct in data['artist']['albums']:
+            node = Node_product()
+            node.set_data(jproduct)
+            self.add_child(node)
+
+    def make_XbmcListItem(self):
+        print "LABEL: " + self.get_label()
+        item = xbmcgui.ListItem(self.get_label(),
+                                self.get_label(),
+                                '',
+                                '',
+                                self.get_url(),
+                                )
+        return item
+    
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
         for child in self.get_childs():

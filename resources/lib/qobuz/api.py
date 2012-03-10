@@ -153,7 +153,7 @@ class QobuzApi:
         return self._api_request(params, "/api.json/0.1/track/search")
 
     def get_albums_from_artist(self, id, limit = 100):
-        params = {'x-api-auth-token':self.authtoken,
+        params = {'x-api-auth-token': self.authtoken,
                                    'artist_id': id, 'limit': limit}
         data = self._api_request(params, "/api.json/0.1/artist/get")
         return data

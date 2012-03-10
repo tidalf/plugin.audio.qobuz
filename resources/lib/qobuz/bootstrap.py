@@ -25,6 +25,7 @@ from constants import Mode
 from debug import info, debug, warn, error
 from dog import dog
 import qobuz
+from node.flag import NodeFlag
 
 ''' Arguments parssing '''
 def get_params():
@@ -168,7 +169,7 @@ class QobuzBootstrap(object):
         self.params = get_params()
         print repr(self.params)
         if not 'nt' in self.params:
-            self.params['nt'] = '16384'
+            self.params['nt'] = NodeFlag.TYPE_ROOT
             self.MODE = Mode.VIEW
         ''' 
         set mode 

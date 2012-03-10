@@ -73,6 +73,9 @@ class IRenderer(object):
             from node.search import Node_search
             root = Node_search(None, qobuz.boot.params)
             root.set_search_type(qobuz.boot.params['search-type'])
+        elif self.node_type & NodeFlag.TYPE_ARTIST:
+            from node.artist import Node_artist
+            root = Node_artist(None, qobuz.boot.params)
         else:
             print "Nothing to display"
             return False
