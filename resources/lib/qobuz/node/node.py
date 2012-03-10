@@ -128,6 +128,20 @@ class Node(object):
         if id and id != 'None': url += "&nid=" + str(id)
         return url
     
+    def make_XbmcListItem(self):
+        import xbmcgui
+        item = xbmcgui.ListItem(
+                                    self.get_label(),
+                                    self.get_label2(),
+                                    self.get_icon(),
+                                    self.get_thumbnail(),
+                                    self.get_url()
+                                    )
+        item.setProperty('IsFolder', 'true' if self.is_folder() else 'false')
+        item.setIconImage(self.get_icon())
+        item.setThumbnailImage(self.get_thumbnail())
+        return item
+    
     def set_url(self, url):
       self.url = url
       return self.url

@@ -44,25 +44,22 @@ class Node_root(Node):
         self.add_child(Node_user_playlists())
         self.add_child(Node_recommendation())
         self.add_child(Node_purchases())
-        search_album = Node_search()
-        search_album.set_search_type('albums')
-        self.add_child(search_album)
+        search = Node_search()
+        search.set_search_type('albums')
+        self.add_child(search)
+        search = Node_search()
+        search.set_search_type('songs')
+        self.add_child(search)
+        search = Node_search()
+        search.set_search_type('artists')
+        self.add_child(search)
         
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
         for child in self.get_childs():
             if self.filter(flag): continue
             print "URL: " + child.get_url()
-            item = xbmcgui.ListItem(
-                                    child.get_label(),
-                                    child.get_label2(),
-                                    child.get_icon(),
-                                    child.get_thumbnail(),
-                                    child.get_url()
-                                    )
-            item.setProperty('IsFolder', 'true' if child.is_folder() else 'false')
-            item.setIconImage(child.get_icon())
-            item.setThumbnailImage(child.get_thumbnail())
+            item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)
             list.append((child.get_url(), item, child.is_folder()))
         return True

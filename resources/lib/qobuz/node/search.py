@@ -20,6 +20,7 @@ from debug import info, warn, error
 from flag import NodeFlag
 from node import Node
 from product import Node_product
+from track import Node_track
 from constants import Mode
 import pprint
 
@@ -57,8 +58,9 @@ class Node_search(Node):
         search = None
         limit = None
         if stype == 'songs':
+            from qobuz.search.tracks import Search_tracks
             print "Searching songs"
-            search = qobuz.core.getQobuzSearchTracks()
+            search = Search_tracks()
             limit = qobuz.addon.getSetting('songsearchlimit')
             heading = qobuz.lang(30013)
             self.set_content_type('songs')
@@ -71,7 +73,7 @@ class Node_search(Node):
             self.set_content_type('albums')
         elif stype == 'artists':
             print "Searching artists"
-            from search.artists import Search_artists
+            from qobuz.search.artists import Search_artists
             search = Search_artists()
             limit = qobuz.addon.getSetting('artistsearchlimit')
             heading = qobuz.lang(30015)
@@ -85,22 +87,51 @@ class Node_search(Node):
                 return False
         query.strip()
         print "Query: " + query
-        data = search.search(query, limit).get_data()
+        ret = search.search(query, limit)
+        if not ret:
+            warn(self, "Searching artists API call fail")
+            return p_list
+        data = search.get_data()
+        #print pprint.pformat(data)
+        self.notify_data_result(data)
         if self.search_type == 'albums':
             for json_product in data:
                 json_product = json_product['product']
                 artist = json_product['artist']
-                print "Artist: " + artist.encode('utf8', 'ignore')
                 json_product['artist'] = { }
                 json_product['artist']['name'] = artist
-                print pprint.pformat(json_product)
                 product = Node_product()
                 product.set_data(json_product)
                 item = product.make_XbmcListItem()
                 self.attach_context_menu(item, product)
                 p_list.append((product.get_url(), item, product.is_folder()))
+        elif self.search_type == 'songs':
+            #print "DATA: " + pprint.pformat(data)
+            for jtrack in data['tracks']:
+                track = Node_track()
+                track.set_data(jtrack)
+                print "Track"
+                pprint.pprint(jtrack)
+                item = track.make_XbmcListItem()
+                self.attach_context_menu(item, track)
+                p_list.append((track.get_url(Mode.PLAY), item, track.is_folder()))
+                 
+        elif self.search_type == 'artist':
+            print "NOT IMPLEMENTED (search artists)"
+            
         return p_list
 
+    def notify_data_result(self, data):
+        if not 'length' in data:
+            warn(self, "Notify fail")
+            return False
+        qobuz.gui.notifyH("Qobuz Search - " + self.search_type,
+                          'Artists: ' + str(data['length']['artists']) + " / "
+                          'Products: ' + str(data['length']['products']) + " / "
+                          'Songs: ' + str(data['length']['tracks']) + "\n"
+                          , None, 5000)
+        return True
+    
     def _get_keyboard(self, default = "", heading = "", hidden = False):
         import xbmc
         kb = xbmc.Keyboard(default, heading, hidden)

@@ -37,15 +37,15 @@ class QobuzGUI:
     def __init__(self):
         pass
 
-    def notifyH(self, title, text, image = None):
+    def notifyH(self, title, text, image = None, mstime = 2000):
         if not image: image = qobuz.image.access.get('qobuzIcon')
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, 2000, image)
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
         xbmc.executebuiltin(s)
 
-    def notify(self, title, text, image = None):
+    def notify(self, title, text, image = None, mstime = 2000):
         if not image: image = qobuz.image.access.get('qobuzIcon')
         l = qobuz.lang
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), 2000, image)
+        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), mstime, image)
         xbmc.executebuiltin(s)
 
     def show_login_failure(self):

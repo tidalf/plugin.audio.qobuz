@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
+import pprint
 import qobuz
 from debug import log, info, warn
 
@@ -30,8 +31,12 @@ class Search_albums():
         return self._raw_data
 
     def search(self, query, limit = 100):
-        self._raw_data = qobuz.api.search_albums(query, limit)
-        return self
+        data = qobuz.api.search_albums(query, limit)
+        if not data: return False
+        self._raw_data = data
+        pprint.pprint(self._raw_data)
+        if len(data) > 0: return True
+        return False
 
     def search_by_artist(self, p_id, limit = 100):
         self._raw_data = qobuz.api.get_albums_from_artist(p_id, limit)

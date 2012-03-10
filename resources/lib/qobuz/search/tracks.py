@@ -31,6 +31,7 @@ class Search_tracks():
         
     def search(self, query, limit = 100):
         self._raw_data = qobuz.api.search_tracks(query, limit)
+        pprint.pprint(self._raw_data)
         return self
         
     def length(self):
@@ -38,5 +39,5 @@ class Search_tracks():
             return 0
         return len(self._raw_data['results']['tracks'])
 
-
-
+    def get_data(self):
+        return self._raw_data['results']
