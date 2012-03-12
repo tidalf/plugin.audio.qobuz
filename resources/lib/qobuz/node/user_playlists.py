@@ -63,13 +63,14 @@ class Node_user_playlists(Node):
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
         self.set_data(data)
-        print "DATA: " + repr(data)
         jcurrent_playlist = self.cache_current_playlist.fetch_data()
-        print "CURRENT PLAYLIST: " + jcurrent_playlist['id']
+        cpls_id = None
+        try: cpls_id = jcurrent_playlist['id']
+        except: pass
         for playlist in data:
             node = Node_playlist()
             node.set_data(playlist)
-            if (jcurrent_playlist and jcurrent_playlist['id'] == str(node.get_id())):
+            if (cpls_id and cpls_id == str(node.get_id())):
                 node.set_is_current(True)
             self.add_child(node)
 
@@ -77,8 +78,7 @@ class Node_user_playlists(Node):
         username = qobuz.addon.getSetting('username')
         color = qobuz.addon.getSetting('color_notowner')
         for playlist in self.childs:
-            item = playlist.make_XbmcListItem()#tag.getXbmcItem()
-            #print "URL: " + item.getProperty('Path')
+            item = playlist.make_XbmcListItem()
             if playlist.get_owner() != username:
                 item.setLabel(''.join([qobuz.utils.color(color, playlist.get_owner()), ' - ', playlist.get_name()]))
             else:
@@ -179,8 +179,21 @@ class Node_user_playlists(Node):
         xbmc.executebuiltin('Container.Refresh')
         
     def remove_playlist(self, id):
-        from cache.user_playlists import Cache_user_playlists
+        import xbmcgui
+        from cache.playlist import Cache_playlist
+        cache = Cache_playlist(id)
+        data = cache.fetch_data()
+        name = ''
+        if 'name' in data: name = data['name']
+        ok = xbmcgui.Dialog().yesno('Removing playlist',
+                          'Do you really want to delete:',
+                          qobuz.utils.color('FFFF0000', name))
+        if not ok:
+            info(self, "Deleting playlist aborted...")
+            return False
+        
         info(self, "Deleting playlist: " + id)
+        return True
         res = qobuz.api.playlist_delete(id)
         if not res:
             print "Cannot delete playlist with id " + str(id)

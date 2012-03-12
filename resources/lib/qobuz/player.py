@@ -49,8 +49,6 @@ class QobuzPlayer(xbmc.Player):
         node.set_id(id)
         node._set_cache()
         node.set_data(node.cache.fetch_data())
-        print node.to_s()
-        print "URL: " + node.get_streaming_url()
     
         lang = qobuz.lang
         item = node.make_XbmcListItem()

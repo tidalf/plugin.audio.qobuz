@@ -58,3 +58,6 @@ class QobuzGUI:
         else:
             xbmc.executebuiltin('ActivateWindow(home)')
             return False
+        
+    def executeJSONRPC(self, json):
+        xbmc.executeJSONRPC(json)

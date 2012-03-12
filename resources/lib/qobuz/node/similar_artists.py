@@ -29,6 +29,7 @@ from debug import info, warn, error, debug
 from cache.search_artists import Cache_search_artists
 import urllib
 import re
+from xml.dom.minidom import parse, parseString
 '''
     NODE ARTIST
 '''
@@ -55,30 +56,72 @@ class Node_similar_artist(Node):
     '''
     def _build_down(self, lvl, flag = None):
         print "ID: " + self.get_id()
-        query = self.get_parameter('query')
-        print "URL machin: " + query
+        query = self.get_parameter('query').strip().lower()
         data = qobuz.api.get_similar_artists(query)
-        print "RESULT: "
-        pprint.pformat(data)
-        matches = re.findall("<name>(.*)</name>", data)
+        dom = parseString(data.encode('ascii', 'replace'))
+        #print dom.toprettyxml()
+        class parse_simartists():
+            def __init__(self, data):
+                self.dom = parseString(data)
+                self.artists = []
+            def getText(self, nodelist):
+                    rc = []
+                    for node in nodelist:
+                        if node.nodeType == node.TEXT_NODE:
+                            rc.append(node.data)
+                    return ''.join(rc)
+            def parse(self):
+                self._get_artists(self.dom)
         
+            def _get_artists(self, dom):
+                artists = dom.getElementsByTagName('artist')
+                for artist in artists:
+                    self._h_artist(artist)
+            def _h_artist_image(self, domlist, artist):
+                for dom in domlist:
+                    size = dom.getAttribute('size')
+                    if size != 'mega': continue
+                    image = self.getText(dom.childNodes)
+                    print "Image: " + image
+                    artist['image'] = image
+            def _h_artist(self, dom):
+                name = self.getText(dom.getElementsByTagName('name')[0].childNodes).strip().lower()
+                artist = { 'name': name}
+                self._h_artist_image(dom.getElementsByTagName('image'), artist)
+                print "Artist: " + name
+                self.artists.append(artist)
+                return True
+        parse = parse_simartists(data.encode('ascii', 'replace'))
+        parse.parse()
+        
+        #matches = re.findall("<name>(.*)</name>", data)
+        if len(parse.artists) < 1:
+            qobuz.gui.notifyH("Qobuz: No similar artist", urllib.unquote(query).encode('utf8' , 'replace'))
+            return False
         listid = {}
-        for name in matches:
-            namec = name.encode('utf8', 'replace').strip().lower()
-            print "Artist: " + namec
-            #qobuz.gui.notifyH('Qobuz search artist',  name, None, 500)
+        max = 20
+        count = 0
+        for a in parse.artists:
+            if count > max: break
+            count+=1
+            print a['name'] + ' (' + a['image'] + ')'
+            name = a['name']
             search_cache = Cache_search_artists(name)
             result = search_cache.fetch_data()
             if not result or len(result) < 1:
-                print "No result for artist: " + namec
+                warn(self,  "No result for artist: " + name)
                 continue
-            #print "RESULT: " + pprint.pformat(result['results'])
             for jartist in result:
+                    artist_id = jartist['id']
+                    if artist_id in listid:
+                        print "Artist id doublon"
+                        continue
                     artist = Node_artist()
-                    print "JARTIST: " + pprint.pformat(jartist)
                     artist.set_data(jartist)
+                    artist.set_image(a['image'])
+                    listid[artist_id] = artist 
                     self.add_child(artist)
-            
+        return len(parse.artists)
             
     '''
         Get Xbmc ITEMS

@@ -22,7 +22,7 @@ import urllib
 import xbmc
 
 from constants import Mode
-from debug import info, debug, warn, error
+from debug import info,debug,warn,error
 from dog import dog
 import qobuz
 from node.flag import NodeFlag
@@ -34,7 +34,7 @@ def get_params():
     paramstring = sys.argv[2]
     if len(paramstring) >= 2:
         params = sys.argv[2]
-        cleanedparams = params.replace('?', '')
+        cleanedparams = params.replace('?','')
         if (params[len(params) - 1] == '/'):
             params = params[0:len(params) - 2]
         pairsofparams = cleanedparams.split('&')
@@ -43,8 +43,8 @@ def get_params():
             splitparams = {}
             splitparams = pairsofparams[i].split('=')
             if (len(splitparams)) == 2:
-                info('QobuzDog', "Checking script parameter: " + splitparams[0])
-                if d.kv_is_ok(splitparams[0], splitparams[1]):
+                info('QobuzDog',"Checking script parameter: " + splitparams[0])
+                if d.kv_is_ok(splitparams[0],splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
                     print "Invalid key/value (" + splitparams[0] + ", " + splitparams[1] + ")"
@@ -55,14 +55,14 @@ def get_params():
 '''
 class QobuzBootstrap(object):
 
-    def __init__(self, __addon__, __handle__):
+    def __init__(self,__addon__,__handle__):
         qobuz.addon = __addon__
         self.handle = __handle__
         qobuz.boot = self
 
     def bootstrap_app(self):
         self.bootstrap_directories()
-        debug(self, "Directories:\n" + qobuz.path.to_s())
+        debug(self,"Directories:\n" + qobuz.path.to_s())
         self.bootstrap_lang()
         self.bootstrap_utils()
         self.bootstrap_api()
@@ -95,10 +95,10 @@ class QobuzBootstrap(object):
                 s.base = qobuz.addon.getAddonInfo('path')
 
             def _set_dir(s):
-                s.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', qobuz.addon.getAddonInfo('id'))
-                s.cache = os.path.join(s.profile, 'cache')
-                s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
-                s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
+                s.profile = os.path.join(xbmc.translatePath('special://profile/'),'addon_data',qobuz.addon.getAddonInfo('id'))
+                s.cache = os.path.join(s.profile,'cache')
+                s.resources = xbmc.translatePath(os.path.join(qobuz.path.base,'resources'))
+                s.image = xbmc.translatePath(os.path.join(qobuz.path.resources,'img'))
             def to_s(s):
                 out = 'profile : ' + s.profile + "\n"
                 out += 'cache   : ' + s.cache + "\n"
@@ -108,20 +108,20 @@ class QobuzBootstrap(object):
             '''
             Make dir
             '''
-            def mkdir(s, dir):
+            def mkdir(s,dir):
                 if os.path.isdir(dir) == False:
                     try:
                         os.makedirs(dir)
                     except:
                         warn("Cannot create directory: " + dir)
                         exit(2)
-                    info(self, "Directory created: " + dir)
+                    info(self,"Directory created: " + dir)
         qobuz.path = path()
         qobuz.path._set_dir()
         qobuz.path.mkdir(qobuz.path.cache)
 
     def bootstrap_debug(self):
-        from debug import log, warn, error, info
+        from debug import log,warn,error,info
         class d():
             def __init__(s):
                 s.log = log
@@ -154,11 +154,11 @@ class QobuzBootstrap(object):
     def bootstrap_db(self):
         try:
             from utils.db import QobuzDb
-            qobuz.db = QobuzDb(qobuz.path.cache, 'qobuz.db3')
+            qobuz.db = QobuzDb(qobuz.path.cache,'qobuz.db3')
         except:
             qobuz.db = None
         if not qobuz.db.open():
-            warn(self, "Cannot open sql database")
+            warn(self,"Cannot open sql database")
             exit(0)
 
     '''
@@ -177,14 +177,14 @@ class QobuzBootstrap(object):
         try:
             self.MODE = int(self.params['mode'])
         except:
-            warn(self, "No 'mode' parameter")
+            warn(self,"No 'mode' parameter")
         for p in self.params:
-            debug(self, "Param: " + p + ' = ' + str(self.params[p]))
+            debug(self,"Param: " + p + ' = ' + str(self.params[p]))
 
     '''
     
     '''
-    def build_url(self, mode, id, pos = None):
+    def build_url(self,mode,id,pos=None):
         req = sys.argv[0] + "?&mode=" + str(mode) + "&id=" + str(id)
         return req
 
@@ -202,13 +202,24 @@ class QobuzBootstrap(object):
         Execute methode based on MODE
     '''
     def dispatch(self):
+        import pprint
         ret = False
+        cmd = '{"jsonrpc": "2.0", \
+        "method": "AudioLibrary.GetAlbumDetails", \
+        "params": {"properties": [ \
+            "description", "albumlabel", "artist", "genre", "year", "thumbnail", "fanart", "rating"], "albumid":1128 }, "id": 1}'
+        
+        cmd = '{"jsonrpc": "2.0", \
+        "method": "AudioLibrary.Clean"}'
+        
 
+        response = qobuz.gui.executeJSONRPC(cmd)
+        print "JSONRPC: " + pprint.pformat(response)
         if self.MODE == Mode.PLAY:
-            info(self, "Playing song")
+            info(self,"Playing song")
             self.bootstrap_player()
             if qobuz.addon.getSetting('notification_playingsong') == 'true':
-                qobuz.gui.notification(34000, 34001)
+                qobuz.gui.notification(34000,34001)
             try:
                 context_type = urllib.unquote(self.params["context_type"])
             except:
@@ -219,71 +230,64 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.ERASE_CACHE:
             self.erase_cache()
             return True
-            
+
         from renderer.xbmc import Xbmc_renderer as renderer
-        
+
         nt = None
         try: nt = int(self.params['nt'])
         except:
             print "No node type...abort"
             return False
         print "Node type: " + str(nt)
-        
+
         id = None
-        try: id = self.params['nid']        
+        try: id = self.params['nid']
         except: pass
-        
+
         depth = 1
         try: depth = int(self.params['depth'])
         except: pass
-        
+
         view_filter = 0
         try: view_filter = int(self.params['view-filter'])
         except: pass
-        
+
         if self.MODE == Mode.VIEW:
-            info(self, "Displaying node")
-            r = renderer(nt, id)
+            info(self,"Displaying node")
+            r = renderer(nt,id)
             r.set_depth(depth)
             r.set_filter(view_filter)
             return r.display()
-        
-#        elif self.MODE == Mode.LIBRARY_SCAN:
-#            
-#            info(self, "Scanning mode")
-#            r = renderer(nt, id, -1)
-#            return r.display()
-#            
-#
+
         elif self.MODE == Mode.SELECT_CURRENT_PLAYLIST:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             node.set_current_playlist(self.params['nid'])
-        
+
         elif self.MODE == Mode.CREATE_PLAYLIST:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             node.create_playlist()
-            
+
         elif self.MODE == Mode.ADD_TO_CURRENT_PLAYLIST:
             from  node.playlist import Node_playlist
-            node = Node_playlist(None, self.params)
+            node = Node_playlist(None,self.params)
             node.add_to_current_playlist()
-           
+
         elif self.MODE == Mode.RENAME_PLAYLIST:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             node.rename_playlist(self.params['nid'])
-        
+
         elif self.MODE == Mode.REMOVE_PLAYLIST:
             from node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
-            node.remove_playlist(self.params['nid'])       
-         
+            node.remove_playlist(self.params['nid'])
+
         elif self.MODE == Mode.LIBRARY_SCAN:
-            import urllib 
+            import urllib
             #from node.flag import NodeFlag
-            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url'])+'")'
+            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '")'
             print "START SCAN: " + s
 #            s = 'UpdateLibrary("music", "' + sys.argv[0] + "?nt=" + self.params['nt'] + "&mode=" + str(Mode.VIEW) + "&view-filter=" + str(NodeFlag.TYPE_TRACK) + "&depth=-1"
 #            if 'nid' in self.params and self.params['nid']  != "None": 
@@ -295,6 +299,6 @@ class QobuzBootstrap(object):
             #info(self, s)
             xbmc.executebuiltin(s)
             return False
-        
+
 #        else:
 #            error(self, "Unknow mode: " + str(self.MODE))

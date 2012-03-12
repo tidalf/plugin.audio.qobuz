@@ -102,8 +102,7 @@ class Node_playlist(Node):
             qobuz.gui.notify(36000, 36001)
             return False
         for child in self.childs:
-            item = child.make_XbmcListItem()#tag.getXbmcItem()
-            #print "LABEL: " + item.getLabel()
+            item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)
             mode = Mode.PLAY
             if self.packby == 'album': mode = Mode.VIEW
@@ -113,14 +112,7 @@ class Node_playlist(Node):
 
     def hook_attach_context_menu(self, item, node, menuItems, color):
         pass
-        #import sys
-#        ''' DELETE '''
-#        print "removing track id: " + str(id)
-#        url = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST_REMOVE_TRACK) + '&nt=' + str(type) + '&tracks_id=' + str(id)
-#        if self.id: url += '&nid=' + str(self.id)
-#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Remove track from playlist'), "XBMC.RunPlugin(" + url + ")"))
-
-
+    
     def getLabel(self):
         return self.tag.get_name()
 

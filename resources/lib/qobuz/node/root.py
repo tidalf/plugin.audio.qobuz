@@ -59,7 +59,6 @@ class Node_root(Node):
         import qobuz
         for child in self.get_childs():
             if self.filter(flag): continue
-            print "URL: " + child.get_url()
             item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)
             list.append((child.get_url(), item, child.is_folder()))

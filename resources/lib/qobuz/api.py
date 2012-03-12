@@ -235,6 +235,7 @@ class QobuzApi:
         return res
 
     def get_similar_artists(self, query):
+        
         url = 'http://ws.audioscrobbler.com/2.0/'
         params = {
                   'method': 'artist.getsimilar',
@@ -243,7 +244,7 @@ class QobuzApi:
         }
         r = requests.post(url, data = params)
         #response_json = json.loads(r.content)
-        print "Content: " + r.content.encode('utf8', 'replace')
+        #print "Content: " + r.content.encode('utf8', 'replace')
         return r.content
     
 if __name__ == '__main__':

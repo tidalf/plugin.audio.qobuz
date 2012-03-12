@@ -181,11 +181,6 @@ class Node_track(Node):
     def make_XbmcListItem(self):
         import xbmcgui
 
-#        print repr(self.get_data())
-#        print "URL: " + self.get_url()
-#        print "Label: " + self.get_label()
-#        print repr(self._data)
-
         media_number = self.get_media_number()
         if not media_number: media_number = 1
         else: media_number = int(media_number)
@@ -216,16 +211,16 @@ class Node_track(Node):
                                    'genre': self.get_genre(),
                                    'artist': self.get_artist(),
                                    'tracknumber': track_number,
-                                   'discnumber': media_number,
+                                   #'discnumber': media_number,
                                    'duration': duration,
                                    'year': self.get_year(),
                                    'comment': self.get_description()
                                    })
+        item.setProperty('discnumber', str(media_number))
         item.setProperty('node_id', self.get_id())
         item.setProperty('IsPlayable', 'true')
         item.setProperty('IsInternetStream', 'true')
         item.setProperty('Music', 'true')
-        #print "URL: " + repr(self.get_url())
         return item
 
     def hook_attach_context_menu(self, item, node, menuItems, color):

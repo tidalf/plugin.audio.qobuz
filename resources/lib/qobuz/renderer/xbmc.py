@@ -18,12 +18,23 @@
 import sys
 import pprint
 
+import xbmcgui
 import xbmcplugin
 
 import qobuz
 from node.flag import NodeFlag
 from debug import info, warn
 from irenderer import IRenderer
+
+class GuiProgress(xbmcgui.DialogProgress):
+    def __init__(self, heading, line1 = None, line2 = None, line3 = None):
+        super(GuiProgress, self).__init__()
+        self.create(heading, line1)
+        self.buildcount = 0
+        self.itemcount = 0
+
+    def inc_buildcount(self):
+        self.buildcount += 1
 
 
 class Xbmc_renderer(IRenderer):
@@ -40,23 +51,31 @@ class Xbmc_renderer(IRenderer):
         xbmcplugin.addDirectoryItems(handle = qobuz.boot.handle, items = list, totalItems = size)
 
     def display(self):
+        import xbmcgui
+        progress = GuiProgress("Walking into the dark forest", "The beginning")#xbmcgui.DialogProgress()
+        progress.update(25, "1/4 One drop...")
         if not self.set_root_node():
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
             return False
-        self.root.build_down(self.depth, self.filter)
+        progress.update(50, "2/4 Discover trees")
+        self.root.build_down(self.depth, self.filter, progress)
         list = []
+
         #info(self, self.to_s())
         print "DEPTH: " + str(self.depth)
         print "FILTER: " + str(self.filter)
+        progress.update(75, "3/4 Retrieve trees")
         ret = self.root.get_xbmc_items(list, self.depth, self.filter)
         #if not ret: return False
         size = len(list)
         if size < 1: return False
+        progress.update(100, "4/4 Render Trees")
         print "Number of item: " + str(size)
         xbmcplugin.setContent(handle = qobuz.boot.handle, content = self.root.content_type)
         self._add_to_directory(list)
         #xbmcplugin.addDirectoryItems(handle=qobuz.boot.handle, items=list, totalItems=size)
         xbmcplugin.endOfDirectory(handle = qobuz.boot.handle, succeeded = True, updateListing = False, cacheToDisc = True)
+        progress.close()
         return True
 
     def all_tracks(self):

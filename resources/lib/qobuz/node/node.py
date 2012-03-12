@@ -182,7 +182,10 @@ class Node(object):
 
     def set_label(self, label):
         self.label = label
-
+    
+    def set_image(self, image):
+        self.thumb = self.icon = image
+    
     def set_label2(self, label):
         self.label2 = label
 
@@ -215,16 +218,18 @@ class Node(object):
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self, lvl, flag = NodeFlag.TYPE_NODE):
+    def build_down(self, lvl, flag = NodeFlag.TYPE_NODE, progress = None):
         #info(self, lvl*'#' + ' build_down (' + str(NodeFlag.TYPE_NODE) + ')')
         if lvl != -1 and lvl < 1:
             return True
         #info(self, " - build down hook (pre)")
+        if progress: 
+            progress.inc_buildcount()
+            progress.update(50, "2/4 Discover trees: " + str(progress.buildcount))
         self._build_down(lvl, flag)
-        if lvl != -1:
-            lvl -= 1
+        if lvl != -1: lvl -= 1
         for c in self.childs:
-            c.build_down(lvl, flag)
+            c.build_down(lvl, flag, progress)
 
     '''
         _build_down:
@@ -268,7 +273,6 @@ class Node(object):
 
 
     def attach_context_menu(self, item, node):
-        import sys
         import urllib
         color = qobuz.addon.getSetting('color_ctxitem')
         menuItems = []
@@ -311,6 +315,9 @@ class Node(object):
             cmd = "XBMC.Container.Update(%s)" % (args)  
             menuItems.append((qobuz.utils.color(color, qobuz.lang(39001)), cmd))
             
+            '''
+                Similar artist
+            '''
             id = node.get_artist_id()
             query = urllib.quote(node.get_artist())
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW, 
@@ -322,7 +329,6 @@ class Node(object):
         
         args = sys.argv[0] + "?mode=" + str(Mode.ADD_TO_CURRENT_PLAYLIST) + "&nt=" + str(node.get_type())
         if node.get_id(): args += "&nid=" + str(node.get_id())
-        print "CMD: " + cmd
         genre_type = node.get_parameter('genre-type')
         genre_id = node.get_parameter('genre-id')
         if genre_type: cmd += "&genre-type=" + genre_type

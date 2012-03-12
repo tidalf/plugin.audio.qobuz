@@ -89,7 +89,7 @@ class Node_product(Node):
                                             'genre': self.get_genre(),
                                             'year': self.get_year()
                                             })
-        item.setProperty('node_id', str(self.get_id()))
+        #item.setProperty('node_id', str(self.get_id()))
         return item
 
     ''' 
