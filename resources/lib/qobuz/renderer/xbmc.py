@@ -35,11 +35,11 @@ class GuiProgress(xbmcgui.DialogProgress):
 
     def update_buildcount(self):
         self.buildcount+=1
-        self.update(50, "2/4 Discover trees: " + str(self.buildcount))
+        self.update(50, "2/4 Discover node: " + str(self.buildcount))
         
     def update_itemcount(self):
         self.itemcount+=1
-        self.update(75, "3/4 Retrieves trees: " + str(self.itemcount))
+        self.update(75, "3/4 Retrieve node: " + str(self.itemcount))
         
     def inc_buildcount(self):
         print "INC BUILD COUNT"
