@@ -57,6 +57,7 @@ class Node_similar_artist(Node):
     def _build_down(self, lvl, flag = None, progress = None):
         #print "ID: " + self.get_id()
         query = self.get_parameter('query').strip().lower()
+        query.encode('utf8', 'replace')
         data = qobuz.api.get_similar_artists(query)
         dom = parseString(data.encode('ascii', 'replace'))
         #print dom.toprettyxml()
@@ -96,7 +97,7 @@ class Node_similar_artist(Node):
         
         #matches = re.findall("<name>(.*)</name>", data)
         if len(parse.artists) < 1:
-            qobuz.gui.notifyH("Qobuz: No similar artist", urllib.unquote(query).encode('utf8' , 'replace'))
+            qobuz.gui.notifyH("Qobuz: No similar artist", urllib.unquote(query))
             return False
         listid = {}
         max = 20

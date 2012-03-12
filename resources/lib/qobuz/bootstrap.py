@@ -204,17 +204,19 @@ class QobuzBootstrap(object):
     def dispatch(self):
         import pprint
         ret = False
-        cmd = '{"jsonrpc": "2.0", \
-        "method": "AudioLibrary.GetAlbumDetails", \
-        "params": {"properties": [ \
-            "description", "albumlabel", "artist", "genre", "year", "thumbnail", "fanart", "rating"], "albumid":1128 }, "id": 1}'
+#        cmd = '{"jsonrpc": "2.0", \
+#        "method": "AudioLibrary.GetAlbumDetails", \
+#        "params": {"properties": [ \
+#            "description", "albumlabel", "artist", "genre", "year", "thumbnail", "fanart", "rating"], "albumid":1128 }, "id": 1}'
+#        
+#        cmd = '{"jsonrpc": "2.0", \
+#        "method": "AudioLibrary.Clean"}'
+#        
+#
+#        response = qobuz.gui.executeJSONRPC(cmd)
+#        print "JSONRPC: " + pprint.pformat(response)
+#        
         
-        cmd = '{"jsonrpc": "2.0", \
-        "method": "AudioLibrary.Clean"}'
-        
-
-        response = qobuz.gui.executeJSONRPC(cmd)
-        print "JSONRPC: " + pprint.pformat(response)
         if self.MODE == Mode.PLAY:
             info(self,"Playing song")
             self.bootstrap_player()

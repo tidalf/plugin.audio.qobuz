@@ -45,7 +45,7 @@ class Node_playlist(Node):
         self.icon = ''
         self.set_is_folder(True)
         self.cache = None
-        self.packby = None
+        self.packby = 'album'
 
     def set_is_current(self, b):
         self.b_is_current = b
@@ -88,8 +88,10 @@ class Node_playlist(Node):
                 #jalbum['interpreter'] = jtrack['interpreter']
                 #jalbum['composer'] = jtrack['composer']
                 pprint.pprint(jalbum)
-                
-                #jalbum['genre'] = jtrack['genre']
+                keys = [ 'artist', 'interpreter', 'composer']
+                for k in keys:
+                    if k in jtrack: jalbum[k] = jtrack[k]
+              
                 node = Node_product()
                 node.set_data(jalbum)
                 self.add_child(node)
