@@ -78,15 +78,10 @@ class Node_playlist(Node):
         albumseen = {}
         for jtrack in data['tracks']:
             progress.update_buildcount()
-            #print "JTRACK: " + pprint.pformat(jtrack)
             if self.packby == 'album':
-                #print "PACKKKKKKKKKKKKKKKK BY ALBUM"
                 jalbum = jtrack['album']
                 if jalbum['id'] in albumseen: continue
                 albumseen[jalbum['id']] = True
-                print "PRODUCT ID: " + jalbum['id']
-                #jalbum['interpreter'] = jtrack['interpreter']
-                #jalbum['composer'] = jtrack['composer']
                 pprint.pprint(jalbum)
                 keys = [ 'artist', 'interpreter', 'composer']
                 for k in keys:

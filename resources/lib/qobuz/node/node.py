@@ -130,6 +130,9 @@ class Node(object):
         url = sys.argv[0] + '?mode=' + str(mode) + "&nt=" + str(self.type)
         id = self.get_id()
         if id and id != 'None': url += "&nid=" + str(id)
+        action = self.get_parameter('action')
+        if action == 'scan': 
+            url += "&action=scan"
         return url
     
     def make_XbmcListItem(self):
@@ -286,7 +289,7 @@ class Node(object):
         
         ''' SCAN '''
         node_url = urllib.quote(node.make_url(Mode.VIEW))
-        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
+        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url + "&action=scan"
         menuItems.append((qobuz.utils.color(color, "Scan"), "XBMC.RunPlugin("+url+")"))                                                             
         
         ''' SCAN DIR '''

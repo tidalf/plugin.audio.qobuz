@@ -27,12 +27,19 @@ from debug import info, warn
 from irenderer import IRenderer
 
 class GuiProgress(xbmcgui.DialogProgress):
-    def __init__(self, heading, line1 = None, line2 = None, line3 = None):
+    def __init__(self, heading = None, line1 = None, line2 = None, line3 = None):
         super(GuiProgress, self).__init__()
-        self.create(heading, line1)
         self.buildcount = 0
         self.itemcount = 0
-
+        self.showDialog = True
+        self.isopen = False
+        
+    def hide(self):
+        self.showDialog = False
+    
+    def show(self):
+        self.showDialog = True
+        
     def update_buildcount(self):
         self.buildcount+=1
         self.update(50, "2/4 Discover node: " + str(self.buildcount))
@@ -48,6 +55,20 @@ class GuiProgress(xbmcgui.DialogProgress):
     def inc_itemcount(self):
         self.itemcount += 1
 
+    def update(self, p, t):
+        if not self.showDialog: return False
+        super(GuiProgress, self).update(p, t)
+        return True
+
+    def create(self, h, l1 = None):
+        if not self.showDialog: return False
+        super(GuiProgress, self).create(h, l1)
+        self.isopen = True
+        return True
+    
+    def close(self):
+        if not self.isopen: return False
+        return super(GuiProgress, self).close()
 
 class Xbmc_renderer(IRenderer):
 
@@ -64,7 +85,10 @@ class Xbmc_renderer(IRenderer):
 
     def display(self):
         import xbmcgui
-        progress = GuiProgress("Walking into the dark forest", "The beginning")#xbmcgui.DialogProgress()
+        progress = GuiProgress()#xbmcgui.DialogProgress()  
+        if 'action' in qobuz.boot.params and qobuz.boot.params['action'] == 'scan':
+            progress.hide()
+        progress.create("Walking into the dark forest", "The beginning")
         progress.update(25, "1/4 One drop...")
         if not self.set_root_node():
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"

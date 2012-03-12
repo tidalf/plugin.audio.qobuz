@@ -59,6 +59,8 @@ class Node_product(Node):
             warn(self, "Cannot fetch product data")
             return False
         self.set_data(data)
+        if self.get_parameter('action') == 'scan':
+            qobuz.gui.notifyH('Qobuz Scan / Add album', self.get_label())
         for track in data['tracks']:
             progress.update_buildcount()
             node = Node_track()

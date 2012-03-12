@@ -50,6 +50,8 @@ class Node_recommendation(Node):
             url += '&genre-type=' + self.genre_type
         if self.genre_id:
             url += '&genre-id=' + str(self.genre_id)
+        if 'action' in self.parameters and self.parameters['action'] == 'scan': 
+            url += "&action=scan"
         return url
 
     def setGenreType(self, type):

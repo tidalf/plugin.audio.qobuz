@@ -29,7 +29,8 @@ class dog():
                              'search-type': "^(artists|songs|albums)$",
                              'view-filter': "^\d+$",
                              'depth': "^(-)?\d+$",
-                             'query': "^.*$"
+                             'query': "^.*$",
+                             'action': "^(scan)$"
                              }
 
     ''' Match value against regexp '''

@@ -289,7 +289,7 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.LIBRARY_SCAN:
             import urllib
             #from node.flag import NodeFlag
-            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '")'
+            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '&action=scan")'
             print "START SCAN: " + s
 #            s = 'UpdateLibrary("music", "' + sys.argv[0] + "?nt=" + self.params['nt'] + "&mode=" + str(Mode.VIEW) + "&view-filter=" + str(NodeFlag.TYPE_TRACK) + "&depth=-1"
 #            if 'nid' in self.params and self.params['nid']  != "None": 

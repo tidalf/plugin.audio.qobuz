@@ -53,6 +53,8 @@ class Node_search(Node):
     def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
         url += '&search-type=' + self.search_type
+        if 'action' in self.parameters and self.parameters['action'] == 'scan': 
+            url += "&action=scan"
         return url
 
     def _get_xbmc_items(self, p_list, lvl, flag, progress = None):

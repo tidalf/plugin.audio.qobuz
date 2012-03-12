@@ -36,7 +36,7 @@ from product import Node_product
 class Node_purchases(Node):
 
     def __init__(self, parent = None, params = None):
-        super(Node_purchases, self).__init__(parent)
+        super(Node_purchases, self).__init__(parent, params)
         self.label = qobuz.lang(30100)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
         self.set_content_type('albums')
