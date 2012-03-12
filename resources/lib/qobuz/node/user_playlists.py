@@ -193,7 +193,6 @@ class Node_user_playlists(Node):
             return False
         
         info(self, "Deleting playlist: " + id)
-        return True
         res = qobuz.api.playlist_delete(id)
         if not res:
             print "Cannot delete playlist with id " + str(id)
