@@ -41,7 +41,8 @@ class Node_recommendation(Node):
         if genre_id != None: self.genre_id = int(genre_id)
         else: self.genre_id = None
         self.genre_type = self.get_parameter('genre-type')
-        self.set_label("Recommendation")
+        self.set_label(qobuz.lang(30082))
+        self.thumb = self.icon = qobuz.image.access.get('album')
 
     def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
@@ -49,6 +50,7 @@ class Node_recommendation(Node):
             url += '&genre-type=' + self.genre_type
         if self.genre_id:
             url += '&genre-id=' + str(self.genre_id)
+        print "URL: " + url
         return url
 
     def setGenreType(self, type):
@@ -81,7 +83,12 @@ class Node_recommendation(Node):
     def _get_xbmc_items_type(self, list, lvl, flag):
         for t in self.get_childs():
             if self.filter(flag): continue
-            item = xbmcgui.ListItem(t.get_label(), '', '', '', t.get_url())
+            id_image = 'recos-' + str(self.genre_type) + '-' + str(self.genre_id)
+            print "ID: " + id_image
+            image = qobuz.image.cache.get(id_image)
+            print "IMAGE RECOS: " + image
+            #image = ''
+            item = xbmcgui.ListItem(t.get_label(), '', image, image, t.get_url())
             self.attach_context_menu(item, t )
             list.append((t.get_url(), item, True))
         return True
@@ -112,7 +119,8 @@ class Node_recommendation(Node):
         color = qobuz.addon.getSetting('color_recospath')
         for t in self.get_childs():
             if self.filter(flag): continue
-            item = xbmcgui.ListItem(qobuz.utils.color(color, self.genre_type) + ' / ' + t.get_label(), '', '', '', t.get_url())
+            image = ''
+            item = xbmcgui.ListItem(qobuz.utils.color(color, self.genre_type) + ' / ' + t.get_label(), '', image, image, t.get_url())
             self.attach_context_menu(item, t)
             list.append((t.get_url(), item, True))
         return True
@@ -132,11 +140,22 @@ class Node_recommendation(Node):
             self.add_child(node)
         return True
 
+    def cache_image(self, product):
+        id = 'recos-'+self.genre_type
+        image = qobuz.image.cache.get(id)
+        if not image: 
+            qobuz.image.cache.set(id, product.get_image())
+        id = 'recos-'+self.genre_type + '-' + str(self.genre_id)
+        image = qobuz.image.cache.get(id)
+        if not image: 
+            qobuz.image.cache.set(id, product.get_image())
+        
     def _get_xbmc_items_type_genre(self, list , lvl, flag):
         print "TypeGenre xbmc item"
         for product in self.get_childs():
             if self.filter(flag): continue
             item = product.make_XbmcListItem()
+            self.cache_image(product)
             self.attach_context_menu(item, product)
             list.append((product.get_url(), item, product.is_folder()))
         return True
@@ -161,7 +180,7 @@ class Node_recommendation(Node):
             return self._get_xbmc_items_genre(list, lvl, flag)
         return self._get_xbmc_items_type_genre(list, lvl, flag)
 
-    def hook_attach_context_menu(self, item, type, id, menuItems, color):
+    def hook_attach_context_menu(self, item, node, menuItems, color):
         pass
 #        import sys
 #        ''' Add to current playlist '''

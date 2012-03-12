@@ -58,7 +58,7 @@
          
    <!-- Colors -->
    <category label="Colors (r)">
-        <setting id="color_ctxitem" label="Context menu item" type="text" default="55AAAAFF" />
+        <setting id="color_ctxitem" label="Context menu item" type="text" default="FF00FF00" />
         <setting id="color_recospath" label="Context menu item" type="text" default="55AAAAFF" />
         <setting id="color_notowner" label="Context menu item" type="text" default="55AAAAFF" />
         

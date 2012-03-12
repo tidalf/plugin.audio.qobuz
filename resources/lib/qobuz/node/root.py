@@ -39,7 +39,7 @@ class Node_root(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_root, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
-        print "JJA"
+        self.set_content_type('files')
 
     def _build_down(self, lvl, flag = None):
         self.add_child(Node_user_playlists())

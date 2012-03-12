@@ -247,7 +247,7 @@ class QobuzBootstrap(object):
             r.set_depth(depth)
             r.set_filter(view_filter)
             return r.display()
-            
+        
 #        elif self.MODE == Mode.LIBRARY_SCAN:
 #            
 #            info(self, "Scanning mode")
@@ -255,21 +255,46 @@ class QobuzBootstrap(object):
 #            return r.display()
 #            
 #
-#            
+        elif self.MODE == Mode.SELECT_CURRENT_PLAYLIST:
+            from  node.user_playlists import Node_user_playlists
+            node = Node_user_playlists()
+            node.set_current_playlist(self.params['nid'])
+        
+        elif self.MODE == Mode.CREATE_PLAYLIST:
+            from  node.user_playlists import Node_user_playlists
+            node = Node_user_playlists()
+            node.create_playlist()
+            
+        elif self.MODE == Mode.ADD_TO_CURRENT_PLAYLIST:
+            from  node.playlist import Node_playlist
+            node = Node_playlist(None, self.params)
+            node.add_to_current_playlist()
+           
+        elif self.MODE == Mode.RENAME_PLAYLIST:
+            from  node.user_playlists import Node_user_playlists
+            node = Node_user_playlists()
+            node.rename_playlist(self.params['nid'])
+        
+        elif self.MODE == Mode.REMOVE_PLAYLIST:
+            from node.user_playlists import Node_user_playlists
+            node = Node_user_playlists()
+            node.remove_playlist(self.params['nid'])       
+         
         elif self.MODE == Mode.LIBRARY_SCAN:
             import urllib 
-            from node.flag import NodeFlag
-            #s = 'UpdateLibrary("music", "'+sys.argv[0] + urllib.unquote(self.params['url'])+'")'
-            s = 'UpdateLibrary("music", "' + sys.argv[0] + "?nt=" + self.params['nt'] + "&mode=" + str(Mode.VIEW) + "&view-filter=" + str(NodeFlag.TYPE_TRACK) + "&depth=-1"
-            if 'nid' in self.params and self.params['nid']  != "None": 
-                s += "&nid=" + self.params['nid']
-            if 'genre-type' in self.params: s+= "&genre-type=" + self.params['genre-type']
-            if 'genre-id' in self.params: s+= "&genre-id=" + self.params['genre-id']
-            s+= '")'
+            #from node.flag import NodeFlag
+            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url'])+'")'
+            print "START SCAN: " + s
+#            s = 'UpdateLibrary("music", "' + sys.argv[0] + "?nt=" + self.params['nt'] + "&mode=" + str(Mode.VIEW) + "&view-filter=" + str(NodeFlag.TYPE_TRACK) + "&depth=-1"
+#            if 'nid' in self.params and self.params['nid']  != "None": 
+#                s += "&nid=" + self.params['nid']
+#            if 'genre-type' in self.params: s+= "&genre-type=" + self.params['genre-type']
+#            if 'genre-id' in self.params: s+= "&genre-id=" + self.params['genre-id']
+#            s+= '")'
             #print "SCAN: " + s
             #info(self, s)
             xbmc.executebuiltin(s)
             return False
-#            
+        
 #        else:
 #            error(self, "Unknow mode: " + str(self.MODE))

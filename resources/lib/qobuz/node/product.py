@@ -77,6 +77,7 @@ class Node_product(Node):
     
     def make_XbmcListItem(self):
         import xbmcgui
+        print "ALBUM: " + self.get_label()
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),
@@ -88,6 +89,7 @@ class Node_product(Node):
                                             'genre': self.get_genre(),
                                             'year': self.get_year()
                                             })
+        item.setProperty('node_id', str(self.get_id()))
         return item
 
     ''' 
@@ -99,6 +101,14 @@ class Node_product(Node):
         a = self.get_property(('interpreter', 'name'))
         if a: return a
         a = self.get_property(('composer', 'name'))
+        return a
+    
+    def get_artist_id(self):
+        a = self.get_property(('artist', 'id'))
+        if a: return a
+        a = self.get_property(('interpreter', 'id'))
+        if a: return a
+        a = self.get_property(('composer', 'id'))
         return a
     
     def get_title(self):

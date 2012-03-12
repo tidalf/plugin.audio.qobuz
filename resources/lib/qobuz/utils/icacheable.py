@@ -19,7 +19,7 @@ import time
 import pickle
 import hashlib
 
-from debug import log, info, warn, debug
+from debug import log, info, error, warn, debug
 from  file.write import safe_write
 
 class ICacheable(object):
@@ -48,6 +48,9 @@ class ICacheable(object):
         self.cache_path = path
         self.cache_object_path = self.cache_object_name
         if id != None:
+#            if isinstance(id, basestring):
+#                id = id.encode('ascii', 'replace')
+#            else:
             id = str(id)
             self.cache_object_id = id
             self.cache_object_path += '-' + self.cache_object_id
@@ -56,7 +59,6 @@ class ICacheable(object):
             hash.update(self.cache_object_path)
             digest = hash.hexdigest()
             newdir = digest[0:1]
-            print "NEWdir: " + newdir
             self.cache_path = os.path.join(path, newdir)
             self.cache_object_path = digest
             if not os.path.exists(self.cache_path):
@@ -120,6 +122,8 @@ class ICacheable(object):
 
     def _save_cache_data(self, data):
         cache = self.get_cache_path()
+        if not cache:
+            error(self, "Cache is not set")
         s = None
         with open(cache, 'wb') as f:
             s = pickle.dump(data, f, protocol = pickle.HIGHEST_PROTOCOL)

@@ -28,7 +28,8 @@ class dog():
                              'url'       : '^.*$',
                              'search-type': "^(artists|songs|albums)$",
                              'view-filter': "^\d+$",
-                             'depth': "^(-)?\d+$"
+                             'depth': "^(-)?\d+$",
+                             'query': "^.*$"
                              }
 
     ''' Match value against regexp '''

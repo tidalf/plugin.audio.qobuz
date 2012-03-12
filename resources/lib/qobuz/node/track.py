@@ -14,8 +14,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+import sys
 import pprint
-
 import qobuz
 from constants import Mode
 from flag import NodeFlag
@@ -39,13 +39,18 @@ class Node_track(Node):
         self.cache_url = None
 
     def _build_down(self, lvl, flag = None):
+        self._set_cache()
         if flag & NodeFlag.DONTFETCHTRACK:
-            #print "Don't fetch track data"
-            return False
-        return True
+            print "Don't download track data"
+        else:    
+            self.set_data(self.cache.get_data())
+        return False
 
     def _get_xbmc_items(self, list, lvl, flag):
-        return True
+        print "RETURN XBMC ITEM: TRACK"
+        mode = Mode.PLAY
+        list.append((self.make_url(mode), self.make_XbmcListItem(), self.is_folder()))
+        return list
 
     def _set_cache(self):
         id = self.get_id()
@@ -58,9 +63,12 @@ class Node_track(Node):
             error(self, "Cannot set cache without id")
             return False
         self.set_id(id)
-        self.cache = Cache_track(id)
+        self.cache = Cache_track(id, 'playlist', False)
         return True
-
+    
+    def make_url(self, mode = Mode.PLAY):
+        return super(Node_track, self).make_url(mode)
+    
     def get_label(self, format = "%a - %t"):
         format = format.replace("%a", self.get_artist())
         format = format.replace("%t", self.get_title())
@@ -112,6 +120,14 @@ class Node_track(Node):
         s = self.get_interpreter()
         if s: return s
         return self.get_composer()
+
+    def get_artist_id(self):
+        s = self.get_property(('artist', 'id'))
+        if s: return s
+        s =  self.get_property(('composer', 'id'))
+        if s: return s
+        s =  self.get_property(('interpreter', 'id'))
+        return s
 
     def get_track_number(self):
         return self.get_property(('track_number'))
@@ -180,7 +196,8 @@ class Node_track(Node):
             duration = 60
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
             
-        url = self.get_url(Mode.PLAY)
+        mode = Mode.PLAY
+        url = self.get_url(mode)
         #print "TRACK url: " + url
         item = xbmcgui.ListItem(label,
                                 label,
@@ -204,8 +221,20 @@ class Node_track(Node):
                                    'year': self.get_year(),
                                    'comment': self.get_description()
                                    })
+        item.setProperty('node_id', self.get_id())
         item.setProperty('IsPlayable', 'true')
         item.setProperty('IsInternetStream', 'true')
         item.setProperty('Music', 'true')
         #print "URL: " + repr(self.get_url())
         return item
+
+    def hook_attach_context_menu(self, item, node, menuItems, color):
+        pass
+#        args = 'mode=%i&nt=%i&nid=%d' % (Mode.VIEW, 
+#                                         NodeFlag.TYPE_PLAYLIST, 
+#                                         self.get_property(('album', 'id'))
+#                                         )
+#        print "ARGS: " + args
+#        cmd = 'RunScript("%s", "%s")' % (sys.argv[0], args)
+#        print "CMD: " + cmd
+#        menuItems.append(("View Album", cmd))

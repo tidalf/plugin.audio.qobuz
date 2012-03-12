@@ -33,6 +33,7 @@ class Node_search(Node):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
         self.search_type = 'albums'
+        self.thumb = self.icon = qobuz.image.access.get('song')
 
     def get_label(self):
         if self.search_type == 'artists':
@@ -65,6 +66,7 @@ class Node_search(Node):
             limit = qobuz.addon.getSetting('songsearchlimit')
             heading = qobuz.lang(30013)
             self.set_content_type('songs')
+            self.icon = self.thumb = qobuz.image.access.get('song')
         elif stype == 'albums':
             from qobuz.search.albums import Search_albums
             print "Searching albums"
@@ -72,6 +74,7 @@ class Node_search(Node):
             limit = qobuz.addon.getSetting('albumsearchlimit')
             heading = qobuz.lang(30014)
             self.set_content_type('albums')
+            self.icon = self.thumb = qobuz.image.access.get('album')
         elif stype == 'artists':
             print "Searching artists"
             from qobuz.search.artists import Search_artists
@@ -79,6 +82,7 @@ class Node_search(Node):
             limit = qobuz.addon.getSetting('artistsearchlimit')
             heading = qobuz.lang(30015)
             self.set_content_type('files')
+            self.icon = self.thumb = qobuz.image.access.get('artist')
         else:
             error(self, "Unknown search-type: " + stype)
         query = self.get_parameter('query')
@@ -140,10 +144,4 @@ class Node_search(Node):
                           , None, 5000)
         return True
     
-    def _get_keyboard(self, default = "", heading = "", hidden = False):
-        import xbmc
-        kb = xbmc.Keyboard(default, heading, hidden)
-        kb.doModal()
-        if (kb.isConfirmed()):
-            return unicode(kb.getText(), "utf-8")
-        return ''
+

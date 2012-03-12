@@ -43,7 +43,7 @@ class IRenderer(object):
     def set_root_node(self):
         root = None
         debug(self, 'Setting root node: ' 
-                   + str(self.node_type) 
+                   + str(self.node_type) + ' (' + NodeFlag.to_string(self.node_type) + ') '
                    + ' / ' + NodeFlag.to_string(self.flag))
         if self.node_type & NodeFlag.TYPE_ROOT:
             from node.root import Node_root
@@ -63,9 +63,6 @@ class IRenderer(object):
         elif self.node_type & NodeFlag.TYPE_PRODUCT:
             from node.product import Node_product
             root = Node_product(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_VIRTUAL_PLAYLIST:
-            from node_virtual_playlist import node_virtual_playlist
-            root = node_virtual_playlist(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_PURCHASES:
             from node.purchases import Node_purchases
             root = Node_purchases(None, qobuz.boot.params)
@@ -76,6 +73,9 @@ class IRenderer(object):
         elif self.node_type & NodeFlag.TYPE_ARTIST:
             from node.artist import Node_artist
             root = Node_artist(None, qobuz.boot.params)
+        elif self.node_type & NodeFlag.TYPE_SIMILAR_ARTIST:
+            from node.similar_artists import Node_similar_artist
+            root = Node_similar_artist(None, qobuz.boot.params)
         else:
             print "Nothing to display"
             return False

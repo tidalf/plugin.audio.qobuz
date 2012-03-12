@@ -24,52 +24,69 @@ from constants import Mode
 
 from flag import NodeFlag
 from node import Node
-from product import Node_product
+from artist import Node_artist
 from debug import info, warn, error, debug
+from cache.search_artists import Cache_search_artists
+import urllib
+import re
 '''
     NODE ARTIST
 '''
 
-class Node_artist(Node):
+class Node_similar_artist(Node):
 
     def __init__(self, parent = None, parameters = None):
-        super(Node_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ARTIST
+        super(Node_similar_artist, self).__init__(parent, parameters)
+        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SIMILAR_ARTIST
         self.set_content_type('albums')
+        
 
     '''
         Getter 
     '''
     def get_label(self):
-        return self.get_artist()
-    
-    def get_artist(self):
-        return self.get_property('name')
+        return "Similar artist"
     
     def get_label2(self):
-        return self.get_slug()
-    
-    def get_slug(self):
-        return self.get_property('slug')
-    
-    def get_artist_id(self): return self.get_id()
+        return ""
         
     '''
         Build Down
     '''
     def _build_down(self, lvl, flag = None):
-        data = qobuz.api.get_albums_from_artist(self.get_id(), qobuz.addon.getSetting('artistsearchlimit'))
-        if not data:
-            warn(self, "Cannot fetch albums for artist: " + self.get_label())
-        for jproduct in data['artist']['albums']:
-            node = Node_product()
-            node.set_data(jproduct)
-            self.add_child(node)
+        print "ID: " + self.get_id()
+        query = self.get_parameter('query')
+        print "URL machin: " + query
+        data = qobuz.api.get_similar_artists(query)
+        print "RESULT: "
+        pprint.pformat(data)
+        matches = re.findall("<name>(.*)</name>", data)
+        
+        listid = {}
+        for name in matches:
+            namec = name.encode('utf8', 'replace').strip().lower()
+            print "Artist: " + namec
+            #qobuz.gui.notifyH('Qobuz search artist',  name, None, 500)
+            search_cache = Cache_search_artists(name)
+            result = search_cache.fetch_data()
+            if not result or len(result) < 1:
+                print "No result for artist: " + namec
+                continue
+            #print "RESULT: " + pprint.pformat(result['results'])
+            for jartist in result:
+                    artist = Node_artist()
+                    print "JARTIST: " + pprint.pformat(jartist)
+                    artist.set_data(jartist)
+                    self.add_child(artist)
+            
+            
     '''
         Get Xbmc ITEMS
     '''
     def _get_xbmc_items(self, list, lvl, flag):
         import qobuz
+        if len(self.get_childs()) < 1:
+            return False
         for child in self.get_childs():
             if self.filter(flag): continue
             item = child.make_XbmcListItem()
@@ -87,6 +104,5 @@ class Node_artist(Node):
                                 self.get_image(),
                                 self.get_url(),
                                 )
-        item.setProperty('node_id', self.get_id())
         return item
 

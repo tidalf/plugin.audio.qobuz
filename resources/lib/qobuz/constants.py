@@ -23,5 +23,10 @@ class __Mode():
         self.PLAY = 2
         self.ERASE_CACHE = 3
         self.LIBRARY_SCAN = 4
+        self.SELECT_CURRENT_PLAYLIST = 5
+        self.CREATE_PLAYLIST = 6
+        self.ADD_TO_CURRENT_PLAYLIST = 7
+        self.RENAME_PLAYLIST = 8
+        self.REMOVE_PLAYLIST = 9
 
 Mode = __Mode()

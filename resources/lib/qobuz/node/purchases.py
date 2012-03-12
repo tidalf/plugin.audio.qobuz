@@ -41,7 +41,8 @@ class Node_purchases(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
         self.set_content_type('albums')
         self.cache = Cache_purchases()
-
+        self.icon = self.thumb = qobuz.image.access.get('album')
+    
     def _build_down(self, lvl, flag = None):
         data = self.fetch_data()
         print "DATA: " + pprint.pformat(data)

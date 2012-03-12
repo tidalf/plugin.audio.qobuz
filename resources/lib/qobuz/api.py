@@ -183,7 +183,7 @@ class QobuzApi:
                                    'duration': duration}
         return self._api_request(params, "/api.json/0.1/track/reportStreamingEnd")
 
-    def playlist_add_track (self, tracks_id, playlist_id):
+    def playlist_add_track (self, playlist_id, tracks_id):
         params = {'x-api-auth-token': self.authtoken,
                                    'track_ids': tracks_id,
                                    'playlist_id': playlist_id}
@@ -234,5 +234,17 @@ class QobuzApi:
         res = self._api_request(params, "/api.json/0.1/playlist/update")
         return res
 
+    def get_similar_artists(self, query):
+        url = 'http://ws.audioscrobbler.com/2.0/'
+        params = {
+                  'method': 'artist.getsimilar',
+                  'artist': query, 
+                  'api_key': 'b25b959554ed76058ac220b7b2e0a026',
+        }
+        r = requests.post(url, data = params)
+        #response_json = json.loads(r.content)
+        print "Content: " + r.content.encode('utf8', 'replace')
+        return r.content
+    
 if __name__ == '__main__':
     pass

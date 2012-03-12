@@ -53,7 +53,7 @@ class Xbmc_renderer(IRenderer):
         size = len(list)
         if size < 1: return False
         print "Number of item: " + str(size)
-        #xbmcplugin.setContent(handle = qobuz.boot.handle, content = self.root.content_type)
+        xbmcplugin.setContent(handle = qobuz.boot.handle, content = self.root.content_type)
         self._add_to_directory(list)
         #xbmcplugin.addDirectoryItems(handle=qobuz.boot.handle, items=list, totalItems=size)
         xbmcplugin.endOfDirectory(handle = qobuz.boot.handle, succeeded = True, updateListing = False, cacheToDisc = True)

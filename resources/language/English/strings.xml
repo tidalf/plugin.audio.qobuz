@@ -100,7 +100,7 @@
 	<string id="30081"></string>		
 	
 	<!-- Recommandation -->
-	<string id="30082">Show recommandations</string>	
+	<string id="30082">Show recommendations</string>	
 	<string id="30083">Press awards</string>
     <string id="30084">News</string>
     <string id="30085">Best sellers</string>
@@ -170,6 +170,10 @@
      <string id="38001">Stream</string>
      <string id="38002">Search</string>
      <string id="38003">Other</string>
+     
+     <!-- Context Menu -->
+     <string id="39000">This album</string>
+     <string id="39001">All albums</string>
      
 </strings>
 

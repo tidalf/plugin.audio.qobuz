@@ -14,12 +14,14 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+import sys
 import pprint
 
 import qobuz
 from constants import Mode
 from flag import NodeFlag
 from node import Node
+from product import Node_product
 from debug import info, warn, error
 '''
     NODE PLAYLIST
@@ -43,6 +45,7 @@ class Node_playlist(Node):
         self.icon = ''
         self.set_is_folder(True)
         self.cache = None
+        self.packby = None
 
     def set_is_current(self, b):
         self.b_is_current = b
@@ -72,26 +75,46 @@ class Node_playlist(Node):
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
         self.set_data(data)
-        for track in data['tracks']:
-            node = Node_track()
-            node.set_data(track)
-            self.add_child(node)
+        albumseen = {}
+        for jtrack in data['tracks']:
+            #print "JTRACK: " + pprint.pformat(jtrack)
+            if self.packby == 'album':
+                #print "PACKKKKKKKKKKKKKKKK BY ALBUM"
+                jalbum = jtrack['album']
+                if jalbum['id'] in albumseen: continue
+                albumseen[jalbum['id']] = True
+                print "PRODUCT ID: " + jalbum['id']
+                #jalbum['interpreter'] = jtrack['interpreter']
+                #jalbum['composer'] = jtrack['composer']
+                pprint.pprint(jalbum)
+                
+                #jalbum['genre'] = jtrack['genre']
+                node = Node_product()
+                node.set_data(jalbum)
+                self.add_child(node)
+            else:
+                node = Node_track()
+                node.set_data(jtrack)
+                self.add_child(node)
 
     def _get_xbmc_items(self, list, lvl, flag):
         if len(self.childs) < 1:
             qobuz.gui.notify(36000, 36001)
             return False
-        for track in self.childs:
-            item = track.make_XbmcListItem()#tag.getXbmcItem()
+        for child in self.childs:
+            item = child.make_XbmcListItem()#tag.getXbmcItem()
             #print "LABEL: " + item.getLabel()
-            self.attach_context_menu(item, track)
-            url = track.get_url(Mode.PLAY)
-            list.append((url, item, False))
+            self.attach_context_menu(item, child)
+            mode = Mode.PLAY
+            if self.packby == 'album': mode = Mode.VIEW
+            url = child.get_url(mode)
+            list.append((url, item, child.is_folder()))
         return True
 
-    def hook_attach_context_menu(self, item, type, id, menuItems, color):
-        import sys
-        ''' DELETE '''
+    def hook_attach_context_menu(self, item, node, menuItems, color):
+        pass
+        #import sys
+#        ''' DELETE '''
 #        print "removing track id: " + str(id)
 #        url = sys.argv[0] + "?mode=" + str(MODE_PLAYLIST_REMOVE_TRACK) + '&nt=' + str(type) + '&tracks_id=' + str(id)
 #        if self.id: url += '&nid=' + str(self.id)
@@ -120,6 +143,7 @@ class Node_playlist(Node):
                                 self.get_icon(),
                                 self.get_thumbnail(),
                                 self.get_url())
+        item.setProperty('node_id', str(self.get_id()))
         #item.setPath(self.get_url())
         #item.setProperty('Path', self.get_url())
         return item
@@ -135,3 +159,60 @@ class Node_playlist(Node):
         return True
 
 
+    def add_to_current_playlist(self, ):
+            from cache.current_playlist import Cache_current_playlist
+            
+            
+            current_playlist = Cache_current_playlist()
+            print "Current playlist id: " + str(current_playlist.get_id())
+            print '-'*80 + "\n"
+            print "Adding node to new playlist"
+            print '-'*80 + "\n"
+            from renderer.xbmc import Xbmc_renderer as renderer
+            nt = None
+            try: nt = int(self.get_parameter('nt'))
+            except:
+                print "No node type...abort"
+                return False
+            print "Node type: " + str(nt)
+            
+            id = None
+            try: id = self.get_parameter('nid')        
+            except: pass
+            
+            depth = -1
+            try: depth = int(self.get_parameter('depth'))
+            except: pass
+            
+            view_filter = 0
+            try: view_filter = int(self.get_parameter('view-filter'))
+            except: pass
+            
+            print "############################"
+            r = renderer(nt, id)
+            r.set_depth(depth)
+            r.set_filter(view_filter)
+            r.set_root_node()
+            r.root.build_down(depth, NodeFlag.DONTFETCHTRACK)
+            list = []
+            ret = r.root.get_xbmc_items(list, depth, NodeFlag.TYPE_TRACK)
+            if not ret: return False
+            trackids = []
+            if len(list) < 1:
+                warn(self, "No track to add to current playlist")
+                return False
+            for item in list:
+                node_id =  item[1].getProperty('node_id')
+                print "ADD: " + node_id
+                trackids.append(node_id)
+            strtracks = ','.join(trackids)
+            ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
+            
+            from utils.cache import cache_manager
+            from cache.playlist import Cache_playlist
+            cm = cache_manager()
+            pl = Cache_playlist(current_playlist.get_id())
+            cm.delete(pl.get_cache_path())
+            
+            print "RET: " + pprint.pformat(ret)
+            

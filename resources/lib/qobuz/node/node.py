@@ -88,6 +88,10 @@ class Node(object):
     def get_thumbnail(self):
         return self.thumb
 
+    def get_image(self):
+        if self.thumb: return self.thumb
+        return self.icon
+    
     def get_icon(self):
         return self.icon
 
@@ -133,10 +137,14 @@ class Node(object):
         item = xbmcgui.ListItem(
                                     self.get_label(),
                                     self.get_label2(),
-                                    self.get_icon(),
-                                    self.get_thumbnail(),
+                                    self.get_image(),
+                                    self.get_image(),
                                     self.get_url()
                                     )
+        id = self.get_id()
+        if id: id = str(id)
+        else: id = ''
+        item.setProperty('node_id', id)
         item.setProperty('IsFolder', 'true' if self.is_folder() else 'false')
         item.setIconImage(self.get_icon())
         item.setThumbnailImage(self.get_thumbnail())
@@ -153,7 +161,7 @@ class Node(object):
         self.id = id
 
     def get_id(self):
-        if self._data and 'id' in self._data:
+        if self._data and 'id' in self._data and self._data:
             return self._data['id']
         return self.id
 
@@ -270,28 +278,79 @@ class Node(object):
         menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
         
         ''' SCAN '''
-#        #url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + urllib.quote(sys.argv[2])
-#        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&nt=" + str(type) 
-#        if id and id != "None": url+= "&nid=" + str(id)
-        url = node.make_url(Mode.LIBRARY_SCAN)
-       # print "scan URL: " + url
+        node_url = urllib.quote(node.make_url(Mode.VIEW))
+        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
         menuItems.append((qobuz.utils.color(color, "Scan"), "XBMC.RunPlugin("+url+")"))                                                             
         
+        ''' SCAN DIR '''
+        node_url = urllib.quote(self.make_url(Mode.VIEW))
+        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
+        menuItems.append((qobuz.utils.color(color, "Scan dir"), "XBMC.RunPlugin("+url+")"))                                                             
+        
+        if 1: #node.type & NodeFlag.TYPE_PLAYLIST: 
+            '''
+                This album 
+            '''
+            id = node.get_property(('album', 'id'))
+            args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s' % (Mode.VIEW, 
+                                         NodeFlag.TYPE_PRODUCT, 
+                                         id
+                                         )
+            cmd = "XBMC.Container.Update(%s)" % (args)  
+            menuItems.append((qobuz.utils.color(color, qobuz.lang(39000)), cmd))
+            
+        if node.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST): 
+            '''
+                All album
+            '''
+            id = node.get_artist_id()
+            args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s' % (Mode.VIEW, 
+                                         NodeFlag.TYPE_ARTIST, 
+                                         id
+                                         )
+            cmd = "XBMC.Container.Update(%s)" % (args)  
+            menuItems.append((qobuz.utils.color(color, qobuz.lang(39001)), cmd))
+            
+            id = node.get_artist_id()
+            query = urllib.quote(node.get_artist())
+            args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW, 
+                                         NodeFlag.TYPE_SIMILAR_ARTIST, 
+                                         id, query
+                                         )
+            cmd = "XBMC.Container.Update(%s)" % (args)
+            menuItems.append((qobuz.utils.color(color, "Similar artist"), cmd))
+        
+        args = sys.argv[0] + "?mode=" + str(Mode.ADD_TO_CURRENT_PLAYLIST) + "&nt=" + str(node.get_type())
+        if node.get_id(): args += "&nid=" + str(node.get_id())
+        print "CMD: " + cmd
+        genre_type = node.get_parameter('genre-type')
+        genre_id = node.get_parameter('genre-id')
+        if genre_type: cmd += "&genre-type=" + genre_type
+        if genre_id: cmd += "&genre-id=" + genre_id
+        cmd = "XBMC.Container.Update(%s)" % (args)
+        menuItems.append((qobuz.utils.color(color, 'Add to current playlist'), cmd))
+        
         ''' Show playlist '''
-        # addtopl=sys.argv[0]+"?mode="+str(MODE_NODE)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) # Do not work
-        # if id: addtopl+='&nid='+id
-        # menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.RunAddon("+addtopl+")"))
-
+        showplaylist=sys.argv[0]+"?mode="+str(Mode.VIEW)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) 
+        menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.Container.Update("+showplaylist+")"))
+        
 #        ''' 
 #        Give a chance to our siblings to attach their items
 #        '''
-        self.hook_attach_context_menu(item, node.get_type(), node.get_id(), menuItems, color)
+        self.hook_attach_context_menu(item, node, menuItems, color)
         '''
         Add our items to the context menu
         '''
         if len(menuItems) > 0:
             item.addContextMenuItems(menuItems, replaceItems = False)
 
-    def hook_attach_context_menu(self, item, type, id, menuItems, color):
+    def hook_attach_context_menu(self, item, node, menuItems, color):
         pass
   
+    def _get_keyboard(self, default = "", heading = "", hidden = False):
+        import xbmc
+        kb = xbmc.Keyboard(default, heading, hidden)
+        kb.doModal()
+        if (kb.isConfirmed()):
+            return unicode(kb.getText(), "utf-8")
+        return ''

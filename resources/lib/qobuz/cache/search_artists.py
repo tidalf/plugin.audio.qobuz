@@ -14,37 +14,38 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
+
 import os
+import sys
+import random
 
 from utils.icacheable import ICacheable
+from constants import *
 from debug import *
 
-import pprint
 import qobuz
-
 '''
- Class QobuzTrack 
-
- @summary: Manage one qobuz track
- @param qob: parent
- @param id: track id
- @return: New QobuzTrack 
+    Class QobuzPLaylist
 '''
-class Cache_track(ICacheable):
+class Cache_search_artists(ICacheable):
 
-    def __init__(self, id, context_type = 'playlist', auto_fetch = True):
-        self.id = id
-        super(Cache_track, self).__init__(qobuz.path.cache,
-                                         'track',
-                                         self.id, auto_fetch)
-        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_track'))
+    def __init__(self, name):
+        self.name = name
+        super(Cache_search_artists, self).__init__(qobuz.path.cache,
+                                            'search_artists-' + name.encode('ascii', 'replace'),
+                                            None, True)
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
         debug(self, "Cache duration: " + str(self.cache_refresh))
-        if auto_fetch:
-            print "POUET"
-            self.fetch_data()
 
     def _fetch_data(self):
-        json = qobuz.api.get_track(self.id)
-        return json
+        data = qobuz.api.search_artists(self.name)
+        if not data: return None
+        if not 'results' in data: return None
+        if not 'artists' in data['results']: return None
+        return data['results']['artists']
 
+    def length(self):
+        if not 'results' in self._raw_data:
+            return 0
+        return len(self._raw_data['tracks'])
+    

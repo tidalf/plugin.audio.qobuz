@@ -36,8 +36,8 @@ class Cache_purchases(ICacheable):
     def __init__(self, limit = 100):
         self.limit = limit
         super(Cache_purchases, self).__init__(qobuz.path.cache, 
-                                       'purchases')
-        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommandation'))
+                                       'purchases', None, False)
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommendation'))
         debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
         
@@ -79,15 +79,15 @@ class Cache_purchases(ICacheable):
             list.append(product)
         return list
             
-    def get_items(self):
-        list = []
-        data = self.get_data()
-        if not data: return list
-        n = self.length()
-        for a in self.filter_products(self._raw_data):
-            item = a[0].getXbmcItem('fanArt')
-            item.setInfo('music', infoLabels = { 'artist': a[0].getArtist(), 'year': a[1].getYear()})
-            u = qobuz.boot.build_url(MODE_ALBUM, a[0].id)
-            list.append((u, item, True))        
-        return list
+#    def get_items(self):
+#        list = []
+#        data = self.get_data()
+#        if not data: return list
+#        n = self.length()
+#        for a in self.filter_products(self._raw_data):
+#            item = a[0].getXbmcItem('fanArt')
+#            item.setInfo('music', infoLabels = { 'artist': a[0].getArtist(), 'year': a[1].getYear()})
+#            u = qobuz.boot.build_url(MODE_ALBUM, a[0].id)
+#            list.append((u, item, True))        
+#        return list
 

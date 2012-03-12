@@ -24,34 +24,27 @@ class __NodeFlag():
         self.TYPE_RECOMMENDATION   = 32
         self.TYPE_ROOT             = 64
         self.TYPE_PRODUCT          = 128
-        self.TYPE_VIRTUAL_PLAYLIST = 256
-        self.TYPE_PURCHASES        = 512
-        self.TYPE_SEARCH           = 1024
-        self.TYPE_ARTIST           = 2048
-
-#        self.DONTFETCHTRACK        = 1
-#        self.TYPE_NODE             = 2
-#        self.TYPE_TRACK            = 4
-#        self.TYPE_PLAYLIST         = 8
-#        self.TYPE_USERPLAYLISTS    = 16
-#        self.TYPE_RECOMMENDATION   = 32
-#        self.TYPE_ROOT             = 64
-#        self.TYPE_PRODUCT          = 128
-#        self.TYPE_VIRTUAL_PLAYLIST = 256
-#        self.TYPE_PURCHASES        = 512
-#        self.TYPE_SEARCH           = 1024
-#        self.TYPE_ARTIST           = 2048
+        self.TYPE_PURCHASES        = 256
+        self.TYPE_SEARCH           = 512
+        self.TYPE_ARTIST           = 1024
+        self.TYPE_SIMILAR_ARTIST   = 2048
+        self._type_to_string = {
+                                self.DONTFETCHTRACK: "don't fetch track",
+                                self.TYPE_NODE: "node",
+                                self.TYPE_TRACK: "track",
+                                self.TYPE_PLAYLIST: "playlist",
+                                self.TYPE_USERPLAYLISTS: "userplaylists",
+                                self.TYPE_RECOMMENDATION: "recommendation",
+                                self.TYPE_ROOT: "root",
+                                self.TYPE_PRODUCT: "product",
+                                self.TYPE_PURCHASES: "purchases",
+                                self.TYPE_SEARCH: "search",
+                                self.TYPE_ARTIST: "artist"
+        }
+    
     def to_string(self, flag):
-        if not flag: return "No Flag"
-        if flag   == self.TYPE_NODE:           return "node"
-        elif flag == self.TYPE_TRACK:          return "track"
-        elif flag == self.TYPE_PLAYLIST:       return "playlist"
-        elif flag == self.TYPE_USERPLAYLISTS:  return "userplaylists"
-        elif flag == self.TYPE_RECOMMENDATION: return "recommendations"
-        elif flag == self.TYPE_ROOT:           return "root"
-        elif flag == self.TYPE_PRODUCT:        return "product"
-        elif flag == self.TYPE_PURCHASES:      return "purchases"
-        elif flag == self.TYPE_ARTIST:         return "artist"
+        if flag in self._type_to_string:
+            return self._type_to_string[flag]        
         else: return "Unknow flag: " + str(flag)
 
 NodeFlag = __NodeFlag()
