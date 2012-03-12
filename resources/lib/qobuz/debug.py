@@ -52,6 +52,7 @@ except:
 # Logging helper functions
 ###############################################################################
 def log(obj, msg, lvl = LOGNOTICE):
+    return True
     if not __debugging__:
         return
     name = None
@@ -71,7 +72,7 @@ def info(obj, msg):
     log(obj, msg, LOGNOTICE)
 
 def debug(obj, msg):
-    log(obj, msg, LOGDEBUG)
+    log(obj, msg, LOGNOTICE)
 
 def crit(obj, msg):
     log(obj, msg, LOGSEVERE)

@@ -61,11 +61,13 @@ class Node_artist(Node):
         data = qobuz.api.get_albums_from_artist(self.get_id(), qobuz.addon.getSetting('artistsearchlimit'))
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
+            return False
         for jproduct in data['artist']['albums']:
             progress.update_buildcount()
             node = Node_product()
             node.set_data(jproduct)
             self.add_child(node)
+        return True
     '''
         Get Xbmc ITEMS
     '''

@@ -59,8 +59,9 @@ class Node_product(Node):
             warn(self, "Cannot fetch product data")
             return False
         self.set_data(data)
-        if self.get_parameter('action') == 'scan':
-            qobuz.gui.notifyH('Qobuz Scan / Add album', self.get_label())
+#        if self.get_parameter('action') == 'scan':
+#            qobuz.gui.notifyH('Qobuz Scan / Building tree', self.get_label(), self.get_image(), 250)
+        
         for track in data['tracks']:
             progress.update_buildcount()
             node = Node_track()
@@ -71,6 +72,8 @@ class Node_product(Node):
         if len(self.childs) < 1:
             qobuz.gui.notify(36000, 36001)
             return False
+#        if self.get_parameter('action') == 'scan':
+#            qobuz.gui.notifyH('Qobuz Scan / Adding albums to XbmcMusicDatabase', self.get_label(), self.get_image(), 250 )
         for track in self.childs:
             if track.filter(flag): continue
             progress.update_itemcount()
@@ -81,7 +84,7 @@ class Node_product(Node):
     
     def make_XbmcListItem(self):
         import xbmcgui
-        print "ALBUM: " + self.get_label()
+        #print "ALBUM: " + self.get_label()
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),

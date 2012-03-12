@@ -81,18 +81,35 @@ class Xbmc_renderer(IRenderer):
         
     def _add_to_directory(self, list):
         size = len(list)
-        xbmcplugin.addDirectoryItems(handle = qobuz.boot.handle, items = list, totalItems = size)
-
+        print "SIZEEEEEEEEEEEEE: " + str(size)
+        if size <= 100:
+            xbmcplugin.addDirectoryItems(handle = qobuz.boot.handle, items = list, totalItems = size)
+            return True
+        beg = 0
+        for sublist in list[beg:(beg + 100)]:
+            #print "BEGGGGGGGGGGGGGGGGGGGG: " + repr(beg)
+            if beg < (size - 100):
+                sublist = list[beg:]
+                xbmcplugin.addDirectoryItems(handle = qobuz.boot.handle, items = sublist, totalItems = len(sublist))
+                break
+            xbmcplugin.addDirectoryItems(handle = qobuz.boot.handle, items = sublist, totalItems = len(sublist))
+            beg += 100
+    
     def display(self):
         import xbmcgui
         progress = GuiProgress()#xbmcgui.DialogProgress()  
+        action = ''
         if 'action' in qobuz.boot.params and qobuz.boot.params['action'] == 'scan':
-            progress.hide()
+            #progress.hide()
+            action = 'scan'
         progress.create("Walking into the dark forest", "The beginning")
         progress.update(25, "1/4 One drop...")
         if not self.set_root_node():
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
             return False
+        if action == 'scan':
+            self.depth = -1
+            self.filter = NodeFlag.DONTFETCHTRACK
         progress.update_buildcount()
         self.root.build_down(self.depth, self.filter, progress)
         list = []

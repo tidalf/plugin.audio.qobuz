@@ -41,13 +41,12 @@ class Node_track(Node):
     def _build_down(self, lvl, flag = None, progress = None):
         self._set_cache()
         if flag & NodeFlag.DONTFETCHTRACK:
-            print "Don't download track data"
+            info(self, "Don't download track data")
         else:    
             self.set_data(self.cache.get_data())
         return False
 
     def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        print "RETURN XBMC ITEM: TRACK"
         mode = Mode.PLAY
         list.append((self.make_url(mode), self.make_XbmcListItem(), self.is_folder()))
         return list
@@ -164,7 +163,6 @@ class Node_track(Node):
     def get_streaming_url(self):
         self._set_cache_streaming_url()
         data = self.cache_url.get_data()
-        print repr(data)
         return data['streaming_url']
     
     def get_mimetype(self):

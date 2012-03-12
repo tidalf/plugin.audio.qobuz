@@ -222,6 +222,9 @@ class Node(object):
     '''
 
     def build_down(self, lvl, flag = NodeFlag.TYPE_NODE, progress = None):
+        if progress.iscanceled():
+            warn(self, "User has cancel this operation")
+            return False
         #info(self, lvl*'#' + ' build_down (' + str(NodeFlag.TYPE_NODE) + ')')
         if lvl != -1 and lvl < 1:
             return True

@@ -2,7 +2,7 @@ import pprint
 import pickle
 
 import qobuz
-from debug import *
+from debug import info, warn, debug
 from utils.icacheable import ICacheable
 from cache.playlist import Cache_playlist
 
@@ -25,17 +25,15 @@ class Cache_current_playlist(ICacheable):
         return data
 
     def set_id(self, id):
-        print "Setting id for current playlist: " + str(id)
         if self.data and 'id' in self.data and self.data['id'] == id:
-            print "Playlist already selected"
+            warn(self, "Playlist already selected")
             return True
         playlist = Cache_playlist(id)
         playlist.fetch_data()
         if not playlist:
-            print "Cannot get playlist with id: " + str(id)
+            warn(self, "Cannot get playlist with id: " + str(id))
             return False
         self.data = playlist.get_raw_data()
-        #print repr(self.data)
         self.save()
 
 

@@ -58,7 +58,7 @@ class ICacheable(object):
             hash = hashlib.new('SHA1')
             hash.update(self.cache_object_path)
             digest = hash.hexdigest()
-            newdir = digest[0:1]
+            newdir = digest[0:2]
             self.cache_path = os.path.join(path, newdir)
             self.cache_object_path = digest
             if not os.path.exists(self.cache_path):
