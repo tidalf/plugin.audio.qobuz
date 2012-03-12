@@ -56,7 +56,7 @@ class Node_user_playlists(Node):
     def get_display_by(self):
         return self.display_by
 
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, lvl, flag = None, progress = None):
         info(self, "Build-down: user playlists")
         data = self.cache.fetch_data()
         if not data:
@@ -74,7 +74,7 @@ class Node_user_playlists(Node):
                 node.set_is_current(True)
             self.add_child(node)
 
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         username = qobuz.addon.getSetting('username')
         color = qobuz.addon.getSetting('color_notowner')
         for playlist in self.childs:

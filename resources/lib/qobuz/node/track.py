@@ -38,7 +38,7 @@ class Node_track(Node):
         self.cache = None
         self.cache_url = None
 
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, lvl, flag = None, progress = None):
         self._set_cache()
         if flag & NodeFlag.DONTFETCHTRACK:
             print "Don't download track data"
@@ -46,7 +46,7 @@ class Node_track(Node):
             self.set_data(self.cache.get_data())
         return False
 
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         print "RETURN XBMC ITEM: TRACK"
         mode = Mode.PLAY
         list.append((self.make_url(mode), self.make_XbmcListItem(), self.is_folder()))
@@ -225,11 +225,4 @@ class Node_track(Node):
 
     def hook_attach_context_menu(self, item, node, menuItems, color):
         pass
-#        args = 'mode=%i&nt=%i&nid=%d' % (Mode.VIEW, 
-#                                         NodeFlag.TYPE_PLAYLIST, 
-#                                         self.get_property(('album', 'id'))
-#                                         )
-#        print "ARGS: " + args
-#        cmd = 'RunScript("%s", "%s")' % (sys.argv[0], args)
-#        print "CMD: " + cmd
-#        menuItems.append(("View Album", cmd))
+

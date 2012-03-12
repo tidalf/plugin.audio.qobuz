@@ -31,7 +31,7 @@ from track import Node_track
 
 class Node_playlist(Node):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_playlist, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PLAYLIST
         self.current_playlist_id = None
@@ -65,7 +65,7 @@ class Node_playlist(Node):
         self.set_id(id)
         return True
 
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, lvl, flag = None, progress = None):
         info(self, "Build-down playlist")
         if not self._set_cache():
             error(self, "Cannot set cache!")
@@ -77,6 +77,7 @@ class Node_playlist(Node):
         self.set_data(data)
         albumseen = {}
         for jtrack in data['tracks']:
+            progress.update_buildcount()
             #print "JTRACK: " + pprint.pformat(jtrack)
             if self.packby == 'album':
                 #print "PACKKKKKKKKKKKKKKKK BY ALBUM"
@@ -97,11 +98,12 @@ class Node_playlist(Node):
                 node.set_data(jtrack)
                 self.add_child(node)
 
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         if len(self.childs) < 1:
             qobuz.gui.notify(36000, 36001)
             return False
         for child in self.childs:
+            progress.update_itemcount()
             item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)
             mode = Mode.PLAY

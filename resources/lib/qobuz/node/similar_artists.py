@@ -54,8 +54,8 @@ class Node_similar_artist(Node):
     '''
         Build Down
     '''
-    def _build_down(self, lvl, flag = None):
-        print "ID: " + self.get_id()
+    def _build_down(self, lvl, flag = None, progress = None):
+        #print "ID: " + self.get_id()
         query = self.get_parameter('query').strip().lower()
         data = qobuz.api.get_similar_artists(query)
         dom = parseString(data.encode('ascii', 'replace'))
@@ -102,6 +102,7 @@ class Node_similar_artist(Node):
         max = 20
         count = 0
         for a in parse.artists:
+            progress.update_buildcount()
             if count > max: break
             count+=1
             print a['name'] + ' (' + a['image'] + ')'
@@ -112,6 +113,7 @@ class Node_similar_artist(Node):
                 warn(self,  "No result for artist: " + name)
                 continue
             for jartist in result:
+                    progress.update_buildcount()
                     artist_id = jartist['id']
                     if artist_id in listid:
                         print "Artist id doublon"
@@ -126,11 +128,12 @@ class Node_similar_artist(Node):
     '''
         Get Xbmc ITEMS
     '''
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         import qobuz
         if len(self.get_childs()) < 1:
             return False
         for child in self.get_childs():
+            progress.update_itemcount()
             if self.filter(flag): continue
             item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)

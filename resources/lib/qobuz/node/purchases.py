@@ -43,7 +43,7 @@ class Node_purchases(Node):
         self.cache = Cache_purchases()
         self.icon = self.thumb = qobuz.image.access.get('album')
     
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, lvl, flag = None, progress = None):
         data = self.fetch_data()
         print "DATA: " + pprint.pformat(data)
         if not data: 
@@ -53,7 +53,7 @@ class Node_purchases(Node):
         for product in self.cache.filter_products(self.cache.get_data()):
             self.add_child(product)
 
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         if len(self.childs) < 1:
             qobuz.gui.notify(36000, 36001)
             return False

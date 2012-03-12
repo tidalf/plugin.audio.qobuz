@@ -50,7 +50,7 @@ class Node_product(Node):
         self.set_id(id)
         return True
     
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, lvl, flag = None, progress = None):
         if not self._set_cache():
             error(self, "Cannot set product cache")
             return False
@@ -60,16 +60,18 @@ class Node_product(Node):
             return False
         self.set_data(data)
         for track in data['tracks']:
+            progress.update_buildcount()
             node = Node_track()
             node.set_data(track)
             self.add_child(node)
 
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         if len(self.childs) < 1:
             qobuz.gui.notify(36000, 36001)
             return False
         for track in self.childs:
             if track.filter(flag): continue
+            progress.update_itemcount()
             item = track.make_XbmcListItem()#tag.getXbmcItem()
             self.attach_context_menu(item, track)
             list.append((track.get_url(Mode.PLAY), item, False))

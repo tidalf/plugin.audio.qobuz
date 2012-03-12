@@ -224,9 +224,8 @@ class Node(object):
             return True
         #info(self, " - build down hook (pre)")
         if progress: 
-            progress.inc_buildcount()
-            progress.update(50, "2/4 Discover trees: " + str(progress.buildcount))
-        self._build_down(lvl, flag)
+            progress.update_buildcount()
+        self._build_down(lvl, flag, progress)
         if lvl != -1: lvl -= 1
         for c in self.childs:
             c.build_down(lvl, flag, progress)
@@ -237,7 +236,8 @@ class Node(object):
         inherit from node object can implement their own code. Lot of object
         simply fetch data from qobuz (cached data)
     '''
-    def _build_down(self, lvl, flag):
+    def _build_down(self, lvl, flag, progress = None):
+        if progress: progress.inc_buildcount()
         ''' Can be overloaded '''
         pass
 
@@ -246,15 +246,18 @@ class Node(object):
         This method return all xbmc items needed by xbmc.* routines
         We can filter item with flag
     '''
-    def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE):
+    def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE, progress = None):
         if lvl != -1 and lvl < 1:
             return False
-        if not self._get_xbmc_items(list, lvl, flag):
+        if progress:
+            progress.inc_itemcount()
+            progress.update(75, "3/4 Retrieve trees: " + str(progress.itemcount))
+        if not self._get_xbmc_items(list, lvl, flag, progress):
             return False
         if lvl != -1:
             lvl -= 1
         for c in self.childs:
-            if not c.get_xbmc_items(list, lvl, flag):
+            if not c.get_xbmc_items(list, lvl, flag, progress):
                 return False
         return True
 

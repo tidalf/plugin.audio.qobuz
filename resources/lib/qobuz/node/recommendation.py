@@ -160,7 +160,7 @@ class Node_recommendation(Node):
         return True
 
 # DISPATCH
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, lvl, flag = None, progress = None):
         if not self.genre_type:
             print "Build node type"
             return self._build_recos_type(lvl, flag)
@@ -170,7 +170,7 @@ class Node_recommendation(Node):
         return self._build_down_type_genre(lvl, flag)
 
 
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         if not self.genre_type:
             print "Displaying type"
             return self._get_xbmc_items_type(list, lvl, flag)

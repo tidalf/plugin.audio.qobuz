@@ -33,8 +33,20 @@ class GuiProgress(xbmcgui.DialogProgress):
         self.buildcount = 0
         self.itemcount = 0
 
+    def update_buildcount(self):
+        self.buildcount+=1
+        self.update(50, "2/4 Discover trees: " + str(self.buildcount))
+        
+    def update_itemcount(self):
+        self.itemcount+=1
+        self.update(75, "3/4 Retrieves trees: " + str(self.itemcount))
+        
     def inc_buildcount(self):
+        print "INC BUILD COUNT"
         self.buildcount += 1
+        
+    def inc_itemcount(self):
+        self.itemcount += 1
 
 
 class Xbmc_renderer(IRenderer):
@@ -57,15 +69,15 @@ class Xbmc_renderer(IRenderer):
         if not self.set_root_node():
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
             return False
-        progress.update(50, "2/4 Discover trees")
+        progress.update_buildcount()
         self.root.build_down(self.depth, self.filter, progress)
         list = []
 
         #info(self, self.to_s())
         print "DEPTH: " + str(self.depth)
         print "FILTER: " + str(self.filter)
-        progress.update(75, "3/4 Retrieve trees")
-        ret = self.root.get_xbmc_items(list, self.depth, self.filter)
+        progress.update_itemcount()
+        ret = self.root.get_xbmc_items(list, self.depth, self.filter, progress)
         #if not ret: return False
         size = len(list)
         if size < 1: return False

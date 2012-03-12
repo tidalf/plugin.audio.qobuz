@@ -41,7 +41,7 @@ class Node_root(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
         self.set_content_type('files')
 
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, lvl, flag = None, progress = None):
         self.add_child(Node_user_playlists())
         self.add_child(Node_recommendation())
         self.add_child(Node_purchases())
@@ -55,7 +55,7 @@ class Node_root(Node):
         search.set_search_type('artists')
         self.add_child(search)
         
-    def _get_xbmc_items(self, list, lvl, flag):
+    def _get_xbmc_items(self, list, lvl, flag, progress = None):
         import qobuz
         for child in self.get_childs():
             if self.filter(flag): continue
