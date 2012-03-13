@@ -257,10 +257,16 @@ class QobuzBootstrap(object):
         if self.MODE == Mode.VIEW:
             info(self,"Displaying node")
             r = renderer(nt,id)
-            r.set_depth(depth)
+            r.set_depth(1)
             r.set_filter(view_filter)
             return r.display()
-
+        
+        if self.MODE == Mode.SCAN:
+            r = renderer(nt, id)
+            r.set_depth(-1)
+            r.set_filter(NodeFlag.DONTFETCHTRACK)
+            return r.scan()
+            
         elif self.MODE == Mode.SELECT_CURRENT_PLAYLIST:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()

@@ -22,7 +22,7 @@ from flag import NodeFlag
 from node import Node
 from cache.track import Cache_track
 from cache.track_stream_url import Cache_track_stream_url
-from debug import info, warn, error
+from debug import error, debug
 #from gettext import re
 '''
     NODE TRACK
@@ -41,7 +41,7 @@ class Node_track(Node):
     def _build_down(self, lvl, flag = None, progress = None):
         self._set_cache()
         if flag & NodeFlag.DONTFETCHTRACK:
-            info(self, "Don't download track data")
+            debug(self, "Don't download track data")
         else:    
             self.set_data(self.cache.get_data())
         return False
@@ -75,7 +75,13 @@ class Node_track(Node):
         format = format.replace("%n", self.get_track_number())
         format = format.replace("%g", self.get_genre())
         return format
-
+    
+    def is_sample(self):
+        streamtype = self.get_property('streamtype')
+        if 'full' in streamtype:
+            return True
+        return False
+    
     def get_composer(self):
         return self.get_property(('composer', 'name'))
 
@@ -91,9 +97,9 @@ class Node_track(Node):
             
     def get_image(self):
         image = self.get_property(('album', 'image', 'large'))
-        if image: return image.replace('_230.jpg', '_600.jpg')
+        if image: return image.replace('_230.', '_600.')
         if not self.parent: return ''
-        if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+        if self.parent.get_type() & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_PLAYLIST):
             return self.parent.get_image()
 
     def get_playlist_track_id(self):
@@ -191,7 +197,6 @@ class Node_track(Node):
             
         mode = Mode.PLAY
         url = self.get_url(mode)
-        #print "TRACK url: " + url
         item = xbmcgui.ListItem(label,
                                 label,
                                 self.get_image(),

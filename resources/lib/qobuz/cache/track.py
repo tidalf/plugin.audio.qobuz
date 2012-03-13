@@ -39,7 +39,7 @@ class Cache_track(ICacheable):
                                          'track',
                                          self.id, auto_fetch)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_track'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
 
     def _fetch_data(self):
         json = qobuz.api.get_track(self.id)

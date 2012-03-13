@@ -118,7 +118,9 @@ class Node_product(Node):
         return title
     
     def get_image(self):
-        return self.get_property(('image', 'large'))
+        image = self.get_property(('image', 'large'))
+        image = image.replace('_230.', '_600.')
+        return image 
     
     def get_label(self):
         label = ''.join((self.get_artist(), ' - ', self.get_title()))

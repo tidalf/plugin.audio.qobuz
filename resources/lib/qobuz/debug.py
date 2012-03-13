@@ -71,7 +71,7 @@ def info(obj, msg):
     log(obj, msg, LOGNOTICE)
 
 def debug(obj, msg):
-    log(obj, msg, LOGNOTICE)
+    log(obj, msg, LOGDEBUG)
 
 def crit(obj, msg):
     log(obj, msg, LOGSEVERE)

@@ -40,6 +40,7 @@ class Node(object):
         self.b_is_folder = True
         self._data = None
         self.id = None
+
         
     def set_data(self, data):
         self._data = data
@@ -184,13 +185,13 @@ class Node(object):
         return list
 
     def set_label(self, label):
-        self.label = label
+        self.label = label.encode('utf8', 'replace')
     
     def set_image(self, image):
         self.thumb = self.icon = image
     
     def set_label2(self, label):
-        self.label2 = label
+        self.label2 = label.encode('utf8', 'replace')
 
     def get_label(self):
         return self.label
@@ -215,27 +216,27 @@ class Node(object):
         #print "FLAG fail: removing item"
         return True
 
+    def get_all_nodes(self, Dir, whiteFlag = None, blackFlag = None):
+        for child in self.childs:
+            Dir.add_node(child)
+            child.get_all_nodes(Dir, whiteFlag, blackFlag)
+        
     '''
         build_down:
         This method fetch data from cache recursively and build our tree
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self, lvl, flag = NodeFlag.TYPE_NODE, progress = None):
-        if progress.iscanceled():
-            warn(self, "User has cancel this operation")
-            return False
-        
+    def build_down(self, xbmc_directory, lvl = 1, whiteFlag = NodeFlag.TYPE_NODE):
         if lvl != -1 and lvl < 1:
             return True
-        
-        if progress: 
-            progress.update_buildcount(self)
-
-        self._build_down(lvl, flag, progress)
+        xbmc_directory.update(50, "Getting data (cache/network)", self.get_label())
+        self._build_down(lvl, whiteFlag)
         if lvl != -1: lvl -= 1
-        for c in self.childs:
-            c.build_down(lvl, flag, progress)
+        for child in self.childs:
+            if child.type & whiteFlag:
+                xbmc_directory.add_node(child)
+            child.build_down(xbmc_directory, lvl, whiteFlag)
 
     '''
         _build_down:
@@ -243,7 +244,7 @@ class Node(object):
         inherit from node object can implement their own code. Lot of object
         simply fetch data from qobuz (cached data)
     '''
-    def _build_down(self, lvl, flag, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag):
         ''' Can be overloaded '''
         pass
 
@@ -252,7 +253,7 @@ class Node(object):
         This method return all xbmc items needed by xbmc.* routines
         We can filter item with flag
     '''
-    def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE, progress = None):
+    def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE):
         if progress.iscanceled():
             warn(self, "User has cancel this operation")
             return False
@@ -262,12 +263,12 @@ class Node(object):
         if progress:
             progress.update_itemcount(self)
             
-        if not self._get_xbmc_items(list, lvl, flag, progress):
+        if not self._get_xbmc_items(list, lvl, flag):
             return False
         if lvl != -1:
             lvl -= 1
         for c in self.childs:
-            if not c.get_xbmc_items(list, lvl, flag, progress):
+            if not c.get_xbmc_items(list, lvl, flag):
                 return False
         return True
 
@@ -285,7 +286,7 @@ class Node(object):
         return total
 
 
-    def attach_context_menu(self, item, node):
+    def attach_context_menu(self, item):
         import urllib
         color = qobuz.addon.getSetting('color_ctxitem')
         menuItems = []
@@ -296,7 +297,7 @@ class Node(object):
         
         ''' SCAN '''
         path = xbmc.getInfoLabel('ListItem.Path')
-        node_url = urllib.quote(node.make_url(Mode.VIEW))
+        node_url = urllib.quote(node.make_url(Mode.SCAN))
         url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url + "&action=scan"
         label = "Scan"
         menuItems.append((qobuz.utils.color(color, label), "XBMC.RunPlugin("+url+")"))                                                             
@@ -353,8 +354,9 @@ class Node(object):
         menuItems.append((qobuz.utils.color(color, 'Add to current playlist'), cmd))
         
         ''' Show playlist '''
-        showplaylist=sys.argv[0]+"?mode="+str(Mode.VIEW)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) 
-        menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.Container.Update("+showplaylist+")"))
+        if not (node.get_type() & NodeFlag.TYPE_PLAYLIST):
+            showplaylist=sys.argv[0]+"?mode="+str(Mode.VIEW)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) 
+            menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.Container.Update("+showplaylist+")"))
         
 #        ''' 
 #        Give a chance to our siblings to attach their items
@@ -366,7 +368,7 @@ class Node(object):
         if len(menuItems) > 0:
             item.addContextMenuItems(menuItems, replaceItems = False)
 
-    def hook_attach_context_menu(self, item, node, menuItems, color):
+    def hook_attach_context_menu(self, item, menuItems, color):
         pass
   
     def _get_keyboard(self, default = "", heading = "", hidden = False):

@@ -57,7 +57,7 @@ class Node_search(Node):
             url += "&action=scan"
         return url
 
-    def _get_xbmc_items(self, p_list, lvl, flag, progress = None):
+    def _build_down(self, lvl, flag):
         stype = self.get_search_type()
         search = None
         limit = None
@@ -97,7 +97,7 @@ class Node_search(Node):
         ret = search.search(query, limit)
         if not ret:
             warn(self, "Searching artists API call fail")
-            return p_list
+            return False
         data = search.get_data()
         #print pprint.pformat(data)
         self.notify_data_result(data)
@@ -109,31 +109,30 @@ class Node_search(Node):
                 json_product['artist']['name'] = artist
                 product = Node_product()
                 product.set_data(json_product)
-                item = product.make_XbmcListItem()
-                self.attach_context_menu(item, product)
-                p_list.append((product.get_url(), item, product.is_folder()))
+                #item = product.make_XbmcListItem()
+                #self.attach_context_menu(item, product)
+                #p_list.append((product.get_url(), item, product.is_folder()))
+                self.add_child(product)
         elif self.search_type == 'songs':
             #print "DATA: " + pprint.pformat(data)
             for jtrack in data['tracks']:
                 track = Node_track()
                 track.set_data(jtrack)
-                print "Track"
-                pprint.pprint(jtrack)
-                item = track.make_XbmcListItem()
-                self.attach_context_menu(item, track)
-                p_list.append((track.get_url(Mode.PLAY), item, track.is_folder()))
-                 
+#                print "Track"
+#                pprint.pprint(jtrack)
+#                item = track.make_XbmcListItem()
+#                self.attach_context_menu(item, track)
+#                p_list.append((track.get_url(Mode.PLAY), item, track.is_folder()))
+                self.add_child(track)
         elif self.search_type == 'artists':
-            print "NOT IMPLEMENTED (search artists)"
             for jartist in data['results']['artists']:
-                print "ARTIST JSON"
-                pprint.pprint(jartist)
                 artist = Node_artist()
                 artist.set_data(jartist)
-                item = artist.make_XbmcListItem()
-                self.attach_context_menu(item, artist)
-                p_list.append((artist.get_url(), item, artist.is_folder()))
-        return p_list
+#                item = artist.make_XbmcListItem()
+#                self.attach_context_menu(item, artist)
+#                p_list.append((artist.get_url(), item, artist.is_folder()))
+                self.add_child(artist)
+        return True
 
     def notify_data_result(self, data):
         if not 'length' in data:

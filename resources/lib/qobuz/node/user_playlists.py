@@ -74,21 +74,20 @@ class Node_user_playlists(Node):
                 node.set_is_current(True)
             self.add_child(node)
 
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        username = qobuz.addon.getSetting('username')
-        color = qobuz.addon.getSetting('color_notowner')
-        for playlist in self.childs:
-            item = playlist.make_XbmcListItem()
-            if playlist.get_owner() != username:
-                item.setLabel(''.join([qobuz.utils.color(color, playlist.get_owner()), ' - ', playlist.get_name()]))
-            else:
-                self.attach_context_menu(item, playlist)
-            
-            if playlist.is_current():
-                label = item.getLabel()
-                item.setLabel(qobuz.utils.color(color, '-> ') + label + qobuz.utils.color(color, ' <-'))
-            list.append((playlist.get_url(), item, playlist.is_folder()))
-        return True
+#    def _get_xbmc_items(self, list, lvl, flag, progress = None):
+#        username = qobuz.addon.getSetting('username')
+#        color = qobuz.addon.getSetting('color_notowner')
+#        for playlist in self.childs:
+#            item = playlist.make_XbmcListItem()
+#            if playlist.get_owner() != username:
+#                item.setLabel(''.join([qobuz.utils.color(color, playlist.get_owner()), ' - ', playlist.get_name()]))
+#               
+#            if playlist.is_current():
+#                label = item.getLabel()
+#                item.setLabel(qobuz.utils.color(color, '-[ %s ]-' % (label) ))
+#            self.attach_context_menu(item, playlist)
+#            list.append((playlist.get_url(), item, playlist.is_folder()))
+#        return True
 
     def hook_attach_context_menu(self, item, node, menuItems, color):
 #        ''' RENAME '''

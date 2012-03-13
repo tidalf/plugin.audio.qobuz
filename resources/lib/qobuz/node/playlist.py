@@ -47,6 +47,9 @@ class Node_playlist(Node):
         self.cache = None
         self.packby = 'album'
 
+    def get_label(self):
+        return self.get_property('name')
+        
     def set_is_current(self, b):
         self.b_is_current = b
 
@@ -65,7 +68,7 @@ class Node_playlist(Node):
         self.set_id(id)
         return True
 
-    def _build_down(self, lvl, flag = None, progress = None):
+    def _build_down(self, lvl, flag = None):
         info(self, "Build-down playlist")
         if not self._set_cache():
             error(self, "Cannot set cache!")
@@ -77,21 +80,23 @@ class Node_playlist(Node):
         self.set_data(data)
         albumseen = {}
         for jtrack in data['tracks']:
+            node = None
             if self.packby == 'album':
                 jalbum = jtrack['album']
                 if jalbum['id'] in albumseen: continue
-                albumseen[jalbum['id']] = True
                 keys = [ 'artist', 'interpreter', 'composer']
                 for k in keys:
                     if k in jtrack: jalbum[k] = jtrack[k]
+                if 'image' in jtrack: jalbum['image'] = jtrack['image']
               
                 node = Node_product()
                 node.set_data(jalbum)
-                self.add_child(node)
+                
             else:
                 node = Node_track()
                 node.set_data(jtrack)
-                self.add_child(node)
+            albumseen[jalbum['id']] = node
+            self.add_child(node)
 
     def _get_xbmc_items(self, list, lvl, flag, progress = None):
         if len(self.childs) < 1:
@@ -149,7 +154,7 @@ class Node_playlist(Node):
 
     def add_to_current_playlist(self, ):
             from cache.current_playlist import Cache_current_playlist
-            
+            from renderer.xbmc import GuiProgress
             
             current_playlist = Cache_current_playlist()
             print "Current playlist id: " + str(current_playlist.get_id())
@@ -181,9 +186,11 @@ class Node_playlist(Node):
             r.set_depth(depth)
             r.set_filter(view_filter)
             r.set_root_node()
-            r.root.build_down(depth, NodeFlag.DONTFETCHTRACK)
+            progress = GuiProgress()
+            progress.create("Add to current playlist", r.root.get_label())
+            r.root.build_down(depth, NodeFlag.DONTFETCHTRACK, progress)
             list = []
-            ret = r.root.get_xbmc_items(list, depth, NodeFlag.TYPE_TRACK)
+            ret = r.root.get_xbmc_items(list, depth, NodeFlag.TYPE_TRACK, progress)
             if not ret: return False
             trackids = []
             if len(list) < 1:

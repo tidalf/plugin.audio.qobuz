@@ -14,18 +14,19 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
+#import sys
+#import pprint
 
 import xbmcgui
 
 import qobuz
-from constants import Mode
 
+#from constants import Mode
 from flag import NodeFlag
 from node import Node
 from product import Node_product
-from debug import info, warn, error, debug
+#from debug import info, warn, error, debug
+from debug import warn
 '''
     NODE ARTIST
 '''

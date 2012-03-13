@@ -28,5 +28,5 @@ class __Mode():
         self.ADD_TO_CURRENT_PLAYLIST = 7
         self.RENAME_PLAYLIST = 8
         self.REMOVE_PLAYLIST = 9
-
+        self.SCAN = 10
 Mode = __Mode()
