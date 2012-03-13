@@ -63,6 +63,9 @@ class Node_artist(Node):
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
         for jproduct in data['artist']['albums']:
+            keys = ['artist', 'interpreter', 'composer']
+            for k in keys:
+                if k in data['artist']: jproduct[k] = data['artist'][k]
             node = Node_product()
             node.set_data(jproduct)
             self.add_child(node)

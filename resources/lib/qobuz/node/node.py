@@ -230,7 +230,7 @@ class Node(object):
             return True
         
         if progress: 
-            progress.update_buildcount()
+            progress.update_buildcount(self)
 
         self._build_down(lvl, flag, progress)
         if lvl != -1: lvl -= 1
@@ -260,7 +260,7 @@ class Node(object):
         if lvl != -1 and lvl < 1:
             return False
         if progress:
-            progress.update_itemcount()
+            progress.update_itemcount(self)
             
         if not self._get_xbmc_items(list, lvl, flag, progress):
             return False
@@ -289,7 +289,7 @@ class Node(object):
         import urllib
         color = qobuz.addon.getSetting('color_ctxitem')
         menuItems = []
-        
+        cmd = ''
         ''' ERASE CACHE '''
         erasecache=sys.argv[0]+"?mode="+str(Mode.ERASE_CACHE)
         menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
@@ -307,7 +307,7 @@ class Node(object):
         url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
         label = "Scan dir: " + path 
         menuItems.append(( qobuz.utils.color(color, label), 'XBMC.RunPlugin("%s")' % (url) ))                                                         
-        if 1: #node.type & NodeFlag.TYPE_PLAYLIST: 
+        if node.type & NodeFlag.TYPE_PLAYLIST: 
             '''
                 This album 
             '''

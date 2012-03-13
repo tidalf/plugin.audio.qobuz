@@ -42,13 +42,13 @@ class GuiProgress(xbmcgui.DialogProgress):
     def show(self):
         self.showDialog = True
         
-    def update_buildcount(self):
+    def update_buildcount(self, node):
         self.buildcount+=1
-        self.update(50, "2/4 Discover node: " + str(self.buildcount))
+        self.update(50, "[1/2] Discover node: " + str(self.buildcount), node.get_label())
         
-    def update_itemcount(self):
+    def update_itemcount(self, node):
         self.itemcount+=1
-        self.update(75, "3/4 Retrieve node: " + str(self.itemcount))
+        self.update(100, "[2/2] Making item: " + str(self.itemcount), node.get_label())
     
     def update_addtodirectory(self, count, total):
         if total == 0:
@@ -68,12 +68,12 @@ class GuiProgress(xbmcgui.DialogProgress):
     def inc_itemcount(self):
         self.itemcount += 1
 
-    def update(self, p, t):
+    def update(self, p, label1, label2 = ''):
         p = int(p)
         if p < 0: p = 0
         if p > 100: p = 100
         if not self.showDialog: return False
-        super(GuiProgress, self).update(p, t)
+        super(GuiProgress, self).update(p, label1, label2)
         return True
 
     def create(self, h, l1 = None):
@@ -101,13 +101,11 @@ class Xbmc_renderer(IRenderer):
         step = 500
         size = len(list)
         start = 0
-        print "SIZEEEEEEEEEEEEE: " + str(size)
         if size <= step:
             progress.update_addtodirectory(start, size)
             xbmcplugin.addDirectoryItems(handle = qobuz.boot.handle, items = list, totalItems = size)
             return True
         while start <= (size - step):
-            print "BEGGGGGGGGGGGGGGGGGGGG: " + str(start)
             stop = start + step
             sublist = list[start:stop]
             progress.update_addtodirectory(start, size)
@@ -115,7 +113,6 @@ class Xbmc_renderer(IRenderer):
             start = stop
             time.sleep(1)
         if start <= size:
-            print "COMPLETE LIST: " + str(start)
             progress.update_addtodirectory(start, size)
             xbmcplugin.addDirectoryItems(handle = qobuz.boot.handle, items = list[start:], totalItems = len(sublist))
         return True
@@ -129,34 +126,25 @@ class Xbmc_renderer(IRenderer):
             #progress.hide()
             action = 'scan'
             bCacheToDisc = False
-        progress.create("Walking into the dark forest", "The beginning")
-        progress.update(25, "1/4 One drop...")
+        progress.create("Building tree", "The beginning")
         if not self.set_root_node():
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
             return False
         if action == 'scan':
             self.depth = -1
             self.filter = NodeFlag.DONTFETCHTRACK
-        progress.update_buildcount()
         self.root.build_down(self.depth, self.filter, progress)
         list = []
-
-        #info(self, self.to_s())
         print "DEPTH: " + str(self.depth)
         print "FILTER: " + str(self.filter)
-        progress.update_itemcount()
         ret = self.root.get_xbmc_items(list, self.depth, self.filter, progress)
         if progress.iscanceled():
             xbmcplugin.endOfDirectory(handle = qobuz.boot.handle, succeeded = False, updateListing = False, cacheToDisc = False)
             return False
-        #if not ret: return False
         size = len(list)
         if size < 1: return False
-        progress.update(100, "4/4 Add node to directory")
-        print "Number of item: " + str(size)
         xbmcplugin.setContent(handle = qobuz.boot.handle, content = self.root.content_type)
         self._add_to_directory(list, progress)
-        #xbmcplugin.addDirectoryItems(handle=qobuz.boot.handle, items=list, totalItems=size)
         xbmcplugin.endOfDirectory(handle = qobuz.boot.handle, succeeded = True, updateListing = False, cacheToDisc = bCacheToDisc)
         progress.close()
         return True
