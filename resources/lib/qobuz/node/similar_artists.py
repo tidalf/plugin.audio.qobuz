@@ -149,5 +149,6 @@ class Node_similar_artist(Node):
                                 self.get_image(),
                                 self.get_url(),
                                 )
+        self.attach_context_menu(item)
         return item
 

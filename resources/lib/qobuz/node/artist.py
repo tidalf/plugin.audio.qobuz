@@ -71,17 +71,6 @@ class Node_artist(Node):
             node.set_data(jproduct)
             self.add_child(node)
         return True
-    '''
-        Get Xbmc ITEMS
-    '''
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        import qobuz
-        for child in self.get_childs():
-            if self.filter(flag): continue
-            item = child.make_XbmcListItem()
-            self.attach_context_menu(item, child)
-            list.append((child.get_url(), item, child.is_folder()))
-        return True
     
     '''
         Make XbmcListItem
@@ -94,5 +83,6 @@ class Node_artist(Node):
                                 self.get_url(),
                                 )
         item.setProperty('node_id', self.get_id())
+        self.attach_context_menu(item)
         return item
 

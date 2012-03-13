@@ -126,7 +126,11 @@ class Node_playlist(Node):
                                 self.get_icon(),
                                 self.get_thumbnail(),
                                 self.get_url())
+        if not item:
+            warn(self, "Error: Cannot make xbmc list item")
+            return None
         item.setProperty('node_id', str(self.get_id()))
+        self.attach_context_menu(item)
         return item
 
 

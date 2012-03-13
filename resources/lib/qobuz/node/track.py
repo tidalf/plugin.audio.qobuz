@@ -201,6 +201,9 @@ class Node_track(Node):
                                 self.get_image(),
                                 self.get_image(),
                                 url)
+        if not item:
+            warn(self, "Cannot create xbmc list item")
+            return None
         item.setPath(url)                        
         track_number = self.get_track_number()
         if not track_number: track_number = 0
@@ -223,6 +226,7 @@ class Node_track(Node):
         item.setProperty('IsPlayable', 'true')
         item.setProperty('IsInternetStream', 'true')
         item.setProperty('Music', 'true')
+        self.attach_context_menu(item)
         return item
 
     def hook_attach_context_menu(self, item, node, menuItems, color):

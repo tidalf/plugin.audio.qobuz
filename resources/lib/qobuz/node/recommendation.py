@@ -75,9 +75,9 @@ class Node_recommendation(Node):
         types.append(('editor-picks', qobuz.lang(30086)))
         for t in types:
             node = Node_recommendation()
-            self.add_child(node)
             node.setGenreType(t[0])
             node.set_label(t[1])
+            self.add_child(node)
 
 # GENRE
     def _build_recos_genre(self, lvl, flag):

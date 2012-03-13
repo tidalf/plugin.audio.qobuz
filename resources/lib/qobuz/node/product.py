@@ -78,6 +78,7 @@ class Node_product(Node):
                                             'genre': self.get_genre(),
                                             'year': self.get_year()
                                             })
+        self.attach_context_menu(item)
         return item
 
     ''' 

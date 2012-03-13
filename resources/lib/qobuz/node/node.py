@@ -143,6 +143,7 @@ class Node(object):
         item.setProperty('IsFolder', 'true' if self.is_folder() else 'false')
         item.setIconImage(self.get_icon())
         item.setThumbnailImage(self.get_thumbnail())
+        self.attach_context_menu(item)
         return item
     
     def set_url(self, url):
@@ -211,11 +212,6 @@ class Node(object):
             return False
         #print "FLAG fail: removing item"
         return True
-
-    def get_all_nodes(self, Dir, whiteFlag = None, blackFlag = None):
-        for child in self.childs:
-            Dir.add_node(child)
-            child.get_all_nodes(Dir, whiteFlag, blackFlag)
         
     '''
         build_down:
@@ -244,30 +240,6 @@ class Node(object):
         ''' Can be overloaded '''
         pass
 
-    '''
-        get_xbmc_items:
-        This method return all xbmc items needed by xbmc.* routines
-        We can filter item with flag
-    '''
-    def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE):
-        if progress.iscanceled():
-            warn(self, "User has cancel this operation")
-            return False
-        
-        if lvl != -1 and lvl < 1:
-            return False
-        if progress:
-            progress.update_itemcount(self)
-            
-        if not self._get_xbmc_items(list, lvl, flag):
-            return False
-        if lvl != -1:
-            lvl -= 1
-        for c in self.childs:
-            if not c.get_xbmc_items(list, lvl, flag):
-                return False
-        return True
-
 
     '''
         count_node:
@@ -293,7 +265,7 @@ class Node(object):
         
         ''' SCAN '''
         path = xbmc.getInfoLabel('ListItem.Path')
-        node_url = urllib.quote(node.make_url(Mode.SCAN))
+        node_url = urllib.quote(self.make_url(Mode.SCAN))
         url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url + "&action=scan"
         label = "Scan"
         menuItems.append((qobuz.utils.color(color, label), "XBMC.RunPlugin("+url+")"))                                                             
@@ -304,11 +276,11 @@ class Node(object):
         url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
         label = "Scan dir: " + path 
         menuItems.append(( qobuz.utils.color(color, label), 'XBMC.RunPlugin("%s")' % (url) ))                                                         
-        if node.type & NodeFlag.TYPE_PLAYLIST: 
+        if self.type & NodeFlag.TYPE_PLAYLIST: 
             '''
                 This album 
             '''
-            id = node.get_property(('album', 'id'))
+            id = self.get_property(('album', 'id'))
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s' % (Mode.VIEW, 
                                          NodeFlag.TYPE_PRODUCT, 
                                          id
@@ -316,11 +288,11 @@ class Node(object):
             cmd = "XBMC.Container.Update(%s)" % (args)  
             menuItems.append((qobuz.utils.color(color, qobuz.lang(39000)), cmd))
             
-        if node.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST): 
+        if self.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST): 
             '''
                 All album
             '''
-            id = node.get_artist_id()
+            id = self.get_artist_id()
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s' % (Mode.VIEW, 
                                          NodeFlag.TYPE_ARTIST, 
                                          id
@@ -331,8 +303,8 @@ class Node(object):
             '''
                 Similar artist
             '''
-            id = node.get_artist_id()
-            query = urllib.quote(node.get_artist())
+            id = self.get_artist_id()
+            query = urllib.quote(self.get_artist())
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW, 
                                          NodeFlag.TYPE_SIMILAR_ARTIST, 
                                          id, query
@@ -340,24 +312,24 @@ class Node(object):
             cmd = "XBMC.Container.Update(%s)" % (args)
             menuItems.append((qobuz.utils.color(color, "Similar artist"), cmd))
         
-        args = sys.argv[0] + "?mode=" + str(Mode.ADD_TO_CURRENT_PLAYLIST) + "&nt=" + str(node.get_type())
-        if node.get_id(): args += "&nid=" + str(node.get_id())
-        genre_type = node.get_parameter('genre-type')
-        genre_id = node.get_parameter('genre-id')
+        args = sys.argv[0] + "?mode=" + str(Mode.ADD_TO_CURRENT_PLAYLIST) + "&nt=" + str(self.get_type())
+        if self.get_id(): args += "&nid=" + str(self.get_id())
+        genre_type = self.get_parameter('genre-type')
+        genre_id = self.get_parameter('genre-id')
         if genre_type: cmd += "&genre-type=" + genre_type
         if genre_id: cmd += "&genre-id=" + genre_id
         cmd = "XBMC.Container.Update(%s)" % (args)
         menuItems.append((qobuz.utils.color(color, 'Add to current playlist'), cmd))
         
         ''' Show playlist '''
-        if not (node.get_type() & NodeFlag.TYPE_PLAYLIST):
+        if not (self.get_type() & NodeFlag.TYPE_PLAYLIST):
             showplaylist=sys.argv[0]+"?mode="+str(Mode.VIEW)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) 
             menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.Container.Update("+showplaylist+")"))
         
 #        ''' 
 #        Give a chance to our siblings to attach their items
 #        '''
-        self.hook_attach_context_menu(item, node, menuItems, color)
+        #self.hook_attach_context_menu(item, node, menuItems, color)
         '''
         Add our items to the context menu
         '''
