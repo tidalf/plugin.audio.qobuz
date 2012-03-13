@@ -43,6 +43,9 @@ class Node_search(Node):
         elif self.search_type == 'songs':
             return "Searching for songs"
 
+    def get_description(self):
+        return self.get_label()
+    
     def set_search_type(self, st):
         print "Set search type: " + st
         self.search_type = st
@@ -111,6 +114,7 @@ class Node_search(Node):
                 self.add_child(product)
         elif self.search_type == 'songs':
             for jtrack in data['tracks']:
+                print "Track:" + pprint.pformat(jtrack)
                 track = Node_track()
                 track.set_data(jtrack)
                 self.add_child(track)

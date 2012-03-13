@@ -90,6 +90,7 @@ class Node_track(Node):
         if not self.parent: return ''
         if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
             return self.parent.get_title()
+        return ''
             
     def get_image(self):
         image = self.get_property(('album', 'image', 'large'))
@@ -116,7 +117,9 @@ class Node_track(Node):
         if not self.parent: return ''
         if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
             return self.parent.get_genre()
+        return ''
 
+    
     def get_artist(self):
         s = self.get_interpreter()
         if s: return s

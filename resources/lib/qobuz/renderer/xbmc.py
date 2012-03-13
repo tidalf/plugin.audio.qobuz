@@ -37,7 +37,6 @@ class Xbmc_renderer(IRenderer):
         self.filter = 0
         
     def display(self):
-        log(self, "DISPLAY")
         from renderer.xbmc_directory import xbmc_directory
         if not self.set_root_node():
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
