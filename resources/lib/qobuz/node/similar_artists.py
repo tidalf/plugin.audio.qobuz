@@ -113,7 +113,6 @@ class Node_similar_artist(Node):
                 warn(self,  "No result for artist: " + name)
                 continue
             for jartist in result:
-                progress.update_buildcount()
                 artist_id = jartist['id']
                 if artist_id in listid:
                     print "Artist id doublon"
@@ -122,6 +121,7 @@ class Node_similar_artist(Node):
                 artist.set_data(jartist)
                 artist.set_image(a['image'])
                 listid[artist_id] = artist 
+                progress.update_buildcount(artist)
                 self.add_child(artist)
         return len(parse.artists)
             
