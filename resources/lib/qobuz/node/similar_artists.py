@@ -103,7 +103,6 @@ class Node_similar_artist(Node):
         max = 20
         count = 0
         for a in parse.artists:
-            progress.update_buildcount()
             if count > max: break
             count+=1
             print a['name'] + ' (' + a['image'] + ')'
@@ -114,7 +113,6 @@ class Node_similar_artist(Node):
                 warn(self,  "No result for artist: " + name)
                 continue
             for jartist in result:
-                    progress.update_buildcount()
                     artist_id = jartist['id']
                     if artist_id in listid:
                         print "Artist id doublon"
@@ -134,7 +132,6 @@ class Node_similar_artist(Node):
         if len(self.get_childs()) < 1:
             return False
         for child in self.get_childs():
-            progress.update_itemcount()
             if self.filter(flag): continue
             item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)

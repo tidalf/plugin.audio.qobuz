@@ -60,4 +60,4 @@ class QobuzGUI:
             return False
         
     def executeJSONRPC(self, json):
-        xbmc.executeJSONRPC(json)
+        return xbmc.executeJSONRPC(json)

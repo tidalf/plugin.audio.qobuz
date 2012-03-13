@@ -225,12 +225,13 @@ class Node(object):
         if progress.iscanceled():
             warn(self, "User has cancel this operation")
             return False
-        #info(self, lvl*'#' + ' build_down (' + str(NodeFlag.TYPE_NODE) + ')')
+        
         if lvl != -1 and lvl < 1:
             return True
-        #info(self, " - build down hook (pre)")
+        
         if progress: 
             progress.update_buildcount()
+
         self._build_down(lvl, flag, progress)
         if lvl != -1: lvl -= 1
         for c in self.childs:
@@ -243,7 +244,6 @@ class Node(object):
         simply fetch data from qobuz (cached data)
     '''
     def _build_down(self, lvl, flag, progress = None):
-        if progress: progress.inc_buildcount()
         ''' Can be overloaded '''
         pass
 
@@ -253,11 +253,15 @@ class Node(object):
         We can filter item with flag
     '''
     def get_xbmc_items(self, list, lvl, flag = NodeFlag.TYPE_NODE, progress = None):
+        if progress.iscanceled():
+            warn(self, "User has cancel this operation")
+            return False
+        
         if lvl != -1 and lvl < 1:
             return False
         if progress:
-            progress.inc_itemcount()
-            progress.update(75, "3/4 Retrieve trees: " + str(progress.itemcount))
+            progress.update_itemcount()
+            
         if not self._get_xbmc_items(list, lvl, flag, progress):
             return False
         if lvl != -1:
@@ -291,15 +295,18 @@ class Node(object):
         menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
         
         ''' SCAN '''
+        path = xbmc.getInfoLabel('ListItem.Path')
         node_url = urllib.quote(node.make_url(Mode.VIEW))
         url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url + "&action=scan"
-        menuItems.append((qobuz.utils.color(color, "Scan"), "XBMC.RunPlugin("+url+")"))                                                             
+        label = "Scan"
+        menuItems.append((qobuz.utils.color(color, label), "XBMC.RunPlugin("+url+")"))                                                             
         
         ''' SCAN DIR '''
-        node_url = urllib.quote(self.make_url(Mode.VIEW))
+        path = xbmc.getInfoLabel('Container.FolderPath') 
+        node_url = urllib.quote(path)#self.make_url(Mode.VIEW))
         url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
-        menuItems.append((qobuz.utils.color(color, "Scan dir"), "XBMC.RunPlugin("+url+")"))                                                             
-        
+        label = "Scan dir: " + path 
+        menuItems.append(( qobuz.utils.color(color, label), 'XBMC.RunPlugin("%s")' % (url) ))                                                         
         if 1: #node.type & NodeFlag.TYPE_PLAYLIST: 
             '''
                 This album 

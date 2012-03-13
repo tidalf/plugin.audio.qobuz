@@ -63,7 +63,6 @@ class Node_artist(Node):
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
         for jproduct in data['artist']['albums']:
-            progress.update_buildcount()
             node = Node_product()
             node.set_data(jproduct)
             self.add_child(node)
@@ -75,7 +74,6 @@ class Node_artist(Node):
         import qobuz
         for child in self.get_childs():
             if self.filter(flag): continue
-            progress.update_itemcount()
             item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)
             list.append((child.get_url(), item, child.is_folder()))

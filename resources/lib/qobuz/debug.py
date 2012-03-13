@@ -52,7 +52,6 @@ except:
 # Logging helper functions
 ###############################################################################
 def log(obj, msg, lvl = LOGNOTICE):
-    return True
     if not __debugging__:
         return
     name = None

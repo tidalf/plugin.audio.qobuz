@@ -77,12 +77,10 @@ class Node_playlist(Node):
         self.set_data(data)
         albumseen = {}
         for jtrack in data['tracks']:
-            progress.update_buildcount()
             if self.packby == 'album':
                 jalbum = jtrack['album']
                 if jalbum['id'] in albumseen: continue
                 albumseen[jalbum['id']] = True
-                pprint.pprint(jalbum)
                 keys = [ 'artist', 'interpreter', 'composer']
                 for k in keys:
                     if k in jtrack: jalbum[k] = jtrack[k]
@@ -100,7 +98,6 @@ class Node_playlist(Node):
             qobuz.gui.notify(36000, 36001)
             return False
         for child in self.childs:
-            progress.update_itemcount()
             item = child.make_XbmcListItem()
             self.attach_context_menu(item, child)
             mode = Mode.PLAY

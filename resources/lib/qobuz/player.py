@@ -24,13 +24,35 @@ import pprint
 import xbmc
 import xbmcplugin
 import xbmcgui
-
+import json 
 import qobuz
-from debug import *
+from debug import info, warn
+
 
 from node.track import Node_track
 
-#from utils.list_item import QobuzListItem_track
+class xbmc_json_rpc():
+    def __init__(self):
+
+        pass
+
+    def _call(self, method, params = {}):
+        cmd = {
+               'jsonrpc': '2.0',
+               'method': method,
+        }
+        if params: cmd['params'] = params
+        print "JSONRPC CMD: " + pprint.pformat(cmd)
+        response = xbmc.executeJSONRPC(json.dumps( cmd))
+        print "JSONRPC Response: " + response
+        return response
+    
+    def Player_SetAudioStream(self, url):
+        return self._call('Player.SetAudioStream', { 'id': 0, 'url': url })
+    
+    def JSONRPC_Version(self):
+        return xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "JSONRPC.Version" }')
+        return self._call("JSONRPC.Version", None)
 
 class QobuzPlayer(xbmc.Player):
 
@@ -60,9 +82,15 @@ class QobuzPlayer(xbmc.Player):
         '''
 #        if qobuz.addon.getSetting('notification_playingsong') == 'true':
 #            qobuz.gui.showNotificationH(lang(34000), item.getLabel(), item.getProperty('image'))
+        rpc = xbmc_json_rpc()
+        print "JSON RPC Version: " + rpc.JSONRPC_Version()
+        rpc.Player_SetAudioStream(node.get_streaming_url())
+        print "INFO: " + xbmc.getInfoLabel('Container.FolderPath')
+        return True
         '''
             We are called from playlist...
         '''
+        
         if qobuz.boot.handle == -1:
             super(QobuzPlayer, self).play(node.get_streaming_url(), item, False)
         else:

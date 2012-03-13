@@ -103,7 +103,6 @@ class Node_search(Node):
         self.notify_data_result(data)
         if self.search_type == 'albums':
             for json_product in data:
-                progress.update_itemcount()
                 json_product = json_product['product']
                 artist = json_product['artist']
                 json_product['artist'] = { }
@@ -116,7 +115,6 @@ class Node_search(Node):
         elif self.search_type == 'songs':
             #print "DATA: " + pprint.pformat(data)
             for jtrack in data['tracks']:
-                progress.update_itemcount()
                 track = Node_track()
                 track.set_data(jtrack)
                 print "Track"
@@ -128,7 +126,6 @@ class Node_search(Node):
         elif self.search_type == 'artists':
             print "NOT IMPLEMENTED (search artists)"
             for jartist in data['results']['artists']:
-                progress.update_itemcount()
                 print "ARTIST JSON"
                 pprint.pprint(jartist)
                 artist = Node_artist()

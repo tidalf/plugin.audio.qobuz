@@ -58,12 +58,9 @@ class Node_product(Node):
         if not data:
             warn(self, "Cannot fetch product data")
             return False
-        self.set_data(data)
-#        if self.get_parameter('action') == 'scan':
-#            qobuz.gui.notifyH('Qobuz Scan / Building tree', self.get_label(), self.get_image(), 250)
-        
+        self.set_data(data)     
         for track in data['tracks']:
-            progress.update_buildcount()
+
             node = Node_track()
             node.set_data(track)
             self.add_child(node)
@@ -72,11 +69,8 @@ class Node_product(Node):
         if len(self.childs) < 1:
             qobuz.gui.notify(36000, 36001)
             return False
-#        if self.get_parameter('action') == 'scan':
-#            qobuz.gui.notifyH('Qobuz Scan / Adding albums to XbmcMusicDatabase', self.get_label(), self.get_image(), 250 )
         for track in self.childs:
             if track.filter(flag): continue
-            progress.update_itemcount()
             item = track.make_XbmcListItem()#tag.getXbmcItem()
             self.attach_context_menu(item, track)
             list.append((track.get_url(Mode.PLAY), item, False))
