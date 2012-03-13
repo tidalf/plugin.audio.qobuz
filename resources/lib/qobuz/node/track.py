@@ -40,11 +40,11 @@ class Node_track(Node):
 
     def _build_down(self, lvl, flag = None, progress = None):
         if flag & NodeFlag.DONTFETCHTRACK:
-            debug(self, "Don't download track data")
+            return False
         else:    
             self._set_cache()
             self.set_data(self.cache.get_data())
-        return False
+            return True
 
 
     def _set_cache(self):

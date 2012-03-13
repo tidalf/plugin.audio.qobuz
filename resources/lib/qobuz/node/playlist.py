@@ -117,19 +117,23 @@ class Node_playlist(Node):
         import xbmcgui
         color = qobuz.addon.getSetting('color_ctxitem')
         label = self.get_name()
+        print "Name: " + label
         if self.b_is_current:
             label = qobuz.utils.color(color, label)
         if not self.is_my_playlist: 
             label = qobuz.utils.color(color, self.get_owner()) + ' - ' + self.get_name() 
+        
         item = xbmcgui.ListItem(label,
                                 self.get_owner(),
-                                self.get_icon(),
-                                self.get_thumbnail(),
-                                self.get_url())
+                                self.get_image(),
+                                self.get_image(),
+                                self.make_url())
         if not item:
             warn(self, "Error: Cannot make xbmc list item")
             return None
-        item.setProperty('node_id', str(self.get_id()))
+        id = self.get_id()
+        if id: 
+            item.setProperty('node_id', str(id))
         self.attach_context_menu(item)
         return item
 

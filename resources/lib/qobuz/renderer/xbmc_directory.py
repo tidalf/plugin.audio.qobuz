@@ -23,7 +23,7 @@ class xbmc_directory():
         self.Progress = xbmc_progress()
         self.Progress.create("Qobuz directory")
         self.total_put = 0
-        
+
     def add_node(self, node):
         if not self.ALL_AT_ONCE: 
             return self.put_item(node)
@@ -32,18 +32,24 @@ class xbmc_directory():
     
     def update(self, percent, line1, line2 = None):
         self.Progress.update(percent, line1, line2)
-        
+    
+    def is_canceled(self):
+        return self.Progress.iscanceled()
+    
     def put_item(self, node):
         self.total_put += 1
         mode = Mode.VIEW
         item = node.make_XbmcListItem()
+        if not item:
+            return False
         ret = xbmcplugin.addDirectoryItem(self.handle,
                                     node.make_url(),
                                     item,
                                     node.is_folder(),                       
                                     len(self.nodes))
         if not ret: self.put_item_ok = False
-        self.Progress.update(0, "Add Item", node.get_label())
+        if not (node.type & NodeFlag.TYPE_TRACK):
+            self.Progress.update(0, "Add Item", node.get_label())
         return ret
         
     def end_of_directory(self):

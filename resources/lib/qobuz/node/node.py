@@ -220,8 +220,10 @@ class Node(object):
     '''
 
     def build_down(self, xbmc_directory, lvl = 1, whiteFlag = NodeFlag.TYPE_NODE):
+        if xbmc_directory.is_canceled():
+            return False
         if lvl != -1 and lvl < 1:
-            return True
+            return False
         xbmc_directory.update(25, "Getting data (cache/network)", self.get_label())
         self._build_down(lvl, whiteFlag)
         if lvl != -1: lvl -= 1
@@ -229,6 +231,7 @@ class Node(object):
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
             child.build_down(xbmc_directory, lvl, whiteFlag)
+        return True
 
     '''
         _build_down:
