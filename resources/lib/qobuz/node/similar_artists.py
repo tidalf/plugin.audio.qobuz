@@ -54,13 +54,11 @@ class Node_similar_artist(Node):
     '''
         Build Down
     '''
-    def _build_down(self, lvl, flag = None, progress = None):
-        #print "ID: " + self.get_id()
+    def _build_down(self, lvl, flag = None):
         query = self.get_parameter('query').strip().lower()
         query.encode('utf8', 'replace')
         data = qobuz.api.get_similar_artists(query)
         dom = parseString(data.encode('ascii', 'replace'))
-        #print dom.toprettyxml()
         class parse_simartists():
             def __init__(self, data):
                 self.dom = parseString(data)
@@ -95,7 +93,6 @@ class Node_similar_artist(Node):
         parse = parse_simartists(data.encode('ascii', 'replace'))
         parse.parse()
         
-        #matches = re.findall("<name>(.*)</name>", data)
         if len(parse.artists) < 1:
             qobuz.gui.notifyH("Qobuz: No similar artist", urllib.unquote(query))
             return False
@@ -121,23 +118,9 @@ class Node_similar_artist(Node):
                 artist.set_data(jartist)
                 artist.set_image(a['image'])
                 listid[artist_id] = artist 
-                progress.update_buildcount(artist)
                 self.add_child(artist)
         return len(parse.artists)
             
-    '''
-        Get Xbmc ITEMS
-    '''
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        import qobuz
-        if len(self.get_childs()) < 1:
-            return False
-        for child in self.get_childs():
-            if self.filter(flag): continue
-            item = child.make_XbmcListItem()
-            self.attach_context_menu(item, child)
-            list.append((child.get_url(), item, child.is_folder()))
-        return True
     
     '''
         Make XbmcListItem
@@ -147,7 +130,7 @@ class Node_similar_artist(Node):
                                 self.get_label(),
                                 self.get_image(),
                                 self.get_image(),
-                                self.get_url(),
+                                self.make_url(),
                                 )
         self.attach_context_menu(item)
         return item

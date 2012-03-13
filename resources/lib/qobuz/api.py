@@ -39,7 +39,7 @@ class QobuzApi:
         self.retry_num = 0
 
     def _api_request(self, params, uri):
-        qobuz.gui.notifyH('Qobuz API', uri, None, 500)
+        #qobuz.gui.notifyH('Qobuz API', uri, None, 500)
         url = "http://player.qobuz.com"
         r = requests.post(url + uri, data = params)
         response_json = json.loads(r.content)
