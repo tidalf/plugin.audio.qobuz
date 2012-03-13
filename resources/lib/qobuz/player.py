@@ -82,11 +82,11 @@ class QobuzPlayer(xbmc.Player):
         '''
 #        if qobuz.addon.getSetting('notification_playingsong') == 'true':
 #            qobuz.gui.showNotificationH(lang(34000), item.getLabel(), item.getProperty('image'))
-        rpc = xbmc_json_rpc()
-        print "JSON RPC Version: " + rpc.JSONRPC_Version()
-        rpc.Player_SetAudioStream(node.get_streaming_url())
-        print "INFO: " + xbmc.getInfoLabel('Container.FolderPath')
-        return True
+#        rpc = xbmc_json_rpc()
+#        print "JSON RPC Version: " + rpc.JSONRPC_Version()
+#        rpc.Player_SetAudioStream(node.get_streaming_url())
+#        print "INFO: " + xbmc.getInfoLabel('Container.FolderPath')
+#        return True
         '''
             We are called from playlist...
         '''
