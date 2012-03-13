@@ -18,10 +18,11 @@ import sys
 import pprint
 
 import qobuz
-from constants import *
+from constants import Mode
 from flag import NodeFlag
 from node import Node
-from debug import *
+from debug import info, warn, error
+
 
 '''
     NODE USER PLAYLISTS
@@ -57,6 +58,7 @@ class Node_user_playlists(Node):
         return self.display_by
 
     def _build_down(self, lvl, flag = None, progress = None):
+        login = qobuz.addon.getSetting('username')
         info(self, "Build-down: user playlists")
         data = self.cache.fetch_data()
         if not data:
@@ -72,23 +74,10 @@ class Node_user_playlists(Node):
             node.set_data(playlist)
             if (cpls_id and cpls_id == str(node.get_id())):
                 node.set_is_current(True)
+            if node.get_owner() == login:
+                node.set_is_my_playlist(True)
             self.add_child(node)
-
-#    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-#        username = qobuz.addon.getSetting('username')
-#        color = qobuz.addon.getSetting('color_notowner')
-#        for playlist in self.childs:
-#            item = playlist.make_XbmcListItem()
-#            if playlist.get_owner() != username:
-#                item.setLabel(''.join([qobuz.utils.color(color, playlist.get_owner()), ' - ', playlist.get_name()]))
-#               
-#            if playlist.is_current():
-#                label = item.getLabel()
-#                item.setLabel(qobuz.utils.color(color, '-[ %s ]-' % (label) ))
-#            self.attach_context_menu(item, playlist)
-#            list.append((playlist.get_url(), item, playlist.is_folder()))
-#        return True
-
+        
     def hook_attach_context_menu(self, item, node, menuItems, color):
 #        ''' RENAME '''
 #        url=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+'&nt='+str(type)

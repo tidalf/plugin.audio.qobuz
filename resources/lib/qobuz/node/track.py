@@ -39,17 +39,13 @@ class Node_track(Node):
         self.cache_url = None
 
     def _build_down(self, lvl, flag = None, progress = None):
-        self._set_cache()
         if flag & NodeFlag.DONTFETCHTRACK:
             debug(self, "Don't download track data")
         else:    
+            self._set_cache()
             self.set_data(self.cache.get_data())
         return False
 
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        mode = Mode.PLAY
-        list.append((self.make_url(mode), self.make_XbmcListItem(), self.is_folder()))
-        return list
 
     def _set_cache(self):
         id = self.get_id()
@@ -196,7 +192,7 @@ class Node_track(Node):
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
             
         mode = Mode.PLAY
-        url = self.get_url(mode)
+        url = self.make_url(mode)
         item = xbmcgui.ListItem(label,
                                 label,
                                 self.get_image(),

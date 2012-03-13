@@ -78,21 +78,6 @@ class Node_recommendation(Node):
             self.add_child(node)
             node.setGenreType(t[0])
             node.set_label(t[1])
-            #node.set_url()
-
-
-    def _get_xbmc_items_type(self, list, lvl, flag):
-        for t in self.get_childs():
-            if self.filter(flag): continue
-            id_image = 'recos-' + str(self.genre_type) + '-' + str(self.genre_id)
-            print "ID: " + id_image
-            image = qobuz.image.cache.get(id_image)
-            print "IMAGE RECOS: " + image
-            #image = ''
-            item = xbmcgui.ListItem(t.get_label(), '', image, image, t.get_url())
-            self.attach_context_menu(item, t )
-            list.append((t.get_url(), item, True))
-        return True
 
 # GENRE
     def _build_recos_genre(self, lvl, flag):
@@ -109,22 +94,13 @@ class Node_recommendation(Node):
         types.append((112, qobuz.lang(30087)))
         types.append((127, qobuz.lang(30200)))
         types.append((123, qobuz.lang(30203)))
+        color = qobuz.addon.getSetting('color_ctxitem')
         for t in types:
             node = Node_recommendation()
             node.setGenreType(self.getGenreType())
             node.setGenreId(t[0])
-            node.set_label(t[1])
+            node.set_label(qobuz.utils.color(color, self.genre_type + ' / ') + t[1])
             self.add_child(node)
-
-    def _get_xbmc_items_genre(self, list, lvl, flag):
-        color = qobuz.addon.getSetting('color_recospath')
-        for t in self.get_childs():
-            if self.filter(flag): continue
-            image = ''
-            item = xbmcgui.ListItem(qobuz.utils.color(color, self.genre_type) + ' / ' + t.get_label(), '', image, image, t.get_url())
-            self.attach_context_menu(item, t)
-            list.append((t.get_url(), item, True))
-        return True
 
 
 # TYPE GENRE
@@ -151,15 +127,6 @@ class Node_recommendation(Node):
         if not image: 
             qobuz.image.cache.set(id, product.get_image())
         
-    def _get_xbmc_items_type_genre(self, list , lvl, flag):
-        print "TypeGenre xbmc item"
-        for product in self.get_childs():
-            if self.filter(flag): continue
-            item = product.make_XbmcListItem()
-            self.cache_image(product)
-            self.attach_context_menu(item, product)
-            list.append((product.get_url(), item, product.is_folder()))
-        return True
 
 # DISPATCH
     def _build_down(self, lvl, flag = None, progress = None):
@@ -171,15 +138,6 @@ class Node_recommendation(Node):
         self.set_content_type('albums')
         return self._build_down_type_genre(lvl, flag)
 
-
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        if not self.genre_type:
-            print "Displaying type"
-            return self._get_xbmc_items_type(list, lvl, flag)
-        elif not self.genre_id:
-            print "Displaying genre"
-            return self._get_xbmc_items_genre(list, lvl, flag)
-        return self._get_xbmc_items_type_genre(list, lvl, flag)
 
     def hook_attach_context_menu(self, item, node, menuItems, color):
         pass

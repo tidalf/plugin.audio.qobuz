@@ -99,7 +99,6 @@ class Node_search(Node):
             warn(self, "Searching artists API call fail")
             return False
         data = search.get_data()
-        #print pprint.pformat(data)
         self.notify_data_result(data)
         if self.search_type == 'albums':
             for json_product in data:
@@ -109,28 +108,16 @@ class Node_search(Node):
                 json_product['artist']['name'] = artist
                 product = Node_product()
                 product.set_data(json_product)
-                #item = product.make_XbmcListItem()
-                #self.attach_context_menu(item, product)
-                #p_list.append((product.get_url(), item, product.is_folder()))
                 self.add_child(product)
         elif self.search_type == 'songs':
-            #print "DATA: " + pprint.pformat(data)
             for jtrack in data['tracks']:
                 track = Node_track()
                 track.set_data(jtrack)
-#                print "Track"
-#                pprint.pprint(jtrack)
-#                item = track.make_XbmcListItem()
-#                self.attach_context_menu(item, track)
-#                p_list.append((track.get_url(Mode.PLAY), item, track.is_folder()))
                 self.add_child(track)
         elif self.search_type == 'artists':
             for jartist in data['results']['artists']:
                 artist = Node_artist()
                 artist.set_data(jartist)
-#                item = artist.make_XbmcListItem()
-#                self.attach_context_menu(item, artist)
-#                p_list.append((artist.get_url(), item, artist.is_folder()))
                 self.add_child(artist)
         return True
 

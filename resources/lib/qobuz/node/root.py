@@ -14,20 +14,13 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
-import xbmcgui
-
-import qobuz
-from constants import *
-
 from flag import NodeFlag
 from node import Node
 from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
 from search import Node_search
 from purchases import Node_purchases
+
 '''
     NODE ROOT
     
@@ -54,13 +47,5 @@ class Node_root(Node):
         search = Node_search()
         search.set_search_type('artists')
         self.add_child(search)
-        
-#    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-#        import qobuz
-#        for child in self.get_childs():
-#            if self.filter(flag): continue
-#            item = child.make_XbmcListItem()
-#            self.attach_context_menu(item, child)
-#            list.append((child.get_url(), item, child.is_folder()))
-#        return True
+
 

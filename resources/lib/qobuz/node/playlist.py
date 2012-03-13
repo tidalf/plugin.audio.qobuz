@@ -36,8 +36,8 @@ class Node_playlist(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PLAYLIST
         self.current_playlist_id = None
         self.b_is_current = False
+        self.is_my_playlist = False
         self.set_content_type('songs')
-#        self.tag = Tag_playlist()
         self.label = ""
         self.label2 = ""
         self.url = None
@@ -49,7 +49,10 @@ class Node_playlist(Node):
 
     def get_label(self):
         return self.get_property('name')
-        
+    
+    def set_is_my_playlist(self, b):
+        self.is_my_playlist = b
+            
     def set_is_current(self, b):
         self.b_is_current = b
 
@@ -88,7 +91,6 @@ class Node_playlist(Node):
                 for k in keys:
                     if k in jtrack: jalbum[k] = jtrack[k]
                 if 'image' in jtrack: jalbum['image'] = jtrack['image']
-              
                 node = Node_product()
                 node.set_data(jalbum)
                 
@@ -98,47 +100,33 @@ class Node_playlist(Node):
             albumseen[jalbum['id']] = node
             self.add_child(node)
 
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        if len(self.childs) < 1:
-            qobuz.gui.notify(36000, 36001)
-            return False
-        for child in self.childs:
-            item = child.make_XbmcListItem()
-            self.attach_context_menu(item, child)
-            mode = Mode.PLAY
-            if self.packby == 'album': mode = Mode.VIEW
-            url = child.get_url(mode)
-            list.append((url, item, child.is_folder()))
-        return True
-
     def hook_attach_context_menu(self, item, node, menuItems, color):
         pass
     
-    def getLabel(self):
-        return self.tag.get_name()
 
     def get_name(self):
-        if self._data and 'name' in self._data:
-            return self._data['name']
-        return ''
+        return self.get_property('name')
 
     def get_owner(self):
-        if self._data and 'owner' in self._data:
-            return self._data['owner']['name']
-    
+        return self.get_property(('owner', 'name'))
+            
     def get_description(self):
         return self.get_property('description')
     
     def make_XbmcListItem(self):
         import xbmcgui
-        item = xbmcgui.ListItem(self.get_name(),
+        color = qobuz.addon.getSetting('color_ctxitem')
+        label = self.get_name()
+        if self.b_is_current:
+            label = qobuz.utils.color(color, label)
+        if not self.is_my_playlist: 
+            label = qobuz.utils.color(color, self.get_owner()) + ' - ' + self.get_name() 
+        item = xbmcgui.ListItem(label,
                                 self.get_owner(),
                                 self.get_icon(),
                                 self.get_thumbnail(),
                                 self.get_url())
         item.setProperty('node_id', str(self.get_id()))
-        #item.setPath(self.get_url())
-        #item.setProperty('Path', self.get_url())
         return item
 
 

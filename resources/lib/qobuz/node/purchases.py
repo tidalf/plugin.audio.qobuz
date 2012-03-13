@@ -14,23 +14,16 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
-import pprint
-
 import qobuz
-from constants import *
 from flag import NodeFlag
 from node import Node
-from debug import info, warn, error, debug
-#from tag.track import TagTrack
-#from tag.product import TagProduct
+from debug import error
+
 '''
     NODE PURCHASES
 '''
+
 from cache.purchases import Cache_purchases
-from cache.product import Cache_product
-#from tag.product import TagProduct
-#from tag.album import TagAlbum
 from product import Node_product
 
 class Node_purchases(Node):
@@ -45,7 +38,6 @@ class Node_purchases(Node):
     
     def _build_down(self, lvl, flag = None, progress = None):
         data = self.fetch_data()
-        print "DATA: " + pprint.pformat(data)
         if not data: 
             error(self, "Cannot fetch purchases data")
             return False
@@ -53,13 +45,3 @@ class Node_purchases(Node):
         for product in self.cache.filter_products(self.cache.get_data()):
             self.add_child(product)
 
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        if len(self.childs) < 1:
-            qobuz.gui.notify(36000, 36001)
-            return False
-        for product in self.childs:
-            if product.filter(flag): continue
-            item = product.make_XbmcListItem()#tag.getXbmcItem()
-            self.attach_context_menu(item, product)
-            list.append((product.get_url(Mode.VIEW), item, product.is_folder()))
-        return True

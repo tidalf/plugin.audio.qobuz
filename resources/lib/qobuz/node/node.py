@@ -53,27 +53,18 @@ class Node(object):
         return self.cache.fetch_data()
     
     def get_property(self, path):
-        #print "Get property: " + repr(path)
-#        print "type: " + str(type(path))
         if not self._data:
             return ''
-
         if isinstance(path, basestring):
-         #   print "Got a string not tuple"
             if path in self._data and self._data[path] and self._data[path] != 'None':
                 return self._data[path].encode('utf8', 'ignore')
             return ''
-
         root = self._data
         for i in range(0, len(path)):
-#            print "root: " + repr(root)
-#            print "PAth: " + path[i]
             if not path[i] in root:
                 return ''
             root = root[path[i]]
-
         if root and root != 'None':
-#            print "Return: " + repr(root)
             return root.encode('utf8', 'replace')
         return ''
 
@@ -143,7 +134,7 @@ class Node(object):
                                     self.get_label2(),
                                     self.get_image(),
                                     self.get_image(),
-                                    self.get_url()
+                                    self.make_url()
                                     )
         id = self.get_id()
         if id: id = str(id)
@@ -155,15 +146,16 @@ class Node(object):
         return item
     
     def set_url(self, url):
-      self.url = url
-      return self.url
+        self.url = url
+        return self
     
     def get_url(self, mode = Mode.VIEW):
-        return self.set_url(self.make_url(mode))
+        return self.url
 
     def set_id(self, id):
         self.id = id
-
+        return self
+    
     def get_id(self):
         if self._data and 'id' in self._data and self._data:
             return self._data['id']
@@ -173,7 +165,8 @@ class Node(object):
         child.set_parent(self)
         child.set_parameters(self.parameters)
         self.childs.append(child)
-
+        return self
+    
     def get_childs(self):
         return self.childs
 
@@ -186,13 +179,16 @@ class Node(object):
 
     def set_label(self, label):
         self.label = label.encode('utf8', 'replace')
+        return self
     
     def set_image(self, image):
         self.thumb = self.icon = image
+        return self
     
     def set_label2(self, label):
         self.label2 = label.encode('utf8', 'replace')
-
+        return self
+    
     def get_label(self):
         return self.label
 
@@ -230,7 +226,7 @@ class Node(object):
     def build_down(self, xbmc_directory, lvl = 1, whiteFlag = NodeFlag.TYPE_NODE):
         if lvl != -1 and lvl < 1:
             return True
-        xbmc_directory.update(50, "Getting data (cache/network)", self.get_label())
+        xbmc_directory.update(25, "Getting data (cache/network)", self.get_label())
         self._build_down(lvl, whiteFlag)
         if lvl != -1: lvl -= 1
         for child in self.childs:

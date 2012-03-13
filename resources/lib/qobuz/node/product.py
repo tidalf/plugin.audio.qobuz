@@ -60,37 +60,24 @@ class Node_product(Node):
             return False
         self.set_data(data)     
         for track in data['tracks']:
-
             node = Node_track()
             node.set_data(track)
             self.add_child(node)
 
-    def _get_xbmc_items(self, list, lvl, flag, progress = None):
-        if len(self.childs) < 1:
-            qobuz.gui.notify(36000, 36001)
-            return False
-        for track in self.childs:
-            if track.filter(flag): continue
-            item = track.make_XbmcListItem()#tag.getXbmcItem()
-            self.attach_context_menu(item, track)
-            list.append((track.get_url(Mode.PLAY), item, False))
-        return True
     
     def make_XbmcListItem(self):
         import xbmcgui
-        #print "ALBUM: " + self.get_label()
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),
                                 self.get_image(),
                                 self.get_image(),
-                                self.get_url(),                         
+                                self.make_url(),                         
                                 )
         item.setInfo('music', infoLabels = {
                                             'genre': self.get_genre(),
                                             'year': self.get_year()
                                             })
-        #item.setProperty('node_id', str(self.get_id()))
         return item
 
     ''' 
