@@ -302,8 +302,7 @@ class Node(object):
                                          )
             cmd = "XBMC.Container.Update(%s)" % (args)
             menuItems.append((qobuz.utils.color(color, "Similar artist"), cmd))
-        
-        
+            
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.ADD_TO_CURRENT_PLAYLIST))
         menuItems.append((qobuz.utils.color(color, 'Add to current playlist'), cmd))
         
@@ -312,17 +311,19 @@ class Node(object):
             showplaylist=sys.argv[0]+"?mode="+str(Mode.VIEW)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) 
             menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.Container.Update("+showplaylist+")"))
         
-        ''' ERASE CACHE '''
-        color = qobuz.addon.getSetting('color_ctxitem_caution')
-        erasecache=sys.argv[0]+"?mode="+str(Mode.ERASE_CACHE)
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
 #        ''' 
 #        Give a chance to our siblings to attach their items
 #        '''
         self.hook_attach_context_menu(item, menuItems)
+        
+        ''' ERASE CACHE '''
+        color = qobuz.addon.getSetting('color_ctxitem_caution')
+        erasecache=sys.argv[0]+"?mode="+str(Mode.ERASE_CACHE)
+        menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
         '''
         Add our items to the context menu
         '''
+        
         if len(menuItems) > 0:
             item.addContextMenuItems(menuItems, replaceItems = False)
 

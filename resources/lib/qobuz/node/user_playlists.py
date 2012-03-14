@@ -131,7 +131,7 @@ class Node_user_playlists(Node):
         xbmc.executebuiltin('Container.Refresh')
         
     def remove_playlist(self, id):
-        import xbmcgui
+        import xbmcgui, xbmc
         from cache.playlist import Cache_playlist
         cache = Cache_playlist(id)
         data = cache.fetch_data()

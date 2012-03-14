@@ -151,19 +151,13 @@ class Node_playlist(Node):
         ''' RENAME '''
         url=sys.argv[0]+"?mode="+str(Mode.RENAME_PLAYLIST)+'&nt='+str(self.get_type())
         if self.get_id(): url+='&nid='+self.get_id()
-        menuItems.append((qobuz.utils.color(color, 'Rename'), "XBMC.RunPlugin("+url+")"))
+        menuItems.append((qobuz.utils.color(color, 'Rename: ') + self.get_label(), "XBMC.RunPlugin("+url+")"))
 
         ''' REMOVE '''
+        color = qobuz.addon.getSetting('color_ctxitem_caution')
         url=sys.argv[0]+"?mode="+str(Mode.REMOVE_PLAYLIST)+'&nt='+str(self.get_type())
         if self.get_id(): url+='&nid='+self.get_id()
-        menuItems.append((qobuz.utils.color(color, 'Remove *CAUTION*'), "XBMC.RunPlugin("+url+")"))
-
-        ''' Display by '''
-#        display_by = 'songs'
-#        if self.display_by == 'songs':
-#            display_by = 'product'
-#        url=sys.argv[0]+"?mode="+str(MODE_NODE)+'&nt='+str(self.type)+'&display-by='+display_by
-#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Display by: ' + display_by), "XBMC.RunPlugin("+url+")"))
+        menuItems.append((qobuz.utils.color(color, 'Remove: ') + self.get_label(), "XBMC.RunPlugin("+url+")"))
 
 
     def remove_tracks(self, tracks_id):
