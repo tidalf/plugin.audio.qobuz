@@ -77,7 +77,6 @@ class Node(object):
         return self.content_type
 
     def get_image(self):
-        print "Image: " + self.image
         if self.image: return self.image
         if self.parent: return self.parent.get_image()
         return ''
@@ -258,11 +257,9 @@ class Node(object):
         
         
         ''' SCAN '''
-        path = xbmc.getInfoLabel('ListItem.Path')
-        node_url = urllib.quote(self.make_url(Mode.SCAN))
-        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
+        url = self.make_url(Mode.SCAN)
         label = "Scan"
-        menuItems.append((qobuz.utils.color(color, label), "XBMC.RunPlugin("+url+")"))                                                             
+        menuItems.append((qobuz.utils.color(color, label), 'XBMC.UpdateLibrary("music", "%s")' % (url) ))                                                             
         
         ''' SCAN DIR '''
 #        path = xbmc.getInfoLabel('Container.FolderPath') 
@@ -274,13 +271,13 @@ class Node(object):
             '''
                 This album 
             '''
-            id = self.get_property(('album', 'id'))
-            args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s' % (Mode.VIEW, 
-                                         NodeFlag.TYPE_PRODUCT, 
-                                         id
-                                         )
-            cmd = "XBMC.Container.Update(%s)" % (args)  
-            menuItems.append((qobuz.utils.color(color, qobuz.lang(39000)), cmd))
+#            id = self.get_property(('album', 'id'))
+#            args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s' % (Mode.VIEW, 
+#                                         NodeFlag.TYPE_PRODUCT, 
+#                                         id
+#                                         )
+#            cmd = "XBMC.Container.Update(%s)" % (args)  
+#            menuItems.append((qobuz.utils.color(color, qobuz.lang(39000)), cmd))
             
         if self.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST): 
             '''
@@ -306,13 +303,8 @@ class Node(object):
             cmd = "XBMC.Container.Update(%s)" % (args)
             menuItems.append((qobuz.utils.color(color, "Similar artist"), cmd))
         
-        args = sys.argv[0] + "?mode=" + str(Mode.ADD_TO_CURRENT_PLAYLIST) + "&nt=" + str(self.get_type())
-        if self.get_id(): args += "&nid=" + str(self.get_id())
-        genre_type = self.get_parameter('genre-type')
-        genre_id = self.get_parameter('genre-id')
-        if genre_type: cmd += "&genre-type=" + genre_type
-        if genre_id: cmd += "&genre-id=" + genre_id
-        cmd = "XBMC.Container.Update(%s)" % (args)
+        
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.ADD_TO_CURRENT_PLAYLIST))
         menuItems.append((qobuz.utils.color(color, 'Add to current playlist'), cmd))
         
         ''' Show playlist '''

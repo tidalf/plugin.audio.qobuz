@@ -136,6 +136,35 @@ class Node_playlist(Node):
         self.attach_context_menu(item)
         return item
 
+    def hook_attach_context_menu(self, item, menuItems):
+        color = qobuz.addon.getSetting('color_ctxitem')
+   
+        ''' SET AS CURRENT '''
+        url = self.make_url(Mode.SELECT_CURRENT_PLAYLIST)
+        menuItems.append((qobuz.utils.color(color, 'Set as current: ' + self.get_label()), "XBMC.RunPlugin("+url+")"))
+                
+        ''' CREATE '''
+        url=sys.argv[0]+"?mode="+str(Mode.CREATE_PLAYLIST)+'&nt='+str(self.get_type())
+        if self.get_id(): url+='&nid='+self.get_id()
+        menuItems.append((qobuz.utils.color(color, 'Create'), "XBMC.RunPlugin("+url+")"))
+
+        ''' RENAME '''
+        url=sys.argv[0]+"?mode="+str(Mode.RENAME_PLAYLIST)+'&nt='+str(self.get_type())
+        if self.get_id(): url+='&nid='+self.get_id()
+        menuItems.append((qobuz.utils.color(color, 'Rename'), "XBMC.RunPlugin("+url+")"))
+
+        ''' REMOVE '''
+        url=sys.argv[0]+"?mode="+str(Mode.REMOVE_PLAYLIST)+'&nt='+str(self.get_type())
+        if self.get_id(): url+='&nid='+self.get_id()
+        menuItems.append((qobuz.utils.color(color, 'Remove *CAUTION*'), "XBMC.RunPlugin("+url+")"))
+
+        ''' Display by '''
+#        display_by = 'songs'
+#        if self.display_by == 'songs':
+#            display_by = 'product'
+#        url=sys.argv[0]+"?mode="+str(MODE_NODE)+'&nt='+str(self.type)+'&display-by='+display_by
+#        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Display by: ' + display_by), "XBMC.RunPlugin("+url+")"))
+
 
     def remove_tracks(self, tracks_id):
         import qobuz
@@ -148,52 +177,37 @@ class Node_playlist(Node):
 
 
     def add_to_current_playlist(self, ):
+            from renderer.xbmc_directory import xbmc_directory
             from cache.current_playlist import Cache_current_playlist
-            from renderer.xbmc import GuiProgress
-            
             current_playlist = Cache_current_playlist()
-            print "Current playlist id: " + str(current_playlist.get_id())
-            print '-'*80 + "\n"
-            print "Adding node to new playlist"
-            print '-'*80 + "\n"
             from renderer.xbmc import Xbmc_renderer as renderer
             nt = None
             try: nt = int(self.get_parameter('nt'))
             except:
                 print "No node type...abort"
                 return False
-            
             id = None
             try: id = self.get_parameter('nid')        
-            except: pass
-            
+            except: pass 
             depth = -1
             try: depth = int(self.get_parameter('depth'))
             except: pass
-            
             view_filter = 0
             try: view_filter = int(self.get_parameter('view-filter'))
             except: pass
-            
-            print "############################"
             r = renderer(nt, id)
             r.set_depth(depth)
             r.set_filter(view_filter)
             r.set_root_node()
-            progress = GuiProgress()
-            progress.create("Add to current playlist", r.root.get_label())
-            r.root.build_down(depth, NodeFlag.DONTFETCHTRACK, progress)
-            list = []
-            ret = r.root.get_xbmc_items(list, depth, NodeFlag.TYPE_TRACK, progress)
+            dir = xbmc_directory(r.root, qobuz.boot.handle, True)
+            ret = r.root.build_down(dir, depth, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
             if not ret: return False
             trackids = []
-            if len(list) < 1:
+            if len(dir.nodes) < 1:
                 warn(self, "No track to add to current playlist")
                 return False
-            for item in list:
-                node_id =  item[1].getProperty('node_id')
-                print "ADD: " + node_id
-                trackids.append(node_id)
+            for node in dir.nodes:
+                trackids.append(node.get_id())
             strtracks = ','.join(trackids)
             ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
             
@@ -202,6 +216,4 @@ class Node_playlist(Node):
             cm = cache_manager()
             pl = Cache_playlist(current_playlist.get_id())
             cm.delete(pl.get_cache_path())
-            
-            print "RET: " + pprint.pformat(ret)
-            
+            dir.Progress.close()
