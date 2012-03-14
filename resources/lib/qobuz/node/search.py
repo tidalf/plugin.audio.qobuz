@@ -120,7 +120,7 @@ class Node_search(Node):
             if not 'results' in data:
                 warn(self, "No songs result for search")
                 return False
-            for jtrack in data['results']:
+            for jtrack in data['results']['tracks']:
                 track = Node_track()
                 track.set_data(jtrack)
                 self.add_child(track)
