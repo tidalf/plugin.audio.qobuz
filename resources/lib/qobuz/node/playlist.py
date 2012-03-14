@@ -141,7 +141,7 @@ class Node_playlist(Node):
    
         ''' SET AS CURRENT '''
         url = self.make_url(Mode.SELECT_CURRENT_PLAYLIST)
-        menuItems.append((qobuz.utils.color(color, 'Set as current: ' + self.get_label()), "XBMC.RunPlugin("+url+")"))
+        menuItems.append((qobuz.utils.color(color, 'Set as current: ')+ self.get_label(), "XBMC.RunPlugin("+url+")"))
                 
         ''' CREATE '''
         url=sys.argv[0]+"?mode="+str(Mode.CREATE_PLAYLIST)+'&nt='+str(self.get_type())

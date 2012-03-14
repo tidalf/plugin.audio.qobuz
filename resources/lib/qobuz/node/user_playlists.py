@@ -94,6 +94,7 @@ class Node_user_playlists(Node):
         return True
 
     def create_playlist(self):
+        import xbmc
         from utils.cache import cache_manager
         from cache.user_playlists import Cache_user_playlists
         query = self._get_keyboard(default="",heading='Create playlist')
