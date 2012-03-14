@@ -70,6 +70,11 @@ class xbmc_directory():
         if not (node.type & NodeFlag.TYPE_TRACK):
             self.update(50, "Add Item", node.get_label())
         return ret
+    
+    def close(self):
+        if self.Progress: 
+            self.Progress.close()
+            self.Progress = None
         
     def end_of_directory(self):
         success = True
@@ -82,8 +87,7 @@ class xbmc_directory():
         if self.total_put == 0:
             qobuz.gui.notifyH('Empty directory', self.root.get_label())
         self.update(100, "Done", "Displaying " + str(self.total_put).encode('ascii', 'replace'))
-        self.Progress.close()
-        self.Progress = None
+        self.close()
         return success
         
     def set_content(self, content):

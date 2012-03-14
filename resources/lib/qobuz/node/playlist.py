@@ -213,4 +213,4 @@ class Node_playlist(Node):
             cm = cache_manager()
             pl = Cache_playlist(current_playlist.get_id())
             cm.delete(pl.get_cache_path())
-            dir.Progress.close()
+            dir.close()

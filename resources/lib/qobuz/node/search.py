@@ -117,11 +117,17 @@ class Node_search(Node):
                 product.set_data(json_product)
                 self.add_child(product)
         elif self.search_type == 'songs':
+            if not 'results' in data:
+                warn(self, "No songs result for search")
+                return False
             for jtrack in data['results']:
                 track = Node_track()
                 track.set_data(jtrack)
                 self.add_child(track)
         elif self.search_type == 'artists':
+            if not 'results' in data:
+                warn(self, "Non artists result for search")
+                return False
             for jartist in data['results']['artists']:
                 artist = Node_artist()
                 artist.set_data(jartist)
