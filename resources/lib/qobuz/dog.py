@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import re
-
+from debug import info
 class dog():
 
     def __init__(self):
@@ -35,7 +35,7 @@ class dog():
 
     ''' Match value against regexp '''
     def kv_is_ok(self, key, value):
-        print key + ' - ' + value
+        info(self, key + ' - ' + value)
         if key not in self.allowed_keys:
             return False
         match = None

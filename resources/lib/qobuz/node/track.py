@@ -38,7 +38,7 @@ class Node_track(Node):
         self.cache = None
         self.cache_url = None
 
-    def _build_down(self, lvl, flag = None, progress = None):
+    def _build_down(self,xbmc_directory,  lvl, flag = None, progress = None):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
         else:    

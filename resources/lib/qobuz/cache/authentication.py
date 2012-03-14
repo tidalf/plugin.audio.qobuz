@@ -35,7 +35,7 @@ class Cache_authentication(ICacheable):
         super(Cache_authentication, self).__init__(qobuz.path.cache,
                                          'authentication', None, False)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_auth'))
-        debug(self, "Cache duration: " + str(self.cache_refresh))
+        info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def hook_pre_refresh(self):

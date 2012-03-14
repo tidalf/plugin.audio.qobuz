@@ -35,7 +35,7 @@ class Cache_search_artists(ICacheable):
                                             'search_artists-' + name.encode('ascii', 'replace'),
                                             None, True)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
-        debug(self, "Cache duration: " + str(self.cache_refresh))
+        info(self, "Cache duration: " + str(self.cache_refresh))
 
     def _fetch_data(self):
         data = qobuz.api.search_artists(self.name)

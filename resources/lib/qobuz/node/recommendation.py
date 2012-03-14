@@ -129,9 +129,8 @@ class Node_recommendation(Node):
         
 
 # DISPATCH
-    def _build_down(self, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
         if not self.genre_type:
-            print "Build node type"
             return self._build_recos_type(lvl, flag)
         elif not self.genre_id:
             return self._build_recos_genre(lvl, flag)

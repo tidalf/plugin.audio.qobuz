@@ -71,7 +71,7 @@ class Node_playlist(Node):
         self.set_id(id)
         return True
 
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None):
         info(self, "Build-down playlist")
         if not self._set_cache():
             error(self, "Cannot set cache!")
@@ -117,7 +117,6 @@ class Node_playlist(Node):
         import xbmcgui
         color = qobuz.addon.getSetting('color_ctxitem')
         label = self.get_name()
-        print "Name: " + label
         if self.b_is_current:
             label = qobuz.utils.color(color, label)
         if not self.is_my_playlist: 
@@ -163,7 +162,6 @@ class Node_playlist(Node):
             except:
                 print "No node type...abort"
                 return False
-            print "Node type: " + str(nt)
             
             id = None
             try: id = self.get_parameter('nid')        

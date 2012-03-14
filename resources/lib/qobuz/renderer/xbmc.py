@@ -31,18 +31,17 @@ from irenderer import IRenderer
 
 class Xbmc_renderer(IRenderer):
 
-    def __init__(self, node_type, node_id = None, flag = 0):
-        super(Xbmc_renderer, self).__init__(node_type, node_id, flag)
-        self.depth = 1
-        self.filter = 0
+    def __init__(self, node_type, node_id = None):
+        super(Xbmc_renderer, self).__init__(node_type, node_id)
+
         
     def display(self):
         from renderer.xbmc_directory import xbmc_directory
         if not self.set_root_node():
-            print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
+            warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
         dir = xbmc_directory(self.root, qobuz.boot.handle, False)
-        if not self.root.build_down(dir, 1, NodeFlag.TYPE_NODE):
+        if not self.root.build_down(dir, self.depth, self.filter):
             return False
         dir.set_content(self.root.content_type)
         dir.end_of_directory()

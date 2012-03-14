@@ -205,12 +205,9 @@ class Node(object):
 
     def filter(self, flag):
         if not flag: 
-            #print "No flag: accept item"
             return False
         if flag & self.get_type(): 
-            #print "FLAG is ok: accept item"
             return False
-        #print "FLAG fail: removing item"
         return True
         
     '''
@@ -224,13 +221,14 @@ class Node(object):
             return False
         if lvl != -1 and lvl < 1:
             return False
-        xbmc_directory.update(25, "Getting data (cache/network)", self.get_label())
-        self._build_down(lvl, whiteFlag)
+        self._build_down(xbmc_directory, lvl, whiteFlag)
         if lvl != -1: lvl -= 1
+        xbmc_directory.set_given_total(len(self.childs))
         for child in self.childs:
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
-            child.build_down(xbmc_directory, lvl, whiteFlag)
+            if child.build_down(xbmc_directory, lvl, whiteFlag):
+                xbmc_directory.update(50, "Fetching Data (cache / network)", child.get_label())    
         return True
 
     '''
@@ -262,23 +260,26 @@ class Node(object):
         color = qobuz.addon.getSetting('color_ctxitem')
         menuItems = []
         cmd = ''
-        ''' ERASE CACHE '''
-        erasecache=sys.argv[0]+"?mode="+str(Mode.ERASE_CACHE)
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
+        ''' VIEW BIG DIR '''
+        
+        path = self.make_url(Mode.VIEW_BIG_DIR)
+        label = "View big dir"
+        menuItems.append(( qobuz.utils.color(color, label), "XBMC.Container.Update(%s)" % (path) ))
+        
         
         ''' SCAN '''
         path = xbmc.getInfoLabel('ListItem.Path')
         node_url = urllib.quote(self.make_url(Mode.SCAN))
-        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url + "&action=scan"
+        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
         label = "Scan"
         menuItems.append((qobuz.utils.color(color, label), "XBMC.RunPlugin("+url+")"))                                                             
         
         ''' SCAN DIR '''
-        path = xbmc.getInfoLabel('Container.FolderPath') 
-        node_url = urllib.quote(path)#self.make_url(Mode.VIEW))
-        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
-        label = "Scan dir: " + path 
-        menuItems.append(( qobuz.utils.color(color, label), 'XBMC.RunPlugin("%s")' % (url) ))                                                         
+#        path = xbmc.getInfoLabel('Container.FolderPath') 
+#        node_url = urllib.quote(path)#self.make_url(Mode.VIEW))
+#        url = sys.argv[0] + "?mode="+str(Mode.LIBRARY_SCAN) + "&url=" + node_url
+#        label = "Scan dir: " + path 
+#        menuItems.append(( qobuz.utils.color(color, label), 'XBMC.RunPlugin("%s")' % (url) ))                                                         
         if self.type & NodeFlag.TYPE_PLAYLIST: 
             '''
                 This album 
@@ -329,6 +330,10 @@ class Node(object):
             showplaylist=sys.argv[0]+"?mode="+str(Mode.VIEW)+'&nt='+str(NodeFlag.TYPE_USERPLAYLISTS) 
             menuItems.append((qobuz.utils.color(color, 'Show Playlist'), "XBMC.Container.Update("+showplaylist+")"))
         
+        ''' ERASE CACHE '''
+        color = qobuz.addon.getSetting('color_ctxitem_caution')
+        erasecache=sys.argv[0]+"?mode="+str(Mode.ERASE_CACHE)
+        menuItems.append((qobuz.utils.color(color, qobuz.lang(31009)), "XBMC.RunPlugin("+erasecache+")"))
 #        ''' 
 #        Give a chance to our siblings to attach their items
 #        '''

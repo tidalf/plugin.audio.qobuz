@@ -54,7 +54,7 @@ class Node_similar_artist(Node):
     '''
         Build Down
     '''
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None):
         query = self.get_parameter('query').strip().lower()
         query.encode('utf8', 'replace')
         data = qobuz.api.get_similar_artists(query)
@@ -81,13 +81,11 @@ class Node_similar_artist(Node):
                     size = dom.getAttribute('size')
                     if size != 'mega': continue
                     image = self.getText(dom.childNodes)
-                    print "Image: " + image
                     artist['image'] = image
             def _h_artist(self, dom):
                 name = self.getText(dom.getElementsByTagName('name')[0].childNodes).strip().lower()
                 artist = { 'name': name}
                 self._h_artist_image(dom.getElementsByTagName('image'), artist)
-                print "Artist: " + name
                 self.artists.append(artist)
                 return True
         parse = parse_simartists(data.encode('ascii', 'replace'))
@@ -99,11 +97,12 @@ class Node_similar_artist(Node):
         listid = {}
         max = 20
         count = 0
+        toperc = 1 + 100 / len(parse.artists)
         for a in parse.artists:
             if count > max: break
             count+=1
-            print a['name'] + ' (' + a['image'] + ')'
             name = a['name']
+            xbmc_directory.update(count * toperc, "Find artist similar", name)
             search_cache = Cache_search_artists(name)
             result = search_cache.fetch_data()
             if not result or len(result) < 1:
@@ -112,7 +111,6 @@ class Node_similar_artist(Node):
             for jartist in result:
                 artist_id = jartist['id']
                 if artist_id in listid:
-                    print "Artist id doublon"
                     continue
                 artist = Node_artist()
                 artist.set_data(jartist)

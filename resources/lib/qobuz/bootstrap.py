@@ -47,7 +47,7 @@ def get_params():
                 if d.kv_is_ok(splitparams[0],splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
-                    print "Invalid key/value (" + splitparams[0] + ", " + splitparams[1] + ")"
+                    warn('[DOG]', "Invalid key/value (" + splitparams[0] + ", " + splitparams[1] + ")")
     return rparam
 
 '''
@@ -62,15 +62,13 @@ class QobuzBootstrap(object):
 
     def bootstrap_app(self):
         self.bootstrap_directories()
-        debug(self,"Directories:\n" + qobuz.path.to_s())
+        #info(self,"Directories:\n" + qobuz.path.to_s())
         self.bootstrap_lang()
         self.bootstrap_utils()
         self.bootstrap_api()
         self.bootstrap_core()
         self.bootstrap_image()
         self.bootstrap_gui()
-        #self.bootstrap_player()
-        #self.bootstrap_db()
         self.bootstrap_sys_args()
         self.auth = qobuz.core.login()
         if not self.auth:
@@ -167,7 +165,6 @@ class QobuzBootstrap(object):
     def bootstrap_sys_args(self):
         self.MODE = None
         self.params = get_params()
-        print repr(self.params)
         if not 'nt' in self.params:
             self.params['nt'] = NodeFlag.TYPE_ROOT
             self.MODE = Mode.VIEW
@@ -216,7 +213,7 @@ class QobuzBootstrap(object):
 #        response = qobuz.gui.executeJSONRPC(cmd)
 #        print "JSONRPC: " + pprint.pformat(response)
 #        
-        
+        print "HANDLE: " + str(self.handle)
         if self.MODE == Mode.PLAY:
             info(self,"Playing song")
             self.bootstrap_player()
@@ -229,8 +226,16 @@ class QobuzBootstrap(object):
             if qobuz.player.play(self.params['nid']):
                 return True
             return False
+        
         elif self.MODE == Mode.ERASE_CACHE:
+            import xbmcgui
+            ok = xbmcgui.Dialog().yesno('Remove cached data',
+                          'Do you really want to erase all cached data')
+            if not ok:
+                info(self, "Deleting cached data aborted")
+                return False
             self.erase_cache()
+            qobuz.gui.notifyH("Qobuz cache", "All cached data removed")
             return True
 
         from renderer.xbmc import Xbmc_renderer as renderer
@@ -246,27 +251,25 @@ class QobuzBootstrap(object):
         try: id = self.params['nid']
         except: pass
 
-        depth = 1
-        try: depth = int(self.params['depth'])
-        except: pass
-
-        view_filter = 0
-        try: view_filter = int(self.params['view-filter'])
-        except: pass
-
         if self.MODE == Mode.VIEW:
             info(self,"Displaying node")
             r = renderer(nt,id)
             r.set_depth(1)
-            r.set_filter(view_filter)
+            r.set_filter(NodeFlag.TYPE_NODE| NodeFlag.DONTFETCHTRACK )
             return r.display()
         
-        if self.MODE == Mode.SCAN:
+        elif self.MODE == Mode.VIEW_BIG_DIR:
+            r = renderer(nt, id)
+            r.set_depth(-1)
+            r.set_filter(NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
+            return r.display()
+            
+        elif self.MODE == Mode.SCAN:
             r = renderer(nt, id)
             r.set_depth(-1)
             r.set_filter(NodeFlag.DONTFETCHTRACK)
             return r.scan()
-            
+        
         elif self.MODE == Mode.SELECT_CURRENT_PLAYLIST:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()

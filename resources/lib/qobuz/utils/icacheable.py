@@ -65,7 +65,7 @@ class ICacheable(object):
                 try: os.mkdir(self.cache_path)
                 except: warn(self, "Cannot make directory: " + self.cache_path)
         self.cache_object_path += '.dat'
-        debug(self, "Cache for " + name + " set to: " + self.cache_object_path)
+        info(self, "Cache for " + name + " set to: " + self.cache_object_path)
 
     def get_cache_refresh(self):
         return self.cache_refresh

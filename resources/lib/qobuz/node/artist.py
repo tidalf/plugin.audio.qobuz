@@ -58,7 +58,7 @@ class Node_artist(Node):
     '''
         Build Down
     '''
-    def _build_down(self, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
         data = qobuz.api.get_albums_from_artist(self.get_id(), qobuz.addon.getSetting('artistsearchlimit'))
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
@@ -69,6 +69,7 @@ class Node_artist(Node):
                 if k in data['artist']: jproduct[k] = data['artist'][k]
             node = Node_product()
             node.set_data(jproduct)
+            xbmc_directory.update(25, "Add album:" + node.get_label(), '')
             self.add_child(node)
         return True
     

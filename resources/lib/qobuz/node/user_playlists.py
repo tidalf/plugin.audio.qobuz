@@ -57,7 +57,7 @@ class Node_user_playlists(Node):
     def get_display_by(self):
         return self.display_by
 
-    def _build_down(self, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
         login = qobuz.addon.getSetting('username')
         info(self, "Build-down: user playlists")
         data = self.cache.fetch_data()

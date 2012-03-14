@@ -36,7 +36,7 @@ class Cache_purchases(ICacheable):
         super(Cache_purchases, self).__init__(qobuz.path.cache, 
                                        'purchases', None, False)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommendation'))
-        debug(self, "Cache duration: " + str(self.cache_refresh))
+        info(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
         
     def _fetch_data(self):
@@ -62,7 +62,6 @@ class Cache_purchases(ICacheable):
             id = product.get_id()
             if id in blackid: continue
             if id in albumseen: continue
-            print "LABEL " + product.get_label()
             albumseen[id] = 1
             list.append(product)
         return list

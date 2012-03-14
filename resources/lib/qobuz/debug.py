@@ -17,7 +17,7 @@
 
 import os
 
-__debugging__ = True
+__debugging__ = False
 ourlog = None
 LOGDEBUG = None
 LOGNOTICE = None
@@ -33,11 +33,11 @@ try:
     LOGERROR = xbmc.LOGERROR
     LOGSEVERE = xbmc.LOGSEVERE
     __debugging__ = True
-    if xbmcaddon.Addon(id = 'plugin.audio.qobuz').getSetting('debug') == 'true':
+    if xbmcaddon.Addon(id = 'plugin.audio.qobuz2').getSetting('debug') == 'true':
         __debugging__ = True
     else:
         __debugging__ = False
-
+    
 except:
     LOGDEBUG = '[DEBUG]'
     LOGNOTICE = '[NOTICE]'
@@ -47,6 +47,9 @@ except:
     def logfunc(msg, lvl):
         print lvl + msg
     ourlog = logfunc
+
+if __debugging__:
+    print "DEBUGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
 
 ###############################################################################
 # Logging helper functions

@@ -20,6 +20,7 @@ from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
 from search import Node_search
 from purchases import Node_purchases
+import qobuz
 
 '''
     NODE ROOT
@@ -34,18 +35,19 @@ class Node_root(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
         self.set_content_type('files')
 
-    def _build_down(self, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None):
         self.add_child(Node_user_playlists())
         self.add_child(Node_recommendation())
         self.add_child(Node_purchases())
-        search = Node_search()
-        search.set_search_type('albums')
-        self.add_child(search)
-        search = Node_search()
-        search.set_search_type('songs')
-        self.add_child(search)
-        search = Node_search()
-        search.set_search_type('artists')
-        self.add_child(search)
+        if qobuz.addon.getSetting('search_enabled') == 'true':
+            search = Node_search()
+            search.set_search_type('albums')
+            self.add_child(search)
+            search = Node_search()
+            search.set_search_type('songs')
+            self.add_child(search)
+            search = Node_search()
+            search.set_search_type('artists')
+            self.add_child(search)
 
 

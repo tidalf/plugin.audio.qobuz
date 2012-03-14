@@ -36,7 +36,7 @@ class Node_purchases(Node):
         self.cache = Cache_purchases()
         self.icon = self.thumb = qobuz.image.access.get('album')
     
-    def _build_down(self, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory,  lvl, flag = None, progress = None):
         data = self.fetch_data()
         if not data: 
             error(self, "Cannot fetch purchases data")

@@ -50,7 +50,7 @@ class Node_product(Node):
         self.set_id(id)
         return True
     
-    def _build_down(self, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
         if not self._set_cache():
             error(self, "Cannot set product cache")
             return False

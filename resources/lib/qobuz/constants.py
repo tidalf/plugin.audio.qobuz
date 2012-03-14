@@ -29,4 +29,5 @@ class __Mode():
         self.RENAME_PLAYLIST = 8
         self.REMOVE_PLAYLIST = 9
         self.SCAN = 10
+        self.VIEW_BIG_DIR = 11
 Mode = __Mode()

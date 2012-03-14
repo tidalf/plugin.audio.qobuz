@@ -20,19 +20,15 @@ from debug import info, warn, error, debug
 
 class IRenderer(object):
 
-    def __init__(self, node_type, node_id = None, flag = 0):
+    def __init__(self, node_type, node_id = None):
         self.node_type = node_type
         self.node_id = node_id
-        self.flag = flag
         self.root = None
+        self.filter = NodeFlag.TYPE_NODE
 
     def to_s(self):
-        s = "Node type: " + str(self.node_type) + "\n"
-        s += "Node id  : " + str(self.node_id) + "\n"
-        s += "Flag     : " + str(self.flag) + "\n"
-        if self.root:
-            s += self.root.to_s()
-        return s
+        import pprint
+        return pprint.pformat(self)
     
     def set_depth(self, d):
         self.depth = d
@@ -42,9 +38,6 @@ class IRenderer(object):
     
     def set_root_node(self):
         root = None
-        debug(self, 'Setting root node: ' 
-                   + str(self.node_type) + ' (' + NodeFlag.to_string(self.node_type) + ') '
-                   + ' / ' + NodeFlag.to_string(self.flag))
         if self.node_type & NodeFlag.TYPE_ROOT:
             from node.root import Node_root
             root = Node_root(None, qobuz.boot.params)
@@ -77,7 +70,7 @@ class IRenderer(object):
             from node.similar_artists import Node_similar_artist
             root = Node_similar_artist(None, qobuz.boot.params)
         else:
-            print "Nothing to display"
+            warn(self, "Nothing to display")
             return False
         root.set_id(self.node_id)
         root.get_url()

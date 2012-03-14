@@ -59,6 +59,7 @@
    <!-- Colors -->
    <category label="Colors">
         <setting id="color_ctxitem" label="Context menu item" type="text" default="FF59A9C5" />
+        <setting id="color_ctxitem_caution" label="Context menu item - Caution" type="text" default="FFFF0000" />
         <setting id="color_recospath" label="Path" type="text" default="FF59A9C5" />
         <!-- <setting id="color_notowner" label="Not owner" type="text" default="FF59A9C5" /> -->
         

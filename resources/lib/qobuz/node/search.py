@@ -47,7 +47,6 @@ class Node_search(Node):
         return self.get_label()
     
     def set_search_type(self, st):
-        print "Set search type: " + st
         self.search_type = st
         
     def get_search_type(self):
@@ -60,13 +59,13 @@ class Node_search(Node):
             url += "&action=scan"
         return url
 
-    def _build_down(self, lvl, flag):
+    def _build_down(self,xbmc_directory,  lvl, flag):
         stype = self.get_search_type()
         search = None
         limit = None
         if stype == 'songs':
             from qobuz.search.tracks import Search_tracks
-            print "Searching songs"
+            info(self, "Searching songs")
             search = Search_tracks()
             limit = qobuz.addon.getSetting('songsearchlimit')
             heading = qobuz.lang(30013)
@@ -74,14 +73,14 @@ class Node_search(Node):
             self.icon = self.thumb = qobuz.image.access.get('song')
         elif stype == 'albums':
             from qobuz.search.albums import Search_albums
-            print "Searching albums"
+            info(self, "Searching albums")
             search = Search_albums()
             limit = qobuz.addon.getSetting('albumsearchlimit')
             heading = qobuz.lang(30014)
             self.set_content_type('albums')
             self.icon = self.thumb = qobuz.image.access.get('album')
         elif stype == 'artists':
-            print "Searching artists"
+            info(self, "Searching artists")
             from qobuz.search.artists import Search_artists
             search = Search_artists()
             limit = qobuz.addon.getSetting('artistsearchlimit')
@@ -96,7 +95,6 @@ class Node_search(Node):
             if not query:
                 return False
         query.strip()
-        print "Query: " + query
         ret = search.search(query, limit)
         if not ret:
             warn(self, "Searching artists API call fail")
@@ -114,7 +112,6 @@ class Node_search(Node):
                 self.add_child(product)
         elif self.search_type == 'songs':
             for jtrack in data['tracks']:
-                print "Track:" + pprint.pformat(jtrack)
                 track = Node_track()
                 track.set_data(jtrack)
                 self.add_child(track)
