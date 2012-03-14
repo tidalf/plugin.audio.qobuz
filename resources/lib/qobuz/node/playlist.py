@@ -37,7 +37,6 @@ class Node_playlist(Node):
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
-        self.set_content_type('songs')
         self.label = ""
         self.label2 = ""
         self.url = None
@@ -45,6 +44,10 @@ class Node_playlist(Node):
         self.cache = None
         self.packby = 'album'
         self.image = qobuz.image.access.get('playlist')
+        if self.packby == 'album':
+            self.set_content_type('albums')
+        else:
+            self.set_content_type('songs')
 
     def get_label(self):
         return self.get_property('name')
