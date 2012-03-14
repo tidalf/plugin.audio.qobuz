@@ -34,7 +34,8 @@ class QobuzImage_access():
     def get(self, name, path = '', ext = 'png'):
         if name in self.images:
             return self.images[name]
-        path = os.path.join(qobuz.path.image, path, name + '.' + ext)
+        path = 'file://' + os.path.join(qobuz.path.image, path, name + '.' + ext)
+        #path = os.path.join(path, name + '.' + ext)
         self.add(name, path)
         return path
 

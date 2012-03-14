@@ -42,7 +42,7 @@ class Node_recommendation(Node):
         else: self.genre_id = None
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(qobuz.lang(30082))
-        self.thumb = self.icon = qobuz.image.access.get('album')
+        self.image = qobuz.image.access.get('album')
 
     def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
@@ -137,7 +137,4 @@ class Node_recommendation(Node):
         self.set_content_type('albums')
         return self._build_down_type_genre(lvl, flag)
 
-
-    def hook_attach_context_menu(self, item, node, menuItems, color):
-        pass
 

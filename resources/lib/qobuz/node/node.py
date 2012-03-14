@@ -31,8 +31,7 @@ class Node(object):
         self.parent = parent
         self.type = NodeFlag.TYPE_NODE
         self.content_type = "files"
-        self.icon = ""
-        self.thumb = ""
+        self.image = ''
         self.childs = []
         self.label = ""
         self.label2 = ""
@@ -77,15 +76,11 @@ class Node(object):
     def get_content_type(self):
         return self.content_type
 
-    def get_thumbnail(self):
-        return self.thumb
-
     def get_image(self):
-        if self.thumb: return self.thumb
-        return self.icon
-    
-    def get_icon(self):
-        return self.icon
+        print "Image: " + self.image
+        if self.image: return self.image
+        if self.parent: return self.parent.get_image()
+        return ''
 
     def is_folder(self):
         return self.b_is_folder
@@ -129,20 +124,15 @@ class Node(object):
     
     def make_XbmcListItem(self):
         import xbmcgui
+        image = self.get_image()
         item = xbmcgui.ListItem(
                                     self.get_label(),
                                     self.get_label2(),
-                                    self.get_image(),
-                                    self.get_image(),
+                                    image,
+                                    image,
                                     self.make_url()
                                     )
-        id = self.get_id()
-        if id: id = str(id)
-        else: id = ''
-        item.setProperty('node_id', id)
         item.setProperty('IsFolder', 'true' if self.is_folder() else 'false')
-        item.setIconImage(self.get_icon())
-        item.setThumbnailImage(self.get_thumbnail())
         self.attach_context_menu(item)
         return item
     
@@ -183,7 +173,7 @@ class Node(object):
         return self
     
     def set_image(self, image):
-        self.thumb = self.icon = image
+        self.image = image
         return self
     
     def set_label2(self, label):
@@ -337,14 +327,14 @@ class Node(object):
 #        ''' 
 #        Give a chance to our siblings to attach their items
 #        '''
-        #self.hook_attach_context_menu(item, node, menuItems, color)
+        self.hook_attach_context_menu(item, menuItems)
         '''
         Add our items to the context menu
         '''
         if len(menuItems) > 0:
             item.addContextMenuItems(menuItems, replaceItems = False)
 
-    def hook_attach_context_menu(self, item, menuItems, color):
+    def hook_attach_context_menu(self, item, menuItems):
         pass
   
     def _get_keyboard(self, default = "", heading = "", hidden = False):

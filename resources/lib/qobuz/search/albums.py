@@ -34,7 +34,6 @@ class Search_albums():
         data = qobuz.api.search_albums(query, limit)
         if not data: return False
         self._raw_data = data
-        pprint.pprint(self._raw_data)
         if len(data) > 0: return True
         return False
 
@@ -42,5 +41,3 @@ class Search_albums():
         self._raw_data = qobuz.api.get_albums_from_artist(p_id, limit)
         return self
 
-    def length(self):
-        return len(self._raw_data)

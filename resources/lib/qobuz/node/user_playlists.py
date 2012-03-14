@@ -37,7 +37,7 @@ class Node_user_playlists(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = qobuz.utils.lang(30019)
-        self.icon = self.thumb = qobuz.image.access.get('userplaylists')
+        self.image = qobuz.image.access.get('userplaylists')
         self.label2 = 'Keep your current playlist'
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
         self.set_content_type('files')
@@ -57,7 +57,7 @@ class Node_user_playlists(Node):
     def get_display_by(self):
         return self.display_by
 
-    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None):
         login = qobuz.addon.getSetting('username')
         info(self, "Build-down: user playlists")
         data = self.cache.fetch_data()
@@ -78,7 +78,8 @@ class Node_user_playlists(Node):
                 node.set_is_my_playlist(True)
             self.add_child(node)
         
-    def hook_attach_context_menu(self, item, node, menuItems, color):
+    def hook_attach_context_menu(self, item, menuItems):
+        color = qobuz.addon.getSetting('color_ctxitem')
 #        ''' RENAME '''
 #        url=sys.argv[0]+"?mode="+str(MODE_RENAME_PLAYLIST)+'&nt='+str(type)
 #        if id: url+='&nid='+id
@@ -90,23 +91,23 @@ class Node_user_playlists(Node):
 #        menuItems.append((qobuz.utils.color(qobuz.addon.getSetting('color_ctxitem'), 'Delete'), "XBMC.RunPlugin("+url+")"))
 #        
         ''' SET AS CURRENT '''
-        url=sys.argv[0]+"?mode="+str(Mode.SELECT_CURRENT_PLAYLIST)+'&nt='+str(node.get_type())
-        if node.get_id(): url +='&nid='+node.get_id()
+        url=sys.argv[0]+"?mode="+str(Mode.SELECT_CURRENT_PLAYLIST)+'&nt='+str(self.get_type())
+        if self.get_id(): url +='&nid='+self.get_id()
         menuItems.append((qobuz.utils.color(color, 'Set as current: ' + item.getLabel()), "XBMC.RunPlugin("+url+")"))
 #        
         ''' CREATE '''
-        url=sys.argv[0]+"?mode="+str(Mode.CREATE_PLAYLIST)+'&nt='+str(node.get_type())
-        if node.get_id(): url+='&nid='+node.get_id()
+        url=sys.argv[0]+"?mode="+str(Mode.CREATE_PLAYLIST)+'&nt='+str(self.get_type())
+        if self.get_id(): url+='&nid='+self.get_id()
         menuItems.append((qobuz.utils.color(color, 'Create'), "XBMC.RunPlugin("+url+")"))
 
         ''' RENAME '''
-        url=sys.argv[0]+"?mode="+str(Mode.RENAME_PLAYLIST)+'&nt='+str(node.get_type())
-        if node.get_id(): url+='&nid='+node.get_id()
+        url=sys.argv[0]+"?mode="+str(Mode.RENAME_PLAYLIST)+'&nt='+str(self.get_type())
+        if self.get_id(): url+='&nid='+self.get_id()
         menuItems.append((qobuz.utils.color(color, 'Rename'), "XBMC.RunPlugin("+url+")"))
 
         ''' REMOVE '''
-        url=sys.argv[0]+"?mode="+str(Mode.REMOVE_PLAYLIST)+'&nt='+str(node.get_type())
-        if node.get_id(): url+='&nid='+node.get_id()
+        url=sys.argv[0]+"?mode="+str(Mode.REMOVE_PLAYLIST)+'&nt='+str(self.get_type())
+        if self.get_id(): url+='&nid='+self.get_id()
         menuItems.append((qobuz.utils.color(color, 'Remove *CAUTION*'), "XBMC.RunPlugin("+url+")"))
 
         ''' Display by '''

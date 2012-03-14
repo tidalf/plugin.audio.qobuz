@@ -151,7 +151,7 @@ class QobuzApi:
         params = {'x-api-auth-token':self.authtoken,
                                    'query': query.encode("utf8", "ignore"),
                                    'type': 'artists', 'limit': limit}
-        return self._api_request(params, "/api.json/0.1/track/search")
+        return self._api_request(params, "/api.json/0.1/artist/search")
 
     def get_albums_from_artist(self, id, limit = 100):
         params = {'x-api-auth-token': self.authtoken,

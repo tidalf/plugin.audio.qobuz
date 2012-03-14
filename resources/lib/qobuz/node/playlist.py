@@ -41,11 +41,10 @@ class Node_playlist(Node):
         self.label = ""
         self.label2 = ""
         self.url = None
-        self.thumb = ''
-        self.icon = ''
         self.set_is_folder(True)
         self.cache = None
         self.packby = 'album'
+        self.image = qobuz.image.access.get('playlist')
 
     def get_label(self):
         return self.get_property('name')
@@ -99,11 +98,7 @@ class Node_playlist(Node):
                 node.set_data(jtrack)
             albumseen[jalbum['id']] = node
             self.add_child(node)
-
-    def hook_attach_context_menu(self, item, node, menuItems, color):
-        pass
-    
-
+            
     def get_name(self):
         return self.get_property('name')
 
@@ -117,6 +112,8 @@ class Node_playlist(Node):
         import xbmcgui
         color = qobuz.addon.getSetting('color_ctxitem')
         label = self.get_name()
+        image = self.get_image()
+        url = self.make_url()
         if self.b_is_current:
             label = qobuz.utils.color(color, label)
         if not self.is_my_playlist: 
@@ -124,15 +121,18 @@ class Node_playlist(Node):
         
         item = xbmcgui.ListItem(label,
                                 self.get_owner(),
-                                self.get_image(),
-                                self.get_image(),
-                                self.make_url())
+                                image,
+                                image,
+                                url)
         if not item:
             warn(self, "Error: Cannot make xbmc list item")
             return None
         id = self.get_id()
         if id: 
             item.setProperty('node_id', str(id))
+        item.setPath(url)
+        item.setThumbnailImage(image)
+        item.setIconImage(image)
         self.attach_context_menu(item)
         return item
 

@@ -120,16 +120,16 @@ class Node_similar_artist(Node):
         return len(parse.artists)
             
     
-    '''
-        Make XbmcListItem
-    '''
-    def make_XbmcListItem(self):
-        item = xbmcgui.ListItem(self.get_label(),
-                                self.get_label(),
-                                self.get_image(),
-                                self.get_image(),
-                                self.make_url(),
-                                )
-        self.attach_context_menu(item)
-        return item
+#    '''
+#        Make XbmcListItem
+#    '''
+#    def make_XbmcListItem(self):
+#        item = xbmcgui.ListItem(self.get_label(),
+#                                self.get_label(),
+#                                self.get_image(),
+#                                self.get_image(),
+#                                self.make_url(),
+#                                )
+#        self.attach_context_menu(item)
+#        return item
 

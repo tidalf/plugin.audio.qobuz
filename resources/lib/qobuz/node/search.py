@@ -32,21 +32,28 @@ class Node_search(Node):
     def __init__(self, parent = None, params = None):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
-        self.search_type = 'albums'
         self.thumb = self.icon = qobuz.image.access.get('song')
-
+        self.set_search_type('albums')
+        
     def get_label(self):
-        if self.search_type == 'artists':
-            return "Searching artist"
-        elif self.search_type == 'albums':
-            return "Searching albums"
-        elif self.search_type == 'songs':
-            return "Searching for songs"
+        return self.label
 
     def get_description(self):
         return self.get_label()
     
     def set_search_type(self, st):
+        if st == 'artists':
+            self.label = "Searching artist"
+            self.image = qobuz.image.access.get('artist')
+            self.set_content_type('files')
+        elif st == 'albums':
+            self.label = "Searching albums"
+            self.image = qobuz.image.access.get('album')
+            self.set_content_type('albums')
+        elif st == 'songs':
+            self.label = "Searching for songs"
+            self.image = qobuz.image.access.get('song')
+            self.set_content_type('songs')
         self.search_type = st
         
     def get_search_type(self):
@@ -69,24 +76,19 @@ class Node_search(Node):
             search = Search_tracks()
             limit = qobuz.addon.getSetting('songsearchlimit')
             heading = qobuz.lang(30013)
-            self.set_content_type('songs')
-            self.icon = self.thumb = qobuz.image.access.get('song')
+ 
         elif stype == 'albums':
             from qobuz.search.albums import Search_albums
             info(self, "Searching albums")
             search = Search_albums()
             limit = qobuz.addon.getSetting('albumsearchlimit')
             heading = qobuz.lang(30014)
-            self.set_content_type('albums')
-            self.icon = self.thumb = qobuz.image.access.get('album')
         elif stype == 'artists':
             info(self, "Searching artists")
             from qobuz.search.artists import Search_artists
             search = Search_artists()
             limit = qobuz.addon.getSetting('artistsearchlimit')
             heading = qobuz.lang(30015)
-            self.set_content_type('files')
-            self.icon = self.thumb = qobuz.image.access.get('artist')
         else:
             error(self, "Unknown search-type: " + stype)
         query = self.get_parameter('query')
@@ -100,7 +102,11 @@ class Node_search(Node):
             warn(self, "Searching artists API call fail")
             return False
         data = search.get_data()
+        if not data:
+            warn(self, "Search return no data")
+            return False
         self.notify_data_result(data)
+        print pprint.pformat(data)
         if self.search_type == 'albums':
             for json_product in data:
                 json_product = json_product['product']
@@ -111,7 +117,7 @@ class Node_search(Node):
                 product.set_data(json_product)
                 self.add_child(product)
         elif self.search_type == 'songs':
-            for jtrack in data['tracks']:
+            for jtrack in data['results']:
                 track = Node_track()
                 track.set_data(jtrack)
                 self.add_child(track)

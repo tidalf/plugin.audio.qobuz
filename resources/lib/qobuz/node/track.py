@@ -190,9 +190,11 @@ class Node_track(Node):
         
         duration = self.get_duration()
         label = self.get_label()
+        isplayable = 'true'
         if self.get_streaming_type() == 'sample':
             duration = 60
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
+            isplayable = 'false'
             
         mode = Mode.PLAY
         url = self.make_url(mode)
@@ -222,13 +224,10 @@ class Node_track(Node):
                                    'comment': self.get_description()
                                    })
         item.setProperty('discnumber', str(media_number))
-        item.setProperty('node_id', self.get_id())
-        item.setProperty('IsPlayable', 'true')
-        item.setProperty('IsInternetStream', 'true')
-        item.setProperty('Music', 'true')
+        #item.setProperty('node_id', self.get_id())
+        item.setProperty('IsPlayable', isplayable)
+        item.setProperty('IsInternetStream', isplayable)
+        item.setProperty('Music', isplayable)
         self.attach_context_menu(item)
         return item
-
-    def hook_attach_context_menu(self, item, node, menuItems, color):
-        pass
 

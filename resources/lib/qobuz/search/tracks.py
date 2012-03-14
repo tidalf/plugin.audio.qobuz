@@ -34,10 +34,6 @@ class Search_tracks():
         pprint.pprint(self._raw_data)
         return self
         
-    def length(self):
-        if not self._raw_data['results']:
-            return 0
-        return len(self._raw_data['results']['tracks'])
 
     def get_data(self):
         return self._raw_data['results']
