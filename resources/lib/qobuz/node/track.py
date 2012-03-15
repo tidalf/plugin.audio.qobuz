@@ -223,6 +223,6 @@ class Node_track(Node):
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
-        #self.attach_context_menu(item)
+        self.attach_context_menu(item)
         return item
 
