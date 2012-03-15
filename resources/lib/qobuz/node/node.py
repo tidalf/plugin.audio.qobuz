@@ -280,16 +280,16 @@ class Node(object):
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
                                          id,query)
             cmd = "XBMC.Container.Update(%s)" % (args)
-            menuItems.append((qobuz.utils.color(color,"Similar artist"),cmd))
+            menuItems.append((qobuz.utils.color(color, qobuz.lang(39004)),cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.ADD_TO_CURRENT_PLAYLIST))
-        menuItems.append((qobuz.utils.color(color,'Add to current playlist'),cmd))
+        menuItems.append((qobuz.utils.color(color,qobuz.lang(39005)),cmd))
 
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):
             showplaylist = sys.argv[0] + "?mode=" + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_USERPLAYLISTS)
-            menuItems.append((qobuz.utils.color(color,'Show Playlist'),"XBMC.Container.Update(" + showplaylist + ")"))
+            menuItems.append((qobuz.utils.color(color, qobuz.lang(39006)),"XBMC.Container.Update(" + showplaylist + ")"))
 
 
         ''' 

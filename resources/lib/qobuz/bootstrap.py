@@ -74,6 +74,9 @@ class QobuzBootstrap(object):
         if not self.auth:
             qobuz.gui.show_login_failure()
             exit(1)
+        if qobuz.gui.is_free_account():
+            print "FREEEEEEEEEEEEEEEEEEEEEE"
+            qobuz.gui.popup_free_account()
         self.dispatch()
 
     def bootstrap_lang(self):
@@ -213,12 +216,11 @@ class QobuzBootstrap(object):
 #        response = qobuz.gui.executeJSONRPC(cmd)
 #        print "JSONRPC: " + pprint.pformat(response)
 #        
-        print "HANDLE: " + str(self.handle)
         if self.MODE == Mode.PLAY:
             info(self,"Playing song")
             self.bootstrap_player()
             if qobuz.addon.getSetting('notification_playingsong') == 'true':
-                qobuz.gui.notification(34000,34001)
+                qobuz.gui.notify(34000,34001)
             try:
                 context_type = urllib.unquote(self.params["context_type"])
             except:

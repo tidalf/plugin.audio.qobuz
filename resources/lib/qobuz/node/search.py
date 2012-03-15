@@ -43,15 +43,15 @@ class Node_search(Node):
     
     def set_search_type(self, st):
         if st == 'artists':
-            self.label = "Searching artist"
+            self.label = qobuz.lang(30015)
             self.image = qobuz.image.access.get('artist')
             self.set_content_type('files')
         elif st == 'albums':
-            self.label = "Searching albums"
+            self.label = qobuz.lang(30014)
             self.image = qobuz.image.access.get('album')
             self.set_content_type('albums')
         elif st == 'songs':
-            self.label = "Searching for songs"
+            self.label = qobuz.lang(30013)
             self.image = qobuz.image.access.get('song')
             self.set_content_type('songs')
         self.search_type = st

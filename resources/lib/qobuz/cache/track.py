@@ -37,7 +37,7 @@ class Cache_track(ICacheable):
         self.id = id
         super(Cache_track, self).__init__(qobuz.path.cache,
                                          'track',
-                                         self.id, auto_fetch)
+                                         self.id, True)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_track'))
         debug(self, "Cache duration: " + str(self.cache_refresh))
 

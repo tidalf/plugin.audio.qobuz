@@ -103,6 +103,8 @@ class Node_track(Node):
         return self.get_property(('playlist_track_id'))
 
     def get_streaming_type(self):
+        if self.cache_url:
+            return self.cache_url.get_data()['streaming_type']
         return self.get_property(('streaming_type'))
 
     def get_position(self):
@@ -119,6 +121,12 @@ class Node_track(Node):
             return self.parent.get_genre()
         return ''
 
+    
+    def get_streaming_url(self):
+        self._set_cache_streaming_url()
+        data = self.cache_url.get_data()
+        if not data: return None
+        return data['streaming_url']
     
     def get_artist(self):
         s = self.get_interpreter()
@@ -166,10 +174,7 @@ class Node_track(Node):
         self.cache_url.fetch_data()
         
         
-    def get_streaming_url(self):
-        self._set_cache_streaming_url()
-        data = self.cache_url.get_data()
-        return data['streaming_url']
+
     
     def get_mimetype(self):
         self._set_cache_streaming_url()
@@ -190,10 +195,14 @@ class Node_track(Node):
         duration = self.get_duration()
         label = self.get_label()
         isplayable = 'true'
-        if self.get_streaming_type() == 'sample':
+        allowed_audio_format_ids = qobuz.boot.auth.get_data()['user']['credential']['allowed_audio_format_ids']
+        pprint.pprint(allowed_audio_format_ids)
+        free_account = False
+        if not allowed_audio_format_ids:
+            free_account = True
+        if self.get_streaming_type() == 'sample' or free_account:
             duration = 60
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
-            isplayable = 'false'
         mode = Mode.PLAY
         url = self.make_url(mode)
         item = xbmcgui.ListItem(label,

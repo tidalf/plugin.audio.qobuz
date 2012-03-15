@@ -46,7 +46,7 @@ class cache_manager():
         for f in list:
             if not f.endswith('.dat'):
                 continue
-            if f == 'auth.dat':
+            if f == 'authentication.dat':
                 ldel.append(f)
             elif f.startswith('userplaylists'):
                 ldel.append(f)

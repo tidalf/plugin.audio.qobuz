@@ -88,7 +88,7 @@ class xbmc_directory():
                                    updateListing = False, 
                                    cacheToDisc = success)
         if self.total_put == 0:
-            qobuz.gui.notifyH(qobuz.lang(40001), self.root.get_label())
+            qobuz.gui.notifyH(qobuz.lang(40001).encode('utf8', 'replace'), self.root.get_label().encode('utf8', 'replace'))
         self.update(100, 100,  qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put).encode('ascii', 'replace') + ' items')
         self.close()
         return success

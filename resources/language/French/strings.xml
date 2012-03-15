@@ -117,6 +117,80 @@
     <string id="30096">Tous</string>
     <string id="30100">Voir les achats</string>
     <string id="30101">Voir les nouveautées</string>
+    
+        
+    <!-- Cache -->
+    <string id="31000">Le temps en minute pendant lequel les données doivent etre sauvée dans le cache
+    [CR][I]- La valeut 0 désactive le cache[/I]</string>
+    <string id="31001">Durée du cache album</string>
+    <string id="31002">Durée du cache artiste</string>
+    <string id="31003">Durée du cache chanson</string>
+    <string id="31004">Durée du cache recommendation</string>
+    <string id="31005">Durée du cache liste de lecture</string>
+    <string id="31006">Cache</string>
+    <string id="31007">Paramètres du cache</string>
+    <string id="31008">Durée du cache d'authentification</string>
+    <string id="31009">Effacer le cache</string>
+    <string id="31010">Organisation des listes de lecture</string>
+
+    <!-- Stream -->
+    <string id="32000">Type de stream</string>
+    <string id="32001">Ne pas jouer les extraits</string>
+
+    <!-- URL Resolver -->
+    <string id="33000">Resolver activé</string>
+
+    <!-- Color -->
+    <string id="33101">Couleurs</string>
+    <string id="33102">Elements du menu contextuel</string>
+    <string id="33103">Elements "dangereux" du menu contextuel </string>
+    <string id="33104">Elements des listes de lecture</string>
+    
+    <!-- Qobuz Player -->
+    <string id="34000">Qobuz Player</string>
+    <string id="34001">Joue un morceau</string>
+    <string id="34002">Ne peut pas jouer le morceau</string>
+
+    <!-- Search -->
+    <string id="35000">Recherches activées</string>
+    <string id="35001">Pas de résultats pour les chansons</string>
+    <string id="35002">Pas de résultats pour les albums</string>
+    <string id="35003">Pas de résultats pour les artistes</string>
+
+    <!-- Notification -->
+    <string id="36000">Qobuz</string>
+    <string id="36001">Dossier vide</string>
+    <string id="36002">Notification</string>
+    <string id="36003">Notification à la lecture du morceau</string>
+
+    <!-- Sort -->
+    <string id="37000">Tri activé</string>
+
+    <!-- Settings -->
+    <string id="38000">Connection</string>
+    <string id="38001">Stream</string>
+    <string id="38002">Recherche</string>
+    <string id="38003">Autre</string>
+
+    <!-- Context Menu -->
+    <string id="39000">Cet album</string>
+    <string id="39001">Tous les albums</string>
+    <string id="39002">Vue répertoire unique</string>
+    <string id="39003">Scan</string>
+    <string id="39004">Artistes similaire</string>
+    <string id="39005">Ajout à la playlist courante</string>
+    <string id="39006">Voir playlists</string>
+    <string id="39007">Définir courante</string>
+    <string id="39008">Créer</string>
+    <string id="39009">Renommer</string>
+    <string id="39010">Effacer</string>
+
+    <!-- Progress bar -->
+    <string id="40000">Début</string>
+    <string id="40001">Répertoire vide</string>
+    <string id="40002">Affiche</string>
+    <string id="40003">Finis</string>
+    <string id="40004">Récupération des données</string>
 </strings>
 
 

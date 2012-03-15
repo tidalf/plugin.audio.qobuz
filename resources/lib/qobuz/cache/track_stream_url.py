@@ -45,4 +45,6 @@ class Cache_track_stream_url(ICacheable):
 
     # Methode called by parent class ICacheable when fresh data is needed
     def _fetch_data(self):
-        return qobuz.api.get_track_url(self.id, 'playlist', 0, self.format_id)
+        data = qobuz.api.get_track_url(self.id, 'playlist', 0, self.format_id)
+        print pprint.pformat(data)
+        return data

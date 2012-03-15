@@ -51,22 +51,23 @@
         <setting id="cache_duration_auth" type="labelenum" label="31008" default="60" values="0|5|10|30|60|120|240|480|960|1440" />
    </category>
    <!-- Notification -->
-   <category label="36002">
-        <setting id="notification_playingsong" label="36003" type="bool" default="false" />
+   <!-- <category label="36002">
         
-   </category>
+   </category>-->
          
    <!-- Colors -->
-   <category label="Colors">
-        <setting id="color_item" label="Context menu item" type="text" default="FF59A9C5" />
-        <setting id="color_item_caution" label="Context menu item - Caution" type="text" default="FFFF0000" />
-        <setting id="color_item_playlist" label="Playlist item color" type="text" default="FFAA4455" />
+   <category label="33101">
+        <setting id="color_item" label="33102" type="text" default="FF59A9C5" />
+        <setting id="color_item_caution" label="33103" type="text" default="FFFF0000" />
+        <setting id="color_item_playlist" label="33104" type="text" default="FFAA4455" />
         
    </category>       
    <!-- Other -->
    <category label="38003">
+        <setting id="notification_playingsong" label="36003" type="bool" default="false" />
+        <!-- <setting id="resolver_enabled" label="33000" type="bool" default="true" /> -->
         <setting id="debug" label="Debug" type="bool" default="false" />
-        <setting id="resolver_enabled" label="33000" type="bool" default="true" />
+    <setting id="warn_free_account" type="bool" default="true" option="hidden"/>
    </category>   	
 
 </settings>

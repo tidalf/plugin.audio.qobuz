@@ -58,6 +58,19 @@ class QobuzGUI:
         else:
             xbmc.executebuiltin('ActivateWindow(home)')
             return False
-        
+    
+    def is_free_account(self):
+        if not qobuz.boot.auth.get_data()['user']['credential']['allowed_audio_format_ids']:
+            return True
+        return False
+    
+    def popup_free_account(self):
+        if qobuz.addon.getSetting('warn_free_account') != 'true':
+            return
+        dialog = xbmcgui.Dialog()
+        ok = dialog.yesno(qobuz.lang(41000), qobuz.lang(41001), qobuz.lang(41002), qobuz.lang(41003))
+        if ok:
+            qobuz.addon.setSetting('warn_free_account', 'false')
+
     def executeJSONRPC(self, json):
         return xbmc.executeJSONRPC(json)

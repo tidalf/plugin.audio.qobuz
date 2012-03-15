@@ -80,8 +80,8 @@ class QobuzPlayer(xbmc.Player):
         '''
             PLaying track
         '''
-#        if qobuz.addon.getSetting('notification_playingsong') == 'true':
-#            qobuz.gui.showNotificationH(lang(34000), item.getLabel(), item.getProperty('image'))
+        if qobuz.addon.getSetting('notification_playingsong') == 'true':
+            qobuz.gui.notifyH(lang(34000), node.get_label().encode('utf8', 'replace'), node.get_image())
 #        rpc = xbmc_json_rpc()
 #        print "JSON RPC Version: " + rpc.JSONRPC_Version()
 #        rpc.Player_SetAudioStream(node.get_streaming_url())
