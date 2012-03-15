@@ -78,6 +78,7 @@ class Node_recommendation(Node):
             node.setGenreType(t[0])
             node.set_label(t[1])
             self.add_child(node)
+        return True
 
 # GENRE
     def _build_recos_genre(self, lvl, flag):
@@ -101,6 +102,7 @@ class Node_recommendation(Node):
             node.setGenreId(t[0])
             node.set_label(qobuz.utils.color(color, self.genre_type + ' / ') + t[1])
             self.add_child(node)
+        return True
 
 
 # TYPE GENRE

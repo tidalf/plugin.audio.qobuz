@@ -44,4 +44,4 @@ class Node_purchases(Node):
         self.set_data(data)
         for product in self.cache.filter_products(self.cache.get_data()):
             self.add_child(product)
-
+        return True

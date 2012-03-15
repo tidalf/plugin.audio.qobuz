@@ -34,6 +34,7 @@ class Node_root(Node):
         super(Node_root, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
         self.set_content_type('files')
+        self.label = "Qobuz"
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         self.add_child(Node_user_playlists())
@@ -49,5 +50,6 @@ class Node_root(Node):
             search = Node_search()
             search.set_search_type('artists')
             self.add_child(search)
+        return True
 
 

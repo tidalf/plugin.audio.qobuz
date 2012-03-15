@@ -41,8 +41,7 @@ class Xbmc_renderer(IRenderer):
             warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
         dir = xbmc_directory(self.root, qobuz.boot.handle, False)
-        if not self.root.build_down(dir, self.depth, self.filter):
-            return False
+        self.root.build_down(dir, self.depth, self.filter)
         dir.set_content(self.root.content_type)
         dir.end_of_directory()
         return True
@@ -53,7 +52,7 @@ class Xbmc_renderer(IRenderer):
             print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
             return False
         dir = xbmc_directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK) 
+        self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
         dir.set_content(self.root.content_type)
         dir.end_of_directory()
         return True

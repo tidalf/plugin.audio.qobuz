@@ -63,14 +63,17 @@ class Node_artist(Node):
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
+        total = len(data['artist']['albums'])
+        count = 0
         for jproduct in data['artist']['albums']:
             keys = ['artist', 'interpreter', 'composer']
             for k in keys:
                 if k in data['artist']: jproduct[k] = data['artist'][k]
             node = Node_product()
             node.set_data(jproduct)
-            xbmc_directory.update(25, "Add album:" + node.get_label(), '')
+            xbmc_directory.update(count, total, "Add album:" + node.get_label(), '')
             self.add_child(node)
+            count += 1
         return True
     
     '''

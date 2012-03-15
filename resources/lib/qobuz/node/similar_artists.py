@@ -97,12 +97,12 @@ class Node_similar_artist(Node):
         listid = {}
         max = 20
         count = 0
-        toperc = 1 + 100 / len(parse.artists)
+        total = len(parse.artists)
         for a in parse.artists:
             if count > max: break
             count+=1
             name = a['name']
-            xbmc_directory.update(count * toperc, "Find artist similar", name)
+            xbmc_directory.update(count, total, "Finding similar artist", name)
             search_cache = Cache_search_artists(name)
             result = search_cache.fetch_data()
             if not result or len(result) < 1:
@@ -118,18 +118,4 @@ class Node_similar_artist(Node):
                 listid[artist_id] = artist 
                 self.add_child(artist)
         return len(parse.artists)
-            
-    
-#    '''
-#        Make XbmcListItem
-#    '''
-#    def make_XbmcListItem(self):
-#        item = xbmcgui.ListItem(self.get_label(),
-#                                self.get_label(),
-#                                self.get_image(),
-#                                self.get_image(),
-#                                self.make_url(),
-#                                )
-#        self.attach_context_menu(item)
-#        return item
 

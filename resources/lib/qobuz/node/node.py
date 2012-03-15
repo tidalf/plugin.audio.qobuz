@@ -212,12 +212,14 @@ class Node(object):
             return False
         self._build_down(xbmc_directory, lvl, whiteFlag)
         if lvl != -1: lvl -= 1
-        xbmc_directory.set_given_total(len(self.childs))
+        total = len(self.childs)
+        count = 0
         for child in self.childs:
+            xbmc_directory.update(count, total, "Process data", child.get_label())  
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
-            if child.build_down(xbmc_directory, lvl, whiteFlag):
-                xbmc_directory.update(50, "Fetching Data (cache / network)", child.get_label())    
+            child.build_down(xbmc_directory, lvl, whiteFlag)
+            count += 1
         return True
 
     '''

@@ -101,7 +101,6 @@ class ICacheable(object):
         if refresh and refresh != -1:
             diff = time.time() - mtime
             if diff > refresh:
-                print "Refresh"
                 debug(self, "Refreshing cache")
                 self.hook_pre_refresh()
                 return None

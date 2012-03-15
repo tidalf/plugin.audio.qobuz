@@ -77,6 +77,7 @@ class Node_user_playlists(Node):
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
             self.add_child(node)
+        return True
         
 
     def set_current_playlist(self, id):
