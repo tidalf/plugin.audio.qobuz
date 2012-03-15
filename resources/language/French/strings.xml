@@ -96,27 +96,31 @@
 	<string id="30076">Créer une liste de lecture Qobuz</string>
 	<string id="30077">Supprimer une liste de lecture Qobuz</string>		
 	<string id="30078">Renommer une liste de lecture Qobuz</string>
-	<string id="30079"></string>		
-	<string id="30080"></string>
-	<string id="30081"></string>		
-	<string id="30082">Voir les recommandations</string>	
-	<string id="30083">Prix de la Presse</string>
-    <string id="30084">Nouveautés</string>
-    <string id="30085">Meilleures ventes</string>
-    <string id="30086">Choix de la rédaction</string>
-    <string id="30087">Pop/Rock</string>
+    
+    <!-- Recommandation -->
+    <string id="30082">Show recommendations</string>
+    <string id="30083">Press awards</string>
+    <string id="30084">News</string>
+    <string id="30085">Best sellers</string>
+    <string id="30086">Editor's picks</string>
+    <string id="30087">Pop / Rock</string>
     <string id="30088">Electro</string>
     <string id="30089">Jazz</string>
     <string id="30090">Chanson Française</string>
-    <string id="30091">Soul/Funk/Rap</string>
-    <string id="30092">Musiques du monde</string>
-    <string id="30093">Blues/Country/Folk</string>
-    <string id="30094">Bande originale de film</string>
-    <string id="30095">Classique</string>
+    <string id="30091">Soul / Funk/Rap</string>
+    <string id="30092">World Music</string>
+    <string id="30093">Blues / Country/Folk</string>
+    <string id="30094">Movie Soundtracks</string>
+    <string id="30095">Classical</string>
+    <string id="30096">All of them</string>
     <string id="30097">Reggae</string>
-    <string id="30096">Tous</string>
-    <string id="30100">Voir les achats</string>
-    <string id="30101">Voir les nouveautées</string>
+    <string id="30098">Historical documents / Litterature / Humor</string>
+    <string id="30200">Rap / HipHop / R&B / Soul</string>
+    <string id="30201">Childs / Karakoke / Ambiance</string>
+    <string id="30202">Techno</string>
+    <string id="30203">Reggae</string>
+    <string id="30100">Show Purchases</string>
+    <string id="30101">Show News</string>
     
         
     <!-- Cache -->

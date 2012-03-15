@@ -44,7 +44,7 @@ class xbmc_directory():
         return '%02i:%02i:%02i' % (hours, minutes, seconds)
     
         
-    def update(self, count, total, line1, line2 = ''):
+    def update(self, count, total, line1, line2 = '', line3 = ''):
         percent = 100
         if total and count:
             percent = count * (1 + 100 / total)
@@ -53,7 +53,7 @@ class xbmc_directory():
             if percent > 100: percent = 100
         pet = self._pretty_time(int(self.elapsed()))
         line1 = '[%05i / %s] %s' % (self.total_put, pet, line1)
-        self.Progress.update(percent, line1, line2)
+        self.Progress.update(percent, line1, line2, line3)
     
     def is_canceled(self):
         return self.Progress.iscanceled()

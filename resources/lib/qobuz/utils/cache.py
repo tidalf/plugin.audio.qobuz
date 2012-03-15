@@ -92,7 +92,6 @@ class cache_manager():
             sw.unlink(path)
 
     def delete_all_data(self):
-        print "ERRRASE"
         cache = qobuz.path.cache
         if not self._cache_path_exists(cache):
             return False
