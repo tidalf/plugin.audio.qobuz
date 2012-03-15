@@ -79,7 +79,6 @@ class Node_user_playlists(Node):
             self.add_child(node)
         return True
         
-
     def set_current_playlist(self, id):
         import xbmc
         info(self, "Set current playlist: " + str(id))
@@ -102,7 +101,7 @@ class Node_user_playlists(Node):
         query = query.strip()
         #info(self, "Query: " + repr(query))
         if query != '':
-            print "Creating playlist: " + query
+            print "Creating playlist: " + query.encode('ascii', 'replace')
         ret = qobuz.api.playlist_create(query, '', '', '', 'off', 'off')
         if not ret:
             warn(self, "Cannot create playlist name '"+ query +"'")

@@ -95,7 +95,7 @@ class Node_recommendation(Node):
         types.append((112, qobuz.lang(30087)))
         types.append((127, qobuz.lang(30200)))
         types.append((123, qobuz.lang(30203)))
-        color = qobuz.addon.getSetting('color_ctxitem')
+        color = qobuz.addon.getSetting('color_item')
         for t in types:
             node = Node_recommendation()
             node.setGenreType(self.getGenreType())

@@ -94,11 +94,12 @@ class Node_product(Node):
     
     def get_artist_id(self):
         a = self.get_property(('artist', 'id'))
-        if a: return a
+        if a: return int(a)
         a = self.get_property(('interpreter', 'id'))
-        if a: return a
+        if a: return int(a)
         a = self.get_property(('composer', 'id'))
-        return a
+        if a: return int(a)
+        return None
     
     def get_title(self):
         title =  self.get_property('title')

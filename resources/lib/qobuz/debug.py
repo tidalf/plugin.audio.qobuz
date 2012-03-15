@@ -48,9 +48,6 @@ except:
         print lvl + msg
     ourlog = logfunc
 
-if __debugging__:
-    print "DEBUGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
-
 ###############################################################################
 # Logging helper functions
 ###############################################################################

@@ -86,7 +86,7 @@ class Node_artist(Node):
                                 self.get_image(),
                                 self.make_url(),
                                 )
-        item.setProperty('node_id', self.get_id())
+        #item.setProperty('node_id', self.get_id())
         self.attach_context_menu(item)
         return item
 

@@ -26,7 +26,7 @@ class xbmc_directory():
         self.total_put = 0
         self.started_on = time.time()
         self.Progress.create(self.label + root.get_label())
-        self.update(0, 100, "Starting")
+        self.update(0, 100, qobuz.lang(40000))
 
     def elapsed(self):
         return time.time() - self.started_on
@@ -67,11 +67,11 @@ class xbmc_directory():
         ret = xbmcplugin.addDirectoryItem(self.handle,
                                     node.make_url(),
                                     item,
-                                    node.is_folder(),                       
+                                    node.is_folder,                       
                                     len(self.nodes))
         if not ret: self.put_item_ok = False
         if not (node.type & NodeFlag.TYPE_TRACK):
-            pass#self.update(50, "Add Item", node.get_label())
+            pass
         return ret
     
     def close(self):
@@ -88,8 +88,8 @@ class xbmc_directory():
                                    updateListing = False, 
                                    cacheToDisc = success)
         if self.total_put == 0:
-            qobuz.gui.notifyH('Empty directory', self.root.get_label())
-        self.update(100, 100,  "Done", "Displaying " + str(self.total_put).encode('ascii', 'replace') + ' items')
+            qobuz.gui.notifyH(qobuz.lang(40001), self.root.get_label())
+        self.update(100, 100,  qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put).encode('ascii', 'replace') + ' items')
         self.close()
         return success
         

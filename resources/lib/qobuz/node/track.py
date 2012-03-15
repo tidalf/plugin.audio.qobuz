@@ -127,11 +127,12 @@ class Node_track(Node):
 
     def get_artist_id(self):
         s = self.get_property(('artist', 'id'))
-        if s: return s
+        if s: return int(s)
         s =  self.get_property(('composer', 'id'))
-        if s: return s
+        if s: return int(s)
         s =  self.get_property(('interpreter', 'id'))
-        return s
+        if s: return int(s)
+        return None
 
     def get_track_number(self):
         return self.get_property(('track_number'))
@@ -183,11 +184,9 @@ class Node_track(Node):
         
     def make_XbmcListItem(self):
         import xbmcgui
-
         media_number = self.get_media_number()
         if not media_number: media_number = 1
         else: media_number = int(media_number)
-        
         duration = self.get_duration()
         label = self.get_label()
         isplayable = 'true'
@@ -195,7 +194,6 @@ class Node_track(Node):
             duration = 60
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
             isplayable = 'false'
-            
         mode = Mode.PLAY
         url = self.make_url(mode)
         item = xbmcgui.ListItem(label,
@@ -210,7 +208,6 @@ class Node_track(Node):
         track_number = self.get_track_number()
         if not track_number: track_number = 0
         else: track_number = int(track_number)
-        
         item.setInfo(type = 'music', infoLabels = {
                                    'track_id': self.get_id(),
                                    'title': self.get_title(),
@@ -218,16 +215,14 @@ class Node_track(Node):
                                    'genre': self.get_genre(),
                                    'artist': self.get_artist(),
                                    'tracknumber': track_number,
-                                   #'discnumber': media_number,
                                    'duration': duration,
                                    'year': self.get_year(),
                                    'comment': self.get_description()
                                    })
         item.setProperty('discnumber', str(media_number))
-        #item.setProperty('node_id', self.get_id())
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
-        self.attach_context_menu(item)
+        #self.attach_context_menu(item)
         return item
 

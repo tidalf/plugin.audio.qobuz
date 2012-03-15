@@ -44,6 +44,7 @@ class Xbmc_renderer(IRenderer):
         self.root.build_down(dir, self.depth, self.filter)
         dir.set_content(self.root.content_type)
         dir.end_of_directory()
+        self.root.delete_tree()
         return True
     
     def scan(self):
