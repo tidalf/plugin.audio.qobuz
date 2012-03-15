@@ -92,13 +92,24 @@ class cache_manager():
             sw.unlink(path)
 
     def delete_all_data(self):
+        print "ERRRASE"
         cache = qobuz.path.cache
         if not self._cache_path_exists(cache):
             return False
-        list = os.listdir(cache)
-        ldel = []
-        for f in list:
-            if not f.endswith('.dat'):
-                continue
-            ldel.append(f)
-        self._delete_files(cache, ldel)
+        list = []
+        self._delete_subdir_data(cache, list)
+        sw = safe_write()
+        for file in list:
+            print "Delete file: " + file
+            sw.unlink(file)
+            
+    def _delete_subdir_data(self, path, files_to_delete = []):
+        list = os.listdir(path)
+        for file in list:
+            newpath = os.path.join(path, file)
+            if file.endswith('.dat'):
+                files_to_delete.append(newpath)
+            elif os.path.isdir(newpath):
+                self._delete_subdir_data(newpath, files_to_delete)
+        
+            
