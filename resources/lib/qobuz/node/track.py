@@ -195,12 +195,7 @@ class Node_track(Node):
         duration = self.get_duration()
         label = self.get_label()
         isplayable = 'true'
-        allowed_audio_format_ids = qobuz.boot.auth.get_data()['user']['credential']['allowed_audio_format_ids']
-        pprint.pprint(allowed_audio_format_ids)
-        free_account = False
-        if not allowed_audio_format_ids:
-            free_account = True
-        if self.get_streaming_type() == 'sample' or free_account:
+        if self.get_streaming_type() == 'sample' or qobuz.gui.is_free_account():
             duration = 60
             label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
         mode = Mode.PLAY
