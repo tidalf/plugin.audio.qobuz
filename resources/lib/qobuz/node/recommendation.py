@@ -27,6 +27,28 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from debug import info, warn, error
+
+RECOS_TYPES = {
+                     'new-releases': qobuz.lang(30084),
+                      'press-awards': qobuz.lang(30083),
+                      'best-sellers': qobuz.lang(30085),
+                      'editor-picks': qobuz.lang(30086),
+                      }
+
+RECOS_GENRES ={
+              2: qobuz.lang(30093),
+              10: qobuz.lang(30095),
+              6: qobuz.lang(30090),
+              59: qobuz.lang(30098),
+              73: qobuz.lang(30201),
+              80: qobuz.lang(30089),
+              64: qobuz.lang(30202),
+              91: qobuz.lang(30094),
+              94: qobuz.lang(30092),
+              112: qobuz.lang(30087),
+              127: qobuz.lang(30200),
+              123: qobuz.lang(30203) 
+              }
 '''
     NODE RECOS
 '''
@@ -69,14 +91,16 @@ class Node_recommendation(Node):
 # TYPE
     def _build_recos_type(self, lvl, flag):
         types = []
+        color = qobuz.addon.getSetting('color_item')
         types.append(('new-releases', qobuz.lang(30084)))
         types.append(('press-awards', qobuz.lang(30083)))
         types.append(('best-sellers', qobuz.lang(30085)))
         types.append(('editor-picks', qobuz.lang(30086)))
-        for t in types:
+        for t in RECOS_TYPES:
+            print "T0: " + t
             node = Node_recommendation()
-            node.setGenreType(t[0])
-            node.set_label(t[1])
+            node.setGenreType(t)
+            node.set_label(qobuz.utils.color(color, RECOS_TYPES[t]))
             self.add_child(node)
         return True
 
@@ -96,11 +120,11 @@ class Node_recommendation(Node):
         types.append((127, qobuz.lang(30200)))
         types.append((123, qobuz.lang(30203)))
         color = qobuz.addon.getSetting('color_item')
-        for t in types:
+        for t in RECOS_GENRES:
             node = Node_recommendation()
             node.setGenreType(self.getGenreType())
-            node.setGenreId(t[0])
-            node.set_label(qobuz.utils.color(color, self.genre_type + ' / ') + t[1])
+            node.setGenreId(int(t))
+            node.set_label(qobuz.utils.color(color, RECOS_TYPES[self.genre_type] + ' / ') + RECOS_GENRES[t])
             self.add_child(node)
         return True
 

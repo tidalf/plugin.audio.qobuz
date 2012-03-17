@@ -20,7 +20,7 @@ import sys
 import xbmcaddon
 import xbmc
 
-__addon__        = xbmcaddon.Addon(id='plugin.audio.qobuz2')
+__addon__        = xbmcaddon.Addon(id='plugin.audio.qobuz')
 __addonversion__ = __addon__.getAddonInfo('version')
 __addonid__      = __addon__.getAddonInfo('id')
 __cwd__          = __addon__.getAddonInfo('path')

@@ -23,11 +23,31 @@ class __Mode():
         self.PLAY = 2
         self.ERASE_CACHE = 3
         self.LIBRARY_SCAN = 4
-        self.SELECT_CURRENT_PLAYLIST = 5
-        self.CREATE_PLAYLIST = 6
-        self.ADD_TO_CURRENT_PLAYLIST = 7
-        self.RENAME_PLAYLIST = 8
-        self.REMOVE_PLAYLIST = 9
         self.SCAN = 10
         self.VIEW_BIG_DIR = 11
+        ''' Playlist '''
+        self.PLAYLIST_REMOVE_TRACK = 12
+        self.PLAYLIST_SELECT_CURRENT = 13 
+        self.PLAYLIST_ADD_TO_CURRENT = 14    
+        self.PLAYLIST_CREATE = 15
+        self.PLAYLIST_RENAME = 16
+        self.PLAYLIST_REMOVE = 17
+        self.PLAYLIST_ADD_AS_NEW = 18
+    
+    def to_s(self, mode):
+        if mode == self.VIEW: return "view"
+        elif mode == self.PLAY: return "play"
+        elif mode == self.ERASE_CACHE: return "erase cache"
+        elif mode == self.LIBRARY_SCAN: return "library scan"
+        elif mode == self.SCAN: return "scan"
+        elif mode == self.VIEW_BIG_DIR: return "view big dir"
+        elif mode == self.PLAYLIST_REMOVE: return "playlist remove"
+        elif mode == self.PLAYLIST_REMOVE_TRACK: return "playlist remove track"
+        elif mode == self.PLAYLIST_CREATE: return "playlist create"
+        elif mode == self.PLAYLIST_RENAME: return "playlist rename"
+        elif mode == self.PLAYLIST_ADD_AS_NEW: return "playlist add as new"
+        elif mode == self.PLAYLIST_ADD_TO_CURRENT: return "playlist add to current"
+        elif mode == self.PLAYLIST_SELECT_CURRENT: return "playlist select current"
+        else: return "Unknow mode: " + str(mode)
+        
 Mode = __Mode()

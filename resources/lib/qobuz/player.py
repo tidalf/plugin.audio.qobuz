@@ -31,29 +31,6 @@ from debug import info, warn
 
 from node.track import Node_track
 
-class xbmc_json_rpc():
-    def __init__(self):
-
-        pass
-
-    def _call(self, method, params = {}):
-        cmd = {
-               'jsonrpc': '2.0',
-               'method': method,
-        }
-        if params: cmd['params'] = params
-        print "JSONRPC CMD: " + pprint.pformat(cmd)
-        response = xbmc.executeJSONRPC(json.dumps( cmd))
-        print "JSONRPC Response: " + response
-        return response
-    
-    def Player_SetAudioStream(self, url):
-        return self._call('Player.SetAudioStream', { 'id': 0, 'url': url })
-    
-    def JSONRPC_Version(self):
-        return xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "JSONRPC.Version" }')
-        return self._call("JSONRPC.Version", None)
-
 class QobuzPlayer(xbmc.Player):
 
     def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
@@ -66,27 +43,38 @@ class QobuzPlayer(xbmc.Player):
         qobuz.api.report_streaming_start(self.id)
 
     def play(self, id):
+        #progress = xbmcgui.DialogProgress()
+        #progress.create("Qobuz Player")
         info(self, "Playing track: " + str(id))
         node = Node_track()
         node.set_id(id)
         node._set_cache()
-        node.set_data(node.cache.fetch_data())
-    
+        data = node.cache.fetch_data()
+        if not data:
+            warn(self, "Cannot get track data")
+            progress.update(25, "Cannot get data from Qobuz... abort")
+            progress.close()
+            return False
+        node.set_data(data)
+        #progress.update(50, "Getting stream url", node.get_label())
         lang = qobuz.lang
         item = node.make_XbmcListItem()
-        item.setProperty('mimetype', node.get_mimetype())
+        mimetype = node.get_mimetype()
+        if not mimetype: 
+            warn(self, "Cannot get track strem url")
+            #progress.update(50, "Cannot get stream url", node.get_label())
+            #progress.close()
+            return False
+        item.setProperty('mimetype', mimetype)
         item.setPath(node.get_streaming_url())
         watchPlayback = False
         '''
             PLaying track
         '''
+        #progress.update(75, "Playing song", node.get_label())
         if qobuz.addon.getSetting('notification_playingsong') == 'true':
             qobuz.gui.notifyH(lang(34000), node.get_label().encode('utf8', 'replace'), node.get_image())
-#        rpc = xbmc_json_rpc()
-#        print "JSON RPC Version: " + rpc.JSONRPC_Version()
-#        rpc.Player_SetAudioStream(node.get_streaming_url())
-#        print "INFO: " + xbmc.getInfoLabel('Container.FolderPath')
-#        return True
+
         '''
             We are called from playlist...
         '''
@@ -112,6 +100,10 @@ class QobuzPlayer(xbmc.Player):
                 break
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())
+            #progress.update(100, "Cannot play track:", node.get_label())
+            #progress.close()
             return False
+        #progress.update(100, "Playing track", node.get_label())
+        #progress.close()
         return True
 

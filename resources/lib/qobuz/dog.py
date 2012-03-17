@@ -30,7 +30,8 @@ class dog():
                              'view-filter': "^\d+$",
                              'depth': "^(-)?\d+$",
                              'query': "^.*$",
-                             'action': "^(scan)$"
+                             'action': "^(scan)$",
+                             'track-id': "^\d{1,10}$"
                              }
 
     ''' Match value against regexp '''

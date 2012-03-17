@@ -22,7 +22,7 @@ from flag import NodeFlag
 from node import Node
 from cache.track import Cache_track
 from cache.track_stream_url import Cache_track_stream_url
-from debug import error, debug
+from debug import error, debug, warn
 #from gettext import re
 '''
     NODE TRACK
@@ -45,8 +45,7 @@ class Node_track(Node):
             self._set_cache()
             self.set_data(self.cache.get_data())
             return True
-
-
+        
     def _set_cache(self):
         id = self.get_id()
         #print "ID: " + str(id )
@@ -179,6 +178,9 @@ class Node_track(Node):
     def get_mimetype(self):
         self._set_cache_streaming_url()
         data = self.cache_url.get_data()
+        if not data:
+            warn(self, "Cannot get mime/type for track (network problem?)")
+            return ''
         format = int(data['format_id'])
         mime = ''
         if format == 6:
@@ -230,3 +232,10 @@ class Node_track(Node):
         self.attach_context_menu(item)
         return item
 
+    def hook_attach_context_menu(self, item, menuItems):
+        color = qobuz.addon.getSetting('color_item')
+        if self.parent and self.parent.type & NodeFlag.TYPE_PLAYLIST:
+            url = self.parent.make_url(Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_id())
+            #print "URL: " + url
+            menuItems.append((qobuz.utils.color(color, "(i8n) Remove track: ")+ self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
+        

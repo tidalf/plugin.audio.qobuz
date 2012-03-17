@@ -50,6 +50,20 @@ def get_params():
                     warn('[DOG]', "Invalid key/value (" + splitparams[0] + ", " + splitparams[1] + ")")
     return rparam
 
+class xbmc_json_rpc():
+    
+    def __init__(self):
+        pass
+
+    def Introspect(self, id):
+        return xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "JSONRPC.Introspect", "id": %i }' % (id))
+
+    def AudioLibrary_GetAlbums(self, params = {}):
+        s = ''
+        if 'id' in params: s = '"id": "' + str(params['id']) + '"'
+        elif 'name' in params: s = '"Audio.Fields.Artist": "' + str(params['name']) + '"' 
+        return xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"AudioLibrary.GetAlbums","params":{"genreid": -1 ,"artistid": 1 ,"start": -1,"end": -1 }, "id":"AudioLibraryGetAlbums"}')
+
 '''
     QobuzBootstrap
 '''
@@ -75,7 +89,6 @@ class QobuzBootstrap(object):
             qobuz.gui.show_login_failure()
             exit(1)
         if qobuz.gui.is_free_account():
-            print "FREEEEEEEEEEEEEEEEEEEEEE"
             qobuz.gui.popup_free_account()
         self.dispatch()
 
@@ -202,20 +215,10 @@ class QobuzBootstrap(object):
         Execute methode based on MODE
     '''
     def dispatch(self):
-        import pprint
+        import pprint, xbmc
         ret = False
-#        cmd = '{"jsonrpc": "2.0", \
-#        "method": "AudioLibrary.GetAlbumDetails", \
-#        "params": {"properties": [ \
-#            "description", "albumlabel", "artist", "genre", "year", "thumbnail", "fanart", "rating"], "albumid":1128 }, "id": 1}'
-#        
-#        cmd = '{"jsonrpc": "2.0", \
-#        "method": "AudioLibrary.Clean"}'
-#        
-#
-#        response = qobuz.gui.executeJSONRPC(cmd)
-#        print "JSONRPC: " + pprint.pformat(response)
-#        
+        
+        info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt'])) ))
         if self.MODE == Mode.PLAY:
             info(self,"Playing song")
             self.bootstrap_player()
@@ -252,7 +255,7 @@ class QobuzBootstrap(object):
         id = None
         try: id = self.params['nid']
         except: pass
-
+        
         if self.MODE == Mode.VIEW:
             info(self,"Displaying node")
             r = renderer(nt,id)
@@ -272,31 +275,44 @@ class QobuzBootstrap(object):
             r.set_filter(NodeFlag.DONTFETCHTRACK)
             return r.scan()
         
-        elif self.MODE == Mode.SELECT_CURRENT_PLAYLIST:
+        elif self.MODE == Mode.PLAYLIST_SELECT_CURRENT:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             node.set_current_playlist(self.params['nid'])
 
-        elif self.MODE == Mode.CREATE_PLAYLIST:
+        elif self.MODE == Mode.PLAYLIST_CREATE:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             node.create_playlist()
 
-        elif self.MODE == Mode.ADD_TO_CURRENT_PLAYLIST:
+        elif self.MODE == Mode.PLAYLIST_ADD_TO_CURRENT:
             from  node.playlist import Node_playlist
             node = Node_playlist(None,self.params)
             node.add_to_current_playlist()
-
-        elif self.MODE == Mode.RENAME_PLAYLIST:
+            
+        elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
+            from  node.playlist import Node_playlist
+            node = Node_playlist(None,self.params)
+            node.add_as_new_playlist()
+        
+        elif self.MODE == Mode.PLAYLIST_RENAME:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             node.rename_playlist(self.params['nid'])
 
-        elif self.MODE == Mode.REMOVE_PLAYLIST:
+        elif self.MODE == Mode.PLAYLIST_REMOVE:
             from node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             node.remove_playlist(self.params['nid'])
 
+        elif self.MODE == Mode.PLAYLIST_REMOVE_TRACK:
+            from node.playlist import Node_playlist
+            node = Node_playlist(None, self.params)
+            node.set_id(self.params['nid'])
+            node.set_data(node.fetch_data())
+            print "Removing track from playlist: " + node.get_label()
+            node.remove_tracks(self.params['track-id'])
+            
         elif self.MODE == Mode.LIBRARY_SCAN:
             import urllib
             #from node.flag import NodeFlag
@@ -313,5 +329,5 @@ class QobuzBootstrap(object):
             xbmc.executebuiltin(s)
             return False
 
-#        else:
-#            error(self, "Unknow mode: " + str(self.MODE))
+        else:
+            error(self, "Unknow mode: " + str(self.MODE))

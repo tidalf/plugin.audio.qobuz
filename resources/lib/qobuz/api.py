@@ -41,7 +41,9 @@ class QobuzApi:
     def _api_request(self, params, uri):
         #qobuz.gui.notifyH('Qobuz API', uri, None, 500)
         url = "http://player.qobuz.com"
-        r = requests.post(url + uri, data = params)
+        #r = requests.post(url + uri, data = params, headers = { "x-api-auth-token": self.authtoken }, proxies = { "http": "127.0.0.1:8080" } )
+        r = requests.post(url + uri, data = params )
+        pprint.pprint(r)
         response_json = json.loads(r.content)
         error = None
         try:
@@ -193,11 +195,12 @@ class QobuzApi:
 
     def playlist_remove_track (self, playlist_id, playlist_track_id,):
         params = {'x-api-auth-token': self.authtoken,
-                                   'playlist_track_id': playlist_track_id,
-                                   'playlist_id': playlist_id}
-        log("info", "deleting " + playlist_track_id + "from playlist" + playlist_id)
-        return True
-        #return self._api_request(params,"/api.json/0.1/playlist/deleteTracks")
+                                   'playlist_id': playlist_id,
+                                   'playlist_track_ids': playlist_track_id,
+                                   }
+        log("info", "deleting " + playlist_track_id + " from playlist " + playlist_id)
+        #return True
+        return self._api_request(params,"/api.json/0.1/playlist/deleteTracks")
 
     def playlist_create (self, playlist_name, tracks_id = '', description = '', album_id = '', is_public = 'on', is_collaborative = 'off'):
         params = {'x-api-auth-token': self.authtoken,

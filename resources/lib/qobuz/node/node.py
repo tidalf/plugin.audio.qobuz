@@ -38,8 +38,17 @@ class Node(object):
         self.label2 = ""
         self.is_folder = True
         self._data = None
+        self.auto_set_cache = False
 
 
+    def set_cache(self):
+        warn(self, "node::set_cache (must be overloaded")
+        return False
+    
+    def set_auto_set_cache(self, b):
+        if b: self.auto_set_cache = True 
+        else: self.auto_set_cache = False
+        
     def delete_tree(self):
         for child in self.childs:
             child.delete_tree()
@@ -159,6 +168,8 @@ class Node(object):
 
     def set_id(self,id):
         self.id = id
+        if self.auto_set_cache:
+            self.set_cache()
         return self
 
     '''
@@ -167,7 +178,7 @@ class Node(object):
         TODO: check id consistency
     '''
     def get_id(self):
-        if self._data and 'id' in self._data and self._data:
+        if self._data and 'id' in self._data:
             return self._data['id']
         return self.id
 
@@ -283,15 +294,22 @@ class Node(object):
             menuItems.append((qobuz.utils.color(color, qobuz.lang(39004)),cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.ADD_TO_CURRENT_PLAYLIST))
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((qobuz.utils.color(color,qobuz.lang(39005)),cmd))
 
+        ''' ADD AS NEW '''
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))
+        menuItems.append((qobuz.utils.color(color, "(i8n) Add as new"),cmd))
+        
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):
             showplaylist = sys.argv[0] + "?mode=" + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_USERPLAYLISTS)
             menuItems.append((qobuz.utils.color(color, qobuz.lang(39006)),"XBMC.Container.Update(" + showplaylist + ")"))
 
-
+        if self.type & NodeFlag.TYPE_USERPLAYLISTS:
+            ''' CREATE '''
+            url = self.make_url(Mode.PLAYLIST_CREATE)
+            menuItems.append((qobuz.utils.color(color, qobuz.lang(39008)), "XBMC.RunPlugin("+url+")"))
         ''' 
         Give a chance to our siblings to attach their items
         '''

@@ -42,14 +42,18 @@ class Node_playlist(Node):
         self.url = None
         self.set_is_folder(True)
         self.cache = None
-        self.packby = 'album'
+        self.packby = ''#album'
         self.image = qobuz.image.access.get('playlist')
         if self.packby == 'album':
             self.set_content_type('albums')
         else:
             self.set_content_type('songs')
+        self.set_auto_set_cache(True)
 
     def get_label(self):
+        return self.get_name()
+    
+    def get_name(self):
         return self.get_property('name')
     
     def set_is_my_playlist(self, b):
@@ -61,7 +65,7 @@ class Node_playlist(Node):
     def is_current(self):
         return self.b_is_current
 
-    def _set_cache(self):
+    def set_cache(self):
         id = self.get_id()
         if not id:
             try: id = self.get_parameter('nid')
@@ -70,12 +74,11 @@ class Node_playlist(Node):
             error(self, "Cannot set cache without id")
             return False
         self.cache = Cache_playlist(id)
-        self.set_id(id)
         return True
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         info(self, "Build-down playlist")
-        if not self._set_cache():
+        if not self.set_cache():
             error(self, "Cannot set cache!")
             return False
         data = self.cache.fetch_data()
@@ -95,11 +98,10 @@ class Node_playlist(Node):
                 if 'image' in jtrack: jalbum['image'] = jtrack['image']
                 node = Node_product()
                 node.set_data(jalbum)
-                
+                albumseen[jalbum['id']] = node
             else:
                 node = Node_track()
                 node.set_data(jtrack)
-            albumseen[jalbum['id']] = node
             self.add_child(node)
             
     def get_name(self):
@@ -142,33 +144,38 @@ class Node_playlist(Node):
         label = self.get_label()
         
         ''' SET AS CURRENT '''
-        url = self.make_url(Mode.SELECT_CURRENT_PLAYLIST)
+        url = self.make_url(Mode.PLAYLIST_SELECT_CURRENT)
         menuItems.append((qobuz.utils.color(color, qobuz.lang(39007).encode('utf8', 'replace') + ': ') + label, "XBMC.RunPlugin("+url+")"))
                 
         ''' CREATE '''
-        url = self.make_url(Mode.CREATE_PLAYLIST)
+        url = self.make_url(Mode.PLAYLIST_CREATE)
         menuItems.append((qobuz.utils.color(color, qobuz.lang(39008)), "XBMC.RunPlugin("+url+")"))
 
         ''' RENAME '''
-        url = self.make_url(Mode.RENAME_PLAYLIST)
+        url = self.make_url(Mode.PLAYLIST_RENAME)
         menuItems.append((qobuz.utils.color(color, qobuz.lang(39009).encode('utf8', 'replace') + ': ') + label, "XBMC.RunPlugin("+url+")"))
 
         ''' REMOVE '''
-        url = self.make_url(Mode.REMOVE_PLAYLIST)
+        url = self.make_url(Mode.PLAYLIST_REMOVE)
         menuItems.append((qobuz.utils.color(color_warn, qobuz.lang(39010).encode('utf8', 'replace') + ': ') + label, "XBMC.RunPlugin("+url+")"))
-
-
+        
+        
     def remove_tracks(self, tracks_id):
-        import qobuz
+        import qobuz, xbmc
         info(self, "Removing tracks: " + tracks_id)
-        if not qobuz.api.playlist_remove_track(self.id, tracks_id):
+        result = qobuz.api.playlist_remove_track(self.id, tracks_id)
+        pprint.pprint(result)
+        if not result:
             warn(self, "Cannot remove tracks from playlist: " + str(self.id))
+            qobuz.gui.notifyH('Qobuz Playlist / Remove track', "Fail to remove track")
             return False
         info(self, "Tracks removed from playlist: " + str(self.id))
+        self.cache.delete_cache()
+        xbmc.executebuiltin('Container.Refresh')
         return True
 
 
-    def add_to_current_playlist(self, ):
+    def add_to_current_playlist(self):
             from renderer.xbmc_directory import xbmc_directory
             from cache.current_playlist import Cache_current_playlist
             current_playlist = Cache_current_playlist()
@@ -187,12 +194,15 @@ class Node_playlist(Node):
             view_filter = 0
             try: view_filter = int(self.get_parameter('view-filter'))
             except: pass
-            r = renderer(nt, id)
-            r.set_depth(depth)
-            r.set_filter(view_filter)
-            r.set_root_node()
-            dir = xbmc_directory(r.root, qobuz.boot.handle, True)
-            ret = r.root.build_down(dir, depth, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
+            render = renderer(nt, id)
+            render.set_depth(depth)
+            render.set_filter(view_filter)
+            render.set_root_node()
+            dir = xbmc_directory(render.root, qobuz.boot.handle, True)
+            flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
+            if render.root.type & NodeFlag.TYPE_TRACK:
+                flags = NodeFlag.TYPE_TRACK
+            ret = render.root.build_down(dir, depth, flags)
             if not ret: return False
             trackids = []
             if len(dir.nodes) < 1:
@@ -202,10 +212,13 @@ class Node_playlist(Node):
                 trackids.append(node.get_id())
             strtracks = ','.join(trackids)
             ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
-            
             from utils.cache import cache_manager
             from cache.playlist import Cache_playlist
             cm = cache_manager()
             pl = Cache_playlist(current_playlist.get_id())
             cm.delete(pl.get_cache_path())
             dir.close()
+            
+    def add_as_new_playlist(self):
+        print "ADD AS NEW PLAYLIST (FAKE :p)"
+        pass
