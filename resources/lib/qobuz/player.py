@@ -105,5 +105,12 @@ class QobuzPlayer(xbmc.Player):
             return False
         #progress.update(100, "Playing track", node.get_label())
         #progress.close()
+        watch_playing(node)
         return True
-
+    
+def watch_playing(node):
+    print "Watching ..."
+    player = xbmc.Player()
+    while player.isPlayingAudio():
+        print "Playing track: " + player.getPlayingFile()
+    pass

@@ -90,7 +90,7 @@ class QobuzBootstrap(object):
             exit(1)
         if qobuz.gui.is_free_account():
             qobuz.gui.popup_free_account()
-        self.dispatch()
+        return self.dispatch()
 
     def bootstrap_lang(self):
         qobuz.lang = qobuz.addon.getLocalizedString

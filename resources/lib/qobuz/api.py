@@ -40,25 +40,11 @@ class QobuzApi:
         self.retry_num = 0
 
     def _api_request(self, params, uri):
-        #qobuz.gui.notifyH('Qobuz API', uri, None, 500)
         url = "http://player.qobuz.com"
         
-        # mimic browser
-        #qheaders = { 
-        #             "Origin": "http://player.qobuz.com",            
-        #             "X-Requested-With": "XMLHttpRequest",
-        #             "User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.79 Safari/535.11",
-        #             "Content-Type": "application/x-www-form-urlencoded",
-        #             "Accept": "application/json, text/javascript, */*; q=0.01",
-        #             "Referer": "http://player.qobuz.com/",
-        #             "Accept-Encoding": "gzip,deflate,sdch",
-        #             "Accept-Language": "en-US,en;q=0.8",
-        #             "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.3"
-        #             }  
-        qheaders = {}
+        qheaders={}
         if self.authtoken:
             qheaders["x-api-auth-token"] = self.authtoken
-            self.cookie["__qobuz_remember"] = self.authtoken
             
         r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
         if r.cookies: 
@@ -82,7 +68,6 @@ class QobuzApi:
 
     def login(self, user, password):
         from cache.authentication import Cache_authentication
-        #from cache.authentication import Cache_authentication
         auth = Cache_authentication(user, password)
         data = auth.get_data()
         if not data:
@@ -91,8 +76,6 @@ class QobuzApi:
         self.userid = data['user']['id']
         self.auth = auth
         self.cookie = data['cookie']
-        print "OUR COOOOOOKIE: " + pprint.pformat(self.cookie)
-        #self.auf = data['user']['credential']['allowed_audio_format_ids']
         return auth
 
     def get_track_url(self, track_id, context_type, context_id , format_id = 6):
@@ -200,7 +183,6 @@ class QobuzApi:
         except:
             warn(self, 'No authentification token')
             return None
-        #info(self, "Report Streaming stop for user:  " + str(self.userid) + ", track: " + str(track_id))
         params = {'x-api-auth-token': token,
                                    'user_id': self.userid,
                                    'track_id': track_id,
@@ -220,7 +202,6 @@ class QobuzApi:
                                    'playlist_track_ids': playlist_track_id,
                                    }
         log("info", "deleting " + playlist_track_id + " from playlist " + playlist_id)
-        #return True
         return self._api_request(params,"/api.json/0.1/playlist/deleteTracks")
 
     def playlist_create (self, playlist_name, tracks_id = '', description = '', album_id = '', is_public = 'on', is_collaborative = 'off'):
@@ -235,7 +216,6 @@ class QobuzApi:
                                    'deezer_playlist_url':''}
 
         log("info", "creating new playlist" + repr(playlist_name) + "with (or without) tracks :" + tracks_id + ")")
-        #&is_public=on&spotify_track_uris=&deezer_playlist_url=&track_ids=1068442%2C1068443%2C1068444&album_id=&is_collaborative=off
         return self._api_request(params, "/api.json/0.1/playlist/create")
 
     def playlist_delete (self, playlist_id):
@@ -253,8 +233,6 @@ class QobuzApi:
                                    'spotify_track_uris' : '',
                                    'deezer_playlist_url': '',
                                    'playlist_id'        : playlist_id }
-        #name=John+Coltrane+Quartet&description=John+Coltrane+Quartet&is_public=on&spotify_track_uris=&deezer_playlist_url=&playlist_id=78237&is_collaborative=off
-
         log("info", "updating playlist " + str(playlist_id))
         res = self._api_request(params, "/api.json/0.1/playlist/update")
         return res
@@ -268,8 +246,6 @@ class QobuzApi:
                   'api_key': 'b25b959554ed76058ac220b7b2e0a026',
         }
         r = requests.post(url, data = params)
-        #response_json = json.loads(r.content)
-        #print "Content: " + r.content.encode('utf8', 'replace')
         return r.content
     
 if __name__ == '__main__':
