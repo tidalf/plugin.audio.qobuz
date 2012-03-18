@@ -46,9 +46,17 @@ class QobuzApi:
         if self.authtoken:
             qheaders["x-api-auth-token"] = self.authtoken
             
-        r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
+        r = None
+        try: 
+            r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
+        except:
+            warn(self, "API Error: POST fail")
+            return None
         if r.cookies: 
                 self.cookie = r.cookies
+        if not r.content:
+            warn(self, "No content return")
+            return None
         response_json = json.loads(r.content)
         error = None
         try:

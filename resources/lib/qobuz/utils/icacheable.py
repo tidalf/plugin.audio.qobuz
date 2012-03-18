@@ -35,6 +35,7 @@ class ICacheable(object):
         self.cache_object_name = None
         self.set_hashing_path(hash_path)
         self.set_cache_path(path, name, id)
+        self.no_network = False
         
     def set_hashing_path(self, b):
         if b: self.hashing_path = True
@@ -144,6 +145,9 @@ class ICacheable(object):
         debug(self, "Fetching data: " + cache)
         data = self._load_cache_data()
         if not data:
+            if self.no_network: 
+                info(self, "No network flag set (don't)")
+                return None
             debug(self, "No data cached, fetching new one")
             data = self._fetch_data()
             if data == None:

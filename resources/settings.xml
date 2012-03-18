@@ -59,7 +59,7 @@
    <category label="33101">
         <setting id="color_item" label="33102" type="text" default="FF59A9C5" />
         <setting id="color_item_caution" label="33103" type="text" default="FFFF0000" />
-        <setting id="color_item_playlist" label="33104" type="text" default="FFAA4455" />
+        <setting id="color_item_playlist" label="33104" type="text" default="FFFFFFFF" />
         
    </category>       
    <!-- Other -->

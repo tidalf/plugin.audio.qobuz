@@ -219,6 +219,8 @@ class QobuzBootstrap(object):
         ret = False
         
         info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt'])) ))
+        
+        ''' PLAY '''
         if self.MODE == Mode.PLAY:
             info(self,"Playing song")
             self.bootstrap_player()
@@ -232,6 +234,10 @@ class QobuzBootstrap(object):
                 return True
             return False
         
+        elif self.MODE == Mode.GET_IMAGE:
+            print "GET IMAGE"
+            return False
+        # ERASE CACHE '''
         elif self.MODE == Mode.ERASE_CACHE:
             import xbmcgui
             ok = xbmcgui.Dialog().yesno('Remove cached data',

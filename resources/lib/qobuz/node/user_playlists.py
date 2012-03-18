@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
+import random
 import pprint
 
 import qobuz
@@ -72,12 +73,31 @@ class Node_user_playlists(Node):
         for playlist in data:
             node = Node_playlist()
             node.set_data(playlist)
+            image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
+            if not image: image = self.get_random_image(node)
+            if image: node.image = image
             if (cpls_id and cpls_id == str(node.get_id())):
                 node.set_is_current(True)
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
             self.add_child(node)
         return True
+    
+    def get_random_image(self, node):
+        node.set_cache()
+        node.cache.no_network = True
+        newdata = node.cache.fetch_data()
+        image = None
+        if not newdata: return None 
+        node.set_data(newdata)
+        size = len(newdata['tracks'])
+        if size < 1: return None
+        r = random.randint(0, len(newdata['tracks']) - 1)
+        try: image = newdata["tracks"][r]['album']['image']['large']
+        except: warn(self, "Cannot get random image for playlist")
+        if not image: return None
+        qobuz.image.cache.set("playlist-"+str(node.get_id()), image)
+        return image
         
     def set_current_playlist(self, id):
         import xbmc

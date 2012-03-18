@@ -46,7 +46,7 @@ class Node_track(Node):
             self.set_data(self.cache.get_data())
             return True
         
-    def _set_cache(self):
+    def set_cache(self):
         id = self.get_id()
         #print "ID: " + str(id )
         if not id:
@@ -56,7 +56,7 @@ class Node_track(Node):
         if not id:
             error(self, "Cannot set cache without id")
             return False
-        self.set_id(id)
+        #self.set_id(id)
         self.cache = Cache_track(id, 'playlist', False)
         return True
     

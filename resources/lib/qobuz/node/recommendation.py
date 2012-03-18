@@ -17,6 +17,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import random
 import pprint
 
 import xbmcgui
@@ -76,59 +77,47 @@ class Node_recommendation(Node):
             url += "&action=scan"
         return url
 
-    def setGenreType(self, type):
+    def set_genre_type(self, type):
         self.genre_type = type
 
-    def setGenreId(self, id):
+    def set_genre_id(self, id):
         self.genre_id = id
 
-    def getGenreType(self):
+    def get_genre_type(self):
         return self.genre_type
 
-    def getGenreId(self):
+    def get_genre_id(self):
         return self.genre_id
 
 # TYPE
     def _build_recos_type(self, lvl, flag):
         types = []
         color = qobuz.addon.getSetting('color_item')
-        types.append(('new-releases', qobuz.lang(30084)))
-        types.append(('press-awards', qobuz.lang(30083)))
-        types.append(('best-sellers', qobuz.lang(30085)))
-        types.append(('editor-picks', qobuz.lang(30086)))
-        for t in RECOS_TYPES:
-            print "T0: " + t
+        for gtype in RECOS_TYPES:
             node = Node_recommendation()
-            node.setGenreType(t)
-            node.set_label(qobuz.utils.color(color, RECOS_TYPES[t]))
+            node.set_genre_type(gtype)
+            node.set_label(qobuz.utils.color(color, RECOS_TYPES[gtype]))
             self.add_child(node)
         return True
 
 # GENRE
     def _build_recos_genre(self, lvl, flag):
         types = []
-        types.append((2, qobuz.lang(30093)))
-        types.append((10, qobuz.lang(30095)))
-        types.append((6, qobuz.lang(30090)))
-        types.append((59, qobuz.lang(30098)))
-        types.append((73, qobuz.lang(30201)))
-        types.append((80, qobuz.lang(30089)))
-        types.append((64, qobuz.lang(30202)))
-        types.append((91, qobuz.lang(30094)))
-        types.append((94, qobuz.lang(30092)))
-        types.append((112, qobuz.lang(30087)))
-        types.append((127, qobuz.lang(30200)))
-        types.append((123, qobuz.lang(30203)))
         color = qobuz.addon.getSetting('color_item')
-        for t in RECOS_GENRES:
+        for genreid in RECOS_GENRES:
             node = Node_recommendation()
-            node.setGenreType(self.getGenreType())
-            node.setGenreId(int(t))
-            node.set_label(qobuz.utils.color(color, RECOS_TYPES[self.genre_type] + ' / ') + RECOS_GENRES[t])
+            type = self.get_genre_type()
+            node.set_genre_type(self.get_genre_type())
+            node.set_genre_id(int(genreid))
+            image_name = 'recos-%s-%s' % (type, genreid)
+            print "GET image name: " + image_name
+            image = qobuz.image.cache.get(image_name)
+            if image: node.image = image
+            node.set_label(qobuz.utils.color(color, RECOS_TYPES[self.genre_type] + ' / ') + RECOS_GENRES[genreid])
             self.add_child(node)
         return True
 
-
+    
 # TYPE GENRE
     def _build_down_type_genre(self, lvl, flag):
         self.cache = Cache_recommendation(self.genre_id, self.genre_type)
@@ -137,21 +126,41 @@ class Node_recommendation(Node):
             warn(self, "Cannot fetch data for recommendation")
             return False
         self.set_data(data)
+        image_name = 'recos-%s-%i' % (self.get_genre_type(), self.get_genre_id())
+        print "Image name: " + image_name
+        image = qobuz.image.cache.get(image_name)
+        if not image: self._get_random_image_type_genre(image_name, data)
         for product in data:
             node = Node_product()
             node.set_data(product)
             self.add_child(node)
         return True
 
-    def cache_image(self, product):
-        id = 'recos-'+self.genre_type
-        image = qobuz.image.cache.get(id)
-        if not image: 
-            qobuz.image.cache.set(id, product.get_image())
-        id = 'recos-'+self.genre_type + '-' + str(self.genre_id)
-        image = qobuz.image.cache.get(id)
-        if not image: 
-            qobuz.image.cache.set(id, product.get_image())
+    def _get_random_image_type_genre(self, image_name, data):
+        if not data: return None
+        size = len(data)
+        if size < 1: return None
+        r = random.randint(0, size - 1)
+        image = ''
+        print pprint.pformat(data[r])
+        try: 
+            
+            image = data[r]['image']['large']
+            image.replace("_230.", "_600.")
+        except: pass
+        if not image: return None
+        qobuz.image.cache.set(image_name, image)
+        return image
+    
+#    def cache_image(self, product):
+#        id = 'recos-'+self.genre_type
+#        image = qobuz.image.cache.get(id)
+#        if not image: 
+#            qobuz.image.cache.set(id, product.get_image())
+#        id = 'recos-'+self.genre_type + '-' + str(self.genre_id)
+#        image = qobuz.image.cache.get(id)
+#        if not image: 
+#            qobuz.image.cache.set(id, product.get_image())
         
 
 # DISPATCH

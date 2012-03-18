@@ -33,22 +33,21 @@
 	<type>9</type>
 
 	<!-- (required) Title -->
-	<title>Qobuz XBMC 2.x</title>
+	<title>Qobuz XBMC</title>
 
 	<!-- (required) Major.minor.build -->
-	<version>0.2.0</version>
+	<version>0.9.0</version>
 
 	<!--
 		(required) author name & email. at least one author name is required
 	-->
 	<authors>
-		<author name="Stephen Denham" email="stephen.denham@gmail.com" />
 		<author name="Tidalf" email="tidalf@ematome.com" />
-		<author name="Joachim Basmaison" email="joachim.basmaison@gmail.om" />
+		<author name="Joachim Basmaison" email="joachim.basmaison@gmail.com" />
 	</authors>
 
 	<!-- (required) Short description of addon. -->
-	<summary>Qobuz addon for XBMC (2.x)</summary>
+	<summary>Qobuz addon for XBMC)</summary>
 
 	<!--
 		Longer descrption of addon. Usage instructions should go here if

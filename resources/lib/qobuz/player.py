@@ -35,20 +35,31 @@ class QobuzPlayer(xbmc.Player):
 
     def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
         super(QobuzPlayer, self).__init__()
+        self.track_id = None
+        self.total = None
+        self.elapsed = None
 
-    def sendQobuzPlaybackEnded(self, duration):
-        qobuz.api.report_streaming_stop(self.id, duration)
+    def sendQobuzPlaybackEnded(self, track_id, duration):
+        qobuz.api.report_streaming_stop(track_id, duration)
 
-    def sendQobuzPlaybackStarted(self,):
-        qobuz.api.report_streaming_start(self.id)
+    def sendQobuzPlaybackStarted(self,track_id):
+        qobuz.api.report_streaming_start(track_id)
 
+    def onPlayBackEnded(self):
+        print "################### onPlayBackEnded"
+        self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
+    
+    def onPlayBackStopped(self):
+        print "onPlayBackStopped"
+        self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
+        
     def play(self, id):
         #progress = xbmcgui.DialogProgress()
         #progress.create("Qobuz Player")
         info(self, "Playing track: " + str(id))
         node = Node_track()
         node.set_id(id)
-        node._set_cache()
+        node.set_cache()
         data = node.cache.fetch_data()
         if not data:
             warn(self, "Cannot get track data")
@@ -66,7 +77,8 @@ class QobuzPlayer(xbmc.Player):
             #progress.close()
             return False
         item.setProperty('mimetype', mimetype)
-        item.setPath(node.get_streaming_url())
+        streaming_url = node.get_streaming_url()
+        item.setPath(streaming_url)
         watchPlayback = False
         '''
             PLaying track
@@ -80,20 +92,20 @@ class QobuzPlayer(xbmc.Player):
         '''
         
         if qobuz.boot.handle == -1:
-            super(QobuzPlayer, self).play(node.get_streaming_url(), item, False)
+            super(QobuzPlayer, self).play(streaming_url, item, False)
         else:
             xbmcplugin.setResolvedUrl(handle = qobuz.boot.handle, succeeded = True, listitem = item)
         '''
             May be a bad idea!!!
         '''
-        xbmc.executebuiltin('Dialog.Close(all,true)')
+        #xbmc.executebuiltin('Dialog.Close(all,true)')
         '''
             Waiting for song to start
         '''
         timeout = 30
         info(self, "Waiting song to start")
         while timeout > 0:
-            if self.isPlayingAudio() == False:
+            if self.isPlayingAudio() == False or self.getPlayingFile() != streaming_url:
                 xbmc.sleep(250)
                 timeout -= 0.250
             else:
@@ -105,12 +117,28 @@ class QobuzPlayer(xbmc.Player):
             return False
         #progress.update(100, "Playing track", node.get_label())
         #progress.close()
-        watch_playing(node)
+        self.watch_playing( node, streaming_url)
         return True
     
-def watch_playing(node):
-    print "Watching ..."
-    player = xbmc.Player()
-    while player.isPlayingAudio():
-        print "Playing track: " + player.getPlayingFile()
-    pass
+    def watch_playing(self, node, streaming_url):
+        #print "Watching ..."
+        import time
+        #player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+        start = None
+        end = None
+        self.total = None
+        self.elapsed = None
+        self.track_id = node.get_id()
+        while self.isPlayingAudio() and self.getPlayingFile() == streaming_url:
+            #print "Playing track: " +  self.getPlayingFile()
+            #print "Time: " +  str(self.getTime())
+            self.total = self.getTotalTime()
+            self.elapsed = self.getTime()
+            if not start and self.elapsed >= 5:
+                print "Start"
+                self.sendQobuzPlaybackStarted(node.get_id())
+                start = True
+            xbmc.sleep(1000)
+        # print "Duration: " + str(self.total - self.elapsed )
+        # self.sendQobuzPlaybackEnded(node.get_id(), self.total - self.elapsed)
+        # print "End of track"

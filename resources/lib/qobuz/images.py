@@ -19,6 +19,7 @@ import os
 from debug import *
 from utils.icacheable import ICacheable
 import qobuz
+import time
 
 class QobuzImage_access():
 
@@ -69,14 +70,14 @@ class QobuzImage_cache(ICacheable):
     def set(self, id, image):
         print "SET IMAGE: " + str(id) + ' / ' +  image 
         data = self.get_raw_data()
-        data[id] = image
+        data[id] = { 'url': image, 'time': time.time() }
         self._save_cache_data(data)
         return image
 
     def get(self, id):
         data = self.get_data()
-        if id in data:
-            return data[id]
+        if id in data and (time.time() - data[id]['time']) < 3600:
+            return data[id]['url']
         return ''
 
 class QobuzImage():
