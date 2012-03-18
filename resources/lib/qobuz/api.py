@@ -32,6 +32,7 @@ class QobuzApi:
     def __init__(self):
         self.auth = None
         self.authtoken = None
+        self.cookie = None
         self.userid = None
         self.auf = None
         self.token_validity_time = 3600
@@ -41,9 +42,27 @@ class QobuzApi:
     def _api_request(self, params, uri):
         #qobuz.gui.notifyH('Qobuz API', uri, None, 500)
         url = "http://player.qobuz.com"
-        #r = requests.post(url + uri, data = params, headers = { "x-api-auth-token": self.authtoken }, proxies = { "http": "127.0.0.1:8080" } )
-        r = requests.post(url + uri, data = params )
-        pprint.pprint(r)
+        
+        # mimic browser
+        #qheaders = { 
+        #             "Origin": "http://player.qobuz.com",            
+        #             "X-Requested-With": "XMLHttpRequest",
+        #             "User-Agent": "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.79 Safari/535.11",
+        #             "Content-Type": "application/x-www-form-urlencoded",
+        #             "Accept": "application/json, text/javascript, */*; q=0.01",
+        #             "Referer": "http://player.qobuz.com/",
+        #             "Accept-Encoding": "gzip,deflate,sdch",
+        #             "Accept-Language": "en-US,en;q=0.8",
+        #             "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.3"
+        #             }  
+        qheaders = {}
+        if self.authtoken:
+            qheaders["x-api-auth-token"] = self.authtoken
+            self.cookie["__qobuz_remember"] = self.authtoken
+            
+        r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
+        if r.cookies: 
+                self.cookie = r.cookies
         response_json = json.loads(r.content)
         error = None
         try:
@@ -71,7 +90,9 @@ class QobuzApi:
         self.authtoken = data['user']['session_id']
         self.userid = data['user']['id']
         self.auth = auth
-        self.auf = data['user']['credential']['allowed_audio_format_ids']
+        self.cookie = data['cookie']
+        print "OUR COOOOOOKIE: " + pprint.pformat(self.cookie)
+        #self.auf = data['user']['credential']['allowed_audio_format_ids']
         return auth
 
     def get_track_url(self, track_id, context_type, context_id , format_id = 6):

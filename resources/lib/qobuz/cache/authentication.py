@@ -52,6 +52,7 @@ class Cache_authentication(ICacheable):
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
         if not data['user']['id']: return None
+        data['cookie'] = qobuz.api.cookie
         data['user']['email'] = ''
         data['user']['firstname'] = ''
         data['user']['lastname'] = ''

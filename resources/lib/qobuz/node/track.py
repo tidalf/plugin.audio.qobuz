@@ -235,7 +235,7 @@ class Node_track(Node):
     def hook_attach_context_menu(self, item, menuItems):
         color = qobuz.addon.getSetting('color_item')
         if self.parent and self.parent.type & NodeFlag.TYPE_PLAYLIST:
-            url = self.parent.make_url(Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_id())
+            url = self.parent.make_url(Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
             #print "URL: " + url
             menuItems.append((qobuz.utils.color(color, "(i8n) Remove track: ")+ self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
         
