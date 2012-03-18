@@ -2,7 +2,7 @@
 -----
 * re-add context items (playlist management, track/album/artist navigation, etc.)
 
-releaase
+release
 
 0.2.0
 -----
