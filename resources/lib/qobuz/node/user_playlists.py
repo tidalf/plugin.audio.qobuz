@@ -47,6 +47,10 @@ class Node_user_playlists(Node):
         self.set_display_by(display_by)
         self.cache = Cache_user_playlists()
         self.cache_current_playlist = Cache_current_playlist()
+        display_cover = qobuz.addon.getSetting('userplaylists_display_cover')
+        if display_cover == 'true': display_cover = True 
+        else: display_cover = False
+        self.display_product_cover = display_cover
         
 
     def set_display_by(self, type):
@@ -73,9 +77,10 @@ class Node_user_playlists(Node):
         for playlist in data:
             node = Node_playlist()
             node.set_data(playlist)
-            image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
-            if not image: image = self.get_random_image(node)
-            if image: node.image = image
+            if self.display_product_cover:
+                image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
+                if not image: image = self.get_random_image(node)
+                if image: node.image = image
             if (cpls_id and cpls_id == str(node.get_id())):
                 node.set_is_current(True)
             if node.get_owner() == login:

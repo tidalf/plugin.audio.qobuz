@@ -67,7 +67,7 @@
         <setting id="notification_playingsong" label="36003" type="bool" default="false" />
         <!-- <setting id="resolver_enabled" label="33000" type="bool" default="true" /> -->
         <setting id="debug" label="Debug" type="bool" default="false" />
-    <setting id="warn_free_account" type="bool" default="true" option="hidden"/>
+    	<setting id="userplaylists_display_cover" label="(i8n) Playlist - show cover" type="bool" default="true"/>
    </category>   	
-
+	<setting id="warn_free_account" type="bool" default="true" option="hidden"/>
 </settings>
