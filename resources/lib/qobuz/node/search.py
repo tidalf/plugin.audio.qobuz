@@ -106,7 +106,7 @@ class Node_search(Node):
             warn(self, "Search return no data")
             return False
         self.notify_data_result(data)
-        print pprint.pformat(data)
+        #print pprint.pformat(data)
         if self.search_type == 'albums':
             for json_product in data:
                 json_product = json_product['product']

@@ -83,7 +83,7 @@ class Node_playlist(Node):
         if not self.set_cache():
             error(self, "Cannot set cache!")
             return False
-        data = self.cache.fetch_data()
+        data = self.cache.fetch_data(xbmc_directory.Progress)
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False

@@ -254,9 +254,9 @@ class QobuzBootstrap(object):
         nt = None
         try: nt = int(self.params['nt'])
         except:
-            print "No node type...abort"
+            warn(self, "No node type...abort")
             return False
-        print "Node type: " + str(nt)
+        info(self, "Node type: " + str(nt))
 
         id = None
         try: id = self.params['nid']

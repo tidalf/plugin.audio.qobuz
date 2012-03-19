@@ -109,10 +109,10 @@ class Node_recommendation(Node):
             type = self.get_genre_type()
             node.set_genre_type(self.get_genre_type())
             node.set_genre_id(int(genreid))
-            image_name = 'recos-%s-%s' % (type, genreid)
-            print "GET image name: " + image_name
-            image = qobuz.image.cache.get(image_name)
-            if image: node.image = image
+            if qobuz.addon.getSetting('userplaylists_display_cover') == 'true':
+                image_name = 'recos-%s-%s' % (type, genreid)
+                image = qobuz.image.cache.get(image_name)
+                if image: node.image = image
             node.set_label(qobuz.utils.color(color, RECOS_TYPES[self.genre_type] + ' / ') + RECOS_GENRES[genreid])
             self.add_child(node)
         return True
@@ -126,10 +126,10 @@ class Node_recommendation(Node):
             warn(self, "Cannot fetch data for recommendation")
             return False
         self.set_data(data)
-        image_name = 'recos-%s-%i' % (self.get_genre_type(), self.get_genre_id())
-        print "Image name: " + image_name
-        image = qobuz.image.cache.get(image_name)
-        if not image: self._get_random_image_type_genre(image_name, data)
+        if qobuz.addon.getSetting('userplaylists_display_cover') == 'true':
+            image_name = 'recos-%s-%i' % (self.get_genre_type(), self.get_genre_id())
+            image = qobuz.image.cache.get(image_name)
+            if not image: self._get_random_image_type_genre(image_name, data)
         for product in data:
             node = Node_product()
             node.set_data(product)

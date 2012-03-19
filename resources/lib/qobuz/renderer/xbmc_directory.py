@@ -18,11 +18,15 @@ class xbmc_directory():
         self.ALL_AT_ONCE = ALL_AT_ONCE
         self.handle = handle
         self.put_item_ok = True
-        self.Progress = Progress(False)
+        self.Progress = Progress(True)
         self.total_put = 0
         self.started_on = time.time()
         self.Progress.create(self.label + root.get_label())
         self.update(0, 100, qobuz.lang(40000))
+        self.line1 = ''
+        self.line2 = ''
+        self.line3 = ''
+        self.percent = 0
 
     def elapsed(self):
         return time.time() - self.started_on
@@ -39,7 +43,6 @@ class xbmc_directory():
         seconds = time % 60
         return '%02i:%02i:%02i' % (hours, minutes, seconds)
     
-        
     def update(self, count, total, line1, line2 = '', line3 = ''):
         percent = 100
         if total and count:
@@ -49,6 +52,10 @@ class xbmc_directory():
             if percent > 100: percent = 100
         pet = self._pretty_time(int(self.elapsed()))
         line1 = '[%05i / %s] %s' % (self.total_put, pet, line1)
+        self.line1 = line1
+        self.line2 = line2
+        self.line3 = line3
+        self.percent = percent
         self.Progress.update(percent, line1, line2, line3)
         return True
     

@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os
 import time
-import pickle
+import cPickle as pickle
 import hashlib
 
 from debug import log, info, error, warn, debug
@@ -137,17 +137,19 @@ class ICacheable(object):
     def get_raw_data(self):
         return self._raw_data
 
-    def fetch_data(self):
+    def fetch_data(self, progress = None):
         cache = self.get_cache_path()
         if not cache:
             warn(self, "No cache path, cannot fetch data")
             return None
         debug(self, "Fetching data: " + cache)
+        if progress: progress.update_line3("Fetching data ...")
         data = self._load_cache_data()
         if not data:
             if self.no_network: 
                 info(self, "No network flag set (don't)")
                 return None
+            if progress: progress.update_line3("Fetching data from Internet")
             debug(self, "No data cached, fetching new one")
             data = self._fetch_data()
             if data == None:

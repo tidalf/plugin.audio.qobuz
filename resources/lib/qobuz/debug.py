@@ -32,11 +32,9 @@ try:
     LOGNOTICE = xbmc.LOGNOTICE
     LOGERROR = xbmc.LOGERROR
     LOGSEVERE = xbmc.LOGSEVERE
-    __debugging__ = True
+    __debugging__ = False
     if xbmcaddon.Addon(id = 'plugin.audio.qobuz2').getSetting('debug') == 'true':
         __debugging__ = True
-    else:
-        __debugging__ = False
     
 except:
     LOGDEBUG = '[DEBUG]'

@@ -36,15 +36,29 @@ class Progress(xbmcgui.DialogProgress):
         self.is_cancelable = True
         if self.active:
             super(Progress, self).__init__()
-
+        self.line1 = ''
+        self.line2 = ''
+        self.line3 = ''
+        self.percent = 0
+        
     def create(self, line1, line2 = '', line3 = ''):
+        self.line1 = line1
+        self.line2 = line2
+        self.line3 = line3
         if not self.active: return False
         return super(Progress, self).create(line1, line2, line3)
     
     def update(self, percent, line1, line2 = '', line3 = ''):
+        self.line1 = line1
+        self.line2 = line2
+        self.line3 = line3
         if not self.active: return False
         return super(Progress, self).update(percent, line1, line2, line3)
-
+        
+    def update_line3(self, line):
+        self.line3 = line
+        return self.update(self.percent, self.line1, self.line2, line)
+    
     def iscanceled(self):
         if not self.active: return False
         if not self.is_cancelable: return False
