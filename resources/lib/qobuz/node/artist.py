@@ -27,6 +27,7 @@ from node import Node
 from product import Node_product
 #from debug import info, warn, error, debug
 from debug import warn
+import weakref
 '''
     NODE ARTIST
 '''
@@ -68,7 +69,7 @@ class Node_artist(Node):
         for jproduct in data['artist']['albums']:
             keys = ['artist', 'interpreter', 'composer']
             for k in keys:
-                if k in data['artist']: jproduct[k] = data['artist'][k]
+                if k in data['artist']: jproduct[k] = weakref.proxy(data['artist'][k])
             node = Node_product()
             node.set_data(jproduct)
             xbmc_directory.update(count, total, "Add album:" + node.get_label(), '')

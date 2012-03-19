@@ -18,6 +18,7 @@ import os
 import time
 import cPickle as pickle
 import hashlib
+import weakref
 
 from debug import log, info, error, warn, debug
 from  utils.file.write import safe_write

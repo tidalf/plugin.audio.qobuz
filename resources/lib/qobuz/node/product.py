@@ -69,7 +69,6 @@ class Node_product(Node):
             warn(self, "Cannot fetch product data")
             return False
         self.set_data(data)    
-        print pprint.pformat(data)
         tracks = None
         if self.is_special_purchase: tracks = self._filter_tracks(data)
         else: tracks = data['tracks']

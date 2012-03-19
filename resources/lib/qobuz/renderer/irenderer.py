@@ -26,6 +26,12 @@ class IRenderer(object):
         self.root = None
         self.filter = NodeFlag.TYPE_NODE
 
+    def __del__(self):
+        if self.root:
+            self.root.delete_tree()
+            self.root = None
+            print "Delete TREEEEEEEEEEEEEEEEEEEEEEEEE"
+
     def to_s(self):
         import pprint
         return pprint.pformat(self)

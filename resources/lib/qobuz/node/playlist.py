@@ -54,9 +54,7 @@ class Node_playlist(Node):
 
     def get_label(self):
         return self.get_name()
-    
-    def get_name(self):
-        return self.get_property('name')
+
     
     def set_is_my_playlist(self, b):
         self.is_my_playlist = b
@@ -105,7 +103,8 @@ class Node_playlist(Node):
                 node = Node_track()
                 node.set_data(jtrack)
             self.add_child(node)
-            
+        del self._data['tracks']
+        
     def get_name(self):
         return self.get_property('name')
 

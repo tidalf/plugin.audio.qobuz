@@ -27,7 +27,13 @@ class xbmc_directory():
         self.line2 = ''
         self.line3 = ''
         self.percent = 0
-
+    
+    def __del__(self):
+        for node in self.nodes:
+            print "Delete node"
+            node.delete_tree()
+        self.root = None
+        
     def elapsed(self):
         return time.time() - self.started_on
     
@@ -91,7 +97,7 @@ class xbmc_directory():
         xbmcplugin.endOfDirectory(handle = self.handle, 
                                    succeeded = success, 
                                    updateListing = False, 
-                                   cacheToDisc = success)
+                                   cacheToDisc = False)
         if self.total_put == 0:
             qobuz.gui.notifyH(qobuz.lang(40001).encode('utf8', 'replace'), self.root.get_label().encode('utf8', 'replace'))
         self.update(100, 100,  qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put).encode('ascii', 'replace') + ' items')

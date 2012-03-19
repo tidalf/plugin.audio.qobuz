@@ -23,6 +23,7 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag
 from debug import *
+import weakref
 
 '''
     NODE
@@ -32,7 +33,8 @@ class Node(object):
     def __init__(self,parent=None,parameters=None):
         self.parameters = parameters
         self.id = None
-        self.parent = parent
+        self.parent = None
+        self.set_parent(parent)
         self.type = NodeFlag.TYPE_NODE
         self.content_type = "files"
         self.image = None
@@ -59,6 +61,7 @@ class Node(object):
         del self.parent
         del self._data
         del self.parameters
+        del self.cache
         self.childs = self.parent = self._data = None
 
     def set_data(self,data):
@@ -112,7 +115,8 @@ class Node(object):
         return s
 
     def set_parent(self,parent):
-        self.parent = parent
+        if not parent: return 
+        self.parent = weakref.proxy(parent)
 
     def get_parent(self):
         return self.parent
@@ -247,9 +251,10 @@ class Node(object):
         if lvl != -1: lvl -= 1
         total = len(self.childs)
         count = 0
+        label = self.get_label()
         for child in self.childs:
             if not (child.type & NodeFlag.TYPE_TRACK):
-                xbmc_directory.update(count,total, self.get_label(), child.get_label())
+                xbmc_directory.update(count,total, label, child.get_label())
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
             child.build_down(xbmc_directory,lvl,whiteFlag)
