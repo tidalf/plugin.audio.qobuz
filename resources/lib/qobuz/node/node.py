@@ -16,6 +16,9 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import pprint
+
+import xbmcgui
+        
 import qobuz
 from constants import Mode
 from flag import NodeFlag
@@ -32,7 +35,7 @@ class Node(object):
         self.parent = parent
         self.type = NodeFlag.TYPE_NODE
         self.content_type = "files"
-        self.image = ''
+        self.image = None
         self.childs = []
         self.label = ""
         self.label2 = ""
@@ -151,7 +154,6 @@ class Node(object):
         Class can overload this method
     '''
     def make_XbmcListItem(self):
-        import xbmcgui
         image = self.get_image()
         item = xbmcgui.ListItem(
                                     self.get_label(),

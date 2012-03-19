@@ -17,6 +17,8 @@
 import sys
 import pprint
 
+import xbmcgui
+
 import qobuz
 from constants import Mode
 from flag import NodeFlag
@@ -114,7 +116,6 @@ class Node_playlist(Node):
         return self.get_property('description')
     
     def make_XbmcListItem(self):
-        import xbmcgui
         color_item = qobuz.addon.getSetting('color_item')
         color_pl = qobuz.addon.getSetting('color_item_playlist')
         label = self.get_name()

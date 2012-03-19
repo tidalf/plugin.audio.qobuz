@@ -17,6 +17,8 @@
 
 import pprint
 
+import xbmcgui
+
 import qobuz
 from constants import *
 from flag import NodeFlag
@@ -26,8 +28,12 @@ from debug import info, warn, error
     NODE PRODUCT
 '''
 from cache.product import Cache_product
+from cache.purchases import Cache_purchases
+
 
 from track import Node_track
+
+SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220', '0000020120221']
 
 class Node_product(Node):
 
@@ -36,18 +42,22 @@ class Node_product(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PRODUCT
         self.set_content_type('songs')
         self.cache = None
-
-
+        self.is_special_purchase = False
+    
     def _set_cache(self):
         id = self.get_id()
-        if not id:
+        if not id: 
             try: id = self.get_parameter('nid')
             except: pass
         if not id:
             error(self, "Cannot set product cache without id")
             return False
-        self.cache = Cache_product(id)
         self.set_id(id)
+        if id in SPECIAL_PURCHASES:
+            self.cache = Cache_purchases()
+            self.is_special_purchase = True
+        else:
+            self.cache = Cache_product(id)
         return True
     
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
@@ -58,15 +68,25 @@ class Node_product(Node):
         if not data:
             warn(self, "Cannot fetch product data")
             return False
-        self.set_data(data)     
-        for track in data['tracks']:
+        self.set_data(data)    
+        print pprint.pformat(data)
+        tracks = None
+        if self.is_special_purchase: tracks = self._filter_tracks(data)
+        else: tracks = data['tracks']
+        for track in tracks:
             node = Node_track()
             node.set_data(track)
             self.add_child(node)
 
-    
+    def _filter_tracks(self, tracks):
+        ltracks = []
+        id = self.get_id()
+        for track in tracks:
+            if track['album']['id'] != id: continue
+            ltracks.append(track)
+        return ltracks 
+        
     def make_XbmcListItem(self):
-        import xbmcgui
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),

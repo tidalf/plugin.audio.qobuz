@@ -53,18 +53,18 @@ class safe_write():
         return False
 
     def _safe_unlink(self, path):
-         if not os.path.exists(path):
-             return True
-         basepath = os.path.dirname(path)
-         old = os.path.basename(path)
-         new = self.generate_filename() + '.' + self.generate_filename(3)
-         newpath = os.path.join(basepath, new)
-         os.rename(path, newpath)
-         if not os.path.exists(newpath):
-             print "Cannot rename file"
-             return False
-         print "Unlink done: " + path
-         return self._unlink(newpath)
+        if not os.path.exists(path):
+            return True
+        basepath = os.path.dirname(path)
+        #old = os.path.basename(path)
+        new = self.generate_filename() + '.' + self.generate_filename(3)
+        newpath = os.path.join(basepath, new)
+        os.rename(path, newpath)
+        if not os.path.exists(newpath):
+            print "Cannot rename file"
+            return False
+        print "Unlink done: " + path
+        return self._unlink(newpath)
 
     def write(self, path, data):
         if os.path.exists(path):
@@ -73,12 +73,4 @@ class safe_write():
 
     def unlink(self, path):
         return self._safe_unlink(path)
-
-if __name__ == "__main__":
-    sf = safe_write()
-    file = "C:\Users\sho\AppData\Local\Temp\safe_write\unlink.txt"
-    if not sf.write(file, 'test'):
-        print "Cannot write file"
-    if not sf._safe_unlink(file):
-        print "Cannot delete file"
 

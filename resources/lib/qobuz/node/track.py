@@ -16,6 +16,9 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import pprint
+
+import xbmcgui
+
 import qobuz
 from constants import Mode
 from flag import NodeFlag
@@ -34,6 +37,7 @@ class Node_track(Node):
         super(Node_track, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_TRACK
         self.set_content_type('songs')
+        self.qobuz_context_type = 'playlist'
         self.set_is_folder(False)
         self.cache = None
         self.cache_url = None
@@ -57,7 +61,7 @@ class Node_track(Node):
             error(self, "Cannot set cache without id")
             return False
         #self.set_id(id)
-        self.cache = Cache_track(id, 'playlist', False)
+        self.cache = Cache_track(id, self.qobuz_context_type, False)
         return True
     
     def make_url(self, mode = Mode.PLAY):
@@ -190,7 +194,6 @@ class Node_track(Node):
         return mime
         
     def make_XbmcListItem(self):
-        import xbmcgui
         media_number = self.get_media_number()
         if not media_number: media_number = 1
         else: media_number = int(media_number)

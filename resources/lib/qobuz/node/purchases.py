@@ -17,6 +17,8 @@
 import qobuz
 from flag import NodeFlag
 from node import Node
+from product import Node_product
+
 from debug import error
 
 '''
@@ -24,7 +26,7 @@ from debug import error
 '''
 
 from cache.purchases import Cache_purchases
-from product import Node_product
+#from product import Node_product
 
 class Node_purchases(Node):
 
@@ -42,6 +44,26 @@ class Node_purchases(Node):
             error(self, "Cannot fetch purchases data")
             return False
         self.set_data(data)
-        for product in self.cache.filter_products(self.cache.get_data()):
+        for product in self.filter_products(self.cache.get_data()):
             self.add_child(product)
         return True
+    
+    def filter_products(self, data):
+        list = []
+        if not data: return list
+        # Qobuz free tracks with invalid product id
+        #blackid = ['0000020110926', '0000201011300', '0000020120220', '0000020120221']
+        albumseen = {}
+        for track in data:
+            json = track['album']
+            json[u'composer'] = track['composer']
+            json[u'interpreter'] = track['interpreter']
+            product = Node_product()
+            product.set_data(json)
+            id = product.get_id()
+            #if id in blackid: product.is_special_purchase = True
+            if id in albumseen: continue
+            albumseen[id] = 1
+            list.append(product)
+        return list
+ 

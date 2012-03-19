@@ -24,7 +24,7 @@ import pprint
 from debug import *
 from constants import *
 from icacheable import ICacheable
-from node.product import Node_product
+#from node.product import Node_product
 import qobuz
 """
     Class QobuzGetPurchases
@@ -47,22 +47,4 @@ class Cache_purchases(ICacheable):
             return 0
         return len(self._raw_data)
 
-    def filter_products(self, data):
-        list = []
-        if not data: return list
-        # Qobuz free tracks with invalid product id
-        blackid = ['0000020110926', '0000201011300']
-        albumseen = {}
-        for track in data:
-            json = track['album']
-            json[u'composer'] = track['composer']
-            json[u'interpreter'] = track['interpreter']
-            product = Node_product()
-            product.set_data(json)
-            id = product.get_id()
-            if id in blackid: continue
-            if id in albumseen: continue
-            albumseen[id] = 1
-            list.append(product)
-        return list
-            
+           
