@@ -58,7 +58,8 @@ class Node_similar_artist(Node):
         query = self.get_parameter('query').strip().lower()
         query.encode('utf8', 'replace')
         data = qobuz.api.get_similar_artists(query)
-        dom = parseString(data.encode('ascii', 'replace'))
+        if not data: return False
+        #dom = parseString(data)
         class parse_simartists():
             def __init__(self, data):
                 self.dom = parseString(data)
@@ -88,7 +89,7 @@ class Node_similar_artist(Node):
                 self._h_artist_image(dom.getElementsByTagName('image'), artist)
                 self.artists.append(artist)
                 return True
-        parse = parse_simartists(data.encode('ascii', 'replace'))
+        parse = parse_simartists(data)
         parse.parse()
         
         if len(parse.artists) < 1:

@@ -4,14 +4,10 @@ import xbmcgui
 
 from node.flag import NodeFlag
 from constants import Mode
+from gui import Progress
 import qobuz
 import time
-
-class xbmc_progress(xbmcgui.DialogProgress):
-    
-    def __init__(self, heading = None, line1 = None, line2 = None, line3 = None):
-        super(xbmc_progress, self).__init__()
-    
+from debug import warn
     
 class xbmc_directory():
     
@@ -22,7 +18,7 @@ class xbmc_directory():
         self.ALL_AT_ONCE = ALL_AT_ONCE
         self.handle = handle
         self.put_item_ok = True
-        self.Progress = xbmc_progress()
+        self.Progress = Progress(False)
         self.total_put = 0
         self.started_on = time.time()
         self.Progress.create(self.label + root.get_label())
@@ -33,7 +29,7 @@ class xbmc_directory():
     
     def add_node(self, node):
         if not self.ALL_AT_ONCE: 
-            return self.put_item(node)
+            return self._put_item(node)
         self.nodes.append(node)
         return True
     
@@ -54,24 +50,26 @@ class xbmc_directory():
         pet = self._pretty_time(int(self.elapsed()))
         line1 = '[%05i / %s] %s' % (self.total_put, pet, line1)
         self.Progress.update(percent, line1, line2, line3)
+        return True
     
     def is_canceled(self):
         return self.Progress.iscanceled()
     
-    def put_item(self, node):
+    def _put_item(self, node):
         self.total_put += 1
         mode = Mode.VIEW
         item = node.make_XbmcListItem()
         if not item:
             return False
-        ret = xbmcplugin.addDirectoryItem(self.handle,
+        try:
+            ret = xbmcplugin.addDirectoryItem(self.handle,
                                     node.make_url(),
                                     item,
                                     node.is_folder,                       
-                                    len(self.nodes))
+                                    self.total_put)
+        except: 
+            warn(self, "Cannot add item")
         if not ret: self.put_item_ok = False
-        if not (node.type & NodeFlag.TYPE_TRACK):
-            pass
         return ret
     
     def close(self):

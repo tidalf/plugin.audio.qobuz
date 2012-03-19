@@ -29,6 +29,30 @@ from debug import __debugging__
 
 import qobuz
 
+class Progress(xbmcgui.DialogProgress):
+    
+    def __init__(self, active = True):
+        self.active = active
+        self.is_cancelable = True
+        if self.active:
+            super(Progress, self).__init__()
+
+    def create(self, line1, line2 = '', line3 = ''):
+        if not self.active: return False
+        return super(Progress, self).create(line1, line2, line3)
+    
+    def update(self, percent, line1, line2 = '', line3 = ''):
+        if not self.active: return False
+        return super(Progress, self).update(percent, line1, line2, line3)
+
+    def iscanceled(self):
+        if not self.active: return False
+        if not self.is_cancelable: return False
+        return super(Progress, self).iscanceled()
+
+    def close(self):
+        if not self.active: return False
+        return super(Progress, self).close()
 '''
     CLASS QobuzGUI
 '''

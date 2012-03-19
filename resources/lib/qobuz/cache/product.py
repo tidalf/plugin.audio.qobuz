@@ -18,7 +18,7 @@ import os
 import sys
 import pprint
 
-from utils.icacheable import ICacheable
+from icacheable import ICacheable
 from debug import *
 from constants import *
 import qobuz

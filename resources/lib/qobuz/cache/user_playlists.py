@@ -21,7 +21,7 @@ import xbmcplugin
 import xbmcgui
 
 import qobuz
-from utils.icacheable import ICacheable
+from icacheable import ICacheable
 from debug import *
 from constants import *
 

@@ -19,7 +19,7 @@ import os
 import sys
 import random
 
-from utils.icacheable import ICacheable
+from icacheable import ICacheable
 from constants import *
 from debug import *
 

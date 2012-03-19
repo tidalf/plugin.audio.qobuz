@@ -47,7 +47,7 @@ def get_params():
                 if d.kv_is_ok(splitparams[0],splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
-                    warn('[DOG]', "Invalid key/value (" + splitparams[0] + ", " + splitparams[1] + ")")
+                    warn('[DOG]', "--- Invalid key: %s / value: %s" % (splitparams[0], splitparams[1]))
     return rparam
 
 class xbmc_json_rpc():
@@ -202,7 +202,7 @@ class QobuzBootstrap(object):
         return req
 
     def erase_cache(self):
-        from utils.cache import cache_manager
+        from utils.cache_manager import cache_manager
         cm = cache_manager()
         cm.delete_all_data()
 

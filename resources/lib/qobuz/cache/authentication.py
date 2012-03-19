@@ -20,9 +20,9 @@ import hashlib
 import pprint
 
 import qobuz
-from utils.icacheable import ICacheable
+from icacheable import ICacheable
 from debug import *
-from utils.cache import cache_manager
+from utils.cache_manager import cache_manager
 '''
  Class QobuzAuth
 

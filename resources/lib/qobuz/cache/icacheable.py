@@ -20,7 +20,7 @@ import pickle
 import hashlib
 
 from debug import log, info, error, warn, debug
-from  file.write import safe_write
+from  utils.file.write import safe_write
 
 class ICacheable(object):
     '''

@@ -138,7 +138,7 @@ class Node_user_playlists(Node):
         import xbmc
         info(self, "rename playlist: " + str(id))
         from cache.playlist import Cache_playlist
-        from utils.cache import cache_manager
+        from utils.cache_manager import cache_manager
         from cache.user_playlists import Cache_user_playlists
         userplaylist = Cache_playlist(id)
         userplaylist.fetch_data()
@@ -171,7 +171,7 @@ class Node_user_playlists(Node):
             print "Cannot delete playlist with id " + str(id)
             return False
         print "Playlist deleted: " + str(id)
-        from utils.cache import cache_manager
+        from utils.cache_manager import cache_manager
         cm = cache_manager()
         userplaylists = Cache_user_playlists() 
         cm.delete(userplaylists.get_cache_path())

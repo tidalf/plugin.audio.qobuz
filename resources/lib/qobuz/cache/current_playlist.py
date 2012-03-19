@@ -3,14 +3,14 @@ import pickle
 
 import qobuz
 from debug import info, warn, debug
-from utils.icacheable import ICacheable
+from icacheable import ICacheable
 from cache.playlist import Cache_playlist
 
 class Cache_current_playlist(ICacheable):
 
     def __init__(self):
         super(Cache_current_playlist, self).__init__(qobuz.path.cache,
-                                            'current-playlist')
+                                            'current-playlist', None, False)
         self.data = None
         self.set_cache_refresh(-1)
         info(self, "Cache duration: " + str(self.cache_refresh))

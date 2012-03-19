@@ -214,7 +214,7 @@ class Node_playlist(Node):
                 trackids.append(node.get_id())
             strtracks = ','.join(trackids)
             ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
-            from utils.cache import cache_manager
+            from utils.cache_manager import cache_manager
             from cache.playlist import Cache_playlist
             cm = cache_manager()
             pl = Cache_playlist(current_playlist.get_id())

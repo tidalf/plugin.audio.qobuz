@@ -24,7 +24,7 @@ import pprint
 
 from debug import *
 from constants import *
-from utils.icacheable import ICacheable
+from icacheable import ICacheable
 import qobuz
 """
     Class QobuzGetRecommendation

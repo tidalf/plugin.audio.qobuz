@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from time import time
+import time
 import re
 import math
 import pprint
@@ -27,7 +27,7 @@ import xbmcgui
 import json 
 import qobuz
 from debug import info, warn
-
+from gui import Progress
 
 from node.track import Node_track
 
@@ -58,7 +58,7 @@ class QobuzPlayer(xbmc.Player):
         return True
             
     def play(self, id):
-        progress = xbmcgui.DialogProgress()
+        progress = Progress(False)
         progress.create("Qobuz Player")
         info(self, "Playing track: " + str(id))
         node = Node_track()
@@ -109,7 +109,7 @@ class QobuzPlayer(xbmc.Player):
         timeout = 30
         info(self, "Waiting song to start")
         while timeout > 0:
-            if self.isPlayingAudio() == False or self.getPlayingFile() != streaming_url:
+            if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
                 xbmc.sleep(250)
                 timeout -= 0.250
             else:
@@ -124,25 +124,33 @@ class QobuzPlayer(xbmc.Player):
         self.watch_playing( node, streaming_url)
         return True
     
+    def isPlayingAudio(self):
+        try: return super(QobuzPlayer, self).isPlayingAudio()
+        except: warn(self, "EXCEPTION: isPlayingAudio")
+        return False
+    
+    def getPlayingFile(self):
+        try: return super(QobuzPlayer, self).getPlayingFile()
+        except: warn(self, "EXCEPTION: getPlayingFile")
+        return ''
+    
+    def getTotalTime(self):
+        try: return super(QobuzPlayer, self).getTotalTime()
+        except: warn(self, "EXCEPTION: getTotalTime")
+        return -1
+    
     def watch_playing(self, node, streaming_url):
-        #print "Watching ..."
-        import time
-        #player = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
         start = None
-        end = None
         self.total = None
         self.elapsed = None
         self.track_id = node.get_id()
+        self.total = self.getTotalTime()
         while self.isPlayingAudio() and self.getPlayingFile() == streaming_url:
-            #print "Playing track: " +  self.getPlayingFile()
-            #print "Time: " +  str(self.getTime())
-            self.total = self.getTotalTime()
             self.elapsed = self.getTime()
             if not start and self.elapsed >= 5:
                 print "Start"
                 self.sendQobuzPlaybackStarted(node.get_id())
                 start = True
-            xbmc.sleep(250)
-        # print "Duration: " + str(self.total - self.elapsed )
-        # self.sendQobuzPlaybackEnded(node.get_id(), self.total - self.elapsed)
-        # print "End of track"
+            #xbmc.sleep(250)
+            time.sleep(0.25)
+       

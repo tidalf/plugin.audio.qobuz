@@ -17,7 +17,7 @@
 import sys
 import os
 
-from utils.icacheable import ICacheable
+from icacheable import ICacheable
 from debug import *
 
 import pprint
