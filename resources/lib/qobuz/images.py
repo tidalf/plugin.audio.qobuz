@@ -17,7 +17,7 @@
 
 import os
 from debug import *
-from utils.icacheable import ICacheable
+from cache.icacheable import ICacheable
 import qobuz
 import time
 
