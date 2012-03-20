@@ -90,7 +90,7 @@ class Node_recommendation(Node):
         return self.genre_id
 
 # TYPE
-    def _build_recos_type(self, lvl, flag):
+    def _build_recos_type(self, xbmc_directory, lvl, flag):
         types = []
         color = qobuz.addon.getSetting('color_item')
         for gtype in RECOS_TYPES:
@@ -101,7 +101,7 @@ class Node_recommendation(Node):
         return True
 
 # GENRE
-    def _build_recos_genre(self, lvl, flag):
+    def _build_recos_genre(self, xbmc_directory, lvl, flag):
         types = []
         color = qobuz.addon.getSetting('color_item')
         for genreid in RECOS_GENRES:
@@ -119,7 +119,7 @@ class Node_recommendation(Node):
 
     
 # TYPE GENRE
-    def _build_down_type_genre(self, lvl, flag):
+    def _build_down_type_genre(self, xbmc_directory, lvl, flag):
         self.cache = Cache_recommendation(self.genre_id, self.genre_type)
         data = self.cache.fetch_data()
         if not data: 
@@ -166,10 +166,10 @@ class Node_recommendation(Node):
 # DISPATCH
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
         if not self.genre_type:
-            return self._build_recos_type(lvl, flag)
+            return self._build_recos_type(xbmc_directory,lvl, flag)
         elif not self.genre_id:
-            return self._build_recos_genre(lvl, flag)
+            return self._build_recos_genre(xbmc_directory,lvl, flag)
         self.set_content_type('albums')
-        return self._build_down_type_genre(lvl, flag)
+        return self._build_down_type_genre(xbmc_directory,lvl, flag)
 
 

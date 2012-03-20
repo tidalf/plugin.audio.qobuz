@@ -45,7 +45,7 @@ class Node_playlist(Node):
         self.set_is_folder(True)
         self.cache = None
         self.packby = ''#album'
-        #self.image = qobuz.image.access.get('playlist')
+        self.image = qobuz.image.access.get('playlist')
         if self.packby == 'album':
             self.set_content_type('albums')
         else:
@@ -55,7 +55,6 @@ class Node_playlist(Node):
     def get_label(self):
         return self.get_name()
 
-    
     def set_is_my_playlist(self, b):
         self.is_my_playlist = b
             
@@ -135,8 +134,6 @@ class Node_playlist(Node):
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
-#        item.setThumbnailImage(image)
-#        item.setIconImage(image)
         self.attach_context_menu(item)
         return item
 
@@ -166,7 +163,6 @@ class Node_playlist(Node):
         import qobuz, xbmc
         info(self, "Removing tracks: " + tracks_id)
         result = qobuz.api.playlist_remove_track(self.id, tracks_id)
-        #pprint.pprint(result)
         if not result:
             warn(self, "Cannot remove tracks from playlist: " + str(self.id))
             qobuz.gui.notifyH('Qobuz Playlist / Remove track', "Fail to remove track")
@@ -218,7 +214,7 @@ class Node_playlist(Node):
             from cache.playlist import Cache_playlist
             cm = cache_manager()
             pl = Cache_playlist(current_playlist.get_id())
-            cm.delete(pl.get_cache_path())
+            pl.delete_cache()
             dir.close()
             
     def add_as_new_playlist(self):

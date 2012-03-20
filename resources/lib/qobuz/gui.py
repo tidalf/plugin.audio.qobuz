@@ -18,6 +18,7 @@
 import os
 import sys
 import urllib
+import time
 
 import xbmcplugin
 import xbmcgui
@@ -36,28 +37,40 @@ class Progress(xbmcgui.DialogProgress):
         self.is_cancelable = True
         if self.active:
             super(Progress, self).__init__()
-        self.line1 = ''
+        self.line1 = 'Working...'
         self.line2 = ''
         self.line3 = ''
         self.percent = 0
-        
+        self.started_on = None
+
     def create(self, line1, line2 = '', line3 = ''):
         self.line1 = line1
         self.line2 = line2
         self.line3 = line3
         if not self.active: return False
+        self.started_on = time.time()
         return super(Progress, self).create(line1, line2, line3)
     
+    def _pretty_time(self, time):
+        hours = (time / 3600)
+        minutes = (time / 60) - (hours * 60)
+        seconds = time % 60
+        return '%02i:%02i:%02i' % (hours, minutes, seconds)
+    
     def update(self, percent, line1, line2 = '', line3 = ''):
-        self.line1 = line1
+        if line1:
+            self.line1 = line1
         self.line2 = line2
         self.line3 = line3
         if not self.active: return False
-        return super(Progress, self).update(percent, line1, line2, line3)
+        elapsed = self._pretty_time((time.time() - self.started_on))
+        return super(Progress, self).update(percent, '[%s] %s' % (elapsed, line1), line2, line3)
         
-    def update_line3(self, line):
-        self.line3 = line
-        return self.update(self.percent, self.line1, self.line2, line)
+    def update_line1(self, line):
+        if not line or line == self.line1:
+            return False
+        self.line1 = line
+        return self.update(self.percent, self.line1, self.line2, self.line3)
     
     def iscanceled(self):
         if not self.active: return False

@@ -46,7 +46,7 @@ class Node_track(Node):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
         else:    
-            self._set_cache()
+            self._set_cache(xbmc_directory.Progress)
             self.set_data(self.cache.get_data())
             return True
         
@@ -123,7 +123,6 @@ class Node_track(Node):
         if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
             return self.parent.get_genre()
         return ''
-
     
     def get_streaming_url(self):
         self._set_cache_streaming_url()
@@ -176,9 +175,6 @@ class Node_track(Node):
             self.cache_url = Cache_track_stream_url(self.get_id())
         self.cache_url.fetch_data()
         
-        
-
-    
     def get_mimetype(self):
         self._set_cache_streaming_url()
         data = self.cache_url.get_data()
@@ -192,7 +188,7 @@ class Node_track(Node):
         else:
             mime = 'audio/mpeg'
         return mime
-        
+    
     def make_XbmcListItem(self):
         media_number = self.get_media_number()
         if not media_number: media_number = 1
@@ -217,6 +213,11 @@ class Node_track(Node):
         track_number = self.get_track_number()
         if not track_number: track_number = 0
         else: track_number = int(track_number)
+        mlabel = self.get_property(('label', 'name'))
+        description = self.get_description()
+        comment = ''
+        if mlabel: comment = mlabel
+        if description: comment += ' - ' + description
         item.setInfo(type = 'music', infoLabels = {
                                    'track_id': self.get_id(),
                                    'title': self.get_title(),
@@ -226,7 +227,7 @@ class Node_track(Node):
                                    'tracknumber': track_number,
                                    'duration': duration,
                                    'year': self.get_year(),
-                                   'comment': self.get_description()
+                                   'comment': comment
                                    })
         item.setProperty('discnumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)

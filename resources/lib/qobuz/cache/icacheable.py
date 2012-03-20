@@ -50,9 +50,6 @@ class ICacheable(object):
         self.cache_path = path
         self.cache_object_path = self.cache_object_name
         if id != None:
-#            if isinstance(id, basestring):
-#                id = id.encode('ascii', 'replace')
-#            else:
             id = str(id)
             self.cache_object_id = id
             self.cache_object_path += '-' + self.cache_object_id
@@ -144,13 +141,13 @@ class ICacheable(object):
             warn(self, "No cache path, cannot fetch data")
             return None
         debug(self, "Fetching data: " + cache)
-        if progress: progress.update_line3("Fetching data ...")
+        if progress: progress.update_line1("Fetching data ...")
         data = self._load_cache_data()
         if not data:
             if self.no_network: 
                 info(self, "No network flag set (don't)")
                 return None
-            if progress: progress.update_line3("Fetching data from Internet")
+            if progress: progress.update_line1("Fetching data from Internet")
             debug(self, "No data cached, fetching new one")
             data = self._fetch_data()
             if data == None:

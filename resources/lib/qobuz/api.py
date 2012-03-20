@@ -29,6 +29,7 @@ from debug import *
 import socket
 
 socket.timeout = 1
+
 class QobuzApi:
 
     def __init__(self):

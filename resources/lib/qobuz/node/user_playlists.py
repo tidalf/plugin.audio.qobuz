@@ -18,6 +18,8 @@ import sys
 import random
 import pprint
 
+import xbmc
+
 import qobuz
 from constants import Mode
 from flag import NodeFlag
@@ -65,7 +67,7 @@ class Node_user_playlists(Node):
     def _build_down(self, xbmc_directory, lvl, flag = None):
         login = qobuz.addon.getSetting('username')
         info(self, "Build-down: user playlists")
-        data = self.cache.fetch_data()
+        data = self.cache.fetch_data(xbmc_directory.Progress)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
@@ -105,22 +107,18 @@ class Node_user_playlists(Node):
         return image
         
     def set_current_playlist(self, id):
-        import xbmc
         info(self, "Set current playlist: " + str(id))
         from cache.current_playlist import Cache_current_playlist
         cp = Cache_current_playlist()
         if cp.get_id() == id:
             log(self, "Playlist already selected... do nothing")
             return True
-        print "set cpls id: " + id
         cp.set_id(id)
         cp.save()
         xbmc.executebuiltin('Container.Refresh')
         return True
 
     def create_playlist(self):
-        import xbmc
-        from utils.cache import cache_manager
         from cache.user_playlists import Cache_user_playlists
         query = self._get_keyboard(default="",heading='Create playlist')
         query = query.strip()
@@ -131,31 +129,42 @@ class Node_user_playlists(Node):
         if not ret:
             warn(self, "Cannot create playlist name '"+ query +"'")
             return False
-        print ret
         userplaylists = Cache_user_playlists()
-        cm = cache_manager()
-        cm.delete(userplaylists.get_cache_path())
+        userplaylists.delete_cache()
         self.set_current_playlist(ret['playlist']['id'])
         info(self, "Container refreshing neeeded!")
         xbmc.executebuiltin('Container.Refresh')
         
+    ''' 
+        Rename playlist 
+    '''
     def rename_playlist(self, id):
-        import xbmc
         info(self, "rename playlist: " + str(id))
         from cache.playlist import Cache_playlist
-        from utils.cache_manager import cache_manager
         from cache.user_playlists import Cache_user_playlists
-        userplaylist = Cache_playlist(id)
-        userplaylist.fetch_data()
-        currentname = userplaylist.get_data()['name']
-        query = self._get_keyboard(default=currentname,heading='Rename playlist')
-        query = query.strip()
-        cm = cache_manager()
-        userplaylists = Cache_user_playlists()
-        cm.delete(userplaylists.get_cache_path())
+        playlist = Cache_playlist(id)
+        playlist.fetch_data()
+        currentname = playlist.get_data()['name']
+        query = self._get_keyboard(default=currentname,heading=qobuz.lang(30078))
+        query = query.strip().encode('utf8', 'replace')
+        if query == currentname:
+            return True
+        print "RENAME TO: " + query
         res = qobuz.api.playlist_update(id, query)
-        xbmc.executebuiltin('Container.Refresh')
-        
+        print "RES: " + repr(res)
+        if res:
+            uplaylists = Cache_user_playlists()
+            if not uplaylists.delete_cache():
+                warn(self, "Cannot remove userplaylists.data")
+                return False
+            xbmc.executebuiltin('Container.Refresh')
+            return True
+        else:
+            qobuz.gui.notifyH('Qobuz Playlist', 'Rename failed: ' + currentname)
+        return False
+    '''
+        Remove playlist
+    '''
     def remove_playlist(self, id):
         import xbmcgui, xbmc
         from cache.playlist import Cache_playlist
@@ -176,8 +185,6 @@ class Node_user_playlists(Node):
             print "Cannot delete playlist with id " + str(id)
             return False
         print "Playlist deleted: " + str(id)
-        from utils.cache_manager import cache_manager
-        cm = cache_manager()
         userplaylists = Cache_user_playlists() 
-        cm.delete(userplaylists.get_cache_path())
+        userplaylists.delete_cache()
         xbmc.executebuiltin('Container.Refresh')

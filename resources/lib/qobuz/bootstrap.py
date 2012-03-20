@@ -76,7 +76,6 @@ class QobuzBootstrap(object):
 
     def bootstrap_app(self):
         self.bootstrap_directories()
-        #info(self,"Directories:\n" + qobuz.path.to_s())
         self.bootstrap_lang()
         self.bootstrap_utils()
         self.bootstrap_api()
@@ -90,6 +89,7 @@ class QobuzBootstrap(object):
             exit(1)
         if qobuz.gui.is_free_account():
             qobuz.gui.popup_free_account()
+        self.bootstrap_db()
         return self.dispatch()
 
     def bootstrap_lang(self):
@@ -114,9 +114,9 @@ class QobuzBootstrap(object):
                 s.resources = xbmc.translatePath(os.path.join(qobuz.path.base,'resources'))
                 s.image = xbmc.translatePath(os.path.join(qobuz.path.resources,'img'))
             def to_s(s):
-                out = 'profile : ' + s.profile + "\n"
+                out =  'profile : ' + s.profile + "\n"
                 out += 'cache   : ' + s.cache + "\n"
-                out += 'resouces: ' + s.resources + "\n"
+                out += 'resources: ' + s.resources + "\n"
                 out += 'image   : ' + s.image + "\n"
                 return out
             '''
@@ -166,15 +166,10 @@ class QobuzBootstrap(object):
         qobuz.player = QobuzPlayer()
 
     def bootstrap_db(self):
-        try:
-            from utils.db import QobuzDb
-            qobuz.db = QobuzDb(qobuz.path.cache,'qobuz.db3')
-        except:
-            qobuz.db = None
-        if not qobuz.db.open():
-            warn(self,"Cannot open sql database")
-            exit(0)
-
+        from db.itable import Db
+        path = os.path.join(qobuz.path.cache, 'data.s3') 
+        print "Path: " + path
+        qobuz.db = Db(path)
     '''
         Parse system parameters
     '''
@@ -217,7 +212,11 @@ class QobuzBootstrap(object):
     def dispatch(self):
         import pprint, xbmc
         ret = False
-        
+        ####################
+        # PLAYING
+        qobuz.db.connect()
+        #
+        ####################
         info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt'])) ))
         
         ''' PLAY '''
@@ -321,19 +320,11 @@ class QobuzBootstrap(object):
             
         elif self.MODE == Mode.LIBRARY_SCAN:
             import urllib
-            #from node.flag import NodeFlag
             s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '&action=scan")'
-            print "START SCAN: " + s
-#            s = 'UpdateLibrary("music", "' + sys.argv[0] + "?nt=" + self.params['nt'] + "&mode=" + str(Mode.VIEW) + "&view-filter=" + str(NodeFlag.TYPE_TRACK) + "&depth=-1"
-#            if 'nid' in self.params and self.params['nid']  != "None": 
-#                s += "&nid=" + self.params['nid']
-#            if 'genre-type' in self.params: s+= "&genre-type=" + self.params['genre-type']
-#            if 'genre-id' in self.params: s+= "&genre-id=" + self.params['genre-id']
-#            s+= '")'
-            #print "SCAN: " + s
-            #info(self, s)
             xbmc.executebuiltin(s)
             return False
 
         else:
             error(self, "Unknow mode: " + str(self.MODE))
+            return False
+        return True

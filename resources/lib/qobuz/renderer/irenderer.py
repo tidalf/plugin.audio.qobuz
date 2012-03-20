@@ -30,8 +30,7 @@ class IRenderer(object):
         if self.root:
             self.root.delete_tree()
             self.root = None
-            print "Delete TREEEEEEEEEEEEEEEEEEEEEEEEE"
-
+            
     def to_s(self):
         import pprint
         return pprint.pformat(self)
@@ -76,7 +75,7 @@ class IRenderer(object):
             from node.similar_artists import Node_similar_artist
             root = Node_similar_artist(None, qobuz.boot.params)
         else:
-            warn(self, "Nothing to display")
+            warn(self, "Cannot set root node!")
             return False
         root.set_id(self.node_id)
         root.get_url()

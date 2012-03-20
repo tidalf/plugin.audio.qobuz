@@ -43,11 +43,11 @@ class xbmc_directory():
         self.nodes.append(node)
         return True
     
-    def _pretty_time(self, time):
-        hours = (time / 3600)
-        minutes = (time / 60) - (hours * 60)
-        seconds = time % 60
-        return '%02i:%02i:%02i' % (hours, minutes, seconds)
+#    def _pretty_time(self, time):
+#        hours = (time / 3600)
+#        minutes = (time / 60) - (hours * 60)
+#        seconds = time % 60
+#        return '%02i:%02i:%02i' % (hours, minutes, seconds)
     
     def update(self, count, total, line1, line2 = '', line3 = ''):
         percent = 100
@@ -56,8 +56,9 @@ class xbmc_directory():
         else:
             percent = count
             if percent > 100: percent = 100
-        pet = self._pretty_time(int(self.elapsed()))
-        line1 = '[%05i / %s] %s' % (self.total_put, pet, line1)
+        #pet = self._pretty_time(int(self.elapsed()))
+        labstat = '[%05i]' % (self.total_put)
+        self.line1 = labstat
         self.line1 = line1
         self.line2 = line2
         self.line3 = line3
@@ -97,10 +98,10 @@ class xbmc_directory():
         xbmcplugin.endOfDirectory(handle = self.handle, 
                                    succeeded = success, 
                                    updateListing = False, 
-                                   cacheToDisc = False)
+                                   cacheToDisc = success)
         if self.total_put == 0:
-            qobuz.gui.notifyH(qobuz.lang(40001).encode('utf8', 'replace'), self.root.get_label().encode('utf8', 'replace'))
-        self.update(100, 100,  qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put).encode('ascii', 'replace') + ' items')
+            qobuz.gui.notifyH(qobuz.lang(40001), repr(self.root.get_label()))
+        self.update(100, 100,  qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put).encode('ascii', 'ignore') + ' items')
         self.close()
         return success
         

@@ -254,7 +254,7 @@ class Node(object):
         label = self.get_label()
         for child in self.childs:
             if not (child.type & NodeFlag.TYPE_TRACK):
-                xbmc_directory.update(count,total, label, child.get_label())
+                xbmc_directory.update(count, total, "Working", label, child.get_label())
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
             child.build_down(xbmc_directory,lvl,whiteFlag)

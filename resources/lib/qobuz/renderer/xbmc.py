@@ -28,7 +28,6 @@ from node.flag import NodeFlag
 from debug import info, warn, log
 from irenderer import IRenderer
 
-
 class Xbmc_renderer(IRenderer):
 
     def __init__(self, node_type, node_id = None):
@@ -49,7 +48,7 @@ class Xbmc_renderer(IRenderer):
     def scan(self):
         from renderer.xbmc_directory import xbmc_directory
         if not self.set_root_node():
-            print "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")"
+            warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
         dir = xbmc_directory(self.root, qobuz.boot.handle, False)
         self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)

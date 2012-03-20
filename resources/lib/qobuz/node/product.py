@@ -64,7 +64,7 @@ class Node_product(Node):
         if not self._set_cache():
             error(self, "Cannot set product cache")
             return False
-        data = self.cache.fetch_data()
+        data = self.cache.fetch_data(xbmc_directory.Progress)
         if not data:
             warn(self, "Cannot fetch product data")
             return False

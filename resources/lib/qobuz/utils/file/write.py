@@ -56,14 +56,12 @@ class safe_write():
         if not os.path.exists(path):
             return True
         basepath = os.path.dirname(path)
-        #old = os.path.basename(path)
         new = self.generate_filename() + '.' + self.generate_filename(3)
         newpath = os.path.join(basepath, new)
         os.rename(path, newpath)
         if not os.path.exists(newpath):
             print "Cannot rename file"
             return False
-        print "Unlink done: " + path
         return self._unlink(newpath)
 
     def write(self, path, data):
