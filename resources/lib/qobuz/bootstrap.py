@@ -89,7 +89,7 @@ class QobuzBootstrap(object):
             exit(1)
         if qobuz.gui.is_free_account():
             qobuz.gui.popup_free_account()
-        self.bootstrap_db()
+        #self.bootstrap_db()
         return self.dispatch()
 
     def bootstrap_lang(self):
@@ -212,8 +212,8 @@ class QobuzBootstrap(object):
         ret = False
         ####################
         # PLAYING
-        qobuz.db.connect()
-        qobuz.db.insert('track', ZTRACKID = '23554')
+#        qobuz.db.connect()
+#        qobuz.db.insert('track', ZTRACKID = '23554')
         #
         ####################
         info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
