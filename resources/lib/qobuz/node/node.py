@@ -53,7 +53,7 @@ class Node(object):
     def set_auto_set_cache(self, b):
         if b: self.auto_set_cache = True 
         else: self.auto_set_cache = False
-        
+      
     def delete_tree(self):
         for child in self.childs:
             child.delete_tree()
@@ -62,8 +62,7 @@ class Node(object):
         del self._data
         del self.parameters
         del self.cache
-        self.childs = self.parent = self._data = None
-
+        
     def set_data(self,data):
         self._data = data
 

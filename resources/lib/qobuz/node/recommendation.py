@@ -92,6 +92,7 @@ class Node_recommendation(Node):
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
         types = []
+        self.label = "Recommendation"
         color = qobuz.addon.getSetting('color_item')
         for gtype in RECOS_TYPES:
             node = Node_recommendation()

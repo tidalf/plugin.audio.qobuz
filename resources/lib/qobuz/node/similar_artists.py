@@ -46,7 +46,7 @@ class Node_similar_artist(Node):
         Getter 
     '''
     def get_label(self):
-        return "Similar artist"
+        return qobuz.lang(39000)
     
     def get_label2(self):
         return ""
@@ -103,7 +103,12 @@ class Node_similar_artist(Node):
             if count > max: break
             count+=1
             name = a['name']
-            xbmc_directory.update(count, total, "Finding similar artist", name)
+            if not name:
+                continue
+            name = name.encode('utf8', 'replace')
+            xbmc_directory.update(count, total, qobuz.lang(40005), name)
+            if xbmc_directory.is_canceled():
+                break
             search_cache = Cache_search_artists(name)
             result = search_cache.fetch_data()
             if not result or len(result) < 1:

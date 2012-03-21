@@ -232,10 +232,7 @@ class QobuzBootstrap(object):
             if qobuz.player.play(self.params['nid']):
                 return True
             return False
-        
-        elif self.MODE == Mode.GET_IMAGE:
-            print "GET IMAGE"
-            return False
+
         # ERASE CACHE '''
         elif self.MODE == Mode.ERASE_CACHE:
             import xbmcgui
@@ -249,18 +246,19 @@ class QobuzBootstrap(object):
             return True
 
         from renderer.xbmc import Xbmc_renderer as renderer
-
+        ''' SET Node type '''
         nt = None
         try: nt = int(self.params['nt'])
         except:
             warn(self, "No node type...abort")
             return False
         info(self, "Node type: " + str(nt))
-
+        ''' SET Node id '''
         id = None
         try: id = self.params['nid']
         except: pass
-        
+
+        ''' UGLY MODE DISPATCH '''
         if self.MODE == Mode.VIEW:
             info(self,"Displaying node")
             r = renderer(nt,id)
@@ -283,12 +281,19 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.PLAYLIST_SELECT_CURRENT:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
-            node.set_current_playlist(self.params['nid'])
+            if node.set_current_playlist(self.params['nid']):
+                return False
+            xbmc.executebuiltin('Container.Refresh')
+            return True
 
         elif self.MODE == Mode.PLAYLIST_CREATE:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
-            node.create_playlist()
+            if not node.create_playlist():
+                qobuz.gui.notify(30078, 30046)
+                return False
+            xbmc.executebuiltin('Container.Refresh')
+            return True
 
         elif self.MODE == Mode.PLAYLIST_ADD_TO_CURRENT:
             from  node.playlist import Node_playlist
@@ -298,7 +303,10 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
             from  node.playlist import Node_playlist
             node = Node_playlist(None,self.params)
-            node.add_as_new_playlist()
+            if not node.add_as_new_playlist():
+                return False
+            #xbmc.executebuiltin('Container.Refresh')
+            return False
         
         elif self.MODE == Mode.PLAYLIST_RENAME:
             from  node.user_playlists import Node_user_playlists
@@ -308,7 +316,10 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.PLAYLIST_REMOVE:
             from node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
-            node.remove_playlist(self.params['nid'])
+            if not node.remove_playlist(self.params['nid']):
+                return False
+            xbmc.executebuiltin('Container.Refresh')
+            return True        
 
         elif self.MODE == Mode.PLAYLIST_REMOVE_TRACK:
             from node.playlist import Node_playlist

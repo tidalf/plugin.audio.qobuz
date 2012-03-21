@@ -93,9 +93,9 @@ class QobuzApi:
         params = {
                                    'x-api-auth-token':self.authtoken,
                                    'track_id': track_id ,
-                                   'format_id': format_id,
-                                   'context_type':context_type,
-                                   'context_id':context_id}
+                                   'format_id': 5, #format_id,
+                                   'context_type': 'purchases', #context_type,
+                                   'context_id': context_id}
         data = self._api_request(params, "/api.json/0.1/track/getStreamingUrl")
         return data
 

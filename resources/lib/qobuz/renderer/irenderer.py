@@ -17,6 +17,7 @@
 import qobuz
 from node.flag import NodeFlag
 from debug import info, warn, error, debug
+import pprint
 
 class IRenderer(object):
 
@@ -26,21 +27,15 @@ class IRenderer(object):
         self.root = None
         self.filter = NodeFlag.TYPE_NODE
 
-    def __del__(self):
-        if self.root:
-            self.root.delete_tree()
-            self.root = None
-            
     def to_s(self):
-        import pprint
         return pprint.pformat(self)
-    
+
     def set_depth(self, d):
         self.depth = d
-        
+
     def set_filter(self, filter):
         self.filter = filter
-    
+
     def set_root_node(self):
         root = None
         if self.node_type & NodeFlag.TYPE_ROOT:

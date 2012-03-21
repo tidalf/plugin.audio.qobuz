@@ -46,11 +46,11 @@ class Node_track(Node):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
         else:    
-            self._set_cache(xbmc_directory.Progress)
+            self.set_cache(xbmc_directory.Progress)
             self.set_data(self.cache.get_data())
             return True
         
-    def set_cache(self):
+    def set_cache(self, progress = None):
         id = self.get_id()
         #print "ID: " + str(id )
         if not id:

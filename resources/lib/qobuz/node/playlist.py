@@ -105,8 +105,9 @@ class Node_playlist(Node):
         del self._data['tracks']
         
     def get_name(self):
-        return self.get_property('name')
-
+        name = self.get_property('name')
+        return name
+    
     def get_owner(self):
         return self.get_property(('owner', 'name'))
             
@@ -121,7 +122,7 @@ class Node_playlist(Node):
         owner = self.get_owner()
         url = self.make_url()
         if self.b_is_current:
-            label = qobuz.utils.color(color_item, label)
+            label = ''.join(('-o] ', qobuz.utils.color(color_item, label), ' [o-'))
         if not self.is_my_playlist: 
             label = qobuz.utils.color(color_item, owner) + ' - ' + self.get_name() 
         label = qobuz.utils.color(color_pl, label)
@@ -181,7 +182,7 @@ class Node_playlist(Node):
             nt = None
             try: nt = int(self.get_parameter('nt'))
             except:
-                print "No node type...abort"
+                warn(self, "No node type...abort")
                 return False
             id = None
             try: id = self.get_parameter('nid')        
@@ -201,10 +202,13 @@ class Node_playlist(Node):
             if render.root.type & NodeFlag.TYPE_TRACK:
                 flags = NodeFlag.TYPE_TRACK
             ret = render.root.build_down(dir, depth, flags)
-            if not ret: return False
+            if not ret: 
+                dir.end_of_directory()
+                return False
             trackids = []
             if len(dir.nodes) < 1:
                 warn(self, "No track to add to current playlist")
+                dir.end_of_directory()
                 return False
             for node in dir.nodes:
                 trackids.append(node.get_id())
@@ -215,8 +219,61 @@ class Node_playlist(Node):
             cm = cache_manager()
             pl = Cache_playlist(current_playlist.get_id())
             pl.delete_cache()
-            dir.close()
+            dir.end_of_directory()
+            return True
             
     def add_as_new_playlist(self):
-        print "ADD AS NEW PLAYLIST (FAKE :p)"
-        pass
+        from renderer.xbmc_directory import xbmc_directory
+        from user_playlists import Node_user_playlists
+        from cache.current_playlist import Cache_current_playlist
+        from renderer.xbmc import Xbmc_renderer as renderer
+        nt = None
+        try: nt = int(self.get_parameter('nt'))
+        except:
+            warn(self, "No node type...abort")
+            return False
+        id = None
+        try: id = self.get_parameter('nid')        
+        except: pass 
+        depth = -1
+        try: depth = int(self.get_parameter('depth'))
+        except: pass
+        view_filter = 0
+        try: view_filter = int(self.get_parameter('view-filter'))
+        except: pass
+        render = renderer(nt, id)
+        render.set_depth(depth)
+        render.set_filter(view_filter)
+        render.set_root_node()
+        dir = xbmc_directory(render.root, qobuz.boot.handle, True)
+        flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
+        if render.root.type & NodeFlag.TYPE_TRACK:
+            flags = NodeFlag.TYPE_TRACK
+        ret = render.root.build_down(dir, depth, flags)
+        if not ret:
+            dir.end_of_directory()
+            print "Nothing to add as new playlist"
+            return False
+        print "CREATE PLAYLIST: " + render.root.get_label()
+        userplaylists = Node_user_playlists()
+        if not userplaylists.create_playlist(render.root.get_label()):
+            print "Cannot create playlist..."
+            dir.end_of_directory()
+            return False
+        trackids = []
+        if len(dir.nodes) < 1:
+            warn(self, "No track to add to current playlist")
+            dir.end_of_directory()
+            return False
+        for node in dir.nodes:
+            trackids.append(node.get_id())
+        strtracks = ','.join(trackids)
+        current_playlist = Cache_current_playlist()
+        ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
+        from utils.cache_manager import cache_manager
+        from cache.playlist import Cache_playlist
+        cm = cache_manager()
+        pl = Cache_playlist(current_playlist.get_id())
+        pl.delete_cache()
+        dir.end_of_directory()
+        return True

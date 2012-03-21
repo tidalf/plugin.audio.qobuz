@@ -43,10 +43,10 @@ class Node_product(Node):
         self.set_content_type('songs')
         self.cache = None
         self.is_special_purchase = False
-    
-    def _set_cache(self):
+
+    def set_cache(self):
         id = self.get_id()
-        if not id: 
+        if not id:
             try: id = self.get_parameter('nid')
             except: pass
         if not id:
@@ -59,16 +59,16 @@ class Node_product(Node):
         else:
             self.cache = Cache_product(id)
         return True
-    
+
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
-        if not self._set_cache():
+        if not self.set_cache():
             error(self, "Cannot set product cache")
             return False
         data = self.cache.fetch_data(xbmc_directory.Progress)
         if not data:
             warn(self, "Cannot fetch product data")
             return False
-        self.set_data(data)    
+        self.set_data(data)
         tracks = None
         if self.is_special_purchase: tracks = self._filter_tracks(data)
         else: tracks = data['tracks']
@@ -83,15 +83,15 @@ class Node_product(Node):
         for track in tracks:
             if track['album']['id'] != id: continue
             ltracks.append(track)
-        return ltracks 
-        
+        return ltracks
+
     def make_XbmcListItem(self):
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),
                                 self.get_image(),
                                 self.get_image(),
-                                self.make_url(),                         
+                                self.make_url(),
                                 )
         item.setInfo('music', infoLabels = {
                                             'genre': self.get_genre(),
@@ -110,7 +110,7 @@ class Node_product(Node):
         if a: return a
         a = self.get_property(('composer', 'name'))
         return a
-    
+
     def get_artist_id(self):
         a = self.get_property(('artist', 'id'))
         if a: return int(a)
@@ -119,42 +119,40 @@ class Node_product(Node):
         a = self.get_property(('composer', 'id'))
         if a: return int(a)
         return None
-    
+
     def get_title(self):
-        title =  self.get_property('title')
+        title = self.get_property('title')
         if not title: title = self.get_property('subtitle')
         return title
-    
+
     def get_image(self):
         image = self.get_property(('image', 'large'))
         image = image.replace('_230.', '_600.')
-        if image: 
+        if image:
             self.image = image
             return image
-        if self.parent: 
-            image =  self.parent.get_image()
+        if self.parent:
+            image = self.parent.get_image()
             if image: self.image = image
         return self.image
-    
+
     def get_label(self):
         label = ''.join((self.get_artist(), ' - ', self.get_title()))
         return label
-    
+
     def get_label2(self):
         return self.get_label()
-    
+
     def get_genre(self):
         return self.get_property(('genre', 'name'))
-    
-    
+
     def get_year(self):
         date = self.get_property('release_date')
         year = 0
         try: year = int(date.split('-')[0])
         except: pass
         return year
-    
+
     def get_description(self):
         return self.get_property('description')
-    
-    
+

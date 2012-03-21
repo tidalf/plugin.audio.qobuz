@@ -120,7 +120,7 @@
 	<string id="30101">Show News</string>
 
 
-	<!-- Cache -->
+	<!-- Cache Addon Menu -->
 	<string id="31000">Time in minute for various Qobuz data to be held in
 		cache[CR][I]- Set to zero to disable caching[/I]</string>
 	<string id="31001">Album cache duration</string>
@@ -133,7 +133,12 @@
 	<string id="31008">Authentification cache duration</string>
 	<string id="31009">Erase cache</string>
 	<string id="31010">Playlist Manager</string>
-
+	
+	<!-- Cache Notify -->
+	<string id="31100">Qobuz cache</string>
+	<string id="31101">Error while erasing cached data</string>
+	
+	
 	<!-- Stream -->
 	<string id="32000">Stream type</string>
 	<string id="32001">Skip sample</string>
@@ -192,6 +197,7 @@
 	<string id="40002">Displaying</string>
 	<string id="40003">Done</string>
 	<string id="40004">Processing data</string>
+	<string id="40005">Finding similar artist</string>
 
     <!--  Free account warning -->
     <string id="41000">Free account warning</string>
