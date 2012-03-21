@@ -175,7 +175,7 @@ class Node_playlist(Node):
 
 
     def add_to_current_playlist(self):
-            from renderer.xbmc_directory import xbmc_directory
+            from gui.directory import Directory
             from cache.current_playlist import Cache_current_playlist
             current_playlist = Cache_current_playlist()
             from renderer.xbmc import Xbmc_renderer as renderer
@@ -197,7 +197,7 @@ class Node_playlist(Node):
             render.set_depth(depth)
             render.set_filter(view_filter)
             render.set_root_node()
-            dir = xbmc_directory(render.root, qobuz.boot.handle, True)
+            dir = Directory(render.root, qobuz.boot.handle, True)
             flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
             if render.root.type & NodeFlag.TYPE_TRACK:
                 flags = NodeFlag.TYPE_TRACK
@@ -223,7 +223,7 @@ class Node_playlist(Node):
             return True
             
     def add_as_new_playlist(self):
-        from renderer.xbmc_directory import xbmc_directory
+        from gui.directory import Directory
         from user_playlists import Node_user_playlists
         from cache.current_playlist import Cache_current_playlist
         from renderer.xbmc import Xbmc_renderer as renderer
@@ -245,7 +245,7 @@ class Node_playlist(Node):
         render.set_depth(depth)
         render.set_filter(view_filter)
         render.set_root_node()
-        dir = xbmc_directory(render.root, qobuz.boot.handle, True)
+        dir = Directory(render.root, qobuz.boot.handle, True)
         flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
         if render.root.type & NodeFlag.TYPE_TRACK:
             flags = NodeFlag.TYPE_TRACK
