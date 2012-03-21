@@ -213,6 +213,7 @@ class QobuzBootstrap(object):
         ####################
         # PLAYING
         qobuz.db.connect()
+        qobuz.db.insert('track', ZTRACKID = '23554')
         #
         ####################
         info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
