@@ -228,7 +228,7 @@ class QobuzBootstrap(object):
                 context_type = urllib.unquote(self.params["context_type"])
             except:
                 context_type = "playlist"
-            if qobuz.player.play(self.params['nid']):
+            if qobuz.player.play(self.NID):
                 return True
             return False
 

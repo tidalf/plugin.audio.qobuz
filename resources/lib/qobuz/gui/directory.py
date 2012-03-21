@@ -42,12 +42,6 @@ class Directory():
         self.nodes.append(node)
         return True
 
-#    def _pretty_time(self, time):
-#        hours = (time / 3600)
-#        minutes = (time / 60) - (hours * 60)
-#        seconds = time % 60
-#        return '%02i:%02i:%02i' % (hours, minutes, seconds)
-
     def update(self, count, total, line1, line2 = '', line3 = ''):
         percent = 100
         if total and count:
@@ -55,7 +49,6 @@ class Directory():
         else:
             percent = count
             if percent > 100: percent = 100
-        #pet = self._pretty_time(int(self.elapsed()))
         labstat = '[%05i]' % (self.total_put)
         self.line1 = labstat
         self.line1 = line1

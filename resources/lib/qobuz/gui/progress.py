@@ -49,7 +49,10 @@ class Progress(xbmcgui.DialogProgress):
         self.line3 = line3
         if not self.active: return False
         self.started_on = time.time()
-        return super(Progress, self).create(line1, line2, line3)
+        try:return super(Progress, self).create(line1, line2, line3)
+        except:
+            warn(self, "Cannot create progress bar")
+            return False
 
     def _pretty_time(self, time):
         hours = (time / 3600)
@@ -64,19 +67,31 @@ class Progress(xbmcgui.DialogProgress):
         self.line3 = line3
         if not self.active: return False
         elapsed = self._pretty_time((time.time() - self.started_on))
-        return super(Progress, self).update(percent, '[%s] %s' % (elapsed, line1), line2, line3)
+        try: return super(Progress, self).update(percent, '[%s] %s' % (elapsed, line1), line2, line3)
+        except:
+            warn(self, "Cannot update progress bar")
+            return False
 
     def update_line1(self, line):
         if not line or line == self.line1:
             return False
         self.line1 = line
-        return self.update(self.percent, self.line1, self.line2, self.line3)
+        try: return self.update(self.percent, self.line1, self.line2, self.line3)
+        except:
+            warn(self, "Cannot update line1 progress bar")
+            return False
 
     def iscanceled(self):
         if not self.active: return False
         if not self.is_cancelable: return False
-        return super(Progress, self).iscanceled()
+        try: return super(Progress, self).iscanceled()
+        except:
+            warn(self, "Cannot get iscanceled progress bar status")
+            return False
 
     def close(self):
         if not self.active: return False
-        return super(Progress, self).close()
+        try: return super(Progress, self).close()
+        except:
+            warn(self, "Cannot close progress bar")
+            return False

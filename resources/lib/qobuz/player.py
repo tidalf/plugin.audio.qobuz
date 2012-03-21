@@ -58,7 +58,7 @@ class QobuzPlayer(xbmc.Player):
         return True
             
     def play(self, id):
-        progress = Progress(False)
+        progress = Progress(True)
         progress.create("Qobuz Player")
         info(self, "Playing track: " + str(id))
         node = Node_track()
@@ -106,7 +106,7 @@ class QobuzPlayer(xbmc.Player):
         '''
             Waiting for song to start
         '''
-        timeout = 30
+        timeout = 5
         info(self, "Waiting song to start")
         while timeout > 0:
             if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
@@ -151,6 +151,6 @@ class QobuzPlayer(xbmc.Player):
                 print "Start"
                 self.sendQobuzPlaybackStarted(node.get_id())
                 start = True
-            #xbmc.sleep(250)
-            time.sleep(0.25)
+            xbmc.sleep(250)
+            #time.sleep(0.25)
        

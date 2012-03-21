@@ -28,7 +28,7 @@ import qobuz
 from debug import *
 import socket
 
-socket.timeout = 1
+socket.timeout = 3
 
 class QobuzApi:
 
@@ -44,18 +44,18 @@ class QobuzApi:
 
     def _api_request(self, params, uri):
         url = "http://player.qobuz.com"
-        
-        qheaders={}
+
+        qheaders = {}
         if self.authtoken:
             qheaders["x-api-auth-token"] = self.authtoken
-            
+
         r = None
-        try: 
+        try:
             r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
         except:
             warn(self, "API Error: POST fail")
             return None
-        if r.cookies: 
+        if r.cookies:
                 self.cookie = r.cookies
         if not r.content:
             warn(self, "No content return")
@@ -134,6 +134,7 @@ class QobuzApi:
         return self.get_album_tracks(id, context_type)
 
     def get_recommandations(self, genre_id, typer = "new-releases", limit = 100):
+        limit = 1000
         if genre_id == 'null':
             params = {'x-api-auth-token': self.authtoken,
                                        'type': typer, 'limit': limit}
@@ -213,7 +214,7 @@ class QobuzApi:
                                    'playlist_track_ids': playlist_track_id,
                                    }
         log("info", "deleting " + playlist_track_id + " from playlist " + playlist_id)
-        return self._api_request(params,"/api.json/0.1/playlist/deleteTracks")
+        return self._api_request(params, "/api.json/0.1/playlist/deleteTracks")
 
     def playlist_create (self, playlist_name, tracks_id = '', description = '', album_id = '', is_public = 'on', is_collaborative = 'off'):
         params = {'x-api-auth-token': self.authtoken,
@@ -249,15 +250,15 @@ class QobuzApi:
         return res
 
     def get_similar_artists(self, query):
-        
+
         url = 'http://ws.audioscrobbler.com/2.0/'
         params = {
                   'method': 'artist.getsimilar',
-                  'artist': query, 
+                  'artist': query,
                   'api_key': 'b25b959554ed76058ac220b7b2e0a026',
         }
         r = requests.post(url, data = params)
         return r.content
-    
+
 if __name__ == '__main__':
     pass

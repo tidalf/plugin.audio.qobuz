@@ -48,7 +48,8 @@ RECOS_GENRES = {
               94: qobuz.lang(30092),
               112: qobuz.lang(30087),
               127: qobuz.lang(30200),
-              123: qobuz.lang(30203)
+              123: qobuz.lang(30203),
+              'null': 'All',
               }
 '''
     NODE RECOS
@@ -61,7 +62,7 @@ class Node_recommendation(Node):
         super(Node_recommendation, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_RECOMMENDATION
         genre_id = self.get_parameter('genre-id')
-        if genre_id != None: self.genre_id = int(genre_id)
+        if genre_id != None: self.genre_id = genre_id
         else: self.genre_id = None
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(qobuz.lang(30082))
@@ -92,12 +93,11 @@ class Node_recommendation(Node):
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
         types = []
-        self.label = "Recommendation"
         color = qobuz.addon.getSetting('color_item')
         for gtype in RECOS_TYPES:
             node = Node_recommendation()
             node.set_genre_type(gtype)
-            node.set_label(qobuz.utils.color(color, RECOS_TYPES[gtype]))
+            node.set_label(self.label + ' / ' + qobuz.utils.color(color, RECOS_TYPES[gtype]))
             self.add_child(node)
         return True
 
@@ -109,12 +109,12 @@ class Node_recommendation(Node):
             node = Node_recommendation()
             type = self.get_genre_type()
             node.set_genre_type(self.get_genre_type())
-            node.set_genre_id(int(genreid))
+            node.set_genre_id(genreid)
             if qobuz.addon.getSetting('userplaylists_display_cover') == 'true':
                 image_name = 'recos-%s-%s' % (type, genreid)
                 image = qobuz.image.cache.get(image_name)
                 if image: node.image = image
-            node.set_label(qobuz.utils.color(color, RECOS_TYPES[self.genre_type] + ' / ') + RECOS_GENRES[genreid])
+            node.set_label(self.label + ' / ' + qobuz.utils.color(color, RECOS_TYPES[self.genre_type]) + ' / ' + RECOS_GENRES[genreid])
             self.add_child(node)
         return True
 
@@ -128,7 +128,9 @@ class Node_recommendation(Node):
             return False
         self.set_data(data)
         if qobuz.addon.getSetting('userplaylists_display_cover') == 'true':
-            image_name = 'recos-%s-%i' % (self.get_genre_type(), self.get_genre_id())
+            genre_id = self.get_genre_id()
+            if genre_id != 'null': genre_id = str(genre_id)
+            image_name = 'recos-%s-%s' % (self.get_genre_type(), genre_id)
             image = qobuz.image.cache.get(image_name)
             if not image: self._get_random_image_type_genre(image_name, data)
         for product in data:
