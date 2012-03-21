@@ -35,22 +35,22 @@ class Xbmc_renderer(IRenderer):
 
         
     def display(self):
-        from renderer.xbmc_directory import xbmc_directory
+        from gui.directory import Directory
         if not self.set_root_node():
             warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
-        dir = xbmc_directory(self.root, qobuz.boot.handle, False)
+        dir = Directory(self.root, qobuz.boot.handle, False)
         self.root.build_down(dir, self.depth, self.filter)
         dir.set_content(self.root.content_type)
         dir.end_of_directory()
         return True
     
     def scan(self):
-        from renderer.xbmc_directory import xbmc_directory
+        from gui.directory import Directory
         if not self.set_root_node():
             warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
-        dir = xbmc_directory(self.root, qobuz.boot.handle, False)
+        dir = Directory(self.root, qobuz.boot.handle, False)
         self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
         dir.set_content(self.root.content_type)
         dir.end_of_directory()

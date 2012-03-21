@@ -31,7 +31,7 @@ from debug import __debugging__
 import qobuz
 
 class Progress(xbmcgui.DialogProgress):
-    
+
     def __init__(self, active = True):
         self.active = active
         self.is_cancelable = True
@@ -50,13 +50,13 @@ class Progress(xbmcgui.DialogProgress):
         if not self.active: return False
         self.started_on = time.time()
         return super(Progress, self).create(line1, line2, line3)
-    
+
     def _pretty_time(self, time):
         hours = (time / 3600)
         minutes = (time / 60) - (hours * 60)
         seconds = time % 60
         return '%02i:%02i:%02i' % (hours, minutes, seconds)
-    
+
     def update(self, percent, line1, line2 = '', line3 = ''):
         if line1:
             self.line1 = line1
@@ -65,13 +65,13 @@ class Progress(xbmcgui.DialogProgress):
         if not self.active: return False
         elapsed = self._pretty_time((time.time() - self.started_on))
         return super(Progress, self).update(percent, '[%s] %s' % (elapsed, line1), line2, line3)
-        
+
     def update_line1(self, line):
         if not line or line == self.line1:
             return False
         self.line1 = line
         return self.update(self.percent, self.line1, self.line2, self.line3)
-    
+
     def iscanceled(self):
         if not self.active: return False
         if not self.is_cancelable: return False
@@ -80,48 +80,3 @@ class Progress(xbmcgui.DialogProgress):
     def close(self):
         if not self.active: return False
         return super(Progress, self).close()
-'''
-    CLASS QobuzGUI
-'''
-class QobuzGUI:
-
-    def __init__(self):
-        pass
-
-    def notifyH(self, title, text, image = None, mstime = 2000):
-        if not image: image = qobuz.image.access.get('qobuzIcon')
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
-        xbmc.executebuiltin(s)
-
-    def notify(self, title, text, image = None, mstime = 2000):
-        if not image: image = qobuz.image.access.get('qobuzIcon')
-        l = qobuz.lang
-        s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), mstime, image)
-        xbmc.executebuiltin(s)
-
-    def show_login_failure(self):
-        __language__ = qobuz.lang
-        dialog = xbmcgui.Dialog()
-        if dialog.yesno(__language__(30008), __language__(30034), __language__(30040)):
-            qobuz.addon.openSettings()
-            xbmcplugin.endOfDirectory(handle = int(sys.argv[1]), succeeded = False, updateListing = True, cacheToDisc = False)
-            return qobuz.boot.dispatch()
-        else:
-            xbmc.executebuiltin('ActivateWindow(home)')
-            return False
-    
-    def is_free_account(self):
-        if not qobuz.boot.auth.get_data()['user']['credential']['allowed_audio_format_ids']:
-            return True
-        return False
-    
-    def popup_free_account(self):
-        if qobuz.addon.getSetting('warn_free_account') != 'true':
-            return
-        dialog = xbmcgui.Dialog()
-        ok = dialog.yesno(qobuz.lang(41000), qobuz.lang(41001), qobuz.lang(41002), qobuz.lang(41003))
-        if ok:
-            qobuz.addon.setSetting('warn_free_account', 'false')
-
-    def executeJSONRPC(self, json):
-        return xbmc.executeJSONRPC(json)

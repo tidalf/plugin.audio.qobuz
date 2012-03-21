@@ -27,7 +27,7 @@ import xbmcgui
 import json 
 import qobuz
 from debug import info, warn
-from gui import Progress
+from gui.progress import Progress
 
 from node.track import Node_track
 

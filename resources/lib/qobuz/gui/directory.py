@@ -4,12 +4,12 @@ import xbmcgui
 
 from node.flag import NodeFlag
 from constants import Mode
-from gui import Progress
+from progress import Progress
 import qobuz
 import time
 from debug import warn
 
-class xbmc_directory():
+class Directory():
 
     def __init__(self, root, handle, ALL_AT_ONCE = False):
         self.nodes = []

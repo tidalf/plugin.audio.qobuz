@@ -157,8 +157,8 @@ class QobuzBootstrap(object):
         qobuz.image = QobuzImage()
 
     def bootstrap_gui(self):
-        from gui import QobuzGUI
-        qobuz.gui = QobuzGUI()
+        from gui.utils import Utils
+        qobuz.gui = Utils()
 
     def bootstrap_player(self):
         #warn(self, "REWRITE! need to bootstrap player")
