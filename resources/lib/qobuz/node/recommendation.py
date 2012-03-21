@@ -36,7 +36,7 @@ RECOS_TYPES = {
                       'editor-picks': qobuz.lang(30086),
                       }
 
-RECOS_GENRES ={
+RECOS_GENRES = {
               2: qobuz.lang(30093),
               10: qobuz.lang(30095),
               6: qobuz.lang(30090),
@@ -48,7 +48,7 @@ RECOS_GENRES ={
               94: qobuz.lang(30092),
               112: qobuz.lang(30087),
               127: qobuz.lang(30200),
-              123: qobuz.lang(30203) 
+              123: qobuz.lang(30203)
               }
 '''
     NODE RECOS
@@ -73,7 +73,7 @@ class Node_recommendation(Node):
             url += '&genre-type=' + self.genre_type
         if self.genre_id:
             url += '&genre-id=' + str(self.genre_id)
-        if 'action' in self.parameters and self.parameters['action'] == 'scan': 
+        if 'action' in self.parameters and self.parameters['action'] == 'scan':
             url += "&action=scan"
         return url
 
@@ -118,12 +118,12 @@ class Node_recommendation(Node):
             self.add_child(node)
         return True
 
-    
+
 # TYPE GENRE
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
         self.cache = Cache_recommendation(self.genre_id, self.genre_type)
         data = self.cache.fetch_data()
-        if not data: 
+        if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
         self.set_data(data)
@@ -143,16 +143,14 @@ class Node_recommendation(Node):
         if size < 1: return None
         r = random.randint(0, size - 1)
         image = ''
-        print pprint.pformat(data[r])
-        try: 
-            
+        try:
             image = data[r]['image']['large']
             image.replace("_230.", "_600.")
         except: pass
         if not image: return None
         qobuz.image.cache.set(image_name, image)
         return image
-    
+
 #    def cache_image(self, product):
 #        id = 'recos-'+self.genre_type
 #        image = qobuz.image.cache.get(id)
@@ -162,15 +160,15 @@ class Node_recommendation(Node):
 #        image = qobuz.image.cache.get(id)
 #        if not image: 
 #            qobuz.image.cache.set(id, product.get_image())
-        
+
 
 # DISPATCH
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
         if not self.genre_type:
-            return self._build_recos_type(xbmc_directory,lvl, flag)
+            return self._build_recos_type(xbmc_directory, lvl, flag)
         elif not self.genre_id:
-            return self._build_recos_genre(xbmc_directory,lvl, flag)
+            return self._build_recos_genre(xbmc_directory, lvl, flag)
         self.set_content_type('albums')
-        return self._build_down_type_genre(xbmc_directory,lvl, flag)
+        return self._build_down_type_genre(xbmc_directory, lvl, flag)
 
 

@@ -75,7 +75,7 @@ class QobuzImage_cache(ICacheable):
 
     def get(self, id):
         data = self.get_data()
-        if id in data and (time.time() - data[id]['time']) < 3600:
+        if id in data and (time.time() - data[id]['time']) < 3600000:
             return data[id]['url']
         return ''
 

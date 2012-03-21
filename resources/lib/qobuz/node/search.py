@@ -14,7 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys 
+import sys
 import qobuz
 from debug import info, warn, error
 from flag import NodeFlag
@@ -26,7 +26,7 @@ from constants import Mode
 import pprint
 
 #from search.artists import Search_artists
-            
+
 class Node_search(Node):
 
     def __init__(self, parent = None, params = None):
@@ -34,13 +34,13 @@ class Node_search(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
         self.thumb = self.icon = qobuz.image.access.get('song')
         self.set_search_type('albums')
-        
+
     def get_label(self):
         return self.label
 
     def get_description(self):
         return self.get_label()
-    
+
     def set_search_type(self, st):
         if st == 'artists':
             self.label = qobuz.lang(30015)
@@ -55,18 +55,18 @@ class Node_search(Node):
             self.image = qobuz.image.access.get('song')
             self.set_content_type('songs')
         self.search_type = st
-        
+
     def get_search_type(self):
         return self.search_type
 
     def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
         url += '&search-type=' + self.search_type
-        if 'action' in self.parameters and self.parameters['action'] == 'scan': 
+        if 'action' in self.parameters and self.parameters['action'] == 'scan':
             url += "&action=scan"
         return url
 
-    def _build_down(self,xbmc_directory,  lvl, flag):
+    def _build_down(self, xbmc_directory, lvl, flag):
         stype = self.get_search_type()
         search = None
         limit = None
@@ -76,7 +76,7 @@ class Node_search(Node):
             search = Search_tracks()
             limit = qobuz.addon.getSetting('songsearchlimit')
             heading = qobuz.lang(30013)
- 
+
         elif stype == 'albums':
             from qobuz.search.albums import Search_albums
             info(self, "Searching albums")
@@ -106,7 +106,6 @@ class Node_search(Node):
             warn(self, "Search return no data")
             return False
         self.notify_data_result(data)
-        #print pprint.pformat(data)
         if self.search_type == 'albums':
             for json_product in data:
                 json_product = json_product['product']
@@ -144,5 +143,5 @@ class Node_search(Node):
                           'Songs: ' + str(data['length']['tracks']) + "\n"
                           , None, 5000)
         return True
-    
+
 

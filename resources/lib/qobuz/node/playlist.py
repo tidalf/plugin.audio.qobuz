@@ -252,12 +252,12 @@ class Node_playlist(Node):
         ret = render.root.build_down(dir, depth, flags)
         if not ret:
             dir.end_of_directory()
-            print "Nothing to add as new playlist"
+            warn(self, "Nothing to add as new playlist")
             return False
-        print "CREATE PLAYLIST: " + render.root.get_label()
+        info(self, "CREATE PLAYLIST: " + render.root.get_label())
         userplaylists = Node_user_playlists()
         if not userplaylists.create_playlist(render.root.get_label()):
-            print "Cannot create playlist..."
+            warn(self, "Cannot create playlist...")
             dir.end_of_directory()
             return False
         trackids = []

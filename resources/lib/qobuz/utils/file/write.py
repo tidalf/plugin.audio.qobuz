@@ -60,7 +60,6 @@ class safe_write():
         newpath = os.path.join(basepath, new)
         os.rename(path, newpath)
         if not os.path.exists(newpath):
-            print "Cannot rename file"
             return False
         return self._unlink(newpath)
 

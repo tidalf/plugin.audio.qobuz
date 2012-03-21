@@ -42,17 +42,17 @@ class Node_track(Node):
         self.cache = None
         self.cache_url = None
 
-    def _build_down(self,xbmc_directory,  lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
-        else:    
+        else:
             self.set_cache(xbmc_directory.Progress)
-            self.set_data(self.cache.get_data())
+            self.set_data(self.cache.fetch_data())
+            xbmc_directory.add_node(self)
             return True
-        
+
     def set_cache(self, progress = None):
         id = self.get_id()
-        #print "ID: " + str(id )
         if not id:
             try:
                 id = self.get_parameter('nid')
@@ -60,13 +60,12 @@ class Node_track(Node):
         if not id:
             error(self, "Cannot set cache without id")
             return False
-        #self.set_id(id)
         self.cache = Cache_track(id, self.qobuz_context_type, False)
         return True
-    
+
     def make_url(self, mode = Mode.PLAY):
         return super(Node_track, self).make_url(mode)
-    
+
     def get_label(self, format = "%a - %t"):
         format = format.replace("%a", self.get_artist())
         format = format.replace("%t", self.get_title())
@@ -74,13 +73,13 @@ class Node_track(Node):
         format = format.replace("%n", self.get_track_number())
         format = format.replace("%g", self.get_genre())
         return format
-    
+
     def is_sample(self):
         streamtype = self.get_property('streamtype')
         if 'full' in streamtype:
             return True
         return False
-    
+
     def get_composer(self):
         return self.get_property(('composer', 'name'))
 
@@ -94,7 +93,7 @@ class Node_track(Node):
         if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
             return self.parent.get_title()
         return ''
-            
+
     def get_image(self):
         image = self.get_property(('album', 'image', 'large'))
         if image: return image.replace('_230.', '_600.')
@@ -123,13 +122,13 @@ class Node_track(Node):
         if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
             return self.parent.get_genre()
         return ''
-    
+
     def get_streaming_url(self):
         self._set_cache_streaming_url()
         data = self.cache_url.get_data()
         if not data: return None
         return data['streaming_url']
-    
+
     def get_artist(self):
         s = self.get_interpreter()
         if s: return s
@@ -138,9 +137,9 @@ class Node_track(Node):
     def get_artist_id(self):
         s = self.get_property(('artist', 'id'))
         if s: return int(s)
-        s =  self.get_property(('composer', 'id'))
+        s = self.get_property(('composer', 'id'))
         if s: return int(s)
-        s =  self.get_property(('interpreter', 'id'))
+        s = self.get_property(('interpreter', 'id'))
         if s: return int(s)
         return None
 
@@ -169,12 +168,12 @@ class Node_track(Node):
     def  get_description(self):
         if self.parent: return self.parent.get_description()
         return ''
-    
+
     def _set_cache_streaming_url(self):
         if not self.cache_url:
             self.cache_url = Cache_track_stream_url(self.get_id())
         self.cache_url.fetch_data()
-        
+
     def get_mimetype(self):
         self._set_cache_streaming_url()
         data = self.cache_url.get_data()
@@ -188,7 +187,7 @@ class Node_track(Node):
         else:
             mime = 'audio/mpeg'
         return mime
-    
+
     def make_XbmcListItem(self):
         media_number = self.get_media_number()
         if not media_number: media_number = 1
@@ -198,7 +197,7 @@ class Node_track(Node):
         isplayable = 'true'
         if self.get_streaming_type() == 'sample' or qobuz.gui.is_free_account():
             duration = 60
-            label =  '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
+            label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
         mode = Mode.PLAY
         url = self.make_url(mode)
         item = xbmcgui.ListItem(label,
@@ -209,7 +208,7 @@ class Node_track(Node):
         if not item:
             warn(self, "Cannot create xbmc list item")
             return None
-        item.setPath(url)                        
+        item.setPath(url)
         track_number = self.get_track_number()
         if not track_number: track_number = 0
         else: track_number = int(track_number)
@@ -240,6 +239,5 @@ class Node_track(Node):
         color = qobuz.addon.getSetting('color_item')
         if self.parent and self.parent.type & NodeFlag.TYPE_PLAYLIST:
             url = self.parent.make_url(Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
-            #print "URL: " + url
-            menuItems.append((qobuz.utils.color(color, "(i8n) Remove track: ")+ self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
-        
+            menuItems.append((qobuz.utils.color(color, "(i8n) Remove track: ") + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
+
