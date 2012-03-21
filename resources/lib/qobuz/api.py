@@ -92,10 +92,11 @@ class QobuzApi:
     def get_track_url(self, track_id, context_type, context_id , format_id = 6):
         params = {
                                    'x-api-auth-token':self.authtoken,
-                                   'track_id': track_id ,
+                                   'track_id': track_id,
                                    'format_id': format_id,
                                    'context_type': context_type,
-                                   'context_id': context_id}
+                                   #'context_id': context_id
+                                   }
         data = self._api_request(params, "/api.json/0.1/track/getStreamingUrl")
         return data
 

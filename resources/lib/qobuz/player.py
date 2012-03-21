@@ -24,7 +24,7 @@ import pprint
 import xbmc
 import xbmcplugin
 import xbmcgui
-import json 
+import json
 import qobuz
 from debug import info, warn
 from gui.progress import Progress
@@ -42,7 +42,7 @@ class QobuzPlayer(xbmc.Player):
     def sendQobuzPlaybackEnded(self, track_id, duration):
         qobuz.api.report_streaming_stop(track_id, duration)
 
-    def sendQobuzPlaybackStarted(self,track_id):
+    def sendQobuzPlaybackStarted(self, track_id):
         qobuz.api.report_streaming_start(track_id)
 
     def onPlayBackEnded(self):
@@ -50,13 +50,13 @@ class QobuzPlayer(xbmc.Player):
             return False
         self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
         return True
-    
+
     def onPlayBackStopped(self):
         if not (self.track_id and self.total and self.elapsed):
             return False
         self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
         return True
-            
+
     def play(self, id):
         progress = Progress(True)
         progress.create("Qobuz Player")
@@ -65,17 +65,20 @@ class QobuzPlayer(xbmc.Player):
         node.set_id(id)
         node.set_cache()
         data = node.cache.fetch_data()
+        label = None
         if not data:
             warn(self, "Cannot get track data")
             progress.update(25, "Cannot get data from Qobuz... abort")
-            progress.close()
-            return False
+            label = "Maybe an invalid track id"
+            # QOBUE PURCHASE DON'T response to json api track/get ...
+            #progress.close()
+            #return False
         node.set_data(data)
         progress.update(50, "Getting stream url", node.get_label())
         lang = qobuz.lang
         item = node.make_XbmcListItem()
         mimetype = node.get_mimetype()
-        if not mimetype: 
+        if not mimetype:
             warn(self, "Cannot get track strem url")
             progress.update(50, "Cannot get stream url", node.get_label())
             progress.close()
@@ -94,7 +97,7 @@ class QobuzPlayer(xbmc.Player):
         '''
             We are called from playlist...
         '''
-        
+
         if qobuz.boot.handle == -1:
             super(QobuzPlayer, self).play(streaming_url, item, False)
         else:
@@ -121,24 +124,24 @@ class QobuzPlayer(xbmc.Player):
             return False
         progress.update(100, "Playing track", node.get_label())
         progress.close()
-        self.watch_playing( node, streaming_url)
+        self.watch_playing(node, streaming_url)
         return True
-    
+
     def isPlayingAudio(self):
         try: return super(QobuzPlayer, self).isPlayingAudio()
         except: warn(self, "EXCEPTION: isPlayingAudio")
         return False
-    
+
     def getPlayingFile(self):
         try: return super(QobuzPlayer, self).getPlayingFile()
         except: warn(self, "EXCEPTION: getPlayingFile")
         return ''
-    
+
     def getTotalTime(self):
         try: return super(QobuzPlayer, self).getTotalTime()
         except: warn(self, "EXCEPTION: getTotalTime")
         return -1
-    
+
     def watch_playing(self, node, streaming_url):
         start = None
         self.total = None
@@ -151,6 +154,6 @@ class QobuzPlayer(xbmc.Player):
                 print "Start"
                 self.sendQobuzPlaybackStarted(node.get_id())
                 start = True
-            xbmc.sleep(250)
+            xbmc.sleep(500)
             #time.sleep(0.25)
-       
+
