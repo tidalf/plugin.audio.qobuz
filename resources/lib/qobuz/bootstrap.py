@@ -166,9 +166,9 @@ class QobuzBootstrap(object):
         qobuz.player = QobuzPlayer()
 
     def bootstrap_db(self):
-        from db.itable import Db
+        from db.manager import Manager
         path = os.path.join(qobuz.path.cache, 'data.s3')
-        qobuz.db = Db(path)
+        qobuz.db = Manager(path)
     '''
         Parse system parameters
     '''
@@ -209,12 +209,18 @@ class QobuzBootstrap(object):
     '''
     def dispatch(self):
         import pprint, xbmc
+        import time
         ret = False
         ####################
         # PLAYING
-        qobuz.db.connect()
-        qobuz.db.insert('track', ZTRACKID = '23554')
-        #
+        db = qobuz.db
+        db.connect()
+#        db.insert('track', where = { "id": 3434, 'composer_id': 532345})#str(int(time.time()))
+#        row = db.get('track', where = {"id": 2132912 })
+#        if not row:
+#            print 'Cannot get track'
+#        print "Track in database!!!"
+
         ####################
         info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
 
