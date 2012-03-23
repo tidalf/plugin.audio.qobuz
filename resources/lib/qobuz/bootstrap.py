@@ -213,8 +213,8 @@ class QobuzBootstrap(object):
         ret = False
         ####################
         # PLAYING
-        db = qobuz.db
-        db.connect()
+#        db = qobuz.db
+#        db.connect()
 #        db.insert('track', where = { "id": 3434, 'composer_id': 532345})#str(int(time.time()))
 #        row = db.get('track', where = {"id": 2132912 })
 #        if not row:
