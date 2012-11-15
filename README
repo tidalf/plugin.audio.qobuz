@@ -22,7 +22,6 @@ note: you need Hifi subscription to stream flac files or premium subscription to
 Known Issues:
 -------------
 - Xbmc library mode and playlists are supported using patched xbmc (https://github.com/xbmc/xbmc/pull/688)
-- mp3 play is slower than flac 
-- Eden only (you need to install xbmc eden-pre)
+- some unstabilities
 
 The authors are not affiliated with Qobuz
