@@ -78,7 +78,7 @@ class Node(object):
             return ''
         if isinstance(path,basestring):
             if path in self._data and self._data[path] and self._data[path] != 'None':
-                return self._data[path].encode('utf8','ignore')
+                return self._data[path] #.encode('utf8','ignore')
             return ''
         root = self._data
         for i in range(0,len(path)):
@@ -86,7 +86,7 @@ class Node(object):
                 return ''
             root = root[path[i]]
         if root and root != 'None':
-            return root.encode('utf8','replace')
+            return root # .encode('utf8','replace')
         return ''
 
     def set_is_folder(self,b):
@@ -273,7 +273,7 @@ class Node(object):
         return '%s?mode=%i&nt=%i&nid=%s' % (sys.argv[0],mode,nt,nid)
 
     def attach_context_menu(self,item):
-        import urllib
+        # import urllib
         color = qobuz.addon.getSetting('color_item')
         menuItems = []
         cmd = ''
@@ -293,7 +293,8 @@ class Node(object):
 
             ''' Similar artist '''
             id = self.get_artist_id()
-            query = urllib.quote(self.get_artist())
+            import urllib
+            query = urllib.quote(self.get_artist().encode('utf-8'))
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW,
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
                                          id,query)
@@ -304,9 +305,11 @@ class Node(object):
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((qobuz.utils.color(color,qobuz.lang(39005)),cmd))
 
-        ''' ADD AS NEW '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))
-        menuItems.append((qobuz.utils.color(color, "(i8n) Add as new"),cmd))
+        #=======================================================================
+        # ''' ADD AS NEW '''
+        # cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))
+        # menuItems.append((qobuz.utils.color(color, "(i8n) Add as new"),cmd))
+        #=======================================================================
         
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):
@@ -324,7 +327,10 @@ class Node(object):
 
         ''' SCAN '''
         url = self.make_url(Mode.SCAN)
-        label = qobuz.utils.color(color,qobuz.lang(39003) + ": ") + self.get_label().decode('utf8','replace')
+        try:
+            label = qobuz.utils.color(color,qobuz.lang(39003) + ": ") + self.get_label().decode('utf8','replace')
+        except: pass
+        
         menuItems.append((label,'XBMC.UpdateLibrary("music", "%s")' % (url)))
 
         ''' ERASE CACHE '''

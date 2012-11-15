@@ -89,7 +89,7 @@ class QobuzBootstrap(object):
             exit(1)
         if qobuz.gui.is_free_account():
             qobuz.gui.popup_free_account()
-        self.bootstrap_db()
+        # self.bootstrap_db()
         return self.dispatch()
 
     def bootstrap_lang(self):
@@ -165,10 +165,10 @@ class QobuzBootstrap(object):
         from player import QobuzPlayer
         qobuz.player = QobuzPlayer()
 
-    def bootstrap_db(self):
-        from db.manager import Manager
-        path = os.path.join(qobuz.path.cache, 'data.s3')
-        qobuz.db = Manager(path)
+    #def bootstrap_db(self):
+    #    from db.manager import Manager
+    #    path = os.path.join(qobuz.path.cache, 'data.s3')
+    #    qobuz.db = Manager(path)
     '''
         Parse system parameters
     '''
@@ -307,12 +307,14 @@ class QobuzBootstrap(object):
                 return False
             return True
 
-        elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
-            from  node.playlist import Node_playlist
-            node = Node_playlist(None, self.params)
-            if not node.add_as_new_playlist():
-                return False
-            return True
+        #=======================================================================
+        # elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
+        #    from  node.playlist import Node_playlist
+        #    node = Node_playlist(None, self.params)
+        #    if not node.add_as_new_playlist():
+        #        return False
+        #    return True
+        #=======================================================================
 
         elif self.MODE == Mode.PLAYLIST_RENAME:
             from  node.user_playlists import Node_user_playlists

@@ -41,7 +41,7 @@ class Cache_product(ICacheable):
     def _fetch_data(self):
         data = qobuz.api.get_product(str(self.id), self.context_type)
         if not data: return None
-        return data['product']
+        return data
 
     def length(self):
         return len(self._raw_data['tracks'])

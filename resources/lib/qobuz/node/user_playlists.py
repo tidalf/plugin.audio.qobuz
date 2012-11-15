@@ -127,7 +127,7 @@ class Node_user_playlists(Node):
             return False
         userplaylists = Cache_user_playlists()
         userplaylists.delete_cache()
-        self.set_current_playlist(ret['playlist']['id'])
+        self.set_current_playlist(ret['id'])
         return True
 
     ''' 

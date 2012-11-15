@@ -43,7 +43,7 @@ class Cache_user_playlists_toremove(ICacheable):
         raw_data = self.Api.get_user_playlists()
         if not raw_data: return None
         data = []
-        for p in raw_data: data.append(p['playlist'])
+        for p in raw_data['playlists']['items']: data.append(p)
         return data
 
     def length(self):

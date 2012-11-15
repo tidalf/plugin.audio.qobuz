@@ -43,10 +43,12 @@ class Cache_authentication(ICacheable):
         c.delete_token_data()
 
     def _fetch_data(self):
-        params = {'x-api-auth-token': 'null',
-                  'email': self.login ,
-                  'hashed_password': hashlib.md5(self.password).hexdigest() }
-        data = qobuz.api._api_request(params, "/api.json/0.1/user/login")
+        params = {
+                  'password': hashlib.md5(self.password).hexdigest(),
+                  'username': self.login, 
+                  'email': self.login,
+                   }
+        data = qobuz.api._api_request(params, "/api.json/0.2/user/login")
         if not data: return None
         if not 'user' in data: return None
         if not 'id' in data['user']: return None

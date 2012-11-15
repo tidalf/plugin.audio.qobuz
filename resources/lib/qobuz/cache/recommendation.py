@@ -46,7 +46,7 @@ class Cache_recommendation(ICacheable):
     def _fetch_data(self):
         return qobuz.api.get_recommandations(self.genre_id,
                                              self.type,
-                                             self.limit)
+                                             self.limit)['albums']['items']
     def length(self):
         return len(self.get_raw_data())
 

@@ -61,12 +61,18 @@ class Node_artist(Node):
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
-        total = len(data['artist']['albums'])
+        try: 
+            total = len(data['albums']['items'])
+        except: 
+            import pprint
+            warn(self, pprint.pformat(data))
         count = 0
-        for jproduct in data['artist']['albums']:
-            keys = ['artist', 'interpreter', 'composer']
+        for jproduct in data['albums']['items']:
+            keys = ['artist', 'interpreter', 'composer','performer']
             for k in keys:
-                if k in data['artist']: jproduct[k] = weakref.proxy(data['artist'][k])
+                try: 
+                    if k in data['artist']: jproduct[k] = weakref.proxy(data['artist'][k])
+                except: pass
             node = Node_product()
             node.set_data(jproduct)
             xbmc_directory.update(count, total, "Add album:" + node.get_label(), '')

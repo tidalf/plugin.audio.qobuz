@@ -54,10 +54,10 @@ class Node_purchases(Node):
         # Qobuz free tracks with invalid product id
         #blackid = ['0000020110926', '0000201011300', '0000020120220', '0000020120221']
         albumseen = {}
-        for track in data:
-            json = track['album']
-            json[u'composer'] = track['composer']
-            json[u'interpreter'] = track['interpreter']
+        for track in data['albums']['items']:
+            json = track
+            # json[u'composer'] = track['composer']
+            json[u'interpreter'] = track['artist']['name']
             product = Node_product()
             product.set_data(json)
             id = product.get_id()

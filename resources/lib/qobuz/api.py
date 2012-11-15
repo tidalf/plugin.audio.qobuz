@@ -23,7 +23,7 @@ import pickle
 import pprint
 from time import time
 import math
-
+import md5
 import qobuz
 from debug import *
 import socket
@@ -47,8 +47,8 @@ class QobuzApi:
 
         qheaders = {}
         if self.authtoken:
-            qheaders["x-api-auth-token"] = self.authtoken
-
+            qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
+        qheaders["X-APP-ID"] = '214748364'
         r = None
         try:
             r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
@@ -60,7 +60,16 @@ class QobuzApi:
         if not r.content:
             warn(self, "No content return")
             return None
-        response_json = json.loads(r.content)
+        try:  # try to get if connexion fail we try a second time 
+            response_json = json.loads(r.content)
+        except:
+            warn(self, "Json loads failed to load... retrying!")
+            try:  # please !
+                response_json = json.loads(r.content)
+            except: 
+                warn(self, "Json loads failed a second time")
+                return 0
+            
         error = None
         try:
             error = response_json['status']
@@ -83,34 +92,40 @@ class QobuzApi:
         data = auth.get_data()
         if not data:
             return False
-        self.authtoken = data['user']['session_id']
+        self.authtoken = data['user_auth_token']
         self.userid = data['user']['id']
         self.auth = auth
         self.cookie = data['cookie']
         return auth
 
     def get_track_url(self, track_id, context_type, context_id , format_id = 6):
+        tsrequest = time()
         params = {
-                                   'x-api-auth-token':self.authtoken,
-                                   'track_id': track_id,
-                                   'format_id': format_id,
-                                   'context_type': context_type,
-                                   #'context_id': context_id
-                                   }
-        data = self._api_request(params, "/api.json/0.1/track/getStreamingUrl")
+     #                              'x-api-auth-token':self.authtoken,
+                                   'format_id': str(format_id),
+     #                              'context_type':context_type,
+     #                              'context_id':context_id,
+                                   'intent':'stream',
+                                   'request_ts':tsrequest ,                        
+                                   'request_sig':str(md5.new("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id" 
+                                                            + str(track_id)+ str(tsrequest) + "6fdcbccb7a073f35fbd16a193cdef6c4").hexdigest()),
+                                   'track_id': str(track_id)
+                }
+        data = self._api_request(params, "/api.json/0.2/track/getFileUrl")
         return data
+
 
 
     def get_track(self, trackid):
         params = {'x-api-auth-token': self.authtoken,
                                    'track_id': trackid}
-        data = self._api_request(params, "/api.json/0.1/track/get")
+        data = self._api_request(params, "/api.json/0.2/track/get")
         return data
 
     def get_user_playlists(self):
         params = {'x-api-auth-token': self.authtoken,
                                    'user_id': self.userid }
-        data = self._api_request(params, "/api.json/0.1/playlist/getUserPlaylists")
+        data = self._api_request(params, "/api.json/0.2/playlist/getUserPlaylists")
         return data
 
     def getPlaylistSongs(self, playlistID):
@@ -125,11 +140,11 @@ class QobuzApi:
         params = {'x-api-auth-token':self.authtoken,
                                    'playlist_id':playlist_id,
                                    'extra':'tracks'}
-        return self._api_request(params, "/api.json/0.1/playlist/get")
+        return self._api_request(params, "/api.json/0.2/playlist/get")
 
     def get_album_tracks(self, album_id, context_type = 'plalist'):
-        params = {'x-api-auth-token':self.authtoken, 'product_id':album_id, 'context_type':context_type}
-        return self._api_request(params, "/api.json/0.1/product/get")
+        params = {'x-api-auth-token':self.authtoken, 'album_id':album_id, 'context_type':context_type}
+        return self._api_request(params, "/api.json/0.2/album/get")
 
     def get_product(self, id, context_type = "playlist"):
         return self.get_album_tracks(id, context_type)
@@ -145,12 +160,12 @@ class QobuzApi:
                                        'type': typer,
                                        'limit': limit}
 
-        return self._api_request(params, "/api.json/0.1/product/getRecommendations")
+        return self._api_request(params, "/api.json/0.2/album/getFeatured")
 
     def get_purchases(self, limit = 100):
         params = {'x-api-auth-token':self.authtoken,
                                    'user_id': self.userid }
-        return self._api_request(params, "/api.json/0.1/purchase/getUserPurchases")
+        return self._api_request(params, "/api.json/0.2/purchase/getUserPurchases")
 
     # SEARCH #
     def search_tracks(self, query, limit = 100):
@@ -158,24 +173,24 @@ class QobuzApi:
                                    'query': query.encode("utf8", "ignore"),
                                    'type': 'tracks',
                                    'limit': limit}
-        return self._api_request(params, "/api.json/0.1/track/search")
+        return self._api_request(params, "/api.json/0.2/search/getResults")
 
     def search_albums(self, query, limit = 100):
         params = {'x-api-auth-token':self.authtoken,
                                    'query': query.encode("utf8", "ignore"),
                                    'type': 'albums', 'limit': limit}
-        return self._api_request(params, "/api.json/0.1/product/search")
+        return self._api_request(params, "/api.json/0.2/search/getResults")
 
     def search_artists(self, query, limit = 100):
         params = {'x-api-auth-token':self.authtoken,
                                    'query': query.encode("utf8", "ignore"),
                                    'type': 'artists', 'limit': limit}
-        return self._api_request(params, "/api.json/0.1/artist/search")
+        return self._api_request(params, "/api.json/0.2/search/getResults")
 
     def get_albums_from_artist(self, id, limit = 100):
         params = {'x-api-auth-token': self.authtoken,
-                                   'artist_id': id, 'limit': limit}
-        data = self._api_request(params, "/api.json/0.1/artist/get")
+                                   'artist_id': id, 'limit': limit,'extra':'albums'}
+        data = self._api_request(params, "/api.json/0.2/artist/get")
         return data
     # REPORT #    
     def report_streaming_start(self, track_id):
@@ -183,7 +198,7 @@ class QobuzApi:
         params = {'x-api-auth-token':self.authtoken,
                                    'user_id': self.userid,
                                    'track_id': track_id}
-        return self._api_request(params, "/api.json/0.1/track/reportStreamingStart")
+        return self._api_request(params, "/api.json/0.2/track/reportStreamingStart")
 
     def report_streaming_stop(self, track_id, duration):
         duration = math.floor(int(duration))
@@ -200,14 +215,14 @@ class QobuzApi:
                                    'user_id': self.userid,
                                    'track_id': track_id,
                                    'duration': duration}
-        return self._api_request(params, "/api.json/0.1/track/reportStreamingEnd")
+        return self._api_request(params, "/api.json/0.2/track/reportStreamingEnd")
 
     def playlist_add_track (self, playlist_id, tracks_id):
         params = {'x-api-auth-token': self.authtoken,
                                    'track_ids': tracks_id,
                                    'playlist_id': playlist_id}
         log("info", "adding " + tracks_id + " to playlist " + playlist_id)
-        return self._api_request(params, "/api.json/0.1/playlist/addTracks")
+        return self._api_request(params, "/api.json/0.2/playlist/addTracks")
 
     def playlist_remove_track (self, playlist_id, playlist_track_id,):
         params = {'x-api-auth-token': self.authtoken,
@@ -215,7 +230,7 @@ class QobuzApi:
                                    'playlist_track_ids': playlist_track_id,
                                    }
         log("info", "deleting " + playlist_track_id + " from playlist " + playlist_id)
-        return self._api_request(params, "/api.json/0.1/playlist/deleteTracks")
+        return self._api_request(params, "/api.json/0.2/playlist/deleteTracks")
 
     def playlist_create (self, playlist_name, tracks_id = '', description = '', album_id = '', is_public = 'on', is_collaborative = 'off'):
         params = {'x-api-auth-token': self.authtoken,
@@ -229,13 +244,13 @@ class QobuzApi:
                                    'deezer_playlist_url':''}
 
         log("info", "creating new playlist" + repr(playlist_name) + "with (or without) tracks :" + tracks_id + ")")
-        return self._api_request(params, "/api.json/0.1/playlist/create")
+        return self._api_request(params, "/api.json/0.2/playlist/create")
 
     def playlist_delete (self, playlist_id):
         params = {'x-api-auth-token': self.authtoken,
                                    'playlist_id': playlist_id}
         log("info", "deleting playlist: " + str(playlist_id))
-        return self._api_request(params, "/api.json/0.1/playlist/delete")
+        return self._api_request(params, "/api.json/0.2/playlist/delete")
 
     def playlist_update (self, playlist_id, name, description = '', album_id = '', is_public = 'on', is_collaborative = 'off'):
         params = {'x-api-auth-token': self.authtoken,
@@ -247,7 +262,7 @@ class QobuzApi:
                                    'deezer_playlist_url': '',
                                    'playlist_id'        : playlist_id }
         log("info", "updating playlist " + str(playlist_id))
-        res = self._api_request(params, "/api.json/0.1/playlist/update")
+        res = self._api_request(params, "/api.json/0.2/playlist/update")
         return res
 
     def get_similar_artists(self, query):

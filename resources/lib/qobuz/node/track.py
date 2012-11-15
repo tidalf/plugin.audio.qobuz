@@ -69,9 +69,11 @@ class Node_track(Node):
     def get_label(self, format = "%a - %t"):
         format = format.replace("%a", self.get_artist())
         format = format.replace("%t", self.get_title())
-        format = format.replace("%A", self.get_album())
-        format = format.replace("%n", self.get_track_number())
-        format = format.replace("%g", self.get_genre())
+        try:
+            format = format.replace("%A", self.get_album()) # .encode('utf8', 'ignore'))
+        except: pass
+        format = format.replace("%n", str(self.get_track_number()))
+        format = format.replace("%g", self.get_genre()) # .encode('utf8', 'ignore'))
         return format
 
     def is_sample(self):
@@ -81,13 +83,22 @@ class Node_track(Node):
         return False
 
     def get_composer(self):
-        return self.get_property(('composer', 'name'))
-
+        try: 
+            return self.get_property(('composer', 'name'))
+        except:
+            return -1
+        
     def get_interpreter(self):
-        return self.get_property(('interpreter', 'name'))
-
+        try: 
+            return self.get_property(('performer', 'name'))
+        except: 
+            return -1
+        
     def get_album(self):
-        album = self.get_property(('album', 'title'))
+        try: 
+            album = self.get_property(('album', 'title'))
+        except:
+            return -1
         if album: return album
         if not self.parent: return ''
         if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
@@ -95,9 +106,11 @@ class Node_track(Node):
         return ''
 
     def get_image(self):
-        image = self.get_property(('album', 'image', 'large'))
-        if image: return image.replace('_230.', '_600.')
-        if not self.parent: return ''
+        try:
+            image = self.get_property(('album', 'image', 'large'))
+            if image: return image.replace('_230.', '_600.')
+        except: pass
+        # if not self.parent: return ''
         if self.parent.get_type() & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_PLAYLIST):
             return self.parent.get_image()
 
@@ -116,7 +129,11 @@ class Node_track(Node):
         return self.get_property('title')
 
     def get_genre(self):
-        genre = self.get_property(('album', 'genre', 'name'))
+        try:
+            genre = self.get_property(('album', 'genre', 'name'))
+        except:
+            genre = "none"
+        
         if genre: return genre
         if not self.parent: return ''
         if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
@@ -127,7 +144,7 @@ class Node_track(Node):
         self._set_cache_streaming_url()
         data = self.cache_url.get_data()
         if not data: return None
-        return data['streaming_url']
+        return data['url']
 
     def get_artist(self):
         s = self.get_interpreter()
@@ -138,6 +155,8 @@ class Node_track(Node):
         s = self.get_property(('artist', 'id'))
         if s: return int(s)
         s = self.get_property(('composer', 'id'))
+        if s: return int(s)
+        s = self.get_property(('performer', 'id'))
         if s: return int(s)
         s = self.get_property(('interpreter', 'id'))
         if s: return int(s)
@@ -152,17 +171,22 @@ class Node_track(Node):
     def get_duration(self):
         duration = self.get_property(('duration'))
         if duration:
-            (sh, sm, ss) = duration.strip().split(':')
-            return (int(sh) * 3600 + int(sm) * 60 + int(ss))
+        #    (sh, sm, ss) = duration.strip().split(':')
+        #    return (int(sh) * 3600 + int(sm) * 60 + int(ss))
+            return duration
         return -1
 
     def get_year(self):
-        date = self.get_property(('album', 'release_date'))
-        if not date and self.parent and self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
-            return self.parent.get_year()
-        year = 0
-        try: year = int(date.split('-')[0])
+        import time
+        try:
+            date = self.get_property(('album', 'released_at'))
+            if not date and self.parent and self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+                return self.parent.get_year()
         except: pass
+        year = 0
+        try: year = time.strftime("%Y", time.localtime(date))
+        except: pass
+        
         return year
 
     def  get_description(self):
@@ -180,7 +204,11 @@ class Node_track(Node):
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
             return ''
-        format = int(data['format_id'])
+        try: 
+            format = int(data['format_id'])
+        except:
+            warn(self, "Cannot get mime/type for track (restricted track?)")
+            return ''
         mime = ''
         if format == 6:
             mime = 'audio/flac'
@@ -202,8 +230,8 @@ class Node_track(Node):
         url = self.make_url(mode)
         item = xbmcgui.ListItem(label,
                                 label,
-                                self.get_image(),
-                                self.get_image(),
+                                str(self.get_image()),
+                                str(self.get_image()),
                                 url)
         if not item:
             warn(self, "Cannot create xbmc list item")

@@ -98,36 +98,48 @@ class Node_search(Node):
                 return False
         query.strip()
         ret = search.search(query, limit)
-        if not ret:
-            warn(self, "Searching artists API call fail")
-            return False
+        #if not ret:
+        #    warn(self, "Searching artists API call fail")
+        #    return False
         data = search.get_data()
         if not data:
             warn(self, "Search return no data")
             return False
         self.notify_data_result(data)
         if self.search_type == 'albums':
-            for json_product in data:
-                json_product = json_product['product']
-                artist = json_product['artist']
-                json_product['artist'] = { }
-                json_product['artist']['name'] = artist
+            try:
+                if data['albums']['items']: pass
+            except: 
+                return False
+            for json_product in data['albums']['items']:
+                # json_product = json_product['albums']['items']
+                artist = json_product['artist']['name']
+                #json_product['artist'] = { }
+                #json_product['artist']['name'] = artist
                 product = Node_product()
                 product.set_data(json_product)
                 self.add_child(product)
         elif self.search_type == 'songs':
-            if not 'results' in data:
-                warn(self, "No songs result for search")
+            #if not 'results' in data:
+            #    warn(self, "No songs result for search")
+            #    return False
+            try:
+                if data['tracks']['items']: pass
+            except: 
                 return False
-            for jtrack in data['results']['tracks']:
+            for jtrack in data['tracks']['items']:
                 track = Node_track()
                 track.set_data(jtrack)
                 self.add_child(track)
         elif self.search_type == 'artists':
-            if not 'results' in data:
-                warn(self, "Non artists result for search")
+            #if not 'results' in data:
+            #    warn(self, "Non artists result for search")
+            #    return False
+            try:
+                if data['artists']['items']: pass
+            except: 
                 return False
-            for jartist in data['results']['artists']:
+            for jartist in data['artists']['items']:
                 artist = Node_artist()
                 artist.set_data(jartist)
                 self.add_child(artist)

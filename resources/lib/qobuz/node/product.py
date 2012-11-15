@@ -71,8 +71,11 @@ class Node_product(Node):
         self.set_data(data)
         tracks = None
         if self.is_special_purchase: tracks = self._filter_tracks(data)
-        else: tracks = data['tracks']
-        for track in tracks:
+        else: tracks = data
+        warn (self, pprint.pformat(data))
+        for track in tracks['tracks']['items']:
+            #rack ['image'] = ""
+            # warn(self, "addimagedata")
             node = Node_track()
             node.set_data(track)
             self.add_child(node)
@@ -81,7 +84,7 @@ class Node_product(Node):
         ltracks = []
         id = self.get_id()
         for track in tracks:
-            if track['album']['id'] != id: continue
+            # if track['album']['id'] != id: continue
             ltracks.append(track)
         return ltracks
 
@@ -137,7 +140,10 @@ class Node_product(Node):
         return self.image
 
     def get_label(self):
-        label = ''.join((self.get_artist(), ' - ', self.get_title()))
+        try:
+            label = ''.join((self.get_artist(), ' - ', self.get_title()))
+        except: 
+            label = self.get_title()
         return label
 
     def get_label2(self):
@@ -147,9 +153,10 @@ class Node_product(Node):
         return self.get_property(('genre', 'name'))
 
     def get_year(self):
-        date = self.get_property('release_date')
+        import time
+        date = self.get_property('released_at')
         year = 0
-        try: year = int(date.split('-')[0])
+        try: year = time.strftime("%Y", time.localtime(date))
         except: pass
         return year
 

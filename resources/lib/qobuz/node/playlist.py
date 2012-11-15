@@ -86,7 +86,7 @@ class Node_playlist(Node):
             return False
         self.set_data(data)
         albumseen = {}
-        for jtrack in data['tracks']:
+        for jtrack in data['tracks']['items']:
             node = None
             if self.packby == 'album':
                 jalbum = jtrack['album']
@@ -211,7 +211,7 @@ class Node_playlist(Node):
                 dir.end_of_directory()
                 return False
             for node in dir.nodes:
-                trackids.append(node.get_id())
+                trackids.append(str(node.get_id()))
             strtracks = ','.join(trackids)
             ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
             from utils.cache_manager import cache_manager
@@ -267,7 +267,7 @@ class Node_playlist(Node):
             return False
         for node in dir.nodes:
             trackids.append(node.get_id())
-        strtracks = ','.join(trackids)
+        strtracks = ','.join(str(trackids))
         current_playlist = Cache_current_playlist()
         ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
         from utils.cache_manager import cache_manager

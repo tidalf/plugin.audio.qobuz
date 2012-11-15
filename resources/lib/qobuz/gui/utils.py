@@ -63,8 +63,9 @@ class Utils:
     def is_free_account(self):
         data = qobuz.boot.auth.get_data()
         if not data: return True
-        if not data['user']['credential']['allowed_audio_format_ids']:
-            return True
+        # fixme check user rights
+        #if not data['user']['credential']['allowed_audio_format_ids']:
+        #    return True
         return False
 
     def popup_free_account(self):
