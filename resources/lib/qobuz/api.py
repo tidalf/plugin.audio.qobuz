@@ -48,7 +48,7 @@ class QobuzApi:
         qheaders = {}
         if self.authtoken:
             qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
-        qheaders["X-APP-ID"] = '214748364'
+        qheaders["X-APP-ID"] = '285473059' # qobuz xbmc appid
         r = None
         try:
             r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
@@ -108,7 +108,7 @@ class QobuzApi:
                                    'intent':'stream',
                                    'request_ts':tsrequest ,                        
                                    'request_sig':str(md5.new("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id" 
-                                                            + str(track_id)+ str(tsrequest) + "6fdcbccb7a073f35fbd16a193cdef6c4").hexdigest()),
+                                                            + str(track_id)+ str(tsrequest) + "47249d0eaefa6bf43a959c09aacdbce8").hexdigest()),
                                    'track_id': str(track_id)
                 }
         data = self._api_request(params, "/api.json/0.2/track/getFileUrl")
