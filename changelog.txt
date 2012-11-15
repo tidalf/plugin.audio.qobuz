@@ -1,3 +1,7 @@
+0.9.9
+-----
+* updates for qobuz api v0.2
+
 0.9.0
 -----
 * re-add context items (playlist management, track/album/artist navigation, etc.)
