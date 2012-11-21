@@ -48,7 +48,7 @@ class QobuzApi:
         qheaders = {}
         if self.authtoken:
             qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
-        qheaders["X-APP-ID"] = '285473059' # qobuz xbmc appid
+        qheaders["X-APP-ID"] = '285473059'
         r = None
         try:
             r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
@@ -104,7 +104,7 @@ class QobuzApi:
      #                              'x-api-auth-token':self.authtoken,
                                    'format_id': str(format_id),
      #                              'context_type':context_type,
-     #                              'context_id':context_id,
+     #                              'con  text_id':context_id,
                                    'intent':'stream',
                                    'request_ts':tsrequest ,                        
                                    'request_sig':str(md5.new("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id" 
@@ -166,6 +166,12 @@ class QobuzApi:
         params = {'x-api-auth-token':self.authtoken,
                                    'user_id': self.userid }
         return self._api_request(params, "/api.json/0.2/purchase/getUserPurchases")
+    
+    def get_favorites(self, limit = 100):
+        params = {'x-api-auth-token':self.authtoken,
+                                   # 'type': "tracks",
+                                   'user_id': self.userid }
+        return self._api_request(params, "/api.json/0.2/favorite/getUserFavorites")
 
     # SEARCH #
     def search_tracks(self, query, limit = 100):

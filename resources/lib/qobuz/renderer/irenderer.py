@@ -69,6 +69,9 @@ class IRenderer(object):
         elif self.node_type & NodeFlag.TYPE_SIMILAR_ARTIST:
             from node.similar_artists import Node_similar_artist
             root = Node_similar_artist(None, qobuz.boot.params)
+        elif self.node_type & NodeFlag.TYPE_FAVORITES:
+            from node.favorites import Node_favorites
+            root = Node_favorites(None, qobuz.boot.params)
         else:
             warn(self, "Cannot set root node!")
             return False

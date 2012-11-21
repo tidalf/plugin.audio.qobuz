@@ -28,7 +28,8 @@ class __NodeFlag():
         self.TYPE_SEARCH           = 512
         self.TYPE_ARTIST           = 1024
         self.TYPE_SIMILAR_ARTIST   = 2048
-    
+        self.TYPE_FAVORITES        = 4096
+        
     def to_s(self, flag):
         if flag & self.TYPE_TRACK: return "track"
         elif flag & self.TYPE_PLAYLIST: return "playlist"
@@ -37,6 +38,7 @@ class __NodeFlag():
         elif flag & self.TYPE_ROOT: return "root"
         elif flag & self.TYPE_PRODUCT: return "product"
         elif flag & self.TYPE_PURCHASES: return "purchases"
+        elif flag & self.TYPE_FAVORITES: return "favorites"
         elif flag & self.TYPE_SEARCH: return "search"
         elif flag & self.TYPE_ARTIST: return "artist"
         elif flag & self.TYPE_SIMILAR_ARTIST: "similar artist" 

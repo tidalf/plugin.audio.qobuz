@@ -72,6 +72,7 @@ class Node_playlist(Node):
         if not id:
             error(self, "Cannot set cache without id")
             return False
+        from cache.favorites import Cache_favorites
         self.cache = Cache_playlist(id)
         return True
 

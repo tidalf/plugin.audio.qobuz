@@ -38,7 +38,7 @@ class __Mode():
     def to_s(self, mode):
         if mode == self.VIEW: return "view"
         elif mode == self.PLAY: return "play"
-        elif mode == self.ERASE_CACHE: return "erase cache"
+        elif mode == self.ERASE_CACHE: return "clear cache"
         elif mode == self.LIBRARY_SCAN: return "library scan"
         elif mode == self.SCAN: return "scan"
         elif mode == self.VIEW_BIG_DIR: return "view big dir"

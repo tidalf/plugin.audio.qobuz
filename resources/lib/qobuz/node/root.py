@@ -19,6 +19,7 @@ from node import Node
 from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
 from search import Node_search
+from favorites import Node_favorites
 from purchases import Node_purchases
 import qobuz
 
@@ -41,6 +42,7 @@ class Node_root(Node):
         self.add_child(Node_user_playlists())
         self.add_child(Node_recommendation())
         self.add_child(Node_purchases())
+        self.add_child(Node_favorites())
         if qobuz.addon.getSetting('search_enabled') == 'true':
             search = Node_search()
             search.set_search_type('albums')

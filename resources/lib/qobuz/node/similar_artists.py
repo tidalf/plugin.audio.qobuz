@@ -58,6 +58,7 @@ class Node_similar_artist(Node):
         query = self.get_parameter('query').strip().lower()
         query.encode('utf8', 'replace')
         data = qobuz.api.get_similar_artists(query)
+        warn (self, pprint.pformat(data))
         if not data: return False
         #dom = parseString(data)
         class parse_simartists():
