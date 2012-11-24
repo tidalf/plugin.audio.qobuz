@@ -23,7 +23,7 @@ import pickle
 import pprint
 from time import time
 import math
-import md5
+import hashlib
 import qobuz
 from debug import *
 import socket
@@ -41,6 +41,7 @@ class QobuzApi:
         self.token_validity_time = 3600
         self.retry_time = [1, 3, 5, 10]
         self.retry_num = 0
+        self.appid = "285473059"
 
     def _api_request(self, params, uri):
         url = "http://player.qobuz.com"
@@ -48,7 +49,7 @@ class QobuzApi:
         qheaders = {}
         if self.authtoken:
             qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
-        qheaders["X-APP-ID"] = '285473059'
+        qheaders["X-APP-ID"] = self.appid
         r = None
         try:
             r = requests.post(url + uri, data = params, cookies = self.cookie, headers = qheaders)
@@ -100,21 +101,23 @@ class QobuzApi:
 
     def get_track_url(self, track_id, context_type, context_id , format_id = 6):
         tsrequest = time()
+        import binascii 
+        from itertools import izip,cycle
+        # appid and associated secret is for thie app usage only 
+        # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
+        s3b = "Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8="
+        s3s = binascii.a2b_base64(s3b)
+        s4 = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in izip(s3s, cycle(self.appid)))
         params = {
-     #                              'x-api-auth-token':self.authtoken,
                                    'format_id': str(format_id),
-     #                              'context_type':context_type,
-     #                              'con  text_id':context_id,
                                    'intent':'stream',
                                    'request_ts':tsrequest ,                        
-                                   'request_sig':str(md5.new("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id" 
-                                                            + str(track_id)+ str(tsrequest) + "47249d0eaefa6bf43a959c09aacdbce8").hexdigest()),
+                                   'request_sig':str(hashlib.md5("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id" 
+                                                            + str(track_id)+ str(tsrequest) + s4).hexdigest()),
                                    'track_id': str(track_id)
                 }
         data = self._api_request(params, "/api.json/0.2/track/getFileUrl")
         return data
-
-
 
     def get_track(self, trackid):
         params = {'x-api-auth-token': self.authtoken,
@@ -201,6 +204,8 @@ class QobuzApi:
     # REPORT #    
     def report_streaming_start(self, track_id):
         #info(self, "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id))
+        # appid and associated secret is for thie app usage only 
+        # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {'x-api-auth-token':self.authtoken,
                                    'user_id': self.userid,
                                    'track_id': track_id}
