@@ -41,6 +41,7 @@ class Node_track(Node):
         self.set_is_folder(False)
         self.cache = None
         self.cache_url = None
+        self.status = None
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         if flag & NodeFlag.DONTFETCHTRACK:
@@ -76,12 +77,6 @@ class Node_track(Node):
         format = format.replace("%g", self.get_genre()) # .encode('utf8', 'ignore'))
         return format
 
-    def is_sample(self):
-        streamtype = self.get_property('streamtype')
-        if 'full' in streamtype:
-            return True
-        return False
-
     def get_composer(self):
         try: 
             return self.get_property(('composer', 'name'))
@@ -116,11 +111,6 @@ class Node_track(Node):
 
     def get_playlist_track_id(self):
         return self.get_property(('playlist_track_id'))
-
-    def get_streaming_type(self):
-        if self.cache_url:
-            return self.cache_url.get_data()['streaming_type']
-        return self.get_property(('streaming_type'))
 
     def get_position(self):
         return self.get_property(('position'))
@@ -198,6 +188,17 @@ class Node_track(Node):
             self.cache_url = Cache_track_stream_url(self.get_id())
         self.cache_url.fetch_data()
 
+    def is_sample(self):
+        self._set_cache_streaming_url()
+        data = self.cache_url.get_data()
+        if not data:
+            warn(self, "Cannot get stream type for track (network problem?)")
+            return ''
+        try: 
+            return data['sample']
+        except: 
+            return ''
+    
     def get_mimetype(self):
         self._set_cache_streaming_url()
         data = self.cache_url.get_data()

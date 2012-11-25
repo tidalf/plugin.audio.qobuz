@@ -69,11 +69,7 @@ class QobuzPlayer(xbmc.Player):
         item = None
         if not data:
             warn(self, "Cannot get track data")
-#            progress.update(25, "Cannot get data from Qobuz... abort")
             label = "Maybe an invalid track id"
-            # QOBUE PURCHASE DON'T response to json api track/get ...
-            #progress.close()
-            #return False
             item = xbmcgui.ListItem("No track information",
                                 '',
                                 '',
@@ -82,16 +78,18 @@ class QobuzPlayer(xbmc.Player):
         else:
             node.set_data(data)
             item = node.make_XbmcListItem()
-#        progress.update(50, "Getting stream url", node.get_label())
         lang = qobuz.lang
         mimetype = node.get_mimetype()
         if not mimetype:
             warn(self, "Cannot get track strem url")
-#            progress.update(50, "Cannot get stream url", node.get_label())
-#            progress.close()
             return False
         item.setProperty('mimetype', mimetype)
         streaming_url = node.get_streaming_url()
+        # some tracks are not authorized for stream and a 60s sample is returned, in that case we overwrite the song duration
+        if node.is_sample(): 
+            item.setInfo('music', infoLabels = {
+                                   'duration': 60,
+                                   } ) 
         item.setPath(streaming_url)
         watchPlayback = False
         '''

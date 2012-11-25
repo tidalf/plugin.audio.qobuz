@@ -45,7 +45,7 @@ class Cache_authentication(ICacheable):
     def _fetch_data(self):
         params = {
                   'password': hashlib.md5(self.password).hexdigest(),
-                  'username': self.login, 
+                  'username': self.login,
                   'email': self.login,
                    }
         data = qobuz.api._api_request(params, "/api.json/0.2/user/login")
