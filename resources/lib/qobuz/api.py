@@ -93,6 +93,7 @@ class QobuzApi:
         data = auth.get_data()
         if not data:
             return False
+        #warn (self, pprint.pformat(data))
         self.authtoken = data['user_auth_token']
         self.userid = data['user']['id']
         self.auth = auth

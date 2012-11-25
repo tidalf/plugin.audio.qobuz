@@ -224,7 +224,7 @@ class Node_track(Node):
         duration = self.get_duration()
         label = self.get_label()
         isplayable = 'true'
-        if self.get_streaming_type() == 'sample' or qobuz.gui.is_free_account():
+        if qobuz.gui.is_free_account():
             duration = 60
             label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
         mode = Mode.PLAY
