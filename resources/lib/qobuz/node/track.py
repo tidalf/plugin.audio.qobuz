@@ -224,9 +224,12 @@ class Node_track(Node):
         duration = self.get_duration()
         label = self.get_label()
         isplayable = 'true'
-        if qobuz.gui.is_free_account():
-            duration = 60
-            label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
+        
+        # Disable free account checking here, purchased track are still playable even with free account, but we don't know yet.
+        #if qobuz.gui.is_free_account():
+        #    duration = 60
+        #    label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
+        
         mode = Mode.PLAY
         url = self.make_url(mode)
         item = xbmcgui.ListItem(label,

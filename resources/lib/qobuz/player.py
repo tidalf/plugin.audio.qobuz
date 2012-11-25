@@ -89,7 +89,10 @@ class QobuzPlayer(xbmc.Player):
         if node.is_sample(): 
             item.setInfo('music', infoLabels = {
                                    'duration': 60,
-                                   } ) 
+                                   } )
+            # don't warn for free account (all songs except purchases are 60s limited)
+            if not qobuz.gui.is_free_account():
+                qobuz.gui.notifyH("Qobuz", "Sample returned") 
         item.setPath(streaming_url)
         watchPlayback = False
         '''
