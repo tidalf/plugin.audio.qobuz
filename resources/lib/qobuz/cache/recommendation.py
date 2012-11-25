@@ -39,7 +39,7 @@ class Cache_recommendation(ICacheable):
                                                      'recommendations-' + type,
                                                      genre_id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommendation'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.cacheImage = qobuz.image.cache
         self.fetch_data()
 

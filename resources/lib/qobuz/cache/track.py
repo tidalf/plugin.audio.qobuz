@@ -43,6 +43,5 @@ class Cache_track(ICacheable):
 
     def _fetch_data(self):
         json = qobuz.api.get_track(self.id)
-        print pprint.pformat(json)
         return json
 

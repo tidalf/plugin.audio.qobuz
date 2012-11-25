@@ -72,13 +72,14 @@ class Node_product(Node):
         tracks = None
         if self.is_special_purchase: tracks = self._filter_tracks(data)
         else: tracks = data
-        warn (self, pprint.pformat(data))
-        for track in tracks['tracks']['items']:
+        try: 
+            for track in tracks['tracks']['items']:
             #rack ['image'] = ""
             # warn(self, "addimagedata")
-            node = Node_track()
-            node.set_data(track)
-            self.add_child(node)
+                node = Node_track()
+                node.set_data(track)
+                self.add_child(node)
+        except: pass
 
     def _filter_tracks(self, tracks):
         ltracks = []

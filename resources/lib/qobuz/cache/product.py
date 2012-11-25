@@ -35,7 +35,7 @@ class Cache_product(ICacheable):
                                           'product',
                                           self.id)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_album'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):

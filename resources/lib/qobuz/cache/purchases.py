@@ -36,7 +36,7 @@ class Cache_purchases(ICacheable):
         super(Cache_purchases, self).__init__(qobuz.path.cache, 
                                        'purchases', None, False)
         self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommendation'))
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
         
     def _fetch_data(self):

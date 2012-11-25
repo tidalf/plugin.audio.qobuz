@@ -66,7 +66,7 @@ class Node_user_playlists(Node):
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         login = qobuz.addon.getSetting('username')
-        info(self, "Build-down: user playlists")
+        debug(self, "Build-down: user playlists")
         data = self.cache.fetch_data(xbmc_directory.Progress)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")

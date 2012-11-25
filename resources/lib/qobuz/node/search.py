@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import qobuz
-from debug import info, warn, error
+from debug import info, warn, error, debug
 from flag import NodeFlag
 from node import Node
 from product import Node_product
@@ -72,19 +72,19 @@ class Node_search(Node):
         limit = None
         if stype == 'songs':
             from qobuz.search.tracks import Search_tracks
-            info(self, "Searching songs")
+            debug(self, "Searching songs")
             search = Search_tracks()
             limit = qobuz.addon.getSetting('songsearchlimit')
             heading = qobuz.lang(30013)
 
         elif stype == 'albums':
             from qobuz.search.albums import Search_albums
-            info(self, "Searching albums")
+            debug(self, "Searching albums")
             search = Search_albums()
             limit = qobuz.addon.getSetting('albumsearchlimit')
             heading = qobuz.lang(30014)
         elif stype == 'artists':
-            info(self, "Searching artists")
+            debug(self, "Searching artists")
             from qobuz.search.artists import Search_artists
             search = Search_artists()
             limit = qobuz.addon.getSetting('artistsearchlimit')

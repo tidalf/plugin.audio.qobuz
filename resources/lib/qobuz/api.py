@@ -103,7 +103,7 @@ class QobuzApi:
         tsrequest = time()
         import binascii 
         from itertools import izip,cycle
-        # appid and associated secret is for thie app usage only 
+        # appid and associated secret is for this app usage only 
         # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         s3b = "Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8="
         s3s = binascii.a2b_base64(s3b)
@@ -203,8 +203,6 @@ class QobuzApi:
         return data
     # REPORT #    
     def report_streaming_start(self, track_id):
-        #info(self, "Report Streaming start for user: " + str(self.userid) + ", track: " + str(track_id))
-        # appid and associated secret is for thie app usage only 
         # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {'x-api-auth-token':self.authtoken,
                                    'user_id': self.userid,

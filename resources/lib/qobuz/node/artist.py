@@ -63,9 +63,7 @@ class Node_artist(Node):
             return False
         try: 
             total = len(data['albums']['items'])
-        except: 
-            import pprint
-            warn(self, pprint.pformat(data))
+        except: pass
         count = 0
         for jproduct in data['albums']['items']:
             keys = ['artist', 'interpreter', 'composer','performer']

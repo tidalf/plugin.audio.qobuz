@@ -43,7 +43,7 @@ def get_params():
             splitparams = {}
             splitparams = pairsofparams[i].split('=')
             if (len(splitparams)) == 2:
-                info('QobuzDog', "Checking script parameter: " + splitparams[0])
+                debug('QobuzDog', "Checking script parameter: " + splitparams[0])
                 if d.kv_is_ok(splitparams[0], splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
@@ -192,7 +192,7 @@ class QobuzBootstrap(object):
         self.NID = ''
         if 'nid' in self.params: self.NID = self.params['nid']
 
-        info(self, "NT: " + str(self.NT) + " / NID: " + self.NID)
+        debug(self, "NT: " + str(self.NT) + " / NID: " + self.NID)
 
     def erase_cache(self):
         from utils.cache_manager import cache_manager
@@ -222,11 +222,11 @@ class QobuzBootstrap(object):
 #        print "Track in database!!!"
 
         ####################
-        info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
+        debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
 
         ''' PLAY '''
         if self.MODE == Mode.PLAY:
-            info(self, "Playing song")
+            debug(self, "Playing song")
             self.bootstrap_player()
             if qobuz.addon.getSetting('notification_playingsong') == 'true':
                 qobuz.gui.notify(34000, 34001)
@@ -257,7 +257,7 @@ class QobuzBootstrap(object):
         except:
             warn(self, "No node type...abort")
             return False
-        info(self, "Node type: " + str(nt))
+        debug(self, "Node type: " + str(nt))
         ''' SET Node id '''
         id = None
         try: id = self.params['nid']

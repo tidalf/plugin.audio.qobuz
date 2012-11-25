@@ -26,7 +26,7 @@ import xbmcplugin
 import xbmcgui
 import json
 import qobuz
-from debug import info, warn
+from debug import info, warn, debug
 from gui.progress import Progress
 
 from node.track import Node_track
@@ -60,7 +60,7 @@ class QobuzPlayer(xbmc.Player):
     def play(self, id):
 #        progress = Progress(True)
 #        progress.create("Qobuz Player")
-        info(self, "Playing track: " + str(id))
+        debug(self, "Playing track: " + str(id))
         node = Node_track()
         node.set_id(id)
         node.set_cache()
@@ -117,7 +117,7 @@ class QobuzPlayer(xbmc.Player):
             Waiting for song to start
         '''
         timeout = 5
-        info(self, "Waiting song to start")
+        debug(self, "Waiting song to start")
         while timeout > 0:
             if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
                 xbmc.sleep(250)
@@ -157,7 +157,6 @@ class QobuzPlayer(xbmc.Player):
         while self.isPlayingAudio() and self.getPlayingFile() == streaming_url:
             self.elapsed = self.getTime()
             if not start and self.elapsed >= 5:
-                print "Start"
                 self.sendQobuzPlaybackStarted(node.get_id())
                 start = True
             xbmc.sleep(500)

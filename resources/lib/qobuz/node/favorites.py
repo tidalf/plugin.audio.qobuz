@@ -67,7 +67,6 @@ class Node_favorites(Node):
         return True
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        info(self, "Build-down favorites")
         if not self.set_cache():
             error(self, "Cannot set cache!")
             return False
@@ -127,31 +126,17 @@ class Node_favorites(Node):
         color = qobuz.addon.getSetting('color_item')
         color_warn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
-                        
-#        ''' CREATE '''
-#        url = self.make_url(Mode.PLAYLIST_CREATE)
-#        menuItems.append((qobuz.utils.color(color, qobuz.lang(39008)), "XBMC.RunPlugin("+url+")"))
-
-#        ''' REMOVE '''
-#        url = self.make_url(Mode.FAVORITE_REMOVE)
-#        menuItems.append((qobuz.utils.color(color_warn, qobuz.lang(39010).encode('utf8', 'replace') + ': ') + label, "XBMC.RunPlugin("+url+")"))
-        
-
-    
+                     
     def filter_products(self, data):
         list = []
         if not data: return list
-        # Qobuz free tracks with invalid product id
-        #blackid = ['0000020110926', '0000201011300', '0000020120220', '0000020120221']
         albumseen = {}
         for track in data['albums']['items']:
             json = track
-            # json[u'composer'] = track['composer']
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
             product.set_data(json)
             id = product.get_id()
-            #if id in blackid: product.is_special_purchase = True
             if id in albumseen: continue
             albumseen[id] = 1
             list.append(product)

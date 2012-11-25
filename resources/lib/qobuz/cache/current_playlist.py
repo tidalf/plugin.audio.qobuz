@@ -13,7 +13,7 @@ class Cache_current_playlist(ICacheable):
                                             'current-playlist', None, False)
         self.data = None
         self.set_cache_refresh(-1)
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):

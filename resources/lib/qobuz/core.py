@@ -51,12 +51,10 @@ class QobuzCore:
         return auth
 
     def delete_user_data(self):
-        #try:
             from utils.cache_manager import cache_manager
             c = cache_manager()
             if not c.delete_user_data():
                 warn(self, "Fail to erase all specific user data")
                 qobuz.gui.notifyH(self, "Cache can be inconsistant")
-#        except:
-#            warn(self, "Cannot remove user data from cache")
+
             

@@ -61,7 +61,7 @@ class QobuzImage_cache(ICacheable):
         super(QobuzImage_cache, self).__init__(qobuz.path.cache,
                                                      'images-cache', None, False)
         self.set_cache_refresh(-1)
-        info(self, "Cache duration: " + str(self.cache_refresh))
+        debug(self, "Cache duration: " + str(self.cache_refresh))
         self.fetch_data()
 
     def _fetch_data(self):
