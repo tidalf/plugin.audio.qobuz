@@ -297,7 +297,7 @@ class Node(object):
             query = urllib.quote(self.get_artist().encode('utf-8'))
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW,
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
-                                         id,query)
+                                         id,id)
             cmd = "XBMC.Container.Update(%s)" % (args)
             menuItems.append((qobuz.utils.color(color, qobuz.lang(39004)),cmd))
 

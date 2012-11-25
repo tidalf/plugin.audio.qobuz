@@ -24,7 +24,7 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag
 from node import Node
-from debug import info, warn, error
+from debug import info, warn, error, debug
 
 
 '''
