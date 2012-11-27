@@ -50,7 +50,10 @@ class QobuzPlayer(xbmc.Player):
             return False
         self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
         return True
-
+    
+    def OnQueueNextItem(self):
+        return True
+    
     def onPlayBackStopped(self):
         if not (self.track_id and self.total and self.elapsed):
             return False
@@ -81,7 +84,7 @@ class QobuzPlayer(xbmc.Player):
         lang = qobuz.lang
         mimetype = node.get_mimetype()
         if not mimetype:
-            warn(self, "Cannot get track strem url")
+            warn(self, "Cannot get track stream url")
             return False
         item.setProperty('mimetype', mimetype)
         streaming_url = node.get_streaming_url()
@@ -98,7 +101,6 @@ class QobuzPlayer(xbmc.Player):
         '''
             PLaying track
         '''
-#        progress.update(75, "Playing song", node.get_label())
         if qobuz.addon.getSetting('notification_playingsong') == 'true':
             qobuz.gui.notifyH(lang(34000), node.get_label().encode('utf8', 'replace'), node.get_image())
 
@@ -117,7 +119,7 @@ class QobuzPlayer(xbmc.Player):
         '''
             Waiting for song to start
         '''
-        timeout = 5
+        timeout = 10
         debug(self, "Waiting song to start")
         while timeout > 0:
             if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
@@ -161,5 +163,4 @@ class QobuzPlayer(xbmc.Player):
                 self.sendQobuzPlaybackStarted(node.get_id())
                 start = True
             xbmc.sleep(500)
-            #time.sleep(0.25)
         return True

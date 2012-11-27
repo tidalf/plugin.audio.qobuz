@@ -24,5 +24,5 @@ Known Issues:
 - Xbmc library mode and playlists are supported using patched xbmc (https://github.com/xbmc/xbmc/pull/688)
 - some unstabilities
 
-The authors are not affiliated with Qobuz
-Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
+This application uses the Qobuz API but is not certified by Qobuz.
+Any use of the API implies your full acceptance of the Qobuz General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)

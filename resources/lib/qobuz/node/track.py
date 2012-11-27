@@ -161,10 +161,9 @@ class Node_track(Node):
     def get_duration(self):
         duration = self.get_property(('duration'))
         if duration:
-        #    (sh, sm, ss) = duration.strip().split(':')
-        #    return (int(sh) * 3600 + int(sm) * 60 + int(ss))
             return duration
-        return -1
+        else: 
+            return -1
 
     def get_year(self):
         import time
