@@ -61,8 +61,6 @@ class QobuzPlayer(xbmc.Player):
         return True
 
     def play(self, id):
-#        progress = Progress(True)
-#        progress.create("Qobuz Player")
         debug(self, "Playing track: " + str(id))
         node = Node_track()
         node.set_id(id)
@@ -129,11 +127,7 @@ class QobuzPlayer(xbmc.Player):
                 break
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())
-#            progress.update(100, "Cannot play track:", node.get_label())
-#            progress.close()
             return False
-#        progress.update(100, "Playing track", node.get_label())
-#        progress.close()
         return self.watch_playing(node, streaming_url)
 
     def isPlayingAudio(self):
