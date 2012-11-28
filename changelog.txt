@@ -1,3 +1,9 @@
+0.9.10
+-----
+* fixes for release
+* add favorites support
+* remove lastfm similar artists support and use qobuz one
+
 0.9.9
 -----
 * updates for qobuz api v0.2
