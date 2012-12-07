@@ -177,6 +177,8 @@
 	<string id="38001">Stream</string>
 	<string id="38002">Search limit</string>
 	<string id="38003">Other</string>
+	<string id="38004">Show recommandations items</string>
+	
 
 	<!-- Context Menu -->
 	<string id="39000">This album</string>

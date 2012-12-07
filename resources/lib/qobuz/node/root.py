@@ -40,7 +40,8 @@ class Node_root(Node):
         
     def _build_down(self, xbmc_directory, lvl, flag = None):
         self.add_child(Node_user_playlists())
-        self.add_child(Node_recommendation())
+        if qobuz.addon.getSetting('show_recommendations') == 'true':
+            self.add_child(Node_recommendation())
         self.add_child(Node_purchases())
         self.add_child(Node_favorites())
         if qobuz.addon.getSetting('search_enabled') == 'true':

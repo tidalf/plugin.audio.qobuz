@@ -62,6 +62,7 @@
    <!-- Other -->
    <category label="38003">
         <setting id="notification_playingsong" label="36003" type="bool" default="false" />
+        <setting id="show_recommendations" label="38004" type="bool" default="true" />
         <!-- <setting id="resolver_enabled" label="33000" type="bool" default="true" /> -->
         <setting id="debug" label="Debug" type="bool" default="false" />
     	<setting id="userplaylists_display_cover" label="(i8n) Playlist - show cover" type="bool" default="true"/>
