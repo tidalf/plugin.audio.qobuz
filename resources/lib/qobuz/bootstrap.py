@@ -307,15 +307,13 @@ class QobuzBootstrap(object):
                 return False
             return True
 
-        #=======================================================================
-        # elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
-        #    from  node.playlist import Node_playlist
-        #    node = Node_playlist(None, self.params)
-        #    if not node.add_as_new_playlist():
-        #        return False
-        #    return True
-        #=======================================================================
-
+        elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
+            from  node.playlist import Node_playlist
+            node = Node_playlist(None, self.params)
+            if not node.add_as_new_playlist():
+                return False
+            return True
+        
         elif self.MODE == Mode.PLAYLIST_RENAME:
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()

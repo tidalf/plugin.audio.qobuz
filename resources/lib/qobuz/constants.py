@@ -46,7 +46,7 @@ class __Mode():
         elif mode == self.PLAYLIST_REMOVE_TRACK: return "playlist remove track"
         elif mode == self.PLAYLIST_CREATE: return "playlist create"
         elif mode == self.PLAYLIST_RENAME: return "playlist rename"
-        # elif mode == self.PLAYLIST_ADD_AS_NEW: return "playlist add as new"
+        elif mode == self.PLAYLIST_ADD_AS_NEW: return "playlist add as new"
         elif mode == self.PLAYLIST_ADD_TO_CURRENT: return "playlist add to current"
         elif mode == self.PLAYLIST_SELECT_CURRENT: return "playlist select current"
         else: return "Unknow mode: " + str(mode)
