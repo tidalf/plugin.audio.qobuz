@@ -36,14 +36,14 @@
 	<title>Qobuz XBMC</title>
 
 	<!-- (required) Major.minor.build -->
-	<version>0.9.10</version>
+	<version>0.9.11</version>
 
 	<!--
 		(required) author name & email. at least one author name is required
 	-->
 	<authors>
 		<author name="Joachim Basmaison" email="joachim.basmaison@gmail.com" />
-		<author name="Tidalf" email="tidalf@ematome.com" />
+		<author name="Tidalf" email="cyril.leclerc@gmail.com" />
 	</authors>
 
 	<!-- (required) Short description of addon. -->

@@ -1,3 +1,8 @@
+0.9.11
+-----
+* add context menu item "add as new playlist"
+* add option to hide recommendations
+
 0.9.10
 -----
 * fixes for release
