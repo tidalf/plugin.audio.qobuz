@@ -36,7 +36,7 @@
 	<title>Qobuz XBMC</title>
 
 	<!-- (required) Major.minor.build -->
-	<version>0.9.11</version>
+	<version>0.9.12</version>
 
 	<!--
 		(required) author name & email. at least one author name is required

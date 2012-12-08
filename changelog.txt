@@ -1,3 +1,7 @@
+0.9.12
+-----
+* fix utf8 glitch
+
 0.9.11
 -----
 * add context menu item "add as new playlist"

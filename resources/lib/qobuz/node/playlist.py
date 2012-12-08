@@ -146,7 +146,7 @@ class Node_playlist(Node):
         
         ''' SET AS CURRENT '''
         url = self.make_url(Mode.PLAYLIST_SELECT_CURRENT)
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(39007).encode('utf8', 'replace') + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((qobuz.utils.color(color, qobuz.lang(39007) + ': ') + label, "XBMC.RunPlugin("+url+")"))
                 
         ''' CREATE '''
         url = self.make_url(Mode.PLAYLIST_CREATE)
@@ -154,11 +154,11 @@ class Node_playlist(Node):
 
         ''' RENAME '''
         url = self.make_url(Mode.PLAYLIST_RENAME)
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(39009).encode('utf8', 'replace') + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((qobuz.utils.color(color, qobuz.lang(39009) + ': ') + label, "XBMC.RunPlugin("+url+")"))
 
         ''' REMOVE '''
         url = self.make_url(Mode.PLAYLIST_REMOVE)
-        menuItems.append((qobuz.utils.color(color_warn, qobuz.lang(39010).encode('utf8', 'replace') + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((qobuz.utils.color(color_warn, qobuz.lang(39010) + ': ') + label, "XBMC.RunPlugin("+url+")"))
         
         
     def remove_tracks(self, tracks_id):
