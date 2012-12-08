@@ -233,7 +233,13 @@ class QobuzApi:
                                    'playlist_id': playlist_id}
         log("info", "adding " + tracks_id + " to playlist " + playlist_id)
         return self._api_request(params, "/api.json/0.2/playlist/addTracks")
-
+   
+    def favorites_add_track (self, tracks_id):
+        params = {'x-api-auth-token': self.authtoken,
+                                   'track_ids': tracks_id}
+        log("info", "adding " + tracks_id + " to favorites ")
+        return self._api_request(params, "/api.json/0.2/favorite/create")    
+    
     def playlist_remove_track (self, playlist_id, playlist_track_id,):
         params = {'x-api-auth-token': self.authtoken,
                                    'playlist_id': playlist_id,

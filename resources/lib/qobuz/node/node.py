@@ -305,6 +305,10 @@ class Node(object):
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((qobuz.utils.color(color,qobuz.lang(39005)),cmd))
 
+        ''' ADD TO FAVORITES '''
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.FAVORITES_ADD_TO_CURRENT))
+        menuItems.append((qobuz.utils.color(color,qobuz.lang(39011)),cmd))
+
         ''' ADD AS NEW '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))
         menuItems.append((qobuz.utils.color(color, "(i8n) Add as new"),cmd))

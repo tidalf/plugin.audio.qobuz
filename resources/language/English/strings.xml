@@ -192,6 +192,7 @@
 	<string id="39008">Create</string>
 	<string id="39009">Rename</string>
 	<string id="39010">Remove</string>
+	<string id="39011">Add to favorites</string>
 
 	<!-- Progress bar -->
 	<string id="40000">Starting</string>

@@ -55,15 +55,8 @@ class Node_favorites(Node):
     #    return self.get_name()
 
     def set_cache(self):
-        id = "1348794"
         from cache.favorites import Cache_favorites
-        if not id:
-            try: id = self.get_parameter('nid')
-            except: pass
-        if not id:
-            error(self, "Cannot set cache without id")
-            return False
-        self.cache = Cache_favorites(id)
+        self.cache = Cache_favorites()
         return True
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
@@ -142,3 +135,50 @@ class Node_favorites(Node):
             list.append(product)
         return list
 
+    def add_to_favorites(self):
+            from gui.directory import Directory
+            from cache.favorites import Cache_favorites
+            favorites = Cache_favorites()
+            from renderer.xbmc import Xbmc_renderer as renderer
+            nt = None
+            try: nt = int(self.get_parameter('nt'))
+            except:
+                warn(self, "No node type...abort")
+                return False
+            id = None
+            try: id = self.get_parameter('nid')        
+            except: pass 
+            depth = -1
+            try: depth = int(self.get_parameter('depth'))
+            except: pass
+            view_filter = 0
+            try: view_filter = int(self.get_parameter('view-filter'))
+            except: pass
+            render = renderer(nt, id)
+            render.set_depth(depth)
+            render.set_filter(view_filter)
+            render.set_root_node()
+            dir = Directory(render.root, qobuz.boot.handle, True)
+            flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
+            if render.root.type & NodeFlag.TYPE_TRACK:
+                flags = NodeFlag.TYPE_TRACK
+            ret = render.root.build_down(dir, depth, flags)
+            if not ret: 
+                dir.end_of_directory()
+                return False
+            trackids = []
+            if len(dir.nodes) < 1:
+                warn(self, "No track to add to favorites")
+                dir.end_of_directory()
+                return False
+            for node in dir.nodes:
+                trackids.append(str(node.get_id()))
+            strtracks = ','.join(trackids)
+            ret = qobuz.api.favorites_add_track(strtracks)
+            from utils.cache_manager import cache_manager
+            #from cache.playlist import Cache_playlist
+            cm = cache_manager()
+            pl = Cache_favorites()
+            pl.delete_cache()
+            dir.end_of_directory()
+            return True

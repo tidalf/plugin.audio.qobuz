@@ -307,6 +307,13 @@ class QobuzBootstrap(object):
                 return False
             return True
 
+        elif self.MODE == Mode.FAVORITES_ADD_TO_CURRENT:
+            from  node.favorites import Node_favorites
+            node = Node_favorites(None, self.params)
+            if not node.add_to_favorites():
+                return False
+            return True
+
         elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
             from  node.playlist import Node_playlist
             node = Node_playlist(None, self.params)

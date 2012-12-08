@@ -42,6 +42,13 @@ class Node_artist(Node):
     def get_label(self):
         return self.get_artist()
     
+    def get_image(self):
+        image = self.get_property(('picture'))
+        # get max size image from lastfm, Qobuz default is a crappy 126p large one
+        # perhaps we need a setting for low bw users
+        image = image.replace('126s', '_')
+        return image
+    
     def get_artist(self):
         return self.get_property('name')
     

@@ -29,40 +29,18 @@ import qobuz
 '''
 class Cache_favorites(ICacheable):
 
-    def __init__(self, id):
-        self.id = id
-        super(Cache_favorites, self).__init__(qobuz.path.cache,
-                                            'favorites',
-                                            self.id, False)
-        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_userplaylist'))
+    def __init__(self, limit = 100):
+        self.limit = limit
+        super(Cache_favorites, self).__init__(qobuz.path.cache, 
+                                       'favorites', None, False)
+        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_recommendation'))
         debug(self, "Cache duration: " + str(self.cache_refresh))
+        self.fetch_data()
         
-        self.cacheImage = qobuz.image.cache
-
-
     def _fetch_data(self):
-        data = qobuz.api.get_favorites(self.id)
-        if not data: return None
-        return data
-
-    def length(self):
-        if not 'tracks' in self._raw_data:
-            return 0
-        return len(self._raw_data['tracks'])
-        
-    def get_image(self, name):
-        id = 'userplaylist' + name
-        return self.cacheImage.get(id)
-
-    def set_image_genre(self, name, image):
-        id = 'userplaylist' + name
-        return self.cacheImage.set(id, image)
+        return qobuz.api.get_favorites(self.limit)
     
-    def get_id(self):
-        if not self.data:
-            return None
-        if not 'id' in self.data:
-            return None
-        if self.data['id']:
-            return int(self.data['id'])
-        return None
+    def length(self):
+        if not self._raw_data:
+            return 0
+        return len(self._raw_data)
