@@ -1,3 +1,9 @@
+0.9.13
+-----
+* retrieve and show artists picture (for similar artists)
+* disable scan feature by default
+* add favorites item (wip)
+
 0.9.12
 -----
 * fix utf8 glitch
