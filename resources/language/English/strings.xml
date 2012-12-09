@@ -178,7 +178,7 @@
 	<string id="38002">Search limit</string>
 	<string id="38003">Other</string>
 	<string id="38004">Show recommandations items</string>
-	
+	<string id="38005">Enable scan feature (experimental)</string>
 
 	<!-- Context Menu -->
 	<string id="39000">This album</string>

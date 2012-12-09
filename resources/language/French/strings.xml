@@ -177,6 +177,8 @@
     <string id="38002">Recherche</string>
     <string id="38003">Autre</string>
     <string id="38004">Montrer les recommandations</string>
+    <string id="38005">Activer la fonction scan (experimental)</string>
+
 
     <!-- Context Menu -->
     <string id="39000">Cet album</string>
