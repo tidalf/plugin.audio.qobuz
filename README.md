@@ -23,7 +23,7 @@ notes:
 
 Known Issues:
 -------------
-- Xbmc library mode are work in progress using patched xbmc, download binaries for various plateforms or the patch there : https://github.com/tidalf/plugin.audio.qobuz/downloads
+- Xbmc library mode are work in progress using patched xbmc, download binaries for various plateforms or the patch there : https://github.com/tidalf/plugin.audio.qobuz/wiki
 
 
 This application uses the Qobuz API but is not certified by Qobuz.
