@@ -1,3 +1,8 @@
+0.9.14
+-----
+* remove sys.exit since it exit the whole xbmc since frodo rc2
+
+
 0.9.13
 -----
 * retrieve and show artists picture (for similar artists)
