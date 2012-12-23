@@ -127,7 +127,7 @@ class Node_favorites(Node):
         if not data: return list
         albumseen = {}
         for track in data['data']['albums']['items']:
-            warn(self, 'Track ' + track)
+            #warn(self, 'Track ' + track)
             json = track
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
