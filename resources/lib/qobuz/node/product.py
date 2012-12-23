@@ -23,12 +23,10 @@ import qobuz
 from constants import *
 from flag import NodeFlag
 from node import Node
-from debug import info, warn, error
+from debug import info, warn, error,log
 '''
     NODE PRODUCT
 '''
-from cache.product import Cache_product
-from cache.purchases import Cache_purchases
 
 
 from track import Node_track
@@ -43,37 +41,37 @@ class Node_product(Node):
         self.set_content_type('songs')
         self.cache = None
         self.is_special_purchase = False
-
-    def set_cache(self):
-        id = self.get_id()
-        if not id:
-            try: id = self.get_parameter('nid')
-            except: pass
-        if not id:
-            error(self, "Cannot set product cache without id")
-            return False
-        self.set_id(id)
-        if id in SPECIAL_PURCHASES:
-            self.cache = Cache_purchases()
-            self.is_special_purchase = True
-        else:
-            self.cache = Cache_product(id)
-        return True
+#
+#    def set_cache(self):
+#        id = self.get_id()
+#        if not id:
+#            try: id = self.get_parameter('nid')
+#            except: pass
+#        if not id:
+#            error(self, "Cannot set product cache without id")
+#            return False
+#        self.set_id(id)
+#        if id in SPECIAL_PURCHASES:
+#            self.is_special_purchase = True
+#        return True
 
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
-        if not self.set_cache():
-            error(self, "Cannot set product cache")
-            return False
-        data = self.cache.fetch_data(xbmc_directory.Progress)
+        nid = self.get_id()
+        data = None
+        if self.is_special_purchase:
+            data = qobuz.registry.get(name='purchase', id=nid)
+        else:
+            data = qobuz.registry.get(name='product', id=nid)
         if not data:
             warn(self, "Cannot fetch product data")
             return False
         self.set_data(data)
+        log(self, pprint.pformat(data))
         tracks = None
-        if self.is_special_purchase: tracks = self._filter_tracks(data)
+        if self.is_special_purchase: tracks = self._filter_tracks(data['data'][''])
         else: tracks = data
         try: 
-            for track in tracks['tracks']['items']:
+            for track in tracks['data']['tracks']['items']:
             #rack ['image'] = ""
             # warn(self, "addimagedata")
                 node = Node_track()
@@ -93,8 +91,8 @@ class Node_product(Node):
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),
-                                self.get_image(),
-                                self.get_image(),
+#                                self.get_image(),
+#                                self.get_image(),
                                 self.make_url(),
                                 )
         item.setInfo('music', infoLabels = {

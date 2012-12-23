@@ -24,7 +24,7 @@ __addon__        = xbmcaddon.Addon(id='plugin.audio.qobuz')
 __addonversion__ = __addon__.getAddonInfo('version')
 __addonid__      = __addon__.getAddonInfo('id')
 __cwd__          = __addon__.getAddonInfo('path')
-
+dbg = True
 addonDir  = __addon__.getAddonInfo('path')
 libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))

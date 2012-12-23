@@ -67,7 +67,7 @@ class QobuzPlayer(xbmc.Player):
         node = Node_track()
         node.set_id(id)
         node.set_cache()
-        data = node.cache.fetch_data()
+        data = qobuz.registry.get(name='track', id=id)['data']
         label = None
         item = None
         if not data:

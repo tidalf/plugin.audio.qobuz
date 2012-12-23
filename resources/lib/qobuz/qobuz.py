@@ -26,3 +26,4 @@ core = None
 db = None
 boot = None
 debug = None
+registry = None

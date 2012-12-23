@@ -43,35 +43,35 @@ class Node(object):
         self.label2 = ""
         self.is_folder = True
         self._data = None
-        self.auto_set_cache = False
+#        self.auto_set_cache = False
 
 
-    def set_cache(self):
-        warn(self, "node::set_cache (must be overloaded")
-        return False
-    
-    def set_auto_set_cache(self, b):
-        if b: self.auto_set_cache = True 
-        else: self.auto_set_cache = False
+#    def set_cache(self):
+#        warn(self, "node::set_cache (must be overloaded")
+#        return False
+#    
+#    def set_auto_set_cache(self, b):
+#        if b: self.auto_set_cache = True 
+#        else: self.auto_set_cache = False
       
     def delete_tree(self):
         for child in self.childs:
             child.delete_tree()
         del self.childs
         del self.parent
-        del self._data
+#        del self._data
         del self.parameters
-        del self.cache
+#        del self.cache
         
     def set_data(self,data):
         self._data = data
 
-    def get_data(self):
-        return self._data
+#    def get_data(self):
+#        return self._data
 
-    def fetch_data(self):
-        if not self.cache: return None
-        return self.cache.fetch_data()
+#    def fetch_data(self):
+#        if not self.cache: return None
+#        return self.cache.fetch_data()
 
     def get_property(self,path):
         if not self._data:
@@ -173,8 +173,6 @@ class Node(object):
 
     def set_id(self,id):
         self.id = id
-        if self.auto_set_cache:
-            self.set_cache()
         return self
 
     '''

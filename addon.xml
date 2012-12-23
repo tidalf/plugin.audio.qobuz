@@ -4,6 +4,7 @@
 	<requires>
 		<import addon="xbmc.python" version="2.0" />
 		<import addon="script.module.requests"/> 
+		<import addon="script.common.plugin.cache" version="0.9.1"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
 		<provides>audio</provides>
@@ -23,4 +24,3 @@ addon Qobuz pour XBMC. Il permet d'accéder à l'ensemble du service streaming d
 	</extension>
 	-->
 </addon>
-

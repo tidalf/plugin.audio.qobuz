@@ -31,8 +31,8 @@ from debug import info, warn, error, debug
     NODE USER PLAYLISTS
 '''
 
-from cache.user_playlists import Cache_user_playlists
-from cache.current_playlist import Cache_current_playlist
+#from cache.user_playlists import Cache_user_playlists
+#from cache.current_playlist import Cache_current_playlist
 from playlist import Node_playlist
 
 class Node_user_playlists(Node):
@@ -40,15 +40,15 @@ class Node_user_playlists(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = qobuz.utils.lang(30019)
-        self.image = qobuz.image.access.get('userplaylists')
+        #self.image = qobuz.image.access.get('userplaylists')
         self.label2 = 'Keep your current playlist'
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
         self.set_content_type('files')
         display_by = self.get_parameter('display-by')
         if not display_by: display_by = 'songs'
         self.set_display_by(display_by)
-        self.cache = Cache_user_playlists()
-        self.cache_current_playlist = Cache_current_playlist()
+#        self.cache = Cache_user_playlists()
+#        self.cache_current_playlist = Cache_current_playlist()
         display_cover = qobuz.addon.getSetting('userplaylists_display_cover')
         if display_cover == 'true': display_cover = True
         else: display_cover = False
@@ -67,22 +67,23 @@ class Node_user_playlists(Node):
     def _build_down(self, xbmc_directory, lvl, flag = None):
         login = qobuz.addon.getSetting('username')
         debug(self, "Build-down: user playlists")
-        data = self.cache.fetch_data(xbmc_directory.Progress)
+        data = qobuz.registry.get(name='user-playlists')
+        #pprint.pprint(data)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
-        self.set_data(data)
-        jcurrent_playlist = self.cache_current_playlist.fetch_data()
+        jcurrent_playlist = data 
         cpls_id = None
         try: cpls_id = jcurrent_playlist['id']
         except: pass
-        for playlist in data:
+        for playlist in data['data']['playlists']['items']:
             node = Node_playlist()
             node.set_data(playlist)
             if self.display_product_cover:
-                image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
-                if not image: image = self.get_random_image(node)
-                if image: node.image = image
+                pass
+                #image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
+                #if not image: image = self.get_random_image(node)
+                #if image: node.image = image
             if (cpls_id and cpls_id == str(node.get_id())):
                 node.set_is_current(True)
             if node.get_owner() == login:

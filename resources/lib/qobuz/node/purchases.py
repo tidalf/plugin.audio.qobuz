@@ -18,15 +18,15 @@ import qobuz
 from flag import NodeFlag
 from node import Node
 from product import Node_product
-
-from debug import error
+import pprint
+from debug import error, log
 
 '''
     NODE PURCHASES
 '''
 
-from cache.purchases import Cache_purchases
-#from product import Node_product
+#from cache.purchases import Cache_purchases
+from product import Node_product
 
 class Node_purchases(Node):
 
@@ -35,16 +35,16 @@ class Node_purchases(Node):
         self.label = qobuz.lang(30100)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
         self.set_content_type('albums')
-        self.cache = Cache_purchases()
-        self.image = qobuz.image.access.get('album')
+#        self.cache = Cache_purchases()
+#        self.image = qobuz.image.access.get('album')
     
     def _build_down(self, xbmc_directory,  lvl, flag = None, progress = None):
-        data = self.fetch_data()
+        data = qobuz.registry.get(name='purchases')
         if not data: 
             error(self, "Cannot fetch purchases data")
             return False
-        self.set_data(data)
-        for product in self.filter_products(self.cache.get_data()):
+        log(self, pprint.pformat(data))
+        for product in self.filter_products(data['data']):
             self.add_child(product)
         return True
     

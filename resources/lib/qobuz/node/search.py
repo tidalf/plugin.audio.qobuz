@@ -32,7 +32,7 @@ class Node_search(Node):
     def __init__(self, parent = None, params = None):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
-        self.thumb = self.icon = qobuz.image.access.get('song')
+#        self.thumb = self.icon = qobuz.image.access.get('song')
         self.set_search_type('albums')
 
     def get_label(self):
@@ -44,15 +44,15 @@ class Node_search(Node):
     def set_search_type(self, st):
         if st == 'artists':
             self.label = qobuz.lang(30015)
-            self.image = qobuz.image.access.get('artist')
+#            self.image = qobuz.image.access.get('artist')
             self.set_content_type('files')
         elif st == 'albums':
             self.label = qobuz.lang(30014)
-            self.image = qobuz.image.access.get('album')
+#            self.image = qobuz.image.access.get('album')
             self.set_content_type('albums')
         elif st == 'songs':
             self.label = qobuz.lang(30013)
-            self.image = qobuz.image.access.get('song')
+#            self.image = qobuz.image.access.get('song')
             self.set_content_type('songs')
         self.search_type = st
 

@@ -61,9 +61,9 @@ class Utils:
             return False
 
     def is_free_account(self):
-        data = qobuz.boot.auth.get_data()
+        data = qobuz.registry.get(name='user')
         if not data: return True
-        if not data ['user']['credential']['id']: 
+        if not data['data']['user']['credential']['id']: 
             return True
         return False
 
