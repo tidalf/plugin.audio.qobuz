@@ -216,11 +216,37 @@ class QobuzCacheCommon(QobuzLocalStorage):
         import xbmcaddon
         import xbmc
         import StorageServer
+        StorageServer.dbg = True
+        self.storage = StorageServer.StorageServer('plugin.audio.qobuz', 24)
+        super(QobuzCacheCommon,self).__init__(*args, **kwargs)
         print "import ok"
-        super(QobuzCacheDefault,self).__init__(*args, **kwargs)
-        self.data = StorageServer.StorageServer('plugin.audio.qobuz', 24)
-        if not 'basePath' in kwargs:
-            QobuzXbmcError({'Who': self,'What': 'missing_parameter','With': 'basePath'})
+        
+    def make_key(self, *args, **kwargs):
+            if not 'id' in kwargs: kwargs['id'] = 0
+            return str(kwargs['name'] + '-' + str(kwargs['id']));
+    
+    def load(self, **kwargs):
+        key = self.make_key(**kwargs)
+        #self.storage.delete(key)
+        data = self.storage.get(key)
+        if data:
+            print pprint.pformat(data)
+            return pickle.loads(data)
+        return super(QobuzCacheCommon, self).load(**kwargs)
+    
+    def save(self, key = None):
+        if key == None:
+            count = 0
+            for key in self.data:
+                if not self.saved(key):
+                    count += 1
+                    self.save(key)
+            return count
+        if not key in self.data:
+            QobuzXbmcError(who=self,what='undefined_key', additional=key)
+        self.storage.set(key, pickle.dumps(self.data[key], pickle.HIGHEST_PROTOCOL))
+        self.saved(key,True)
+        return 1
 
 class QobuzRegistry():
     def __init__(self,*args,**kwargs):
@@ -230,10 +256,12 @@ class QobuzRegistry():
             self.cache = QobuzCacheDefault(*args,**kwargs)
         elif kwargs['cacheType'] == 'xbmc-common':
             cache = None
-            try:
-                cache = QobuzCacheCommon(*args, **kwargs)
-            except:
-                cache = QobuzCacheDefault(*args, **kwargs)
+#            try:
+            cache = QobuzCacheCommon(*args, **kwargs)
+#            except Exception:
+#                pass
+                #pprint.pformat(Exception)
+                #cache = QobuzCacheDefault(*args, **kwargs)
             self.cache = cache
         else:
             QobuzXbmcError(who=self, what='unknown_cache_type',additionnal=kwargs['cacheType'])
