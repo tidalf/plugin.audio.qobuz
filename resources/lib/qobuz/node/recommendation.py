@@ -79,7 +79,7 @@ class Node_recommendation(Node):
         return url
 
     def get_id(self):
-        return self.genre_type + '-' + self.genre_id
+        return self.genre_type + '-' + str(self.genre_id)
     
     def set_genre_type(self, type):
         self.genre_type = type

@@ -48,7 +48,8 @@ class Node_track(Node):
             return False
         else:
             self.set_cache(xbmc_directory.Progress)
-            self.set_data(self.cache.fetch_data())
+            nid = self.get_parameter('nid')
+            self.set_data(qobuz.registry.get(name='track', id=nid))
             xbmc_directory.add_node(self)
             return True
 

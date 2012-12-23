@@ -10,13 +10,13 @@ from debug import *
 class QobuzLocalStorage(object):
 
     def __init__(self,*args,**kwargs):
-        mandatory = ['user', 'password']
+        mandatory = ['user', 'password', 'streamFormat']
         for key in mandatory:
             if not key in kwargs:
-                QobuzXbmcError({
-                        'Who': self,
-                        'What': 'missing_parameter',
-                        'With': key})
+                QobuzXbmcError(
+                        who=self,
+                        what='missing_parameter',
+                        additional=key)
         
         #print "Params: " + pprint.pformat(kwargs)
         self.options = kwargs
@@ -100,12 +100,14 @@ class QobuzLocalStorage(object):
             user = self.get(name='user', id=0)
             context_type = ''
             context_id = ''
-            format_id = 3
+            format_id = self.options['streamFormat']
             response = self.api.get_track_url(kwargs['id'], context_type, context_id, format_id)
         elif kwargs['name'] == 'purchases':
             response = self.api.get_purchases(100)
         elif kwargs['name'] == 'recommendation':
             response = self.api.get_recommandations(kwargs['genre_id'], kwargs['genre_type'], 100) 
+        elif kwargs['name'] == 'favorites':
+            response = self.api.get_favorites(100)
         else:
             QobuzXbmcError(
                         who= self,
@@ -125,7 +127,6 @@ class QobuzLocalStorage(object):
         if not key in self.data:
             print 'NotFresh 01'
             return False
-        #pprint.pprint(self.data)
         if (time() - self.data[key]['updatedOn']) > self.options['refresh']:
             print 'NotFresh 02'
             return False
@@ -134,9 +135,9 @@ class QobuzLocalStorage(object):
         
     def saved(self,key,value=None):
         if not key:
-            QobuzXbmcError({'Who': self,'What': 'missing_parameter','With': 'key'})
+            QobuzXbmcError(who=self, what='missing_parameter', additional='key')
         if not key in self.data:
-            QobuzXbmcError({'Who': self,'What': 'undefined_key','With': key})
+            QobuzXbmcError(who=self,what= 'undefined_key', additional=key)
         if value == None:
             return self.data[key]['saved']
         self.data[key]['saved'] = True if value else False
@@ -151,9 +152,10 @@ class QobuzCacheDefault(QobuzLocalStorage):
     def __init__(self,*args,**kwargs):
         super(QobuzCacheDefault,self).__init__(*args, **kwargs)
         if not 'basePath' in kwargs:
-            QobuzXbmcError({'Who': self,'What': 'missing_parameter','With': 'basePath'})
+            QobuzXbmcError(who=self, what='missing_parameter',additional='basePath')
 
     def make_key(self, *args, **kwargs):
+        if not 'id' in kwargs: kwargs['id'] = 0
         return kwargs['name'] + '-' + str(kwargs['id']);
 
     def _load_from_disk(self, **kwargs):
@@ -206,6 +208,7 @@ class QobuzCacheDefault(QobuzLocalStorage):
 
     def delete(self, **kwargs):
         key = self.make_key(**kwargs)
+        info(self, 'Deleting key: ' + key)
         cache = os.path.join(self.options['basePath'], key + '.dat')
         if not os.path.exists(cache):
             return False
@@ -261,7 +264,9 @@ class QobuzRegistry():
         if not 'id' in kwargs:
             kwargs['id'] = 0
         self.cache.delete(**kwargs)
-        
+    
+    def make_key(self, **kwargs):
+        return self.cache.make_key(**kwargs)
 if __name__ == '__main__':
 #    try:
 #        QobuzXbmcError({'Who': 'TestException','What': 'test_exception','With': 'TestingException'})

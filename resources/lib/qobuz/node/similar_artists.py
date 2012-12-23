@@ -26,7 +26,7 @@ from flag import NodeFlag
 from node import Node
 from artist import Node_artist
 from debug import info, warn, error, debug
-from cache.search_artists import Cache_search_artists
+#from cache.search_artists import Cache_search_artists
 import urllib
 import re
 from xml.dom.minidom import parse, parseString
