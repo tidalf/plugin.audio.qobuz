@@ -71,12 +71,14 @@ class Node_product(Node):
         return ltracks
 
     def make_XbmcListItem(self):
+        image = self.get_image()
+        print 'IMAGE ' + image
         item = xbmcgui.ListItem(
-                                self.get_label(),
-                                self.get_label2(),
-                               self.get_image(),
-                                self.get_image(),
-                                self.make_url(),
+                                label=self.get_label(),
+                                label2=self.get_label2(),
+                                iconImage=self.get_image(),
+                                thumbnailImage=self.get_image(),
+                                path=self.make_url(),
                                 )
         item.setInfo('music', infoLabels = {
                                             'genre': self.get_genre(),
@@ -111,14 +113,18 @@ class Node_product(Node):
         return title
 
     def get_image(self):
-        image = self.get_property(('image', 'large'))
-        image = image.replace('_230.', '_600.')
+        image = self.get_property(( 'image', 'large'))
+        if image:
+            self.image = image
+            return image
+        image = self.get_property(( 'data', 'image', 'large'))
         if image:
             self.image = image
             return image
         if self.parent:
             image = self.parent.get_image()
             if image: self.image = image
+        image = self.image.replace('_230.', '_600.')
         return self.image
 
     def get_label(self):

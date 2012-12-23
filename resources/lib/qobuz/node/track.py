@@ -23,10 +23,9 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag
 from node import Node
-#from cache.track import Cache_track
-#from cache.track_stream_url import Cache_track_stream_url
+
 from debug import error, debug, warn
-#from gettext import re
+
 '''
     NODE TRACK
 '''
@@ -39,8 +38,6 @@ class Node_track(Node):
         self.set_content_type('songs')
         self.qobuz_context_type = 'playlist'
         self.set_is_folder(False)
-        self.cache = None
-        self.cache_url = None
         self.status = None
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
@@ -62,7 +59,6 @@ class Node_track(Node):
         if not id:
             error(self, "Cannot set cache without id")
             return False
-        #self.cache = Cache_track(id, self.qobuz_context_type, False)
         return True
 
     def make_url(self, mode = Mode.PLAY):
@@ -104,9 +100,9 @@ class Node_track(Node):
     def get_image(self):
         try:
             image = self.get_property(('album', 'image', 'large'))
-            if image: return image.replace('_230.', '_600.')
         except: pass
-        # if not self.parent: return ''
+        if image: return image.replace('_230.', '_600.')
+        if not self.parent: return ''
         if self.parent.get_type() & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_PLAYLIST):
             return self.parent.get_image()
 
@@ -132,7 +128,6 @@ class Node_track(Node):
         return ''
 
     def get_streaming_url(self):
-#        self._set_cache_streaming_url()
         nid = self.get_id() or self.parameters['nid']
         data = qobuz.registry.get(name='stream-url', id=nid)
         if not data: return None
@@ -184,13 +179,8 @@ class Node_track(Node):
         if self.parent: return self.parent.get_description()
         return ''
 
-#    def _set_cache_streaming_url(self):
-#        if not self.cache_url:
-#            self.cache_url = Cache_track_stream_url(self.get_id())
-#        self.cache_url.fetch_data()
 
     def is_sample(self):
-        #self._set_cache_streaming_url()
         nid = self.get_id() or self.parameters['nid']
         data = qobuz.registry.get(name='stream-url', id=nid)
         if not data:
@@ -202,7 +192,6 @@ class Node_track(Node):
             return ''
     
     def get_mimetype(self):
-#        self._set_cache_streaming_url()
         nid = self.get_id() or self.parameters['nid']
         data = qobuz.registry.get(name='stream-url', id=nid)
         if not data:
@@ -214,7 +203,6 @@ class Node_track(Node):
             warn(self, "Cannot get mime/type for track (restricted track?)")
             return ''
         mime = ''
-        #print "FORMAT " + str(format)
         if format == 6:
             mime = 'audio/flac'
         elif format == 5:
