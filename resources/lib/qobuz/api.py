@@ -62,6 +62,7 @@ class QobuzApi:
         qheaders = {}
         if useToken and self.authtoken:
             qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
+            params['x-api-auth-token'] = self.authtoken
         qheaders["X-APP-ID"] = self.appid
        
         # Sending our request

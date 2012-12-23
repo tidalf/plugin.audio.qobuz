@@ -214,9 +214,13 @@ class Node_track(Node):
             warn(self, "Cannot get mime/type for track (restricted track?)")
             return ''
         mime = ''
+        print "FORMAT " + str(format)
         if format == 6:
             mime = 'audio/flac'
+        elif format == 5:
+            mime = 'audio/mpeg'
         else:
+            warn(self, "Unknow format " + str(format))
             mime = 'audio/mpeg'
         return mime
 

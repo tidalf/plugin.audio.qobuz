@@ -87,6 +87,7 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Cannot get track stream url")
             return False
         item.setProperty('mimetype', mimetype)
+        print 'Mime: ' + mimetype
         streaming_url = node.get_streaming_url()
         # some tracks are not authorized for stream and a 60s sample is returned, in that case we overwrite the song duration
         if node.is_sample(): 

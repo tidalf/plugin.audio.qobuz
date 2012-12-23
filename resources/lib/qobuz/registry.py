@@ -101,6 +101,7 @@ class QobuzLocalStorage(object):
             context_type = ''
             context_id = ''
             format_id = self.options['streamFormat']
+            print 'Format:'  + str(format_id)
             response = self.api.get_track_url(kwargs['id'], context_type, context_id, format_id)
         elif kwargs['name'] == 'purchases':
             response = self.api.get_purchases(100)
