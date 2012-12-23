@@ -213,7 +213,7 @@ class Node_playlist(Node):
     def add_as_new_playlist(self):
         from gui.directory import Directory
         from user_playlists import Node_user_playlists
-        from cache.current_playlist import Cache_current_playlist
+#        from cache.current_playlist import Cache_current_playlist
         from renderer.xbmc import Xbmc_renderer as renderer
         nt = None
         try: nt = int(self.get_parameter('nt'))
@@ -256,8 +256,9 @@ class Node_playlist(Node):
         for node in dir.nodes:
             trackids.append(str(node.get_id()))
         strtracks = ','.join(trackids)
-        current_playlist = Cache_current_playlist()
-        ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
+        current_playlist = qobuz.registry.get(name='current-playlist')
+        print "Current_playlist" + current_playlist
+        ret = qobuz.api.playlist_add_track(current_playlist['data'], strtracks)
         from utils.cache_manager import cache_manager
         from cache.playlist import Cache_playlist
         cm = cache_manager()

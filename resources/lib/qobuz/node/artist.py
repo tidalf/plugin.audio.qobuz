@@ -17,12 +17,9 @@
 import xbmcgui
 
 import qobuz
-
-#from constants import Mode
 from flag import NodeFlag
 from node import Node
 from product import Node_product
-#from debug import info, warn, error, debug
 from debug import warn
 import weakref
 '''
@@ -95,7 +92,6 @@ class Node_artist(Node):
                                 self.get_image(),
                                 self.make_url(),
                                 )
-        #item.setProperty('node_id', self.get_id())
         self.attach_context_menu(item)
         return item
 

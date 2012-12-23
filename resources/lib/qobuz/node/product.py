@@ -41,19 +41,6 @@ class Node_product(Node):
         self.set_content_type('songs')
         self.cache = None
         self.is_special_purchase = False
-#
-#    def set_cache(self):
-#        id = self.get_id()
-#        if not id:
-#            try: id = self.get_parameter('nid')
-#            except: pass
-#        if not id:
-#            error(self, "Cannot set product cache without id")
-#            return False
-#        self.set_id(id)
-#        if id in SPECIAL_PURCHASES:
-#            self.is_special_purchase = True
-#        return True
 
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
         nid = self.get_id()
@@ -66,14 +53,11 @@ class Node_product(Node):
             warn(self, "Cannot fetch product data")
             return False
         self.set_data(data)
-        #log(self, pprint.pformat(data))
         tracks = None
         if self.is_special_purchase: tracks = self._filter_tracks(data['data'][''])
         else: tracks = data
         try: 
             for track in tracks['data']['tracks']['items']:
-            #rack ['image'] = ""
-            # warn(self, "addimagedata")
                 node = Node_track()
                 node.set_data(track)
                 self.add_child(node)
@@ -83,7 +67,6 @@ class Node_product(Node):
         ltracks = []
         id = self.get_id()
         for track in tracks:
-            # if track['album']['id'] != id: continue
             ltracks.append(track)
         return ltracks
 
@@ -91,8 +74,8 @@ class Node_product(Node):
         item = xbmcgui.ListItem(
                                 self.get_label(),
                                 self.get_label2(),
-#                                self.get_image(),
-#                                self.get_image(),
+                               self.get_image(),
+                                self.get_image(),
                                 self.make_url(),
                                 )
         item.setInfo('music', infoLabels = {

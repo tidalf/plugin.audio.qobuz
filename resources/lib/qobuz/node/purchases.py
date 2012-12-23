@@ -17,9 +17,8 @@
 import qobuz
 from flag import NodeFlag
 from node import Node
-from product import Node_product
-import pprint
-from debug import error, log
+#from product import Node_product
+from debug import error
 
 '''
     NODE PURCHASES
@@ -30,25 +29,22 @@ from product import Node_product
 
 class Node_purchases(Node):
 
-    def __init__(self, parent = None, params = None):
-        super(Node_purchases, self).__init__(parent, params)
+    def __init__(self,parent=None,params=None):
+        super(Node_purchases,self).__init__(parent,params)
         self.label = qobuz.lang(30100)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
         self.set_content_type('albums')
-#        self.cache = Cache_purchases()
-#        self.image = qobuz.image.access.get('album')
-    
-    def _build_down(self, xbmc_directory,  lvl, flag = None, progress = None):
+
+    def _build_down(self,xbmc_directory,lvl,flag=None,progress=None):
         data = qobuz.registry.get(name='purchases')
-        if not data: 
-            error(self, "Cannot fetch purchases data")
+        if not data:
+            error(self,"Cannot fetch purchases data")
             return False
-        #log(self, pprint.pformat(data))
         for product in self.filter_products(data['data']):
             self.add_child(product)
         return True
-    
-    def filter_products(self, data):
+
+    def filter_products(self,data):
         list = []
         if not data: return list
         # Qobuz free tracks with invalid product id
@@ -56,14 +52,12 @@ class Node_purchases(Node):
         albumseen = {}
         for track in data['albums']['items']:
             json = track
-            # json[u'composer'] = track['composer']
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
             product.set_data(json)
             id = product.get_id()
-            #if id in blackid: product.is_special_purchase = True
             if id in albumseen: continue
             albumseen[id] = 1
             list.append(product)
         return list
- 
+
