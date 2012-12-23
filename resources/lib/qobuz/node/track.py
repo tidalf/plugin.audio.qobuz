@@ -257,7 +257,7 @@ class Node_track(Node):
         if mlabel: comment = mlabel
         if description: comment += ' - ' + description
         item.setInfo(type = 'music', infoLabels = {
-                                   'track_id': self.get_id(),
+                                   #'track_id': self.get_id(),
                                    'title': self.get_title(),
                                    'album': self.get_album(),
                                    'genre': self.get_genre(),

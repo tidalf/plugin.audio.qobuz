@@ -84,7 +84,7 @@ class QobuzLocalStorage(object):
         return None
 
     def load(self, **kwargs):
-        print "Loading with Qobuz API"
+        log(self, "Loading with Qobuz API")
 #        key = self.make_key(**kwargs)
         if kwargs['name'] == 'user':
             response = self.api.login(kwargs['user'], kwargs['password'])
@@ -101,7 +101,6 @@ class QobuzLocalStorage(object):
             context_type = ''
             context_id = ''
             format_id = self.options['streamFormat']
-            print 'Format:'  + str(format_id)
             response = self.api.get_track_url(kwargs['id'], context_type, context_id, format_id)
         elif kwargs['name'] == 'purchases':
             response = self.api.get_purchases(100)
@@ -115,7 +114,7 @@ class QobuzLocalStorage(object):
                         what= 'qobuz_api_invalid_query',
                         additional= pprint.pformat(kwargs))
         if not response:
-                print "Loading from Qobuz fail"
+                warn(self, "Loading from Qobuz fail")
                 return False
         kwargs['value'] = response
         self.set(**kwargs)
@@ -123,12 +122,10 @@ class QobuzLocalStorage(object):
 
     
     def fresh(self, key):
-        print "Key id fresh " + key
         if not key in self.data:
             return False
         if (time() - self.data[key]['updatedOn']) > self.options['refresh']:
             return False
-        print 'Fresh'
         return True
         
     def saved(self,key,value=None):
@@ -174,9 +171,9 @@ class QobuzCacheDefault(QobuzLocalStorage):
             
     def load(self, **kwargs):
         key = self.make_key(**kwargs)
-        print "Loading from disk " + key
         if not self._load_from_disk(**kwargs):
-            print "Loading from disk fail"
+            pass
+#            print "Loading from disk fail"
         if key in self.data and self.fresh(key):
             return self.data[key]
         return super(QobuzCacheDefault, self).load(**kwargs)
@@ -191,7 +188,7 @@ class QobuzCacheDefault(QobuzLocalStorage):
             return count
         if not key in self.data:
             QobuzXbmcError({'Who': self,'What': 'undefined_key','With': key})
-        print 'Saving key ' + key
+        #print 'Saving key ' + key
         cache = os.path.join(self.options['basePath'], key+'.dat');
         with open(cache, 'wb') as f:
             s = pickle.dump(self.data[key], f, protocol = pickle.HIGHEST_PROTOCOL)
@@ -229,7 +226,6 @@ class QobuzRegistry():
     def __init__(self,*args,**kwargs):
         if not 'cacheType' in kwargs:
             kwargs['cacheType'] = 'default'
-        print "CacheType: " + kwargs['cacheType']
         if kwargs['cacheType'] == 'default':
             self.cache = QobuzCacheDefault(*args,**kwargs)
         elif kwargs['cacheType'] == 'xbmc-common':

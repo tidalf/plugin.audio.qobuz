@@ -139,7 +139,6 @@ class Node_recommendation(Node):
 #            if not image: self._get_random_image_type_genre(image_name, data)
         #pprint.pprint(data)
         for product in data['data']['albums']['items']:
-            print 'PRODUCT' + pprint.pformat(product)
             node = Node_product()
             node.set_data(product)
             self.add_child(node)

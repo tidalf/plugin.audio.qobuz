@@ -43,7 +43,7 @@ class Node_purchases(Node):
         if not data: 
             error(self, "Cannot fetch purchases data")
             return False
-        log(self, pprint.pformat(data))
+        #log(self, pprint.pformat(data))
         for product in self.filter_products(data['data']):
             self.add_child(product)
         return True

@@ -273,7 +273,6 @@ class QobuzBootstrap(object):
 
         ''' UGLY MODE DISPATCH '''
         if self.MODE == Mode.VIEW:
-            info(self, "Displaying node")
             r = renderer(nt, id)
             r.set_depth(1)
             r.set_filter(NodeFlag.TYPE_NODE | NodeFlag.DONTFETCHTRACK)

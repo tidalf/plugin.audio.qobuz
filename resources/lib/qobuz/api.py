@@ -33,7 +33,6 @@ socket.timeout = 5
 class QobuzApi:
 
     def __init__(self):
-        print 'Init QobuzAPI'
         self.auth = None
         self.authtoken = None
         self.cookie = None
