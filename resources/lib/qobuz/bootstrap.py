@@ -84,7 +84,7 @@ class QobuzBootstrap(object):
         self.bootstrap_gui()
         self.bootstrap_sys_args()
         from registry import QobuzRegistry
-        streamFormat = 6 if qobuz.addon.getSetting('streamformat') else 3
+        streamFormat = 6 if qobuz.addon.getSetting('streamtype')=='flac' else 5
         qobuz.registry = QobuzRegistry(
                                        cacheType='default', 
                                        user=qobuz.addon.getSetting('username'), 

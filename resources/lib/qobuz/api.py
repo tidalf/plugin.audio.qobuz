@@ -123,7 +123,7 @@ class QobuzApi:
         data['user']['lastname'] = ''
         return data
 
-    def get_track_url(self, track_id, context_type, context_id , format_id = 6):
+    def get_track_url(self, track_id, context_type, context_id , format_id ):
         tsrequest = time()
         import binascii 
         from itertools import izip,cycle
