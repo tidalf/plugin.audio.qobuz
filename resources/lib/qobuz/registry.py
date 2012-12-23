@@ -117,7 +117,6 @@ class QobuzLocalStorage(object):
         if not response:
                 print "Loading from Qobuz fail"
                 return False
-        #pprint.pprint(response)
         kwargs['value'] = response
         self.set(**kwargs)
         return True
@@ -126,10 +125,8 @@ class QobuzLocalStorage(object):
     def fresh(self, key):
         print "Key id fresh " + key
         if not key in self.data:
-            print 'NotFresh 01'
             return False
         if (time() - self.data[key]['updatedOn']) > self.options['refresh']:
-            print 'NotFresh 02'
             return False
         print 'Fresh'
         return True
@@ -204,7 +201,6 @@ class QobuzCacheDefault(QobuzLocalStorage):
         sw = safe_write()
         sw.write(self.options.basePath, self.data[key])
         self.saved(key,True)
-        pprint.pprint(self.data[key])
         return 1
 
     def delete(self, **kwargs):

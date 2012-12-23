@@ -8,7 +8,7 @@ class QobuzXbmcError(Exception):
         msg = 'QobuzXbmcError: '  + pprint.pformat(kwargs)
         print msg
         traceback.print_stack()
-        print repr(traceback.extract_stack())
+        #print repr(traceback.extract_stack())
         print repr(traceback.format_stack())
         raise self
 #        sys.exit(1)
