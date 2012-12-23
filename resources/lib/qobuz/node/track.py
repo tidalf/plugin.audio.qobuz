@@ -23,8 +23,8 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag
 from node import Node
-from cache.track import Cache_track
-from cache.track_stream_url import Cache_track_stream_url
+#from cache.track import Cache_track
+#from cache.track_stream_url import Cache_track_stream_url
 from debug import error, debug, warn
 #from gettext import re
 '''
@@ -61,7 +61,7 @@ class Node_track(Node):
         if not id:
             error(self, "Cannot set cache without id")
             return False
-        self.cache = Cache_track(id, self.qobuz_context_type, False)
+        #self.cache = Cache_track(id, self.qobuz_context_type, False)
         return True
 
     def make_url(self, mode = Mode.PLAY):
@@ -131,10 +131,11 @@ class Node_track(Node):
         return ''
 
     def get_streaming_url(self):
-        self._set_cache_streaming_url()
-        data = self.cache_url.get_data()
+#        self._set_cache_streaming_url()
+        nid = self.get_id() or self.parameters['nid']
+        data = qobuz.registry.get(name='stream-url', id=nid)
         if not data: return None
-        return data['url']
+        return data['data']['url']
 
     def get_artist(self):
         s = self.get_interpreter()
@@ -182,30 +183,32 @@ class Node_track(Node):
         if self.parent: return self.parent.get_description()
         return ''
 
-    def _set_cache_streaming_url(self):
-        if not self.cache_url:
-            self.cache_url = Cache_track_stream_url(self.get_id())
-        self.cache_url.fetch_data()
+#    def _set_cache_streaming_url(self):
+#        if not self.cache_url:
+#            self.cache_url = Cache_track_stream_url(self.get_id())
+#        self.cache_url.fetch_data()
 
     def is_sample(self):
-        self._set_cache_streaming_url()
-        data = self.cache_url.get_data()
+        #self._set_cache_streaming_url()
+        nid = self.get_id() or self.parameters['nid']
+        data = qobuz.registry.get(name='stream-url', id=nid)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
         try: 
-            return data['sample']
+            return data['data']['sample']
         except: 
             return ''
     
     def get_mimetype(self):
-        self._set_cache_streaming_url()
-        data = self.cache_url.get_data()
+#        self._set_cache_streaming_url()
+        nid = self.get_id() or self.parameters['nid']
+        data = qobuz.registry.get(name='stream-url', id=nid)
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
             return ''
         try: 
-            format = int(data['format_id'])
+            format = int(data['data']['format_id'])
         except:
             warn(self, "Cannot get mime/type for track (restricted track?)")
             return ''

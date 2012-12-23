@@ -18,32 +18,41 @@ import os
 import json
 import time
 import requests
-import hashlib
-import pickle
+#import hashlib
+#import pickle
 import pprint
 from time import time
 import math
 import hashlib
-import qobuz
+#import qobuz
 from debug import *
 import socket
 
-socket.timeout = 3
+socket.timeout = 5
 
 class QobuzApi:
 
     def __init__(self):
+        print 'Init QobuzAPI'
         self.auth = None
         self.authtoken = None
         self.cookie = None
-        self.userid = None
+        self.user_id = None
         self.auf = None
         self.token_validity_time = 3600
         self.retry_time = [1, 3, 5, 10]
         self.retry_num = 0
         self.appid = "285473059"
+        self.last_error = None
+        self.user = None
+        self.password = None
 
+    def set_logged(self, *args, **data):
+        self.authtoken = data['data']['user_auth_token']
+        self.user_id = data['data']['user']['id']
+    
     def _api_request(self, params, uri):
+        self.last_error = None
         url = "http://player.qobuz.com"
 
         qheaders = {}
@@ -68,6 +77,7 @@ class QobuzApi:
             try:  # please !
                 response_json = json.loads(r.content)
             except: 
+                self.last_error = "Cannot load: " + url + uri
                 warn(self, "Json loads failed a second time")
                 return 0
             
@@ -86,19 +96,25 @@ class QobuzApi:
                 self.auth.delete_cache()
             return None
         return response_json
-
+    
     def login(self, user, password):
-        from cache.authentication import Cache_authentication
-        auth = Cache_authentication(user, password)
-        data = auth.get_data()
-        if not data:
-            return False
-        #warn (self, pprint.pformat(data))
-        self.authtoken = data['user_auth_token']
-        self.userid = data['user']['id']
-        self.auth = auth
-        self.cookie = data['cookie']
-        return auth
+        print "Login with user " + user
+        # from cache.authentication import Cache_authentication
+        params = {
+                  'password': hashlib.md5(password).hexdigest(),
+                  'username': user,
+                  'email': user+'@QobuzXbmc.beta',
+                   }
+        data = self._api_request(params, "/api.json/0.2/user/login")
+        if not data: return None
+        if not 'user' in data: return None
+        if not 'id' in data['user']: return None
+        if not data['user']['id']: return None
+        data['cookie'] = self.cookie
+        data['user']['email'] = ''
+        data['user']['firstname'] = ''
+        data['user']['lastname'] = ''
+        return data
 
     def get_track_url(self, track_id, context_type, context_id , format_id = 6):
         tsrequest = time()
@@ -128,7 +144,7 @@ class QobuzApi:
 
     def get_user_playlists(self):
         params = {'x-api-auth-token': self.authtoken,
-                                   'user_id': self.userid }
+                                   'user_id': self.user_id }
         data = self._api_request(params, "/api.json/0.2/playlist/getUserPlaylists")
         return data
 
@@ -168,13 +184,13 @@ class QobuzApi:
 
     def get_purchases(self, limit = 100):
         params = {'x-api-auth-token':self.authtoken,
-                                   'user_id': self.userid }
+                                   'user_id': self.user_id }
         return self._api_request(params, "/api.json/0.2/purchase/getUserPurchases")
     
     def get_favorites(self, limit = 100):
         params = {'x-api-auth-token':self.authtoken,
                                    # 'type': "tracks",
-                                   'user_id': self.userid }
+                                   'user_id': self.user_id }
         return self._api_request(params, "/api.json/0.2/favorite/getUserFavorites")
 
     # SEARCH #
@@ -206,7 +222,7 @@ class QobuzApi:
     def report_streaming_start(self, track_id):
         # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {'x-api-auth-token':self.authtoken,
-                                   'user_id': self.userid,
+                                   'user_id': self.user_id,
                                    'track_id': track_id}
         return self._api_request(params, "/api.json/0.2/track/reportStreamingStart")
 
@@ -222,7 +238,7 @@ class QobuzApi:
             warn(self, 'No authentification token')
             return None
         params = {'x-api-auth-token': token,
-                                   'user_id': self.userid,
+                                   'user_id': self.user_id,
                                    'track_id': track_id,
                                    'duration': duration}
         return self._api_request(params, "/api.json/0.2/track/reportStreamingEnd")

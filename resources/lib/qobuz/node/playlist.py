@@ -28,7 +28,7 @@ from debug import info, warn, error
 '''
     NODE PLAYLIST
 '''
-from cache.playlist import Cache_playlist
+#from cache.playlist import Cache_playlist
 from track import Node_track
 
 class Node_playlist(Node):
@@ -43,14 +43,13 @@ class Node_playlist(Node):
         self.label2 = ""
         self.url = None
         self.set_is_folder(True)
-        self.cache = None
         self.packby = ''#album'
-        self.image = qobuz.image.access.get('playlist')
+#        self.image = qobuz.image.access.get('playlist')
         if self.packby == 'album':
             self.set_content_type('albums')
         else:
             self.set_content_type('songs')
-        self.set_auto_set_cache(True)
+#        self.set_auto_set_cache(True)
 
     def get_label(self):
         return self.get_name()
@@ -64,30 +63,19 @@ class Node_playlist(Node):
     def is_current(self):
         return self.b_is_current
 
-    def set_cache(self):
-        id = self.get_id()
-        if not id:
-            try: id = self.get_parameter('nid')
-            except: pass
-        if not id:
-            error(self, "Cannot set cache without id")
-            return False
-        from cache.favorites import Cache_favorites
-        self.cache = Cache_playlist(id)
-        return True
-
     def _build_down(self, xbmc_directory, lvl, flag = None):
+        nid = self.get_id() or self.get_parameter('nid')
         info(self, "Build-down playlist")
-        if not self.set_cache():
-            error(self, "Cannot set cache!")
-            return False
-        data = self.cache.fetch_data(xbmc_directory.Progress)
+#        if not self.set_cache():
+#            error(self, "Cannot set cache!")
+#            return False
+        data = qobuz.registry.get(name='playlist',id=nid)
+        #pprint.pprint(data)
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
-        self.set_data(data)
         albumseen = {}
-        for jtrack in data['tracks']['items']:
+        for jtrack in data['data']['tracks']['items']:
             node = None
             if self.packby == 'album':
                 jalbum = jtrack['album']
@@ -103,7 +91,6 @@ class Node_playlist(Node):
                 node = Node_track()
                 node.set_data(jtrack)
             self.add_child(node)
-        del self._data['tracks']
         
     def get_name(self):
         name = self.get_property('name')

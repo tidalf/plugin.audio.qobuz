@@ -17,7 +17,7 @@
 
 import os
 
-__debugging__ = False
+__debugging__ = True
 ourlog = None
 LOGDEBUG = None
 LOGNOTICE = None

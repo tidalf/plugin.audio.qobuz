@@ -83,13 +83,12 @@ class QobuzBootstrap(object):
         self.bootstrap_image()
         self.bootstrap_gui()
         self.bootstrap_sys_args()
-        self.auth = qobuz.core.login()
-        if not self.auth:
+        from registry import QobuzRegistry
+        qobuz.registry = QobuzRegistry(cacheType='xbmc-common', user=qobuz.addon.getSetting('username'), password=qobuz.addon.getSetting('password'), basePath=qobuz.path.cache)
+        if not qobuz.registry.get(name='user'):
             qobuz.gui.show_login_failure()
             exit(1)
-        if qobuz.gui.is_free_account():
-            qobuz.gui.popup_free_account()
-        # self.bootstrap_db()
+        
         return self.dispatch()
 
     def bootstrap_lang(self):
@@ -153,8 +152,9 @@ class QobuzBootstrap(object):
         qobuz.core = QobuzCore()
 
     def bootstrap_image(self):
-        from images import QobuzImage
-        qobuz.image = QobuzImage()
+       pass
+       # from images import QobuzImage
+       # qobuz.image = QobuzImage()
 
     def bootstrap_gui(self):
         from gui.utils import Utils

@@ -36,7 +36,7 @@ class Node_root(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
         self.set_content_type('files')
         self.label = "Qobuz"
-        self.image = qobuz.image.access.get('default')
+        #self.image = qobuz.image.access.get('default')
         
     def _build_down(self, xbmc_directory, lvl, flag = None):
         self.add_child(Node_user_playlists())

@@ -40,7 +40,7 @@ class Node_favorites(Node):
         #self.set_is_folder(True)
         #self.cache = None
         self.packby = ''#album'
-        self.image = qobuz.image.access.get('playlist')
+#        self.image = qobuz.image.access.get('playlist')
         #if self.packby == 'album':
         #    self.set_content_type('albums')
         #else:
@@ -49,7 +49,7 @@ class Node_favorites(Node):
         self.label = qobuz.lang(30079)
         
         self.set_content_type('songs')
-        self.set_auto_set_cache(True)
+        #self.set_auto_set_cache(True)
 
     # def get_label(self):
     #    return self.get_name()
