@@ -30,6 +30,8 @@ import socket
 
 socket.timeout = 5
 
+
+
 class QobuzApi:
 
     def __init__(self):
@@ -47,13 +49,28 @@ class QobuzApi:
         self.password = None
         self.version = '0.2'
         self.baseUrl = 'http://player.qobuz.com/api.json/' + self.version
+        self.stats = { 
+                      'request': 0
+        }
+        self.__set_s4()
 
     def set_logged(self,*args,**data):
         self.authtoken = data['data']['user_auth_token']
         self.user_id = data['data']['user']['id']
+        self.logged_on = time()
+
+    def __set_s4(self):
+        import binascii
+        from itertools import izip,cycle
+        # appid and associated secret is for this app usage only 
+        # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
+        s3b = "Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8="
+        s3s = binascii.a2b_base64(s3b)
+        self.s4 = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in izip(s3s,cycle(self.appid)))
 
     def _api_request(self,params,uri,**opt):
         self.last_error = None
+        self.stats['request'] += 1
         url = self.baseUrl
         useToken = False if (opt and 'noToken' in opt) else True
 
@@ -69,7 +86,8 @@ class QobuzApi:
         try:
             r = requests.post(url + uri,data=params,cookies=self.cookie,headers=qheaders)
         except:
-            warn(self,"API Error: POST fail")
+            self.last_error = "Qobuz API POST fail"
+            warn(self, self.last_error)
             return None
         # We have cookies
         if r.cookies:
@@ -125,21 +143,12 @@ class QobuzApi:
 
     def get_track_url(self,track_id,context_type,context_id ,format_id):
         tsrequest = time()
-        import binascii
-        from itertools import izip,cycle
-        # appid and associated secret is for this app usage only 
-        # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
-        s3b = "Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8="
-        s3s = binascii.a2b_base64(s3b)
-        s4 = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in izip(s3s,cycle(self.appid)))
-        params = {
-                                   'format_id': str(format_id),
-                                   'intent':'stream',
-                                   'request_ts':tsrequest ,
-                                   'request_sig':str(hashlib.md5("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id"
-                                                            + str(track_id) + str(tsrequest) + s4).hexdigest()),
-                                   'track_id': str(track_id)
-                }
+        params = {'format_id'  : str(format_id),
+                  'intent'     : 'stream',
+                  'request_ts' : tsrequest ,
+                  'request_sig': str(hashlib.md5("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id"
+                                + str(track_id) + str(tsrequest) + self.s4).hexdigest()), 'track_id': str(track_id)
+        }
         data = self._api_request(params,"/track/getFileUrl")
         return data
 
@@ -262,7 +271,7 @@ class QobuzApi:
                     'spotify_track_uris':'',
                     'deezer_playlist_url':''}
 
-        log("info","creating new playlist" + repr(playlist_name) + "with (or without) tracks :" + tracks_id + ")")
+        log("info","creating new playlist" + str(playlist_name) + "with (or without) tracks :" + tracks_id + ")")
         return self._api_request(params,"/playlist/create")
 
     def playlist_delete (self,playlist_id):
@@ -286,5 +295,4 @@ class QobuzApi:
         params = { 'artist_id': artist_id }
         return self._api_request(params,"/artist/getSimilarArtists")
 
-if __name__ == '__main__':
-    pass
+

@@ -52,7 +52,7 @@ class Node_product(Node):
         if not data:
             warn(self, "Cannot fetch product data")
             return False
-        self.set_data(data)
+        self.set_data(data['data'])
         tracks = None
         if self.is_special_purchase: tracks = self._filter_tracks(data['data'][''])
         else: tracks = data
@@ -132,10 +132,10 @@ class Node_product(Node):
         if image:
             self.image = image
             return image
-        image = self.get_property(( 'data', 'image', 'large'))
-        if image:
-            self.image = image
-            return image
+#        image = self.get_property(( 'data', 'image', 'large'))
+#        if image:
+#            self.image = image
+#            return image
         if self.parent:
             image = self.parent.get_image()
             if image: self.image = image

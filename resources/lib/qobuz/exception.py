@@ -1,14 +1,17 @@
 import sys
 import pprint
 import traceback
+
 class QobuzXbmcError(Exception):
-    def __init__(self, *args, **kwargs):
-        if (not 'who' in kwargs) or (not 'what' in kwargs): 
+    
+    def __init__(self, *a, **ka):
+        nl = "\n"
+        if (not 'who' in ka) or (not 'what' in ka): 
             raise Exception('QobuzXbmcError', 'Missing constructor arguments (who|what)')
-        msg = 'QobuzXbmcError: '  + pprint.pformat(kwargs)
+        msg = "[QobuzXbmcError]" + nl
+        msg+= " - who        : " + pprint.pformat(ka['who']) + nl
+        msg+= " - what       : " + ka['what'] + nl
+        msg+= " - additional : " + ka['additional'] + nl
+        msg+= " - Stack      : " + nl
         print msg
         traceback.print_stack()
-        #print repr(traceback.extract_stack())
-        print repr(traceback.format_stack())
-        raise self
-#        sys.exit(1)

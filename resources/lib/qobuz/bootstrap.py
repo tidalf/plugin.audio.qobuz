@@ -73,7 +73,7 @@ class QobuzBootstrap(object):
         qobuz.addon = __addon__
         self.handle = __handle__
         qobuz.boot = self
-
+        
     def bootstrap_app(self):
         self.bootstrap_directories()
         self.bootstrap_lang()

@@ -44,9 +44,9 @@ class Node_track(Node):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
         else:
-            self.set_cache(xbmc_directory.Progress)
+            #self.set_cache(xbmc_directory.Progress)
             nid = self.get_parameter('nid')
-            self.set_data(qobuz.registry.get(name='track', id=nid))
+            self.set_data(qobuz.registry.get(name='track', id=nid)['data'])
             xbmc_directory.add_node(self)
             return True
 

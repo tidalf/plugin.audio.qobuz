@@ -42,11 +42,12 @@ class Utils:
         try: 
             if not image: image = qobuz.image.access.get('qobuzIcon')
         except: pass
+
         s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
         xbmc.executebuiltin(s)
 
     def notify(self, title, text, image = None, mstime = 2000):
-        if not image: image = qobuz.image.access.get('qobuzIcon')
+        #if not image: image = qobuz.image.access.get('qobuzIcon')
         l = qobuz.lang
         s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), mstime, image)
         xbmc.executebuiltin(s)

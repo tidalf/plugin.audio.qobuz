@@ -10,15 +10,15 @@ from debug import *
 class QobuzLocalStorage(object):
 
     def __init__(self,*args,**kwargs):
+        # Checking mandatory parameters
         mandatory = ['user', 'password', 'streamFormat']
         for key in mandatory:
-            if not key in kwargs:
-                QobuzXbmcError(
-                        who=self,
-                        what='missing_parameter',
-                        additional=key)
+            if not key in kwargs: raise QobuzXbmcError(
+                                                       who=self,
+                                                       what='missing_parameter',
+                                                       additional=key)
         
-        #print "Params: " + pprint.pformat(kwargs)
+        # Setting our options
         self.options = kwargs
         if not 'autoSave' in self.options:
             self.options['autoSave'] = True
@@ -28,18 +28,19 @@ class QobuzLocalStorage(object):
             self.options['refresh'] = 3600
         if not 'overwrite' in self.options:
             self.options['overwrite'] = True
+        
+        # Our dictionary storage
         self.data = {}
+
+        # Qobuz API
         self.api = QobuzApi()
+     
+        # Login into Qobuz our raise exception   
         key = self.make_key(name='user', id=0)
         data = self.get(name='user', id=0, user=kwargs['user'], password=kwargs['password'])
-        #pprint.pprint(data)
-        if not data:
-            QobuzXbmcError(
-                        who= self,
-                        what= 'login_failure',
-                        additional= kwargs['user'])
+        if not data: raise QobuzXbmcError(who= self, what= 'login_failure', additional= kwargs['user'])
+        # We feed our api wit user data (auth_token, rights ...)
         self.api.set_logged(**data)
-        
     
     
     def lastError(self):
@@ -48,14 +49,11 @@ class QobuzLocalStorage(object):
     def set(self,**kwargs):
         mandatory = ['name','id']
         for key in mandatory:
-            if not key in kwargs:
-                QobuzXbmcError(
-                        who=self,
-                        what='missing_parameter',
-                        additionnal=key)
+            if not key in kwargs: 
+                raise QobuzXbmcError(who=self, what='missing_parameter', additionnal=key)
         key = self.make_key(**kwargs)
         if not self.options['overwrite'] and key in self.data:
-            QobuzXbmcError(who=self, what='key_exist', additional=key)
+            raise QobuzXbmcError(who=self, what='key_exist', additional=key)
         self.data[key] = {
                           'name': kwargs['name'],
                           'id': kwargs['id'],
@@ -83,41 +81,39 @@ class QobuzLocalStorage(object):
             return self.data[key]
         return None
 
-    def load(self, **kwargs):
+    def load(self, **ka):
         log(self, "Loading with Qobuz API")
-#        key = self.make_key(**kwargs)
-        if kwargs['name'] == 'user':
-            response = self.api.login(kwargs['user'], kwargs['password'])
-        elif kwargs['name'] == 'product':
-            response = self.api.get_product(kwargs['id'])
-        elif kwargs['name'] == 'user-playlists':
+        if ka['name'] == 'user':
+            response = self.api.login(ka['user'], ka['password'])
+        elif ka['name'] == 'product':
+            response = self.api.get_product(ka['id'])
+        elif ka['name'] == 'user-playlists':
             response = self.api.get_user_playlists()
-        elif kwargs['name'] == 'playlist':
-            response = self.api.get_playlist(kwargs['id'])
-        elif kwargs['name'] == 'track':
-            response = self.api.get_track(kwargs['id'])
-        elif kwargs['name'] == 'stream-url':
-            user = self.get(name='user', id=0)
+        elif ka['name'] == 'playlist':
+            response = self.api.get_playlist(ka['id'])
+        elif ka['name'] == 'track':
+            response = self.api.get_track(ka['id'])
+        elif ka['name'] == 'stream-url':
             context_type = ''
             context_id = ''
             format_id = self.options['streamFormat']
-            response = self.api.get_track_url(kwargs['id'], context_type, context_id, format_id)
-        elif kwargs['name'] == 'purchases':
+            response = self.api.get_track_url(ka['id'], context_type, context_id, format_id)
+        elif ka['name'] == 'purchases':
             response = self.api.get_purchases(100)
-        elif kwargs['name'] == 'recommendation':
-            response = self.api.get_recommandations(kwargs['genre_id'], kwargs['genre_type'], 100) 
-        elif kwargs['name'] == 'favorites':
+        elif ka['name'] == 'recommendation':
+            response = self.api.get_recommandations(ka['genre_id'], ka['genre_type'], 100) 
+        elif ka['name'] == 'favorites':
             response = self.api.get_favorites(100)
         else:
             QobuzXbmcError(
                         who= self,
                         what= 'qobuz_api_invalid_query',
-                        additional= pprint.pformat(kwargs))
+                        additional= pprint.pformat(ka))
         if not response:
                 warn(self, "Loading from Qobuz fail")
                 return False
-        kwargs['value'] = response
-        self.set(**kwargs)
+        ka['value'] = response
+        self.set(**ka)
         return True
 
     
@@ -216,19 +212,20 @@ class QobuzCacheCommon(QobuzLocalStorage):
         import xbmcaddon
         import xbmc
         import StorageServer
-        StorageServer.dbg = True
-        self.storage = StorageServer.StorageServer('plugin.audio.qobuz', 24)
+        #StorageServer.dbg = True
+        self.storage = StorageServer.StorageServer('plugin_audio_qobuz', 24)
         super(QobuzCacheCommon,self).__init__(*args, **kwargs)
         print "import ok"
         
     def make_key(self, *args, **kwargs):
             if not 'id' in kwargs: kwargs['id'] = 0
-            return str(kwargs['name'] + '-' + str(kwargs['id']));
+            return "" + kwargs['name'] + '-' + str(kwargs['id']);
     
     def load(self, **kwargs):
         key = self.make_key(**kwargs)
         #self.storage.delete(key)
         data = self.storage.get(key)
+        print "LOADING " + key + ' / ' + pprint.pformat(data)
         if data:
             print pprint.pformat(data)
             return pickle.loads(data)
@@ -244,7 +241,9 @@ class QobuzCacheCommon(QobuzLocalStorage):
             return count
         if not key in self.data:
             QobuzXbmcError(who=self,what='undefined_key', additional=key)
-        self.storage.set(key, pickle.dumps(self.data[key], pickle.HIGHEST_PROTOCOL))
+        data = pickle.dumps(self.data[key], 0)
+        print "SAVE key " + key + ' / ' + pprint.pformat(data)
+        self.storage.set(key, data)
         self.saved(key,True)
         return 1
 

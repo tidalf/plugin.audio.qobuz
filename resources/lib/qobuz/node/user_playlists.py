@@ -108,17 +108,10 @@ class Node_user_playlists(Node):
         return image
 
     def set_current_playlist(self, id):
-        info(self, "Set current playlist: " + str(id))
-        from cache.current_playlist import Cache_current_playlist
-        cp = Cache_current_playlist()
-        if cp.get_id() == id:
-            info(self, "Playlist already selected... do nothing")
-            return False
-        cp.set_id(id)
-        return cp.save()
-
+        #playlist = qobuz.registry.get(name='user-playlists')
+        qobuz.registry.set('current-playlist-id', id)
+        
     def create_playlist(self, query = None):
-        from cache.user_playlists import Cache_user_playlists
         if not query:
             query = self._get_keyboard(default = "", heading = 'Create playlist')
             query = query.strip()
@@ -126,9 +119,8 @@ class Node_user_playlists(Node):
         if not ret:
             warn(self, "Cannot create playlist name '" + query + "'")
             return False
-        userplaylists = Cache_user_playlists()
-        userplaylists.delete_cache()
         self.set_current_playlist(ret['id'])
+        qobuz.registry.delete(name='user-playlists')
         return True
 
     ''' 
@@ -136,23 +128,16 @@ class Node_user_playlists(Node):
     '''
     def rename_playlist(self, id):
         info(self, "rename playlist: " + str(id))
-        from cache.playlist import Cache_playlist
-        from cache.user_playlists import Cache_user_playlists
-        playlist = Cache_playlist(id)
-        playlist.fetch_data()
-        currentname = playlist.get_data()['name'].encode('utf8', 'replace')
+        playlist = qobuz.registry.get(name='user-playlists')
+        currentname = playlist['data']['name'].encode('utf8', 'replace')
         query = self._get_keyboard(default = currentname, heading = qobuz.lang(30078))
         query = query.strip().encode('utf8', 'replace')
         if query == currentname:
             return True
         res = qobuz.api.playlist_update(id, query)
         if res:
-            uplaylists = Cache_user_playlists()
-            if not uplaylists.delete_cache():
-                warn(self, "Cannot remove userplaylists.dat")
-                qobuz.gui.notfify(31100, 31101, 'default_red')
-                return False
-            return True
+            qobuz.registry.delete(name='user-playlist')
+            return False
         else:
             qobuz.gui.notifyH(qobuz.lang(30078), qobuz.lang(39009) + ': ' + currentname)
         return False
@@ -161,9 +146,7 @@ class Node_user_playlists(Node):
     '''
     def remove_playlist(self, id):
         import xbmcgui, xbmc
-        from cache.playlist import Cache_playlist
-        cache = Cache_playlist(id)
-        data = cache.fetch_data()
+        data = qobuz.registry.get(name='playlist', id=id)
         name = ''
         if 'name' in data: name = data['name']
         ok = xbmcgui.Dialog().yesno('Removing playlist',
@@ -178,7 +161,5 @@ class Node_user_playlists(Node):
         if not res:
             warn(self, "Cannot delete playlist with id " + str(id))
             return False
-        info(self, "Playlist deleted: " + str(id))
-        userplaylists = Cache_user_playlists()
-        userplaylists.delete_cache()
+        qobuz.registry.delete(name='user-playlist')
         return True
