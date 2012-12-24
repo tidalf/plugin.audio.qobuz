@@ -96,6 +96,12 @@ class Node_product(Node):
         a = self.get_property(('interpreter', 'name'))
         if a: return a
         a = self.get_property(('composer', 'name'))
+        if a: return a
+        a = self.get_property(('data','artist', 'name'))
+        if a: return a
+        a = self.get_property(('data','interpreter', 'name'))
+        if a: return a
+        a = self.get_property(('data','composer', 'name'))
         return a
 
     def get_artist_id(self):
@@ -105,12 +111,21 @@ class Node_product(Node):
         if a: return int(a)
         a = self.get_property(('composer', 'id'))
         if a: return int(a)
+        a = self.get_property(('data','artist', 'id'))
+        if a: return int(a)
+        a = self.get_property(('data','interpreter', 'id'))
+        if a: return int(a)
+        a = self.get_property(('data','composer', 'id'))
+        if a: return int(a)
         return None
 
     def get_title(self):
         title = self.get_property('title')
-        if not title: title = self.get_property('subtitle')
-        return title
+        if title: 
+            return title
+        return self.get_property(('data','title'))
+        #if not title: title = self.get_property(('data','subtitle'))
+        #return title
 
     def get_image(self):
         image = self.get_property(( 'image', 'large'))
@@ -138,16 +153,24 @@ class Node_product(Node):
         return self.get_label()
 
     def get_genre(self):
-        return self.get_property(('genre', 'name'))
+        genre = self.get_property(('genre', 'name'))
+        if genre: 
+            return genre
+        return self.get_property(('data','genre', 'name'))
 
     def get_year(self):
         import time
-        date = self.get_property('released_at')
+        date = self.get_property(('data','released_at'))
+        if not date:
+            date = self.get_property(('data','released_at'))
         year = 0
         try: year = time.strftime("%Y", time.localtime(date))
         except: pass
         return year
 
     def get_description(self):
-        return self.get_property('description')
+        description = self.get_property('description')
+        if description: 
+            return description
+        return self.get_property(('data','description'))
 
