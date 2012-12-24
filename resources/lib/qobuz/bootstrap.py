@@ -116,7 +116,7 @@ class QobuzBootstrap(object):
                                        user=qobuz.addon.getSetting('username'), 
                                        password=qobuz.addon.getSetting('password'), 
                                        basePath=qobuz.path.cache,
-                                       streamFormat=streamFormat)
+                                       streamFormat=streamFormat, hashKey=False)
         if not qobuz.registry.get(name='user'):
             qobuz.gui.show_login_failure()
             exit(1)

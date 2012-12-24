@@ -22,6 +22,7 @@ from utils.file.write import safe_write
 import cPickle as pickle
 import os
 from debug import *
+import hashlib
 
 class QobuzLocalStorage(object):
 
@@ -44,7 +45,8 @@ class QobuzLocalStorage(object):
             self.options['refresh'] = 3600
         if not 'overwrite' in self.options:
             self.options['overwrite'] = True
-        
+        if not 'hashKey' in self.options:
+            self.options['hashKey'] = False
         # Our dictionary storage
         self.data = {}
 
@@ -88,13 +90,24 @@ class QobuzLocalStorage(object):
     def save(self,key):
         QobuzXbmcError(who=self, what='not_implemented_in_child_class', additional='save')
 
-    def make_key(self,*args, **kwargs):
+    def make_key(self, **ka):
+        key = self._make_key(**ka)
+        if self.options['hashKey']:
+            return self.hash_key(key)
+        return key
+    
+    def _make_key(self, **ka):
         QobuzXbmcError(who= self,what= 'not_implemented_in_child_class',additional='make_key')
 
-    def get(self,*args, **kwargs):
-        key = self.make_key(**kwargs)
+    def hash_key(self, key):
+        h = hashlib.new('sha256')
+        h.update(key)
+        return h.hexdigest()
+    
+    def get(self,*args, **ka):
+        key = self.make_key(**ka)
         if not key in self.data:
-            self.load(**kwargs)
+            self.load(**ka)
         if key in self.data:
             return self.data[key]
         return None
@@ -156,25 +169,48 @@ class QobuzLocalStorage(object):
         self.data[key]['saved'] = True if value else False
         return self
 
-    def delete(self, **kwargs):
-        key = self.make_key(**kwargs)
+    def delete(self, **ka):
+        key = self.make_key(**ka)
         self.data[key] = None
         del self.data[key]
         
 class QobuzCacheDefault(QobuzLocalStorage):
-    def __init__(self,*args,**kwargs):
-        super(QobuzCacheDefault,self).__init__(*args, **kwargs)
-        if not 'basePath' in kwargs:
+    def __init__(self,*args,**ka):
+        super(QobuzCacheDefault,self).__init__(*args, **ka)
+        if not 'basePath' in ka:
             QobuzXbmcError(who=self, what='missing_parameter',additional='basePath')
 
-    def make_key(self, *args, **kwargs):
-        if not 'id' in kwargs: kwargs['id'] = 0
-        return kwargs['name'] + '-' + str(kwargs['id']);
+    def _make_key(self, *args, **ka):
+        if not 'id' in ka: ka['id'] = 0
+        return ka['name'] + '-' + str(ka['id']);
 
-    def hook_pre_load(self, **kwargs):
+    def _make_sub_path(self, xpath, key, size, count):
+        if count == 0 or len(key) < size + 1:
+            return key + '.dat'
+        subp = key[:size]
+        root = os.path.join(os.path.join(*xpath), subp)
+        print 'Testing ' + repr(subp) + 'in ' + repr(root)
+        if not os.path.exists(root):
+            os.mkdir(root)
+        xpath.append(subp)
+        count -= 1
+        return self._make_sub_path(xpath, key[size:], size, count )
+        
+    def _make_path(self, key):
+        xpath = []
+        xpath.append(self.options['basePath'])
+        fileName = None
+        if self.options['hashKey']:
+            fileName = self._make_sub_path(xpath, key, 2, 1)
+        else:
+            fileName = key + '.dat'
+        return os.path.join(os.path.join(*xpath), fileName)
+    
+    def hook_pre_load(self, **ka):
         log(self, "Loading from disk")
-        key = self.make_key(**kwargs)
-        cache = os.path.join(self.options['basePath'], key+'.dat');
+        key = self.make_key(**ka)
+        cache = self._make_path(key)
+        #cache = os.path.join(self.options['basePath'], key+'.dat');
         if not os.path.exists(cache):
             warn(self, "Path doesn't exists " + cache)
             return False
@@ -186,13 +222,6 @@ class QobuzCacheDefault(QobuzLocalStorage):
                 warn(self, "Pickle can't load data from file")
                 return False
         return True
-            
-#    def load(self, **kwargs):
-#        key = self.make_key(**kwargs)
-#        self._load_from_disk(**kwargs)
-#        if key in self.data and self.fresh(key):
-#            return self.data[key]
-#        return super(QobuzCacheDefault, self).load(**kwargs)
         
     def save(self, key = None):
         if key == None:
@@ -203,51 +232,48 @@ class QobuzCacheDefault(QobuzLocalStorage):
                     self.save(key)
             return count
         if not key in self.data:
-            QobuzXbmcError({'Who': self,'What': 'undefined_key','With': key})
-        cache = os.path.join(self.options['basePath'], key+'.dat');
+            raise QobuzXbmcError(who=self, what='undefined_key',additional=key)
+        cache = self._make_path(key)
         with open(cache, 'wb') as f:
             s = pickle.dump(self.data[key], f, protocol = pickle.HIGHEST_PROTOCOL)
             f.flush()
             os.fsync(f)
         return s
-        sw = safe_write()
-        sw.write(self.options.basePath, self.data[key])
-        self.saved(key,True)
-        return 1
+        warn(self, 'Cannot save key ' + key)
+        return 0
 
-    def delete(self, **kwargs):
-        key = self.make_key(**kwargs)
+    def delete(self, **ka):
+        key = self.make_key(**ka)
         info(self, 'Deleting key: ' + key)
         cache = os.path.join(self.options['basePath'], key + '.dat')
         if not os.path.exists(cache):
             return False
         sw = safe_write();
         if sw.unlink(cache):
-            super(QobuzCacheDefault, self).delete(**kwargs)
+            super(QobuzCacheDefault, self).delete(**ka)
 
 class QobuzCacheCommon(QobuzLocalStorage):
-    def __init__(self,*args,**kwargs):
+    def __init__(self,*args,**ka):
         print "Loading Common cache"
         import xbmcaddon
         import xbmc
         import StorageServer
         #StorageServer.dbg = True
         self.storage = StorageServer.StorageServer('plugin_audio_qobuz', 24)
-        super(QobuzCacheCommon,self).__init__(*args, **kwargs)
+        super(QobuzCacheCommon,self).__init__(*args, **ka)
         print "import ok"
         
-    def make_key(self, *args, **kwargs):
-            if not 'id' in kwargs: kwargs['id'] = 0
-            return "" + kwargs['name'] + '-' + str(kwargs['id']);
+    def _make_key(self, *args, **ka):
+            if not 'id' in ka: ka['id'] = 0
+            return "" + ka['name'] + '-' + str(ka['id']);
     
-    def load(self, **kwargs):
-        key = self.make_key(**kwargs)
+    def hook_pre_load(self, **ka):
+        key = self.make_key(**ka)
         data = self.storage.get(key)
         log(self, "LOADING " + key + ' / ' + pprint.pformat(data))
         if data:
             print pprint.pformat(data)
-            return pickle.loads(data)
-        return super(QobuzCacheCommon, self).load(**kwargs)
+            self.data[key] = pickle.loads(data)
     
     def save(self, key = None):
         if key == None:
@@ -267,43 +293,43 @@ class QobuzCacheCommon(QobuzLocalStorage):
 
 class QobuzRegistry():
     
-    def __init__(self,*args,**kwargs):
-        if not 'cacheType' in kwargs:
-            kwargs['cacheType'] = 'default'
-        if kwargs['cacheType'] == 'default':
-            self.cache = QobuzCacheDefault(*args,**kwargs)
-        elif kwargs['cacheType'] == 'xbmc-common':
+    def __init__(self,*args,**ka):
+        if not 'cacheType' in ka:
+            ka['cacheType'] = 'default'
+        if ka['cacheType'] == 'default':
+            self.cache = QobuzCacheDefault(*args,**ka)
+        elif ka['cacheType'] == 'xbmc-common':
             cache = None
             try:
-                cache = QobuzCacheCommon(*args, **kwargs)
+                cache = QobuzCacheCommon(*args, **ka)
             except Exception:
-                cache = QobuzCacheDefault(*args, **kwargs)
+                cache = QobuzCacheDefault(*args, **ka)
             self.cache = cache
         else:
-            QobuzXbmcError(who=self, what='unknown_cache_type',additionnal=kwargs['cacheType'])
+            QobuzXbmcError(who=self, what='unknown_cache_type',additionnal=ka['cacheType'])
         return None
 
     def lastError(self):
         return self.cache.lastError()
     
-    def get(self,**kwargs):
-        if not 'id' in kwargs:
-            kwargs['id'] = 0
-        return self.cache.get(**kwargs);
+    def get(self,**ka):
+        if not 'id' in ka:
+            ka['id'] = 0
+        return self.cache.get(**ka);
 
-    def set(self,**kwargs):
-        self.cache.set(**kwargs)
+    def set(self,**ka):
+        self.cache.set(**ka)
         
     def save(self):
         self.cache.save()
         
-    def delete(self, **kwargs):
-        if not 'id' in kwargs:
-            kwargs['id'] = 0
-        self.cache.delete(**kwargs)
+    def delete(self, **ka):
+        if not 'id' in ka:
+            ka['id'] = 0
+        self.cache.delete(**ka)
     
-    def make_key(self, **kwargs):
-        return self.cache.make_key(**kwargs)
+    def make_key(self, **ka):
+        return self.cache.make_key(**ka)
 
 
 if __name__ == '__main__':
