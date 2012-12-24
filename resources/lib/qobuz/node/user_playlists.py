@@ -31,8 +31,6 @@ from debug import info, warn, error, debug
     NODE USER PLAYLISTS
 '''
 
-#from cache.user_playlists import Cache_user_playlists
-#from cache.current_playlist import Cache_current_playlist
 from playlist import Node_playlist
 
 class Node_user_playlists(Node):
@@ -47,8 +45,6 @@ class Node_user_playlists(Node):
         display_by = self.get_parameter('display-by')
         if not display_by: display_by = 'songs'
         self.set_display_by(display_by)
-#        self.cache = Cache_user_playlists()
-#        self.cache_current_playlist = Cache_current_playlist()
         display_cover = qobuz.addon.getSetting('userplaylists_display_cover')
         if display_cover == 'true': display_cover = True
         else: display_cover = False
@@ -109,7 +105,7 @@ class Node_user_playlists(Node):
 
     def set_current_playlist(self, id):
         #playlist = qobuz.registry.get(name='user-playlists')
-        qobuz.registry.set('current-playlist-id', id)
+        qobuz.registry.set(name='current-playlist-id', id=0, value=id)
         
     def create_playlist(self, query = None):
         if not query:

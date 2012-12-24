@@ -64,19 +64,19 @@ class QobuzLocalStorage(object):
     def lastError(self):
         return self.api.last_error
         
-    def set(self,**kwargs):
+    def set(self,**ka):
         mandatory = ['name','id']
         for key in mandatory:
-            if not key in kwargs: 
-                raise QobuzXbmcError(who=self, what='missing_parameter', additionnal=key)
-        key = self.make_key(**kwargs)
+            if not key in ka: 
+                raise QobuzXbmcError(who=self, what='missing_parameter', additional=key)
+        key = self.make_key(**ka)
         if not self.options['overwrite'] and key in self.data:
             raise QobuzXbmcError(who=self, what='key_exist', additional=key)
         self.data[key] = {
-                          'name': kwargs['name'],
-                          'id': kwargs['id'],
+                          'name': ka['name'],
+                          'id': ka['id'],
                           'saved': False,
-                          'data': kwargs['value'],
+                          'data': ka['value'],
                           'updatedOn': time(),
                           'refresh': self.options['refresh']
                           }
@@ -100,6 +100,10 @@ class QobuzLocalStorage(object):
         return None
 
     def load(self, **ka):
+        self.hook_pre_load(**ka)
+        key = self.make_key(**ka)
+        if key in self.data and self.fresh(key):
+            return self.data[key]
         log(self, "Loading data from Qobuz")
         if ka['name'] == 'user':
             response = self.api.login(ka['user'], ka['password'])
@@ -167,10 +171,10 @@ class QobuzCacheDefault(QobuzLocalStorage):
         if not 'id' in kwargs: kwargs['id'] = 0
         return kwargs['name'] + '-' + str(kwargs['id']);
 
-    def _load_from_disk(self, **kwargs):
+    def hook_pre_load(self, **kwargs):
+        log(self, "Loading from disk")
         key = self.make_key(**kwargs)
         cache = os.path.join(self.options['basePath'], key+'.dat');
-        data = None
         if not os.path.exists(cache):
             warn(self, "Path doesn't exists " + cache)
             return False
@@ -183,13 +187,12 @@ class QobuzCacheDefault(QobuzLocalStorage):
                 return False
         return True
             
-    def load(self, **kwargs):
-        key = self.make_key(**kwargs)
-        if not self._load_from_disk(**kwargs):
-            pass
-        if key in self.data and self.fresh(key):
-            return self.data[key]
-        return super(QobuzCacheDefault, self).load(**kwargs)
+#    def load(self, **kwargs):
+#        key = self.make_key(**kwargs)
+#        self._load_from_disk(**kwargs)
+#        if key in self.data and self.fresh(key):
+#            return self.data[key]
+#        return super(QobuzCacheDefault, self).load(**kwargs)
         
     def save(self, key = None):
         if key == None:
