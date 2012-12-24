@@ -17,14 +17,12 @@
 import qobuz
 from flag import NodeFlag
 from node import Node
-#from product import Node_product
 from debug import error
 
 '''
     NODE PURCHASES
 '''
 
-#from cache.purchases import Cache_purchases
 from product import Node_product
 
 class Node_purchases(Node):

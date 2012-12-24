@@ -93,9 +93,7 @@ class Directory():
                                    cacheToDisc = success)
         if self.total_put == 0:
             label = self.root.get_label()
-            #print "LABEL: " + label
-            #qobuz.gui.notifyH(qobuz.lang(40001), label)
-        self.update(100, 100, qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put).encode('ascii', 'ignore') + ' items')
+        self.update(100, 100, qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put) + ' items')
         self.close()
         return success
 

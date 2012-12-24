@@ -32,7 +32,6 @@ sys.path.append(libDir)
 sys.path.append(qobuzDir)
 
 from bootstrap import QobuzBootstrap
-import qobuz
 boot = QobuzBootstrap(__addon__, int(sys.argv[1]))
 boot.bootstrap_app()
 

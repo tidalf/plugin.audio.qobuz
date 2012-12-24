@@ -14,23 +14,19 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import os
+#import os
 import json
-import time
 import requests
-#import hashlib
-#import pickle
 import pprint
 from time import time
 import math
 import hashlib
-#import qobuz
-from debug import *
+
+from debug import warn, log
+
 import socket
 
 socket.timeout = 5
-
-
 
 class QobuzApi:
 
@@ -117,20 +113,19 @@ class QobuzApi:
             '''
             When something wrong we are deleting our auth token
                 '''
-            if self.auth:
-                self.auth.delete_cache()
+#            if self.auth:
+#                self.auth.delete_cache()
             return None
         return response_json
 
     def login(self,user,password):
-        print "Login with user " + user
-        # from cache.authentication import Cache_authentication
+        log(self, 'Login with user ' + user)
         params = {
                   'password': hashlib.md5(password).hexdigest(),
                   'username': user,
                   'email': user + '@QobuzXbmc.beta',
                    }
-        data = self._api_request(params,"/user/login",noToken=True)
+        data = self._api_request(params, "/user/login", noToken=True)
         if not data: return None
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
@@ -271,7 +266,8 @@ class QobuzApi:
                     'spotify_track_uris':'',
                     'deezer_playlist_url':''}
 
-        log("info","creating new playlist" + str(playlist_name) + "with (or without) tracks :" + tracks_id + ")")
+        log("info","creating new playlist " + str(playlist_name) + " / tracks[" + tracks_id + "]")
+        log(self, 'Token: ' + self.authtoken)
         return self._api_request(params,"/playlist/create")
 
     def playlist_delete (self,playlist_id):

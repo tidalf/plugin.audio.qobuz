@@ -97,12 +97,7 @@ class Node_product(Node):
         if a: return a
         a = self.get_property(('composer', 'name'))
         if a: return a
-        a = self.get_property(('data','artist', 'name'))
-        if a: return a
-        a = self.get_property(('data','interpreter', 'name'))
-        if a: return a
-        a = self.get_property(('data','composer', 'name'))
-        return a
+        return None
 
     def get_artist_id(self):
         a = self.get_property(('artist', 'id'))
@@ -111,31 +106,16 @@ class Node_product(Node):
         if a: return int(a)
         a = self.get_property(('composer', 'id'))
         if a: return int(a)
-        a = self.get_property(('data','artist', 'id'))
-        if a: return int(a)
-        a = self.get_property(('data','interpreter', 'id'))
-        if a: return int(a)
-        a = self.get_property(('data','composer', 'id'))
-        if a: return int(a)
         return None
 
     def get_title(self):
-        title = self.get_property('title')
-        if title: 
-            return title
-        return self.get_property(('data','title'))
-        #if not title: title = self.get_property(('data','subtitle'))
-        #return title
+        return self.get_property('title')
 
     def get_image(self):
         image = self.get_property(( 'image', 'large'))
         if image:
             self.image = image
             return image
-#        image = self.get_property(( 'data', 'image', 'large'))
-#        if image:
-#            self.image = image
-#            return image
         if self.parent:
             image = self.parent.get_image()
             if image: self.image = image
@@ -153,16 +133,13 @@ class Node_product(Node):
         return self.get_label()
 
     def get_genre(self):
-        genre = self.get_property(('genre', 'name'))
-        if genre: 
-            return genre
-        return self.get_property(('data','genre', 'name'))
+        return self.get_property(('genre', 'name'))
 
     def get_year(self):
         import time
-        date = self.get_property(('data','released_at'))
+        date = self.get_property(('released_at'))
         if not date:
-            date = self.get_property(('data','released_at'))
+            date = self.get_property(('released_at'))
         year = 0
         try: year = time.strftime("%Y", time.localtime(date))
         except: pass

@@ -43,42 +43,26 @@ class Node(object):
         self.label2 = ""
         self.is_folder = True
         self._data = None
-#        self.auto_set_cache = False
-
-
-#    def set_cache(self):
-#        warn(self, "node::set_cache (must be overloaded")
-#        return False
-#    
-#    def set_auto_set_cache(self, b):
-#        if b: self.auto_set_cache = True 
-#        else: self.auto_set_cache = False
       
     def delete_tree(self):
         for child in self.childs:
             child.delete_tree()
         del self.childs
         del self.parent
-#        del self._data
         del self.parameters
-#        del self.cache
-        
+      
     def set_data(self,data):
         self._data = data
 
-#    def get_data(self):
-#        return self._data
-
-#    def fetch_data(self):
-#        if not self.cache: return None
-#        return self.cache.fetch_data()
+    def get_data(self):
+        return self._data
 
     def get_property(self,path):
         if not self._data:
             return ''
         if isinstance(path,basestring):
             if path in self._data and self._data[path] and self._data[path] != 'None':
-                return self._data[path] #.encode('utf8','ignore')
+                return self._data[path] 
             return ''
         root = self._data
         for i in range(0,len(path)):
@@ -86,7 +70,7 @@ class Node(object):
                 return ''
             root = root[path[i]]
         if root and root != 'None':
-            return root # .encode('utf8','replace')
+            return root 
         return ''
 
     def set_is_folder(self,b):
@@ -271,7 +255,6 @@ class Node(object):
         return '%s?mode=%i&nt=%i&nid=%s' % (sys.argv[0],mode,nt,nid)
 
     def attach_context_menu(self,item):
-        # import urllib
         color = qobuz.addon.getSetting('color_item')
         menuItems = []
         cmd = ''

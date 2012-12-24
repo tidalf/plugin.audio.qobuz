@@ -9,17 +9,17 @@ from debug import *
 
 class QobuzLocalStorage(object):
 
-    def __init__(self,*args,**kwargs):
+    def __init__(self,**ka):
         # Checking mandatory parameters
         mandatory = ['user', 'password', 'streamFormat']
         for key in mandatory:
-            if not key in kwargs: raise QobuzXbmcError(
+            if not key in ka: raise QobuzXbmcError(
                                                        who=self,
                                                        what='missing_parameter',
                                                        additional=key)
         
         # Setting our options
-        self.options = kwargs
+        self.options = ka
         if not 'autoSave' in self.options:
             self.options['autoSave'] = True
         if not 'autoLoad' in self.options:
@@ -37,10 +37,12 @@ class QobuzLocalStorage(object):
      
         # Login into Qobuz our raise exception   
         key = self.make_key(name='user', id=0)
-        data = self.get(name='user', id=0, user=kwargs['user'], password=kwargs['password'])
-        if not data: raise QobuzXbmcError(who= self, what= 'login_failure', additional= kwargs['user'])
+        data = self.get(name='user', id=0, user=ka['user'], password=ka['password'])
+        if not data: raise QobuzXbmcError(who= self, what= 'login_failure', additional= ka['user'])
+        print "We are logged"
         # We feed our api wit user data (auth_token, rights ...)
         self.api.set_logged(**data)
+        print 'Token: ' + self.api.authtoken
     
     
     def lastError(self):
@@ -82,7 +84,7 @@ class QobuzLocalStorage(object):
         return None
 
     def load(self, **ka):
-        log(self, "Loading with Qobuz API")
+        log(self, "Loading data from Qobuz")
         if ka['name'] == 'user':
             response = self.api.login(ka['user'], ka['password'])
         elif ka['name'] == 'product':
@@ -169,7 +171,6 @@ class QobuzCacheDefault(QobuzLocalStorage):
         key = self.make_key(**kwargs)
         if not self._load_from_disk(**kwargs):
             pass
-#            print "Loading from disk fail"
         if key in self.data and self.fresh(key):
             return self.data[key]
         return super(QobuzCacheDefault, self).load(**kwargs)
@@ -184,7 +185,6 @@ class QobuzCacheDefault(QobuzLocalStorage):
             return count
         if not key in self.data:
             QobuzXbmcError({'Who': self,'What': 'undefined_key','With': key})
-        #print 'Saving key ' + key
         cache = os.path.join(self.options['basePath'], key+'.dat');
         with open(cache, 'wb') as f:
             s = pickle.dump(self.data[key], f, protocol = pickle.HIGHEST_PROTOCOL)
@@ -223,9 +223,8 @@ class QobuzCacheCommon(QobuzLocalStorage):
     
     def load(self, **kwargs):
         key = self.make_key(**kwargs)
-        #self.storage.delete(key)
         data = self.storage.get(key)
-        print "LOADING " + key + ' / ' + pprint.pformat(data)
+        log(self, "LOADING " + key + ' / ' + pprint.pformat(data))
         if data:
             print pprint.pformat(data)
             return pickle.loads(data)
@@ -248,6 +247,7 @@ class QobuzCacheCommon(QobuzLocalStorage):
         return 1
 
 class QobuzRegistry():
+    
     def __init__(self,*args,**kwargs):
         if not 'cacheType' in kwargs:
             kwargs['cacheType'] = 'default'
@@ -255,12 +255,10 @@ class QobuzRegistry():
             self.cache = QobuzCacheDefault(*args,**kwargs)
         elif kwargs['cacheType'] == 'xbmc-common':
             cache = None
-#            try:
-            cache = QobuzCacheCommon(*args, **kwargs)
-#            except Exception:
-#                pass
-                #pprint.pformat(Exception)
-                #cache = QobuzCacheDefault(*args, **kwargs)
+            try:
+                cache = QobuzCacheCommon(*args, **kwargs)
+            except Exception:
+                cache = QobuzCacheDefault(*args, **kwargs)
             self.cache = cache
         else:
             QobuzXbmcError(who=self, what='unknown_cache_type',additionnal=kwargs['cacheType'])
@@ -287,6 +285,8 @@ class QobuzRegistry():
     
     def make_key(self, **kwargs):
         return self.cache.make_key(**kwargs)
+
+
 if __name__ == '__main__':
 #    try:
 #        QobuzXbmcError({'Who': 'TestException','What': 'test_exception','With': 'TestingException'})

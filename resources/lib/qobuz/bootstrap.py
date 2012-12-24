@@ -27,6 +27,11 @@ from dog import dog
 import qobuz
 from node.flag import NodeFlag
 
+from exception import QobuzXbmcError
+
+import json
+import pprint
+
 ''' Arguments parssing '''
 def get_params():
     d = dog()
@@ -50,20 +55,27 @@ def get_params():
                     warn('[DOG]', "--- Invalid key: %s / value: %s" % (splitparams[0], splitparams[1]))
     return rparam
 
-class xbmc_json_rpc():
 
+class XbmcRPC:
     def __init__(self):
         pass
+    
+    def send(self, request):
+        if not request: raise QobuzXbmcError(who=self, what='missing_parameter', additional='request')
+        request['jsonrpc'] = '2.0'
+        request['method'] = 'JSONRPC.' + request['method']
+        if not 'id' in request: request['id'] = 1
+        rjson = json.dumps(request)
+        print 'REQUEST: ' + rjson
+        ret = xbmc.executeJSONRPC(rjson)
+        return ret
 
-    def Introspect(self, id):
-        return xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "JSONRPC.Introspect", "id": %i }' % (id))
-
-    def AudioLibrary_GetAlbums(self, params = {}):
-        s = ''
-        if 'id' in params: s = '"id": "' + str(params['id']) + '"'
-        elif 'name' in params: s = '"Audio.Fields.Artist": "' + str(params['name']) + '"'
-        return xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"AudioLibrary.GetAlbums","params":{"genreid": -1 ,"artistid": 1 ,"start": -1,"end": -1 }, "id":"AudioLibraryGetAlbums"}')
-
+    def ping(self):
+        request = {
+                   'method': 'Ping',
+        }
+        return self.send(request)
+        
 '''
     QobuzBootstrap
 '''
@@ -73,20 +85,27 @@ class QobuzBootstrap(object):
         qobuz.addon = __addon__
         self.handle = __handle__
         qobuz.boot = self
+#        rpc = XbmcRPC()
+#        ret = rpc.ping()
+#        pprint.pprint(ret)
         
     def bootstrap_app(self):
         self.bootstrap_directories()
         self.bootstrap_lang()
         self.bootstrap_utils()
         self.bootstrap_api()
-        self.bootstrap_core()
-        self.bootstrap_image()
         self.bootstrap_gui()
         self.bootstrap_sys_args()
-        from registry import QobuzRegistry
+        self.bootstrap_registry()
+        
+        return self.dispatch()
 
+    def bootstrap_lang(self):
+        qobuz.lang = qobuz.addon.getLocalizedString
+
+    def bootstrap_registry(self):
+        from registry import QobuzRegistry
         streamFormat = 6 if qobuz.addon.getSetting('streamtype') == 'flac' else 5
-        #print 'streamFormat: ' + str(streamFormat)
         qobuz.registry = QobuzRegistry(
                                        cacheType='default', 
                                        user=qobuz.addon.getSetting('username'), 
@@ -96,12 +115,7 @@ class QobuzBootstrap(object):
         if not qobuz.registry.get(name='user'):
             qobuz.gui.show_login_failure()
             exit(1)
-        
-        return self.dispatch()
-
-    def bootstrap_lang(self):
-        qobuz.lang = qobuz.addon.getLocalizedString
-
+    
     def bootstrap_utils(self):
         import utils.string
         class Utils():
@@ -155,14 +169,6 @@ class QobuzBootstrap(object):
         from api import QobuzApi
         qobuz.api = QobuzApi()
 
-    def bootstrap_core(self):
-        from core import QobuzCore
-        qobuz.core = QobuzCore()
-
-    def bootstrap_image(self):
-       pass
-       # from images import QobuzImage
-       # qobuz.image = QobuzImage()
 
     def bootstrap_gui(self):
         from gui.utils import Utils
@@ -207,11 +213,11 @@ class QobuzBootstrap(object):
         cm = cache_manager()
         cm.delete_all_data()
 
-    '''
-    
-    '''
-    def build_url_return(self):
-        return sys.argv[2]
+#    '''
+#    
+#    '''
+#    def build_url_return(self):
+#        return sys.argv[2]
     '''
         Execute methode based on MODE
     '''
