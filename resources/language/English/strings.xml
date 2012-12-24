@@ -10,6 +10,10 @@
 	If not, see <http://www.gnu.org/licenses/>. -->
 <?xml version="1.0" encoding="UTF8" standalone="yes"?>
 <strings>
+      <string id="3101">Action</string>
+  <string id="3102">Exit</string>
+  <string id="3120">Demo Text</string>  
+  
 	<!-- credentials -->
 	<string id="37000">Username</string>
 	<string id="37001">Password</string>

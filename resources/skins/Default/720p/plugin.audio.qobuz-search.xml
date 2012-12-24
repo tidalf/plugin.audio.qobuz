@@ -1,0 +1,73 @@
+﻿<window id="8569" type="dialog">
+    <defaultcontrol always="false">2</defaultcontrol>
+    <allowoverlay>yes</allowoverlay>
+	<visible>true</visible>
+	<coordinates>
+		<system>1</system>
+<!-- 		<posx>640</posx>
+		<posy>360</posy> -->
+	</coordinates>
+	<backgroundcolor>0x000000FF</backgroundcolor>
+	<controls>
+		<!-- <control type="group"> -->
+			<description>Search</description>
+			<visible>true</visible>
+			<control type="label" id=1>
+				<label>Qobuz powered search</label>
+			</control>
+			<control type="radiobutton" id="2">
+				<description>Artist</description>
+				<type>radiobutton</type>
+				<visible>true</visible>
+				<label>Artist</label>
+				<align>left</align>
+				<aligny>center</aligny>
+<!-- 				<textoffsetx>4</textoffsetx>
+				<textoffsety>5</textoffsety> -->
+				<pulseonselect>false</pulseonselect>
+				<onfocus>-</onfocus>
+				<onunfocus>-</onunfocus>
+				<onup>2</onup>
+				<ondown>3</ondown>
+				<onleft>1</onleft>
+				<onright>1</onright>
+			</control>
+			<control type="radiobutton" id="3">
+                <description>Album</description>
+                <type>radiobutton</type>
+                <visible>true</visible>
+                <label>Artist</label>
+                <align>left</align>
+                <aligny>center</aligny>
+<!--                 <textoffsetx>4</textoffsetx>
+                <textoffsety>5</textoffsety> -->
+                <pulseonselect>false</pulseonselect>
+                <onfocus>-</onfocus>
+                <onunfocus>-</onunfocus>
+                <onup>2</onup>
+                <ondown>3</ondown>
+                <onleft>1</onleft>
+                <onright>1</onright>
+            </control>
+                     <control type="radiobutton" id="3">
+                <description>Track</description>
+                <type>radiobutton</type>
+                <visible>true</visible>
+                <label>Artist</label>
+                <align>left</align>
+                <aligny>center</aligny>
+<!--                 <textoffsetx>4</textoffsetx>
+                <textoffsety>5</textoffsety> -->
+                <pulseonselect>false</pulseonselect>
+                <onfocus>-</onfocus>
+                <onunfocus>-</onunfocus>
+                <onup>2</onup>
+                <ondown>3</ondown>
+                <onleft>1</onleft>
+                <onright>1</onright>
+            </control>
+
+	<!-- 	</control> -->
+
+	</controls>
+</window>

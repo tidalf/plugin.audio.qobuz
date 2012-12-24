@@ -88,6 +88,11 @@ class QobuzBootstrap(object):
 #        rpc = XbmcRPC()
 #        ret = rpc.ping()
 #        pprint.pprint(ret)
+#        from qobuz.gui.dialog.search import Dialog
+#        name = 'plugin.audio.qobuz-search.xml'# % qobuz.addon.getAddonInfo('name')
+#        print 'name: ' + name
+#        d = Dialog(name, qobuz.addon.getAddonInfo('path'), 'default')
+#        d.doModal()
         
     def bootstrap_app(self):
         self.bootstrap_directories()
