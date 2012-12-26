@@ -64,8 +64,8 @@ class IRenderer(object):
             root = Node_search(None, qobuz.boot.params)
             root.set_search_type(qobuz.boot.params['search-type'])
         elif self.node_type & NodeFlag.TYPE_ARTIST:
-            from node.artist import Node_artist
-            root = Node_artist(None, qobuz.boot.params)
+            from node.product_by_artist import Node_product_by_artist
+            root = Node_product_by_artist(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_SIMILAR_ARTIST:
             from node.similar_artists import Node_similar_artist
             root = Node_similar_artist(None, qobuz.boot.params)

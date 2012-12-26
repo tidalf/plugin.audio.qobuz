@@ -201,7 +201,7 @@ class Node_playlist(Node):
             for node in dir.nodes:
                 trackids.append(str(node.get_id()))
             strtracks = ','.join(trackids)
-            ret = qobuz.api.playlist_add_track(str(cid), strtracks)
+            ret = qobuz.api.playlist_addTracks(playlist_id=str(cid), tracks_id=strtracks)
             if ret:
                 qobuz.registry.delete(name='user-playlist', id=cid)
             return True
@@ -252,7 +252,7 @@ class Node_playlist(Node):
         for node in dir.nodes:
             trackids.append(str(node.get_id()))
         strtracks = ','.join(trackids)
-        ret = qobuz.api.playlist_add_track(nid, strtracks)
+        ret = qobuz.api.playlist_addTracks(playlist_id=nid, tracks_id=strtracks)
         if ret:
             qobuz.registry.set(name='user-current-playlist-id', id=0, value=nid, noRemote=True)
         dir.end_of_directory()

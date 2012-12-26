@@ -105,7 +105,7 @@ class QobuzBootstrap(object):
         try:
             qobuz.registry = QobuzRegistry(
                                        cacheType='default', 
-                                       user=qobuz.addon.getSetting('username'), 
+                                       username=qobuz.addon.getSetting('username'), 
                                        password=qobuz.addon.getSetting('password'), 
                                        basePath=qobuz.path.cache,
                                        streamFormat=streamFormat, hashKey=False)

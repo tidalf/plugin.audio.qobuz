@@ -21,7 +21,6 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from track import Node_track
-from artist import Node_artist
 from constants import Mode
 import pprint
 

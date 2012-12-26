@@ -20,7 +20,7 @@ import qobuz
 
 from flag import NodeFlag
 from node import Node
-from artist import Node_artist
+from product_by_artist import Node_product_by_artist
 
 '''
     NODE ARTIST
@@ -47,12 +47,12 @@ class Node_similar_artist(Node):
     '''
     def _build_down(self, xbmc_directory, lvl, flag = None):
         query = self.get_parameter('query')
-        data = qobuz.api.get_similar_artists(query)
+        data = qobuz.api.artist_getSimilarArtists(artist_id=query)
         if not data: return False
         total = len(data['artists']['items'])
         
         for jartist in data['artists']['items']:
-                artist = Node_artist()
+                artist = Node_product_by_artist()
                 artist.set_data(jartist)
                 self.add_child(artist)
         return total

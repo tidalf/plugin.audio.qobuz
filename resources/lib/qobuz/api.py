@@ -29,10 +29,11 @@ import socket
 
 socket.timeout = 5
 
+collectionLimit = 1000
+
 class QobuzApi:
 
     def __init__(self):
-#        self.auth = None
         self.authtoken = None
         self.cookie = None
         self.user_id = None
@@ -51,6 +52,13 @@ class QobuzApi:
         }
         self.__set_s4()
 
+    def _check_ka(self, ka, mandatory, allowed = []):
+        for label in mandatory:
+            if not label in ka: raise QobuzXbmcError(who=self,what='missing_parameter', additional=label)
+        for label in ka:
+            if label not in mandatory and label not in allowed:
+                raise QobuzXbmcError(who=self,what='invalid_parameter', additional=label)
+    
     def set_logged(self,*args,**data):
         self.authtoken = data['data']['user_auth_token']
         self.user_id = data['data']['user']['id']
@@ -117,14 +125,12 @@ class QobuzApi:
             return None
         return response_json
 
-    def login(self,user,password):
-        log(self, 'Login with user ' + user)
-        params = {
-                  'password': hashlib.md5(password).hexdigest(),
-                  'username': user,
-                  'email': user + '@QobuzXbmc.beta',
-                   }
-        data = self._api_request(params, "/user/login", noToken=True)
+    '''
+    User
+    '''
+    def user_login(self, **ka):
+        self._check_ka(ka, ['username', 'password'], ['email'])
+        data = self._api_request(ka, "/user/login", noToken=True)
         if not data: return None
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
@@ -135,87 +141,90 @@ class QobuzApi:
         data['user']['lastname'] = ''
         return data
 
-    def get_track_url(self,track_id,context_type,context_id ,format_id):
-        tsrequest = time()
-        params = {'format_id'  : str(format_id),
+    ''' 
+    Track 
+    '''
+    def track_get(self, **ka):
+        self._check_ka(ka, ['track_id'])
+        data = self._api_request(ka,"/track/get")
+        return data
+    
+    def track_getFileUrl(self, **ka):
+        self._check_ka(ka, ['format_id', 'track_id'])
+        ka['request_ts'] = time()
+        params = {'format_id'  : str(ka['format_id']),
                   'intent'     : 'stream',
-                  'request_ts' : tsrequest ,
-                  'request_sig': str(hashlib.md5("trackgetFileUrlformat_id" + str(format_id) + "intentstream" + "track_id"
-                                + str(track_id) + str(tsrequest) + self.s4).hexdigest()), 'track_id': str(track_id)
+                  'request_ts' : ka['request_ts'] ,
+                  'request_sig': str(hashlib.md5("trackgetFileUrlformat_id" + str(ka['format_id']) + "intentstream" + "track_id"
+                                + str(ka['track_id']) + str(ka['request_ts']) + self.s4).hexdigest()), 'track_id': str(ka['track_id'])
         }
-        data = self._api_request(params,"/track/getFileUrl")
+        return self._api_request(params,"/track/getFileUrl")
+    
+    # MAPI UNTESTED
+    def track_search(self, **ka):
+        self._check_ka(ka, ['query'], ['limit'])
+        if not 'limit' in ka: ka['limit'] = collectionLimit
+        data = self._api_request(ka,"/track/search")
         return data
-
-    def get_track(self,trackid):
-        params = { 'track_id': trackid }
-        data = self._api_request(params,"/track/get")
+    '''
+    Artist
+    '''
+    def artist_get(self, **ka):
+        self._check_ka(ka, ['artist_id'], ['extra'])
+        data = self._api_request(ka,"/artist/get")
         return data
+    '''
+    Album
+    '''
+    def album_get(self, **ka):
+        self._check_ka(ka, ['album_id'])
+        return self._api_request(ka,"/album/get")
 
-    def get_user_playlists(self):
+    def album_getFeatured(self, **ka):
+        self._check_ka(ka, [], ['type', 'genre_id'])
+        if not 'limit' in ka: ka['limit'] = collectionLimit
+        return self._api_request(ka,"/album/getFeatured")
+
+    '''
+    Playlist
+    '''
+    def playlist_getUserPlaylists(self):
         params = { 'user_id': self.user_id }
         data = self._api_request(params,"/playlist/getUserPlaylists")
         return data
 
-    def getPlaylistSongs(self,playlistID):
-        result = self._callRemote('getPlaylistSongs',
-                                  {'playlistID' : playlistID});
-        if 'result' in result:
-            return self._parseSongs(result)
-        else:
-            return []
+    def playlist_get(self,**ka):
+        self._check_ka(ka, ['playlist_id'], ['extra'])
+        return self._api_request(ka,"/playlist/get")
+    
+    def playlist_addTracks (self, **ka):
+        self._check_ka(ka, ['playlist_id', 'tracks_id'])
+        return self._api_request(ka,"/playlist/addTracks")
+    
 
-    def get_playlist(self,playlist_id=39837):
-        params = {'playlist_id':playlist_id,'extra':'tracks'}
-        return self._api_request(params,"/playlist/get")
+    '''
+    Purchase
+    '''
+    def purchase_getUserPurchases(self,**ka):
+        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit'])
+        if not 'limit'in ka: ka['limit'] = collectionLimit
+        return self._api_request(ka,"/purchase/getUserPurchases")
 
-    def get_album_tracks(self,album_id,context_type='plalist'):
-        params = { 'album_id':album_id,'context_type':context_type }
-        return self._api_request(params,"/album/get")
-
-    def get_product(self,id,context_type="playlist"):
-        return self.get_album_tracks(id,context_type)
-
-    def get_recommandations(self,genre_id,typer="new-releases",limit=100):
-        limit = 1000
-        if genre_id == 'null':
-            params = { 'type': typer,'limit': limit }
-        else:
-            params = {'genre_id': genre_id,
-                                       'type': typer,
-                                       'limit': limit}
-
-        return self._api_request(params,"/album/getFeatured")
-
-    def get_purchases(self,limit=100):
-        params = {'user_id': self.user_id }
-        return self._api_request(params,"/purchase/getUserPurchases")
-
-    def get_favorites(self,limit=100):
-        params = { # 'type': "tracks",
-                   'user_id': self.user_id }
-        return self._api_request(params,"/favorite/getUserFavorites")
+    def favorite_getUserFavorites(self, **ka):
+        self._check_ka(ka, [], ['user_id', 'type', 'limit'])
+        if not 'limit' in ka: ka['limit'] = collectionLimit
+        return self._api_request(ka,"/favorite/getUserFavorites")
 
     # SEARCH #
-    def search_tracks(self,query,limit=100):
-        params = {  'query': query.encode("utf8","ignore"),
-                    'type': 'tracks',
-                    'limit': limit}
-        return self._api_request(params,"/search/getResults")
+    def search_getResults(self, **ka):
+        self._check_ka(ka, ['query'], ['type', 'limit'])
+        mandatory = ['query', 'type']
+        for label in mandatory:
+            if not label in ka: raise QobuzXbmcError(who=self, what='missing_parameter',additional=label)
+        if not 'limit' in ka: ka['limit'] = collectionLimit
+        return self._api_request(ka,"/search/getResults")
 
-    def search_albums(self,query,limit=100):
-        params = {  'query': query.encode("utf8","ignore"),
-                    'type': 'albums','limit': limit}
-        return self._api_request(params,"/search/getResults")
 
-    def search_artists(self,query,limit=100):
-        params = { 'query': query.encode("utf8","ignore"),
-                   'type': 'artists','limit': limit}
-        return self._api_request(params,"/search/getResults")
-
-    def get_albums_from_artist(self,id,limit=100):
-        params = { 'artist_id': id,'limit': limit,'extra':'albums'}
-        data = self._api_request(params,"/artist/get")
-        return data
     # REPORT #    
     def report_streaming_start(self,track_id):
         # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
@@ -238,58 +247,39 @@ class QobuzApi:
                     'duration': duration}
         return self._api_request(params,"/track/reportStreamingEnd")
 
-    def playlist_add_track (self,playlist_id,tracks_id):
-        params = {  'track_ids': tracks_id,'playlist_id': playlist_id}
-        log("info","adding " + repr(tracks_id) + " to playlist " + repr(playlist_id))
-        return self._api_request(params,"/playlist/addTracks")
 
-    def favorites_add_track (self,tracks_id):
-        params = { 'track_ids': tracks_id}
-        log("info","adding " + tracks_id + " to favorites ")
-        return self._api_request(params,"/favorite/create")
 
-    def playlist_remove_track (self,playlist_id,playlist_track_id,):
-        params = {  'playlist_id': playlist_id,
-                    'playlist_track_ids': playlist_track_id,
-                                   }
-        log("info","deleting " + playlist_track_id + " from playlist " + playlist_id)
-        return self._api_request(params,"/playlist/deleteTracks")
+    def favorites_create (self, **ka):
+        mandatory = ['artist_ids', 'albums_ids', 'track_ids']
+        found = None
+        for label in mandatory:
+            if label in ka: found = label
+        if not found:
+            raise QobuzXbmcError(who=self, what='missing_parameter',additional='artist_ids|albums_ids|track_ids')
+        return self._api_request(ka,"/favorite/create")
 
-    # @TODO replace current parameters with **ka form
-    def playlist_create (self,playlist_name,tracks_id='',description='',album_id='',is_public='on',is_collaborative='off'):
-        params = {  'name': playlist_name,
-                    'is_public': is_public,
-                    'track_ids':tracks_id,
-                    'album_id':album_id,
-                    'is_collaborative': is_collaborative,
-                    'description': description,
-                    'spotify_track_uris':'',
-                    'deezer_playlist_url':''}
+    def playlist_deleteTracks (self, **ka):
+        self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])
+        return self._api_request(ka,"/playlist/deleteTracks")
 
-        log("info","creating new playlist " + repr(playlist_name) + " / tracks[" + tracks_id + "]")
-        log(self, 'Token: ' + self.authtoken)
-        return self._api_request(params,"/playlist/create")
+    def playlist_create (self, **ka):
+        self._check_ka(ka, ['name'], ['is_public', 'is_collaborative', 'tracks_id', 'album_id'])
+        if not 'is_public' in ka: ka['is_public'] = True
+        if not 'is_collaborative' in ka: ka['is_collaborative'] = False
+        return self._api_request(ka,"/playlist/create")
 
-    def playlist_delete (self,playlist_id):
-        params = { 'playlist_id': playlist_id}
-        log("info","deleting playlist: " + str(playlist_id))
-        return self._api_request(params,"/playlist/delete")
+    def playlist_delete (self, **ka):
+        self._check_ka(ka, ['playlist_id'])
+        if not 'playlist_id' in ka:  raise QobuzXbmcError(who=self, what='missing_parameter',additional='playlist_id')
+        return self._api_request(ka,"/playlist/delete")
 
     def playlist_update (self, **ka):
-        valid_keys = ['name', 'description', 'is_public', 'is_collaborative', 'tracks_id']
-        if not 'id' in ka:
-            raise QobuzXbmcError(who=self, what='missing_parameter',additional='id')
-        params = {}
-        for label in ka:
-            if label == 'id': continue
-            if label not in valid_keys: raise QobuzXbmcError(who=self, what='invalid_parameter',additional=label)
-            params[label] = ka[label]
-        params['playlist_id'] = ka['id']
-        res = self._api_request(params,"/playlist/update")
+        self._check_ka(ka, ['playlist_id'], ['name', 'description', 'is_public', 'is_collaborative', 'tracks_id'])
+        res = self._api_request(ka,"/playlist/update")
         return res
 
-    def get_similar_artists (self,artist_id):
-        params = { 'artist_id': artist_id }
-        return self._api_request(params,"/artist/getSimilarArtists")
+    def artist_getSimilarArtists (self, **ka):
+        self._check_ka(ka, ['artist_id'])
+        return self._api_request(ka,"/artist/getSimilarArtists")
 
 

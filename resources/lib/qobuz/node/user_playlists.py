@@ -109,7 +109,7 @@ class Node_user_playlists(Node):
         if not query:
             query = self._get_keyboard(default = "", heading = 'Create playlist')
             query = query.strip()
-        ret = qobuz.api.playlist_create(query, '', '', '', 'off', 'off')
+        ret = qobuz.api.playlist_create(name=query, is_public=False)
         if not ret:
             warn(self, "Cannot create playlist name '" + query + "'")
             return None
@@ -128,7 +128,7 @@ class Node_user_playlists(Node):
         newname = newname.strip().encode('utf8', 'replace')
         if newname == currentname:
             return True
-        res = qobuz.api.playlist_update(id=id,name=newname)
+        res = qobuz.api.playlist_update(playlist_id=id,name=newname)
         if res:
             qobuz.registry.delete(name='user-playlist', id=id)
             qobuz.registry.delete(name='user-playlists')
@@ -153,7 +153,7 @@ class Node_user_playlists(Node):
             return False
 
         info(self, "Deleting playlist: " + id)
-        res = qobuz.api.playlist_delete(id)
+        res = qobuz.api.playlist_delete(playlist_id=id)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(id))
             return False

@@ -21,7 +21,7 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from track import Node_track
-from artist import Node_artist
+from product_by_artist import Node_product_by_artist
 from constants import Mode
 import pprint
 
@@ -140,7 +140,7 @@ class Node_search(Node):
             except: 
                 return False
             for jartist in data['artists']['items']:
-                artist = Node_artist()
+                artist = Node_product_by_artist()
                 artist.set_data(jartist)
                 self.add_child(artist)
         return True

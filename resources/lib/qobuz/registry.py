@@ -28,7 +28,7 @@ class QobuzLocalStorage(object):
 
     def __init__(self,**ka):
         # Checking mandatory parameters
-        mandatory = ['user', 'password', 'streamFormat']
+        mandatory = ['username', 'password', 'streamFormat']
         for key in mandatory:
             if not key in ka: raise QobuzXbmcError(
                                                        who=self,
@@ -55,7 +55,7 @@ class QobuzLocalStorage(object):
      
         # Login into Qobuz our raise exception   
         key = self.make_key(name='user', id=0)
-        data = self.get(name='user', id=0, user=ka['user'], password=ka['password'])
+        data = self.get(name='user', id=0, username=ka['username'], password=ka['password'])
         if not data: raise QobuzXbmcError(who= self, what= 'login_failure', additional= ka['user'])
         # We feed our api wit user data (auth_token, rights ...)
         self.api.set_logged(**data)
@@ -110,6 +110,8 @@ class QobuzLocalStorage(object):
 
     def load(self, **ka):
         self.hook_pre_load(**ka)
+        limit = 1000
+        # noRemote prevent data loading from Qobuz (local key only)
         if 'noRemote' in ka and ka['noRemote'] == True:
             return False
         key = self.make_key(**ka)
@@ -117,27 +119,33 @@ class QobuzLocalStorage(object):
             return self.data[key]
         log(self, "Loading data from Qobuz")
         response = None
-        if ka['name'] == 'user':
-            response = self.api.login(ka['user'], ka['password'])
-        elif ka['name'] == 'product':
-            response = self.api.get_product(ka['id'])
-        elif ka['name'] == 'user-playlists':
-            response = self.api.get_user_playlists()
-        elif ka['name'] == 'user-playlist':
-            response = self.api.get_playlist(ka['id'])
-        elif ka['name'] == 'track':
-            response = self.api.get_track(ka['id'])
-        elif ka['name'] == 'stream-url':
-            context_type = ''
-            context_id = ''
-            format_id = self.options['streamFormat']
-            response = self.api.get_track_url(ka['id'], context_type, context_id, format_id)
-        elif ka['name'] == 'purchases':
-            response = self.api.get_purchases(100)
-        elif ka['name'] == 'recommendation':
-            response = self.api.get_recommandations(ka['genre_id'], ka['genre_type'], 100) 
-        elif ka['name'] == 'favorites':
-            response = self.api.get_favorites(100)
+        # We are deleting name and id because we don't want to send them
+        # to Qobuz
+        name = ka['name']
+        del ka['name']
+        id = ka['id']
+        del ka['id']
+        # Switching on name
+        if name == 'user':
+            response = self.api.user_login(**ka)
+        elif name == 'product':
+            response = self.api.album_get(album_id=id)
+        elif name == 'user-playlists':
+            response = self.api.playlist_getUserPlaylists()
+        elif name == 'user-playlist':
+            response = self.api.playlist_get(playlist_id=id,extra='tracks')
+        elif name == 'track':
+            response = self.api.track_get(track_id=id)
+        elif name == 'stream-url':
+            response = self.api.track_getFileUrl(track_id=id, format_id=self.options['streamFormat'])
+        elif name == 'purchases':
+            response = self.api.purchase_getUserPurchases(limit=limit)
+        elif name == 'recommendation':
+            response = self.api.album_getFeatured(**ka) 
+        elif name == 'favorites':
+            response = self.api.favorite_getUserFavorites(limit=limit)
+        elif name == 'artist':
+            response = self.api.artist_get(artist_id=id, limit=limit)
         else:
             QobuzXbmcError(
                         who= self,
@@ -147,6 +155,8 @@ class QobuzLocalStorage(object):
                 warn(self, "Loading from Qobuz fail")
                 return False
         ka['value'] = response
+        ka['name'] = name
+        ka['id'] = id
         self.set(**ka)
         return True
 
