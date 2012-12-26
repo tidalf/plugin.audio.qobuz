@@ -71,7 +71,8 @@ class FileUtil():
 
     def unlink(self, path):
         return self._safe_unlink(path)
-
+    
+    ''' Find '''
     def find(self, dir, pattern):
         flist = []
         fok = re.compile(pattern)

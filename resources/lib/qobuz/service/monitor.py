@@ -43,7 +43,6 @@ class Monitor(xbmc.Monitor):
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
         
-
     def onSettingsChanged(self):
         if not qobuz.path.cache:
             warn(self, 'qobuz.path.cache is not set... abort')
