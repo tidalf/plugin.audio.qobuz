@@ -39,5 +39,6 @@ boot = QobuzBootstrap(__addon__, int(sys.argv[1]))
 
 try:
     boot.bootstrap_app()
+    boot.dispatch()
 except QobuzXbmcError as e:
     warn('['+pluginId+']', "Exception while running plugin")

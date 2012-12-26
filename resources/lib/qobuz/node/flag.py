@@ -29,6 +29,7 @@ class __NodeFlag():
         self.TYPE_ARTIST           = 1024
         self.TYPE_SIMILAR_ARTIST   = 2048
         self.TYPE_FAVORITES        = 4096
+        self.TYPE_CUSTOM_SEARCH    = 8192
         
     def to_s(self, flag):
         if flag & self.TYPE_TRACK: return "track"

@@ -65,9 +65,6 @@ class QobuzPlayer(xbmc.Player):
         print "PLAYBACK STARTED"
         
     def play(self, id):
-#        progress = Progress(True)
-#        progress.create("Qobuz Player")
-        debug(self, "Playing track: " + str(id))
         node = Node_track()
         node.set_id(id)
         node.set_cache()

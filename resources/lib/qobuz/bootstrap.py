@@ -95,7 +95,6 @@ class QobuzBootstrap(object):
         self.bootstrap_registry()
         self.bootstrap_sys_args()
         
-        return self.dispatch()
 
     def bootstrap_lang(self):
         qobuz.lang = qobuz.addon.getLocalizedString
@@ -222,8 +221,8 @@ class QobuzBootstrap(object):
         if self.MODE == Mode.PLAY:
             debug(self, "Playing song")
             self.bootstrap_player()
-            if qobuz.addon.getSetting('notification_playingsong') == 'true':
-                qobuz.gui.notify(34000, 34001)
+#            if qobuz.addon.getSetting('notification_playingsong') == 'true':
+#                qobuz.gui.notify(34000, 34001)
             try:
                 context_type = urllib.unquote(self.params["context_type"])
             except:

@@ -217,6 +217,9 @@ class Node(object):
             return False
         return True
 
+    # When returning False we are not displaying directory content
+    def pre_build_down(self):
+        return True
     '''
         build_down:
         This method fetch data from cache recursively and build our tree

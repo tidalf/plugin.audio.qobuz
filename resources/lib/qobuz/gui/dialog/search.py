@@ -1,5 +1,5 @@
 import sys
-import xbmcgui
+import xbmcgui, xbmc
 
 #getLocalizedString = sys.modules['__main__'].getLocalizedString
 
@@ -9,7 +9,12 @@ class Dialog(xbmcgui.WindowXMLDialog):
         xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
 
     def onInit(self):
+        #blanks the screen - this is crude, and probably wrong, but works
+        self.background = xbmcgui.ControlImage(0,0,1280,720, 'black.png')
+        self.addControl(self.background)
         self.action_exitkeys_id = [10, 13]
+        self.keyboard = xbmc.Keyboard()
+        self.addControl(self.keyboard)
         
         # get control ids
 #        self.control_id_button_action = 3000

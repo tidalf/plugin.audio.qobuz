@@ -39,10 +39,12 @@ class Xbmc_renderer(IRenderer):
         if not self.set_root_node():
             warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
-        dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(dir, self.depth, self.filter)
-        dir.set_content(self.root.content_type)
-        dir.end_of_directory()
+        buildDown = self.root.pre_build_down()
+        if buildDown:
+            dir = Directory(self.root, qobuz.boot.handle, False)
+            self.root.build_down(dir, self.depth, self.filter)
+            dir.set_content(self.root.content_type)
+            dir.end_of_directory()
         return True
 
     def scan(self):

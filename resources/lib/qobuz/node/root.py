@@ -21,6 +21,7 @@ from recommendation import Node_recommendation
 from search import Node_search
 from favorites import Node_favorites
 from purchases import Node_purchases
+from custom_search import Node_custom_search
 import qobuz
 
 '''
@@ -54,5 +55,7 @@ class Node_root(Node):
             search = Node_search()
             search.set_search_type('artists')
             self.add_child(search)
+#            search = Node_custom_search()
+#            self.add_child(search)
         return True
 

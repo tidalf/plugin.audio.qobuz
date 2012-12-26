@@ -48,7 +48,7 @@ class Monitor(xbmc.Monitor):
         qobuz.registry.delete(name='user')
         qobuz.registry.delete(name='user-playlists')
         qobuz.registry.delete(name='user-playlist-id')
-        qobuz.registry.delete(name='user-playlist')
+        #qobuz.registry.delete(name='user-playlist') #@TODO Delete all user playlist (or not :p)
         xbmc.executebuiltin('Container.Refresh')
 
 boot = QobuzBootstrap(__addon__, 0)
