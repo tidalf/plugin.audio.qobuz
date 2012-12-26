@@ -1,3 +1,9 @@
+0.10.0
+-----
+* big cleaning & rewrites
+* add common cache support (disabled)
+* speed optimisations
+
 0.9.14
 -----
 * remove sys.exit since it exit the whole xbmc since frodo rc2
