@@ -129,7 +129,7 @@ class Node_track(Node):
 
     def get_streaming_url(self):
         nid = self.get_id() or self.parameters['nid']
-        data = qobuz.registry.get(name='stream-url', id=nid)
+        data = qobuz.registry.get(name='user-stream-url', id=nid)
         if not data: return None
         return data['data']['url']
 
@@ -182,7 +182,7 @@ class Node_track(Node):
 
     def is_sample(self):
         nid = self.get_id() or self.parameters['nid']
-        data = qobuz.registry.get(name='stream-url', id=nid)
+        data = qobuz.registry.get(name='user-stream-url', id=nid)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
@@ -193,7 +193,7 @@ class Node_track(Node):
     
     def get_mimetype(self):
         nid = self.get_id() or self.parameters['nid']
-        data = qobuz.registry.get(name='stream-url', id=nid)
+        data = qobuz.registry.get(name='user-stream-url', id=nid)
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
             return ''

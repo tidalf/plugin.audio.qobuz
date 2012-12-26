@@ -29,7 +29,7 @@ class Search_tracks():
     def __init__(self):
         self._raw_data = {}
         
-    def search(self, query, limit = 100):
+    def search(self, query, limit = 1000):
         data = qobuz.api.search_getResults(query=query, type='tracks', limit=limit)
         self._raw_data = data
         if not 'results' in data: return False

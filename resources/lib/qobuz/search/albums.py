@@ -30,14 +30,14 @@ class Search_albums():
     def get_data(self):
         return self._raw_data
 
-    def search(self, query, limit = 100):
+    def search(self, query, limit = 1000):
         data = qobuz.api.search_getResults(query=query, type='albums', limit=limit)
         if not data: return False
         self._raw_data = data
         if len(data) > 0: return True
         return False
 
-    def search_by_artist(self, p_id, limit = 100):
+    def search_by_artist(self, p_id, limit = 1000):
         self._raw_data = qobuz.api.get_albums_from_artist(p_id, limit)
         return self
 

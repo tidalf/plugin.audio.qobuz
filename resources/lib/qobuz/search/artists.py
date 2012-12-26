@@ -33,7 +33,7 @@ class Search_artists():
     def get_data(self):
         return self._raw_data
     
-    def search(self, query, limit = 100):
+    def search(self, query, limit = 1000):
         data = qobuz.api.search_getResults(query=query, type='artists', limit=limit)
         if not data: return False
         self._raw_data = data

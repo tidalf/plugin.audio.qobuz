@@ -19,8 +19,9 @@ import os
 import time
 import random
 import string
+import re
 
-class safe_write():
+class FileUtil():
 
     def __init__(self):
         pass
@@ -71,3 +72,13 @@ class safe_write():
     def unlink(self, path):
         return self._safe_unlink(path)
 
+    def find(self, dir, pattern):
+        flist = []
+        fok = re.compile(pattern)
+        for dirname, dirnames, filenames in os.walk(dir):
+            for subdirname in dirnames:
+                flist.append( os.path.join(dirname, subdirname))
+            for filename in filenames:
+                if fok.match(filename):
+                    flist.append(os.path.join(dirname, filename))
+        return flist

@@ -119,10 +119,13 @@ class QobuzBootstrap(object):
             raise QobuzXbmcError(who=self, what='invalid_login', additional=None)
             
     def bootstrap_utils(self):
-        import utils.string
+        #import utils.string
+        def color(color, str):
+            str = '[COLOR=' + color + ']' + str + '[/COLOR]'    
+            return str
         class Utils():
             def __init__(self):
-                self.color = utils.string.color
+                self.color = color
                 self.lang = qobuz.addon.getLocalizedString
         qobuz.utils = Utils()
 
@@ -202,9 +205,13 @@ class QobuzBootstrap(object):
         debug(self, "NT: " + str(self.NT) + " / NID: " + self.NID)
 
     def erase_cache(self):
-        from utils.cache_manager import cache_manager
-        cm = cache_manager()
-        cm.delete_all_data()
+        if not qobuz.path.cache:
+            raise QobuzXbmcError(who=self, what='qobuz_path_not_set')
+        from util.file import FileUtil
+        fu = FileUtil()
+        flist = fu.find(qobuz.path.cache, '^.*\.dat$')
+        for fileName in flist:
+            fu.unlink(fileName)
 
 
     '''

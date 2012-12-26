@@ -36,33 +36,13 @@ class Node_favorites(Node):
         super(Node_favorites, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FAVORITES
         self.set_label(qobuz.lang(30079))
-        #self.set_is_folder(True)
-        #self.cache = None
-        self.packby = ''#album'
-#        self.image = qobuz.image.access.get('playlist')
-        #if self.packby == 'album':
-        #    self.set_content_type('albums')
-        #else:
-        
+        self.packby = ''#album'      
         self.name = qobuz.lang(30079)
-        self.label = qobuz.lang(30079)
-        
+        self.label = qobuz.lang(30079)    
         self.set_content_type('songs')
-        #self.set_auto_set_cache(True)
-
-    # def get_label(self):
-    #    return self.get_name()
-
-#    def set_cache(self):
-#        from cache.favorites import Cache_favorites
-#        self.cache = Cache_favorites()
-#        return True
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
-#        if not self.set_cache():
-#            error(self, "Cannot set cache!")
-#            return False
-        data = qobuz.registry.get(name='favorites')
+        data = qobuz.registry.get(name='user-favorites')
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
@@ -95,13 +75,9 @@ class Node_favorites(Node):
     def make_XbmcListItem(self):
         color_item = qobuz.addon.getSetting('color_item')
         color_pl = qobuz.addon.getSetting('color_item_playlist')
-        # label = self.get_name() 
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
-        #if not self.is_my_playlist: 
-        #    label = qobuz.utils.color(color_item, owner) + ' - ' + self.get_name() 
-        # label = qobuz.utils.color(color_pl, label)
         item = xbmcgui.ListItem(self.label,
                                 owner,
                                 image,
@@ -137,8 +113,6 @@ class Node_favorites(Node):
 
     def add_to_favorites(self):
             from gui.directory import Directory
-            #from cache.favorites import Cache_favorites
-            #favorites = Cache_favorites()
             from renderer.xbmc import Xbmc_renderer as renderer
             nt = None
             try: nt = int(self.get_parameter('nt'))
@@ -176,11 +150,6 @@ class Node_favorites(Node):
             strtracks = ','.join(trackids)
             ret = qobuz.api.favorites_add_track(strtracks)
             info(self, pprint.pformat(ret))
-            qobuz.registry.delete(name='favorites')
-            from utils.cache_manager import cache_manager
-            #from cache.playlist import Cache_playlist
-            #cm = cache_manager()
-            #pl = Cache_favorites()
-            #pl.delete_cache()
+            qobuz.registry.delete(name='user-favorites')
             dir.end_of_directory()
             return True

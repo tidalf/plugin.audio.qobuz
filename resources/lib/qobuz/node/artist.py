@@ -47,7 +47,7 @@ class Node_artist(Node):
 #        if not self.set_cache():
 #            error(self, "Cannot set cache!")
 #            return False
-        data = qobuz.registry.get(name='favorites')
+        data = qobuz.registry.get(name='user-favorites')
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False

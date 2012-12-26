@@ -37,6 +37,7 @@ from bootstrap import QobuzBootstrap
 from debug import warn
 from debug import log
 import qobuz
+from util.file import FileUtil
 
 class Monitor(xbmc.Monitor):
     def __init__(self, qobuz):
@@ -44,11 +45,13 @@ class Monitor(xbmc.Monitor):
         
 
     def onSettingsChanged(self):
-        log(self, 'Addong settings has changed')
-        qobuz.registry.delete(name='user')
-        qobuz.registry.delete(name='user-playlists')
-        qobuz.registry.delete(name='user-playlist-id')
-        #qobuz.registry.delete(name='user-playlist') #@TODO Delete all user playlist (or not :p)
+        if not qobuz.path.cache:
+            warn(self, 'qobuz.path.cache is not set... abort')
+            return False
+        fu = FileUtil()
+        flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
+        for fileName in flist:
+            fu.unlink(fileName)
         xbmc.executebuiltin('Container.Refresh')
 
 boot = QobuzBootstrap(__addon__, 0)

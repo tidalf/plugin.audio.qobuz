@@ -34,7 +34,7 @@ class Node_purchases(Node):
         self.set_content_type('albums')
 
     def _build_down(self,xbmc_directory,lvl,flag=None,progress=None):
-        data = qobuz.registry.get(name='purchases')
+        data = qobuz.registry.get(name='user-purchases')
         if not data:
             error(self,"Cannot fetch purchases data")
             return False

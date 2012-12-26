@@ -18,7 +18,7 @@ import pprint
 from exception import QobuzXbmcError
 from api import QobuzApi
 from time import time
-from utils.file.write import safe_write
+from file_util import FileUtil
 import cPickle as pickle
 import os
 from debug import *
@@ -86,6 +86,9 @@ class QobuzLocalStorage(object):
     def save(self,key):
         QobuzXbmcError(who=self, what='not_implemented_in_child_class', additional='save')
 
+    def delete_by_name(self, name):
+        QobuzXbmcError(who=self, what='not_implemented_in_child_class', additional='delete_by_name')
+        
     def make_key(self, **ka):
         key = self._make_key(**ka)
         if self.options['hashKey']:
@@ -134,16 +137,16 @@ class QobuzLocalStorage(object):
             response = self.api.playlist_getUserPlaylists()
         elif name == 'user-playlist':
             response = self.api.playlist_get(playlist_id=id,extra='tracks')
+        elif name == 'user-favorites':
+            response = self.api.favorite_getUserFavorites(limit=limit)
         elif name == 'track':
             response = self.api.track_get(track_id=id)
-        elif name == 'stream-url':
+        elif name == 'user-stream-url':
             response = self.api.track_getFileUrl(track_id=id, format_id=self.options['streamFormat'])
-        elif name == 'purchases':
+        elif name == 'user-purchases':
             response = self.api.purchase_getUserPurchases(limit=limit)
         elif name == 'recommendation':
-            response = self.api.album_getFeatured(**ka) 
-        elif name == 'favorites':
-            response = self.api.favorite_getUserFavorites(limit=limit)
+            response = self.api.album_getFeatured(**ka)
         elif name == 'artist':
             response = self.api.artist_get(artist_id=id, limit=limit)
         else:
@@ -256,9 +259,14 @@ class QobuzCacheDefault(QobuzLocalStorage):
         cache = os.path.join(self.options['basePath'], key + '.dat')
         if not os.path.exists(cache):
             return False
-        sw = safe_write();
-        if sw.unlink(cache):
+        fu = FileUtil();
+        if fu.unlink(cache):
             super(QobuzCacheDefault, self).delete(**ka)
+            
+    def delete_by_name(self, name):
+        fu = FileUtil()
+        files = fu.find(self.basePath, '^user(.*)\.dat$')
+        pprint.pprint(files)
 
 class QobuzCacheCommon(QobuzLocalStorage):
     def __init__(self,*args,**ka):
@@ -338,10 +346,12 @@ class QobuzRegistry():
             ka['id'] = 0
         self.cache.delete(**ka)
     
+    def delete_by_name(self, name):
+        self.cache.delete_by_name(name)
+    
     def make_key(self, **ka):
         return self.cache.make_key(**ka)
-
-
+    
 if __name__ == '__main__':
 #    try:
 #        QobuzXbmcError({'Who': 'TestException','What': 'test_exception','With': 'TestingException'})
