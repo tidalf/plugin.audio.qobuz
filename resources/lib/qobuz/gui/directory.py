@@ -87,6 +87,7 @@ class Directory():
         success = True
         if not self.put_item_ok or (self.total_put == 0):
             success = False
+            qobuz.gui.notify(30008, 36001)
         xbmcplugin.endOfDirectory(handle = self.handle,
                                    succeeded = success,
                                    updateListing = False,

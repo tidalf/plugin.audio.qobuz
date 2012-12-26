@@ -97,7 +97,11 @@
 	<string id="30077">Delete Qobuz playlist</string>
 	<string id="30078">Rename playlist</string>
 	<string id="30079">Show Favorites</string>
-
+	<string id="30080">Add as new playlist</string>
+	
+	<string id="29000">Qobuz Playlist</string>
+    <string id="29001">No current playlist</string>
+    
 	<!-- Recommandation -->
 	<string id="30082">Show recommendations</string>
 	<string id="30083">Press awards</string>
@@ -197,6 +201,7 @@
 	<string id="39009">Rename</string>
 	<string id="39010">Remove</string>
 	<string id="39011">Add to favorites</string>
+
 
 	<!-- Progress bar -->
 	<string id="40000">Starting</string>

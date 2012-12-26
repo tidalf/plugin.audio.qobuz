@@ -57,7 +57,7 @@ class Utils:
         if dialog.yesno(__language__(30008), __language__(30034), __language__(30040)):
             qobuz.addon.openSettings()
             xbmcplugin.endOfDirectory(handle = int(sys.argv[1]), succeeded = False, updateListing = True, cacheToDisc = False)
-            return qobuz.boot.dispatch()
+            
         else:
             xbmc.executebuiltin('ActivateWindow(home)')
             return False

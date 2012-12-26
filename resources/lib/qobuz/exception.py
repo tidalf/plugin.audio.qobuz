@@ -21,6 +21,7 @@ import traceback
 class QobuzXbmcError(Exception):
     
     def __init__(self, *a, **ka):
+        if not 'additional' in ka or ka['additional'] == None: ka['additional'] = ''
         nl = "\n"
         if (not 'who' in ka) or (not 'what' in ka): 
             raise Exception('QobuzXbmcError', 'Missing constructor arguments (who|what)')

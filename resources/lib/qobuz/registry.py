@@ -57,15 +57,12 @@ class QobuzLocalStorage(object):
         key = self.make_key(name='user', id=0)
         data = self.get(name='user', id=0, user=ka['user'], password=ka['password'])
         if not data: raise QobuzXbmcError(who= self, what= 'login_failure', additional= ka['user'])
-        print "We are logged"
         # We feed our api wit user data (auth_token, rights ...)
         self.api.set_logged(**data)
-        print 'Token: ' + self.api.authtoken
-    
     
     def lastError(self):
         return self.api.last_error
-        
+    
     def set(self,**ka):
         mandatory = ['name','id']
         for key in mandatory:
@@ -83,7 +80,6 @@ class QobuzLocalStorage(object):
                           'refresh': self.options['refresh']
                           }
         if self.options['autoSave']:
-            print "AutoSaving...\n"
             self.save(key)
         return self
 
@@ -107,24 +103,27 @@ class QobuzLocalStorage(object):
     def get(self,*args, **ka):
         key = self.make_key(**ka)
         if not key in self.data:
-            self.load(**ka)
+                self.load(**ka)
         if key in self.data:
             return self.data[key]
         return None
 
     def load(self, **ka):
         self.hook_pre_load(**ka)
+        if 'noRemote' in ka and ka['noRemote'] == True:
+            return False
         key = self.make_key(**ka)
         if key in self.data and self.fresh(key):
             return self.data[key]
         log(self, "Loading data from Qobuz")
+        response = None
         if ka['name'] == 'user':
             response = self.api.login(ka['user'], ka['password'])
         elif ka['name'] == 'product':
             response = self.api.get_product(ka['id'])
         elif ka['name'] == 'user-playlists':
             response = self.api.get_user_playlists()
-        elif ka['name'] == 'playlist':
+        elif ka['name'] == 'user-playlist':
             response = self.api.get_playlist(ka['id'])
         elif ka['name'] == 'track':
             response = self.api.get_track(ka['id'])
@@ -189,7 +188,6 @@ class QobuzCacheDefault(QobuzLocalStorage):
             return key + '.dat'
         subp = key[:size]
         root = os.path.join(os.path.join(*xpath), subp)
-        print 'Testing ' + repr(subp) + 'in ' + repr(root)
         if not os.path.exists(root):
             os.mkdir(root)
         xpath.append(subp)
@@ -272,7 +270,6 @@ class QobuzCacheCommon(QobuzLocalStorage):
         data = self.storage.get(key)
         log(self, "LOADING " + key + ' / ' + pprint.pformat(data))
         if data:
-            print pprint.pformat(data)
             self.data[key] = pickle.loads(data)
     
     def save(self, key = None):
@@ -308,7 +305,10 @@ class QobuzRegistry():
         else:
             QobuzXbmcError(who=self, what='unknown_cache_type',additionnal=ka['cacheType'])
         return None
-
+    
+    def get_api(self):
+        return self.cache.api
+    
     def lastError(self):
         return self.cache.lastError()
     

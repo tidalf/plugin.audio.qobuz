@@ -71,9 +71,7 @@ class Node_favorites(Node):
         albumseen = {}
         warn (self, pprint.pformat(data))
         for track in data['data']['tracks']['items']:
-            #pprint.pprint(track)
             node = None
-            #if self.packby == 'album':
             node = Node_track()
             node.set_data(track)
             self.add_child(node)

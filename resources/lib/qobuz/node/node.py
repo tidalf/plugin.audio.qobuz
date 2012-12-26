@@ -292,7 +292,7 @@ class Node(object):
 
         ''' ADD AS NEW '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))
-        menuItems.append((qobuz.utils.color(color, "(i8n) Add as new"),cmd))
+        menuItems.append((qobuz.utils.color(color, qobuz.lang(30080)),cmd))
         
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):

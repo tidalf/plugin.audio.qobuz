@@ -137,7 +137,7 @@ class Node_recommendation(Node):
 #            image_name = 'recos-%s-%s' % (self.get_genre_type(), genre_id)
 #            image = qobuz.image.cache.get(image_name)
 #            if not image: self._get_random_image_type_genre(image_name, data)
-        #pprint.pprint(data)
+
         for product in data['data']['albums']['items']:
             node = Node_product()
             node.set_data(product)

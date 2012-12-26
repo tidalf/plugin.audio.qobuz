@@ -14,29 +14,3 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
-from constants import *
-from debug import log, info, warn
-import qobuz
-
-###############################################################################
-# Class QobuzSearchTracks 
-###############################################################################
-class Search_tracks():
-
-    def __init__(self):
-        self._raw_data = {}
-        
-    def search(self, query, limit = 100):
-        data = qobuz.api.search_tracks(query, limit)
-        self._raw_data = data
-        if not 'results' in data: return False
-        if not 'tracks' in data['results']: return False
-        if len(data['results']['tracks']) < 1: return False
-        return True
-        
-
-    def get_data(self):
-        return self._raw_data

@@ -66,11 +66,7 @@ class Node_playlist(Node):
     def _build_down(self, xbmc_directory, lvl, flag = None):
         nid = self.get_id() or self.get_parameter('nid')
         info(self, "Build-down playlist")
-#        if not self.set_cache():
-#            error(self, "Cannot set cache!")
-#            return False
-        data = qobuz.registry.get(name='playlist',id=nid)
-        #pprint.pprint(data)
+        data = qobuz.registry.get(name='user-playlist',id=nid)
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
@@ -157,16 +153,20 @@ class Node_playlist(Node):
             qobuz.gui.notifyH('Qobuz Playlist / Remove track', "Fail to remove track")
             return False
         info(self, "Tracks removed from playlist: " + str(self.id))
-        self.cache.delete_cache()
+        qobuz.registry.delete(name='user-playlist', id=self.id)
         xbmc.executebuiltin('Container.Refresh')
         return True
 
 
     def add_to_current_playlist(self):
             from gui.directory import Directory
-            from cache.current_playlist import Cache_current_playlist
-            current_playlist = Cache_current_playlist()
             from renderer.xbmc import Xbmc_renderer as renderer
+            cid = qobuz.registry.get(name='user-current-playlist-id')
+            if cid: cid = cid['data']
+            if not cid:
+                warn(self, 'no current playlist id')
+                qobuz.gui.notify(29000, 29001)
+                return False
             nt = None
             try: nt = int(self.get_parameter('nt'))
             except:
@@ -201,19 +201,14 @@ class Node_playlist(Node):
             for node in dir.nodes:
                 trackids.append(str(node.get_id()))
             strtracks = ','.join(trackids)
-            ret = qobuz.api.playlist_add_track(str(current_playlist.get_id()), strtracks)
-            from utils.cache_manager import cache_manager
-            from cache.playlist import Cache_playlist
-            cm = cache_manager()
-            pl = Cache_playlist(current_playlist.get_id())
-            pl.delete_cache()
-            dir.end_of_directory()
+            ret = qobuz.api.playlist_add_track(str(cid), strtracks)
+            if ret:
+                qobuz.registry.delete(name='user-playlist', id=cid)
             return True
             
     def add_as_new_playlist(self):
         from gui.directory import Directory
         from user_playlists import Node_user_playlists
-#        from cache.current_playlist import Cache_current_playlist
         from renderer.xbmc import Xbmc_renderer as renderer
         nt = None
         try: nt = int(self.get_parameter('nt'))
@@ -242,9 +237,10 @@ class Node_playlist(Node):
             dir.end_of_directory()
             warn(self, "Nothing to add as new playlist")
             return False
-        info(self, "CREATE PLAYLIST: " + render.root.get_label())
+        info(self, "CREATE PLAYLIST: " + repr(render.root.get_label()))
         userplaylists = Node_user_playlists()
-        if not userplaylists.create_playlist(render.root.get_label()):
+        nid = userplaylists.create_playlist(render.root.get_label())
+        if not nid: 
             warn(self, "Cannot create playlist...")
             dir.end_of_directory()
             return False
@@ -256,13 +252,8 @@ class Node_playlist(Node):
         for node in dir.nodes:
             trackids.append(str(node.get_id()))
         strtracks = ','.join(trackids)
-        current_playlist = qobuz.registry.get(name='current-playlist')
-        print "Current_playlist" + current_playlist
-        ret = qobuz.api.playlist_add_track(current_playlist['data'], strtracks)
-        from utils.cache_manager import cache_manager
-        from cache.playlist import Cache_playlist
-        cm = cache_manager()
-        pl = Cache_playlist(current_playlist.get_id())
-        pl.delete_cache()
+        ret = qobuz.api.playlist_add_track(nid, strtracks)
+        if ret:
+            qobuz.registry.set(name='user-current-playlist-id', id=0, value=nid, noRemote=True)
         dir.end_of_directory()
         return True

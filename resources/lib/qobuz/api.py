@@ -22,6 +22,7 @@ from time import time
 import math
 import hashlib
 
+from exception import QobuzXbmcError
 from debug import warn, log
 
 import socket
@@ -31,7 +32,7 @@ socket.timeout = 5
 class QobuzApi:
 
     def __init__(self):
-        self.auth = None
+#        self.auth = None
         self.authtoken = None
         self.cookie = None
         self.user_id = None
@@ -69,7 +70,7 @@ class QobuzApi:
         self.stats['request'] += 1
         url = self.baseUrl
         useToken = False if (opt and 'noToken' in opt) else True
-
+        
         # Setting header
         qheaders = {}
         if useToken and self.authtoken:
@@ -113,8 +114,6 @@ class QobuzApi:
             '''
             When something wrong we are deleting our auth token
                 '''
-#            if self.auth:
-#                self.auth.delete_cache()
             return None
         return response_json
 
@@ -241,7 +240,7 @@ class QobuzApi:
 
     def playlist_add_track (self,playlist_id,tracks_id):
         params = {  'track_ids': tracks_id,'playlist_id': playlist_id}
-        log("info","adding " + tracks_id + " to playlist " + playlist_id)
+        log("info","adding " + repr(tracks_id) + " to playlist " + repr(playlist_id))
         return self._api_request(params,"/playlist/addTracks")
 
     def favorites_add_track (self,tracks_id):
@@ -256,6 +255,7 @@ class QobuzApi:
         log("info","deleting " + playlist_track_id + " from playlist " + playlist_id)
         return self._api_request(params,"/playlist/deleteTracks")
 
+    # @TODO replace current parameters with **ka form
     def playlist_create (self,playlist_name,tracks_id='',description='',album_id='',is_public='on',is_collaborative='off'):
         params = {  'name': playlist_name,
                     'is_public': is_public,
@@ -266,7 +266,7 @@ class QobuzApi:
                     'spotify_track_uris':'',
                     'deezer_playlist_url':''}
 
-        log("info","creating new playlist " + str(playlist_name) + " / tracks[" + tracks_id + "]")
+        log("info","creating new playlist " + repr(playlist_name) + " / tracks[" + tracks_id + "]")
         log(self, 'Token: ' + self.authtoken)
         return self._api_request(params,"/playlist/create")
 
@@ -275,15 +275,16 @@ class QobuzApi:
         log("info","deleting playlist: " + str(playlist_id))
         return self._api_request(params,"/playlist/delete")
 
-    def playlist_update (self,playlist_id,name,description='',album_id='',is_public='on',is_collaborative='off'):
-        params = {  'name'               : name,
-                    'is_public'          : is_public,
-                    'is_collaborative'   : is_collaborative,
-                    'description'        : description,
-                    'spotify_track_uris' : '',
-                    'deezer_playlist_url': '',
-                    'playlist_id'        : playlist_id }
-        log("info","updating playlist " + str(playlist_id))
+    def playlist_update (self, **ka):
+        valid_keys = ['name', 'description', 'is_public', 'is_collaborative', 'tracks_id']
+        if not 'id' in ka:
+            raise QobuzXbmcError(who=self, what='missing_parameter',additional='id')
+        params = {}
+        for label in ka:
+            if label == 'id': continue
+            if label not in valid_keys: raise QobuzXbmcError(who=self, what='invalid_parameter',additional=label)
+            params[label] = ka[label]
+        params['playlist_id'] = ka['id']
         res = self._api_request(params,"/playlist/update")
         return res
 

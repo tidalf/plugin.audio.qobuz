@@ -72,7 +72,6 @@ class Node_product(Node):
 
     def make_XbmcListItem(self):
         image = self.get_image()
-        print 'IMAGE ' + image
         item = xbmcgui.ListItem(
                                 label=self.get_label(),
                                 label2=self.get_label2(),

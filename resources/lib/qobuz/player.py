@@ -33,7 +33,8 @@ from node.track import Node_track
 
 class QobuzPlayer(xbmc.Player):
 
-    def __init__(self, type = xbmc.PLAYER_CORE_AUTO):
+    def __init__(self, *a, **ka):
+        ka['type'] = xbmc.PLAYER_CORE_AUTO
         super(QobuzPlayer, self).__init__()
         self.track_id = None
         self.total = None
@@ -60,6 +61,9 @@ class QobuzPlayer(xbmc.Player):
         self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
         return True
 
+    def onPlaybackStarted(self):
+        print "PLAYBACK STARTED"
+        
     def play(self, id):
 #        progress = Progress(True)
 #        progress.create("Qobuz Player")
@@ -123,6 +127,7 @@ class QobuzPlayer(xbmc.Player):
         timeout = 10
         debug(self, "Waiting song to start")
         while timeout > 0:
+            print "Playing: " + repr(self.isPlayingAudio()) + ' / ' + repr(self.getPlayingFile()) + ' / ' + streaming_url
             if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
                 xbmc.sleep(250)
                 timeout -= 0.250
@@ -130,11 +135,7 @@ class QobuzPlayer(xbmc.Player):
                 break
         if timeout <= 0:
             warn(self, "Player can't play track: " + item.getLabel())
-#            progress.update(100, "Cannot play track:", node.get_label())
-#            progress.close()
             return False
-#        progress.update(100, "Playing track", node.get_label())
-#        progress.close()
         return self.watch_playing(node, streaming_url)
 
     def isPlayingAudio(self):
@@ -145,7 +146,7 @@ class QobuzPlayer(xbmc.Player):
     def getPlayingFile(self):
         try: return super(QobuzPlayer, self).getPlayingFile()
         except: warn(self, "EXCEPTION: getPlayingFile")
-        return ''
+        return None
 
     def getTotalTime(self):
         try: return super(QobuzPlayer, self).getTotalTime()
@@ -156,7 +157,6 @@ class QobuzPlayer(xbmc.Player):
         start = None
         self.total = None
         self.elapsed = None
-        self.track_id = node.get_id()
         self.total = self.getTotalTime()
         while self.isPlayingAudio() and self.getPlayingFile() == streaming_url:
             self.elapsed = self.getTime()
