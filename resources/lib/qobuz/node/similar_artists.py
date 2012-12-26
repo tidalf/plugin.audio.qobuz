@@ -14,22 +14,14 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
 import xbmcgui
 
 import qobuz
-from constants import Mode
 
 from flag import NodeFlag
 from node import Node
-from artist import Node_artist
-from debug import info, warn, error, debug
-from cache.search_artists import Cache_search_artists
-import urllib
-import re
-from xml.dom.minidom import parse, parseString
+from product_by_artist import Node_product_by_artist
+
 '''
     NODE ARTIST
 '''
@@ -41,7 +33,6 @@ class Node_similar_artist(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SIMILAR_ARTIST
         self.set_content_type('albums')
         
-
     '''
         Getter 
     '''
@@ -55,14 +46,13 @@ class Node_similar_artist(Node):
         Build Down
     '''
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        query = self.get_parameter('query') # .strip().lower()
-        data = qobuz.api.get_similar_artists(query)
-        debug (self, pprint.pformat(data))
+        query = self.get_parameter('query')
+        data = qobuz.api.artist_getSimilarArtists(artist_id=query)
         if not data: return False
         total = len(data['artists']['items'])
         
         for jartist in data['artists']['items']:
-                artist = Node_artist()
+                artist = Node_product_by_artist()
                 artist.set_data(jartist)
                 self.add_child(artist)
         return total

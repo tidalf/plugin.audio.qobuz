@@ -30,9 +30,8 @@ class Search_tracks():
         self._raw_data = {}
         
     def search(self, query, limit = 100):
-        data = qobuz.api.search_tracks(query, limit)
+        data = qobuz.api.search_getResults(query=query, type='tracks', limit=limit)
         self._raw_data = data
-        pprint.pprint(self._raw_data)
         if not 'results' in data: return False
         if not 'tracks' in data['results']: return False
         if len(data['results']['tracks']) < 1: return False

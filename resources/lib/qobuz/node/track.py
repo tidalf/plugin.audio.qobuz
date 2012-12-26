@@ -23,10 +23,9 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag
 from node import Node
-from cache.track import Cache_track
-from cache.track_stream_url import Cache_track_stream_url
+
 from debug import error, debug, warn
-#from gettext import re
+
 '''
     NODE TRACK
 '''
@@ -39,16 +38,15 @@ class Node_track(Node):
         self.set_content_type('songs')
         self.qobuz_context_type = 'playlist'
         self.set_is_folder(False)
-        self.cache = None
-        self.cache_url = None
         self.status = None
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
         else:
-            self.set_cache(xbmc_directory.Progress)
-            self.set_data(self.cache.fetch_data())
+            #self.set_cache(xbmc_directory.Progress)
+            nid = self.get_parameter('nid')
+            self.set_data(qobuz.registry.get(name='track', id=nid)['data'])
             xbmc_directory.add_node(self)
             return True
 
@@ -61,7 +59,6 @@ class Node_track(Node):
         if not id:
             error(self, "Cannot set cache without id")
             return False
-        self.cache = Cache_track(id, self.qobuz_context_type, False)
         return True
 
     def make_url(self, mode = Mode.PLAY):
@@ -103,9 +100,9 @@ class Node_track(Node):
     def get_image(self):
         try:
             image = self.get_property(('album', 'image', 'large'))
-            if image: return image.replace('_230.', '_600.')
         except: pass
-        # if not self.parent: return ''
+        if image: return image.replace('_230.', '_600.')
+        if not self.parent: return ''
         if self.parent.get_type() & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_PLAYLIST):
             return self.parent.get_image()
 
@@ -131,10 +128,10 @@ class Node_track(Node):
         return ''
 
     def get_streaming_url(self):
-        self._set_cache_streaming_url()
-        data = self.cache_url.get_data()
+        nid = self.get_id() or self.parameters['nid']
+        data = qobuz.registry.get(name='stream-url', id=nid)
         if not data: return None
-        return data['url']
+        return data['data']['url']
 
     def get_artist(self):
         s = self.get_interpreter()
@@ -182,37 +179,36 @@ class Node_track(Node):
         if self.parent: return self.parent.get_description()
         return ''
 
-    def _set_cache_streaming_url(self):
-        if not self.cache_url:
-            self.cache_url = Cache_track_stream_url(self.get_id())
-        self.cache_url.fetch_data()
 
     def is_sample(self):
-        self._set_cache_streaming_url()
-        data = self.cache_url.get_data()
+        nid = self.get_id() or self.parameters['nid']
+        data = qobuz.registry.get(name='stream-url', id=nid)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
         try: 
-            return data['sample']
+            return data['data']['sample']
         except: 
             return ''
     
     def get_mimetype(self):
-        self._set_cache_streaming_url()
-        data = self.cache_url.get_data()
+        nid = self.get_id() or self.parameters['nid']
+        data = qobuz.registry.get(name='stream-url', id=nid)
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
             return ''
         try: 
-            format = int(data['format_id'])
+            format = int(data['data']['format_id'])
         except:
             warn(self, "Cannot get mime/type for track (restricted track?)")
             return ''
         mime = ''
         if format == 6:
             mime = 'audio/flac'
+        elif format == 5:
+            mime = 'audio/mpeg'
         else:
+            warn(self, "Unknow format " + str(format))
             mime = 'audio/mpeg'
         return mime
 
@@ -249,7 +245,7 @@ class Node_track(Node):
         if mlabel: comment = mlabel
         if description: comment += ' - ' + description
         item.setInfo(type = 'music', infoLabels = {
-                                   'track_id': self.get_id(),
+                                   #'track_id': self.get_id(),
                                    'title': self.get_title(),
                                    'album': self.get_album(),
                                    'genre': self.get_genre(),
@@ -270,4 +266,4 @@ class Node_track(Node):
         color = qobuz.addon.getSetting('color_item')
         if self.parent and self.parent.type & NodeFlag.TYPE_PLAYLIST:
             url = self.parent.make_url(Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
-            menuItems.append((qobuz.utils.color(color, "(i8n) Remove track: ") + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
+            menuItems.append((qobuz.utils.color(color, qobuz.lang(30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))

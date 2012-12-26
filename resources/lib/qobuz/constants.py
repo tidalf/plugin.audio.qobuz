@@ -18,6 +18,7 @@
 __debugging__ = 0
 
 class __Mode():
+    
     def __init__(self):
         self.VIEW = 1
         self.PLAY = 2

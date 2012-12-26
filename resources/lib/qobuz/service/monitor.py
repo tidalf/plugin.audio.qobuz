@@ -35,10 +35,30 @@ sys.path.append(qobuzDir)
 from exception import QobuzXbmcError
 from bootstrap import QobuzBootstrap
 from debug import warn
-boot = QobuzBootstrap(__addon__, int(sys.argv[1]))
+from debug import log
+import qobuz
 
+class Monitor(xbmc.Monitor):
+    def __init__(self, qobuz):
+        super(Monitor, self).__init__()
+        
+
+    def onSettingsChanged(self):
+        log(self, 'Addong settings has changed')
+        qobuz.registry.delete(name='user')
+        qobuz.registry.delete(name='user-playlists')
+        qobuz.registry.delete(name='user-playlist-id')
+        #qobuz.registry.delete(name='user-playlist') #@TODO Delete all user playlist (or not :p)
+        xbmc.executebuiltin('Container.Refresh')
+
+boot = QobuzBootstrap(__addon__, 0)
 try:
-    boot.bootstrap_app()
-    boot.dispatch()
+    boot.bootstrap_app()    
+    monitor = Monitor(qobuz)
+    while (not xbmc.abortRequested):
+        xbmc.sleep(1000)
+    
 except QobuzXbmcError as e:
     warn('['+pluginId+']', "Exception while running plugin")
+
+

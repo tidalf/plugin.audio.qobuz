@@ -31,8 +31,6 @@ from debug import info, warn, error, debug
     NODE USER PLAYLISTS
 '''
 
-from cache.user_playlists import Cache_user_playlists
-from cache.current_playlist import Cache_current_playlist
 from playlist import Node_playlist
 
 class Node_user_playlists(Node):
@@ -40,15 +38,13 @@ class Node_user_playlists(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = qobuz.utils.lang(30019)
-        self.image = qobuz.image.access.get('userplaylists')
+        #self.image = qobuz.image.access.get('userplaylists')
         self.label2 = 'Keep your current playlist'
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
         self.set_content_type('files')
         display_by = self.get_parameter('display-by')
         if not display_by: display_by = 'songs'
         self.set_display_by(display_by)
-        self.cache = Cache_user_playlists()
-        self.cache_current_playlist = Cache_current_playlist()
         display_cover = qobuz.addon.getSetting('userplaylists_display_cover')
         if display_cover == 'true': display_cover = True
         else: display_cover = False
@@ -67,23 +63,21 @@ class Node_user_playlists(Node):
     def _build_down(self, xbmc_directory, lvl, flag = None):
         login = qobuz.addon.getSetting('username')
         debug(self, "Build-down: user playlists")
-        data = self.cache.fetch_data(xbmc_directory.Progress)
+        data = qobuz.registry.get(name='user-playlists')
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
-        self.set_data(data)
-        jcurrent_playlist = self.cache_current_playlist.fetch_data()
-        cpls_id = None
-        try: cpls_id = jcurrent_playlist['id']
-        except: pass
-        for playlist in data:
+        cid = qobuz.registry.get(name='user-current-playlist-id', noRemote=True)
+        if cid: cid = int(cid['data'])
+        for playlist in data['data']['playlists']['items']:
             node = Node_playlist()
             node.set_data(playlist)
             if self.display_product_cover:
-                image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
-                if not image: image = self.get_random_image(node)
-                if image: node.image = image
-            if (cpls_id and cpls_id == str(node.get_id())):
+                pass
+                #image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
+                #if not image: image = self.get_random_image(node)
+                #if image: node.image = image
+            if (cid and cid == node.get_id()):
                 node.set_is_current(True)
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
@@ -107,51 +101,39 @@ class Node_user_playlists(Node):
         return image
 
     def set_current_playlist(self, id):
-        info(self, "Set current playlist: " + str(id))
-        from cache.current_playlist import Cache_current_playlist
-        cp = Cache_current_playlist()
-        if cp.get_id() == id:
-            info(self, "Playlist already selected... do nothing")
-            return False
-        cp.set_id(id)
-        return cp.save()
-
+        qobuz.registry.set(name='user-current-playlist-id', id=0, value=id)
+        
     def create_playlist(self, query = None):
-        from cache.user_playlists import Cache_user_playlists
+        #!TODO: Why we are no more logged ...
+        qobuz.registry.get(name='user')
         if not query:
             query = self._get_keyboard(default = "", heading = 'Create playlist')
             query = query.strip()
-        ret = qobuz.api.playlist_create(query, '', '', '', 'off', 'off')
+        ret = qobuz.api.playlist_create(name=query, is_public=False)
         if not ret:
             warn(self, "Cannot create playlist name '" + query + "'")
-            return False
-        userplaylists = Cache_user_playlists()
-        userplaylists.delete_cache()
+            return None
         self.set_current_playlist(ret['id'])
-        return True
+        qobuz.registry.delete(name='user-playlists')
+        return ret['id']
 
     ''' 
         Rename playlist 
     '''
     def rename_playlist(self, id):
         info(self, "rename playlist: " + str(id))
-        from cache.playlist import Cache_playlist
-        from cache.user_playlists import Cache_user_playlists
-        playlist = Cache_playlist(id)
-        playlist.fetch_data()
-        currentname = playlist.get_data()['name'].encode('utf8', 'replace')
-        query = self._get_keyboard(default = currentname, heading = qobuz.lang(30078))
-        query = query.strip().encode('utf8', 'replace')
-        if query == currentname:
+        playlist = qobuz.registry.get(name='user-playlist', id=id)
+        currentname = playlist['data']['name'].encode('utf8', 'replace')
+        newname = self._get_keyboard(default = currentname, heading = qobuz.lang(30078))
+        newname = newname.strip().encode('utf8', 'replace')
+        if newname == currentname:
             return True
-        res = qobuz.api.playlist_update(id, query)
+        res = qobuz.api.playlist_update(playlist_id=id,name=newname)
         if res:
-            uplaylists = Cache_user_playlists()
-            if not uplaylists.delete_cache():
-                warn(self, "Cannot remove userplaylists.dat")
-                qobuz.gui.notfify(31100, 31101, 'default_red')
-                return False
-            return True
+            qobuz.registry.delete(name='user-playlist', id=id)
+            qobuz.registry.delete(name='user-playlists')
+            xbmc.executebuiltin('Container.Refresh')
+            return False
         else:
             qobuz.gui.notifyH(qobuz.lang(30078), qobuz.lang(39009) + ': ' + currentname)
         return False
@@ -160,24 +142,20 @@ class Node_user_playlists(Node):
     '''
     def remove_playlist(self, id):
         import xbmcgui, xbmc
-        from cache.playlist import Cache_playlist
-        cache = Cache_playlist(id)
-        data = cache.fetch_data()
+        data = qobuz.registry.get(name='user-playlist', id=id)['data']
         name = ''
         if 'name' in data: name = data['name']
-        ok = xbmcgui.Dialog().yesno('Removing playlist',
-                          'Do you really want to delete:',
+        ok = xbmcgui.Dialog().yesno(qobuz.lang(39010),
+                          qobuz.lang(30052), 
                           qobuz.utils.color('FFFF0000', name))
         if not ok:
             info(self, "Deleting playlist aborted...")
             return False
 
         info(self, "Deleting playlist: " + id)
-        res = qobuz.api.playlist_delete(id)
+        res = qobuz.api.playlist_delete(playlist_id=id)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(id))
             return False
-        info(self, "Playlist deleted: " + str(id))
-        userplaylists = Cache_user_playlists()
-        userplaylists.delete_cache()
+        qobuz.registry.delete(name='user-playlists')
         return True

@@ -39,15 +39,17 @@ class Utils:
         pass
 
     def notifyH(self, title, text, image = None, mstime = 2000):
-        if not image: image = qobuz.image.access.get('qobuzIcon')
+        try: 
+            if not image: image = qobuz.image.access.get('qobuzIcon')
+        except: pass
         s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
-        xbmc.executebuiltin(s)
+        xbmc.executebuiltin(s.encode('utf-8', 'replace'))
 
     def notify(self, title, text, image = None, mstime = 2000):
-        if not image: image = qobuz.image.access.get('qobuzIcon')
+        #if not image: image = qobuz.image.access.get('qobuzIcon')
         l = qobuz.lang
         s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), mstime, image)
-        xbmc.executebuiltin(s)
+        xbmc.executebuiltin(s.encode('utf-8', 'replace'))
 
     def show_login_failure(self):
         __language__ = qobuz.lang
@@ -55,15 +57,15 @@ class Utils:
         if dialog.yesno(__language__(30008), __language__(30034), __language__(30040)):
             qobuz.addon.openSettings()
             xbmcplugin.endOfDirectory(handle = int(sys.argv[1]), succeeded = False, updateListing = True, cacheToDisc = False)
-            return qobuz.boot.dispatch()
+            
         else:
             xbmc.executebuiltin('ActivateWindow(home)')
             return False
 
     def is_free_account(self):
-        data = qobuz.boot.auth.get_data()
+        data = qobuz.registry.get(name='user')
         if not data: return True
-        if not data ['user']['credential']['id']: 
+        if not data['data']['user']['credential']['id']: 
             return True
         return False
 

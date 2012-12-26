@@ -23,7 +23,7 @@ class dog():
                              'mode'      : '^\d{1,10}$',
                              'nid'       : '^\d{1,14}$',
                              'nt'        : '^\d{1,10}$',
-                             'genre-type': '^(editor-picks|best-sellers|press-awards|new-releases)$',
+                             'genre-type': '^(editor-picks|best-sellers|press-awards|new-releases|most-featured)$',
                              'genre-id'  : '^(\d+|null)$',
                              'url'       : '^.*$',
                              'search-type': "^(artists|songs|albums)$",

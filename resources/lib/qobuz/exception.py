@@ -15,33 +15,20 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
-import os
-
-from icacheable import ICacheable
-from debug import *
-
 import pprint
-import qobuz
+import traceback
 
-'''
- Class QobuzTrack 
-
- @summary: Manage one qobuz track
- @param qob: parent
- @param id: track id
- @return: New QobuzTrack 
-'''
-class Cache_track(ICacheable):
-
-    def __init__(self, id, context_type = 'playlist', auto_fetch = True):
-        self.id = id
-        super(Cache_track, self).__init__(qobuz.path.cache,
-                                         'track',
-                                         self.id, True)
-        self.set_cache_refresh(qobuz.addon.getSetting('cache_duration_track'))
-        debug(self, "Cache duration: " + str(self.cache_refresh))
-
-    def _fetch_data(self):
-        json = qobuz.api.get_track(self.id)
-        return json
-
+class QobuzXbmcError(Exception):
+    
+    def __init__(self, *a, **ka):
+        if not 'additional' in ka or ka['additional'] == None: ka['additional'] = ''
+        nl = "\n"
+        if (not 'who' in ka) or (not 'what' in ka): 
+            raise Exception('QobuzXbmcError', 'Missing constructor arguments (who|what)')
+        msg = "[QobuzXbmcError]" + nl
+        msg+= " - who        : " + pprint.pformat(ka['who']) + nl
+        msg+= " - what       : " + ka['what'] + nl
+        msg+= " - additional : " + ka['additional'] + nl
+        msg+= " - Stack      : " + nl
+        print msg
+        traceback.print_stack()

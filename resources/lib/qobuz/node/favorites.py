@@ -28,7 +28,6 @@ from debug import info, warn, error
 '''
     NODE PLAYLIST
 '''
-#from cache.playlist import Cache_playlist
 from track import Node_track
 
 class Node_favorites(Node):
@@ -40,7 +39,7 @@ class Node_favorites(Node):
         #self.set_is_folder(True)
         #self.cache = None
         self.packby = ''#album'
-        self.image = qobuz.image.access.get('playlist')
+#        self.image = qobuz.image.access.get('playlist')
         #if self.packby == 'album':
         #    self.set_content_type('albums')
         #else:
@@ -49,34 +48,34 @@ class Node_favorites(Node):
         self.label = qobuz.lang(30079)
         
         self.set_content_type('songs')
-        self.set_auto_set_cache(True)
+        #self.set_auto_set_cache(True)
 
     # def get_label(self):
     #    return self.get_name()
 
-    def set_cache(self):
-        from cache.favorites import Cache_favorites
-        self.cache = Cache_favorites()
-        return True
+#    def set_cache(self):
+#        from cache.favorites import Cache_favorites
+#        self.cache = Cache_favorites()
+#        return True
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        if not self.set_cache():
-            error(self, "Cannot set cache!")
-            return False
-        data = self.cache.fetch_data(xbmc_directory.Progress)
+#        if not self.set_cache():
+#            error(self, "Cannot set cache!")
+#            return False
+        data = qobuz.registry.get(name='favorites')
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
         self.set_data(data)
         albumseen = {}
         warn (self, pprint.pformat(data))
-        for jtrack in data['tracks']['items']:
+        for track in data['data']['tracks']['items']:
             node = None
-            #if self.packby == 'album':
             node = Node_track()
-            node.set_data(jtrack)
+            node.set_data(track)
             self.add_child(node)
-        for product in self.filter_products(self.cache.get_data()):
+    
+        for product in self.filter_products(data):
             self.add_child(product)
         return True
         
@@ -124,7 +123,8 @@ class Node_favorites(Node):
         list = []
         if not data: return list
         albumseen = {}
-        for track in data['albums']['items']:
+        for track in data['data']['albums']['items']:
+            #warn(self, 'Track ' + track)
             json = track
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
@@ -137,8 +137,8 @@ class Node_favorites(Node):
 
     def add_to_favorites(self):
             from gui.directory import Directory
-            from cache.favorites import Cache_favorites
-            favorites = Cache_favorites()
+            #from cache.favorites import Cache_favorites
+            #favorites = Cache_favorites()
             from renderer.xbmc import Xbmc_renderer as renderer
             nt = None
             try: nt = int(self.get_parameter('nt'))
@@ -175,10 +175,12 @@ class Node_favorites(Node):
                 trackids.append(str(node.get_id()))
             strtracks = ','.join(trackids)
             ret = qobuz.api.favorites_add_track(strtracks)
+            info(self, pprint.pformat(ret))
+            qobuz.registry.delete(name='favorites')
             from utils.cache_manager import cache_manager
             #from cache.playlist import Cache_playlist
-            cm = cache_manager()
-            pl = Cache_favorites()
-            pl.delete_cache()
+            #cm = cache_manager()
+            #pl = Cache_favorites()
+            #pl.delete_cache()
             dir.end_of_directory()
             return True
