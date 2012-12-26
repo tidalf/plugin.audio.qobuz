@@ -30,6 +30,9 @@ class __NodeFlag():
         self.TYPE_SIMILAR_ARTIST   = 2048
         self.TYPE_FAVORITES        = 4096
         self.TYPE_CUSTOM_SEARCH    = 8192
+        self.TYPE_FRIEND           = 16384
+        self.TYPE_FRIEND_LIST      = 32768
+        
         
     def to_s(self, flag):
         if flag & self.TYPE_TRACK: return "track"
@@ -45,7 +48,7 @@ class __NodeFlag():
         elif flag & self.TYPE_SIMILAR_ARTIST: "similar artist" 
         elif flag & self.TYPE_NODE: return "node"
         elif flag & self.DONTFETCHTRACK: "don't fetch track"
-        
+        elif flag & self.FRIEND: "friend"
         else: "Unknow flag: " + str(flag)
         
 NodeFlag = __NodeFlag()

@@ -22,6 +22,7 @@ from search import Node_search
 from favorites import Node_favorites
 from purchases import Node_purchases
 from custom_search import Node_custom_search
+from friend_list import Node_friend_list
 import qobuz
 
 '''
@@ -57,5 +58,7 @@ class Node_root(Node):
             self.add_child(search)
 #            search = Node_custom_search()
 #            self.add_child(search)
+            friend_list = Node_friend_list()
+            self.add_child(friend_list)
         return True
 

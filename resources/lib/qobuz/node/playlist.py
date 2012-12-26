@@ -28,7 +28,6 @@ from debug import info, warn, error
 '''
     NODE PLAYLIST
 '''
-#from cache.playlist import Cache_playlist
 from track import Node_track
 
 class Node_playlist(Node):

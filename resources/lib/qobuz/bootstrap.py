@@ -351,6 +351,13 @@ class QobuzBootstrap(object):
             s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '&action=scan")'
             xbmc.executebuiltin(s)
             return False
+        
+        elif self.MODE == Mode.FRIEND_ADD:
+            from node.friend import Node_friend
+            friend = Node_friend()
+            if friend.create():
+                xbmc.executebuiltin('Container.Refresh')
+            return False
 
         else:
             error(self, "Unknow mode: " + str(self.MODE))

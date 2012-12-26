@@ -35,6 +35,7 @@ class __Mode():
         self.PLAYLIST_REMOVE = 17
         self.PLAYLIST_ADD_AS_NEW = 18
         self.FAVORITES_ADD_TO_CURRENT = 19
+        self.FRIEND_ADD = 20
 
     
     def to_s(self, mode):
