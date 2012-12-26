@@ -198,7 +198,7 @@ class QobuzApi:
         return self._api_request(ka,"/playlist/get")
     
     def playlist_addTracks (self, **ka):
-        self._check_ka(ka, ['playlist_id', 'tracks_id'])
+        self._check_ka(ka, ['playlist_id', 'track_ids'])
         return self._api_request(ka,"/playlist/addTracks")
     
 

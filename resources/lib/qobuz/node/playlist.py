@@ -147,7 +147,7 @@ class Node_playlist(Node):
     def remove_tracks(self, tracks_id):
         import qobuz, xbmc
         info(self, "Removing tracks: " + tracks_id)
-        result = qobuz.api.playlist_remove_track(self.id, tracks_id)
+        result = qobuz.api.playlist_deleteTracks(playlist_id=self.id, playlist_track_ids=tracks_id)
         if not result:
             warn(self, "Cannot remove tracks from playlist: " + str(self.id))
             qobuz.gui.notifyH('Qobuz Playlist / Remove track', "Fail to remove track")
@@ -201,7 +201,7 @@ class Node_playlist(Node):
             for node in dir.nodes:
                 trackids.append(str(node.get_id()))
             strtracks = ','.join(trackids)
-            ret = qobuz.api.playlist_addTracks(playlist_id=str(cid), tracks_id=strtracks)
+            ret = qobuz.api.playlist_addTracks(playlist_id=str(cid), track_ids=strtracks)
             if ret:
                 qobuz.registry.delete(name='user-playlist', id=cid)
             return True
@@ -252,7 +252,7 @@ class Node_playlist(Node):
         for node in dir.nodes:
             trackids.append(str(node.get_id()))
         strtracks = ','.join(trackids)
-        ret = qobuz.api.playlist_addTracks(playlist_id=nid, tracks_id=strtracks)
+        ret = qobuz.api.playlist_addTracks(playlist_id=nid, track_ids=strtracks)
         if ret:
             qobuz.registry.set(name='user-current-playlist-id', id=0, value=nid, noRemote=True)
         dir.end_of_directory()
