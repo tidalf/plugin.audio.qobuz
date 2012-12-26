@@ -10,6 +10,10 @@
 	If not, see <http://www.gnu.org/licenses/>. -->
 <?xml version="1.0" encoding="UTF8" standalone="yes"?>
 <strings>
+      <string id="3101">Action</string>
+  <string id="3102">Exit</string>
+  <string id="3120">Demo Text</string>  
+  
 	<!-- credentials -->
 	<string id="37000">Username</string>
 	<string id="37001">Password</string>
@@ -93,7 +97,11 @@
 	<string id="30077">Delete Qobuz playlist</string>
 	<string id="30078">Rename playlist</string>
 	<string id="30079">Show Favorites</string>
-
+	<string id="30080">Add as new playlist</string>
+	
+	<string id="29000">Qobuz Playlist</string>
+    <string id="29001">No current playlist</string>
+    
 	<!-- Recommandation -->
 	<string id="30082">Show recommendations</string>
 	<string id="30083">Press awards</string>
@@ -118,6 +126,8 @@
 	<string id="30203">Reggae</string>
 	<string id="30100">Show Purchases</string>
 	<string id="30101">Show News</string>
+	<string id="30102">Most featured</string>
+    
 
 
 	<!-- Cache Addon Menu -->
@@ -193,6 +203,7 @@
 	<string id="39009">Rename</string>
 	<string id="39010">Remove</string>
 	<string id="39011">Add to favorites</string>
+
 
 	<!-- Progress bar -->
 	<string id="40000">Starting</string>

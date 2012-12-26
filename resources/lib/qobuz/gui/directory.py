@@ -87,15 +87,14 @@ class Directory():
         success = True
         if not self.put_item_ok or (self.total_put == 0):
             success = False
+            qobuz.gui.notify(30008, 36001)
         xbmcplugin.endOfDirectory(handle = self.handle,
                                    succeeded = success,
                                    updateListing = False,
                                    cacheToDisc = success)
         if self.total_put == 0:
             label = self.root.get_label()
-            #print "LABEL: " + label
-            #qobuz.gui.notifyH(qobuz.lang(40001), label)
-        self.update(100, 100, qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put).encode('ascii', 'ignore') + ' items')
+        self.update(100, 100, qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put) + ' items')
         self.close()
         return success
 

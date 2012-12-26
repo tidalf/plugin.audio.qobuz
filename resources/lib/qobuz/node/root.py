@@ -21,6 +21,7 @@ from recommendation import Node_recommendation
 from search import Node_search
 from favorites import Node_favorites
 from purchases import Node_purchases
+from custom_search import Node_custom_search
 import qobuz
 
 '''
@@ -36,7 +37,7 @@ class Node_root(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
         self.set_content_type('files')
         self.label = "Qobuz"
-        self.image = qobuz.image.access.get('default')
+        #self.image = qobuz.image.access.get('default')
         
     def _build_down(self, xbmc_directory, lvl, flag = None):
         self.add_child(Node_user_playlists())
@@ -54,5 +55,7 @@ class Node_root(Node):
             search = Node_search()
             search.set_search_type('artists')
             self.add_child(search)
+#            search = Node_custom_search()
+#            self.add_child(search)
         return True
 

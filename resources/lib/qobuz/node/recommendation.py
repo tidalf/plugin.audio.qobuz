@@ -34,6 +34,7 @@ RECOS_TYPES = {
                       'press-awards': qobuz.lang(30083),
                       'best-sellers': qobuz.lang(30085),
                       'editor-picks': qobuz.lang(30086),
+                      'most-featured': qobuz.lang(30102),
                       }
 
 RECOS_GENRES = {
@@ -54,7 +55,7 @@ RECOS_GENRES = {
 '''
     NODE RECOS
 '''
-from cache.recommendation import Cache_recommendation
+#from cache.recommendation import Cache_recommendation
 
 class Node_recommendation(Node):
 
@@ -66,7 +67,7 @@ class Node_recommendation(Node):
         else: self.genre_id = None
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(qobuz.lang(30082))
-        self.image = qobuz.image.access.get('album')
+        #self.image = qobuz.image.access.get('album')
 
     def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
@@ -78,6 +79,9 @@ class Node_recommendation(Node):
             url += "&action=scan"
         return url
 
+    def get_id(self):
+        return self.genre_type + '-' + str(self.genre_id)
+    
     def set_genre_type(self, type):
         self.genre_type = type
 
@@ -110,10 +114,6 @@ class Node_recommendation(Node):
             type = self.get_genre_type()
             node.set_genre_type(self.get_genre_type())
             node.set_genre_id(genreid)
-            if qobuz.addon.getSetting('userplaylists_display_cover') == 'true':
-                image_name = 'recos-%s-%s' % (type, genreid)
-                image = qobuz.image.cache.get(image_name)
-                if image: node.image = image
             node.set_label(self.label + ' / ' + qobuz.utils.color(color, RECOS_TYPES[self.genre_type]) + ' / ' + RECOS_GENRES[genreid])
             self.add_child(node)
         return True
@@ -121,19 +121,11 @@ class Node_recommendation(Node):
 
 # TYPE GENRE
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
-        self.cache = Cache_recommendation(self.genre_id, self.genre_type)
-        data = self.cache.fetch_data()
+        data = qobuz.registry.get(name='recommendation', id=self.genre_id, type=self.genre_type, genre_id=self.genre_id)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
-        self.set_data(data)
-        if qobuz.addon.getSetting('userplaylists_display_cover') == 'true':
-            genre_id = self.get_genre_id()
-            if genre_id != 'null': genre_id = str(genre_id)
-            image_name = 'recos-%s-%s' % (self.get_genre_type(), genre_id)
-            image = qobuz.image.cache.get(image_name)
-            if not image: self._get_random_image_type_genre(image_name, data)
-        for product in data:
+        for product in data['data']['albums']['items']:
             node = Node_product()
             node.set_data(product)
             self.add_child(node)
@@ -152,17 +144,6 @@ class Node_recommendation(Node):
         if not image: return None
         qobuz.image.cache.set(image_name, image)
         return image
-
-#    def cache_image(self, product):
-#        id = 'recos-'+self.genre_type
-#        image = qobuz.image.cache.get(id)
-#        if not image: 
-#            qobuz.image.cache.set(id, product.get_image())
-#        id = 'recos-'+self.genre_type + '-' + str(self.genre_id)
-#        image = qobuz.image.cache.get(id)
-#        if not image: 
-#            qobuz.image.cache.set(id, product.get_image())
-
 
 # DISPATCH
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):

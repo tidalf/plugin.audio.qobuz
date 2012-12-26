@@ -33,16 +33,20 @@ class Xbmc_renderer(IRenderer):
     def __init__(self, node_type, node_id = None):
         super(Xbmc_renderer, self).__init__(node_type, node_id)
 
-
     def display(self):
         from gui.directory import Directory
         if not self.set_root_node():
             warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
-        dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(dir, self.depth, self.filter)
-        dir.set_content(self.root.content_type)
-        dir.end_of_directory()
+        buildDown = self.root.pre_build_down()
+        if buildDown:
+            dir = Directory(self.root, qobuz.boot.handle, False)
+            self.root.build_down(dir, self.depth, self.filter)
+            dir.set_content(self.root.content_type)
+#            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
+#            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_LABEL)
+#            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_NONE)
+            dir.end_of_directory()
         return True
 
     def scan(self):

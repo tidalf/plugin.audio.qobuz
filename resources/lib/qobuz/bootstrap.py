@@ -27,10 +27,16 @@ from dog import dog
 import qobuz
 from node.flag import NodeFlag
 
+from exception import QobuzXbmcError
+import json
+import pprint
+
 ''' Arguments parssing '''
 def get_params():
     d = dog()
     rparam = {}
+    if len(sys.argv) <= 1:
+        return rparam
     paramstring = sys.argv[2]
     if len(paramstring) >= 2:
         params = sys.argv[2]
@@ -50,20 +56,27 @@ def get_params():
                     warn('[DOG]', "--- Invalid key: %s / value: %s" % (splitparams[0], splitparams[1]))
     return rparam
 
-class xbmc_json_rpc():
 
+class XbmcRPC:
     def __init__(self):
         pass
+    
+    def send(self, request):
+        if not request: raise QobuzXbmcError(who=self, what='missing_parameter', additional='request')
+        request['jsonrpc'] = '2.0'
+        request['method'] = 'JSONRPC.' + request['method']
+        if not 'id' in request: request['id'] = 1
+        rjson = json.dumps(request)
+        print 'REQUEST: ' + rjson
+        ret = xbmc.executeJSONRPC(rjson)
+        return ret
 
-    def Introspect(self, id):
-        return xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "JSONRPC.Introspect", "id": %i }' % (id))
-
-    def AudioLibrary_GetAlbums(self, params = {}):
-        s = ''
-        if 'id' in params: s = '"id": "' + str(params['id']) + '"'
-        elif 'name' in params: s = '"Audio.Fields.Artist": "' + str(params['name']) + '"'
-        return xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"AudioLibrary.GetAlbums","params":{"genreid": -1 ,"artistid": 1 ,"start": -1,"end": -1 }, "id":"AudioLibraryGetAlbums"}')
-
+    def ping(self):
+        request = {
+                   'method': 'Ping',
+        }
+        return self.send(request)
+        
 '''
     QobuzBootstrap
 '''
@@ -73,28 +86,38 @@ class QobuzBootstrap(object):
         qobuz.addon = __addon__
         self.handle = __handle__
         qobuz.boot = self
-
+        
     def bootstrap_app(self):
         self.bootstrap_directories()
         self.bootstrap_lang()
         self.bootstrap_utils()
-        self.bootstrap_api()
-        self.bootstrap_core()
-        self.bootstrap_image()
         self.bootstrap_gui()
+        self.bootstrap_registry()
         self.bootstrap_sys_args()
-        self.auth = qobuz.core.login()
-        if not self.auth:
-            qobuz.gui.show_login_failure()
-            exit(1)
-        if qobuz.gui.is_free_account():
-            qobuz.gui.popup_free_account()
-        # self.bootstrap_db()
-        return self.dispatch()
+        
 
     def bootstrap_lang(self):
         qobuz.lang = qobuz.addon.getLocalizedString
 
+    def bootstrap_registry(self):
+        from registry import QobuzRegistry
+        streamFormat = 6 if qobuz.addon.getSetting('streamtype') == 'flac' else 5
+        try:
+            qobuz.registry = QobuzRegistry(
+                                       cacheType='default', 
+                                       username=qobuz.addon.getSetting('username'), 
+                                       password=qobuz.addon.getSetting('password'), 
+                                       basePath=qobuz.path.cache,
+                                       streamFormat=streamFormat, hashKey=False)
+
+            qobuz.registry.get(name='user')
+            qobuz.api = qobuz.registry.get_api()
+        except QobuzXbmcError:
+            qobuz.gui.show_login_failure()
+            #@TODO sys.exit killing XBMC? FRODO BUG ?
+            #sys.exit(1)
+            raise QobuzXbmcError(who=self, what='invalid_login', additional=None)
+            
     def bootstrap_utils(self):
         import utils.string
         class Utils():
@@ -144,31 +167,15 @@ class QobuzBootstrap(object):
                 s.info = info
         qobuz.debug = d()
 
-    def bootstrap_api(self):
-        from api import QobuzApi
-        qobuz.api = QobuzApi()
-
-    def bootstrap_core(self):
-        from core import QobuzCore
-        qobuz.core = QobuzCore()
-
-    def bootstrap_image(self):
-        from images import QobuzImage
-        qobuz.image = QobuzImage()
-
     def bootstrap_gui(self):
         from gui.utils import Utils
         qobuz.gui = Utils()
 
     def bootstrap_player(self):
-        #warn(self, "REWRITE! need to bootstrap player")
         from player import QobuzPlayer
         qobuz.player = QobuzPlayer()
 
-    #def bootstrap_db(self):
-    #    from db.manager import Manager
-    #    path = os.path.join(qobuz.path.cache, 'data.s3')
-    #    qobuz.db = Manager(path)
+
     '''
         Parse system parameters
     '''
@@ -199,11 +206,7 @@ class QobuzBootstrap(object):
         cm = cache_manager()
         cm.delete_all_data()
 
-    '''
-    
-    '''
-    def build_url_return(self):
-        return sys.argv[2]
+
     '''
         Execute methode based on MODE
     '''
@@ -211,25 +214,15 @@ class QobuzBootstrap(object):
         import pprint, xbmc
         import time
         ret = False
-        ####################
-        # PLAYING
-#        db = qobuz.db
-#        db.connect()
-#        db.insert('track', where = { "id": 3434, 'composer_id': 532345})#str(int(time.time()))
-#        row = db.get('track', where = {"id": 2132912 })
-#        if not row:
-#            print 'Cannot get track'
-#        print "Track in database!!!"
 
-        ####################
         debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
 
         ''' PLAY '''
         if self.MODE == Mode.PLAY:
             debug(self, "Playing song")
             self.bootstrap_player()
-            if qobuz.addon.getSetting('notification_playingsong') == 'true':
-                qobuz.gui.notify(34000, 34001)
+#            if qobuz.addon.getSetting('notification_playingsong') == 'true':
+#                qobuz.gui.notify(34000, 34001)
             try:
                 context_type = urllib.unquote(self.params["context_type"])
             except:
@@ -238,7 +231,7 @@ class QobuzBootstrap(object):
                 return True
             return False
 
-        # ERASE CACHE '''
+        # ERASE CACHE
         elif self.MODE == Mode.ERASE_CACHE:
             import xbmcgui
             ok = xbmcgui.Dialog().yesno('Remove cached data',
@@ -265,7 +258,6 @@ class QobuzBootstrap(object):
 
         ''' UGLY MODE DISPATCH '''
         if self.MODE == Mode.VIEW:
-            info(self, "Displaying node")
             r = renderer(nt, id)
             r.set_depth(1)
             r.set_filter(NodeFlag.TYPE_NODE | NodeFlag.DONTFETCHTRACK)
@@ -341,7 +333,7 @@ class QobuzBootstrap(object):
             from node.playlist import Node_playlist
             node = Node_playlist(None, self.params)
             node.set_id(self.NID)
-            node.set_data(node.fetch_data())
+            node.set_data(qobuz.registry.get(name='user-playlist',id=self.NID))
             if not node.remove_tracks(self.params['track-id']):
                 return False
             xbmc.executebuiltin('Container.Refresh')
