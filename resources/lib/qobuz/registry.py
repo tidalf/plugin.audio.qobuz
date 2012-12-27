@@ -18,7 +18,7 @@ import pprint
 from exception import QobuzXbmcError
 from api import QobuzApi
 from time import time
-from util.file import FileUtil
+from file_util import FileUtil
 import cPickle as pickle
 import os
 from debug import *
