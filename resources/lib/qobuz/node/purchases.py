@@ -53,7 +53,7 @@ class Node_purchases(Node):
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
             product.set_data(json)
-            id = product.get_id()
+            id = product.id
             if id in albumseen: continue
             albumseen[id] = 1
             list.append(product)

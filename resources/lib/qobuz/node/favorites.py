@@ -105,7 +105,7 @@ class Node_favorites(Node):
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
             product.set_data(json)
-            id = product.get_id()
+            id = product.id
             if id in albumseen: continue
             albumseen[id] = 1
             list.append(product)
@@ -146,7 +146,7 @@ class Node_favorites(Node):
                 dir.end_of_directory()
                 return False
             for node in dir.nodes:
-                trackids.append(str(node.get_id()))
+                trackids.append(str(node.id))
             strtracks = ','.join(trackids)
             ret = qobuz.api.favorites_add_track(strtracks)
             info(self, pprint.pformat(ret))

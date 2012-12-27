@@ -42,13 +42,11 @@ class Node_playlist(Node):
         self.label2 = ""
         self.url = None
         self.set_is_folder(True)
-        self.packby = ''#album'
-#        self.image = qobuz.image.access.get('playlist')
+        self.packby = ''
         if self.packby == 'album':
             self.set_content_type('albums')
         else:
             self.set_content_type('songs')
-#        self.set_auto_set_cache(True)
 
     def get_label(self):
         return self.get_name()
@@ -63,7 +61,7 @@ class Node_playlist(Node):
         return self.b_is_current
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        nid = self.get_id() or self.get_parameter('nid')
+        nid = self.id or self.get_parameter('nid')
         info(self, "Build-down playlist")
         data = qobuz.registry.get(name='user-playlist',id=nid)
         if not data:
@@ -80,7 +78,8 @@ class Node_playlist(Node):
                     if k in jtrack: jalbum[k] = jtrack[k]
                 if 'image' in jtrack: jalbum['image'] = jtrack['image']
                 node = Node_product()
-                node.set_data(jalbum)
+                cdata = qobuz.registry.get(name='product', id=jalbum['id'], noRemote=True)
+                node.set_data(cdata or jalbum)
                 albumseen[jalbum['id']] = node
             else:
                 node = Node_track()
@@ -93,7 +92,10 @@ class Node_playlist(Node):
     
     def get_owner(self):
         return self.get_property(('owner', 'name'))
-            
+
+    def get_owner_id(self):
+        return self.get_property(('owner', 'id'))
+                 
     def get_description(self):
         return self.get_property('description')
     
@@ -198,7 +200,7 @@ class Node_playlist(Node):
                 dir.end_of_directory()
                 return False
             for node in dir.nodes:
-                trackids.append(str(node.get_id()))
+                trackids.append(str(node.id))
             strtracks = ','.join(trackids)
             ret = qobuz.api.playlist_addTracks(playlist_id=str(cid), track_ids=strtracks)
             if ret:
@@ -249,7 +251,7 @@ class Node_playlist(Node):
             dir.end_of_directory()
             return False
         for node in dir.nodes:
-            trackids.append(str(node.get_id()))
+            trackids.append(str(node.id))
         strtracks = ','.join(trackids)
         ret = qobuz.api.playlist_addTracks(playlist_id=nid, track_ids=strtracks)
         if ret:

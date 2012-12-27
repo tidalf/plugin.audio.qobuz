@@ -51,7 +51,7 @@ class Node_track(Node):
             return True
 
     def set_cache(self, progress = None):
-        id = self.get_id()
+        id = self.id
         if not id:
             try:
                 id = self.get_parameter('nid')
@@ -128,7 +128,7 @@ class Node_track(Node):
         return ''
 
     def get_streaming_url(self):
-        nid = self.get_id() or self.parameters['nid']
+        nid = self.id or self.parameters['nid']
         data = qobuz.registry.get(name='user-stream-url', id=nid)
         if not data: return None
         return data['data']['url']
@@ -181,7 +181,7 @@ class Node_track(Node):
 
 
     def is_sample(self):
-        nid = self.get_id() or self.parameters['nid']
+        nid = self.id or self.parameters['nid']
         data = qobuz.registry.get(name='user-stream-url', id=nid)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
@@ -192,7 +192,7 @@ class Node_track(Node):
             return ''
     
     def get_mimetype(self):
-        nid = self.get_id() or self.parameters['nid']
+        nid = self.id or self.parameters['nid']
         data = qobuz.registry.get(name='user-stream-url', id=nid)
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
@@ -245,7 +245,6 @@ class Node_track(Node):
         if mlabel: comment = mlabel
         if description: comment += ' - ' + description
         item.setInfo(type = 'music', infoLabels = {
-                                   #'track_id': self.get_id(),
                                    'title': self.get_title(),
                                    'album': self.get_album(),
                                    'genre': self.get_genre(),

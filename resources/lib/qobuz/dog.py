@@ -31,7 +31,8 @@ class dog():
                              'depth': "^(-)?\d+$",
                              'query': "^.*$",
                              'action': "^(scan)$",
-                             'track-id': "^\d{1,10}$"
+                             'track-id': "^\d{1,10}$",
+                             'name': "^[\w\d_]+$"
                              }
 
     ''' Match value against regexp '''

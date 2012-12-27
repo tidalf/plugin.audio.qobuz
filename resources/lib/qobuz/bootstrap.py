@@ -355,9 +355,11 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.FRIEND_ADD:
             from node.friend import Node_friend
             friend = Node_friend()
-            if friend.create():
-                xbmc.executebuiltin('Container.Refresh')
-            return False
+            if not friend.create():
+                qobuz.gui.notifyH('Qobuz Xbmc (i8n)', 'Cannot add friend')
+                return False
+            xbmc.executebuiltin('Container.Refresh')
+            return True
 
         else:
             error(self, "Unknow mode: " + str(self.MODE))

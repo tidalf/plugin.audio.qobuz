@@ -51,15 +51,19 @@ class QobuzLocalStorage(object):
         self.data = {}
 
         # Qobuz API
-        self.api = QobuzApi()
-     
+        self.api = QobuzApi()  
+        if not self.login(**ka):
+            raise QobuzXbmcError(who= self, what= 'login_failure', additional= ka['user'])
+    
+    def login(self, **ka):
         # Login into Qobuz our raise exception   
-        key = self.make_key(name='user', id=0)
+        #key = self.make_key(name='user', id=0)
         data = self.get(name='user', id=0, username=ka['username'], password=ka['password'])
-        if not data: raise QobuzXbmcError(who= self, what= 'login_failure', additional= ka['user'])
+        if not data: return False 
         # We feed our api wit user data (auth_token, rights ...)
         self.api.set_logged(**data)
-    
+        return True
+        
     def lastError(self):
         return self.api.last_error
     
@@ -351,6 +355,9 @@ class QobuzRegistry():
     
     def make_key(self, **ka):
         return self.cache.make_key(**ka)
+    
+    def login(self, **ka):
+        return self.cache.login(**ka)
     
 if __name__ == '__main__':
 #    try:

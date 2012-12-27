@@ -43,7 +43,7 @@ class Node_product(Node):
         self.is_special_purchase = False
 
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
-        nid = self.get_id()
+        nid = self.id
         data = None
         if self.is_special_purchase:
             data = qobuz.registry.get(name='purchase', id=nid)
@@ -65,7 +65,7 @@ class Node_product(Node):
 
     def _filter_tracks(self, tracks):
         ltracks = []
-        id = self.get_id()
+        id = self.id
         for track in tracks:
             ltracks.append(track)
         return ltracks

@@ -77,7 +77,7 @@ class Node_user_playlists(Node):
                 #image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
                 #if not image: image = self.get_random_image(node)
                 #if image: node.image = image
-            if (cid and cid == node.get_id()):
+            if (cid and cid == node.id):
                 node.set_is_current(True)
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
@@ -97,7 +97,7 @@ class Node_user_playlists(Node):
         try: image = newdata["tracks"][r]['album']['image']['large']
         except: warn(self, "Cannot get random image for playlist")
         if not image: return None
-        qobuz.image.cache.set("playlist-" + str(node.get_id()), image)
+        qobuz.image.cache.set("playlist-" + str(node.id), image)
         return image
 
     def set_current_playlist(self, id):

@@ -33,8 +33,7 @@ class Node(object):
     def __init__(self,parent=None,parameters=None):
         self.parameters = parameters
         self.id = None
-        self.parent = None
-        self.set_parent(parent)
+        self.parent = parent
         self.type = NodeFlag.TYPE_NODE
         self.content_type = "files"
         self.image = None
@@ -43,13 +42,48 @@ class Node(object):
         self.label2 = ""
         self.is_folder = True
         self._data = None
-      
+    
+    '''
+    Id
+    '''
+    @property
+    def id(self):
+        return self._id
+    
+    @id.setter 
+    def id(self, value):
+        print "Setter ---"
+        self._id = value
+    
+    @id.getter
+    def id(self):
+        if self._data and 'id' in self._data:
+            return self._data['id']
+        return self._id
+    
+    '''
+    Parent
+    '''
+    @property
+    def parent(self):
+        return self._parent
+    @parent.setter
+    def parent(self, parent):
+        if not parent: 
+            self._parent = None
+            return
+        self._parent = weakref.proxy(parent)
+    @parent.getter
+    def parent(self):
+        return self._parent
+    
     def delete_tree(self):
         for child in self.childs:
             child.delete_tree()
         del self.childs
         del self.parent
         del self.parameters
+      
       
     def set_data(self,data):
         self._data = data
@@ -97,12 +131,7 @@ class Node(object):
             s += 'data:' + pprint.pformat(data)
         return s
 
-    def set_parent(self,parent):
-        if not parent: return 
-        self.parent = weakref.proxy(parent)
 
-    def get_parent(self):
-        return self.parent
 
     '''
         Parameters 
@@ -128,7 +157,7 @@ class Node(object):
     '''
     def make_url(self,mode=Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + "&nt=" + str(self.type)
-        id = self.get_id()
+        id = self.id
         if id and id != 'None': url += "&nid=" + str(id)
         action = self.get_parameter('action')
         if action == 'scan':
@@ -155,22 +184,8 @@ class Node(object):
     def get_url(self,mode=Mode.VIEW):
         return self.make_url(mode)
 
-    def set_id(self,id):
-        self.id = id
-        return self
-
-    '''
-        WE don't convert id to int because qobuz store album id
-        with with zero in front of them
-        TODO: check id consistency
-    '''
-    def get_id(self):
-        if self._data and 'id' in self._data:
-            return self._data['id']
-        return self.id
-
     def add_child(self,child):
-        child.set_parent(self)
+        child.parent = self
         child.set_parameters(self.parameters)
         self.childs.append(child)
         return self

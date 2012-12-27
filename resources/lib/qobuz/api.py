@@ -83,9 +83,10 @@ class QobuzApi:
         qheaders = {}
         if useToken and self.authtoken:
             qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
-            params['x-api-auth-token'] = self.authtoken
+            print "Token: " + self.authtoken
+            #params['x-api-auth-token'] = self.authtoken
         qheaders["X-APP-ID"] = self.appid
-
+        print "X-APP-ID: " + self.appid
         # Sending our request
         r = None
         try:
@@ -101,6 +102,7 @@ class QobuzApi:
             warn(self,"No content return")
             return None
         try:  # try to get if connexion fail we try a second time 
+            print "Content: " + pprint.pformat(r.content)
             response_json = json.loads(r.content)
         except:
             warn(self,"Json loads failed to load... retrying!")
@@ -141,6 +143,13 @@ class QobuzApi:
         data['user']['lastname'] = ''
         return data
 
+    def user_update(self, **ka):
+        self._check_ka(ka, [], ['player_settings'])
+        print "Update: " + repr(ka['player_settings'])
+        data = self._api_request(ka, '/user/update')
+        print "Data: " + repr(data)
+        return data
+        
     ''' 
     Track 
     '''

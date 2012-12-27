@@ -66,7 +66,7 @@ class QobuzPlayer(xbmc.Player):
         
     def play(self, id):
         node = Node_track()
-        node.set_id(id)
+        node.id = id
         node.set_cache()
         data = qobuz.registry.get(name='track', id=id)['data']
         label = None
@@ -158,7 +158,7 @@ class QobuzPlayer(xbmc.Player):
         while self.isPlayingAudio() and self.getPlayingFile() == streaming_url:
             self.elapsed = self.getTime()
             if not start and self.elapsed >= 5:
-                self.sendQobuzPlaybackStarted(node.get_id())
+                self.sendQobuzPlaybackStarted(node.id)
                 start = True
             xbmc.sleep(500)
         return True

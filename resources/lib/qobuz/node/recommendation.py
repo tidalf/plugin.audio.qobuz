@@ -79,8 +79,18 @@ class Node_recommendation(Node):
             url += "&action=scan"
         return url
 
-    def get_id(self):
+    @property
+    def id(self):
+        return self.value
+    
+    @id.getter
+    def id(self):
         return self.genre_type + '-' + str(self.genre_id)
+    
+    @id.setter
+    def id(self, value):
+        print "SET RECOOOOOO"
+        self._id = value
     
     def set_genre_type(self, type):
         self.genre_type = type

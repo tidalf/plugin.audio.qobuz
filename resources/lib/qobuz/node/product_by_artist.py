@@ -55,13 +55,13 @@ class Node_product_by_artist(Node):
     def get_slug(self):
         return self.get_property('slug')
     
-    def get_artist_id(self): return self.get_id()
+    def get_artist_id(self): return self.id
         
     '''
         Build Down
     '''
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
-        data = qobuz.api.artist_get(artist_id=self.get_id(), limit=qobuz.addon.getSetting('artistsearchlimit'),extra='albums')
+        data = qobuz.api.artist_get(artist_id=self.id, limit=qobuz.addon.getSetting('artistsearchlimit'),extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
