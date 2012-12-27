@@ -152,10 +152,12 @@ class QobuzBootstrap(object):
                 self.error = error
                 self.info = info
         qobuz.debug = DebugObject()
+    ''' Player '''
+    def bootstrap_player(self):
+        from player import QobuzPlayer
+        qobuz.player = QobuzPlayer()
 
-    '''
-        Parse system parameters
-    '''
+    ''' Parse system parameters '''
     def bootstrap_sys_args(self):
         self.MODE = None
         self.params = get_params()
@@ -163,9 +165,6 @@ class QobuzBootstrap(object):
             self.params['nt'] = NodeFlag.TYPE_ROOT
             self.MODE = Mode.VIEW
         self.NT = int(self.params['nt'])
-        ''' 
-        set mode 
-        '''
         try:
             self.MODE = int(self.params['mode'])
         except:
