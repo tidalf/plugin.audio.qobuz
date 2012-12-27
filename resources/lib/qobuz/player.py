@@ -82,7 +82,7 @@ class QobuzPlayer(xbmc.Player):
                                 '',
                                 '')
         else:
-            node.set_data(data)
+            node.data = data
             item = node.make_XbmcListItem()
         lang = qobuz.lang
         mimetype = node.get_mimetype()

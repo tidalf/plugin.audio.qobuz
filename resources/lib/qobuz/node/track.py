@@ -35,7 +35,7 @@ class Node_track(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_track, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_TRACK
-        self.set_content_type('songs')
+        self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.set_is_folder(False)
         self.status = None
@@ -46,7 +46,7 @@ class Node_track(Node):
         else:
             #self.set_cache(xbmc_directory.Progress)
             nid = self.get_parameter('nid')
-            self.set_data(qobuz.registry.get(name='track', id=nid)['data'])
+            self.data = qobuz.registry.get(name='track', id=nid)['data']
             xbmc_directory.add_node(self)
             return True
 

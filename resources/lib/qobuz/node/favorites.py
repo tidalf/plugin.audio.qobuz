@@ -39,20 +39,20 @@ class Node_favorites(Node):
         self.packby = ''#album'      
         self.name = qobuz.lang(30079)
         self.label = qobuz.lang(30079)    
-        self.set_content_type('songs')
+        self.content_type = 'songs'
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         data = qobuz.registry.get(name='user-favorites')
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
-        self.set_data(data)
+        self.data = data
         albumseen = {}
         warn (self, pprint.pformat(data))
         for track in data['data']['tracks']['items']:
             node = None
             node = Node_track()
-            node.set_data(track)
+            node.data = track
             self.add_child(node)
     
         for product in self.filter_products(data):
@@ -104,7 +104,7 @@ class Node_favorites(Node):
             json = track
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
-            product.set_data(json)
+            product.data = json 
             id = product.id
             if id in albumseen: continue
             albumseen[id] = 1

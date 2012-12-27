@@ -31,7 +31,7 @@ class Node_similar_artist(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_similar_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SIMILAR_ARTIST
-        self.set_content_type('albums')
+        self.content_type = 'albums'
         
     '''
         Getter 
@@ -53,7 +53,7 @@ class Node_similar_artist(Node):
         
         for jartist in data['artists']['items']:
                 artist = Node_product_by_artist()
-                artist.set_data(jartist)
+                artist.data = jartist
                 self.add_child(artist)
         return total
 

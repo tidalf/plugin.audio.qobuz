@@ -41,7 +41,7 @@ class Node_user_playlists(Node):
         #self.image = qobuz.image.access.get('userplaylists')
         self.label2 = 'Keep your current playlist'
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
-        self.set_content_type('files')
+        self.content_type = 'files'
         display_by = self.get_parameter('display-by')
         if not display_by: display_by = 'songs'
         self.set_display_by(display_by)
@@ -71,34 +71,15 @@ class Node_user_playlists(Node):
         if cid: cid = int(cid['data'])
         for playlist in data['data']['playlists']['items']:
             node = Node_playlist()
-            node.set_data(playlist)
+            node.data = playlist
             if self.display_product_cover:
                 pass
-                #image = qobuz.image.cache.get('playlist-' + str(node.get_id()))
-                #if not image: image = self.get_random_image(node)
-                #if image: node.image = image
             if (cid and cid == node.id):
                 node.set_is_current(True)
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
             self.add_child(node)
         return True
-
-    def get_random_image(self, node):
-        node.set_cache()
-        node.cache.no_network = True
-        newdata = node.cache.fetch_data()
-        image = None
-        if not newdata: return None
-        node.set_data(newdata)
-        size = len(newdata['tracks'])
-        if size < 1: return None
-        r = random.randint(0, len(newdata['tracks']) - 1)
-        try: image = newdata["tracks"][r]['album']['image']['large']
-        except: warn(self, "Cannot get random image for playlist")
-        if not image: return None
-        qobuz.image.cache.set("playlist-" + str(node.id), image)
-        return image
 
     def set_current_playlist(self, id):
         qobuz.registry.set(name='user-current-playlist-id', id=0, value=id)
@@ -113,8 +94,6 @@ class Node_user_playlists(Node):
             if not k.isConfirmed():
                 return None
             query = k.getText()
-#            query = self._get_keyboard(default = "", heading = 'Create playlist')
-#            query = query.strip()
         ret = qobuz.api.playlist_create(name=query, is_public=False)
         if not ret:
             warn(self, "Cannot create playlist name '" + query + "'")
@@ -127,10 +106,15 @@ class Node_user_playlists(Node):
         Rename playlist 
     '''
     def rename_playlist(self, id):
-        info(self, "rename playlist: " + str(id))
+        from qobuz.gui import Keyboard
+        info(self, "renaming playlist: " + str(id))
         playlist = qobuz.registry.get(name='user-playlist', id=id)
         currentname = playlist['data']['name'].encode('utf8', 'replace')
-        newname = self._get_keyboard(default = currentname, heading = qobuz.lang(30078))
+        k = Keyboard('', qobuz.lang(30078))
+        k.doModal()
+        if not k.isConfirmed():
+            return False
+        newname = k.getText()
         newname = newname.strip().encode('utf8', 'replace')
         if newname == currentname:
             return True

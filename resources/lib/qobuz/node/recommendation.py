@@ -137,7 +137,7 @@ class Node_recommendation(Node):
             return False
         for product in data['data']['albums']['items']:
             node = Node_product()
-            node.set_data(product)
+            node.data = product
             self.add_child(node)
         return True
 
@@ -161,7 +161,7 @@ class Node_recommendation(Node):
             return self._build_recos_type(xbmc_directory, lvl, flag)
         elif not self.genre_id:
             return self._build_recos_genre(xbmc_directory, lvl, flag)
-        self.set_content_type('albums')
+        self.content_type = 'albums'
         return self._build_down_type_genre(xbmc_directory, lvl, flag)
 
 

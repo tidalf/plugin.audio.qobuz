@@ -38,8 +38,7 @@ class Node_product(Node):
     def __init__(self, parent = None, params = None):
         super(Node_product, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PRODUCT
-        self.set_content_type('songs')
-        self.cache = None
+        self.content_type = 'songs'
         self.is_special_purchase = False
 
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
@@ -52,14 +51,14 @@ class Node_product(Node):
         if not data:
             warn(self, "Cannot fetch product data")
             return False
-        self.set_data(data['data'])
+        self.data = data['data']
         tracks = None
         if self.is_special_purchase: tracks = self._filter_tracks(data['data'][''])
         else: tracks = data
         try: 
             for track in tracks['data']['tracks']['items']:
                 node = Node_track()
-                node.set_data(track)
+                node.data = track
                 self.add_child(node)
         except: pass
 

@@ -15,6 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
+import weakref
 import pprint
 
 import xbmcgui
@@ -22,8 +23,8 @@ import xbmcgui
 import qobuz
 from constants import Mode
 from flag import NodeFlag
-from debug import *
-import weakref
+#from debug import error
+from exception import QobuzXbmcError
 
 '''
     NODE
@@ -43,9 +44,7 @@ class Node(object):
         self.is_folder = True
         self._data = None
     
-    '''
-    Id
-    '''
+    ''' Id '''
     @property
     def id(self):
         return self._id
@@ -60,18 +59,18 @@ class Node(object):
             return self._data['id']
         return self._id
     
-    '''
-    Parent
-    '''
+    ''' Parent '''
     @property
     def parent(self):
         return self._parent
+    
     @parent.setter
     def parent(self, parent):
         if not parent: 
             self._parent = None
             return
         self._parent = weakref.proxy(parent)
+    
     @parent.getter
     def parent(self):
         return self._parent
@@ -83,13 +82,35 @@ class Node(object):
         del self.parent
         del self.parameters
       
-      
-    def set_data(self,data):
-        self._data = data
-
-    def get_data(self):
+    ''' content_type '''
+    @property
+    def content_type(self):
+        return self._content_type
+    
+    @content_type.getter
+    def content_type(self):
+        return self._content_type
+    
+    @content_type.setter
+    def content_type(self, type):
+        if type not in ['songs', 'albums', 'files', 'artist']:
+            raise QobuzXbmcError(who=self, what='invalid_type', additional=type)
+        self._content_type = type
+        
+    ''' data '''
+    @property
+    def data(self):
         return self._data
-
+    
+    @data.getter
+    def data(self):
+        return self._data
+    
+    @data.setter
+    def data(self, value):
+        self._data = value
+        
+        
     def get_property(self,path):
         if not self._data:
             return ''
@@ -109,12 +130,6 @@ class Node(object):
     def set_is_folder(self,b):
         self.is_folder = True if b else False
 
-    def set_content_type(self,ct):
-        self.content_type = ct
-
-    def get_content_type(self):
-        return self.content_type
-
     def get_image(self):
         if self.image: return self.image
         if self.parent: return self.parent.get_image()
@@ -125,7 +140,7 @@ class Node(object):
         s += " id: " + str(self.id) + "\n"
         s += " Label : " + str(self.label) + "\n"
         s += " label2: " + str(self.label2) + "\n"
-        data = self.get_data()
+        data = self.data
         if data:
             s += 'data:' + pprint.pformat(data)
         return s

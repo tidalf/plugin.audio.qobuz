@@ -339,8 +339,8 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.PLAYLIST_REMOVE_TRACK:
             from node.playlist import Node_playlist
             node = Node_playlist(None, self.params)
-            node.set_id(self.NID)
-            node.set_data(qobuz.registry.get(name='user-playlist',id=self.NID))
+            node.id = self.NID
+            node.data = qobuz.registry.get(name='user-playlist',id=self.NID)
             if not node.remove_tracks(self.params['track-id']):
                 return False
             xbmc.executebuiltin('Container.Refresh')

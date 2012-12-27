@@ -52,13 +52,13 @@ class Node_search(Node):
     def search_type(self, st):
         if st == 'artists':
             self.label = qobuz.lang(30015)
-            self.set_content_type('files')
+            self.content_type = 'files'
         elif st == 'albums':
             self.label = qobuz.lang(30014)
-            self.set_content_type('albums')
+            self.content_type = 'albums'
         elif st == 'tracks':
             self.label = qobuz.lang(30013)
-            self.set_content_type('songs')
+            self.content_type = 'songs'
         else:
             raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
         self._search_type = st
@@ -103,7 +103,7 @@ class Node_search(Node):
             for json_product in data['albums']['items']:
                 artist = json_product['artist']['name']
                 product = Node_product()
-                product.set_data(json_product)
+                product.data = json_product
                 self.add_child(product)
         elif self.search_type == 'tracks':
             try:
@@ -112,7 +112,7 @@ class Node_search(Node):
                 return False
             for jtrack in data['tracks']['items']:
                 track = Node_track()
-                track.set_data(jtrack)
+                track.data = jtrack
                 self.add_child(track)
         elif self.search_type == 'artists':
             try:
@@ -121,7 +121,7 @@ class Node_search(Node):
                 return False
             for jartist in data['artists']['items']:
                 artist = Node_product_by_artist()
-                artist.set_data(jartist)
+                artist.data = jartist
                 self.add_child(artist)
         return True
 

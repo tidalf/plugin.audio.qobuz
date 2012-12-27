@@ -46,9 +46,9 @@ class Node_playlist(Node):
         self.set_is_folder(True)
         self.packby = ''
         if self.packby == 'album':
-            self.set_content_type('albums')
+            self.content_type = 'albums'
         else:
-            self.set_content_type('songs')
+            self.content_type = 'songs'
 
     def get_label(self):
         return self.get_name()
@@ -81,11 +81,11 @@ class Node_playlist(Node):
                 if 'image' in jtrack: jalbum['image'] = jtrack['image']
                 node = Node_product()
                 cdata = qobuz.registry.get(name='product', id=jalbum['id'], noRemote=True)
-                node.set_data(cdata or jalbum)
+                node.data = cdata or jalbum
                 albumseen[jalbum['id']] = node
             else:
                 node = Node_track()
-                node.set_data(jtrack)
+                node.data = jtrack
             self.add_child(node)
         
     def get_name(self):

@@ -115,7 +115,7 @@ class Node_friend(Node):
             return False
         for pl in data['playlists']['items']:
             node = Node_playlist()
-            node.set_data(pl)
+            node.data = pl
             if node.get_owner() == self.label:
                 print "GOT OWNER ID"
                 self.set_id(node.get_owner_id())

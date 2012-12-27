@@ -31,7 +31,7 @@ class Node_product_by_artist(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_product_by_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ARTIST
-        self.set_content_type('albums')
+        self.content_type = 'albums'
 
     '''
         Getter 
@@ -76,7 +76,7 @@ class Node_product_by_artist(Node):
                     if k in data['artist']: jproduct[k] = weakref.proxy(data['artist'][k])
                 except: pass
             node = Node_product()
-            node.set_data(jproduct)
+            node.data = jproduct
             xbmc_directory.update(count, total, "Add album:" + node.get_label(), '')
             self.add_child(node)
             count += 1

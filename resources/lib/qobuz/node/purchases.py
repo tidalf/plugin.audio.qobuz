@@ -31,7 +31,7 @@ class Node_purchases(Node):
         super(Node_purchases,self).__init__(parent,params)
         self.label = qobuz.lang(30100)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
-        self.set_content_type('albums')
+        self.content_type = 'albums'
 
     def _build_down(self,xbmc_directory,lvl,flag=None,progress=None):
         data = qobuz.registry.get(name='user-purchases')
@@ -52,7 +52,7 @@ class Node_purchases(Node):
             json = track
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
-            product.set_data(json)
+            product.data = json
             id = product.id
             if id in albumseen: continue
             albumseen[id] = 1

@@ -36,7 +36,7 @@ class Node_root(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_root, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
-        self.set_content_type('files')
+        self.content_type = 'files'
         self.label = "Qobuz"
         #self.image = qobuz.image.access.get('default')
         
