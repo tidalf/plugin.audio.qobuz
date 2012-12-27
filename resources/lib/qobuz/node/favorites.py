@@ -25,6 +25,8 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from debug import info, warn, error
+from gui.util import lang
+
 '''
     NODE PLAYLIST
 '''
@@ -35,10 +37,10 @@ class Node_favorites(Node):
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_favorites, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FAVORITES
-        self.set_label(qobuz.lang(30079))
-        self.packby = ''#album'      
-        self.name = qobuz.lang(30079)
-        self.label = qobuz.lang(30079)    
+        self.set_label(lang(30079))
+        self.packby = ''  
+        self.name = lang(30079)
+        self.label = lang(30079)    
         self.content_type = 'songs'
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
@@ -73,8 +75,6 @@ class Node_favorites(Node):
         return self.get_property('description')
     
     def make_XbmcListItem(self):
-        color_item = qobuz.addon.getSetting('color_item')
-        color_pl = qobuz.addon.getSetting('color_item_playlist')
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
@@ -89,12 +89,7 @@ class Node_favorites(Node):
         item.setPath(url)
         self.attach_context_menu(item)
         return item
-
-    def hook_attach_context_menu(self, item, menuItems):
-        color = qobuz.addon.getSetting('color_item')
-        color_warn = qobuz.addon.getSetting('color_item_caution')
-        label = self.get_label()
-                     
+                    
     def filter_products(self, data):
         list = []
         if not data: return list

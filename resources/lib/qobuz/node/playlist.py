@@ -25,7 +25,7 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from debug import info, warn
-from gui import notifyH, notify
+from gui.util import notifyH, notify, color, lang
 
 '''
     NODE PLAYLIST
@@ -102,17 +102,17 @@ class Node_playlist(Node):
         return self.get_property('description')
     
     def make_XbmcListItem(self):
-        color_item = qobuz.addon.getSetting('color_item')
-        color_pl = qobuz.addon.getSetting('color_item_playlist')
+        colorItem = qobuz.addon.getSetting('color_item')
+        colorPl = qobuz.addon.getSetting('color_item_playlist')
         label = self.get_name()
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
         if self.b_is_current:
-            label = ''.join(('-o] ', qobuz.utils.color(color_item, label), ' [o-'))
+            label = ''.join(('-o] ', color(colorItem, label), ' [o-'))
         if not self.is_my_playlist: 
-            label = qobuz.utils.color(color_item, owner) + ' - ' + self.get_name() 
-        label = qobuz.utils.color(color_pl, label)
+            label = color(colorItem, owner) + ' - ' + self.get_name() 
+        label = color(colorPl, label)
         item = xbmcgui.ListItem(label,
                                 owner,
                                 image,
@@ -126,25 +126,25 @@ class Node_playlist(Node):
         return item
 
     def hook_attach_context_menu(self, item, menuItems):
-        color = qobuz.addon.getSetting('color_item')
-        color_warn = qobuz.addon.getSetting('color_item_caution')
+        colorItem = qobuz.addon.getSetting('color_item')
+        colorWarn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
         
         ''' SET AS CURRENT '''
         url = self.make_url(Mode.PLAYLIST_SELECT_CURRENT)
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(39007) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((color(colorItem, lang(39007) + ': ') + label, "XBMC.RunPlugin("+url+")"))
                 
         ''' CREATE '''
         url = self.make_url(Mode.PLAYLIST_CREATE)
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(39008)), "XBMC.RunPlugin("+url+")"))
+        menuItems.append((color(colorItem, lang(39008)), "XBMC.RunPlugin("+url+")"))
 
         ''' RENAME '''
         url = self.make_url(Mode.PLAYLIST_RENAME)
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(39009) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((color(colorItem, lang(39009) + ': ') + label, "XBMC.RunPlugin("+url+")"))
 
         ''' REMOVE '''
         url = self.make_url(Mode.PLAYLIST_REMOVE)
-        menuItems.append((qobuz.utils.color(color_warn, qobuz.lang(39010) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((color(colorWarn, lang(39010) + ': ') + label, "XBMC.RunPlugin("+url+")"))
         
         
     def remove_tracks(self, tracks_id):

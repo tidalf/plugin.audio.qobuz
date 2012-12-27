@@ -8,7 +8,7 @@ from progress import Progress
 import qobuz
 import time
 from debug import warn
-from gui import notify
+from gui.util import notify, lang
 
 class Directory():
 
@@ -23,7 +23,7 @@ class Directory():
         self.total_put = 0
         self.started_on = time.time()
         self.Progress.create(self.label + root.get_label())
-        self.update(0, 100, qobuz.lang(40000))
+        self.update(0, 100, lang(40000))
         self.line1 = ''
         self.line2 = ''
         self.line3 = ''
@@ -95,7 +95,7 @@ class Directory():
                                    cacheToDisc = success)
         if self.total_put == 0:
             label = self.root.get_label()
-        self.update(100, 100, qobuz.lang(40003), qobuz.lang(40002) + ': ' + str(self.total_put) + ' items')
+        self.update(100, 100, lang(40003), lang(40002) + ': ' + str(self.total_put) + ' items')
         self.close()
         return success
 

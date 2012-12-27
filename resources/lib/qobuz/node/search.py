@@ -26,7 +26,7 @@ from track import Node_track
 from product_by_artist import Node_product_by_artist
 from constants import Mode
 from exception import QobuzXbmcError
-from gui import notifyH
+from gui.util import notifyH, lang
 
 #from search.artists import Search_artists
 
@@ -51,13 +51,13 @@ class Node_search(Node):
     @search_type.setter
     def search_type(self, st):
         if st == 'artists':
-            self.label = qobuz.lang(30015)
+            self.label = lang(30015)
             self.content_type = 'files'
         elif st == 'albums':
-            self.label = qobuz.lang(30014)
+            self.label = lang(30014)
             self.content_type = 'albums'
         elif st == 'tracks':
-            self.label = qobuz.lang(30013)
+            self.label = lang(30013)
             self.content_type = 'songs'
         else:
             raise QobuzXbmcError(who=self, what='invalid_type', additional=st)

@@ -17,13 +17,6 @@
 addon = None
 debug = None
 path = None
-image = None
-player = None
-lang = None
-gui = None
 api = None
-#core = None
-db = None
 boot = None
-debug = None
 registry = None

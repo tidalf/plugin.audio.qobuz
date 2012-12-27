@@ -24,7 +24,8 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from friend import Node_friend
-from debug import info, warn, error
+from debug import info, warn
+from gui.util import color
 
 '''
     NODE FRIEND
@@ -56,10 +57,10 @@ class Node_friend_list(Node):
             self.add_child(node)
 
     def hook_attach_context_menu(self, item, menuItems):
-        color = qobuz.addon.getSetting('color_item')
+        colorItem = qobuz.addon.getSetting('color_item')
         color_warn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
         
         ''' SET AS CURRENT '''
         url = self.make_url(Mode.FRIEND_ADD)
-        menuItems.append((qobuz.utils.color(color, 'Add friend (i8n)' + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((color(colorItem, 'Add friend (i8n)' + ': ') + label, "XBMC.RunPlugin("+url+")"))

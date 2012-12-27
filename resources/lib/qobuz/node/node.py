@@ -25,7 +25,7 @@ from constants import Mode
 from flag import NodeFlag
 #from debug import error
 from exception import QobuzXbmcError
-
+from gui.util import color, lang
 '''
     NODE
 '''
@@ -284,19 +284,20 @@ class Node(object):
     def help_make_url(self,mode,nt,nid):
         return '%s?mode=%i&nt=%i&nid=%s' % (sys.argv[0],mode,nt,nid)
 
-    def attach_context_menu(self,item):
-        color = qobuz.addon.getSetting('color_item')
+    def attach_context_menu(self, item):
+        colorItem = qobuz.addon.getSetting('color_item')
+        print color(colorItem, "plop")
         menuItems = []
         cmd = ''
         
         ''' ADD AS NEW '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.TEST))
-        menuItems.append((qobuz.utils.color(color, "TEST WINDOW"),cmd))
+        menuItems.append((color(colorItem, "TEST WINDOW"),cmd))
         
         ''' VIEW BIG DIR '''
         path = self.make_url(Mode.VIEW_BIG_DIR)
-        label = qobuz.lang(39002)
-        menuItems.append((qobuz.utils.color(color,label),"XBMC.Container.Update(%s)" % (path)))
+        label = lang(39002)
+        menuItems.append((color(colorItem,label),"XBMC.Container.Update(%s)" % (path)))
 
 
         if self.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST):
@@ -304,7 +305,7 @@ class Node(object):
             id = self.get_artist_id()
             url = self.help_make_url(Mode.VIEW,NodeFlag.TYPE_ARTIST,id)
             cmd = "XBMC.Container.Update(%s)" % (url)
-            menuItems.append((qobuz.utils.color(color,qobuz.lang(39001)),cmd))
+            menuItems.append((color(colorItem,lang(39001)),cmd))
 
             ''' Similar artist '''
             id = self.get_artist_id()
@@ -314,29 +315,29 @@ class Node(object):
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
                                          id,id)
             cmd = "XBMC.Container.Update(%s)" % (args)
-            menuItems.append((qobuz.utils.color(color, qobuz.lang(39004)),cmd))
+            menuItems.append((color(colorItem, lang(39004)),cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_TO_CURRENT))
-        menuItems.append((qobuz.utils.color(color,qobuz.lang(39005)),cmd))
+        menuItems.append((color(colorItem,lang(39005)),cmd))
 
         ''' ADD TO FAVORITES '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.FAVORITES_ADD_TO_CURRENT))
-        menuItems.append((qobuz.utils.color(color,qobuz.lang(39011)),cmd))
+        menuItems.append((color(colorItem,lang(39011)),cmd))
 
         ''' ADD AS NEW '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))
-        menuItems.append((qobuz.utils.color(color, qobuz.lang(30080)),cmd))
+        menuItems.append((color(colorItem, lang(30080)),cmd))
         
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):
             showplaylist = sys.argv[0] + "?mode=" + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_USERPLAYLISTS)
-            menuItems.append((qobuz.utils.color(color, qobuz.lang(39006)),"XBMC.Container.Update(" + showplaylist + ")"))
+            menuItems.append((color(colorItem, lang(39006)),"XBMC.Container.Update(" + showplaylist + ")"))
 
         if self.type & NodeFlag.TYPE_USERPLAYLISTS:
             ''' CREATE '''
             url = self.make_url(Mode.PLAYLIST_CREATE)
-            menuItems.append((qobuz.utils.color(color, qobuz.lang(39008)), "XBMC.RunPlugin("+url+")"))
+            menuItems.append((color(colorItem, lang(39008)), "XBMC.RunPlugin("+url+")"))
         ''' 
         Give a chance to our siblings to attach their items
         '''
@@ -346,14 +347,14 @@ class Node(object):
         if qobuz.addon.getSetting('enable_scan_feature') == 'true':
             url = self.make_url(Mode.SCAN)
             try:
-                label = qobuz.utils.color(color,qobuz.lang(39003) + ": ") + self.get_label().decode('utf8','replace')
+                label = color(colorItem,lang(39003) + ": ") + self.get_label().decode('utf8','replace')
             except: pass
             menuItems.append((label,'XBMC.UpdateLibrary("music", "%s")' % (url)))
 
         ''' ERASE CACHE '''
-        color = qobuz.addon.getSetting('color_item_caution')
+        colorItem = qobuz.addon.getSetting('color_item_caution')
         erasecache = sys.argv[0] + "?mode=" + str(Mode.ERASE_CACHE)
-        menuItems.append((qobuz.utils.color(color,qobuz.lang(31009)),"XBMC.RunPlugin(" + erasecache + ")"))
+        menuItems.append((color(colorItem,lang(31009)),"XBMC.RunPlugin(" + erasecache + ")"))
         '''
         Add our items to the context menu
         '''

@@ -23,8 +23,8 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag
 from node import Node
-
-from debug import error, debug, warn
+from debug import error, warn
+from gui.util import color, lang
 
 '''
     NODE TRACK
@@ -262,7 +262,7 @@ class Node_track(Node):
         return item
 
     def hook_attach_context_menu(self, item, menuItems):
-        color = qobuz.addon.getSetting('color_item')
+        colorItem = qobuz.addon.getSetting('color_item')
         if self.parent and self.parent.type & NodeFlag.TYPE_PLAYLIST:
             url = self.parent.make_url(Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
-            menuItems.append((qobuz.utils.color(color, qobuz.lang(30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
+            menuItems.append((color(colorItem, lang(30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))

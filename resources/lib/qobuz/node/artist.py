@@ -20,11 +20,11 @@ import pprint
 import xbmcgui
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
 from node import Node
-from product import Node_product
-from debug import info, warn, error
+from track import Node_track
+from debug import warn
+from gui.util import lang
 
 '''
     NODE PLAYLIST
@@ -35,18 +35,15 @@ class Node_artist(Node):
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FAVORITES
-        self.set_label(qobuz.lang(30079))
+        self.set_label(lang(30079))
         self.set_is_folder(True)
         
-        self.name = qobuz.lang(30079)
-        self.label = qobuz.lang(30079)
+        self.name = lang(30079)
+        self.label = lang(30079)
         
         self.content_type = 'artist'
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
-#        if not self.set_cache():
-#            error(self, "Cannot set cache!")
-#            return False
         data = qobuz.registry.get(name='user-favorites')
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
@@ -55,7 +52,6 @@ class Node_artist(Node):
         albumseen = {}
         warn (self, pprint.pformat(data))
         for track in data['data']['tracks']['items']:
-            node = None
             node = Node_track()
             node.data = track
             self.add_child(node)
@@ -78,15 +74,9 @@ class Node_artist(Node):
         return self.get_property('description')
     
     def make_XbmcListItem(self):
-        color_item = qobuz.addon.getSetting('color_item')
-        color_pl = qobuz.addon.getSetting('color_item_playlist')
-        # label = self.get_name() 
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
-        #if not self.is_my_playlist: 
-        #    label = qobuz.utils.color(color_item, owner) + ' - ' + self.get_name() 
-        # label = qobuz.utils.color(color_pl, label)
         item = xbmcgui.ListItem(self.label,
                                 owner,
                                 image,
@@ -98,9 +88,3 @@ class Node_artist(Node):
         item.setPath(url)
         self.attach_context_menu(item)
         return item
-
-    def hook_attach_context_menu(self, item, menuItems):
-        color = qobuz.addon.getSetting('color_item')
-        color_warn = qobuz.addon.getSetting('color_item_caution')
-        label = self.get_label()
-                     

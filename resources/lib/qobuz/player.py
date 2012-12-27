@@ -15,21 +15,13 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-#import sys
-#import time
-#import re
-#import math
-#import pprint
-#import json
-
 import xbmc
 import xbmcplugin
 import xbmcgui
 
 import qobuz
 from debug import warn, debug
-#from gui.progress import Progress
-from gui import notifyH, isFreeAccount
+from gui.util import notifyH, isFreeAccount, lang
 
 from node.track import Node_track
 
@@ -84,7 +76,6 @@ class QobuzPlayer(xbmc.Player):
         else:
             node.data = data
             item = node.make_XbmcListItem()
-        lang = qobuz.lang
         mimetype = node.get_mimetype()
         if not mimetype:
             warn(self, "Cannot get track stream url")

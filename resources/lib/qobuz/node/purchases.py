@@ -18,6 +18,7 @@ import qobuz
 from flag import NodeFlag
 from node import Node
 from debug import error
+from gui.util import lang
 
 '''
     NODE PURCHASES
@@ -29,7 +30,7 @@ class Node_purchases(Node):
 
     def __init__(self,parent=None,params=None):
         super(Node_purchases,self).__init__(parent,params)
-        self.label = qobuz.lang(30100)
+        self.label = lang(30100)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
         self.content_type = 'albums'
 

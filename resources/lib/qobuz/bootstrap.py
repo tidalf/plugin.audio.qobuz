@@ -29,7 +29,7 @@ from dog import dog
 import qobuz
 from node.flag import NodeFlag
 from exception import QobuzXbmcError
-from gui import notifyH, notify, dialogLoginFailure
+from gui.util import notifyH, notify, dialogLoginFailure
 
 ''' Arguments parssing '''
 def get_params():
@@ -89,15 +89,8 @@ class QobuzBootstrap(object):
         
     def bootstrap_app(self):
         self.bootstrap_directories()
-        self.bootstrap_lang()
-        self.bootstrap_utils()
-        self.bootstrap_gui()
         self.bootstrap_registry()
         self.bootstrap_sys_args()
-        
-
-    def bootstrap_lang(self):
-        qobuz.lang = qobuz.addon.getLocalizedString
 
     def bootstrap_registry(self):
         from registry import QobuzRegistry
@@ -113,42 +106,32 @@ class QobuzBootstrap(object):
             qobuz.registry.get(name='user')
             qobuz.api = qobuz.registry.get_api()
         except QobuzXbmcError:
-            show_login_failure()
+            dialogLoginFailure()
             #@TODO sys.exit killing XBMC? FRODO BUG ?
             #sys.exit(1)
             raise QobuzXbmcError(who=self, what='invalid_login', additional=None)
             
-    def bootstrap_utils(self):
-        #import utils.string
-        def color(color, str):
-            str = '[COLOR=' + color + ']' + str + '[/COLOR]'    
-            return str
-        class Utils():
-            def __init__(self):
-                self.color = color
-                self.lang = qobuz.addon.getLocalizedString
-        qobuz.utils = Utils()
 
     def bootstrap_directories(self):
-        class path ():
-            def __init__(s):
-                s.base = qobuz.addon.getAddonInfo('path')
+        class PathObject ():
+            def __init__(self):
+                self.base = qobuz.addon.getAddonInfo('path')
 
-            def _set_dir(s):
-                s.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', qobuz.addon.getAddonInfo('id'))
-                s.cache = os.path.join(s.profile, 'cache')
-                s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
-                s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
-            def to_s(s):
-                out = 'profile : ' + s.profile + "\n"
-                out += 'cache   : ' + s.cache + "\n"
-                out += 'resources: ' + s.resources + "\n"
-                out += 'image   : ' + s.image + "\n"
+            def _set_dir(self):
+                self.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', qobuz.addon.getAddonInfo('id'))
+                self.cache = os.path.join(self.profile, 'cache')
+                self.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
+                self.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
+            def to_s(self):
+                out = 'profile : ' + self.profile + "\n"
+                out += 'cache   : ' + self.cache + "\n"
+                out += 'resources: ' + self.resources + "\n"
+                out += 'image   : ' + self.image + "\n"
                 return out
             '''
             Make dir
             '''
-            def mkdir(s, dir):
+            def mkdir(self, dir):
                 if os.path.isdir(dir) == False:
                     try:
                         os.makedirs(dir)
@@ -156,28 +139,19 @@ class QobuzBootstrap(object):
                         warn("Cannot create directory: " + dir)
                         exit(2)
                     info(self, "Directory created: " + dir)
-        qobuz.path = path()
+        qobuz.path = PathObject()
         qobuz.path._set_dir()
         qobuz.path.mkdir(qobuz.path.cache)
 
     def bootstrap_debug(self):
         from debug import log, warn, error, info
-        class d():
-            def __init__(s):
-                s.log = log
-                s.warn = warn
-                s.error = error
-                s.info = info
-        qobuz.debug = d()
-
-    def bootstrap_gui(self):
-        from gui.utils import Utils
-        qobuz.gui = Utils()
-
-    def bootstrap_player(self):
-        from player import QobuzPlayer
-        qobuz.player = QobuzPlayer()
-
+        class DebugObject():
+            def __init__(self):
+                self.log = log
+                self.warn = warn
+                self.error = error
+                self.info = info
+        qobuz.debug = DebugObject()
 
     '''
         Parse system parameters
@@ -218,10 +192,7 @@ class QobuzBootstrap(object):
         Execute methode based on MODE
     '''
     def dispatch(self):
-        import pprint, xbmc
-        import time
         ret = False
-
         debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
 
         ''' PLAY '''

@@ -27,7 +27,7 @@ import qobuz
 from node.flag import NodeFlag
 from debug import info, warn, log
 from irenderer import IRenderer
-from gui import notifyH
+from gui.util import notifyH
 
 class Xbmc_renderer(IRenderer):
 

@@ -28,28 +28,29 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from debug import info, warn, error
+from gui.util import color, lang
 
 RECOS_TYPES = {
-                     'new-releases': qobuz.lang(30084),
-                      'press-awards': qobuz.lang(30083),
-                      'best-sellers': qobuz.lang(30085),
-                      'editor-picks': qobuz.lang(30086),
-                      'most-featured': qobuz.lang(30102),
+                     'new-releases': lang(30084),
+                      'press-awards': lang(30083),
+                      'best-sellers': lang(30085),
+                      'editor-picks': lang(30086),
+                      'most-featured': lang(30102),
                       }
 
 RECOS_GENRES = {
-              2: qobuz.lang(30093),
-              10: qobuz.lang(30095),
-              6: qobuz.lang(30090),
-              59: qobuz.lang(30098),
-              73: qobuz.lang(30201),
-              80: qobuz.lang(30089),
-              64: qobuz.lang(30202),
-              91: qobuz.lang(30094),
-              94: qobuz.lang(30092),
-              112: qobuz.lang(30087),
-              127: qobuz.lang(30200),
-              123: qobuz.lang(30203),
+              2: lang(30093),
+              10: lang(30095),
+              6: lang(30090),
+              59: lang(30098),
+              73: lang(30201),
+              80: lang(30089),
+              64: lang(30202),
+              91: lang(30094),
+              94: lang(30092),
+              112: lang(30087),
+              127: lang(30200),
+              123: lang(30203),
               'null': 'All',
               }
 '''
@@ -66,8 +67,7 @@ class Node_recommendation(Node):
         if genre_id != None: self.genre_id = genre_id
         else: self.genre_id = None
         self.genre_type = self.get_parameter('genre-type')
-        self.set_label(qobuz.lang(30082))
-        #self.image = qobuz.image.access.get('album')
+        self.set_label(lang(30082))
 
     def make_url(self, mode = Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
@@ -89,7 +89,6 @@ class Node_recommendation(Node):
     
     @id.setter
     def id(self, value):
-        print "SET RECOOOOOO"
         self._id = value
     
     def set_genre_type(self, type):
@@ -107,24 +106,24 @@ class Node_recommendation(Node):
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
         types = []
-        color = qobuz.addon.getSetting('color_item')
+        colorItem = qobuz.addon.getSetting('color_item')
         for gtype in RECOS_TYPES:
             node = Node_recommendation()
             node.set_genre_type(gtype)
-            node.set_label(self.label + ' / ' + qobuz.utils.color(color, RECOS_TYPES[gtype]))
+            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[gtype]))
             self.add_child(node)
         return True
 
 # GENRE
     def _build_recos_genre(self, xbmc_directory, lvl, flag):
         types = []
-        color = qobuz.addon.getSetting('color_item')
+        colorItem = qobuz.addon.getSetting('color_item')
         for genreid in RECOS_GENRES:
             node = Node_recommendation()
             type = self.get_genre_type()
             node.set_genre_type(self.get_genre_type())
             node.set_genre_id(genreid)
-            node.set_label(self.label + ' / ' + qobuz.utils.color(color, RECOS_TYPES[self.genre_type]) + ' / ' + RECOS_GENRES[genreid])
+            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[self.genre_type]) + ' / ' + RECOS_GENRES[genreid])
             self.add_child(node)
         return True
 

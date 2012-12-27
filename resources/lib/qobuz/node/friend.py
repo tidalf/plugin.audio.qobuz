@@ -26,7 +26,7 @@ from flag import NodeFlag
 from node import Node
 from playlist import Node_playlist
 from debug import info, warn, error
-
+from gui.util import color
 
 '''
     NODE FRIEND
@@ -47,8 +47,8 @@ class Node_friend(Node):
         self.set_is_folder(True)
    
     def set_label(self, label):
-        color = qobuz.addon.getSetting('color_item')
-        self.label = 'friend / ' + qobuz.utils.color(color, label)
+        colorItem = qobuz.addon.getSetting('color_item')
+        self.label = 'friend / ' + color(colorItem, label)
     
     def set_name(self, name):
         self.name = name or ''
@@ -84,7 +84,7 @@ class Node_friend(Node):
                 warn(self, 'Nothing to do')
                 return False
             name = kb.getText()
-        friendpl = friendpl = qobuz.api.playlist_getUserPlaylists(username=name)
+        friendpl = qobuz.api.playlist_getUserPlaylists(username=name)
         if not friendpl: return False
         user = qobuz.registry.get(name='user')
         if not user:
@@ -124,10 +124,7 @@ class Node_friend(Node):
         return True
             
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        info(self, "Build-down friend: " + self.name)
-        pprint.pprint(self)
         data = qobuz.api.playlist_getUserPlaylists(username=self.name)
-        print "Data: " + pprint.pformat(data)
         if not data:
             warn(self, "No friend data")
             return False
@@ -141,9 +138,9 @@ class Node_friend(Node):
         return True
     
     def hook_attach_context_menu(self, item, menuItems):
-        color = qobuz.addon.getSetting('color_item')
-        color_warn = qobuz.addon.getSetting('color_item_caution')
+        colorItem = qobuz.addon.getSetting('color_item')
+        colorWarn = qobuz.addon.getSetting('color_item_caution')
         
         ''' Delete friend'''
         url = self.make_url(Mode.FRIEND_REMOVE)
-        menuItems.append((qobuz.utils.color(color, 'Remove friend (i8n)' + ': ') + self.name, "XBMC.RunPlugin("+url+")"))
+        menuItems.append((color(colorItem, 'Remove friend (i8n)' + ': ') + self.name, "XBMC.RunPlugin("+url+")"))

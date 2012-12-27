@@ -21,6 +21,7 @@ import qobuz
 from flag import NodeFlag
 from node import Node
 from product_by_artist import Node_product_by_artist
+from gui.util import lang
 
 '''
     NODE ARTIST
@@ -37,7 +38,7 @@ class Node_similar_artist(Node):
         Getter 
     '''
     def get_label(self):
-        return qobuz.lang(39000)
+        return lang(39000)
     
     def get_label2(self):
         return ""

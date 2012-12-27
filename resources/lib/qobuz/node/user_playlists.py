@@ -25,7 +25,7 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error, debug
-
+from gui.util import color, lang
 
 '''
     NODE USER PLAYLISTS
@@ -37,7 +37,7 @@ class Node_user_playlists(Node):
 
     def __init__(self, parent = None, parameters = None):
         super(Node_user_playlists, self).__init__(parent, parameters)
-        self.label = qobuz.utils.lang(30019)
+        self.label = lang(30019)
         #self.image = qobuz.image.access.get('userplaylists')
         self.label2 = 'Keep your current playlist'
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
@@ -110,7 +110,7 @@ class Node_user_playlists(Node):
         info(self, "renaming playlist: " + str(id))
         playlist = qobuz.registry.get(name='user-playlist', id=id)
         currentname = playlist['data']['name'].encode('utf8', 'replace')
-        k = Keyboard('', qobuz.lang(30078))
+        k = Keyboard('', lang(30078))
         k.doModal()
         if not k.isConfirmed():
             return False
@@ -125,7 +125,7 @@ class Node_user_playlists(Node):
             xbmc.executebuiltin('Container.Refresh')
             return False
         else:
-            qobuz.gui.notifyH(qobuz.lang(30078), qobuz.lang(39009) + ': ' + currentname)
+            qobuz.gui.notifyH(lang(30078), lang(39009) + ': ' + currentname)
         return False
     '''
         Remove playlist
@@ -135,9 +135,9 @@ class Node_user_playlists(Node):
         data = qobuz.registry.get(name='user-playlist', id=id)['data']
         name = ''
         if 'name' in data: name = data['name']
-        ok = xbmcgui.Dialog().yesno(qobuz.lang(39010),
-                          qobuz.lang(30052), 
-                          qobuz.utils.color('FFFF0000', name))
+        ok = xbmcgui.Dialog().yesno(lang(39010),
+                          lang(30052), 
+                          color('FFFF0000', name))
         if not ok:
             info(self, "Deleting playlist aborted...")
             return False
