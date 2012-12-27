@@ -29,7 +29,7 @@ from dog import dog
 import qobuz
 from node.flag import NodeFlag
 from exception import QobuzXbmcError
-from gui import notifyH, notify
+from gui import notifyH, notify, dialogLoginFailure
 
 ''' Arguments parssing '''
 def get_params():
@@ -113,7 +113,7 @@ class QobuzBootstrap(object):
             qobuz.registry.get(name='user')
             qobuz.api = qobuz.registry.get_api()
         except QobuzXbmcError:
-            qobuz.gui.show_login_failure()
+            show_login_failure()
             #@TODO sys.exit killing XBMC? FRODO BUG ?
             #sys.exit(1)
             raise QobuzXbmcError(who=self, what='invalid_login', additional=None)
