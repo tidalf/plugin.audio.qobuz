@@ -104,7 +104,25 @@ class Node_friend(Node):
             return False
         self._restore_appid()
         return True
-        
+    
+    def remove(self, name):
+        if not name: return False
+        user = qobuz.registry.get(name='user')
+        if not user: return False
+        friends = user['data']['user']['player_settings']
+        if not 'friends' in friends: return False
+        friends = friends['friends']
+        if not name in friends: return False
+        del friends[friends.index(name)]
+        #dict((k, v) for (k, v) in somedict.iteritems() if not k.startswith('someprefix'))
+        newdata = { 'friends': friends }
+        self._change_appid()
+        if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
+            self._restore_appid()
+            return False
+        self._restore_appid()
+        return True
+            
     def _build_down(self, xbmc_directory, lvl, flag = None):
         info(self, "Build-down friend: " + self.name)
         pprint.pprint(self)
@@ -118,9 +136,10 @@ class Node_friend(Node):
             node.data = pl
             if node.get_owner() == self.label:
                 print "GOT OWNER ID"
-                self.set_id(node.get_owner_id())
+                self.id = node.get_owner_id()
             self.add_child(node)
-
+        return True
+    
     def hook_attach_context_menu(self, item, menuItems):
         color = qobuz.addon.getSetting('color_item')
         color_warn = qobuz.addon.getSetting('color_item_caution')

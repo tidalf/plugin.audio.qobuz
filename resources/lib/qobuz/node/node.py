@@ -31,8 +31,8 @@ from exception import QobuzXbmcError
 '''
 class Node(object):
 
-    def __init__(self,parent=None,parameters=None):
-        self.parameters = parameters
+    def __init__(self,parent=None, parameters = None):
+        self.parameters = parameters or {}
         self.id = None
         self.parent = parent
         self.type = NodeFlag.TYPE_NODE
@@ -158,11 +158,10 @@ class Node(object):
     def set_parameter(self,name,value):
         self.parameters[name] = value
 
-    def get_parameter(self,name):
-        try:
-            return self.parameters[name]
-        except: pass
-        return None
+    def get_parameter(self, name):
+        if not name in self.parameters: return None
+        return self.parameters[name]
+    
 
     '''
         Make url
@@ -171,8 +170,7 @@ class Node(object):
     '''
     def make_url(self,mode=Mode.VIEW):
         url = sys.argv[0] + '?mode=' + str(mode) + "&nt=" + str(self.type)
-        id = self.id
-        if id and id != 'None': url += "&nid=" + str(id)
+        if self.id != 'None': url += "&nid=" + str(self.id)
         action = self.get_parameter('action')
         if action == 'scan':
             url += "&action=scan"
@@ -365,22 +363,3 @@ class Node(object):
 
     def hook_attach_context_menu(self,item,menuItems):
         pass
-
-    def _get_keyboard(self,default="",heading="",hidden=False):
-        import xbmc
-        kb = xbmc.Keyboard(default,heading,hidden)
-        import xbmcgui
-        class iwin(xbmc.Keyboard):      
-            def __init__(self, default, heading, hidden):
-                pass#self.setHeading(ka['heading'])
-            def onClick(self, control):
-                print "CLICK"
-                
-            def onAction(self, key):
-                print "WindowID: " + repr(self.id)
-                
-        w = iwin("",'Qobuz',False)
-        w.doModal()
-        if (w.isConfirmed()):
-            return unicode(w.getText(),"utf-8")
-        return ''

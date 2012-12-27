@@ -364,7 +364,7 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.FRIEND_REMOVE:
             from node.friend import Node_friend
             friend = Node_friend()
-            if not friend.remove():
+            if not friend.remove(self.params['name']):
                 notifyH('Qobuz Xbmc (i8n)', 'Cannot remove friend')
                 return False
             xbmc.executebuiltin('Container.Refresh')

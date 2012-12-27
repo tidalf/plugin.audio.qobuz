@@ -40,9 +40,9 @@ class Node_friend_list(Node):
         self.label2 = ""
         self.url = None
         self.set_is_folder(True)
+        self.content_type = 'artist'
   
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        nid = self.id or self.get_parameter('nid')
         info(self, "Build-down playlist")
         data = qobuz.registry.get(name='user')['data']['user']['player_settings']
         print pprint.pformat(data)
