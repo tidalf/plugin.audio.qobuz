@@ -23,7 +23,7 @@ from product import Node_product
 from track import Node_track
 from constants import Mode
 import pprint
-
+from gui.window.base import Window as BaseWindow
 
 import xbmc, xbmcgui, xbmcplugin
 
@@ -53,15 +53,15 @@ class Node_custom_search(Node):
                                    succeeded = False,
                                    updateListing = False,
                                    cacheToDisc = False)
-        from gui.dialog.search import Dialog
+        
         name = 'plugin.audio.qobuz-search.xml'
         print 'name: ' + name
-        d = QobuzSearchKeyboard(name, qobuz.addon.getAddonInfo('path'), 'default')
-        d.doModal()
-        d.close()
+        d = BaseWindow(name, qobuz.addon.getAddonInfo('path'), 'default')
+        d.show()
+        d.uninit()
         del d
 
-        return False
+        return True
     
     def _build_down(self, xbmc_directory, lvl, flag):
         pass

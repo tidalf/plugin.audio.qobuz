@@ -40,8 +40,13 @@ import qobuz
 from util.file import FileUtil
 
 class Monitor(xbmc.Monitor):
+    
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
+        self.abortRequest = False
+        
+    def onAbortRequested(self):
+        self.abortRequest = True
         
     def onSettingsChanged(self):
         if not qobuz.path.cache:
@@ -57,7 +62,7 @@ boot = QobuzBootstrap(__addon__, 0)
 try:
     boot.bootstrap_app()    
     monitor = Monitor(qobuz)
-    while (not xbmc.abortRequested):
+    while (not xbmc.abortRequested and not monitor.abortRequest):
         xbmc.sleep(1000)
     
 except QobuzXbmcError as e:

@@ -15,19 +15,21 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-import time
-import re
-import math
-import pprint
+#import sys
+#import time
+#import re
+#import math
+#import pprint
+#import json
 
 import xbmc
 import xbmcplugin
 import xbmcgui
-import json
+
 import qobuz
-from debug import info, warn, debug
-from gui.progress import Progress
+from debug import warn, debug
+#from gui.progress import Progress
+from gui import notifyH
 
 from node.track import Node_track
 
@@ -97,14 +99,14 @@ class QobuzPlayer(xbmc.Player):
                                    } )
             # don't warn for free account (all songs except purchases are 60s limited)
             if not qobuz.gui.is_free_account():
-                qobuz.gui.notifyH("Qobuz", "Sample returned") 
+                notifyH("Qobuz", "Sample returned") 
         item.setPath(streaming_url)
         watchPlayback = False
         '''
             PLaying track
         '''
         if qobuz.addon.getSetting('notification_playingsong') == 'true':
-            qobuz.gui.notifyH(lang(34000), node.get_label(), node.get_image())
+            notifyH(lang(34000), node.get_label(), node.get_image())
 
         '''
             We are called from playlist...

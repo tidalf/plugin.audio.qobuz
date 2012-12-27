@@ -26,7 +26,6 @@ class __Mode():
         self.LIBRARY_SCAN = 4
         self.SCAN = 10
         self.VIEW_BIG_DIR = 11
-        ''' Playlist '''
         self.PLAYLIST_REMOVE_TRACK = 12
         self.PLAYLIST_SELECT_CURRENT = 13 
         self.PLAYLIST_ADD_TO_CURRENT = 14    
@@ -36,6 +35,8 @@ class __Mode():
         self.PLAYLIST_ADD_AS_NEW = 18
         self.FAVORITES_ADD_TO_CURRENT = 19
         self.FRIEND_ADD = 20
+        self.FRIEND_REMOVE = 21
+        self.TEST = 22
 
     
     def to_s(self, mode):

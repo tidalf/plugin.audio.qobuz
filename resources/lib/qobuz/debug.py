@@ -78,4 +78,4 @@ def crit(obj, msg):
 def error(obj, msg):
     log(obj, msg, LOGSEVERE)
     log(obj, 'Exiting...', LOGSEVERE)
-    os.sys.exit(1)
+    raise Exception(msg)

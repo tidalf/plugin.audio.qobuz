@@ -50,12 +50,9 @@ class Node_friend(Node):
         color = qobuz.addon.getSetting('color_item')
         self.label = 'friend / ' + qobuz.utils.color(color, label)
     
-    # We don't have id directly :/
     def set_name(self, name):
         self.name = name or ''
-        print "SETTTTTTTTTTTTTTTTTTTTTTTTING ID: " + self.name
         self.set_label(self.name)
-        #self.sel_label2(self.name)
         return self
         
     def make_url(self,mode=Mode.VIEW):
@@ -79,18 +76,16 @@ class Node_friend(Node):
         
     def create(self, name = None):
         if not name:
-            kb = xbmc.Keyboard()
+            from qobuz.gui import Keyboard
+            kb = Keyboard('', 'Add Friend (i8n)')
             kb.doModal()
             name = ''
             if not kb.isConfirmed():
                 warn(self, 'Nothing to do')
                 return False
             name = kb.getText()
-        friendpl = None
-        try:
-            friendpl = qobuz.api.playlist_getUserPlaylists(username=name)
-        except: return False
-        print "GOT A FRIEND :') " + pprint.pformat(friendpl)
+        friendpl = friendpl = qobuz.api.playlist_getUserPlaylists(username=name)
+        if not friendpl: return False
         user = qobuz.registry.get(name='user')
         if not user:
             return False
@@ -107,7 +102,6 @@ class Node_friend(Node):
         if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
             self._restore_appid()
             return False
-        print 'Friend ' + name + ' added'
         self._restore_appid()
         return True
         
@@ -132,5 +126,5 @@ class Node_friend(Node):
         color_warn = qobuz.addon.getSetting('color_item_caution')
         
         ''' Delete friend'''
-        url = self.make_url(Mode.FRIEND_ADD)
+        url = self.make_url(Mode.FRIEND_REMOVE)
         menuItems.append((qobuz.utils.color(color, 'Remove friend (i8n)' + ': ') + self.name, "XBMC.RunPlugin("+url+")"))

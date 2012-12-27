@@ -21,6 +21,7 @@ import traceback
 class QobuzXbmcError(Exception):
     
     def __init__(self, *a, **ka):
+#        exc_type, exc_value, exc_traceback = sys.exc_info()
         if not 'additional' in ka or ka['additional'] == None: ka['additional'] = ''
         nl = "\n"
         if (not 'who' in ka) or (not 'what' in ka): 
@@ -28,7 +29,7 @@ class QobuzXbmcError(Exception):
         msg = "[QobuzXbmcError]" + nl
         msg+= " - who        : " + pprint.pformat(ka['who']) + nl
         msg+= " - what       : " + ka['what'] + nl
-        msg+= " - additional : " + ka['additional'] + nl
+        msg+= " - additional : " + repr(ka['additional']) + nl
         msg+= " - Stack      : " + nl
         print msg
-        traceback.print_stack()
+        traceback.print_exc()

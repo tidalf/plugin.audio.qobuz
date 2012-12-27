@@ -14,8 +14,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
+
+#import pprint
 
 import xbmcgui
 
@@ -24,7 +24,9 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from product import Node_product
-from debug import info, warn, error
+from debug import info, warn
+from gui import notifyH, notify
+
 '''
     NODE PLAYLIST
 '''
@@ -151,7 +153,7 @@ class Node_playlist(Node):
         result = qobuz.api.playlist_deleteTracks(playlist_id=self.id, playlist_track_ids=tracks_id)
         if not result:
             warn(self, "Cannot remove tracks from playlist: " + str(self.id))
-            qobuz.gui.notifyH('Qobuz Playlist / Remove track', "Fail to remove track")
+            notifyH('Qobuz Playlist / Remove track', "Fail to remove track")
             return False
         info(self, "Tracks removed from playlist: " + str(self.id))
         qobuz.registry.delete(name='user-playlist', id=self.id)
@@ -166,7 +168,7 @@ class Node_playlist(Node):
             if cid: cid = cid['data']
             if not cid:
                 warn(self, 'no current playlist id')
-                qobuz.gui.notify(29000, 29001)
+                notify(29000, 29001)
                 return False
             nt = None
             try: nt = int(self.get_parameter('nt'))

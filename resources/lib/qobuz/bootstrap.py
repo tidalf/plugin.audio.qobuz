@@ -18,6 +18,8 @@ import sys
 import os
 
 import urllib
+import json
+import pprint
 
 import xbmc
 
@@ -26,10 +28,8 @@ from debug import info, debug, warn, error
 from dog import dog
 import qobuz
 from node.flag import NodeFlag
-
 from exception import QobuzXbmcError
-import json
-import pprint
+from gui import notifyH, notify
 
 ''' Arguments parssing '''
 def get_params():
@@ -247,7 +247,7 @@ class QobuzBootstrap(object):
                 info(self, "Deleting cached data aborted")
                 return False
             self.erase_cache()
-            qobuz.gui.notifyH("Qobuz cache", "All cached data removed")
+            notifyH("Qobuz cache", "All cached data removed")
             return True
 
         from renderer.xbmc import Xbmc_renderer as renderer
@@ -294,7 +294,7 @@ class QobuzBootstrap(object):
             from  node.user_playlists import Node_user_playlists
             node = Node_user_playlists()
             if not node.create_playlist():
-                qobuz.gui.notify(30078, 30046)
+                notify(30078, 30046)
                 return False
             xbmc.executebuiltin('Container.Refresh')
             return True
@@ -356,13 +356,41 @@ class QobuzBootstrap(object):
             from node.friend import Node_friend
             friend = Node_friend()
             if not friend.create():
-                qobuz.gui.notifyH('Qobuz Xbmc (i8n)', 'Cannot add friend')
+                notifyH('Qobuz Xbmc (i8n)', 'Cannot add friend')
                 return False
             xbmc.executebuiltin('Container.Refresh')
             return True
 
-        else:
-            error(self, "Unknow mode: " + str(self.MODE))
-            return False
+        elif self.MODE == Mode.FRIEND_REMOVE:
+            from node.friend import Node_friend
+            friend = Node_friend()
+            if not friend.remove():
+                notifyH('Qobuz Xbmc (i8n)', 'Cannot remove friend')
+                return False
+            xbmc.executebuiltin('Container.Refresh')
+            return True
+        
+        elif self.MODE == Mode.TEST:
+            import xbmcgui
+#            win.clearProperties()
+#            import sys
+#            from gui.window.base import Window
+#            from threading import Thread
+#            import xbmcplugin
+#            def run():
+#                name = 'plugin.audio.qobuz-search.xml'  
+#                w = Window(name, qobuz.addon.getAddonInfo('path'), 'default')
+#                w.doModal()
+#                del w
+#            xbmcplugin.endOfDirectory(handle=int(sys.argv[1]),succeeded=False, updateListing=False, cacheToDisc=False)
+#            try:
+#                t = Thread(None, run, None, ())
+#                t.start()
+#                t.join()
+#            except Exception as e:
+#                print e
+#            return True
 
+        else:
+            raise QobuzXbmcError(who=self,what="unknow_mode", additional=self.MODE)
         return True

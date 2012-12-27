@@ -52,7 +52,6 @@ class Node(object):
     
     @id.setter 
     def id(self, value):
-        print "Setter ---"
         self._id = value
     
     @id.getter
@@ -276,7 +275,11 @@ class Node(object):
         color = qobuz.addon.getSetting('color_item')
         menuItems = []
         cmd = ''
-
+        
+        ''' ADD AS NEW '''
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.TEST))
+        menuItems.append((qobuz.utils.color(color, "TEST WINDOW"),cmd))
+        
         ''' VIEW BIG DIR '''
         path = self.make_url(Mode.VIEW_BIG_DIR)
         label = qobuz.lang(39002)
@@ -351,7 +354,18 @@ class Node(object):
     def _get_keyboard(self,default="",heading="",hidden=False):
         import xbmc
         kb = xbmc.Keyboard(default,heading,hidden)
-        kb.doModal()
-        if (kb.isConfirmed()):
-            return unicode(kb.getText(),"utf-8")
+        import xbmcgui
+        class iwin(xbmc.Keyboard):      
+            def __init__(self, default, heading, hidden):
+                pass#self.setHeading(ka['heading'])
+            def onClick(self, control):
+                print "CLICK"
+                
+            def onAction(self, key):
+                print "WindowID: " + repr(self.id)
+                
+        w = iwin("",'Qobuz',False)
+        w.doModal()
+        if (w.isConfirmed()):
+            return unicode(w.getText(),"utf-8")
         return ''

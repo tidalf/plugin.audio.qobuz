@@ -14,3 +14,33 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
+import xbmc
+import qobuz
+
+'''
+    Keyboard
+'''
+class Keyboard(xbmc.Keyboard):
+    
+    def __init__(self, default, heading, hidden = True):
+        self.setHeading('Qobuz / ' + heading)
+        
+'''
+    Notify Human
+'''
+def notifyH(title, text, image = None, mstime = 2000):
+    try: 
+        if not image: image = qobuz.image.access.get('qobuzIcon')
+    except: pass
+    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
+    xbmc.executebuiltin(s.encode('utf-8', 'replace'))
+
+'''
+    Notify
+'''
+def notify(title, text, image = None, mstime = 2000):
+    #if not image: image = qobuz.image.access.get('qobuzIcon')
+    l = qobuz.lang
+    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (l(title), l(text), mstime, image)
+    xbmc.executebuiltin(s.encode('utf-8', 'replace'))

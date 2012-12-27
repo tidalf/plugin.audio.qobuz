@@ -3,18 +3,21 @@ import xbmcgui, xbmc
 
 #getLocalizedString = sys.modules['__main__'].getLocalizedString
 
-class Dialog(xbmcgui.WindowXMLDialog):
+class Window(xbmcgui.WindowXML):
 
     def __init__(self, *args, **kwargs):
-        xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
-
+        xbmcgui.WindowXML.__init__(self)
+        #xbmcgui.WindowXML.__init__(self)
+        #super(Window, self).__init__(self, *args, **kwargs)
+        pass
+    
     def onInit(self):
         #blanks the screen - this is crude, and probably wrong, but works
-        self.background = xbmcgui.ControlImage(0,0,1280,720, 'black.png')
-        self.addControl(self.background)
+        #self.background = xbmcgui.ControlImage(0,0,1280,720, 'black.png')
+        #self.addControl(self.background)
         self.action_exitkeys_id = [10, 13]
-        self.keyboard = xbmc.Keyboard()
-        self.addControl(self.keyboard)
+        #self.keyboard = xbmc.Keyboard()
+        #self.addControl(self.keyboard)
         
         # get control ids
 #        self.control_id_button_action = 3000
@@ -36,7 +39,7 @@ class Dialog(xbmcgui.WindowXMLDialog):
 
     def onAction(self, action):
         if action in self.action_exitkeys_id:
-            self.closeDialog()
+            self.deinit()
 
     def onFocus(self, controlId):
         pass
@@ -51,5 +54,6 @@ class Dialog(xbmcgui.WindowXMLDialog):
     def doAction(self):
         pass
 
-    def closeDialog(self):
+    def deinit(self):
+        print "Unitializing window"
         self.close()

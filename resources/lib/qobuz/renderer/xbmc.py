@@ -27,6 +27,7 @@ import qobuz
 from node.flag import NodeFlag
 from debug import info, warn, log
 from irenderer import IRenderer
+from gui import notifyH
 
 class Xbmc_renderer(IRenderer):
 
@@ -58,5 +59,5 @@ class Xbmc_renderer(IRenderer):
         self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
         dir.set_content(self.root.content_type)
         dir.end_of_directory()
-        qobuz.gui.notifyH('Scanning results', str(dir.total_put) + ' items where scanned', 3000)
+        notifyH('Scanning results', str(dir.total_put) + ' items where scanned', 3000)
         return True

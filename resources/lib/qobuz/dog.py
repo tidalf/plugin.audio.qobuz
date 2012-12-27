@@ -26,7 +26,7 @@ class dog():
                              'genre-type': '^(editor-picks|best-sellers|press-awards|new-releases|most-featured)$',
                              'genre-id'  : '^(\d+|null)$',
                              'url'       : '^.*$',
-                             'search-type': "^(artists|songs|albums)$",
+                             'search-type': "^(artists|tracks|albums)$",
                              'view-filter': "^\d+$",
                              'depth': "^(-)?\d+$",
                              'query': "^.*$",

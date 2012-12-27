@@ -62,7 +62,7 @@ class IRenderer(object):
         elif self.node_type & NodeFlag.TYPE_SEARCH:
             from node.search import Node_search
             root = Node_search(None, qobuz.boot.params)
-            root.set_search_type(qobuz.boot.params['search-type'])
+            root.search_type = qobuz.boot.params['search-type']
         elif self.node_type & NodeFlag.TYPE_ARTIST:
             from node.product_by_artist import Node_product_by_artist
             root = Node_product_by_artist(None, qobuz.boot.params)

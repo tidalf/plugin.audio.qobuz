@@ -107,8 +107,14 @@ class Node_user_playlists(Node):
         #!TODO: Why we are no more logged ...
         qobuz.registry.get(name='user')
         if not query:
-            query = self._get_keyboard(default = "", heading = 'Create playlist')
-            query = query.strip()
+            from qobuz.gui import Keyboard
+            k = Keyboard('', 'Create Playlist (i8n)')
+            k.doModal()
+            if not k.isConfirmed():
+                return None
+            query = k.getText()
+#            query = self._get_keyboard(default = "", heading = 'Create playlist')
+#            query = query.strip()
         ret = qobuz.api.playlist_create(name=query, is_public=False)
         if not ret:
             warn(self, "Cannot create playlist name '" + query + "'")

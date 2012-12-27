@@ -48,13 +48,13 @@ class Node_root(Node):
         self.add_child(Node_favorites())
         if qobuz.addon.getSetting('search_enabled') == 'true':
             search = Node_search()
-            search.set_search_type('albums')
+            search.search_type = 'albums'
             self.add_child(search)
             search = Node_search()
-            search.set_search_type('songs')
+            search.search_type = 'tracks'
             self.add_child(search)
             search = Node_search()
-            search.set_search_type('artists')
+            search.search_type = 'artists'
             self.add_child(search)
 #            search = Node_custom_search()
 #            self.add_child(search)
