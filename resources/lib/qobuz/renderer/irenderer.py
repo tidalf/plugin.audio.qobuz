@@ -72,15 +72,18 @@ class IRenderer(object):
         elif self.node_type & NodeFlag.TYPE_FAVORITES:
             from node.favorites import Node_favorites
             root = Node_favorites(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_CUSTOM_SEARCH:
-            from node.custom_search import Node_custom_search
-            root = Node_custom_search(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_FRIEND_LIST:
             from node.friend_list import Node_friend_list
             root = Node_friend_list(None, qobuz.boot.params)
         elif self.node_type & NodeFlag.TYPE_FRIEND:
             from node.friend import Node_friend
             root = Node_friend(None, qobuz.boot.params)
+        elif self.node_type & NodeFlag.TYPE_GENRE:
+            from node.genre import Node_genre
+            root = Node_genre(None, qobuz.boot.params)
+        elif self.node_type & NodeFlag.TYPE_LABEL:
+            from node.label import Node_label
+            root = Node_label(None, qobuz.boot.params)
         else:
             warn(self, "Cannot set root node!")
             return False

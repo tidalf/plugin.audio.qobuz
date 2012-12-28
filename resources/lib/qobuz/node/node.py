@@ -109,7 +109,10 @@ class Node(object):
     @data.setter
     def data(self, value):
         self._data = value
+        self.hook_post_data()
         
+    def hook_post_data(self):
+        pass
         
     def get_property(self,path):
         if not self._data:
@@ -286,7 +289,6 @@ class Node(object):
 
     def attach_context_menu(self, item):
         colorItem = qobuz.addon.getSetting('color_item')
-        print color(colorItem, "plop")
         menuItems = []
         cmd = ''
         

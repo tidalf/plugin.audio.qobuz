@@ -21,8 +21,9 @@ from recommendation import Node_recommendation
 from search import Node_search
 from favorites import Node_favorites
 from purchases import Node_purchases
-from custom_search import Node_custom_search
 from friend_list import Node_friend_list
+from genre import Node_genre
+from label import Node_label
 import qobuz
 
 '''
@@ -56,9 +57,8 @@ class Node_root(Node):
             search = Node_search()
             search.search_type = 'artists'
             self.add_child(search)
-#            search = Node_custom_search()
-#            self.add_child(search)
-            friend_list = Node_friend_list()
-            self.add_child(friend_list)
+            self.add_child(Node_friend_list())
+            self.add_child(Node_genre())
+            self.add_child(Node_label())
         return True
 

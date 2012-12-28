@@ -67,7 +67,6 @@ class XbmcRPC:
         request['method'] = 'JSONRPC.' + request['method']
         if not 'id' in request: request['id'] = 1
         rjson = json.dumps(request)
-        print 'REQUEST: ' + rjson
         ret = xbmc.executeJSONRPC(rjson)
         return ret
 

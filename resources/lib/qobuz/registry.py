@@ -153,6 +153,10 @@ class QobuzLocalStorage(object):
             response = self.api.album_getFeatured(**ka)
         elif name == 'artist':
             response = self.api.artist_get(artist_id=id, limit=limit)
+        elif name == 'genre-list':
+            response = self.api.genre_list(parent_id=id, limit=limit)
+        elif name == 'label-list':
+            response = self.api.label_list(limit=limit)
         else:
             QobuzXbmcError(
                         who= self,

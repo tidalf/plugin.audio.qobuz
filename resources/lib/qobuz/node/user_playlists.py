@@ -88,7 +88,7 @@ class Node_user_playlists(Node):
         #!TODO: Why we are no more logged ...
         qobuz.registry.get(name='user')
         if not query:
-            from qobuz.gui import Keyboard
+            from gui.util import Keyboard
             k = Keyboard('', 'Create Playlist (i8n)')
             k.doModal()
             if not k.isConfirmed():
@@ -106,7 +106,7 @@ class Node_user_playlists(Node):
         Rename playlist 
     '''
     def rename_playlist(self, id):
-        from qobuz.gui import Keyboard
+        from gui.util import Keyboard
         info(self, "renaming playlist: " + str(id))
         playlist = qobuz.registry.get(name='user-playlist', id=id)
         currentname = playlist['data']['name'].encode('utf8', 'replace')

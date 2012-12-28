@@ -14,51 +14,45 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
 import pprint
 
-import xbmcgui
+import xbmcgui, xbmc
 
 import qobuz
 from constants import Mode
 from flag import NodeFlag
 from node import Node
-from friend import Node_friend
-from debug import info, warn
+from debug import info, warn, error
 from gui.util import color
 
 '''
-    NODE FRIEND
+    NODE LABEL
 '''
-from track import Node_track
 
-class Node_friend_list(Node):
+
+class Node_label(Node):
 
     def __init__(self, parent = None, parameters = None, progress = None):
-        super(Node_friend_list, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FRIEND_LIST
-        self.label = "Friend (i8n)"
-        self.label2 = ""
+        super(Node_label, self).__init__(parent, parameters)
+        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_LABEL
+        self.set_label('Label (i8n)')
+#        self.id = 1
         self.url = None
         self.set_is_folder(True)
-        self.content_type = 'artist'
-  
-    def _build_down(self, xbmc_directory, lvl, flag = None):
-        info(self, "Build-down playlist")
-        data = qobuz.registry.get(name='user')['data']['user']['player_settings']
-        if not data:
-            warn(self, "No friend data")
-            return False
-        for name in data['friends']:
-            node = Node_friend()
-            node.set_name(str(name))
-            self.add_child(node)
-
-    def hook_attach_context_menu(self, item, menuItems):
-        colorItem = qobuz.addon.getSetting('color_item')
-        color_warn = qobuz.addon.getSetting('color_item_caution')
-        label = self.get_label()
+    
+    
+    def hook_post_data(self):
+        self.label = self.get_property('name')
+        self.id = self.get_property('id')
         
-        ''' SET AS CURRENT '''
-        url = self.make_url(Mode.FRIEND_ADD)
-        menuItems.append((color(colorItem, 'Add friend (i8n)' + ': ') + label, "XBMC.RunPlugin("+url+")"))
+    def _build_down(self, xbmc_directory, lvl, flag = None):
+        data = qobuz.registry.get(name='label-list', id=self.id)
+        if not data:
+            warn(self, "No label data")
+            return False
+        print pprint.pformat(data)
+        for data in data['data']['labels']['items']:
+            node = Node_label()
+            node.data = data
+            self.add_child(node)
+        return True

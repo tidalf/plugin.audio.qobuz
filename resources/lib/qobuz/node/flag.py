@@ -32,6 +32,8 @@ class __NodeFlag():
         self.TYPE_CUSTOM_SEARCH    = 8192
         self.TYPE_FRIEND           = 16384
         self.TYPE_FRIEND_LIST      = 32768
+        self.TYPE_GENRE            = 65536
+        self.TYPE_LABEL            = 131072    
         
         
     def to_s(self, flag):
@@ -49,6 +51,9 @@ class __NodeFlag():
         elif flag & self.TYPE_NODE: return "node"
         elif flag & self.DONTFETCHTRACK: "don't fetch track"
         elif flag & self.FRIEND: "friend"
+        elif flag & self.FRIEND_LIST: "friendlist"
+        elif flag & self.GENRE: "genre"
+        elif flag & self.GENRE: "label"
         else: "Unknow flag: " + str(flag)
         
 NodeFlag = __NodeFlag()

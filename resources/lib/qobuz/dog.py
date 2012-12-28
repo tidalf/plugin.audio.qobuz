@@ -32,7 +32,8 @@ class dog():
                              'query': "^.*$",
                              'action': "^(scan)$",
                              'track-id': "^\d{1,10}$",
-                             'name': "^[\w\d_]+$"
+                             'name': "^[\w\d_.]+$",
+                             'parent-id': "^\d{1,10}$"
                              }
 
     ''' Match value against regexp '''

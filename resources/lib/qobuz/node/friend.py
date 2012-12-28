@@ -42,7 +42,6 @@ class Node_friend(Node):
         self.set_name(self.get_parameter('name'))
         self.set_label(self.name)
         self.label2 = self.label
-        print "LABEL: " + self.label
         self.url = None
         self.set_is_folder(True)
    
@@ -76,7 +75,7 @@ class Node_friend(Node):
         
     def create(self, name = None):
         if not name:
-            from qobuz.gui import Keyboard
+            from gui.util import Keyboard
             kb = Keyboard('', 'Add Friend (i8n)')
             kb.doModal()
             name = ''
@@ -89,7 +88,6 @@ class Node_friend(Node):
         user = qobuz.registry.get(name='user')
         if not user:
             return False
-        print pprint.pformat(user)
         friends = user['data']['user']['player_settings']
         if not 'friends' in friends:
             friends = []

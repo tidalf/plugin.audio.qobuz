@@ -80,7 +80,7 @@ class Node_search(Node):
         limit = None
         query = self.get_parameter('query')
         if not query:
-            from qobuz.gui import Keyboard
+            from gui.util import Keyboard
             k = Keyboard('', stype)
             k.doModal()
             if not k.isConfirmed():
