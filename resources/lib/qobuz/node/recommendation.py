@@ -31,7 +31,7 @@ from debug import info, warn, error
 from gui.util import color, lang
 
 RECOS_TYPES = {
-                     'new-releases': lang(30084),
+                      'new-releases': lang(30084),
                       'press-awards': lang(30083),
                       'best-sellers': lang(30085),
                       'editor-picks': lang(30086),
@@ -139,20 +139,6 @@ class Node_recommendation(Node):
             node.data = product
             self.add_child(node)
         return True
-
-    def _get_random_image_type_genre(self, image_name, data):
-        if not data: return None
-        size = len(data)
-        if size < 1: return None
-        r = random.randint(0, size - 1)
-        image = ''
-        try:
-            image = data[r]['image']['large']
-            image.replace("_230.", "_600.")
-        except: pass
-        if not image: return None
-        qobuz.image.cache.set(image_name, image)
-        return image
 
 # DISPATCH
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):

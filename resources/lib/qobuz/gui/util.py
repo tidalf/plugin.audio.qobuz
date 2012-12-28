@@ -26,13 +26,17 @@ class Keyboard(xbmc.Keyboard):
     def __init__(self, default, heading, hidden = True):
         self.setHeading('Qobuz / ' + heading)
         
+
+def getImage(name):
+    path = qobuz.path.image + name + '.png'
+    print "PATH: " + path
+    return path
+
 '''
     Notify Human
 '''
 def notifyH(title, text, image = None, mstime = 2000):
-    try: 
-        if not image: image = qobuz.image.access.get('qobuzIcon')
-    except: pass
+    image = image or getImage('default')
     s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
 
@@ -40,8 +44,8 @@ def notifyH(title, text, image = None, mstime = 2000):
     Notify
 '''
 def notify(title, text, image = None, mstime = 2000):
-    #if not image: image = qobuz.image.access.get('qobuzIcon')
-    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (lang(title), lang(text), mstime, image)
+    image = image or getImage('default')
+    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (lang(title), lang(text), mstime, getImage)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
     
 def dialogLoginFailure():

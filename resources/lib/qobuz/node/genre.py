@@ -46,7 +46,7 @@ class Node_genre(Node):
     
     def make_url(self,mode=Mode.VIEW):
         url = super(Node_genre, self).make_url(mode)
-        if self.parent and self.parent.id: url+="&parent_id=" + self.parent.id
+        if self.parent and self.parent.id: url+="&parent-id=" + self.parent.id
         return url
     
     def hook_post_data(self):
@@ -56,11 +56,14 @@ class Node_genre(Node):
     def get_name(self):
         return self.get_property('name')
     
+    def _build_down_reco(self):
+        print "BUILD RECO"
+        return True
+        
     def _build_down(self, xbmc_directory, lvl, flag = None):
         data = qobuz.registry.get(name='genre-list', id=self.id)
         if not data:
-            warn(self, "No genre data")
-            return False
+            return self._build_down_reco()
         print pprint.pformat(data)
         for data in data['data']['genres']['items']:
             node = Node_genre()

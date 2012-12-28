@@ -8,7 +8,7 @@ from progress import Progress
 import qobuz
 import time
 from debug import warn
-from gui.util import notify, lang
+from gui.util import notify, lang, getImage
 
 class Directory():
 
@@ -88,7 +88,7 @@ class Directory():
         success = True
         if not self.put_item_ok or (self.total_put == 0):
             success = False
-            notify(30008, 36001)
+            notify(30008, 36001, getImage('icon-error-256'))
         xbmcplugin.endOfDirectory(handle = self.handle,
                                    succeeded = success,
                                    updateListing = False,

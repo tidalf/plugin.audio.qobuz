@@ -26,7 +26,7 @@ from track import Node_track
 from product_by_artist import Node_product_by_artist
 from constants import Mode
 from exception import QobuzXbmcError
-from gui.util import notifyH, lang
+from gui.util import notifyH, lang, getImage
 
 #from search.artists import Search_artists
 
@@ -133,7 +133,7 @@ class Node_search(Node):
                           'Artists: ' + str(data['length']['artists']) + " / "
                           'Products: ' + str(data['length']['products']) + " / "
                           'Songs: ' + str(data['length']['tracks']) + "\n"
-                          , None, 5000)
+                          , getImage('default'), 2000)
         return True
 
 
