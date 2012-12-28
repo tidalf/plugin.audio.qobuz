@@ -174,7 +174,7 @@ class QobuzApi:
     Artist
     '''
     def artist_get(self, **ka):
-        self._check_ka(ka, ['artist_id'], ['extra'])
+        self._check_ka(ka, ['artist_id'], ['extra','limit'])
         data = self._api_request(ka,"/artist/get")
         return data
     '''

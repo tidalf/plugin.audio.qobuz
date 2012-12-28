@@ -48,7 +48,7 @@ class Node_similar_artist(Node):
     '''
     def _build_down(self, xbmc_directory, lvl, flag = None):
         query = self.get_parameter('query')
-        data = qobuz.api.artist_getSimilarArtists(artist_id=query)
+        data = qobuz.api.artist_getSimilarArtists(artist_id=query,offset=0)
         if not data: return False
         total = len(data['artists']['items'])
         
