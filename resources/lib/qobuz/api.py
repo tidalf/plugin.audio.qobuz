@@ -170,7 +170,7 @@ class QobuzApi:
     Artist
     '''
     def artist_get(self, **ka):
-        self._check_ka(ka, ['artist_id'], ['extra'])
+        self._check_ka(ka, ['artist_id'], ['extra','limit'])
         data = self._api_request(ka,"/artist/get")
         return data
     '''
@@ -279,7 +279,7 @@ class QobuzApi:
         return res
 
     def artist_getSimilarArtists (self, **ka):
-        self._check_ka(ka, ['artist_id'])
+        self._check_ka(ka, ['artist_id'],['limit'])
         return self._api_request(ka,"/artist/getSimilarArtists")
 
 
