@@ -88,6 +88,6 @@ class IRenderer(object):
             warn(self, "Cannot set root node!")
             return False
         root.id = self.node_id
-        root.get_url()
+        root.make_url()
         self.root = root
         return True

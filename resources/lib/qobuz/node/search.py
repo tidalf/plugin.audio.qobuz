@@ -67,8 +67,8 @@ class Node_search(Node):
         return self._search_type
 
 
-    def make_url(self, mode = Mode.VIEW):
-        url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
+    def make_url(self, **ka):
+        url = super(Node_search, self).make_url(**ka)
         url += '&search-type=' + self.search_type
         if 'action' in self.parameters and self.parameters['action'] == 'scan':
             url += "&action=scan"

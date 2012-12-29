@@ -202,8 +202,10 @@ class QobuzCacheDefault(QobuzLocalStorage):
 
     def _make_key(self, *args, **ka):
         if not 'id' in ka: ka['id'] = 0
-        return ka['name'] + '-' + str(ka['id']);
-
+        key = ka['name'] + '-' + str(ka['id']);
+        if 'offset' in ka: key += '-' + str(ka['offset'])
+        return key
+    
     def _make_sub_path(self, xpath, key, size, count):
         if count == 0 or len(key) < size + 1:
             return key + '.dat'

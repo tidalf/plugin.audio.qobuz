@@ -60,5 +60,5 @@ class Node_friend_list(Node):
         label = self.get_label()
         
         ''' SET AS CURRENT '''
-        url = self.make_url(Mode.FRIEND_ADD)
+        url = self.make_url(mode=Mode.FRIEND_ADD)
         menuItems.append((color(colorItem, 'Add friend (i8n)' + ': ') + label, "XBMC.RunPlugin("+url+")"))

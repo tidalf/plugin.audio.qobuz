@@ -63,14 +63,12 @@ class Node_recommendation(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_recommendation, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_RECOMMENDATION
-        genre_id = self.get_parameter('genre-id')
-        if genre_id != None: self.genre_id = genre_id
-        else: self.genre_id = None
+        self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(lang(30082))
 
-    def make_url(self, mode = Mode.VIEW):
-        url = sys.argv[0] + '?mode=' + str(mode) + '&nt=' + str(self.get_type())
+    def make_url(self, **ka):
+        url = super(Node_recommendation, self).make_url(**ka)
         if self.genre_type:
             url += '&genre-type=' + self.genre_type
         if self.genre_id:
@@ -85,6 +83,7 @@ class Node_recommendation(Node):
     
     @id.getter
     def id(self):
+        if not self.genre_id or not self.genre_type: return None
         return self.genre_type + '-' + str(self.genre_id)
     
     @id.setter
@@ -130,7 +129,9 @@ class Node_recommendation(Node):
 
 # TYPE GENRE
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
-        data = qobuz.registry.get(name='recommendation', id=self.genre_id, type=self.genre_type, genre_id=self.genre_id)
+        offset = self.get_parameter('offset') or 0
+        data = qobuz.registry.get(name='recommendation', id=self.genre_id, type=self.genre_type, genre_id=self.genre_id, limit=1000, offset=offset)
+        print "Data:" + pprint.pformat(data)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
@@ -138,6 +139,7 @@ class Node_recommendation(Node):
             node = Node_product()
             node.data = product
             self.add_child(node)
+        self.add_pagination(data)
         return True
 
 # DISPATCH

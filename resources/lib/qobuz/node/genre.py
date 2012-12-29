@@ -44,8 +44,8 @@ class Node_genre(Node):
         self.url = None
         self.set_is_folder(True)
     
-    def make_url(self,mode=Mode.VIEW):
-        url = super(Node_genre, self).make_url(mode)
+    def make_url(self, **ka):
+        url = super(Node_genre, self).make_url(**ka)
         if self.parent and self.parent.id: url+="&parent-id=" + self.parent.id
         return url
     

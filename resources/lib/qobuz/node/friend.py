@@ -54,8 +54,8 @@ class Node_friend(Node):
         self.set_label(self.name)
         return self
         
-    def make_url(self,mode=Mode.VIEW):
-        url = sys.argv[0] + '?mode=' + str(mode) + "&nt=" + str(self.type) + "&name=" + self.name
+    def make_url(self, **ka):
+        url = super(Node_friend, self).make_url(ka) + "&name=" + self.name
         return url
     
     def _change_appid(self):

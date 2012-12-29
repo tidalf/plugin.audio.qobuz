@@ -19,19 +19,19 @@ import weakref
 import pprint
 
 import xbmcgui
-        
+
 import qobuz
 from constants import Mode
 from flag import NodeFlag
 #from debug import error
 from exception import QobuzXbmcError
-from gui.util import color, lang
+from gui.util import color,lang
 '''
     NODE
 '''
 class Node(object):
 
-    def __init__(self,parent=None, parameters = None):
+    def __init__(self,parent=None,parameters=None):
         self.parameters = parameters or {}
         self.id = self.get_parameter('nid')
         self.parent = parent
@@ -43,83 +43,87 @@ class Node(object):
         self.label2 = ""
         self.is_folder = True
         self._data = None
-    
+        self.pagination_next = None
+        self.pagination_prev = None
+
     ''' Id '''
     @property
     def id(self):
         return self._id
-    
-    @id.setter 
-    def id(self, value):
+
+    @id.setter
+    def id(self,value):
         self._id = value
-    
+
     @id.getter
     def id(self):
         if self._data and 'id' in self._data:
             return self._data['id']
         return self._id
-    
+
     ''' Parent '''
     @property
     def parent(self):
         return self._parent
-    
+
     @parent.setter
-    def parent(self, parent):
-        if not parent: 
+    def parent(self,parent):
+        if not parent:
             self._parent = None
             return
         self._parent = weakref.proxy(parent)
-    
+
     @parent.getter
     def parent(self):
         return self._parent
-    
+
     def delete_tree(self):
         for child in self.childs:
             child.delete_tree()
         del self.childs
         del self.parent
         del self.parameters
-      
+
     ''' content_type '''
     @property
     def content_type(self):
         return self._content_type
-    
+
     @content_type.getter
     def content_type(self):
         return self._content_type
-    
+
     @content_type.setter
-    def content_type(self, type):
-        if type not in ['songs', 'albums', 'files', 'artist']:
-            raise QobuzXbmcError(who=self, what='invalid_type', additional=type)
+    def content_type(self,type):
+        if type not in ['songs','albums','files','artist']:
+            raise QobuzXbmcError(who=self,what='invalid_type',additional=type)
         self._content_type = type
-        
+
     ''' data '''
     @property
     def data(self):
         return self._data
-    
+
     @data.getter
     def data(self):
         return self._data
-    
+
     @data.setter
-    def data(self, value):
+    def data(self,value):
         self._data = value
         self.hook_post_data()
-        
+
+    ''' Called after node data is set '''
     def hook_post_data(self):
         pass
-        
+
+    ''' Property are just a easy way to access JSON data when set '''
     def get_property(self,path):
         if not self._data:
             return ''
         if isinstance(path,basestring):
             if path in self._data and self._data[path] and self._data[path] != 'None':
-                return self._data[path] 
+                return self._data[path]
             return ''
         root = self._data
         for i in range(0,len(path)):
@@ -127,16 +131,23 @@ class Node(object):
                 return ''
             root = root[path[i]]
         if root and root != 'None':
-            return root 
+            return root
         return ''
+
+    ''' 
+    Called with data from our API, adding special child if pagination
+    is required
+    '''
+    def add_pagination(self,data):
+        if not 'next_offset' in data['data']: return False
+        print "We need to set pagination"
+        url = self.make_url(offset=data['data']['next_offset'])
+        print "URL: " + url
+        self.pagination_next = url
+
 
     def set_is_folder(self,b):
         self.is_folder = True if b else False
-
-    def get_image(self):
-        if self.image: return self.image
-        if self.parent: return self.parent.get_image()
-        return ''
 
     def to_s(self):
         s = "[Node][" + str(self.type) + "\n"
@@ -147,7 +158,6 @@ class Node(object):
         if data:
             s += 'data:' + pprint.pformat(data)
         return s
-
 
 
     '''
@@ -161,22 +171,25 @@ class Node(object):
     def set_parameter(self,name,value):
         self.parameters[name] = value
 
-    def get_parameter(self, name):
+    def get_parameter(self,name):
         if not name in self.parameters: return None
         return self.parameters[name]
-    
+
 
     '''
         Make url
         This function is responsible to create the link to this node.
         Class who implement custom parameter must overload this method
     '''
-    def make_url(self,mode=Mode.VIEW):
-        url = sys.argv[0] + '?mode=' + str(mode) + "&nt=" + str(self.type)
-        if self.id != 'None': url += "&nid=" + str(self.id)
+    def make_url(self,**ka):
+        if not 'mode' in ka: ka['mode'] = Mode.VIEW
+        if not 'type' in ka: ka['type'] = self.type
+        if not 'id' in ka and self.id: ka['id'] = self.id
+        url = sys.argv[0] + '?mode=' + str(ka['mode']) + "&nt=" + str(ka['type'])
+        if 'id' in ka: url += "&nid=" + str(ka['id'])
         action = self.get_parameter('action')
-        if action == 'scan':
-            url += "&action=scan"
+        if action: url += "&action=" + action
+        if 'offset' in ka: url += "&offset=" + str(ka['offset'])
         return url
 
     '''
@@ -184,20 +197,20 @@ class Node(object):
         return  a xbml list item
         Class can overload this method
     '''
-    def make_XbmcListItem(self):
-        image = self.get_image()
+    def make_XbmcListItem(self,**ka):
+        if not 'url' in ka: ka['url'] = self.make_url()
+        if not 'label' in ka: ka['label'] = self.get_label()
+        if not 'label2' in ka: ka['label2'] = self.get_label2()
+        if not 'image' in ka: ka['image'] = self.get_image()
         item = xbmcgui.ListItem(
-                                    self.get_label(),
-                                    self.get_label2(),
-                                    image,
-                                    image,
-                                    self.make_url()
-                                    )
+                                ka['label'],
+                                ka['label2'],
+                                ka['image'],
+                                ka['image'],
+                                ka['url']
+        )
         self.attach_context_menu(item)
         return item
-
-    def get_url(self,mode=Mode.VIEW):
-        return self.make_url(mode)
 
     def add_child(self,child):
         child.parent = self
@@ -218,6 +231,11 @@ class Node(object):
     def set_label(self,label):
         self.label = label.encode('utf8','replace')
         return self
+
+    def get_image(self):
+        if self.image: return self.image
+        if self.parent: return self.parent.get_image()
+        return ''
 
     def set_image(self,image):
         self.image = image
@@ -268,7 +286,7 @@ class Node(object):
         label = self.get_label()
         for child in self.childs:
             if not (child.type & NodeFlag.TYPE_TRACK):
-                xbmc_directory.update(count, total, "Working", label, child.get_label())
+                xbmc_directory.update(count,total,"Working",label,child.get_label())
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
             child.build_down(xbmc_directory,lvl,whiteFlag)
@@ -284,20 +302,17 @@ class Node(object):
     def _build_down(self,xbmc_directory,lvl,flag):
         pass
 
-    def help_make_url(self,mode,nt,nid):
-        return '%s?mode=%i&nt=%i&nid=%s' % (sys.argv[0],mode,nt,nid)
-
-    def attach_context_menu(self, item):
+    def attach_context_menu(self,item):
         colorItem = qobuz.addon.getSetting('color_item')
         menuItems = []
         cmd = ''
-        
+
         ''' ADD AS NEW '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.TEST))
-        menuItems.append((color(colorItem, "TEST WINDOW"),cmd))
-        
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.TEST))
+        menuItems.append((color(colorItem,"TEST WINDOW"),cmd))
+
         ''' VIEW BIG DIR '''
-        path = self.make_url(Mode.VIEW_BIG_DIR)
+        path = self.make_url(mode=Mode.VIEW_BIG_DIR)
         label = lang(39002)
         menuItems.append((color(colorItem,label),"XBMC.Container.Update(%s)" % (path)))
 
@@ -305,7 +320,7 @@ class Node(object):
         if self.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST):
             ''' ALL ALBUM '''
             id = self.get_artist_id()
-            url = self.help_make_url(Mode.VIEW,NodeFlag.TYPE_ARTIST,id)
+            url = self.make_url(mode=Mode.VIEW,type=NodeFlag.TYPE_ARTIST,id=id)
             cmd = "XBMC.Container.Update(%s)" % (url)
             menuItems.append((color(colorItem,lang(39001)),cmd))
 
@@ -317,30 +332,30 @@ class Node(object):
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
                                          id,id)
             cmd = "XBMC.Container.Update(%s)" % (args)
-            menuItems.append((color(colorItem, lang(39004)),cmd))
+            menuItems.append((color(colorItem,lang(39004)),cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_TO_CURRENT))
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((color(colorItem,lang(39005)),cmd))
 
         if self.parent and not (self.parent.type & NodeFlag.TYPE_FAVORITES):
             ''' ADD TO FAVORITES '''
-            cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.FAVORITES_ADD_TO_CURRENT))
+            cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
             menuItems.append((color(colorItem,lang(39011)),cmd))
 
         ''' ADD AS NEW '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))
-        menuItems.append((color(colorItem, lang(30080)),cmd))
-        
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.PLAYLIST_ADD_AS_NEW))
+        menuItems.append((color(colorItem,lang(30080)),cmd))
+
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):
-            showplaylist = sys.argv[0] + "?mode=" + str(Mode.VIEW) + '&nt=' + str(NodeFlag.TYPE_USERPLAYLISTS)
-            menuItems.append((color(colorItem, lang(39006)),"XBMC.Container.Update(" + showplaylist + ")"))
+            cmd = "XBMC.Container.Update(%s)" % (self.make_url(type=NodeFlag.TYPE_USERPLAYLISTS))
+            menuItems.append((color(colorItem,lang(39005)),cmd))
 
         if self.type & NodeFlag.TYPE_USERPLAYLISTS:
             ''' CREATE '''
-            url = self.make_url(Mode.PLAYLIST_CREATE)
-            menuItems.append((color(colorItem, lang(39008)), "XBMC.RunPlugin("+url+")"))
+            url = self.make_url(mode=Mode.PLAYLIST_CREATE)
+            menuItems.append((color(colorItem,lang(39008)),"XBMC.RunPlugin(" + url + ")"))
         ''' 
         Give a chance to our siblings to attach their items
         '''
@@ -348,7 +363,7 @@ class Node(object):
 
         ''' SCAN '''
         if qobuz.addon.getSetting('enable_scan_feature') == 'true':
-            url = self.make_url(Mode.SCAN)
+            url = self.make_url(mode=Mode.SCAN)
             try:
                 label = color(colorItem,lang(39003) + ": ") + self.get_label().decode('utf8','replace')
             except: pass
@@ -356,8 +371,9 @@ class Node(object):
 
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
-        erasecache = sys.argv[0] + "?mode=" + str(Mode.ERASE_CACHE)
-        menuItems.append((color(colorItem,lang(31009)),"XBMC.RunPlugin(" + erasecache + ")"))
+        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.ERASE_CACHE))
+        menuItems.append((color(colorItem,lang(31009)),cmd))
+
         '''
         Add our items to the context menu
         '''

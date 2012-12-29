@@ -129,19 +129,19 @@ class Node_playlist(Node):
         label = self.get_label()
         
         ''' SET AS CURRENT '''
-        url = self.make_url(Mode.PLAYLIST_SELECT_CURRENT)
+        url = self.make_url(mode=Mode.PLAYLIST_SELECT_CURRENT)
         menuItems.append((color(colorItem, lang(39007) + ': ') + label, "XBMC.RunPlugin("+url+")"))
                 
         ''' CREATE '''
-        url = self.make_url(Mode.PLAYLIST_CREATE)
+        url = self.make_url(mode=Mode.PLAYLIST_CREATE)
         menuItems.append((color(colorItem, lang(39008)), "XBMC.RunPlugin("+url+")"))
 
         ''' RENAME '''
-        url = self.make_url(Mode.PLAYLIST_RENAME)
+        url = self.make_url(mode=Mode.PLAYLIST_RENAME)
         menuItems.append((color(colorItem, lang(39009) + ': ') + label, "XBMC.RunPlugin("+url+")"))
 
         ''' REMOVE '''
-        url = self.make_url(Mode.PLAYLIST_REMOVE)
+        url = self.make_url(mode=Mode.PLAYLIST_REMOVE)
         menuItems.append((color(colorWarn, lang(39010) + ': ') + label, "XBMC.RunPlugin("+url+")"))
         
         

@@ -44,7 +44,6 @@ class Node_track(Node):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
         else:
-            #self.set_cache(xbmc_directory.Progress)
             nid = self.get_parameter('nid')
             self.data = qobuz.registry.get(name='track', id=nid)['data']
             xbmc_directory.add_node(self)
@@ -61,8 +60,9 @@ class Node_track(Node):
             return False
         return True
 
-    def make_url(self, mode = Mode.PLAY):
-        return super(Node_track, self).make_url(mode)
+    def make_url(self, **ka):
+        ka['mode'] = Mode.PLAY
+        return super(Node_track, self).make_url(**ka)
 
     def get_label(self, format = "%a - %t"):
         format = format.replace("%a", self.get_artist())

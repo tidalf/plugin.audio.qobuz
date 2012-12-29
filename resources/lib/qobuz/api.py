@@ -73,10 +73,11 @@ class QobuzApi:
         s3s = binascii.a2b_base64(s3b)
         self.s4 = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in izip(s3s,cycle(self.appid)))
 
-    def _api_request(self,params,uri,**opt):
+    def _api_request(self, service, method, params, **opt):
         self.last_error = None
         self.stats['request'] += 1
-        url = self.baseUrl
+        url = self.baseUrl + '/' + service + '/' + method
+        print "Request URL: " + url
         useToken = False if (opt and 'noToken' in opt) else True
         
         # Setting header
@@ -88,7 +89,7 @@ class QobuzApi:
         # Sending our request
         r = None
         try:
-            r = requests.post(url + uri,data=params,cookies=self.cookie,headers=qheaders)
+            r = requests.post(url,data=params,cookies=self.cookie,headers=qheaders)
         except:
             self.last_error = "Qobuz API POST fail"
             warn(self, self.last_error)
@@ -106,7 +107,7 @@ class QobuzApi:
             try:  # please !
                 response_json = json.loads(r.content)
             except:
-                self.last_error = "Cannot load: " + url + uri
+                self.last_error = "Cannot load: " + url
                 warn(self,"Json loads failed a second time")
                 return 0
 
@@ -116,20 +117,39 @@ class QobuzApi:
         except: pass
         if error == 'error':
             warn(self,"Something went wrong with request: "
-                     + uri + "\n" + pprint.pformat(params) + "\n" + pprint.pformat(response_json))
+                     + url+ "\n" + pprint.pformat(params) + "\n" + pprint.pformat(response_json))
 
             '''
             When something wrong we are deleting our auth token
                 '''
             return None
+        self._add_pagination(service, method, response_json)
         return response_json
 
+    def _add_pagination(self, service, method, data):
+        if service not in ['album']:
+            print 'No pagination'
+            return False
+        items = None
+        if service == 'album':
+            items = data['albums']
+        else:
+            raise QobuzXbmcError(who= self, what='invalid_service', additional=service)
+        total = items['total']
+        limit = items['limit']
+        offset = items['offset']
+        if total > offset + limit:
+            data['next_offset'] = offset + limit
+            print "Next: " + repr(data['next_offset'])
+        else: print "Pagination not required"
+        return True
+        
     '''
     User
     '''
     def user_login(self, **ka):
         self._check_ka(ka, ['username', 'password'], ['email'])
-        data = self._api_request(ka, "/user/login", noToken=True)
+        data = self._api_request('user', 'login', ka, noToken=True)
         if not data: return None
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
@@ -185,9 +205,9 @@ class QobuzApi:
         return self._api_request(ka,"/album/get")
 
     def album_getFeatured(self, **ka):
-        self._check_ka(ka, [], ['type', 'genre_id'])
+        self._check_ka(ka, [], ['type', 'genre_id', 'limit', 'offset'])
         if not 'limit' in ka: ka['limit'] = collectionLimit
-        return self._api_request(ka,"/album/getFeatured")
+        return self._api_request('album', 'getFeatured', ka)
 
     '''
     Playlist

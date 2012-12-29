@@ -20,20 +20,21 @@ class dog():
 
     def __init__(self):
         self.allowed_keys = {
-                             'mode'      : '^\d{1,10}$',
-                             'nid'       : '^\d{1,14}$',
-                             'nt'        : '^\d{1,10}$',
-                             'genre-type': '^(editor-picks|best-sellers|press-awards|new-releases|most-featured)$',
-                             'genre-id'  : '^(\d+|null)$',
-                             'url'       : '^.*$',
+                             'mode'       : '^\d{1,10}$',
+                             'nid'        : '^\d{1,14}$',
+                             'nt'         : '^\d{1,10}$',
+                             'genre-type' : '^(editor-picks|best-sellers|press-awards|new-releases|most-featured)$',
+                             'genre-id'   : '^(\d+|null)$',
+                             'url'        : '^.*$',
                              'search-type': "^(artists|tracks|albums)$",
                              'view-filter': "^\d+$",
-                             'depth': "^(-)?\d+$",
-                             'query': "^.*$",
-                             'action': "^(scan)$",
-                             'track-id': "^\d{1,10}$",
-                             'name': "^[\w\d_.]+$",
-                             'parent-id': "^\d{1,10}$"
+                             'depth'      : "^(-)?\d+$",
+                             'query'      : "^.*$",
+                             'action'     : "^(scan)$",
+                             'track-id'   : "^\d{1,10}$",
+                             'name'       : "^[\w\d_.]+$",
+                             'parent-id'  : "^\d{1,10}$",
+                             'offset'     : "^\d{1,10}$"
                              }
 
     ''' Match value against regexp '''

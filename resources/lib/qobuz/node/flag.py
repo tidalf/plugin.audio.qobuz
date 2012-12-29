@@ -34,7 +34,7 @@ class __NodeFlag():
         self.TYPE_FRIEND_LIST      = 32768
         self.TYPE_GENRE            = 65536
         self.TYPE_LABEL            = 131072    
-        
+        self.TYPE_PAGINATION       = 262144       
         
     def to_s(self, flag):
         if flag & self.TYPE_TRACK: return "track"
