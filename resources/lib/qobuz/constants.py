@@ -36,7 +36,8 @@ class __Mode():
         self.FAVORITES_ADD_TO_CURRENT = 19
         self.FRIEND_ADD = 20
         self.FRIEND_REMOVE = 21
-        self.TEST = 22
+        self.FAVORITE_DELETE = 22
+        self.TEST = 2000
 
     
     def to_s(self, mode):

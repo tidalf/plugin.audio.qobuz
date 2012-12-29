@@ -26,6 +26,7 @@ from node import Node
 from product import Node_product
 from debug import info, warn, error
 from gui.util import lang
+from gui.util import color
 
 '''
     NODE PLAYLIST
@@ -49,47 +50,25 @@ class Node_favorites(Node):
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
         self.data = data
-        albumseen = {}
-        warn (self, pprint.pformat(data))
         for track in data['data']['tracks']['items']:
             node = None
             node = Node_track()
             node.data = track
             self.add_child(node)
-    
         for product in self.filter_products(data):
             self.add_child(product)
         return True
         
-        
-        del self._data['tracks']
-        
-    def get_name(self):
-        name = self.get_property('name')
-        return name
-    
-    def get_owner(self):
-        return self.get_property(('owner', 'name'))
-            
+#    def get_name(self):
+#        name = self.get_property('name')
+#        return name
+#    
+#    def get_owner(self):
+#        return self.get_property(('owner', 'name'))
+#            
     def get_description(self):
         return self.get_property('description')
     
-    def make_XbmcListItem(self):
-        image = self.get_image()
-        owner = self.get_owner()
-        url = self.make_url()
-        item = xbmcgui.ListItem(self.label,
-                                owner,
-                                image,
-                                image,
-                                url)
-        if not item:
-            warn(self, "Error: Cannot make xbmc list item")
-            return None
-        item.setPath(url)
-        self.attach_context_menu(item)
-        return item
-                    
     def filter_products(self, data):
         list = []
         if not data: return list
@@ -106,7 +85,7 @@ class Node_favorites(Node):
             list.append(product)
         return list
 
-    def add_to_favorites(self):
+    def add(self):
             from gui.directory import Directory
             from renderer.xbmc import Xbmc_renderer as renderer
             nt = None
@@ -143,8 +122,14 @@ class Node_favorites(Node):
             for node in dir.nodes:
                 trackids.append(str(node.id))
             strtracks = ','.join(trackids)
-            ret = qobuz.api.favorites_add_track(strtracks)
-            info(self, pprint.pformat(ret))
+            ret = qobuz.api.favorite_create(track_ids=strtracks)
             qobuz.registry.delete(name='user-favorites')
             dir.end_of_directory()
             return True
+    
+    def remove(self):
+        print "Removing favorite"
+        if not qobuz.api.favorite_delete(track_ids=str(self.id)):
+            return False
+        qobuz.registry.delete(name='user-favorites')
+        return True

@@ -278,7 +278,7 @@ class QobuzBootstrap(object):
         elif self.MODE == Mode.FAVORITES_ADD_TO_CURRENT:
             from  node.favorites import Node_favorites
             node = Node_favorites(None, self.params)
-            if not node.add_to_favorites():
+            if not node.add():
                 return False
             return True
 
@@ -335,6 +335,15 @@ class QobuzBootstrap(object):
             friend = Node_friend()
             if not friend.remove(self.params['name']):
                 notifyH('Qobuz Xbmc (i8n)', 'Cannot remove friend')
+                return False
+            xbmc.executebuiltin('Container.Refresh')
+            return True
+        
+        elif self.MODE == Mode.FAVORITE_DELETE:
+            from node.favorites import Node_favorites
+            node = Node_favorites(self, self.params)
+            if not node.remove():
+                notifyH('Qobuz Xbmc (i8n)', 'Cannot remove favorite')
                 return False
             xbmc.executebuiltin('Container.Refresh')
             return True

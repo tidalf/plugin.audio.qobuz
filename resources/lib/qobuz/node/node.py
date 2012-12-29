@@ -33,9 +33,9 @@ class Node(object):
 
     def __init__(self,parent=None, parameters = None):
         self.parameters = parameters or {}
-        self.id = None
+        self.id = self.get_parameter('nid')
         self.parent = parent
-        self.type = NodeFlag.TYPE_NODE
+        self.type = self.get_parameter('nt') or NodeFlag.TYPE_NODE
         self.content_type = "files"
         self.image = None
         self.childs = []
@@ -323,9 +323,10 @@ class Node(object):
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((color(colorItem,lang(39005)),cmd))
 
-        ''' ADD TO FAVORITES '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.FAVORITES_ADD_TO_CURRENT))
-        menuItems.append((color(colorItem,lang(39011)),cmd))
+        if self.parent and not (self.parent.type & NodeFlag.TYPE_FAVORITES):
+            ''' ADD TO FAVORITES '''
+            cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.FAVORITES_ADD_TO_CURRENT))
+            menuItems.append((color(colorItem,lang(39011)),cmd))
 
         ''' ADD AS NEW '''
         cmd = "XBMC.Container.Update(%s)" % (self.make_url(Mode.PLAYLIST_ADD_AS_NEW))

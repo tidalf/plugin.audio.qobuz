@@ -254,8 +254,7 @@ class QobuzApi:
         return self._api_request(params,"/track/reportStreamingEnd")
 
 
-
-    def favorites_create (self, **ka):
+    def favorite_create (self, **ka):
         mandatory = ['artist_ids', 'albums_ids', 'track_ids']
         found = None
         for label in mandatory:
@@ -263,6 +262,15 @@ class QobuzApi:
         if not found:
             raise QobuzXbmcError(who=self, what='missing_parameter',additional='artist_ids|albums_ids|track_ids')
         return self._api_request(ka,"/favorite/create")
+    
+    def favorite_delete (self, **ka):
+        mandatory = ['artist_ids', 'albums_ids', 'track_ids']
+        found = None
+        for label in mandatory:
+            if label in ka: found = label
+        if not found:
+            raise QobuzXbmcError(who=self, what='missing_parameter',additional='artist_ids|albums_ids|track_ids')
+        return self._api_request(ka,"/favorite/delete")
 
     def playlist_deleteTracks (self, **ka):
         self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])

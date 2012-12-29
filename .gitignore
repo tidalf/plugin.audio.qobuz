@@ -1,9 +1,4 @@
 *.pyc
 *.pyo
 *DS_store*
-<<<<<<< HEAD
-*pydevproject
-
-=======
-.pydevproject
->>>>>>> origin/master
+*.pydevproject
