@@ -226,7 +226,7 @@ class Node_track(Node):
         #    label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
         
         mode = Mode.PLAY
-        url = self.make_url(mode)
+        url = self.make_url(mode=mode)
         item = xbmcgui.ListItem(label,
                                 label,
                                 str(self.get_image()),
@@ -264,10 +264,10 @@ class Node_track(Node):
     def hook_attach_context_menu(self, item, menuItems):
         colorItem = qobuz.addon.getSetting('color_item')
         if self.parent and self.parent.type & NodeFlag.TYPE_PLAYLIST:
-            url = self.parent.make_url(Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
+            url = self.parent.make_url(mode=Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
             menuItems.append((color(colorItem, lang(30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
         
         if self.parent and self.parent.type & NodeFlag.TYPE_FAVORITES:
             ''' REMOVE '''
-            url = self.make_url(Mode.FAVORITE_DELETE)
+            url = self.make_url(mode=Mode.FAVORITE_DELETE)
             menuItems.append((color(colorItem, 'Remove from favorite') + self.label, "XBMC.RunPlugin("+url+")"))

@@ -130,7 +130,8 @@ class Node_recommendation(Node):
 # TYPE GENRE
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
         offset = self.get_parameter('offset') or 0
-        data = qobuz.registry.get(name='recommendation', id=self.genre_id, type=self.genre_type, genre_id=self.genre_id, limit=1000, offset=offset)
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='recommendation', id=self.genre_id, type=self.genre_type, genre_id=self.genre_id, limit=limit, offset=offset)
         print "Data:" + pprint.pformat(data)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
@@ -139,7 +140,7 @@ class Node_recommendation(Node):
             node = Node_product()
             node.data = product
             self.add_child(node)
-        self.add_pagination(data)
+        self.add_pagination(data['data'])
         return True
 
 # DISPATCH

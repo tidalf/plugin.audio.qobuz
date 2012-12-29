@@ -55,7 +55,7 @@ class Node_friend(Node):
         return self
         
     def make_url(self, **ka):
-        url = super(Node_friend, self).make_url(ka) + "&name=" + self.name
+        url = super(Node_friend, self).make_url(**ka) + "&name=" + self.name
         return url
     
     def _change_appid(self):
@@ -140,5 +140,5 @@ class Node_friend(Node):
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         
         ''' Delete friend'''
-        url = self.make_url(Mode.FRIEND_REMOVE)
+        url = self.make_url(mode=Mode.FRIEND_REMOVE)
         menuItems.append((color(colorItem, 'Remove friend (i8n)' + ': ') + self.name, "XBMC.RunPlugin("+url+")"))

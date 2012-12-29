@@ -36,6 +36,7 @@ class Node_search(Node):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
         self.search_type = 'albums'
+        self.query = None
 
     def get_label(self):
         return self.label
@@ -70,14 +71,15 @@ class Node_search(Node):
     def make_url(self, **ka):
         url = super(Node_search, self).make_url(**ka)
         url += '&search-type=' + self.search_type
-        if 'action' in self.parameters and self.parameters['action'] == 'scan':
-            url += "&action=scan"
+        query = self.query or self.get_parameter('query')
+        if query: url+= '&query=' + query
         return url
 
     def _build_down(self, xbmc_directory, lvl, flag):
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
         stype = self.search_type
         search = None
-        limit = None
         query = self.get_parameter('query')
         if not query:
             from gui.util import Keyboard
@@ -87,13 +89,11 @@ class Node_search(Node):
                 return False
             query = k.getText()
         query.strip()
-        data = qobuz.api.search_getResults(query=query, type=stype, limit=limit)
-        if not data:
-            warn(self, "Searching artists API call fail")
-            return False
+        data = qobuz.api.search_getResults(query=query, type=stype, limit=limit, offset=offset)
         if not data:
             warn(self, "Search return no data")
             return False
+        self.query = query
         self.notify_data_result(data)
         if self.search_type == 'albums':
             try:
@@ -123,6 +123,7 @@ class Node_search(Node):
                 artist = Node_product_by_artist()
                 artist.data = jartist
                 self.add_child(artist)
+        self.add_pagination(data)
         return True
 
     def notify_data_result(self, data):

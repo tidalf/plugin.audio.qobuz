@@ -138,10 +138,18 @@ class Node(object):
     Called with data from our API, adding special child if pagination
     is required
     '''
-    def add_pagination(self,data):
-        if not 'next_offset' in data['data']: return False
-        print "We need to set pagination"
-        url = self.make_url(offset=data['data']['next_offset'])
+    def add_pagination(self, data):
+        paginated = ['albums', 'labels', 'tracks', 'artists']
+        items = None
+        need_pagination = False
+        for p in paginated:
+            if p in data: 
+                items = data[p]
+                if items['total'] > (items['offset'] + items['limit']):
+                    need_pagination = True
+                    break
+        if not need_pagination: return False
+        url = self.make_url(offset=items['offset'] + items['limit'])
         print "URL: " + url
         self.pagination_next = url
 

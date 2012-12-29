@@ -29,8 +29,6 @@ import socket
 
 socket.timeout = 5
 
-collectionLimit = 1000
-
 class QobuzApi:
 
     def __init__(self):
@@ -73,10 +71,10 @@ class QobuzApi:
         s3s = binascii.a2b_base64(s3b)
         self.s4 = ''.join(chr(ord(x) ^ ord(y)) for (x,y) in izip(s3s,cycle(self.appid)))
 
-    def _api_request(self, service, method, params, **opt):
+    def _api_request(self, params, uri, **opt):
         self.last_error = None
         self.stats['request'] += 1
-        url = self.baseUrl + '/' + service + '/' + method
+        url = self.baseUrl + uri
         print "Request URL: " + url
         useToken = False if (opt and 'noToken' in opt) else True
         
@@ -123,33 +121,30 @@ class QobuzApi:
             When something wrong we are deleting our auth token
                 '''
             return None
-        self._add_pagination(service, method, response_json)
+        #self._add_pagination(response_json)
         return response_json
 
-    def _add_pagination(self, service, method, data):
-        if service not in ['album']:
-            print 'No pagination'
-            return False
-        items = None
-        if service == 'album':
-            items = data['albums']
-        else:
-            raise QobuzXbmcError(who= self, what='invalid_service', additional=service)
-        total = items['total']
-        limit = items['limit']
-        offset = items['offset']
-        if total > offset + limit:
-            data['next_offset'] = offset + limit
-            print "Next: " + repr(data['next_offset'])
-        else: print "Pagination not required"
-        return True
+#    def _add_pagination(self, data):
+#        paginated = ['albums', 'labels', 'tracks', 'artists']
+#        items = None
+#        for p in paginated:
+#            if p in data: 
+#                items = data[p]
+#                break
+#        if not items: return False
+#        print "OFFSET...."
+#        if items['total'] > (items['offset'] + items['limit']):
+#            print "Setting next"
+#            data[p]['next_offset'] = items['offset'] + items['limit']
+#        else: return False
+#        return True
         
     '''
     User
     '''
     def user_login(self, **ka):
         self._check_ka(ka, ['username', 'password'], ['email'])
-        data = self._api_request('user', 'login', ka, noToken=True)
+        data = self._api_request(ka, '/user/login', noToken=True)
         if not data: return None
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
@@ -187,7 +182,6 @@ class QobuzApi:
     # MAPI UNTESTED
     def track_search(self, **ka):
         self._check_ka(ka, ['query'], ['limit'])
-        if not 'limit' in ka: ka['limit'] = collectionLimit
         data = self._api_request(ka,"/track/search")
         return data
     '''
@@ -202,12 +196,11 @@ class QobuzApi:
     '''
     def album_get(self, **ka):
         self._check_ka(ka, ['album_id'])
-        return self._api_request(ka,"/album/get")
+        return self._api_request(ka, '/album/get')
 
     def album_getFeatured(self, **ka):
         self._check_ka(ka, [], ['type', 'genre_id', 'limit', 'offset'])
-        if not 'limit' in ka: ka['limit'] = collectionLimit
-        return self._api_request('album', 'getFeatured', ka)
+        return self._api_request(ka, '/album/getFeatured')
 
     '''
     Playlist
@@ -233,21 +226,18 @@ class QobuzApi:
     '''
     def purchase_getUserPurchases(self,**ka):
         self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit'])
-        if not 'limit'in ka: ka['limit'] = collectionLimit
         return self._api_request(ka,"/purchase/getUserPurchases")
 
     def favorite_getUserFavorites(self, **ka):
-        self._check_ka(ka, [], ['user_id', 'type', 'limit'])
-        if not 'limit' in ka: ka['limit'] = collectionLimit
+        self._check_ka(ka, [], ['user_id', 'type', 'limit', 'offset'])
         return self._api_request(ka,"/favorite/getUserFavorites")
 
     # SEARCH #
     def search_getResults(self, **ka):
-        self._check_ka(ka, ['query'], ['type', 'limit'])
+        self._check_ka(ka, ['query'], ['type', 'limit', 'offset'])
         mandatory = ['query', 'type']
         for label in mandatory:
             if not label in ka: raise QobuzXbmcError(who=self, what='missing_parameter',additional=label)
-        if not 'limit' in ka: ka['limit'] = collectionLimit
         return self._api_request(ka,"/search/getResults")
 
 

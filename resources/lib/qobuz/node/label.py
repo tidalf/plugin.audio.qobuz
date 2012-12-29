@@ -36,7 +36,6 @@ class Node_label(Node):
         super(Node_label, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_LABEL
         self.set_label('Label (i8n)')
-#        self.id = 1
         self.url = None
         self.set_is_folder(True)
     
@@ -46,13 +45,16 @@ class Node_label(Node):
         self.id = self.get_property('id')
         
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        data = qobuz.registry.get(name='label-list', id=self.id)
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='label-list', id=self.id, limit=limit, offset=offset)
         if not data:
             warn(self, "No label data")
             return False
         print pprint.pformat(data)
-        for data in data['data']['labels']['items']:
+        for item in data['data']['labels']['items']:
             node = Node_label()
-            node.data = data
+            node.data = item
             self.add_child(node)
+        self.add_pagination(data)
         return True

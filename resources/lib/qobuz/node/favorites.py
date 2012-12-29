@@ -45,7 +45,10 @@ class Node_favorites(Node):
         self.content_type = 'songs'
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        data = qobuz.registry.get(name='user-favorites')
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='user-favorites', limit=limit, offset=offset)
+        print pprint.pformat(data)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
@@ -57,6 +60,7 @@ class Node_favorites(Node):
             self.add_child(node)
         for product in self.filter_products(data):
             self.add_child(product)
+        self.add_pagination(data['data'])
         return True
         
 #    def get_name(self):
