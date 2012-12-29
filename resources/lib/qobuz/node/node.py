@@ -139,12 +139,13 @@ class Node(object):
     is required
     '''
     def add_pagination(self, data):
-        paginated = ['albums', 'labels', 'tracks', 'artists', 'playlists']
+        paginated = ['albums', 'labels', 'tracks', 'artists', 'playlists', 'playlist']
         items = None
         need_pagination = False
         for p in paginated:
             if p in data: 
                 items = data[p]
+                if items['limit'] == None: continue
                 if items['total'] > (items['offset'] + items['limit']):
                     need_pagination = True
                     break

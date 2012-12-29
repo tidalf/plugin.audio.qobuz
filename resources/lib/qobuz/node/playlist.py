@@ -87,7 +87,7 @@ class Node_playlist(Node):
                 node = Node_track()
                 node.data = jtrack
             self.add_child(node)
-        self.add_pagination(data)
+        self.add_pagination(data['data'])
         
     def get_name(self):
         name = self.get_property('name')

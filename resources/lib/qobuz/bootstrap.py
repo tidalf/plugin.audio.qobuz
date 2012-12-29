@@ -184,6 +184,7 @@ class QobuzBootstrap(object):
         flist = fu.find(qobuz.path.cache, '^.*\.dat$')
         for fileName in flist:
             fu.unlink(fileName)
+        return False
 
 
     '''

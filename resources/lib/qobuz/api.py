@@ -213,7 +213,7 @@ class QobuzApi:
         return data
 
     def playlist_get(self,**ka):
-        self._check_ka(ka, ['playlist_id'], ['extra'])
+        self._check_ka(ka, ['playlist_id'], ['extra', 'limit', 'offset'])
         return self._api_request(ka,"/playlist/get")
     
     def playlist_addTracks (self, **ka):

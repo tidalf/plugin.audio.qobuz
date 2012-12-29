@@ -42,6 +42,8 @@ class Node_product(Node):
         self.is_special_purchase = False
 
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
         nid = self.id
         data = None
         if self.is_special_purchase:
@@ -61,7 +63,9 @@ class Node_product(Node):
                 node.data = track
                 self.add_child(node)
         except: pass
-
+        print pprint.pformat(data)
+        self.add_pagination(data['data'])
+        
     def _filter_tracks(self, tracks):
         ltracks = []
         id = self.id

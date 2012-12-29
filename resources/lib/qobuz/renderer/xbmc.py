@@ -27,7 +27,7 @@ import qobuz
 from node.flag import NodeFlag
 from debug import info, warn, log
 from irenderer import IRenderer
-from gui.util import notifyH
+from gui.util import notifyH, getImage
 
 class Xbmc_renderer(IRenderer):
 
@@ -48,9 +48,9 @@ class Xbmc_renderer(IRenderer):
         buildDown = self.root.pre_build_down()
         if buildDown:
             dir = Directory(self.root, qobuz.boot.handle, False)
-            if self.root.pagination_next: self.add_directory_item(dir=dir, label='Next', url=self.root.pagination_next)
+#            if self.root.pagination_next: self.add_directory_item(dir=dir, label='[ Next ]', url=self.root.pagination_next, image=getImage('next'))
             self.root.build_down(dir, self.depth, self.filter)   
-            if self.root.pagination_next: self.add_directory_item(dir=dir, label='Next', url=self.root.pagination_next)
+            if self.root.pagination_next: self.add_directory_item(dir=dir, label='[ Next ]', url=self.root.pagination_next, image=getImage('next'))
             dir.set_content(self.root.content_type)
             xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
             xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_LABEL)

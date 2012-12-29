@@ -28,8 +28,7 @@ class Keyboard(xbmc.Keyboard):
         
 
 def getImage(name):
-    path = qobuz.path.image + name + '.png'
-    print "PATH: " + path
+    path = qobuz.path.image + '/' + name + '.png'
     return path
 
 '''
