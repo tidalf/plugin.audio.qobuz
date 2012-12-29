@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.audio.qobuz" name="Qobuz XBMC" version="0.9.14"
+<addon id="plugin.audio.qobuz" name="Qobuz XBMC" version="0.10.1"
 	provider-name="d@corp">
 	<requires>
-		<import addon="xbmc.python" version="2.0" />
+		<import addon="xbmc.python" version="2.1.0" />
 		<import addon="script.module.requests"/> 
 		<import addon="script.common.plugin.cache" version="1.3.0"/>
 	</requires>

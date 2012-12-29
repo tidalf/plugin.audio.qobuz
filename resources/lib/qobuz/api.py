@@ -23,7 +23,7 @@ import math
 import hashlib
 
 from exception import QobuzXbmcError
-from debug import warn, log
+from debug import warn, log, info
 
 import socket
 
