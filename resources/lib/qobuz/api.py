@@ -206,7 +206,7 @@ class QobuzApi:
     Playlist
     '''
     def playlist_getUserPlaylists(self, **ka):
-        self._check_ka(ka, [], ['user_id', 'username'])
+        self._check_ka(ka, [], ['user_id', 'username', 'offset', 'limit'])
         if not 'user_id' in ka and not 'username' in ka:
             ka['user_id'] = self.user_id
         data = self._api_request(ka,"/playlist/getUserPlaylists")

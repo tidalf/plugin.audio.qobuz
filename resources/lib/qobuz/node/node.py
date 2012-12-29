@@ -139,7 +139,7 @@ class Node(object):
     is required
     '''
     def add_pagination(self, data):
-        paginated = ['albums', 'labels', 'tracks', 'artists']
+        paginated = ['albums', 'labels', 'tracks', 'artists', 'playlists']
         items = None
         need_pagination = False
         for p in paginated:

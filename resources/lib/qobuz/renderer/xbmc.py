@@ -37,16 +37,8 @@ class Xbmc_renderer(IRenderer):
     def add_directory_item(self, **ka):
         if not 'is_folder' in ka: ka['is_folder'] = 1
         if not 'image' in ka: ka['image'] = ''
-        item = xbmcgui.ListItem(
-                                ka['label'],
-                                ka['label'],
-                                ka['image'],
-                                ka['image'],
-                                ka['url']
-        )
-        xbmcplugin.addDirectoryItem(0,
-                                    ka['url'],
-                                    item, ka['is_folder'], 1)
+        item = ka['dir']._xbmc_item(**ka)
+        ka['dir']._add_xbmc_item(url=ka['url'], item=item, is_folder=ka['is_folder'])
         
     def display(self):
         from gui.directory import Directory
@@ -56,13 +48,13 @@ class Xbmc_renderer(IRenderer):
         buildDown = self.root.pre_build_down()
         if buildDown:
             dir = Directory(self.root, qobuz.boot.handle, False)
-            if self.root.pagination_next: self.add_directory_item(label='Next', url=self.root.pagination_next)
+            if self.root.pagination_next: self.add_directory_item(dir=dir, label='Next', url=self.root.pagination_next)
             self.root.build_down(dir, self.depth, self.filter)   
-            if self.root.pagination_next: self.add_directory_item(label='Next', url=self.root.pagination_next)
+            if self.root.pagination_next: self.add_directory_item(dir=dir, label='Next', url=self.root.pagination_next)
             dir.set_content(self.root.content_type)
-#            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
-#            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_LABEL)
-#            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_NONE)
+            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
+            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_LABEL)
+            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_NONE)
             dir.end_of_directory()
         return True
 

@@ -61,9 +61,11 @@ class Node_playlist(Node):
         return self.b_is_current
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
         nid = self.id or self.get_parameter('nid')
         info(self, "Build-down playlist")
-        data = qobuz.registry.get(name='user-playlist',id=nid)
+        data = qobuz.registry.get(name='user-playlist',id=nid, offset=offset, limit=limit)
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
@@ -85,6 +87,7 @@ class Node_playlist(Node):
                 node = Node_track()
                 node.data = jtrack
             self.add_child(node)
+        self.add_pagination(data)
         
     def get_name(self):
         name = self.get_property('name')

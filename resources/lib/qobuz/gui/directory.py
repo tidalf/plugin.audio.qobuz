@@ -62,18 +62,32 @@ class Directory():
     def is_canceled(self):
         return self.Progress.iscanceled()
 
+    def _xbmc_item(self, **ka):
+        return xbmcgui.ListItem(
+                                ka['label'],
+                                ka['label'],
+                                ka['image'],
+                                ka['image'],
+                                ka['url'])
+    
+    def _add_xbmc_item(self, **ka):
+        self.total_put += 1
+        return xbmcplugin.addDirectoryItem(self.handle,
+                                    ka['url'],
+                                    ka['item'],
+                                    ka['is_folder'],
+                                    self.total_put)
+        
+        
     def _put_item(self, node):
         self.total_put += 1
-        mode = Mode.VIEW
         item = node.make_XbmcListItem()
         if not item:
             return False
         try:
-            ret = xbmcplugin.addDirectoryItem(self.handle,
-                                    node.make_url(),
-                                    item,
-                                    node.is_folder,
-                                    self.total_put)
+            ret = self._add_xbmc_item(url=node.make_url(),
+                                    item=item,
+                                    is_folder=node.is_folder)
         except:
             warn(self, "Cannot add item")
         if not ret: self.put_item_ok = False

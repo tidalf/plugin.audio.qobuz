@@ -62,8 +62,10 @@ class Node_user_playlists(Node):
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         login = qobuz.addon.getSetting('username')
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
         debug(self, "Build-down: user playlists")
-        data = qobuz.registry.get(name='user-playlists')
+        data = qobuz.registry.get(name='user-playlists', limit=limit, offset=offset)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
@@ -79,6 +81,7 @@ class Node_user_playlists(Node):
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
             self.add_child(node)
+        self.add_pagination(data['data'])
         return True
 
     def set_current_playlist(self, id):
