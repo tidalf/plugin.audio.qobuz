@@ -48,6 +48,7 @@ class QobuzApi:
         self.stats = { 
                       'request': 0
         }
+        self.session = requests.Session()
         self.__set_s4()
 
     def _check_ka(self, ka, mandatory, allowed = []):
@@ -87,7 +88,7 @@ class QobuzApi:
         # Sending our request
         r = None
         try:
-            r = requests.post(url,data=params,cookies=self.cookie,headers=qheaders)
+            r = self.session.post(url,data=params,cookies=self.cookie,headers=qheaders)
         except:
             self.last_error = "Post request fail"
             warn(self, self.last_error)

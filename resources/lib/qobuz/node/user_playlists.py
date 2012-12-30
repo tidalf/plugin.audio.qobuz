@@ -88,7 +88,13 @@ class Node_user_playlists(Node):
         qobuz.registry.set(name='user-current-playlist-id', id=0, value=id)
     
     def subscribe_playlist(self, id):
-        return qobuz.api.playlist_subscribe(playlist_id = id)
+        if qobuz.api.playlist_subscribe(playlist_id = id):
+            from gui.util import notifyH, isFreeAccount, lang
+            notifyH("Qobuz","(i8n) playlist subscribed")
+            qobuz.registry.delete(name='user-playlists')
+            return True
+        else: 
+            return False
         
     def create_playlist(self, query = None):
         #!TODO: Why we are no more logged ...
