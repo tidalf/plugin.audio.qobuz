@@ -29,7 +29,7 @@ from dog import dog
 import qobuz
 from node.flag import NodeFlag
 from exception import QobuzXbmcError
-from gui.util import notifyH, notify, dialogLoginFailure
+from gui.util import notifyH, notify, dialogLoginFailure, getImage, yesno
 
 ''' Arguments parssing '''
 def get_params():
@@ -187,14 +187,13 @@ class QobuzBootstrap(object):
 
         # ERASE CACHE
         elif self.MODE == Mode.ERASE_CACHE:
-            import xbmcgui
-            ok = xbmcgui.Dialog().yesno('Remove cached data',
-                          'Do you really want to erase all cached data')
-            if not ok:
+            if yesno('Remove cached data', 'Do you really want to erase all cached data'):
                 info(self, "Deleting cached data aborted")
                 return False
-            self.erase_cache()
-            notifyH("Qobuz cache", "All cached data removed")
+            if qobuz.registry.delete_by_name('^.*\.dat$'): 
+                notifyH('Qobuz cache (i8n)', 'All cached data removed')
+            else: 
+                notifyH('Qobuz cache (i8n)', 'Something went wrong while erasing cached data', getImage('icon-error-256'))
             return True
 
         from renderer.xbmc import Xbmc_renderer as renderer
@@ -338,24 +337,6 @@ class QobuzBootstrap(object):
         
         elif self.MODE == Mode.TEST:
             import xbmcgui
-#            win.clearProperties()
-#            import sys
-#            from gui.window.base import Window
-#            from threading import Thread
-#            import xbmcplugin
-#            def run():
-#                name = 'plugin.audio.qobuz-search.xml'  
-#                w = Window(name, qobuz.addon.getAddonInfo('path'), 'default')
-#                w.doModal()
-#                del w
-#            xbmcplugin.endOfDirectory(handle=int(sys.argv[1]),succeeded=False, updateListing=False, cacheToDisc=False)
-#            try:
-#                t = Thread(None, run, None, ())
-#                t.start()
-#                t.join()
-#            except Exception as e:
-#                print e
-#            return True
 
         else:
             raise QobuzXbmcError(who=self,what="unknow_mode", additional=self.MODE)

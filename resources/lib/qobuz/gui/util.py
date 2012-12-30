@@ -91,3 +91,7 @@ def xbmcContainerUpdate(url):
     cmd = 'XBMC.ContainerUpdate("%s")' % (url)
     #debug('xbmcContainerUpdate', "CMD: " + cmd)
     return cmd
+
+def yesno(heading, line1, line2='', line3=''):
+    dialog = xbmcgui.Dialog()
+    return dialog.yesno(heading, line1, line2, line3)
