@@ -18,7 +18,7 @@ import qobuz
 from flag import NodeFlag
 from node import Node
 from debug import error
-from gui.util import lang
+from gui.util import lang, getImage
 
 '''
     NODE PURCHASES
@@ -33,6 +33,7 @@ class Node_purchases(Node):
         self.label = lang(30100)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
         self.content_type = 'albums'
+        self.image = getImage('album')
 
     def _build_down(self,xbmc_directory,lvl,flag=None,progress=None):
         data = qobuz.registry.get(name='user-purchases')

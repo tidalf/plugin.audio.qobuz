@@ -75,7 +75,7 @@ class QobuzApi:
         self.last_error = None
         self.stats['request'] += 1
         url = self.baseUrl + uri
-        print "Request URL: " + url
+        log(self, "Request URL: " + url)
         useToken = False if (opt and 'noToken' in opt) else True
         
         # Setting header
@@ -83,13 +83,13 @@ class QobuzApi:
         if useToken and self.authtoken:
             qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
         qheaders["X-APP-ID"] = self.appid
-        print "X-APP-ID: " + self.appid
+
         # Sending our request
         r = None
         try:
             r = requests.post(url,data=params,cookies=self.cookie,headers=qheaders)
         except:
-            self.last_error = "Qobuz API POST fail"
+            self.last_error = "Post request fail"
             warn(self, self.last_error)
             return None
         # We have cookies

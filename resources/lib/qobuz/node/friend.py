@@ -26,7 +26,7 @@ from flag import NodeFlag
 from node import Node
 from playlist import Node_playlist
 from debug import info, warn, error
-from gui.util import color
+from gui.util import color, getImage
 
 '''
     NODE FRIEND
@@ -38,6 +38,7 @@ class Node_friend(Node):
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_friend, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FRIEND
+        self.image = getImage('artist')
         self.name = ''
         self.set_name(self.get_parameter('name'))
         self.set_label(self.name)

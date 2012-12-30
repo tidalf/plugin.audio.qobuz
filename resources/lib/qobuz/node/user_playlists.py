@@ -25,7 +25,7 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error, debug
-from gui.util import color, lang
+from gui.util import color, lang, getImage
 
 '''
     NODE USER PLAYLISTS
@@ -38,7 +38,7 @@ class Node_user_playlists(Node):
     def __init__(self, parent = None, parameters = None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
-        #self.image = qobuz.image.access.get('userplaylists')
+        self.image = getImage('userplaylists')
         self.label2 = 'Keep your current playlist'
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
         self.content_type = 'files'
@@ -135,7 +135,9 @@ class Node_user_playlists(Node):
     '''
     def remove_playlist(self, id):
         import xbmcgui, xbmc
-        data = qobuz.registry.get(name='user-playlist', id=id)['data']
+        offset = self.get_parameter('offset') or 0
+        limit = limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='user-playlist', id=id, offset=offset, limit=limit)['data']
         name = ''
         if 'name' in data: name = data['name']
         ok = xbmcgui.Dialog().yesno(lang(39010),
@@ -146,9 +148,9 @@ class Node_user_playlists(Node):
             return False
 
         info(self, "Deleting playlist: " + id)
-        res = qobuz.api.playlist_delete(playlist_id=id)
+        res = qobuz.api.playlist_delete(playlist_id=id, offset=offset, limit=limit)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(id))
             return False
-        qobuz.registry.delete(name='user-playlists')
+        qobuz.registry.delete(name='user-playlists', offset=offset, limit=limit)
         return True

@@ -54,12 +54,15 @@ class Node_search(Node):
         if st == 'artists':
             self.label = lang(30015)
             self.content_type = 'files'
+            self.image = getImage('artist')
         elif st == 'albums':
             self.label = lang(30014)
             self.content_type = 'albums'
+            self.image = getImage('album')
         elif st == 'tracks':
             self.label = lang(30013)
             self.content_type = 'songs'
+            self.image = getImage('song')
         else:
             raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
         self._search_type = st

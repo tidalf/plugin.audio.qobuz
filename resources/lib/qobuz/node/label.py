@@ -23,7 +23,7 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error
-from gui.util import color
+from gui.util import color, getImage
 
 '''
     NODE LABEL
@@ -38,6 +38,7 @@ class Node_label(Node):
         self.set_label('Label (i8n)')
         self.url = None
         self.set_is_folder(True)
+        self.image = getImage('album')
     
     
     def hook_post_data(self):

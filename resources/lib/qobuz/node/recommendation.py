@@ -28,7 +28,7 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from debug import info, warn, error
-from gui.util import color, lang
+from gui.util import color, lang, getImage
 
 RECOS_TYPES = {
                       'new-releases': lang(30084),
@@ -66,6 +66,7 @@ class Node_recommendation(Node):
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(lang(30082))
+        self.image = getImage('album')
 
     def make_url(self, **ka):
         url = super(Node_recommendation, self).make_url(**ka)
@@ -132,7 +133,7 @@ class Node_recommendation(Node):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='recommendation', id=self.id, type=self.genre_type, genre_id=self.genre_id, limit=limit, offset=offset)
-        print "Data:" + pprint.pformat(data)
+        #print "Data:" + pprint.pformat(data)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False

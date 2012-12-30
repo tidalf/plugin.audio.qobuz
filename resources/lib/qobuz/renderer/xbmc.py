@@ -27,8 +27,18 @@ import qobuz
 from node.flag import NodeFlag
 from debug import info, warn, log
 from irenderer import IRenderer
-from gui.util import notifyH, getImage
+from gui.util import notifyH, getImage, color
 
+class XbmcWindow_musicfiles(xbmcgui.Window):
+
+    def __init__(self, **ka):
+        # 10501 / WINDOW_MUSIC_FILES 
+        # (http://wiki.xbmc.org/index.php?title=Window_IDs)
+        xbmcgui.Window(10501) 
+    
+    def onAction(self, action):
+        print 'Action: ' + repr(action.getId())
+    
 class Xbmc_renderer(IRenderer):
 
     def __init__(self, node_type, node_id = None):
@@ -66,15 +76,33 @@ class Xbmc_renderer(IRenderer):
             [ xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=method ) for method in methods ]
             dir.end_of_directory()
         return True
+    
+        if not self.root.pre_build_down(): return False 
+        nextString = None
+        if self.root.pagination_next: 
+            colorItem = qobuz.addon.getSetting('color_item')
+            nextString = '[ ' + color(colorItem, 'Next') + ' ]'
+            print "NextString set: " + nextString
+        Dir = Directory(self.root, qobuz.boot.handle, False)
+        self.root.build_down(Dir, self.depth, self.filter)   
+        if nextString:
+            print "NextString: " + nextString
+            self.add_directory_item(dir=Dir, 
+                                        label=nextString, 
+                                        url=self.root.pagination_next, 
+                                        image=getImage('next'))
 
-    def scan(self):
-        from gui.directory import Directory
-        if not self.set_root_node():
-            warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
-            return False
-        dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
-        dir.set_content(self.root.content_type)
-        dir.end_of_directory()
-        notifyH('Scanning results', str(dir.total_put) + ' items where scanned', 3000)
+        Dir.end_of_directory()
         return True
+
+#    def scan(self):
+#        from gui.directory import Directory
+#        if not self.set_root_node():
+#            warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
+#            return False
+#        dir = Directory(self.root, qobuz.boot.handle, False)
+#        self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
+#        dir.set_content(self.root.content_type)
+#        dir.end_of_directory()
+#        notifyH('Scanning results', str(dir.total_put) + ' items where scanned', 3000)
+#        return True

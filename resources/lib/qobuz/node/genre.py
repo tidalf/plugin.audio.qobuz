@@ -26,7 +26,7 @@ from flag import NodeFlag
 from node import Node
 from playlist import Node_playlist
 from debug import info, warn, error
-from gui.util import color
+from gui.util import color, getImage
 
 '''
     NODE FRIEND
@@ -43,6 +43,7 @@ class Node_genre(Node):
         self.label2 = self.label
         self.url = None
         self.set_is_folder(True)
+        self.image = getImage('album')
     
     def make_url(self, **ka):
         url = super(Node_genre, self).make_url(**ka)

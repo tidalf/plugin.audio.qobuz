@@ -34,7 +34,7 @@
    <setting id="songsearchlimit" type="labelenum" label="30002"   default="100" values="10|25|50|100|1000" /> -->
    <setting id="albumsearchlimit" type="labelenum" label="30003"  default="100" values="10|25|50|100|1000" />
    <setting id="artistsearchlimit" type="labelenum" label="30004" default="100" values="10|25|50|100|1000" />
-   <setting id="pagination_limit" type="labelenum" label="30005"  default="100" values="10|25|50|100|1000|5000|10000" /> 
+   <setting id="pagination_limit" type="labelenum" label="30005"  default="100" values="10|25|50|100|500|1000|5000|10000" /> 
    
    </category>
    <!-- Cache -->

@@ -7,7 +7,7 @@ from constants import Mode
 from progress import Progress
 import qobuz
 import time
-from debug import warn
+from debug import warn, log
 from gui.util import notify, lang, getImage
 
 class Directory():
@@ -28,6 +28,7 @@ class Directory():
         self.line2 = ''
         self.line3 = ''
         self.percent = 0
+        self.content_type = 'files'
 
     def __del__(self):
         for node in self.nodes:
@@ -102,7 +103,7 @@ class Directory():
         success = True
         if not self.put_item_ok or (self.total_put == 0):
             success = False
-            notify(30008, 36001, getImage('icon-error-256'))
+            #notify(30008, 36001, getImage('icon-error-256'))
         xbmcplugin.endOfDirectory(handle = self.handle,
                                    succeeded = success,
                                    updateListing = False,
@@ -111,7 +112,9 @@ class Directory():
             label = self.root.get_label()
         self.update(100, 100, lang(40003), lang(40002) + ': ' + str(self.total_put) + ' items')
         self.close()
+        xbmcplugin.setContent(handle = self.handle, content = self.content_type)
         return success
 
     def set_content(self, content):
-        xbmcplugin.setContent(handle = self.handle, content = content)
+        log(self, "Set content: " + content)
+        self.content_type = content

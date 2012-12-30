@@ -25,7 +25,7 @@ from flag import NodeFlag
 from node import Node
 from friend import Node_friend
 from debug import info, warn
-from gui.util import color
+from gui.util import color, getImage
 
 '''
     NODE FRIEND
@@ -37,6 +37,7 @@ class Node_friend_list(Node):
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_friend_list, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FRIEND_LIST
+        self.image = getImage('artist')
         self.label = "Friend (i8n)"
         self.label2 = ""
         self.url = None

@@ -24,6 +24,7 @@ from constants import *
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error,log
+from gui.util import getImage
 '''
     NODE PRODUCT
 '''
@@ -38,6 +39,7 @@ class Node_product(Node):
     def __init__(self, parent = None, params = None):
         super(Node_product, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PRODUCT
+        self.image = getImage('album')
         self.content_type = 'songs'
         self.is_special_purchase = False
 

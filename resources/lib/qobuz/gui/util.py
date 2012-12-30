@@ -16,6 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os
 import xbmc, xbmcgui,xbmcplugin
+from debug import log, debug
 import qobuz
 
 '''
@@ -28,9 +29,7 @@ class Keyboard(xbmc.Keyboard):
         
 
 def getImage(name):
-    path = os.path.join(qobuz.path.image, name + '.png')
-    print "IMAGE PATH: " + path
-    return path
+    return os.path.join(qobuz.path.image, name + '.png')
 
 '''
     Notify Human
@@ -45,7 +44,6 @@ def notifyH(title, text, image = None, mstime = 2000):
 '''
 def notify(title, text, image = None, mstime = 2000):
     if not image: image = getImage('icon-default-256')
-    print "IMAGE: " + image
     s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (lang(title), lang(text), mstime, getImage)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
     
@@ -84,3 +82,12 @@ def lang(langId):
     return qobuz.addon.getLocalizedString(langId)
 
 
+def xbmcRunPlugin(url):
+    cmd = 'XBMC.RunPlugin("%s")' % (url)
+    #debug('xbmcRunPlugin', "CMD: " + cmd)
+    return cmd
+
+def xbmcContainerUpdate(url):
+    cmd = 'XBMC.ContainerUpdate("%s")' % (url)
+    #debug('xbmcContainerUpdate', "CMD: " + cmd)
+    return cmd

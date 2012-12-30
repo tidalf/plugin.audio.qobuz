@@ -24,9 +24,9 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from product import Node_product
-from debug import info, warn, error
+from debug import warn, error, log
 from gui.util import lang
-from gui.util import color
+from gui.util import color, getImage
 
 '''
     NODE PLAYLIST
@@ -43,12 +43,12 @@ class Node_favorites(Node):
         self.name = lang(30079)
         self.label = lang(30079)    
         self.content_type = 'songs'
+        self.image = getImage('favorites')
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='user-favorites', limit=limit, offset=offset)
-        print pprint.pformat(data)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
@@ -132,7 +132,7 @@ class Node_favorites(Node):
             return True
     
     def remove(self):
-        print "Removing favorite"
+        log(self, "Removing favorite: " + repr(self.id))
         if not qobuz.api.favorite_delete(track_ids=str(self.id)):
             return False
         qobuz.registry.delete(name='user-favorites')

@@ -25,7 +25,7 @@ from constants import Mode
 from flag import NodeFlag
 #from debug import error
 from exception import QobuzXbmcError
-from gui.util import color,lang
+from gui.util import color,lang, xbmcRunPlugin, xbmcContainerUpdate
 '''
     NODE
 '''
@@ -340,31 +340,31 @@ class Node(object):
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW,
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
                                          id,id)
-            cmd = "XBMC.Container.Update(%s)" % (args)
+            cmd = xbmcContainerUpdate(args)
             menuItems.append((color(colorItem,lang(39004)),cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.PLAYLIST_ADD_TO_CURRENT))
+        cmd = xbmcContainerUpdate(self.make_url(mode=Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((color(colorItem,lang(39005)),cmd))
 
         if self.parent and not (self.parent.type & NodeFlag.TYPE_FAVORITES):
             ''' ADD TO FAVORITES '''
-            cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
+            cmd = xbmcContainerUpdate(self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
             menuItems.append((color(colorItem,lang(39011)),cmd))
 
         ''' ADD AS NEW '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.PLAYLIST_ADD_AS_NEW))
+        cmd = xbmcContainerUpdate(self.make_url(mode=Mode.PLAYLIST_ADD_AS_NEW))
         menuItems.append((color(colorItem,lang(30080)),cmd))
 
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):
-            cmd = "XBMC.Container.Update(%s)" % (self.make_url(type=NodeFlag.TYPE_USERPLAYLISTS))
+            cmd = xbmcContainerUpdate(self.make_url(type=NodeFlag.TYPE_USERPLAYLISTS))
             menuItems.append((color(colorItem,lang(39005)),cmd))
 
         if self.type & NodeFlag.TYPE_USERPLAYLISTS:
             ''' CREATE '''
-            url = self.make_url(mode=Mode.PLAYLIST_CREATE)
-            menuItems.append((color(colorItem,lang(39008)),"XBMC.RunPlugin(" + url + ")"))
+            cmd = xbmcRunPlugin(self.make_url(mode=Mode.PLAYLIST_CREATE))
+            menuItems.append((color(colorItem,lang(39008)), cmd))
         ''' 
         Give a chance to our siblings to attach their items
         '''
@@ -380,7 +380,7 @@ class Node(object):
 
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
-        cmd = "XBMC.RunPlugin(%s)" % (self.make_url(mode=Mode.ERASE_CACHE))
+        cmd = xbmcRunPlugin(self.make_url(mode=Mode.ERASE_CACHE))
         menuItems.append((color(colorItem,lang(31009)),cmd))
 
         '''
