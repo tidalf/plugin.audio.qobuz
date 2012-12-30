@@ -91,7 +91,7 @@ class Node_user_playlists(Node):
         if qobuz.api.playlist_subscribe(playlist_id = id):
             from gui.util import notifyH, isFreeAccount, lang
             notifyH("Qobuz","(i8n) playlist subscribed")
-            qobuz.registry.delete(name='user-playlists')
+            qobuz.registry.delete_by_name('^user-playlists.*\.dat$')
             return True
         else: 
             return False
