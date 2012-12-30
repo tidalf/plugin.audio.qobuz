@@ -46,11 +46,25 @@ class Node_friend_list(Node):
   
     def _build_down(self, xbmc_directory, lvl, flag = None):
         info(self, "Build-down playlist")
-        data = qobuz.registry.get(name='user')['data']['user']['player_settings']
+        data = qobuz.registry.get(name='user-playlists', limit=0)
         if not data:
             warn(self, "No friend data")
             return False
+        # extract all owner names from the list
+        friend_list = []
+        for item in data['data']['playlists']['items']:
+            friend_list.append(item['owner']['name'])
+        # add previously stored
+        data = qobuz.registry.get(name='user')['data']['user']['player_settings']
         for name in data['friends']:
+            friend_list.append(str(name))
+        # remove duplicates
+        keys = {}
+        for e in friend_list:
+            keys[e] = 1
+        friend_list = keys.keys()
+        # and add them to the directory
+        for name in friend_list:
             node = Node_friend()
             node.set_name(str(name))
             self.add_child(node)
