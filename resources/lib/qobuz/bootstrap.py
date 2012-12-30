@@ -187,7 +187,7 @@ class QobuzBootstrap(object):
 
         # ERASE CACHE
         elif self.MODE == Mode.ERASE_CACHE:
-            if yesno('Remove cached data', 'Do you really want to erase all cached data'):
+            if not yesno('Remove cached data', 'Do you really want to erase all cached data'):
                 info(self, "Deleting cached data aborted")
                 return False
             if qobuz.registry.delete_by_name('^.*\.dat$'): 

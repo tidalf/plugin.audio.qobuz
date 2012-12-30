@@ -386,15 +386,15 @@ class QobuzRegistry():
         self.cache.set(**ka)
 
     def save(self):
-        self.cache.save()
+        return self.cache.save()
 
     def delete(self,**ka):
         if not 'id' in ka:
             ka['id'] = 0
-        self.cache.delete(**ka)
+        return self.cache.delete(**ka)
 
     def delete_by_name(self,name):
-        self.cache.delete_by_name(name)
+        return self.cache.delete_by_name(name)
 
     def make_key(self,**ka):
         return self.cache.make_key(**ka)
