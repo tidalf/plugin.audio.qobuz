@@ -136,10 +136,13 @@ class Node_friend(Node):
             self.add_child(node)
         return True
     
-    def hook_attach_context_menu(self, item, menuItems):
+    def attach_context_menu(self, item, menuItems = []):
         colorItem = qobuz.addon.getSetting('color_item')
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         
         ''' Delete friend'''
         url = self.make_url(mode=Mode.FRIEND_REMOVE)
         menuItems.append((color(colorItem, 'Remove friend (i8n)' + ': ') + self.name, "XBMC.RunPlugin("+url+")"))
+
+        ''' Calling base class '''
+        super(Node_friend, self).attach_context_menu(item, menuItems)

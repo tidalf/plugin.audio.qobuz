@@ -126,7 +126,7 @@ class Node_playlist(Node):
         self.attach_context_menu(item)
         return item
 
-    def hook_attach_context_menu(self, item, menuItems):
+    def attach_context_menu(self, item, menuItems = []):
         colorItem = qobuz.addon.getSetting('color_item')
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
@@ -150,7 +150,9 @@ class Node_playlist(Node):
         ''' REMOVE '''
         url = self.make_url(mode=Mode.PLAYLIST_REMOVE)
         menuItems.append((color(colorWarn, lang(39010) + ': ') + label, "XBMC.RunPlugin("+url+")"))
-        
+    
+        ''' Calling base class '''
+        super(Node_playlist, self).attach_context_menu(item, menuItems)
         
     def remove_tracks(self, tracks_id):
         import qobuz, xbmc

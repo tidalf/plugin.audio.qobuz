@@ -69,7 +69,7 @@ class Node_friend_list(Node):
             node.set_name(str(name))
             self.add_child(node)
 
-    def hook_attach_context_menu(self, item, menuItems):
+    def attach_context_menu(self, item, menuItems = []):
         colorItem = qobuz.addon.getSetting('color_item')
         color_warn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
@@ -77,3 +77,6 @@ class Node_friend_list(Node):
         ''' SET AS CURRENT '''
         url = self.make_url(mode=Mode.FRIEND_ADD)
         menuItems.append((color(colorItem, 'Add friend (i8n)' + ': ') + label, "XBMC.RunPlugin("+url+")"))
+
+        ''' Calling base class '''
+        super(Node_friend_list, self).attach_context_menu(item, menuItems)

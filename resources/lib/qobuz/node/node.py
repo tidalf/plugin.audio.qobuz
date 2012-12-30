@@ -311,14 +311,13 @@ class Node(object):
     def _build_down(self,xbmc_directory,lvl,flag):
         pass
 
-    def attach_context_menu(self,item):
+    def attach_context_menu(self, item, menuItems = []):
         colorItem = qobuz.addon.getSetting('color_item')
-        menuItems = []
         cmd = ''
 
-        ''' ADD AS NEW '''
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.TEST))
-        menuItems.append((color(colorItem,"TEST WINDOW"),cmd))
+        ''' TEST'''
+#        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.TEST))
+#        menuItems.append((color(colorItem,"TEST WINDOW"),cmd))
 
         ''' VIEW BIG DIR '''
         path = self.make_url(mode=Mode.VIEW_BIG_DIR)
@@ -365,10 +364,6 @@ class Node(object):
             ''' CREATE '''
             cmd = xbmcRunPlugin(self.make_url(mode=Mode.PLAYLIST_CREATE))
             menuItems.append((color(colorItem,lang(39008)), cmd))
-        ''' 
-        Give a chance to our siblings to attach their items
-        '''
-        self.hook_attach_context_menu(item,menuItems)
 
         ''' SCAN '''
         if qobuz.addon.getSetting('enable_scan_feature') == 'true':
@@ -389,6 +384,3 @@ class Node(object):
 
         if len(menuItems) > 0:
             item.addContextMenuItems(menuItems,replaceItems=False)
-
-    def hook_attach_context_menu(self,item,menuItems):
-        pass
