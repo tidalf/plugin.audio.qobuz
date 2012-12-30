@@ -52,9 +52,18 @@ class Xbmc_renderer(IRenderer):
             self.root.build_down(dir, self.depth, self.filter)   
             if self.root.pagination_next: self.add_directory_item(dir=dir, label='[ Next ]', url=self.root.pagination_next, image=getImage('next'))
             dir.set_content(self.root.content_type)
-            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_TITLE)
-            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_LABEL)
-            xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_NONE)
+            methods = [
+                xbmcplugin.SORT_METHOD_UNSORTED,
+                xbmcplugin.SORT_METHOD_LABEL,
+                xbmcplugin.SORT_METHOD_DATE,
+                xbmcplugin.SORT_METHOD_TITLE,
+                xbmcplugin.SORT_METHOD_VIDEO_YEAR,
+                xbmcplugin.SORT_METHOD_GENRE,
+                xbmcplugin.SORT_METHOD_ARTIST,
+                xbmcplugin.SORT_METHOD_ALBUM,
+                xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
+                xbmcplugin.SORT_METHOD_TRACKNUM,                 ]
+            [ xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=method ) for method in methods ]
             dir.end_of_directory()
         return True
 
