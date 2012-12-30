@@ -37,6 +37,7 @@ class __Mode():
         self.FRIEND_ADD = 20
         self.FRIEND_REMOVE = 21
         self.FAVORITE_DELETE = 22
+        self.PLAYLIST_SUBSCRIBE = 23
         self.TEST = 2000
 
     
@@ -55,6 +56,7 @@ class __Mode():
         elif mode == self.PLAYLIST_ADD_TO_CURRENT: return "playlist add to current"
         elif mode == self.PLAYLIST_ADD_TO_CURRENT: return "favorites add to current"
         elif mode == self.PLAYLIST_SELECT_CURRENT: return "playlist select current"
+        elif mode == self.PLAYLIST_SUBSCRIBE: return "playlist subscribe"
         else: return "Unknow mode: " + str(mode)
         
 Mode = __Mode()

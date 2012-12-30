@@ -86,6 +86,9 @@ class Node_user_playlists(Node):
 
     def set_current_playlist(self, id):
         qobuz.registry.set(name='user-current-playlist-id', id=0, value=id)
+    
+    def subscribe_playlist(self, id):
+        return qobuz.api.playlist_subscribe(playlist_id = id)
         
     def create_playlist(self, query = None):
         #!TODO: Why we are no more logged ...

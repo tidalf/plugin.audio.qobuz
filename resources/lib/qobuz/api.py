@@ -282,6 +282,15 @@ class QobuzApi:
             raise QobuzXbmcError(who=self, what='missing_parameter',additional='artist_ids|albums_ids|track_ids')
         return self._api_request(ka,"/favorite/delete")
 
+    def playlist_subscribe (self, **ka):
+        mandatory = ['playlist_id']
+        found = None
+        for label in mandatory:
+            if label in ka: found = label
+        if not found:
+            raise QobuzXbmcError(who=self, what='missing_parameter',additional='playlist_id')
+        return self._api_request(ka,"/playlist/subscribe")
+    
     def playlist_deleteTracks (self, **ka):
         self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])
         return self._api_request(ka,"/playlist/deleteTracks")

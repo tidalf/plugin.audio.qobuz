@@ -244,6 +244,14 @@ class QobuzBootstrap(object):
                 return False
             xbmc.executebuiltin('Container.Refresh')
             return True
+        
+        elif self.MODE == Mode.PLAYLIST_SUBSCRIBE:
+            from  node.user_playlists import Node_user_playlists
+            node = Node_user_playlists()
+            if node.subscribe_playlist(self.params['nid']):
+                return False
+            # xbmc.executebuiltin('Container.Refresh')
+            return True
 
         elif self.MODE == Mode.PLAYLIST_CREATE:
             from  node.user_playlists import Node_user_playlists

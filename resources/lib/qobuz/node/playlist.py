@@ -134,6 +134,10 @@ class Node_playlist(Node):
         ''' SET AS CURRENT '''
         url = self.make_url(mode=Mode.PLAYLIST_SELECT_CURRENT)
         menuItems.append((color(colorItem, lang(39007) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+
+        ''' SUBSCRIBE '''
+        url = self.make_url(mode=Mode.PLAYLIST_SUBSCRIBE)
+        menuItems.append((color(colorItem, lang(39012) + ': ') + label, "XBMC.RunPlugin("+url+")"))
                 
         ''' CREATE '''
         url = self.make_url(mode=Mode.PLAYLIST_CREATE)
