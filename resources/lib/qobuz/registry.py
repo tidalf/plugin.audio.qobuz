@@ -23,19 +23,22 @@ import cPickle as pickle
 import os
 from debug import *
 import hashlib
+import re
 
 class QobuzLocalStorage(object):
 
     def __init__(self,**ka):
         # Checking mandatory parameters
-        mandatory = ['username', 'password', 'streamFormat']
+        mandatory = ['username','password','streamFormat']
         for key in mandatory:
-            if not key in ka: raise QobuzXbmcError(
-                                                       who=self,
-                                                       what='missing_parameter',
-                                                       additional=key)
-        
-        # Setting our options
+            if not key in ka: raise QobuzXbmcError(who=self,
+                                                   what='missing_parameter',
+                                                   additional=key)
+        # Regexp to filter out keys that we don't hashed
+        self.hashing_exclude_keys = None
+        self.hash_key_algorithm = 'md5'
+
+        # Setting our options and their default
         self.options = ka
         if not 'autoSave' in self.options:
             self.options['autoSave'] = True
@@ -47,34 +50,54 @@ class QobuzLocalStorage(object):
             self.options['overwrite'] = True
         if not 'hashKey' in self.options:
             self.options['hashKey'] = False
+        
+        if self.options['hashKey']:
+            self.hashing_exclude_keys = '^user.*$'
+
         # Our dictionary storage
         self.data = {}
 
         # Qobuz API
-        self.api = QobuzApi()  
+        self.api = QobuzApi()
         if not self.login(**ka):
-            raise QobuzXbmcError(who= self, what= 'login_failure', additional= ka['user'])
-    
-    def login(self, **ka):
+            raise QobuzXbmcError(who=self,what='login_failure',additional=ka['user'])
+
+    ''' We are compiling exluded key regex and raise error if it's fail '''
+    @property
+    def hashing_exclude_keys(self):
+        return self._hashing_exclude_keys
+    @hashing_exclude_keys.getter
+    def hashing_exclude_keys(self):
+        return self._hashing_exclude_keys
+    @hashing_exclude_keys.setter
+    def hashing_exclude_keys(self,pattern):
+        self._hashing_exclude_keys = None
+        if not pattern: return
+        print "Setting key..."
+        try:
+            self._hashing_exclude_keys = re.compile(pattern)
+        except: raise QobuzXbmcError(who=self,what='invalid_exclude_pattern',additional=pattern)
+
+    def login(self,**ka):
         # Login into Qobuz our raise exception   
         #key = self.make_key(name='user', id=0)
-        data = self.get(name='user', id=0, username=ka['username'], password=ka['password'])
-        if not data: return False 
+        data = self.get(name='user',id=0,username=ka['username'],password=ka['password'])
+        if not data: return False
         # We feed our api wit user data (auth_token, rights ...)
         self.api.set_logged(**data)
         return True
-        
+
     def lastError(self):
         return self.api.last_error
-    
+
     def set(self,**ka):
         mandatory = ['name','id']
         for key in mandatory:
-            if not key in ka: 
-                raise QobuzXbmcError(who=self, what='missing_parameter', additional=key)
+            if not key in ka:
+                raise QobuzXbmcError(who=self,what='missing_parameter',additional=key)
         key = self.make_key(**ka)
         if not self.options['overwrite'] and key in self.data:
-            raise QobuzXbmcError(who=self, what='key_exist', additional=key)
+            raise QobuzXbmcError(who=self,what='key_exist',additional=key)
         self.data[key] = {
                           'name': ka['name'],
                           'id': ka['id'],
@@ -88,26 +111,31 @@ class QobuzLocalStorage(object):
         return self
 
     def save(self,key):
-        QobuzXbmcError(who=self, what='not_implemented_in_child_class', additional='save')
+        QobuzXbmcError(who=self,what='not_implemented_in_child_class',additional='save')
 
-    def delete_by_name(self, name):
-        QobuzXbmcError(who=self, what='not_implemented_in_child_class', additional='delete_by_name')
-        
-    def make_key(self, **ka):
+    def delete_by_name(self,name):
+        QobuzXbmcError(who=self,what='not_implemented_in_child_class',additional='delete_by_name')
+
+    def make_key(self,**ka):
         key = self._make_key(**ka)
         if self.options['hashKey']:
             return self.hash_key(key)
         return key
-    
-    def _make_key(self, **ka):
-        QobuzXbmcError(who= self,what= 'not_implemented_in_child_class',additional='make_key')
 
-    def hash_key(self, key):
-        h = hashlib.new('sha256')
+    def _make_key(self,**ka):
+        QobuzXbmcError(who=self,what='not_implemented_in_child_class',additional='make_key')
+
+    def hash_key(self,key):
+        print "HASH KEY ? " + key + " / " + repr(self.hashing_exclude_keys)
+        if self.hashing_exclude_keys:
+            print "HASHING"
+            if self.hashing_exclude_keys.match(key):
+                return key
+        h = hashlib.new(self.hash_key_algorithm)
         h.update(key)
         return h.hexdigest()
-    
-    def get(self,*args, **ka):
+
+    def get(self,*args,**ka):
         key = self.make_key(**ka)
         if not key in self.data:
                 self.load(**ka)
@@ -115,7 +143,7 @@ class QobuzLocalStorage(object):
             return self.data[key]
         return None
 
-    def load(self, **ka):
+    def load(self,**ka):
         limit = 1000
         self.hook_pre_load(**ka)
         # noRemote prevent data loading from Qobuz (local key only)
@@ -124,7 +152,7 @@ class QobuzLocalStorage(object):
         key = self.make_key(**ka)
         if key in self.data and self.fresh(key):
             return self.data[key]
-        log(self, "Loading data from Qobuz")
+        log(self,"Loading data from Qobuz")
         response = None
         # We are deleting name and id because we don't want to send them
         # to Qobuz
@@ -140,30 +168,30 @@ class QobuzLocalStorage(object):
         elif name == 'user-playlists':
             response = self.api.playlist_getUserPlaylists(**ka)
         elif name == 'user-playlist':
-            response = self.api.playlist_get(playlist_id=id,extra='tracks', limit=ka['limit'], offset=ka['offset'])
+            response = self.api.playlist_get(playlist_id=id,extra='tracks',limit=ka['limit'],offset=ka['offset'])
         elif name == 'user-favorites':
             response = self.api.favorite_getUserFavorites(**ka)
         elif name == 'track':
             response = self.api.track_get(track_id=id)
         elif name == 'user-stream-url':
-            response = self.api.track_getFileUrl(track_id=id, format_id=self.options['streamFormat'])
+            response = self.api.track_getFileUrl(track_id=id,format_id=self.options['streamFormat'])
         elif name == 'user-purchases':
             response = self.api.purchase_getUserPurchases(limit=limit)
         elif name == 'recommendation':
             response = self.api.album_getFeatured(**ka)
         elif name == 'artist':
-            response = self.api.artist_get(artist_id=id, limit=limit)
+            response = self.api.artist_get(artist_id=id,limit=limit)
         elif name == 'genre-list':
-            response = self.api.genre_list(parent_id=id, limit=limit)
+            response = self.api.genre_list(parent_id=id,limit=limit)
         elif name == 'label-list':
             response = self.api.label_list(**ka)
         else:
             QobuzXbmcError(
-                        who= self,
-                        what= 'qobuz_api_invalid_query',
-                        additional= pprint.pformat(ka))
+                        who=self,
+                        what='qobuz_api_invalid_query',
+                        additional=pprint.pformat(ka))
         if not response:
-                warn(self, "Loading from Qobuz fail")
+                warn(self,"Loading from Qobuz fail")
                 return False
         ka['value'] = response
         ka['name'] = name
@@ -171,80 +199,84 @@ class QobuzLocalStorage(object):
         self.set(**ka)
         return True
 
-    
-    def fresh(self, key):
+
+    def fresh(self,key):
         if not key in self.data:
             return False
         if (time() - self.data[key]['updatedOn']) > self.options['refresh']:
             return False
         return True
-        
+
     def saved(self,key,value=None):
         if not key:
-            QobuzXbmcError(who=self, what='missing_parameter', additional='key')
+            QobuzXbmcError(who=self,what='missing_parameter',additional='key')
         if not key in self.data:
-            QobuzXbmcError(who=self,what= 'undefined_key', additional=key)
+            QobuzXbmcError(who=self,what='undefined_key',additional=key)
         if value == None:
             return self.data[key]['saved']
         self.data[key]['saved'] = True if value else False
         return self
 
-    def delete(self, **ka):
+    def delete(self,**ka):
         key = self.make_key(**ka)
         self.data[key] = None
         del self.data[key]
-        
-class QobuzCacheDefault(QobuzLocalStorage):
-    def __init__(self,*args,**ka):
-        super(QobuzCacheDefault,self).__init__(*args, **ka)
-        if not 'basePath' in ka:
-            QobuzXbmcError(who=self, what='missing_parameter',additional='basePath')
 
-    def _make_key(self, *args, **ka):
+class QobuzCacheDefault(QobuzLocalStorage):
+
+    def __init__(self,**ka):
+        # @bug: Must have been herited from parent class ?
+        self._hashing_exclude_keys = None
+        super(QobuzCacheDefault,self).__init__(**ka)
+        if not 'basePath' in ka:
+            QobuzXbmcError(who=self,what='missing_parameter',additional='basePath')
+
+
+    def _make_key(self,*args,**ka):
         if not 'id' in ka: ka['id'] = 0
         key = ka['name'] + '-' + str(ka['id']);
         if 'offset' in ka: key += '-' + str(ka['offset'])
         return key
-    
-    def _make_sub_path(self, xpath, key, size, count):
+
+    def _make_sub_path(self,xpath,key,size,count):
         if count == 0 or len(key) < size + 1:
             return key + '.dat'
         subp = key[:size]
-        root = os.path.join(os.path.join(*xpath), subp)
+        root = os.path.join(os.path.join(*xpath),subp)
         if not os.path.exists(root):
             os.mkdir(root)
         xpath.append(subp)
         count -= 1
-        return self._make_sub_path(xpath, key[size:], size, count )
-        
+        return self._make_sub_path(xpath,key[size:],size,count)
+
     def _make_path(self, key):
         xpath = []
         xpath.append(self.options['basePath'])
         fileName = None
-        if self.options['hashKey']:
-            fileName = self._make_sub_path(xpath, key, 2, 1)
+        if self.options['hashKey'] and not self.hashing_exclude_keys.match(key):
+            fileName = self._make_sub_path(xpath,key,2,1)
         else:
             fileName = key + '.dat'
-        return os.path.join(os.path.join(*xpath), fileName)
-    
-    def hook_pre_load(self, **ka):
-        log(self, "Loading from disk")
+        return os.path.join(os.path.join(*xpath),fileName)
+
+    def hook_pre_load(self,**ka):
+        log(self,"Loading from disk")
         key = self.make_key(**ka)
         cache = self._make_path(key)
         #cache = os.path.join(self.options['basePath'], key+'.dat');
         if not os.path.exists(cache):
-            warn(self, "Path doesn't exists " + cache)
+            warn(self,"Path doesn't exists " + cache)
             return False
-        with open(cache, 'rb') as f:
-            f = open(cache, 'rb')
+        with open(cache,'rb') as f:
+            f = open(cache,'rb')
             try:
                 self.data[key] = pickle.load(f)
-            except: 
-                warn(self, "Pickle can't load data from file")
+            except:
+                warn(self,"Pickle can't load data from file")
                 return False
         return True
-        
-    def save(self, key = None):
+
+    def save(self,key=None):
         if key == None:
             count = 0
             for key in self.data:
@@ -253,29 +285,29 @@ class QobuzCacheDefault(QobuzLocalStorage):
                     self.save(key)
             return count
         if not key in self.data:
-            raise QobuzXbmcError(who=self, what='undefined_key',additional=key)
+            raise QobuzXbmcError(who=self,what='undefined_key',additional=key)
         cache = self._make_path(key)
-        with open(cache, 'wb') as f:
-            s = pickle.dump(self.data[key], f, protocol = pickle.HIGHEST_PROTOCOL)
+        with open(cache,'wb') as f:
+            s = pickle.dump(self.data[key],f,protocol=pickle.HIGHEST_PROTOCOL)
             f.flush()
             os.fsync(f)
         return s
-        warn(self, 'Cannot save key ' + key)
+        warn(self,'Cannot save key ' + key)
         return 0
 
-    def delete(self, **ka):
+    def delete(self,**ka):
         key = self.make_key(**ka)
-        info(self, 'Deleting key: ' + key)
-        cache = os.path.join(self.options['basePath'], key + '.dat')
+        info(self,'Deleting key: ' + key)
+        cache = os.path.join(self.options['basePath'],key + '.dat')
         if not os.path.exists(cache):
             return False
         fu = FileUtil();
         if fu.unlink(cache):
-            super(QobuzCacheDefault, self).delete(**ka)
-            
-    def delete_by_name(self, name):
+            super(QobuzCacheDefault,self).delete(**ka)
+
+    def delete_by_name(self,name):
         fu = FileUtil()
-        files = fu.find(self.basePath, '^user(.*)\.dat$')
+        files = fu.find(self.basePath,'^user(.*)\.dat$')
         pprint.pprint(files)
 
 class QobuzCacheCommon(QobuzLocalStorage):
@@ -285,22 +317,22 @@ class QobuzCacheCommon(QobuzLocalStorage):
         import xbmc
         import StorageServer
         #StorageServer.dbg = True
-        self.storage = StorageServer.StorageServer('plugin_audio_qobuz', 24)
-        super(QobuzCacheCommon,self).__init__(*args, **ka)
+        self.storage = StorageServer.StorageServer('plugin_audio_qobuz',24)
+        super(QobuzCacheCommon,self).__init__(*args,**ka)
         print "import ok"
-        
-    def _make_key(self, *args, **ka):
+
+    def _make_key(self,*args,**ka):
             if not 'id' in ka: ka['id'] = 0
             return "" + ka['name'] + '-' + str(ka['id']);
-    
-    def hook_pre_load(self, **ka):
+
+    def hook_pre_load(self,**ka):
         key = self.make_key(**ka)
         data = self.storage.get(key)
-        log(self, "LOADING " + key + ' / ' + pprint.pformat(data))
+        log(self,"LOADING " + key + ' / ' + pprint.pformat(data))
         if data:
             self.data[key] = pickle.loads(data)
-    
-    def save(self, key = None):
+
+    def save(self,key=None):
         if key == None:
             count = 0
             for key in self.data:
@@ -309,15 +341,15 @@ class QobuzCacheCommon(QobuzLocalStorage):
                     self.save(key)
             return count
         if not key in self.data:
-            QobuzXbmcError(who=self,what='undefined_key', additional=key)
-        data = pickle.dumps(self.data[key], 0)
+            QobuzXbmcError(who=self,what='undefined_key',additional=key)
+        data = pickle.dumps(self.data[key],0)
         print "SAVE key " + key + ' / ' + pprint.pformat(data)
-        self.storage.set(key, data)
+        self.storage.set(key,data)
         self.saved(key,True)
         return 1
 
 class QobuzRegistry():
-    
+
     def __init__(self,*args,**ka):
         if not 'cacheType' in ka:
             ka['cacheType'] = 'default'
@@ -326,20 +358,20 @@ class QobuzRegistry():
         elif ka['cacheType'] == 'xbmc-common':
             cache = None
             try:
-                cache = QobuzCacheCommon(*args, **ka)
+                cache = QobuzCacheCommon(*args,**ka)
             except Exception:
-                cache = QobuzCacheDefault(*args, **ka)
+                cache = QobuzCacheDefault(*args,**ka)
             self.cache = cache
         else:
-            QobuzXbmcError(who=self, what='unknown_cache_type',additionnal=ka['cacheType'])
+            QobuzXbmcError(who=self,what='unknown_cache_type',additionnal=ka['cacheType'])
         return None
-    
+
     def get_api(self):
         return self.cache.api
-    
+
     def lastError(self):
         return self.cache.lastError()
-    
+
     def get(self,**ka):
         if not 'id' in ka:
             ka['id'] = 0
@@ -347,39 +379,38 @@ class QobuzRegistry():
 
     def set(self,**ka):
         self.cache.set(**ka)
-        
+
     def save(self):
         self.cache.save()
-        
-    def delete(self, **ka):
+
+    def delete(self,**ka):
         if not 'id' in ka:
             ka['id'] = 0
         self.cache.delete(**ka)
-    
-    def delete_by_name(self, name):
+
+    def delete_by_name(self,name):
         self.cache.delete_by_name(name)
-    
-    def make_key(self, **ka):
+
+    def make_key(self,**ka):
         return self.cache.make_key(**ka)
-    
-    def login(self, **ka):
+
+    def login(self,**ka):
         return self.cache.login(**ka)
-    
+
 if __name__ == '__main__':
 #    try:
 #        QobuzXbmcError({'Who': 'TestException','What': 'test_exception','With': 'TestingException'})
 #    except(QobuzXbmcError):
 #        pass
 
-    reg = QobuzRegistry(user='SET_USER', password='SET_PASSWORD', cacheType='xbmc-common',
+    reg = QobuzRegistry(user='SET_USER',password='SET_PASSWORD',cacheType='xbmc-common',
                    basePath='c:/tmp/qobuz/',
                    autoSave=True,
-                   autoLoad=True, refresh=3600)
-    
-    user_playlists = reg.get(name='user-playlists', id=12342323)
+                   autoLoad=True,refresh=3600)
+
+    user_playlists = reg.get(name='user-playlists',id=12342323)
     if not user_playlists:
-        print "Error:" + repr(reg.lastError()) 
+        print "Error:" + repr(reg.lastError())
     for pl in user_playlists['data']['playlists']['items']:
         print  '[' + repr(pl['id']) + ']' + "Name: " + pl['name']
-        playlist = reg.get(name='playlist', id=pl['id'])
-        
+        playlist = reg.get(name='playlist',id=pl['id'])

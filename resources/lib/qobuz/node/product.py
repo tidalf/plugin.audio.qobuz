@@ -85,7 +85,7 @@ class Node_product(Node):
         item.setInfo('music', infoLabels = {
                                             'genre': self.get_genre(),
                                             'year': self.get_year()
-                                            })
+        })
         self.attach_context_menu(item)
         return item
 

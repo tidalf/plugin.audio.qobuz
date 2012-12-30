@@ -73,12 +73,13 @@ class FileUtil():
         return self._safe_unlink(path)
     
     ''' Find '''
-    def find(self, dir, pattern):
+    def find(self, dir, pattern, excludeDir = True):
         flist = []
         fok = re.compile(pattern)
         for dirname, dirnames, filenames in os.walk(dir):
-            for subdirname in dirnames:
-                flist.append( os.path.join(dirname, subdirname))
+            if not excludeDir:
+                for subdirname in dirnames:
+                    flist.append( os.path.join(dirname, subdirname))
             for filename in filenames:
                 if fok.match(filename):
                     flist.append(os.path.join(dirname, filename))

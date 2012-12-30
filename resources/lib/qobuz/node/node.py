@@ -380,7 +380,7 @@ class Node(object):
 
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
-        cmd = "XBMC.Container.Update(%s)" % (self.make_url(mode=Mode.ERASE_CACHE))
+        cmd = "XBMC.RunPlugin(%s)" % (self.make_url(mode=Mode.ERASE_CACHE))
         menuItems.append((color(colorItem,lang(31009)),cmd))
 
         '''

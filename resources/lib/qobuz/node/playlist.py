@@ -23,7 +23,7 @@ from flag import NodeFlag
 from node import Node
 from product import Node_product
 from debug import info, warn
-from gui.util import notifyH, notify, color, lang
+from gui.util import notifyH, notify, color, lang, getImage
 
 '''
     NODE PLAYLIST
@@ -169,7 +169,7 @@ class Node_playlist(Node):
             if cid: cid = cid['data']
             if not cid:
                 warn(self, 'no current playlist id')
-                notify(29000, 29001)
+                notify(29000, 29001, getImage('icon-error-256'))
                 return False
             nt = None
             try: nt = int(self.get_parameter('nt'))

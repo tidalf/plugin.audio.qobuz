@@ -97,7 +97,8 @@ class QobuzPlayer(xbmc.Player):
             PLaying track
         '''
         if qobuz.addon.getSetting('notification_playingsong') == 'true':
-            notifyH(lang(34000), node.get_label(), node.get_image())
+#            notifyH(lang(34000), node.get_label(), node.get_image())
+            qobuz.rpc.showNotification(lang(34000), node.get_label(), node.get_image())
 
         '''
             We are called from playlist...

@@ -57,24 +57,7 @@ def get_params():
     return rparam
 
 
-class XbmcRPC:
-    def __init__(self):
-        pass
-    
-    def send(self, request):
-        if not request: raise QobuzXbmcError(who=self, what='missing_parameter', additional='request')
-        request['jsonrpc'] = '2.0'
-        request['method'] = 'JSONRPC.' + request['method']
-        if not 'id' in request: request['id'] = 1
-        rjson = json.dumps(request)
-        ret = xbmc.executeJSONRPC(rjson)
-        return ret
 
-    def ping(self):
-        request = {
-                   'method': 'Ping',
-        }
-        return self.send(request)
         
 '''
     QobuzBootstrap
@@ -87,9 +70,11 @@ class QobuzBootstrap(object):
         qobuz.boot = self
         
     def bootstrap_app(self):
+        from xbmcrpc import XbmcRPC
         self.bootstrap_directories()
         self.bootstrap_registry()
         self.bootstrap_sys_args()
+        qobuz.rpc = XbmcRPC()
 
     def bootstrap_registry(self):
         from registry import QobuzRegistry
@@ -100,7 +85,7 @@ class QobuzBootstrap(object):
                                        username=qobuz.addon.getSetting('username'), 
                                        password=qobuz.addon.getSetting('password'), 
                                        basePath=qobuz.path.cache,
-                                       streamFormat=streamFormat, hashKey=False)
+                                       streamFormat=streamFormat, hashKey=True)
 
             qobuz.registry.get(name='user')
             qobuz.api = qobuz.registry.get_api()
@@ -183,6 +168,7 @@ class QobuzBootstrap(object):
         fu = FileUtil()
         flist = fu.find(qobuz.path.cache, '^.*\.dat$')
         for fileName in flist:
+            print "Trying to delete " + fileName
             fu.unlink(fileName)
         return False
 

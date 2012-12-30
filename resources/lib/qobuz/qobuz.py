@@ -20,3 +20,4 @@ path = None
 api = None
 boot = None
 registry = None
+rpc = None

@@ -14,7 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
+import os
 import xbmc, xbmcgui,xbmcplugin
 import qobuz
 
@@ -28,14 +28,15 @@ class Keyboard(xbmc.Keyboard):
         
 
 def getImage(name):
-    path = qobuz.path.image + '/' + name + '.png'
+    path = os.path.join(qobuz.path.image, name + '.png')
+    print "IMAGE PATH: " + path
     return path
 
 '''
     Notify Human
 '''
 def notifyH(title, text, image = None, mstime = 2000):
-    image = image or getImage('default')
+    if not image: image = getImage('icon-default-256')
     s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
 
@@ -43,7 +44,8 @@ def notifyH(title, text, image = None, mstime = 2000):
     Notify
 '''
 def notify(title, text, image = None, mstime = 2000):
-    image = image or getImage('default')
+    if not image: image = getImage('icon-default-256')
+    print "IMAGE: " + image
     s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (lang(title), lang(text), mstime, getImage)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
     
