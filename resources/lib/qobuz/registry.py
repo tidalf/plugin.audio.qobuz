@@ -60,7 +60,9 @@ class QobuzLocalStorage(object):
         # Qobuz API
         self.api = QobuzApi()
         if not self.login(**ka):
-            raise QobuzXbmcError(who=self,what='login_failure',additional=ka['user'])
+            user = None
+            if 'user' in ka: user = ka['user']
+            raise QobuzXbmcError(who=self,what='login_failure',additional=repr(user))
 
     ''' We are compiling exluded key regex and raise error if it's fail '''
     @property
@@ -305,9 +307,14 @@ class QobuzCacheDefault(QobuzLocalStorage):
 
     def delete_by_name(self, pattern):
         fu = FileUtil()
-        files = fu.find(self.basePath, pattern)
+        files = fu.find(self.options['basePath'], pattern)
+        ret = True
         for fileName in files:
-            print "Removing " + fileName
+            log(self, "[DISK] Removing " + fileName)
+            if not fu.unlink(fileName): 
+                warn(self, "[DISK] Failed to remove: " + fileName)
+                ret = False
+        return ret
 
 class QobuzCacheCommon(QobuzLocalStorage):
     def __init__(self,*args,**ka):

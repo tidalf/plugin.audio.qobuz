@@ -162,15 +162,7 @@ class QobuzBootstrap(object):
         debug(self, "NT: " + str(self.NT) + " / NID: " + self.NID)
 
     def erase_cache(self):
-        if not qobuz.path.cache:
-            raise QobuzXbmcError(who=self, what='qobuz_path_not_set')
-        from util.file import FileUtil
-        fu = FileUtil()
-        flist = fu.find(qobuz.path.cache, '^.*\.dat$')
-        for fileName in flist:
-            print "Trying to delete " + fileName
-            fu.unlink(fileName)
-        return False
+        qobuz.registry.delete_by_name('^.*\.dat$')
 
     '''
         Execute methode based on MODE
