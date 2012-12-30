@@ -48,7 +48,7 @@ class Node_friend(Node):
    
     def set_label(self, label):
         colorItem = qobuz.addon.getSetting('color_item')
-        self.label = 'friend / ' + color(colorItem, label)
+        self.label = color(colorItem, label)
     
     def set_name(self, name):
         self.name = name or ''
