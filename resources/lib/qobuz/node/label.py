@@ -37,7 +37,7 @@ class Node_label(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_LABEL
         self.set_label('Label (i8n)')
         self.url = None
-        self.set_is_folder(True)
+        self.is_folder = True
         self.image = getImage('album')
     
     

@@ -58,8 +58,6 @@ RECOS_GENRES = {
 '''
     NODE RECOS
 '''
-#from cache.recommendation import Cache_recommendation
-
 class Node_recommendation(Node):
 
     def __init__(self, parent = None, parameters = None):
@@ -82,8 +80,6 @@ class Node_recommendation(Node):
         if not self.genre_id or not self.genre_type: return None
         return str(self.genre_type) + '-' + str(self.genre_id)
     
-
-
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
         colorItem = qobuz.addon.getSetting('color_item')
@@ -104,7 +100,6 @@ class Node_recommendation(Node):
             node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[int(self.genre_type)]) + ' / ' + RECOS_GENRES[genre_id])
             self.add_child(node)
         return True
-
 
 # TYPE GENRE
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):

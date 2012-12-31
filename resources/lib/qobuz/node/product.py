@@ -14,16 +14,12 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
-import pprint
-
 import xbmcgui
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
 from node import Node
-from debug import info, warn, error,log
+from debug import warn
 from gui.util import getImage
 '''
     NODE PRODUCT
@@ -65,7 +61,6 @@ class Node_product(Node):
                 node.data = track
                 self.add_child(node)
         except: pass
-        #print pprint.pformat(data)
         self.add_pagination(data['data'])
         
     def _filter_tracks(self, tracks):

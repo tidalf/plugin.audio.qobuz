@@ -36,7 +36,7 @@ class Node_artist(Node):
         super(Node_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FAVORITES
         self.set_label(lang(30079))
-        self.set_is_folder(True)
+        self.is_folder = True
         
         self.name = lang(30079)
         self.label = lang(30079)

@@ -119,7 +119,6 @@ class Node(object):
 
     ''' Property are just a easy way to access JSON data when set '''
     def get_property(self,path):
-        #print "PATH: " + repr(path)
         if not self._data:
             return ''
         if isinstance(path,basestring):
@@ -154,10 +153,6 @@ class Node(object):
         url = self.make_url(offset=items['offset'] + items['limit'])
         print "URL: " + url
         self.pagination_next = url
-
-
-    def set_is_folder(self,b):
-        self.is_folder = True if b else False
 
     def to_s(self):
         s = "[Node][" + str(self.type) + "\n"
@@ -334,14 +329,14 @@ class Node(object):
             ''' ALL ALBUM '''
             id = self.get_artist_id()
             url = self.make_url(mode=Mode.VIEW,type=NodeFlag.TYPE_ARTIST,id=id)
-            cmd = containerUpdate(url)
+            cmd = runPlugin(url)
             menuItems.append((color(colorItem,lang(39001)),cmd))
 
             ''' Similar artist '''
             id = self.get_artist_id()
             import urllib
             query = urllib.quote(self.get_artist().encode('utf-8'))
-            args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW,
+            args = sys.argv[1] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW,
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
                                          id,id)
             cmd = runPlugin(args)

@@ -41,7 +41,7 @@ class Node_playlist(Node):
         self.label = ""
         self.label2 = ""
         self.url = None
-        self.set_is_folder(True)
+        self.is_folder = True
         self.packby = ''
         if self.packby == 'album':
             self.content_type = 'albums'
@@ -174,7 +174,7 @@ class Node_playlist(Node):
     def add_to_current_playlist(self):
             from gui.directory import Directory
             from renderer.xbmc import Xbmc_renderer as renderer
-            cid = qobuz.registry.get(name='user-current-playlist-id')
+            cid = qobuz.registry.get(name='user-current-playlist-id', noRemote=True)
             if cid: cid = cid['data']
             if not cid:
                 warn(self, 'no current playlist id')
@@ -185,8 +185,8 @@ class Node_playlist(Node):
             except:
                 warn(self, "No node type...abort")
                 return False
-            id = None
-            try: id = self.get_parameter('nid')        
+            ID = None
+            try: ID = self.get_parameter('nid')        
             except: pass 
             depth = -1
             try: depth = int(self.get_parameter('depth'))
@@ -194,29 +194,30 @@ class Node_playlist(Node):
             view_filter = 0
             try: view_filter = int(self.get_parameter('view-filter'))
             except: pass
-            render = renderer(nt, id)
+            render = renderer(nt, ID)
             render.set_depth(depth)
             render.set_filter(view_filter)
             render.set_root_node()
-            dir = Directory(render.root, qobuz.boot.handle, True)
+            Dir = Directory(render.root, qobuz.boot.handle, True)
             flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
             if render.root.type & NodeFlag.TYPE_TRACK:
                 flags = NodeFlag.TYPE_TRACK
-            ret = render.root.build_down(dir, depth, flags)
+            ret = render.root.build_down(Dir, depth, flags)
             if not ret: 
-                dir.end_of_directory()
+                Dir.end_of_directory()
                 return False
-            trackids = []
-            if len(dir.nodes) < 1:
+            track_ids = []
+            if len(Dir.nodes) < 1:
                 warn(self, "No track to add to current playlist")
-                dir.end_of_directory()
+                Dir.end_of_directory()
                 return False
-            for node in dir.nodes:
-                trackids.append(str(node.id))
-            strtracks = ','.join(trackids)
-            ret = qobuz.api.playlist_addTracks(playlist_id=str(cid), track_ids=strtracks)
+            for node in Dir.nodes:
+                track_ids.append(str(node.id))
+            str_tracks = ','.join(track_ids)
+            ret = qobuz.api.playlist_addTracks(playlist_id=str(cid), track_ids=str_tracks)
             if ret:
                 qobuz.registry.delete(name='user-playlist', id=cid)
+            Dir.end_of_directory()
             return True
             
     def add_as_new_playlist(self):
@@ -228,8 +229,8 @@ class Node_playlist(Node):
         except:
             warn(self, "No node type...abort")
             return False
-        id = None
-        try: id = self.get_parameter('nid')        
+        ID = None
+        try: ID = self.get_parameter('nid')        
         except: pass 
         depth = -1
         try: depth = int(self.get_parameter('depth'))
@@ -237,17 +238,17 @@ class Node_playlist(Node):
         view_filter = 0
         try: view_filter = int(self.get_parameter('view-filter'))
         except: pass
-        render = renderer(nt, id)
+        render = renderer(nt, ID)
         render.set_depth(depth)
         render.set_filter(view_filter)
         render.set_root_node()
-        dir = Directory(render.root, qobuz.boot.handle, True)
+        Dir = Directory(render.root, qobuz.boot.handle, True)
         flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
         if render.root.type & NodeFlag.TYPE_TRACK:
             flags = NodeFlag.TYPE_TRACK
-        ret = render.root.build_down(dir, depth, flags)
+        ret = render.root.build_down(Dir, depth, flags)
         if not ret:
-            dir.end_of_directory()
+            Dir.end_of_directory()
             warn(self, "Nothing to add as new playlist")
             return False
         info(self, "CREATE PLAYLIST: " + repr(render.root.get_label()))
@@ -255,18 +256,23 @@ class Node_playlist(Node):
         nid = userplaylists.create_playlist(render.root.get_label())
         if not nid: 
             warn(self, "Cannot create playlist...")
-            dir.end_of_directory()
+            Dir.end_of_directory()
             return False
         trackids = []
-        if len(dir.nodes) < 1:
+        if len(Dir.nodes) < 1:
             warn(self, "No track to add to current playlist")
-            dir.end_of_directory()
+            Dir.end_of_directory()
+            qobuz.registry.set(name='user-current-playlist-id', value=nid, noRemote=True)
+            qobuz.registry.delete(name='user-playlist', id=nid)
+            qobuz.registry.deleet(name='user-playlists')
             return False
-        for node in dir.nodes:
+        for node in Dir.nodes:
             trackids.append(str(node.id))
         strtracks = ','.join(trackids)
         ret = qobuz.api.playlist_addTracks(playlist_id=nid, track_ids=strtracks)
         if ret:
-            qobuz.registry.set(name='user-current-playlist-id', id=0, value=nid, noRemote=True)
-        dir.end_of_directory()
+            qobuz.registry.delete(name='user-playlist', id=nid)
+            qobuz.registry.deleet(name='user-playlists')
+            qobuz.registry.set(name='user-current-playlist-id', value=nid, noRemote=True)
+        Dir.end_of_directory()
         return True

@@ -41,7 +41,7 @@ class Node_friend_list(Node):
         self.label = "Friend (i8n)"
         self.label2 = ""
         self.url = None
-        self.set_is_folder(True)
+        self.is_folder = True
         self.content_type = 'artist'
   
     def _build_down(self, xbmc_directory, lvl, flag = None):

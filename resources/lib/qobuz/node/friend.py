@@ -44,7 +44,7 @@ class Node_friend(Node):
         self.set_label(self.name)
         self.label2 = self.label
         self.url = None
-        self.set_is_folder(True)
+        self.is_folder = True
    
     def set_label(self, label):
         colorItem = qobuz.addon.getSetting('color_item')

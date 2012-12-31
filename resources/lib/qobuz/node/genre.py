@@ -33,10 +33,10 @@ class Node_genre(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_GENRE
         self.set_label('Genre (i8n)')
         if self.parent: self.label = self.parent.label + ' / ' + self.label
-        self.id = 1
+        self.id = None
         self.label2 = self.label
         self.url = None
-        self.set_is_folder(True)
+        self.is_folder = True
         self.image = getImage('album')
     
     def make_url(self, **ka):
@@ -51,31 +51,22 @@ class Node_genre(Node):
     def get_name(self):
         return self.get_property('name')
     
-    def _build_down_reco(self, dir, lvl, whiteFlag, id):
+    def _build_down_reco(self, directory, lvl, whiteFlag, ID):
         for gtype in RECOS_TYPE_IDS:
-            print "GTYPE " + repr(gtype)
-            node = Node_recommendation(self, {'genre-id': id, 'genre-type': gtype })
-            node.build_down(dir, lvl, whiteFlag)
-#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'press-awards' })
-#        node.build_down(dir, lvl, whiteFlag)
-#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'best-sellers' })
-#        node.build_down(dir, lvl, whiteFlag)
-#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'editor-picks' })
-#        node.build_down(dir, lvl, whiteFlag)
-#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'most-featured' })
-#        node.build_down(dir, lvl, whiteFlag)
+            node = Node_recommendation(self, {'genre-id': ID, 'genre-type': gtype })
+            node.build_down(directory, lvl, whiteFlag)
         return True
         
-    def _build_down(self, dir, lvl, flag = None):
+    def _build_down(self, directory, lvl, flag = None):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='genre-list', id=self.id, offset=offset, limit=limit)
         if not data or len(data['data']['genres']['items']) == 0:
-            return self._build_down_reco(dir, lvl, flag, self.id)
+            return self._build_down_reco(directory, lvl, flag, self.id)
         for genre in data['data']['genres']['items']:
             node = Node_genre()
             node.data = genre
             if 'parent' in genre and genre['parent']['level'] > 2:
-                self._build_down_reco(dir, lvl, flag, genre['id'])
+                self._build_down_reco(directory, lvl, flag, genre['id'])
             self.add_child(node)
         return True

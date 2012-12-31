@@ -14,18 +14,13 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import random
-import pprint
-
 import xbmc
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error, debug
-from gui.util import color, lang, getImage
+from gui.util import color, lang, getImage, notifyH
 
 '''
     NODE USER PLAYLISTS
@@ -84,11 +79,11 @@ class Node_user_playlists(Node):
         self.add_pagination(data['data'])
         return True
 
-    def set_current_playlist(self, id):
-        qobuz.registry.set(name='user-current-playlist-id', id=0, value=id)
+    def set_current_playlist(self, ID):
+        qobuz.registry.set(name='user-current-playlist-id', id=0, value=ID)
     
-    def subscribe_playlist(self, id):
-        if qobuz.api.playlist_subscribe(playlist_id = id):
+    def subscribe_playlist(self, ID):
+        if qobuz.api.playlist_subscribe(playlist_id = ID):
             from gui.util import notifyH, isFreeAccount, lang
             notifyH("Qobuz","(i8n) playlist subscribed")
             qobuz.registry.delete_by_name('^user-playlists.*\.dat$')
@@ -117,10 +112,10 @@ class Node_user_playlists(Node):
     ''' 
         Rename playlist 
     '''
-    def rename_playlist(self, id):
+    def rename_playlist(self, ID):
         from gui.util import Keyboard
-        info(self, "renaming playlist: " + str(id))
-        playlist = qobuz.registry.get(name='user-playlist', id=id)
+        info(self, "renaming playlist: " + str(ID))
+        playlist = qobuz.registry.get(name='user-playlist', id=ID)
         currentname = playlist['data']['name'].encode('utf8', 'replace')
         k = Keyboard('', lang(30078))
         k.doModal()
@@ -132,21 +127,21 @@ class Node_user_playlists(Node):
             return True
         res = qobuz.api.playlist_update(playlist_id=id,name=newname)
         if res:
-            qobuz.registry.delete(name='user-playlist', id=id)
+            qobuz.registry.delete(name='user-playlist', id=ID)
             qobuz.registry.delete(name='user-playlists')
             xbmc.executebuiltin('Container.Refresh')
             return False
         else:
-            qobuz.gui.notifyH(lang(30078), lang(39009) + ': ' + currentname)
+            notifyH(lang(30078), lang(39009) + ': ' + currentname)
         return False
     '''
         Remove playlist
     '''
-    def remove_playlist(self, id):
+    def remove_playlist(self, ID):
         import xbmcgui, xbmc
         offset = self.get_parameter('offset') or 0
-        limit = limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.registry.get(name='user-playlist', id=id, offset=offset, limit=limit)['data']
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='user-playlist', id=ID, offset=offset, limit=limit)['data']
         name = ''
         if 'name' in data: name = data['name']
         ok = xbmcgui.Dialog().yesno(lang(39010),
@@ -156,10 +151,10 @@ class Node_user_playlists(Node):
             info(self, "Deleting playlist aborted...")
             return False
 
-        info(self, "Deleting playlist: " + id)
-        res = qobuz.api.playlist_delete(playlist_id=id, offset=offset, limit=limit)
+        info(self, "Deleting playlist: " + ID)
+        res = qobuz.api.playlist_delete(playlist_id=ID)
         if not res:
-            warn(self, "Cannot delete playlist with id " + str(id))
+            warn(self, "Cannot delete playlist with id " + str(ID))
             return False
         qobuz.registry.delete(name='user-playlists', offset=offset, limit=limit)
         return True

@@ -14,9 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
 import xbmcgui
 
 import qobuz
@@ -37,7 +34,7 @@ class Node_track(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_TRACK
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
-        self.set_is_folder(False)
+        self.is_folder = False
         self.status = None
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
@@ -48,31 +45,31 @@ class Node_track(Node):
             self.data = qobuz.registry.get(name='track', id=nid)['data']
             xbmc_directory.add_node(self)
             return True
-
-    def set_cache(self, progress = None):
-        id = self.id
-        if not id:
-            try:
-                id = self.get_parameter('nid')
-            except: pass
-        if not id:
-            error(self, "Cannot set cache without id")
-            return False
-        return True
+#
+#    def set_cache(self, progress = None):
+#        nid = self.id
+#        if not id:
+#            try:
+#                id = self.get_parameter('nid')
+#            except: pass
+#        if not id:
+#            error(self, "Cannot set cache without id")
+#            return False
+#        return True
 
     def make_url(self, **ka):
         ka['mode'] = Mode.PLAY
         return super(Node_track, self).make_url(**ka)
 
-    def get_label(self, format = "%a - %t"):
-        format = format.replace("%a", self.get_artist())
-        format = format.replace("%t", self.get_title())
+    def get_label(self, sFormat = "%a - %t"):
+        sFormat = sFormat.replace("%a", self.get_artist())
+        sFormat = sFormat.replace("%t", self.get_title())
         try:
-            format = format.replace("%A", self.get_album()) # .encode('utf8', 'ignore'))
+            sFormat = sFormat.replace("%A", self.get_album())
         except: pass
-        format = format.replace("%n", str(self.get_track_number()))
-        format = format.replace("%g", self.get_genre()) # .encode('utf8', 'ignore'))
-        return format
+        sFormat = sFormat.replace("%n", str(self.get_track_number()))
+        sFormat = sFormat.replace("%g", self.get_genre())
+        return sFormat
 
     def get_composer(self):
         try: 
@@ -194,21 +191,22 @@ class Node_track(Node):
     def get_mimetype(self):
         nid = self.id or self.parameters['nid']
         data = qobuz.registry.get(name='user-stream-url', id=nid)
+        formatId = None
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
             return ''
         try: 
-            format = int(data['data']['format_id'])
+            formatId = int(data['data']['format_id'])
         except:
             warn(self, "Cannot get mime/type for track (restricted track?)")
             return ''
         mime = ''
-        if format == 6:
+        if formatId == 6:
             mime = 'audio/flac'
-        elif format == 5:
+        elif formatId == 5:
             mime = 'audio/mpeg'
         else:
-            warn(self, "Unknow format " + str(format))
+            warn(self, "Unknow format " + str(formatId))
             mime = 'audio/mpeg'
         return mime
 

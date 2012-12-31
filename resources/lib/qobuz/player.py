@@ -58,11 +58,10 @@ class QobuzPlayer(xbmc.Player):
     def onPlaybackStarted(self):
         print "PLAYBACK STARTED"
         
-    def play(self, id):
+    def play(self, ID):
         node = Node_track()
-        node.id = id
-        node.set_cache()
-        data = qobuz.registry.get(name='track', id=id)['data']
+        node.id = ID
+        data = qobuz.registry.get(name='track', id=ID)['data']
         label = None
         item = None
         if not data:
@@ -85,20 +84,18 @@ class QobuzPlayer(xbmc.Player):
         streaming_url = node.get_streaming_url()
         # some tracks are not authorized for stream and a 60s sample is returned, in that case we overwrite the song duration
         if node.is_sample(): 
-            item.setInfo('music', infoLabels = {
-                                   'duration': 60,
-                                   } )
+            item.setInfo(
+                        'music', infoLabels = {
+                        'duration': 60,
+            })
             # don't warn for free account (all songs except purchases are 60s limited)
-            if not isFreeAccount():
-                notifyH("Qobuz", "Sample returned") 
+            if not isFreeAccount(): notifyH("Qobuz", "Sample returned") 
         item.setPath(streaming_url)
-        watchPlayback = False
         '''
             PLaying track
         '''
         if qobuz.addon.getSetting('notification_playingsong') == 'true':
-#            notifyH(lang(34000), node.get_label(), node.get_image())
-            qobuz.rpc.showNotification(lang(34000), node.get_label(), node.get_image())
+            notifyH(lang(34000), node.get_label(), node.get_image())
 
         '''
             We are called from playlist...
@@ -108,10 +105,7 @@ class QobuzPlayer(xbmc.Player):
             super(QobuzPlayer, self).play(streaming_url, item, False)
         else:
             xbmcplugin.setResolvedUrl(handle = qobuz.boot.handle, succeeded = True, listitem = item)
-        '''
-            May be a bad idea!!!
-        '''
-        #xbmc.executebuiltin('Dialog.Close(all,true)')
+
         '''
             Waiting for song to start
         '''

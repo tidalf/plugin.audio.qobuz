@@ -41,7 +41,7 @@ class Node_similar_artist(Node):
         return lang(39000)
     
     def get_label2(self):
-        return ""
+        return self.get_label()
         
     '''
         Build Down
@@ -50,7 +50,7 @@ class Node_similar_artist(Node):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         query = self.get_parameter('query')
-        data = qobuz.api.artist_getSimilarArtists(artist_id=query,offset=offset, limit=limit)
+        data = qobuz.api.artist_getSimilarArtists(artist_id=query, offset=offset, limit=limit)
         if not data: return False
         total = len(data['artists']['items'])
         
