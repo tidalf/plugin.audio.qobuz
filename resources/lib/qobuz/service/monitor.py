@@ -45,31 +45,43 @@ class Monitor(xbmc.Monitor):
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
         self.abortRequest = False
-        self.last_garbage_on = None
-        self.garbage_refresh = 10
+        self.last_garbage_on = time()
+        self.garbage_refresh = 60
         
     def onAbortRequested(self):
         self.abortRequest = True
         
     def cache_remove_old(self, **ka):
+        self.last_garbage_on = time()
         if not 'limit' in ka: ka['limit'] = 1
-        fu = FileUtil()
-        flist = fu.find(qobuz.path.cache, '^.*\.dat$')
-        count = 0
-        for fileName in flist:
-            data = None
-            with open(fileName,'rb') as f:
-                f = open(fileName,'rb')
-                try:
-                    data = pickle.load(f)
-                except: continue
-            if data['refresh'] + data['updated_on'] > time():
-                print "Removing old file: " + fileName
-                fu.unlink(fileName)
-                count += 1
-                if count >= ka['limit']:
-                    break
-                
+        try: 
+            
+            fu = FileUtil()
+            flist = fu.find(qobuz.path.cache, '^.*\.dat$')
+            count = 0
+            for fileName in flist:
+                data = None
+                with open(fileName,'rb') as f:
+                    f = open(fileName,'rb')
+                    try:
+                        data = pickle.load(f)
+                    except: continue
+                    finally: f.close()
+                if  (data['updatedOn'] + data['refresh']) < time():
+                    print "Removing old file: " + fileName
+                    try:
+                        fu.unlink(fileName)
+                        count += 1
+                        if count > ka['limit']:
+                            break
+                    except Exception as e: 
+                        warn(self, "Something went wrong while deleting: " + fileName + " / " + e.value)
+            return True
+        except: 
+            warn(self, 'Something went wrong while trying to delete old cached file')
+            return False
+        return True
+    
     def cache_remove_all(self):
         try:
             if not qobuz.path.cache:
@@ -77,7 +89,7 @@ class Monitor(xbmc.Monitor):
             fu = FileUtil()
             flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
             for fileName in flist:
-                fu.unlink(fileName)
+                    fu.unlink(fileName)
             xbmc.executebuiltin('Container.Refresh')
         except: 
             warn(self, "Error while removing cached data")
@@ -86,14 +98,14 @@ class Monitor(xbmc.Monitor):
     
     def onSettingsChanged(self):
         self.cache_remove_all()
-        if not self.last_garbage_on or time() > (self.last_garbage_on + self.garbage_refresh):
-            self.cache_remove_old(limit=3)
 
 boot = QobuzBootstrap(__addon__, 0)
 try:
     boot.bootstrap_app()    
     monitor = Monitor(qobuz)
-    while (not xbmc.abortRequested and not monitor.abortRequest):
+    while not xbmc.abortRequested:
+        if time() > (monitor.last_garbage_on  + monitor.garbage_refresh):
+            monitor.cache_remove_old(limit=5)
         xbmc.sleep(1000)
     
 except QobuzXbmcError as e:

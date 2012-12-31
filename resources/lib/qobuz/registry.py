@@ -92,6 +92,14 @@ class QobuzLocalStorage(object):
         return self.api.last_error
 
     def set(self,**ka):
+        refresh = None
+        if 'refresh' in ka: refresh = ka['refresh']
+        elif ka['name'] == 'product' or ka['name'] == 'track':
+            refresh = 60 * 60 * 24
+        elif ka['name'] == 'user-stream-url': refresh = 60 * 2
+        else:
+            refresh = self.options['refresh']
+        print "Refresh: " + repr(refresh)
         mandatory = ['name','id']
         for key in mandatory:
             if not key in ka:
@@ -105,7 +113,7 @@ class QobuzLocalStorage(object):
                           'saved': False,
                           'data': ka['value'],
                           'updatedOn': time(),
-                          'refresh': self.options['refresh']
+                          'refresh': refresh
                           }
         if self.options['autoSave']:
             self.save(key)
@@ -272,6 +280,7 @@ class QobuzCacheDefault(QobuzLocalStorage):
             except:
                 warn(self,"[DISK] Failed to load data with Pickle: " + cache)
                 return False
+            f.close()
         return True
 
     def save(self,key=None):
@@ -290,6 +299,7 @@ class QobuzCacheDefault(QobuzLocalStorage):
             s = pickle.dump(self.data[key],f,protocol=pickle.HIGHEST_PROTOCOL)
             f.flush()
             os.fsync(f)
+            f.close()
         return s
         warn(self,'[DISK] Saving failed: ' + key)
         return 0

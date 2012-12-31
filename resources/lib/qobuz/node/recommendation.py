@@ -15,19 +15,13 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
-import sys
-import random
-import pprint
-
 import xbmcgui
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
 from node import Node
 from product import Node_product
-from debug import info, warn, error
+from debug import warn
 from gui.util import color, lang, getImage
 
 RECOS_TYPES = {
@@ -65,9 +59,6 @@ class Node_recommendation(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
-        print 'Parameter: ' + repr(self.parameters)
-        print "GENRE ID  " + repr(self.genre_id)
-        print "GENRE TYPE" + repr(self.genre_type)
         self.set_label(lang(30082))
         self.image = getImage('album')
 
@@ -108,7 +99,6 @@ class Node_recommendation(Node):
 
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
-        types = []
         colorItem = qobuz.addon.getSetting('color_item')
         for gtype in RECOS_TYPES:
             node = Node_recommendation()
@@ -119,11 +109,9 @@ class Node_recommendation(Node):
 
 # GENRE
     def _build_recos_genre(self, xbmc_directory, lvl, flag):
-        types = []
         colorItem = qobuz.addon.getSetting('color_item')
         for genreid in RECOS_GENRES:
             node = Node_recommendation()
-            type = self.get_genre_type()
             node.set_genre_type(self.get_genre_type())
             node.set_genre_id(genreid)
             node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[self.genre_type]) + ' / ' + RECOS_GENRES[genreid])
@@ -135,9 +123,7 @@ class Node_recommendation(Node):
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        print "LIMIT: " + repr(limit)
         data = qobuz.registry.get(name='recommendation', id=self.id, type=self.genre_type, genre_id=self.genre_id, limit=limit, offset=offset)
-        #print "Data:" + pprint.pformat(data)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
@@ -156,5 +142,4 @@ class Node_recommendation(Node):
             return self._build_recos_genre(xbmc_directory, lvl, flag)
         self.content_type = 'albums'
         return self._build_down_type_genre(xbmc_directory, lvl, flag)
-
-
+
