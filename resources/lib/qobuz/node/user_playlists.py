@@ -99,6 +99,7 @@ class Node_user_playlists(Node):
             k = Keyboard('', 'Create Playlist (i8n)')
             k.doModal()
             if not k.isConfirmed():
+                warn(self, 'Creating playlist aborted')
                 return None
             query = k.getText()
         ret = qobuz.api.playlist_create(name=query, is_public=False)
@@ -106,7 +107,8 @@ class Node_user_playlists(Node):
             warn(self, "Cannot create playlist name '" + query + "'")
             return None
         self.set_current_playlist(ret['id'])
-        qobuz.registry.delete(name='user-playlists')
+        qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
+        containerRefresh()
         return ret['id']
 
     ''' 
@@ -114,26 +116,32 @@ class Node_user_playlists(Node):
     '''
     def rename_playlist(self, ID):
         from gui.util import Keyboard
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
         info(self, "renaming playlist: " + str(ID))
-        playlist = qobuz.registry.get(name='user-playlist', id=ID)
+        playlist = qobuz.registry.get(name='user-playlist', id=ID, offset=offset, limit=limit)
         currentname = playlist['data']['name'].encode('utf8', 'replace')
-        k = Keyboard('', lang(30078))
+        k = Keyboard(currentname, lang(30078))
         k.doModal()
         if not k.isConfirmed():
             return False
         newname = k.getText()
-        newname = newname.strip().encode('utf8', 'replace')
+        newname = newname.strip()
         if newname == currentname:
             return True
-        res = qobuz.api.playlist_update(playlist_id=id,name=newname)
-        if res:
-            qobuz.registry.delete(name='user-playlist', id=ID)
-            qobuz.registry.delete(name='user-playlists')
+        res = qobuz.api.playlist_update(playlist_id=ID,name=newname)
+        if not res:
+#            qobuz.registry.delete(name='user-playlist', id=ID)
+#            qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
             containerRefresh()
             return False
         else:
+            qobuz.registry.delete(name='user-playlist', id=ID)
+            qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
+            containerRefresh()
             notifyH(lang(30078), lang(39009) + ': ' + currentname)
-        return False
+        return True
+    
     '''
         Remove playlist
     '''
