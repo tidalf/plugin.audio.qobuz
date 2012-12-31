@@ -61,7 +61,9 @@ class Node_product_by_artist(Node):
         Build Down
     '''
     def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
-        data = qobuz.api.artist_get(artist_id=self.id, limit=qobuz.addon.getSetting('artistsearchlimit'),extra='albums')
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.api.artist_get(artist_id=self.id, limit=limit,offset=offset,extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
@@ -92,6 +94,9 @@ class Node_product_by_artist(Node):
                                 self.get_image(),
                                 self.make_url(),
                                 )
-        self.attach_context_menu(item)
+        menuItems = []
+        self.attach_context_menu(item, menuItems)
+        if len(menuItems) > 0:
+            item.addContextMenuItems(menuItems,replaceItems=False)
         return item
 

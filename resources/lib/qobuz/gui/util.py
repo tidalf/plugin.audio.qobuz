@@ -82,12 +82,12 @@ def lang(langId):
     return qobuz.addon.getLocalizedString(langId)
 
 
-def xbmcRunPlugin(url):
+def runPlugin(url):
     cmd = 'XBMC.RunPlugin("%s")' % (url)
     #debug('xbmcRunPlugin', "CMD: " + cmd)
     return cmd
 
-def xbmcContainerUpdate(url):
+def containerUpdate(url):
     cmd = 'XBMC.ContainerUpdate("%s")' % (url)
     #debug('xbmcContainerUpdate', "CMD: " + cmd)
     return cmd

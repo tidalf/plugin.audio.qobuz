@@ -47,8 +47,10 @@ class Node_similar_artist(Node):
         Build Down
     '''
     def _build_down(self, xbmc_directory, lvl, flag = None):
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
         query = self.get_parameter('query')
-        data = qobuz.api.artist_getSimilarArtists(artist_id=query,offset=0)
+        data = qobuz.api.artist_getSimilarArtists(artist_id=query,offset=offset, limit=limit)
         if not data: return False
         total = len(data['artists']['items'])
         
@@ -56,5 +58,6 @@ class Node_similar_artist(Node):
                 artist = Node_product_by_artist()
                 artist.data = jartist
                 self.add_child(artist)
+        self.add_pagination(data)
         return total
 

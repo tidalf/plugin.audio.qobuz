@@ -65,6 +65,9 @@ class Node_recommendation(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
+        print 'Parameter: ' + repr(self.parameters)
+        print "GENRE ID  " + repr(self.genre_id)
+        print "GENRE TYPE" + repr(self.genre_type)
         self.set_label(lang(30082))
         self.image = getImage('album')
 
@@ -132,6 +135,7 @@ class Node_recommendation(Node):
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
+        print "LIMIT: " + repr(limit)
         data = qobuz.registry.get(name='recommendation', id=self.id, type=self.genre_type, genre_id=self.genre_id, limit=limit, offset=offset)
         #print "Data:" + pprint.pformat(data)
         if not data:

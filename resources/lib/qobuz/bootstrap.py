@@ -85,7 +85,7 @@ class QobuzBootstrap(object):
                                        username=qobuz.addon.getSetting('username'), 
                                        password=qobuz.addon.getSetting('password'), 
                                        basePath=qobuz.path.cache,
-                                       streamFormat=streamFormat, hashKey=True)
+                                       streamFormat=streamFormat, hashKey=False)
 
             qobuz.registry.get(name='user')
             qobuz.api = qobuz.registry.get_api()

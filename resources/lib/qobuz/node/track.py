@@ -175,7 +175,7 @@ class Node_track(Node):
         
         return year
 
-    def  get_description(self):
+    def get_description(self):
         if self.parent: return self.parent.get_description()
         return ''
 
@@ -258,7 +258,10 @@ class Node_track(Node):
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
-        self.attach_context_menu(item)
+        menuItems = []
+        self.attach_context_menu(item, menuItems)
+        if len(menuItems) > 0:
+            item.addContextMenuItems(menuItems,replaceItems=False)
         return item
 
     def attach_context_menu(self, item, menuItems = []):
@@ -274,3 +277,4 @@ class Node_track(Node):
        
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menuItems)
+

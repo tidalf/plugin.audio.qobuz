@@ -14,24 +14,17 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
 import xbmcgui, xbmc
-import json
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
 from node import Node
-from playlist import Node_playlist
-from debug import info, warn, error
-from gui.util import color, getImage
+from recommendation import Node_recommendation
+from gui.util import getImage
 
 '''
-    NODE FRIEND
+    NODE GENRE
 '''
-from track import Node_track
 
 class Node_genre(Node):
 
@@ -39,6 +32,7 @@ class Node_genre(Node):
         super(Node_genre, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_GENRE
         self.set_label('Genre (i8n)')
+        if self.parent: self.label = self.parent.label + ' / ' + self.label
         self.id = 1
         self.label2 = self.label
         self.url = None
@@ -57,17 +51,29 @@ class Node_genre(Node):
     def get_name(self):
         return self.get_property('name')
     
-    def _build_down_reco(self):
-        print "BUILD RECO"
+    def _build_down_reco(self, dir, lvl, whiteFlag, id):
+        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'new-releases' })
+        node.build_down(dir, lvl, whiteFlag)
+        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'press-awards' })
+        node.build_down(dir, lvl, whiteFlag)
+        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'best-sellers' })
+        node.build_down(dir, lvl, whiteFlag)
+        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'editor-picks' })
+        node.build_down(dir, lvl, whiteFlag)
+        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'most-featured' })
+        node.build_down(dir, lvl, whiteFlag)
         return True
         
-    def _build_down(self, xbmc_directory, lvl, flag = None):
-        data = qobuz.registry.get(name='genre-list', id=self.id)
-        if not data:
-            return self._build_down_reco()
-        print pprint.pformat(data)
-        for data in data['data']['genres']['items']:
+    def _build_down(self, dir, lvl, flag = None):
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='genre-list', id=self.id, offset=offset, limit=limit)
+        if not data or len(data['data']['genres']['items']) == 0:
+            return self._build_down_reco(dir, lvl, flag, self.id)
+        for genre in data['data']['genres']['items']:
             node = Node_genre()
-            node.data = data
+            node.data = genre
+            if 'parent' in genre and genre['parent']['level'] > 2:
+                self._build_down_reco(dir, lvl, flag, genre['id'])
             self.add_child(node)
         return True

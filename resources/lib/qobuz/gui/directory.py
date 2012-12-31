@@ -9,7 +9,7 @@ import qobuz
 import time
 from debug import warn, log
 from gui.util import notify, lang, getImage
-
+from exception import QobuzXbmcError
 class Directory():
 
     def __init__(self, root, handle, ALL_AT_ONCE = False):
@@ -39,9 +39,8 @@ class Directory():
         return time.time() - self.started_on
 
     def add_node(self, node):
-        if not self.ALL_AT_ONCE:
-            return self._put_item(node)
-        self.nodes.append(node)
+        if not self.ALL_AT_ONCE: return self._put_item(node)
+        #self.nodes.append(node)
         return True
 
     def update(self, count, total, line1, line2 = '', line3 = ''):
@@ -71,26 +70,27 @@ class Directory():
                                 ka['image'],
                                 ka['url'])
     
-    def _add_xbmc_item(self, **ka):
+    def add_item(self, **ka):
         self.total_put += 1
-        return xbmcplugin.addDirectoryItem(self.handle,
+        xbmcplugin.addDirectoryItem(self.handle,
                                     ka['url'],
                                     ka['item'],
                                     ka['is_folder'],
                                     self.total_put)
+        return True
         
         
     def _put_item(self, node):
         self.total_put += 1
         item = node.make_XbmcListItem()
-        if not item:
-            return False
+        ret = None
+        if not item: return False
         try:
-            ret = self._add_xbmc_item(url=node.make_url(),
+            ret = self.add_item(url=node.make_url(),
                                     item=item,
                                     is_folder=node.is_folder)
         except:
-            warn(self, "Cannot add item")
+            QobuzXbmcError(who=self, what='cannot_add_item', additional='')
         if not ret: self.put_item_ok = False
         return ret
 
@@ -104,6 +104,7 @@ class Directory():
         if not self.put_item_ok or (self.total_put == 0):
             success = False
             #notify(30008, 36001, getImage('icon-error-256'))
+        xbmcplugin.setContent(handle = self.handle, content = self.content_type)
         xbmcplugin.endOfDirectory(handle = self.handle,
                                    succeeded = success,
                                    updateListing = False,
@@ -112,8 +113,8 @@ class Directory():
             label = self.root.get_label()
         self.update(100, 100, lang(40003), lang(40002) + ': ' + str(self.total_put) + ' items')
         self.close()
-        xbmcplugin.setContent(handle = self.handle, content = self.content_type)
-        return success
+        #return success
+        return True
 
     def set_content(self, content):
         log(self, "Set content: " + content)

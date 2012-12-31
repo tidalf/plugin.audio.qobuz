@@ -39,7 +39,7 @@ class __NodeFlag():
     def to_s(self, flag):
         if flag & self.TYPE_TRACK: return "track"
         elif flag & self.TYPE_PLAYLIST: return "playlist"
-        elif flag & self.TYPE_USERPLAYLISTS: return "userplaylist"
+        elif flag & self.TYPE_USERPLAYLISTS: return "user playlist"
         elif flag & self.TYPE_RECOMMENDATION: return "recommendation"
         elif flag & self.TYPE_ROOT: return "root"
         elif flag & self.TYPE_PRODUCT: return "product"
@@ -51,9 +51,9 @@ class __NodeFlag():
         elif flag & self.TYPE_NODE: return "node"
         elif flag & self.DONTFETCHTRACK: "don't fetch track"
         elif flag & self.FRIEND: "friend"
-        elif flag & self.FRIEND_LIST: "friendlist"
+        elif flag & self.FRIEND_LIST: "friend list"
         elif flag & self.GENRE: "genre"
-        elif flag & self.GENRE: "label"
+        elif flag & self.LABEL: "label"
         else: "Unknow flag: " + str(flag)
         
 NodeFlag = __NodeFlag()

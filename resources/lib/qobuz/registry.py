@@ -143,7 +143,6 @@ class QobuzLocalStorage(object):
         return None
 
     def load(self,**ka):
-        limit = 1000
         self.hook_pre_load(**ka)
         # noRemote prevent data loading from Qobuz (local key only)
         if 'noRemote' in ka and ka['noRemote'] == True:
@@ -175,13 +174,13 @@ class QobuzLocalStorage(object):
         elif name == 'user-stream-url':
             response = self.api.track_getFileUrl(track_id=id,format_id=self.options['streamFormat'])
         elif name == 'user-purchases':
-            response = self.api.purchase_getUserPurchases(limit=limit)
+            response = self.api.purchase_getUserPurchases(limit=ka['limit'])
         elif name == 'recommendation':
             response = self.api.album_getFeatured(**ka)
         elif name == 'artist':
-            response = self.api.artist_get(artist_id=id,limit=limit)
+            response = self.api.artist_get(artist_id=id,limit=ka['limit'])
         elif name == 'genre-list':
-            response = self.api.genre_list(parent_id=id,limit=limit)
+            response = self.api.genre_list(parent_id=id,limit=ka['limit'])
         elif name == 'label-list':
             response = self.api.label_list(**ka)
         else:

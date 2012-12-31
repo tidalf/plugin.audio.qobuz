@@ -26,6 +26,7 @@ class IRenderer(object):
         self.node_id = node_id
         self.root = None
         self.filter = NodeFlag.TYPE_NODE
+        self.depth = 1
 
     def to_s(self):
         return pprint.pformat(self)

@@ -25,7 +25,7 @@ from constants import Mode
 from flag import NodeFlag
 #from debug import error
 from exception import QobuzXbmcError
-from gui.util import color,lang, xbmcRunPlugin, xbmcContainerUpdate
+from gui.util import color,lang, runPlugin, containerUpdate
 '''
     NODE
 '''
@@ -119,6 +119,7 @@ class Node(object):
 
     ''' Property are just a easy way to access JSON data when set '''
     def get_property(self,path):
+        #print "PATH: " + repr(path)
         if not self._data:
             return ''
         if isinstance(path,basestring):
@@ -126,7 +127,7 @@ class Node(object):
                 return self._data[path]
             return ''
         root = self._data
-        for i in range(0,len(path)):
+        for i in range(0, len(path)):
             if not path[i] in root:
                 return ''
             root = root[path[i]]
@@ -174,13 +175,13 @@ class Node(object):
         A hash for storing script parameter, each node have a copy of them.
         TODO: each node don't need to copy parameter
     '''
-    def set_parameters(self,params):
+    def set_parameters(self, params):
         self.parameters = params
 
-    def set_parameter(self,name,value):
+    def set_parameter(self, name, value):
         self.parameters[name] = value
 
-    def get_parameter(self,name):
+    def get_parameter(self, name):
         if not name in self.parameters: return None
         return self.parameters[name]
 
@@ -192,6 +193,7 @@ class Node(object):
     '''
     def make_url(self,**ka):
         if not 'mode' in ka: ka['mode'] = Mode.VIEW
+        else: ka['mode'] = int(ka['mode'])
         if not 'type' in ka: ka['type'] = self.type
         if not 'id' in ka and self.id: ka['id'] = self.id
         url = sys.argv[0] + '?mode=' + str(ka['mode']) + "&nt=" + str(ka['type'])
@@ -218,7 +220,10 @@ class Node(object):
                                 ka['image'],
                                 ka['url']
         )
-        self.attach_context_menu(item)
+        menuItems = []
+        self.attach_context_menu(item, menuItems)
+        if len(menuItems) > 0:
+            item.addContextMenuItems(menuItems,replaceItems=False)
         return item
 
     def add_child(self,child):
@@ -320,16 +325,16 @@ class Node(object):
 #        menuItems.append((color(colorItem,"TEST WINDOW"),cmd))
 
         ''' VIEW BIG DIR '''
-        path = self.make_url(mode=Mode.VIEW_BIG_DIR)
+        cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
         label = lang(39002)
-        menuItems.append((color(colorItem,label),"XBMC.Container.Update(%s)" % (path)))
+        menuItems.append((color(colorItem,label), cmd))
 
 
         if self.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST):
             ''' ALL ALBUM '''
             id = self.get_artist_id()
             url = self.make_url(mode=Mode.VIEW,type=NodeFlag.TYPE_ARTIST,id=id)
-            cmd = "XBMC.Container.Update(%s)" % (url)
+            cmd = containerUpdate(url)
             menuItems.append((color(colorItem,lang(39001)),cmd))
 
             ''' Similar artist '''
@@ -339,30 +344,30 @@ class Node(object):
             args = sys.argv[0] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW,
                                          NodeFlag.TYPE_SIMILAR_ARTIST,
                                          id,id)
-            cmd = xbmcContainerUpdate(args)
+            cmd = runPlugin(args)
             menuItems.append((color(colorItem,lang(39004)),cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
-        cmd = xbmcContainerUpdate(self.make_url(mode=Mode.PLAYLIST_ADD_TO_CURRENT))
+        cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((color(colorItem,lang(39005)),cmd))
 
         if self.parent and not (self.parent.type & NodeFlag.TYPE_FAVORITES):
             ''' ADD TO FAVORITES '''
-            cmd = xbmcContainerUpdate(self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
+            cmd = runPlugin(self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
             menuItems.append((color(colorItem,lang(39011)),cmd))
 
         ''' ADD AS NEW '''
-        cmd = xbmcContainerUpdate(self.make_url(mode=Mode.PLAYLIST_ADD_AS_NEW))
+        cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_ADD_AS_NEW))
         menuItems.append((color(colorItem,lang(30080)),cmd))
 
         ''' Show playlist '''
         if not (self.type & NodeFlag.TYPE_PLAYLIST):
-            cmd = xbmcContainerUpdate(self.make_url(type=NodeFlag.TYPE_USERPLAYLISTS))
+            cmd = runPlugin(self.make_url(type=NodeFlag.TYPE_USERPLAYLISTS))
             menuItems.append((color(colorItem,lang(39005)),cmd))
 
         if self.type & NodeFlag.TYPE_USERPLAYLISTS:
             ''' CREATE '''
-            cmd = xbmcRunPlugin(self.make_url(mode=Mode.PLAYLIST_CREATE))
+            cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_CREATE))
             menuItems.append((color(colorItem,lang(39008)), cmd))
 
         ''' SCAN '''
@@ -375,12 +380,11 @@ class Node(object):
 
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
-        cmd = xbmcRunPlugin(self.make_url(mode=Mode.ERASE_CACHE))
+        cmd = runPlugin(self.make_url(mode=Mode.ERASE_CACHE))
         menuItems.append((color(colorItem,lang(31009)),cmd))
 
-        '''
-        Add our items to the context menu
-        '''
+#        '''
+#        Add our items to the context menu
+#        '''
+#
 
-        if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems,replaceItems=False)

@@ -17,8 +17,10 @@
 
 import os
 import sys
+from time import time
 import xbmcaddon
 import xbmc
+import cPickle as pickle
 
 pluginId = 'plugin.audio.qobuz'
 __addon__        = xbmcaddon.Addon(id=pluginId)
@@ -35,7 +37,6 @@ sys.path.append(qobuzDir)
 from exception import QobuzXbmcError
 from bootstrap import QobuzBootstrap
 from debug import warn
-from debug import log
 import qobuz
 from util.file import FileUtil
 
@@ -44,19 +45,49 @@ class Monitor(xbmc.Monitor):
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
         self.abortRequest = False
+        self.last_garbage_on = None
+        self.garbage_refresh = 10
         
     def onAbortRequested(self):
         self.abortRequest = True
         
-    def onSettingsChanged(self):
-        if not qobuz.path.cache:
-            warn(self, 'qobuz.path.cache is not set... abort')
-            return False
+    def cache_remove_old(self, **ka):
+        if not 'limit' in ka: ka['limit'] = 1
         fu = FileUtil()
-        flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
+        flist = fu.find(qobuz.path.cache, '^.*\.dat$')
+        count = 0
         for fileName in flist:
-            fu.unlink(fileName)
-        xbmc.executebuiltin('Container.Refresh')
+            data = None
+            with open(fileName,'rb') as f:
+                f = open(fileName,'rb')
+                try:
+                    data = pickle.load(f)
+                except: continue
+            if data['refresh'] + data['updated_on'] > time():
+                print "Removing old file: " + fileName
+                fu.unlink(fileName)
+                count += 1
+                if count >= ka['limit']:
+                    break
+                
+    def cache_remove_all(self):
+        try:
+            if not qobuz.path.cache:
+                raise QobuzXbmcError(who=self, what='qobuz_core_setting_not_set', additional='setting')
+            fu = FileUtil()
+            flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
+            for fileName in flist:
+                fu.unlink(fileName)
+            xbmc.executebuiltin('Container.Refresh')
+        except: 
+            warn(self, "Error while removing cached data")
+            return False
+        return True
+    
+    def onSettingsChanged(self):
+        self.cache_remove_all()
+        if not self.last_garbage_on or time() > (self.last_garbage_on + self.garbage_refresh):
+            self.cache_remove_old(limit=3)
 
 boot = QobuzBootstrap(__addon__, 0)
 try:

@@ -43,26 +43,31 @@ class Xbmc_renderer(IRenderer):
 
     def __init__(self, node_type, node_id = None):
         super(Xbmc_renderer, self).__init__(node_type, node_id)
-
+        
     def add_directory_item(self, **ka):
         if not 'is_folder' in ka: ka['is_folder'] = 1
         if not 'image' in ka: ka['image'] = ''
         item = ka['dir']._xbmc_item(**ka)
-        ka['dir']._add_xbmc_item(url=ka['url'], item=item, is_folder=ka['is_folder'])
+        ka['dir'].add_item(url=ka['url'], item=item, is_folder=ka['is_folder'])
         
     def display(self):
         from gui.directory import Directory
         if not self.set_root_node():
             warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
-        buildDown = self.root.pre_build_down()
-        if buildDown:
-            dir = Directory(self.root, qobuz.boot.handle, False)
-#            if self.root.pagination_next: self.add_directory_item(dir=dir, label='[ Next ]', url=self.root.pagination_next, image=getImage('next'))
-            self.root.build_down(dir, self.depth, self.filter)   
-            if self.root.pagination_next: self.add_directory_item(dir=dir, label='[ Next ]', url=self.root.pagination_next, image=getImage('next'))
-            dir.set_content(self.root.content_type)
-            methods = [
+        if not self.root.pre_build_down(): return False 
+        Dir = Directory(self.root, qobuz.boot.handle, False)
+        self.root.build_down(Dir, self.depth, self.filter)   
+        if self.root.pagination_next: 
+            colorItem = qobuz.addon.getSetting('color_item')
+            nextString = '[ ' + color(colorItem, 'Next') + ' ]'
+            print "NextString set: " + nextString
+            self.add_directory_item(dir=Dir, 
+                                        label=nextString, 
+                                        url=self.root.pagination_next, 
+                                        image=getImage('next'))
+        Dir.set_content(self.root.content_type)
+        methods = [
                 xbmcplugin.SORT_METHOD_UNSORTED,
                 xbmcplugin.SORT_METHOD_LABEL,
                 xbmcplugin.SORT_METHOD_DATE,
@@ -73,28 +78,10 @@ class Xbmc_renderer(IRenderer):
                 xbmcplugin.SORT_METHOD_ALBUM,
                 xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
                 xbmcplugin.SORT_METHOD_TRACKNUM,                 ]
-            [ xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=method ) for method in methods ]
-            dir.end_of_directory()
-        return True
-    
-        if not self.root.pre_build_down(): return False 
-        nextString = None
-        if self.root.pagination_next: 
-            colorItem = qobuz.addon.getSetting('color_item')
-            nextString = '[ ' + color(colorItem, 'Next') + ' ]'
-            print "NextString set: " + nextString
-        Dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(Dir, self.depth, self.filter)   
-        if nextString:
-            print "NextString: " + nextString
-            self.add_directory_item(dir=Dir, 
-                                        label=nextString, 
-                                        url=self.root.pagination_next, 
-                                        image=getImage('next'))
-
+        [ xbmcplugin.addSortMethod( handle=qobuz.boot.handle, sortMethod=method ) for method in methods ]
         Dir.end_of_directory()
         return True
-
+    
 #    def scan(self):
 #        from gui.directory import Directory
 #        if not self.set_root_node():

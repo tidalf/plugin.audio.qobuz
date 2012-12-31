@@ -36,7 +36,9 @@ class Node_purchases(Node):
         self.image = getImage('album')
 
     def _build_down(self,xbmc_directory,lvl,flag=None,progress=None):
-        data = qobuz.registry.get(name='user-purchases')
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='user-purchases', limit=limit, offset=offset)
         if not data:
             error(self,"Cannot fetch purchases data")
             return False

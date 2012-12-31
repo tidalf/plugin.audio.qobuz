@@ -123,7 +123,10 @@ class Node_playlist(Node):
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
-        self.attach_context_menu(item)
+        menuItems = []
+        self.attach_context_menu(item, menuItems)
+        if len(menuItems) > 0:
+            item.addContextMenuItems(menuItems,replaceItems=False)
         return item
 
     def attach_context_menu(self, item, menuItems = []):

@@ -47,7 +47,9 @@ class Node_label(Node):
         
     def _build_down(self, xbmc_directory, lvl, flag = None):
         offset = self.get_parameter('offset') or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
+        #@bug: Qobuz service seam do don't return total so pagination is broken
+        #limit = qobuz.addon.getSetting('pagination_limit')
+        limit = 5000
         data = qobuz.registry.get(name='label-list', id=self.id, limit=limit, offset=offset)
         if not data:
             warn(self, "No label data")

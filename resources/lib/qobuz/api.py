@@ -76,7 +76,7 @@ class QobuzApi:
         self.last_error = None
         self.stats['request'] += 1
         url = self.baseUrl + uri
-        log(self, "Request URL: " + url)
+        log(self, "Request URL: " + url + ',' + pprint.pformat(params))
         useToken = False if (opt and 'noToken' in opt) else True
         
         # Setting header

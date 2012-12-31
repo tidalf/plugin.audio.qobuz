@@ -20,7 +20,7 @@ import pprint
 import xbmcgui
 
 import qobuz
-from constants import *
+from constants import Mode
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error,log
@@ -43,7 +43,7 @@ class Node_product(Node):
         self.content_type = 'songs'
         self.is_special_purchase = False
 
-    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag = None):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         nid = self.id
@@ -65,7 +65,7 @@ class Node_product(Node):
                 node.data = track
                 self.add_child(node)
         except: pass
-        print pprint.pformat(data)
+        #print pprint.pformat(data)
         self.add_pagination(data['data'])
         
     def _filter_tracks(self, tracks):
@@ -88,7 +88,10 @@ class Node_product(Node):
                                             'genre': self.get_genre(),
                                             'year': self.get_year()
         })
-        self.attach_context_menu(item)
+        menuItems = []
+        self.attach_context_menu(item, menuItems)
+        if len(menuItems) > 0:
+            item.addContextMenuItems(menuItems,replaceItems=False)
         return item
 
     ''' 
