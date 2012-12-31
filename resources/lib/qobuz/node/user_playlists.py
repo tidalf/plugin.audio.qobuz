@@ -140,6 +140,7 @@ class Node_user_playlists(Node):
     def remove_playlist(self, ID):
         import xbmcgui, xbmc
         import pprint
+        login = qobuz.addon.getSetting('username')
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='user-playlist', id=ID, offset=offset, limit=limit)['data']
@@ -153,7 +154,7 @@ class Node_user_playlists(Node):
             info(self, "Deleting playlist aborted...")
             return False
         res = False
-        if data['owner']['name'] == name:
+        if data['owner']['name'] == login:
             info(self, "Deleting playlist: " + ID)
             res = qobuz.api.playlist_delete(playlist_id=ID)
         else:
