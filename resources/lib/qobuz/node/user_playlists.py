@@ -20,7 +20,7 @@ import qobuz
 from flag import NodeFlag
 from node import Node
 from debug import info, warn, error, debug
-from gui.util import color, lang, getImage, notifyH
+from gui.util import color, lang, getImage, notifyH, containerRefresh
 
 '''
     NODE USER PLAYLISTS
@@ -129,7 +129,7 @@ class Node_user_playlists(Node):
         if res:
             qobuz.registry.delete(name='user-playlist', id=ID)
             qobuz.registry.delete(name='user-playlists')
-            xbmc.executebuiltin('Container.Refresh')
+            containerRefresh()
             return False
         else:
             notifyH(lang(30078), lang(39009) + ': ' + currentname)
@@ -139,9 +139,11 @@ class Node_user_playlists(Node):
     '''
     def remove_playlist(self, ID):
         import xbmcgui, xbmc
+        import pprint
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='user-playlist', id=ID, offset=offset, limit=limit)['data']
+        print pprint.pformat(data)
         name = ''
         if 'name' in data: name = data['name']
         ok = xbmcgui.Dialog().yesno(lang(39010),
@@ -150,11 +152,18 @@ class Node_user_playlists(Node):
         if not ok:
             info(self, "Deleting playlist aborted...")
             return False
-
-        info(self, "Deleting playlist: " + ID)
-        res = qobuz.api.playlist_delete(playlist_id=ID)
+        res = False
+        if data['owner']['name'] == name:
+            info(self, "Deleting playlist: " + ID)
+            res = qobuz.api.playlist_delete(playlist_id=ID)
+        else:
+            info(self, 'Unsuscribe playlist' + ID)
+            res = qobuz.api.playlist_unsubscribe(playlist_id=ID)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(ID))
+            notifyH('Qobuz remove playlist (i8n)', 'Cannot remove playlist ' + name, getImage('icon-error-256'))
             return False
         qobuz.registry.delete(name='user-playlists', offset=offset, limit=limit)
+        notifyH('Qobuz remove playlist (i8n)', 'Playlist ' + name + ' removed')
+        containerRefresh()
         return True

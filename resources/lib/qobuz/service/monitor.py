@@ -36,9 +36,10 @@ sys.path.append(qobuzDir)
 
 from exception import QobuzXbmcError
 from bootstrap import QobuzBootstrap
-from debug import warn
+from debug import warn, log
 import qobuz
 from util.file import FileUtil
+from gui.util import containerRefresh, notifyH, getImage
 
 class Monitor(xbmc.Monitor):
     
@@ -82,7 +83,8 @@ class Monitor(xbmc.Monitor):
             return False
         return True
     
-    def cache_remove_all(self):
+    def cache_remove_user_data(self):
+        log(self, "Removing cached user data")
         try:
             if not qobuz.path.cache:
                 raise QobuzXbmcError(who=self, what='qobuz_core_setting_not_set', additional='setting')
@@ -90,14 +92,15 @@ class Monitor(xbmc.Monitor):
             flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
             for fileName in flist:
                     fu.unlink(fileName)
-            xbmc.executebuiltin('Container.Refresh')
+            containerRefresh()
         except: 
             warn(self, "Error while removing cached data")
+            notifyH('Qobuz', 'Failed to remove user data', getImage('icon-error-256'))
             return False
         return True
     
     def onSettingsChanged(self):
-        self.cache_remove_all()
+        self.cache_remove_user_data()
 
 boot = QobuzBootstrap(__addon__, 0)
 try:

@@ -95,3 +95,6 @@ def containerUpdate(url):
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
     return dialog.yesno(heading, line1, line2, line3)
+
+def containerRefresh():
+    xbmc.executebuiltin('Container.Refresh')

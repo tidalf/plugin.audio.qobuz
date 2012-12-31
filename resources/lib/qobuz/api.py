@@ -115,30 +115,14 @@ class QobuzApi:
             error = response_json['status']
         except: pass
         if error == 'error':
-            warn(self,"Something went wrong with request: "
-                     + url+ "\n" + pprint.pformat(params) + "\n" + pprint.pformat(response_json))
+            warn(self, ('Something went wrong with request: %s\n%s\n%s')
+                 % (url, pprint.pformat(params), pprint.pformat(response_json)))
 
             '''
             When something wrong we are deleting our auth token
                 '''
             return None
-        #self._add_pagination(response_json)
         return response_json
-
-#    def _add_pagination(self, data):
-#        paginated = ['albums', 'labels', 'tracks', 'artists']
-#        items = None
-#        for p in paginated:
-#            if p in data: 
-#                items = data[p]
-#                break
-#        if not items: return False
-#        print "OFFSET...."
-#        if items['total'] > (items['offset'] + items['limit']):
-#            print "Setting next"
-#            data[p]['next_offset'] = items['offset'] + items['limit']
-#        else: return False
-#        return True
         
     '''
     User
@@ -166,7 +150,7 @@ class QobuzApi:
     '''
     def track_get(self, **ka):
         self._check_ka(ka, ['track_id'])
-        data = self._api_request(ka,"/track/get")
+        data = self._api_request(ka, '/track/get')
         return data
     
     def track_getFileUrl(self, **ka):
@@ -178,19 +162,19 @@ class QobuzApi:
                   'request_sig': str(hashlib.md5("trackgetFileUrlformat_id" + str(ka['format_id']) + "intentstream" + "track_id"
                                 + str(ka['track_id']) + str(ka['request_ts']) + self.s4).hexdigest()), 'track_id': str(ka['track_id'])
         }
-        return self._api_request(params,"/track/getFileUrl")
+        return self._api_request(params, '/track/getFileUrl')
     
     # MAPI UNTESTED
     def track_search(self, **ka):
         self._check_ka(ka, ['query'], ['limit'])
-        data = self._api_request(ka,"/track/search")
+        data = self._api_request(ka, '/track/search')
         return data
     '''
     Artist
     '''
     def artist_get(self, **ka):
         self._check_ka(ka, ['artist_id'], ['extra','limit'])
-        data = self._api_request(ka,"/artist/get")
+        data = self._api_request(ka, '/artist/get')
         return data
     '''
     Album
@@ -210,16 +194,16 @@ class QobuzApi:
         self._check_ka(ka, [], ['user_id', 'username', 'offset', 'limit'])
         if not 'user_id' in ka and not 'username' in ka:
             ka['user_id'] = self.user_id
-        data = self._api_request(ka,"/playlist/getUserPlaylists")
+        data = self._api_request(ka, '/playlist/getUserPlaylists')
         return data
 
     def playlist_get(self,**ka):
         self._check_ka(ka, ['playlist_id'], ['extra', 'limit', 'offset'])
-        return self._api_request(ka,"/playlist/get")
+        return self._api_request(ka, '/playlist/get')
     
     def playlist_addTracks (self, **ka):
         self._check_ka(ka, ['playlist_id', 'track_ids'])
-        return self._api_request(ka,"/playlist/addTracks")
+        return self._api_request(ka, '/playlist/addTracks')
     
 
     '''
@@ -231,7 +215,7 @@ class QobuzApi:
 
     def favorite_getUserFavorites(self, **ka):
         self._check_ka(ka, [], ['user_id', 'type', 'limit', 'offset'])
-        return self._api_request(ka,"/favorite/getUserFavorites")
+        return self._api_request(ka, '/favorite/getUserFavorites')
 
     # SEARCH #
     def search_getResults(self, **ka):
@@ -239,19 +223,19 @@ class QobuzApi:
         mandatory = ['query', 'type']
         for label in mandatory:
             if not label in ka: raise QobuzXbmcError(who=self, what='missing_parameter',additional=label)
-        return self._api_request(ka,"/search/getResults")
+        return self._api_request(ka, '/search/getResults')
 
 
     # REPORT #    
     def report_streaming_start(self,track_id):
         # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {  'user_id': self.user_id,'track_id': track_id}
-        return self._api_request(params,"/track/reportStreamingStart")
+        return self._api_request(params, '/track/reportStreamingStart')
 
     def report_streaming_stop(self,track_id,duration):
         duration = math.floor(int(duration))
         if duration < 5:
-            info(self,"Duration lesser than 5s, abort reporting")
+            info(self, 'Duration lesser than 5s, abort reporting')
             return None
         token = ''
         try:
@@ -262,7 +246,7 @@ class QobuzApi:
         params = {  'user_id': self.user_id,
                     'track_id': track_id,
                     'duration': duration}
-        return self._api_request(params,"/track/reportStreamingEnd")
+        return self._api_request(params, '/track/reportStreamingEnd')
 
 
     def favorite_create (self, **ka):
@@ -272,7 +256,7 @@ class QobuzApi:
             if label in ka: found = label
         if not found:
             raise QobuzXbmcError(who=self, what='missing_parameter',additional='artist_ids|albums_ids|track_ids')
-        return self._api_request(ka,"/favorite/create")
+        return self._api_request(ka, '/favorite/create')
     
     def favorite_delete (self, **ka):
         mandatory = ['artist_ids', 'albums_ids', 'track_ids']
@@ -281,7 +265,7 @@ class QobuzApi:
             if label in ka: found = label
         if not found:
             raise QobuzXbmcError(who=self, what='missing_parameter',additional='artist_ids|albums_ids|track_ids')
-        return self._api_request(ka,"/favorite/delete")
+        return self._api_request(ka, '/favorite/delete')
 
     def playlist_subscribe (self, **ka):
         mandatory = ['playlist_id']
@@ -290,36 +274,40 @@ class QobuzApi:
             if label in ka: found = label
         if not found:
             raise QobuzXbmcError(who=self, what='missing_parameter',additional='playlist_id')
-        return self._api_request(ka,"/playlist/subscribe")
+        return self._api_request(ka,'/playlist/subscribe')
+    
+    def playlist_unsubscribe(self, **ka):
+        self._check_ka(ka, ['playlist_id'])
+        return self._api_request(ka, '/playlist/unsubscribe')
     
     def playlist_deleteTracks (self, **ka):
         self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])
-        return self._api_request(ka,"/playlist/deleteTracks")
+        return self._api_request(ka, '/playlist/deleteTracks')
 
     def playlist_create (self, **ka):
         self._check_ka(ka, ['name'], ['is_public', 'is_collaborative', 'tracks_id', 'album_id'])
         if not 'is_public' in ka: ka['is_public'] = True
         if not 'is_collaborative' in ka: ka['is_collaborative'] = False
-        return self._api_request(ka,"/playlist/create")
+        return self._api_request(ka, '/playlist/create')
 
     def playlist_delete (self, **ka):
         self._check_ka(ka, ['playlist_id'])
         if not 'playlist_id' in ka:  raise QobuzXbmcError(who=self, what='missing_parameter',additional='playlist_id')
-        return self._api_request(ka,"/playlist/delete")
+        return self._api_request(ka, '/playlist/delete')
 
     def playlist_update (self, **ka):
         self._check_ka(ka, ['playlist_id'], ['name', 'description', 'is_public', 'is_collaborative', 'tracks_id'])
-        res = self._api_request(ka,"/playlist/update")
+        res = self._api_request(ka, '/playlist/update')
         return res
 
     def artist_getSimilarArtists (self, **ka):
         self._check_ka(ka, ['artist_id', 'limit', 'offset'])
-        return self._api_request(ka,"/artist/getSimilarArtists")
+        return self._api_request(ka, '/artist/getSimilarArtists')
 
     def genre_list (self, **ka):
         self._check_ka(ka, [], ['parent_id', 'limit', 'offset'])
-        return self._api_request(ka,"/genre/list")
+        return self._api_request(ka, '/genre/list')
     
     def label_list (self, **ka):
         self._check_ka(ka, [], ['limit', 'offset'])
-        return self._api_request(ka,"/label/list")
+        return self._api_request(ka, '/label/list')
