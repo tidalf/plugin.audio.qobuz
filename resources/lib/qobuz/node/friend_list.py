@@ -37,6 +37,7 @@ class Node_friend_list(Node):
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_friend_list, self).__init__(parent, parameters)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FRIEND_LIST
+        self.name = self.get_parameter('name')
         self.image = getImage('artist')
         self.label = "Friend (i8n)"
         self.label2 = ""
@@ -44,11 +45,15 @@ class Node_friend_list(Node):
         self.is_folder = True
         self.content_type = 'artist'
   
+    def make_url(self, **ka):
+        url = super(Node_friend_list, self).make_url(**ka)
+        if self.name: url+= "&name=" + self.name
+        return url
+    
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        info(self, "Build-down playlist")
-        if self.parent and not (self.parent.type & NodeFlag.TYPE_FRIEND):
-            myname = self.parent.get_property('label')
-            data = qobuz.registry.get(name='user-playlists',username = myname, limit=0)
+        info(self, "Build-down friends list " + repr(self.name))
+        if self.name:
+            data = qobuz.registry.get(name='user-playlists',id = self.name, limit=0)
         else: 
             data = qobuz.registry.get(name='user-playlists',limit=0)
         if not data:
@@ -69,8 +74,7 @@ class Node_friend_list(Node):
         friend_list = keys.keys()
         # and add them to the directory
         for name in friend_list:
-            node = Node_friend()
-            node.set_name(str(name))
+            node = Node_friend(None, {'name': str(name)})
             self.add_child(node)
 
     def attach_context_menu(self, item, menuItems = []):
