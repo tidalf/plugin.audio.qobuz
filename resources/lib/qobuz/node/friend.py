@@ -84,7 +84,7 @@ class Node_friend(Node):
                 warn(self, 'Nothing to do')
                 return False
             name = kb.getText()
-        friendpl = qobuz.api.playlist_getUserPlaylists(username=name)
+        friendpl = qobuz.registry.get(name='user-playlists', username=name, id = name)['data']
         if not friendpl: return False
         user = qobuz.registry.get(name='user')
         if not user:
@@ -123,10 +123,13 @@ class Node_friend(Node):
         return True
             
     def _build_down(self, xbmc_directory, lvl, flag = None):
-        data = qobuz.registry.get(name='user-playlists', username=self.name)['data']
+        data = qobuz.registry.get(name='user-playlists', username=self.name, id = self.name)['data']
         if not data:
             warn(self, "No friend data")
             return False
+        from friend_list import Node_friend_list
+        fl = Node_friend_list()
+        self.add_child(Node_friend_list())
         for pl in data['playlists']['items']:
             node = Node_playlist()
             node.data = pl

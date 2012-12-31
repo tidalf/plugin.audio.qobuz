@@ -46,7 +46,11 @@ class Node_friend_list(Node):
   
     def _build_down(self, xbmc_directory, lvl, flag = None):
         info(self, "Build-down playlist")
-        data = qobuz.registry.get(name='user-playlists', limit=0)
+        if self.parent and not (self.parent.type & NodeFlag.TYPE_FRIEND):
+            myname = self.parent.get_property('label')
+            data = qobuz.registry.get(name='user-playlists',username = myname, limit=0)
+        else: 
+            data = qobuz.registry.get(name='user-playlists',limit=0)
         if not data:
             warn(self, "No friend data")
             return False
