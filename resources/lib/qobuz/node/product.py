@@ -105,9 +105,7 @@ class Node_product(Node):
         return ''
 
     def get_album(self):
-        album = self.get_property(('album', 'name'))
-        if not album: album = self.get_property(('product', 'name'))
-        if not album: album = self.get_property('name')
+        album = self.get_property('name')
         if not album: return ''
         return album
     

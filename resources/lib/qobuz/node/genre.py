@@ -66,7 +66,7 @@ class Node_genre(Node):
         for genre in data['data']['genres']['items']:
             node = Node_genre()
             node.data = genre
-            if 'parent' in genre and genre['parent']['level'] > 2:
+            if 'parent' in genre and genre['parent']['level'] > 1:
                 self._build_down_reco(directory, lvl, flag, genre['id'])
             self.add_child(node)
         return True

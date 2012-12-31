@@ -153,6 +153,10 @@ class Node(object):
         url = self.make_url(offset=items['offset'] + items['limit'])
         print "URL: " + url
         self.pagination_next = url
+        self.pagination_total = items['total']
+        self.pagination_offset = items['offset']
+        self.pagination_limit = items['limit']
+        self.pagination_next_offset = items['offset'] + items['limit']
 
     def to_s(self):
         s = "[Node][" + str(self.type) + "\n"
