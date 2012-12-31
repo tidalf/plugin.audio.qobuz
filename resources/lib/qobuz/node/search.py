@@ -35,7 +35,7 @@ class Node_search(Node):
     def __init__(self, parent = None, params = None):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SEARCH
-        self.search_type = 'albums'
+        self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = None
 
     def get_label(self):

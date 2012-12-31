@@ -37,57 +37,16 @@ class IRenderer(object):
     def set_filter(self, filter):
         self.filter = filter
 
+
     def set_root_node(self):
+        import sys
         root = None
-        if self.node_type & NodeFlag.TYPE_ROOT:
-            from node.root import Node_root
-            root = Node_root(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_TRACK:
-            from node.track import Node_track
-            root = Node_track(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_USERPLAYLISTS:
-            from node.user_playlists import Node_user_playlists
-            root = Node_user_playlists(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_PLAYLIST:
-            from node.playlist import Node_playlist
-            root = Node_playlist(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_RECOMMENDATION:
-            from node.recommendation import Node_recommendation
-            root = Node_recommendation(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_PRODUCT:
-            from node.product import Node_product
-            root = Node_product(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_PURCHASES:
-            from node.purchases import Node_purchases
-            root = Node_purchases(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_SEARCH:
-            from node.search import Node_search
-            root = Node_search(None, qobuz.boot.params)
-            root.search_type = qobuz.boot.params['search-type']
-        elif self.node_type & NodeFlag.TYPE_ARTIST:
-            from node.product_by_artist import Node_product_by_artist
-            root = Node_product_by_artist(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_SIMILAR_ARTIST:
-            from node.similar_artists import Node_similar_artist
-            root = Node_similar_artist(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_FAVORITES:
-            from node.favorites import Node_favorites
-            root = Node_favorites(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_FRIEND_LIST:
-            from node.friend_list import Node_friend_list
-            root = Node_friend_list(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_FRIEND:
-            from node.friend import Node_friend
-            root = Node_friend(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_GENRE:
-            from node.genre import Node_genre
-            root = Node_genre(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_LABEL:
-            from node.label import Node_label
-            root = Node_label(None, qobuz.boot.params)
-        else:
-            warn(self, "Cannot set root node!")
-            return False
+        nodeName = NodeFlag.to_s(self.node_type)
+        modulePath = 'node.' + nodeName
+        moduleName = 'Node_' + nodeName
+        Module =__import__(modulePath, globals(), locals(), [moduleName], -1)
+        node = getattr(Module, moduleName)
+        root = node(None, qobuz.boot.params)
         root.id = self.node_id
         root.make_url()
         self.root = root

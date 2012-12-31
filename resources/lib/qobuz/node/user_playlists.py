@@ -45,7 +45,6 @@ class Node_user_playlists(Node):
         else: display_cover = False
         self.display_product_cover = display_cover
 
-
     def set_display_by(self, type):
         vtype = ('product', 'songs')
         if not type in vtype:
@@ -126,7 +125,8 @@ class Node_user_playlists(Node):
         if not k.isConfirmed():
             return False
         newname = k.getText()
-        newname = newname.strip()
+        newname = newname.strip()#.encode('utf8', 'replace')
+        print "Name: " + repr(newname)
         if newname == currentname:
             return True
         res = qobuz.api.playlist_update(playlist_id=ID,name=newname)
@@ -139,7 +139,7 @@ class Node_user_playlists(Node):
             qobuz.registry.delete(name='user-playlist', id=ID)
             qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
             containerRefresh()
-            notifyH(lang(30078), lang(39009) + ': ' + currentname)
+            notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
         return True
     
     '''

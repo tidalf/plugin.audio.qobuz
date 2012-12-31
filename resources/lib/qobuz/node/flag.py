@@ -14,6 +14,9 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
+from exception import QobuzXbmcError
+
 class __NodeFlag():
     def __init__(self):
         self.DONTFETCHTRACK        = 1
@@ -39,7 +42,7 @@ class __NodeFlag():
     def to_s(self, flag):
         if flag & self.TYPE_TRACK: return "track"
         elif flag & self.TYPE_PLAYLIST: return "playlist"
-        elif flag & self.TYPE_USERPLAYLISTS: return "user playlist"
+        elif flag & self.TYPE_USERPLAYLISTS: return "user_playlists"
         elif flag & self.TYPE_RECOMMENDATION: return "recommendation"
         elif flag & self.TYPE_ROOT: return "root"
         elif flag & self.TYPE_PRODUCT: return "product"
@@ -47,14 +50,14 @@ class __NodeFlag():
         elif flag & self.TYPE_FAVORITES: return "favorites"
         elif flag & self.TYPE_SEARCH: return "search"
         elif flag & self.TYPE_ARTIST: return "artist"
-        elif flag & self.TYPE_SIMILAR_ARTIST: "similar artist" 
-        elif flag & self.TYPE_NODE: return "node"
+        elif flag & self.TYPE_SIMILAR_ARTIST: "similar_artist" 
         elif flag & self.DONTFETCHTRACK: "don't fetch track"
-        elif flag & self.FRIEND: "friend"
-        elif flag & self.FRIEND_LIST: "friend list"
-        elif flag & self.GENRE: "genre"
-        elif flag & self.LABEL: "label"
-        else: "Unknow flag: " + str(flag)
+        elif flag & self.TYPE_FRIEND: "friend"
+        elif flag & self.TYPE_FRIEND_LIST: "friend list"
+        elif flag & self.TYPE_GENRE: "genre"
+        elif flag & self.TYPE_LABEL: "label"
+        elif flag & self.TYPE_NODE: return "node"
+        else: raise QobuzXbmcError(who=self, what='invalid_flag', additional=repr(flag))
         
 NodeFlag = __NodeFlag()
 
