@@ -24,12 +24,20 @@ from product import Node_product
 from debug import warn
 from gui.util import color, lang, getImage
 
+RECOS_TYPE_IDS = {
+                1: 'new-releases',
+                2: 'press-awards',
+                3: 'best-sellers',
+                4: 'editor-picks',
+                5: 'most-featured'           
+}
+
 RECOS_TYPES = {
-                      'new-releases': lang(30084),
-                      'press-awards': lang(30083),
-                      'best-sellers': lang(30085),
-                      'editor-picks': lang(30086),
-                      'most-featured': lang(30102),
+                      1: lang(30084),
+                      2: lang(30083),
+                      3: lang(30085),
+                      4: lang(30086),
+                      5: lang(30102),
                       }
 
 RECOS_GENRES = {
@@ -65,56 +73,35 @@ class Node_recommendation(Node):
     def make_url(self, **ka):
         url = super(Node_recommendation, self).make_url(**ka)
         if self.genre_type:
-            url += '&genre-type=' + self.genre_type
+            url += '&genre-type=' + str(self.genre_type)
         if self.genre_id:
             url += '&genre-id=' + str(self.genre_id)
-        if 'action' in self.parameters and self.parameters['action'] == 'scan':
-            url += "&action=scan"
         return url
 
-    @property
-    def id(self):
-        return self.value
-    
-    @id.getter
-    def id(self):
+    def myid(self):
         if not self.genre_id or not self.genre_type: return None
-        return self.genre_type + '-' + str(self.genre_id)
+        return str(self.genre_type) + '-' + str(self.genre_id)
     
-    @id.setter
-    def id(self, value):
-        self._id = value
-    
-    def set_genre_type(self, type):
-        self.genre_type = type
 
-    def set_genre_id(self, id):
-        self.genre_id = id
-
-    def get_genre_type(self):
-        return self.genre_type
-
-    def get_genre_id(self):
-        return self.genre_id
 
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
         colorItem = qobuz.addon.getSetting('color_item')
-        for gtype in RECOS_TYPES:
+        for gid in RECOS_TYPE_IDS:
             node = Node_recommendation()
-            node.set_genre_type(gtype)
-            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[gtype]))
+            node.genre_type = gid
+            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[gid]))
             self.add_child(node)
         return True
 
 # GENRE
     def _build_recos_genre(self, xbmc_directory, lvl, flag):
         colorItem = qobuz.addon.getSetting('color_item')
-        for genreid in RECOS_GENRES:
+        for genre_id in RECOS_GENRES:
             node = Node_recommendation()
-            node.set_genre_type(self.get_genre_type())
-            node.set_genre_id(genreid)
-            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[self.genre_type]) + ' / ' + RECOS_GENRES[genreid])
+            node.genre_type = self.genre_type
+            node.genre_id = genre_id
+            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[int(self.genre_type)]) + ' / ' + RECOS_GENRES[genre_id])
             self.add_child(node)
         return True
 
@@ -123,7 +110,7 @@ class Node_recommendation(Node):
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.registry.get(name='recommendation', id=self.id, type=self.genre_type, genre_id=self.genre_id, limit=limit, offset=offset)
+        data = qobuz.registry.get(name='recommendation', id=self.myid(), type=RECOS_TYPE_IDS[int(self.genre_type)], genre_id=self.genre_id, limit=limit, offset=offset)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False

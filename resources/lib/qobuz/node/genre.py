@@ -19,7 +19,7 @@ import xbmcgui, xbmc
 import qobuz
 from flag import NodeFlag
 from node import Node
-from recommendation import Node_recommendation
+from recommendation import Node_recommendation, RECOS_TYPE_IDS
 from gui.util import getImage
 
 '''
@@ -52,16 +52,18 @@ class Node_genre(Node):
         return self.get_property('name')
     
     def _build_down_reco(self, dir, lvl, whiteFlag, id):
-        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'new-releases' })
-        node.build_down(dir, lvl, whiteFlag)
-        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'press-awards' })
-        node.build_down(dir, lvl, whiteFlag)
-        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'best-sellers' })
-        node.build_down(dir, lvl, whiteFlag)
-        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'editor-picks' })
-        node.build_down(dir, lvl, whiteFlag)
-        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'most-featured' })
-        node.build_down(dir, lvl, whiteFlag)
+        for gtype in RECOS_TYPE_IDS:
+            print "GTYPE " + repr(gtype)
+            node = Node_recommendation(self, {'genre-id': id, 'genre-type': gtype })
+            node.build_down(dir, lvl, whiteFlag)
+#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'press-awards' })
+#        node.build_down(dir, lvl, whiteFlag)
+#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'best-sellers' })
+#        node.build_down(dir, lvl, whiteFlag)
+#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'editor-picks' })
+#        node.build_down(dir, lvl, whiteFlag)
+#        node = Node_recommendation(None, {'genre-id': id, 'genre-type': 'most-featured' })
+#        node.build_down(dir, lvl, whiteFlag)
         return True
         
     def _build_down(self, dir, lvl, flag = None):
