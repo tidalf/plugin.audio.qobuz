@@ -26,7 +26,7 @@ from flag import NodeFlag
 from node import Node
 from playlist import Node_playlist
 from debug import info, warn, error
-from gui.util import color, getImage
+from gui.util import color, getImage, runPlugin
 
 '''
     NODE FRIEND
@@ -109,14 +109,18 @@ class Node_friend(Node):
         user = qobuz.registry.get(name='user')
         if not user: return False
         friends = user['data']['user']['player_settings']
-        if not 'friends' in friends: return False
+        if not 'friends' in friends: 
+            warn(self, "No friends in user/player_settings")
+            return False
         friends = friends['friends']
-        if not name in friends: return False
+        if not name in friends: 
+            warn(self, "Friend " + repr(name) + " not in friends data")
+            return False
         del friends[friends.index(name)]
-        #dict((k, v) for (k, v) in somedict.iteritems() if not k.startswith('someprefix'))
         newdata = { 'friends': friends }
         self._change_appid()
         if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
+            warn(self, "Cannot update remote user")
             self._restore_appid()
             return False
         self._restore_appid()
@@ -128,7 +132,6 @@ class Node_friend(Node):
             warn(self, "No friend data")
             return False
         from friend_list import Node_friend_list
-        fl = Node_friend_list()
         self.add_child(Node_friend_list(self,self.parameters))
         for pl in data['playlists']['items']:
             node = Node_playlist()
@@ -140,12 +143,12 @@ class Node_friend(Node):
         return True
     
     def attach_context_menu(self, item, menuItems = []):
-        colorItem = qobuz.addon.getSetting('color_item')
+#        colorItem = qobuz.addon.getSetting('color_item')
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         
         ''' Delete friend'''
-        url = self.make_url(mode=Mode.FRIEND_REMOVE)
-        menuItems.append((color(colorItem, 'Remove friend (i8n)' + ': ') + self.name, "XBMC.RunPlugin("+url+")"))
+        cmd = runPlugin(self.make_url(mode=Mode.FRIEND_REMOVE))
+        menuItems.append((color(colorWarn, 'Remove friend (i8n)' + ': ') + self.name, cmd))
 
         ''' Calling base class '''
         super(Node_friend, self).attach_context_menu(item, menuItems)

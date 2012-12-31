@@ -21,10 +21,10 @@ from flag import NodeFlag
 from node import Node
 from debug import warn
 from gui.util import getImage
+
 '''
     NODE PRODUCT
 '''
-
 
 from track import Node_track
 
@@ -36,7 +36,7 @@ class Node_product(Node):
         super(Node_product, self).__init__(parent, params)
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PRODUCT
         self.image = getImage('album')
-        self.content_type = 'songs'
+        self.content_type = 'albums'
         self.is_special_purchase = False
 
     def _build_down(self, xbmc_directory, lvl, flag = None):
@@ -81,7 +81,10 @@ class Node_product(Node):
                                 )
         item.setInfo('music', infoLabels = {
                                             'genre': self.get_genre(),
-                                            'year': self.get_year()
+                                            'year': self.get_year(),
+                                            'artist': self.get_artist(),
+                                            'title': self.get_title(),
+                                            'album': self.get_title(),
         })
         menuItems = []
         self.attach_context_menu(item, menuItems)
@@ -101,6 +104,13 @@ class Node_product(Node):
         if a: return a
         return ''
 
+    def get_album(self):
+        album = self.get_property(('album', 'name'))
+        if not album: album = self.get_property(('product', 'name'))
+        if not album: album = self.get_property('name')
+        if not album: return ''
+        return album
+    
     def get_artist_id(self):
         a = self.get_property(('artist', 'id'))
         if a: return int(a)
