@@ -50,13 +50,13 @@ class __NodeFlag():
         elif flag & self.TYPE_FAVORITES: return "favorites"
         elif flag & self.TYPE_SEARCH: return "search"
         elif flag & self.TYPE_ARTIST: return "artist"
-        elif flag & self.TYPE_SIMILAR_ARTIST: "similar_artist" 
-        elif flag & self.DONTFETCHTRACK: "don't fetch track"
-        elif flag & self.TYPE_FRIEND: "friend"
-        elif flag & self.TYPE_FRIEND_LIST: "friend list"
-        elif flag & self.TYPE_GENRE: "genre"
-        elif flag & self.TYPE_LABEL: "label"
+        elif flag & self.TYPE_SIMILAR_ARTIST: return "similar_artist" 
+        elif flag & self.TYPE_FRIEND: return "friend"
+        elif flag & self.TYPE_FRIEND_LIST: return "friend_list"
+        elif flag & self.TYPE_GENRE: return "genre"
+        elif flag & self.TYPE_LABEL: return "label"
         elif flag & self.TYPE_NODE: return "node"
+        elif flag & self.DONTFETCHTRACK: "don't fetch track"
         else: raise QobuzXbmcError(who=self, what='invalid_flag', additional=repr(flag))
         
 NodeFlag = __NodeFlag()
