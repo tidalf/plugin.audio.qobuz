@@ -61,7 +61,7 @@ class Xbmc_renderer(IRenderer):
         self.root.build_down(Dir, self.depth, self.filter)   
         if self.root.pagination_next: 
             colorItem = qobuz.addon.getSetting('color_item')
-            nextString = ('[ %s  %s / %s ]') % (color(colorItem, 'Next'), 
+            nextString = ('[ %s  %s / %s ]') % (color(colorItem, self.root.get_label()), 
                                               self.root.pagination_next_offset, 
                                               self.root.pagination_total)
             print "NextString set: " + nextString
