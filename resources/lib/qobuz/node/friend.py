@@ -129,7 +129,7 @@ class Node_friend(Node):
             return False
         from friend_list import Node_friend_list
         fl = Node_friend_list()
-        self.add_child(Node_friend_list())
+        self.add_child(Node_friend_list(self,self.parameters))
         for pl in data['playlists']['items']:
             node = Node_playlist()
             node.data = pl

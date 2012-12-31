@@ -39,7 +39,7 @@ class Node_friend_list(Node):
         self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FRIEND_LIST
         self.name = self.get_parameter('name')
         self.image = getImage('artist')
-        self.label = "Friend (i8n)"
+        self.label = str(self.name) + "'s Friends (i8n)" if (self.name) else "Friends (i8n)"
         self.label2 = ""
         self.url = None
         self.is_folder = True
