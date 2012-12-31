@@ -64,9 +64,10 @@ class Node_friend_list(Node):
         for item in data['data']['playlists']['items']:
             friend_list.append(item['owner']['name'])
         # add previously stored
-        data = qobuz.registry.get(name='user')['data']['user']['player_settings']
-        for name in data['friends']:
-            friend_list.append(str(name))
+        if (not self.name):
+            data = qobuz.registry.get(name='user')['data']['user']['player_settings']
+            for name in data['friends']:
+                friend_list.append(str(name))
         # remove duplicates
         keys = {}
         for e in friend_list:
