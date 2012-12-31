@@ -72,7 +72,7 @@ class Monitor(xbmc.Monitor):
                     try:
                         fu.unlink(fileName)
                         count += 1
-                        if count > ka['limit']:
+                        if count >= ka['limit']:
                             break
                     except Exception as e: 
                         warn(self, "Something went wrong while deleting: " + fileName + " / " + e.value)
@@ -105,7 +105,7 @@ try:
     monitor = Monitor(qobuz)
     while not xbmc.abortRequested:
         if time() > (monitor.last_garbage_on  + monitor.garbage_refresh):
-            monitor.cache_remove_old(limit=5)
+            monitor.cache_remove_old(limit=10)
         xbmc.sleep(1000)
     
 except QobuzXbmcError as e:
