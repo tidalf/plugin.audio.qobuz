@@ -29,7 +29,7 @@ from dog import dog
 import qobuz
 from node.flag import NodeFlag as Flag
 from exception import QobuzXbmcError
-from gui.util import notifyH, notify, dialogLoginFailure, getImage, yesno
+from gui.util import notifyH, notify, dialogLoginFailure, getImage, yesno, containerRefresh
 
 ''' Arguments parssing '''
 def get_params():
@@ -95,6 +95,7 @@ class QobuzBootstrap(object):
             dialogLoginFailure()
             #@TODO sys.exit killing XBMC? FRODO BUG ?
             #sys.exit(1)
+            containerRefresh()
             raise QobuzXbmcError(who=self, what='invalid_login', additional=None)
             
     ''' BOTTSTRAP Directories '''

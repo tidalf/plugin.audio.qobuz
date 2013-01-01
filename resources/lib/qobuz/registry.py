@@ -61,7 +61,7 @@ class QobuzLocalStorage(object):
         self.api = QobuzApi()
         if not self.login(**ka):
             user = None
-            if 'user' in ka: user = ka['user']
+            if 'username' in ka: user = ka['username']
             raise QobuzXbmcError(who=self,what='login_failure',additional=repr(user))
 
     ''' We are compiling exluded key regex and raise error if it's fail '''
