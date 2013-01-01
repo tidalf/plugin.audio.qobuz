@@ -295,20 +295,18 @@ class Node_playlist(Node):
         limit = qobuz.addon.getSetting('pagination_limit')
         info(self, "renaming playlist: " + str(self.id))
         playlist = qobuz.registry.get(name='user-playlist', id=self.id, offset=offset, limit=limit)
-        currentname = playlist['data']['name'].encode('utf8', 'replace')
+        currentname = playlist['data']['name']
         k = Keyboard(currentname, lang(30078))
         k.doModal()
         if not k.isConfirmed():
             return False
         newname = k.getText()
-        newname = newname.strip()#.encode('utf8', 'replace')
+        newname = newname.strip()
         print "Name: " + repr(newname)
         if newname == currentname:
             return True
         res = qobuz.api.playlist_update(playlist_id=self.id, name=newname)
         if not res:
-#            qobuz.registry.delete(name='user-playlist', id=ID)
-#            qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
             containerRefresh()
             return False
         else:
