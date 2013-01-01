@@ -54,33 +54,28 @@ class Monitor(xbmc.Monitor):
         
     def cache_remove_old(self, **ka):
         self.last_garbage_on = time()
-        if not 'limit' in ka: ka['limit'] = 1
-        try: 
-            
-            fu = FileUtil()
-            flist = fu.find(qobuz.path.cache, '^.*\.dat$')
-            count = 0
-            for fileName in flist:
-                data = None
-                with open(fileName,'rb') as f:
-                    f = open(fileName,'rb')
-                    try:
-                        data = pickle.load(f)
-                    except: continue
-                    finally: f.close()
-                if  (data['updatedOn'] + data['refresh']) < time():
-                    print "Removing old file: " + fileName
-                    try:
-                        fu.unlink(fileName)
-                        count += 1
-                        if count >= ka['limit']:
-                            break
-                    except Exception as e: 
-                        warn(self, "Something went wrong while deleting: " + fileName + " / " + e.value)
+        gData = { 'limit': 1}
+        if 'limit' in ka: gData['limit'] =  ka['limit']
+        """ function for deleting one file"""
+        def delete_one(fileName, gData):
+            data = None
+            with open(fileName,'rb') as f:
+                f = open(fileName,'rb')
+                try: data = pickle.load(f)
+                except: return False
+                finally: f.close()
+            if  (data['updatedOn'] + data['refresh']) < time():
+                log("[QobuzCache]", ("Removing old file: %s") %(repr(fileName)))
+                try:
+                    fu.unlink(fileName)
+                    gData['limit'] -= 1
+                except Exception as e: 
+                    warn("[QobuzCache]", ("Can't remove file %s\n%s") % (repr(fileName), repr(e)))
+                    return False
+                if gData['limit'] <= 0: return False
             return True
-        except: 
-            warn(self, 'Something went wrong while trying to delete old cached file')
-            return False
+        fu = FileUtil()
+        fu.find(qobuz.path.cache, '^.*\.dat$', delete_one, gData)
         return True
     
     def cache_remove_user_data(self):
@@ -91,11 +86,13 @@ class Monitor(xbmc.Monitor):
             fu = FileUtil()
             flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
             for fileName in flist:
-                    fu.unlink(fileName)
+                    log(self, "Removing file " + fileName)
+                    if not fu.unlink(fileName):
+                        warn(self, "Failed to remove " + fileName)
             containerRefresh()
         except: 
             warn(self, "Error while removing cached data")
-            notifyH('Qobuz', 'Failed to remove user data', getImage('icon-error-256'))
+            notifyH('Qobuz (i8n)', 'Failed to remove user data', getImage('icon-error-256'))
             return False
         return True
     
@@ -108,6 +105,7 @@ try:
     monitor = Monitor(qobuz)
     while not xbmc.abortRequested:
         if time() > (monitor.last_garbage_on  + monitor.garbage_refresh):
+            log('[QobuzCache]', 'Cleaning')
             monitor.cache_remove_old(limit=10)
         xbmc.sleep(1000)
     

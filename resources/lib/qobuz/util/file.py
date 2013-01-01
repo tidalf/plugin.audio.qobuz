@@ -20,6 +20,7 @@ import time
 import random
 import string
 import re
+from debug import warn
 
 class FileUtil():
 
@@ -73,14 +74,18 @@ class FileUtil():
         return self._safe_unlink(path)
     
     ''' Find '''
-    def find(self, dir, pattern, excludeDir = True):
+    def find(self, directory, pattern, callback = None, gData = None):
         flist = []
         fok = re.compile(pattern)
-        for dirname, dirnames, filenames in os.walk(dir):
-            if not excludeDir:
-                for subdirname in dirnames:
-                    flist.append( os.path.join(dirname, subdirname))
+        for dirname, dirnames, filenames in os.walk(directory):
             for filename in filenames:
                 if fok.match(filename):
-                    flist.append(os.path.join(dirname, filename))
+                    path = os.path.join(dirname, filename)
+                    if callback: 
+                        try:
+                            if not callback(path, gData): return None
+                        except Exception as e:
+                            warn(self, "Callback raise exception: " + repr(e))
+                            return None
+                    flist.append(path)
         return flist

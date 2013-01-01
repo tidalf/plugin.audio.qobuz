@@ -45,7 +45,7 @@ class QobuzLocalStorage(object):
         if not 'autoLoad' in self.options:
             self.options['autoLoad'] = True
         if not 'refresh' in self.options:
-            self.options['refresh'] = 3600
+            self.options['refresh'] = 60 * 60 * 12
         if not 'overwrite' in self.options:
             self.options['overwrite'] = True
         if not 'hashKey' in self.options:
@@ -94,9 +94,9 @@ class QobuzLocalStorage(object):
     def set(self,**ka):
         refresh = None
         if 'refresh' in ka: refresh = ka['refresh']
-        elif ka['name'] == 'product' or ka['name'] == 'track':
+        elif ka['name'] in ['product', 'track', 'recommendation', 'genre-list', 'label-list']:
             refresh = 60 * 60 * 24
-        elif ka['name'] == 'user-stream-url': refresh = 60 * 2
+        elif ka['name'] == 'user-stream-url': refresh = 60 * 5
         else:
             refresh = self.options['refresh']
         print "Refresh: " + repr(refresh)
@@ -158,7 +158,7 @@ class QobuzLocalStorage(object):
         key = self.make_key(**ka)
         if key in self.data and self.fresh(key):
             return self.data[key]
-        log(self,"[REMOTE/QOBUZ] Loading: " + key)
+        log(self,"[REMOTE] Loading: " + key)
         response = None
         # We are deleting name and id because we don't want to send them
         # to Qobuz

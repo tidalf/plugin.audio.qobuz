@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import qobuz
 from node.flag import NodeFlag
-from debug import info, warn, error, debug
+#from debug import info, warn, error, debug
 import pprint
 
 class IRenderer(object):
@@ -36,7 +36,6 @@ class IRenderer(object):
 
     def set_filter(self, filter):
         self.filter = filter
-
 
     def set_root_node(self):
         import sys

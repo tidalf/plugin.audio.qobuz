@@ -56,7 +56,7 @@ class __NodeFlag():
         elif flag & self.TYPE_GENRE: return "genre"
         elif flag & self.TYPE_LABEL: return "label"
         elif flag & self.TYPE_NODE: return "node"
-        elif flag & self.DONTFETCHTRACK: "don't fetch track"
+        elif flag & self.DONTFETCHTRACK: return "dont_fetch_track"
         else: raise QobuzXbmcError(who=self, what='invalid_flag', additional=repr(flag))
         
 NodeFlag = __NodeFlag()
