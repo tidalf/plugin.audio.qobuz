@@ -24,7 +24,7 @@ from node import Node
 from product import Node_product
 from debug import info, warn
 from exception import QobuzXbmcError
-from gui.util import notifyH, notify, color, lang, getImage, runPlugin
+from gui.util import notifyH, notify, color, lang, getImage, runPlugin, containerRefresh
 
 '''
     NODE PLAYLIST
@@ -131,21 +131,27 @@ class Node_playlist(Node):
         return item
 
     def attach_context_menu(self, item, menuItems = []):
+        login = qobuz.addon.getSetting('username')
+        isOwner = True
+        if login != self.get_property(('owner', 'name')):
+            isOwner = False
         colorItem = qobuz.addon.getSetting('color_item')
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
         
-        url = self.make_url(type=Flag.PLAYLIST, nm='set_as_current')
-        menuItems.append((color(colorItem, lang(39007) + ': ') + label, runPlugin(url)))
+        if isOwner:
+            url = self.make_url(type=Flag.PLAYLIST, nm='set_as_current')
+            menuItems.append((color(colorItem, lang(39007) + ': ') + label, runPlugin(url)))
+           
+            url = self.make_url(type=Flag.PLAYLIST, nm='rename')
+            menuItems.append((color(colorItem, lang(39009) + ': ') + label, runPlugin(url)))
 
-        url = self.make_url(type=Flag.PLAYLIST, nm='subscribe')
-        menuItems.append((color(colorItem, lang(39012) + ': ') + label, runPlugin(url)))
+        else:
+            url = self.make_url(type=Flag.PLAYLIST, nm='subscribe')
+            menuItems.append((color(colorItem, lang(39012) + ': ') + label, runPlugin(url)))
                 
         url = self.make_url(type=Flag.PLAYLIST, nm='create')
         menuItems.append((color(colorItem, lang(39008)), runPlugin(url)))
-
-        url = self.make_url(type=Flag.PLAYLIST, nm='rename')
-        menuItems.append((color(colorItem, lang(39009) + ': ') + label, runPlugin(url)))
 
         url = self.make_url(type=Flag.PLAYLIST, nm='remove')
         menuItems.append((color(colorWarn, lang(39010) + ': ') + label, runPlugin(url)))
@@ -369,3 +375,13 @@ class Node_playlist(Node):
         notifyH('Qobuz remove playlist (i8n)', 'Playlist ' + name + ' removed')
         containerRefresh()
         return True
+
+    def subscribe(self):
+        ID = self.id
+        if qobuz.api.playlist_subscribe(playlist_id = ID):
+            from gui.util import notifyH, isFreeAccount, lang
+            notifyH("Qobuz","(i8n) playlist subscribed")
+            qobuz.registry.delete_by_name('^user-playlists.*\.dat$')
+            return True
+        else: 
+            return False

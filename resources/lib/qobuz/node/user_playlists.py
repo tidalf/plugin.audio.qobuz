@@ -78,14 +78,7 @@ class Node_user_playlists(Node):
         self.add_pagination(data['data'])
         return True
             
-    def subscribe_playlist(self, ID):
-        if qobuz.api.playlist_subscribe(playlist_id = ID):
-            from gui.util import notifyH, isFreeAccount, lang
-            notifyH("Qobuz","(i8n) playlist subscribed")
-            qobuz.registry.delete_by_name('^user-playlists.*\.dat$')
-            return True
-        else: 
-            return False
+
         
 
     

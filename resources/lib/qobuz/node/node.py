@@ -326,8 +326,7 @@ class Node(object):
 
         ''' VIEW BIG DIR '''
         cmd = runPlugin(self.make_url(mode=Mode.VIEW_BIG_DIR))
-        label = lang(39002)
-        menuItems.append((color(colorItem,label), cmd))
+        menuItems.append((color(colorItem,lang(39002)), cmd))
 
 
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
@@ -341,7 +340,7 @@ class Node(object):
             id = self.get_artist_id()
             import urllib
             query = urllib.quote(self.get_artist().encode('utf-8'))
-            url = self.make_url(mode=Mode.VIEW, type=Flag.SIMILAR_ARTIST, id=id)
+            url = self.make_url(type=Flag.SIMILAR_ARTIST, id=id)
             cmd = runPlugin(url)
             menuItems.append((color(colorItem,lang(39004)),cmd))
 
