@@ -19,11 +19,12 @@ import xbmcgui
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from node import Node
 from product import Node_product
 from debug import info, warn
-from gui.util import notifyH, notify, color, lang, getImage
+from exception import QobuzXbmcError
+from gui.util import notifyH, notify, color, lang, getImage, runPlugin
 
 '''
     NODE PLAYLIST
@@ -34,7 +35,7 @@ class Node_playlist(Node):
 
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_playlist, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PLAYLIST
+        self.type = Flag.NODE | Flag.PLAYLIST
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
@@ -134,25 +135,20 @@ class Node_playlist(Node):
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
         
-        ''' SET AS CURRENT '''
-        url = self.make_url(mode=Mode.PLAYLIST_SELECT_CURRENT)
-        menuItems.append((color(colorItem, lang(39007) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        url = self.make_url(type=Flag.PLAYLIST, nm='set_as_current')
+        menuItems.append((color(colorItem, lang(39007) + ': ') + label, runPlugin(url)))
 
-        ''' SUBSCRIBE '''
-        url = self.make_url(mode=Mode.PLAYLIST_SUBSCRIBE)
-        menuItems.append((color(colorItem, lang(39012) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        url = self.make_url(type=Flag.PLAYLIST, nm='subscribe')
+        menuItems.append((color(colorItem, lang(39012) + ': ') + label, runPlugin(url)))
                 
-        ''' CREATE '''
-        url = self.make_url(mode=Mode.PLAYLIST_CREATE)
-        menuItems.append((color(colorItem, lang(39008)), "XBMC.RunPlugin("+url+")"))
+        url = self.make_url(type=Flag.PLAYLIST, nm='create')
+        menuItems.append((color(colorItem, lang(39008)), runPlugin(url)))
 
-        ''' RENAME '''
-        url = self.make_url(mode=Mode.PLAYLIST_RENAME)
-        menuItems.append((color(colorItem, lang(39009) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        url = self.make_url(type=Flag.PLAYLIST, nm='rename')
+        menuItems.append((color(colorItem, lang(39009) + ': ') + label, runPlugin(url)))
 
-        ''' REMOVE '''
-        url = self.make_url(mode=Mode.PLAYLIST_REMOVE)
-        menuItems.append((color(colorWarn, lang(39010) + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        url = self.make_url(type=Flag.PLAYLIST, nm='remove')
+        menuItems.append((color(colorWarn, lang(39010) + ': ') + label, runPlugin(url)))
     
         ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menuItems)
@@ -199,9 +195,9 @@ class Node_playlist(Node):
             render.set_filter(view_filter)
             render.set_root_node()
             Dir = Directory(render.root, qobuz.boot.handle, True)
-            flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
-            if render.root.type & NodeFlag.TYPE_TRACK:
-                flags = NodeFlag.TYPE_TRACK
+            flags = Flag.TRACK | Flag.DONTFETCHTRACK
+            if render.root.type & Flag.TRACK:
+                flags = Flag.TRACK
             ret = render.root.build_down(Dir, depth, flags)
             if not ret: 
                 Dir.end_of_directory()
@@ -243,9 +239,9 @@ class Node_playlist(Node):
         render.set_filter(view_filter)
         render.set_root_node()
         Dir = Directory(render.root, qobuz.boot.handle, True)
-        flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
-        if render.root.type & NodeFlag.TYPE_TRACK:
-            flags = NodeFlag.TYPE_TRACK
+        flags = Flag.TRACK | Flag.DONTFETCHTRACK
+        if render.root.type & Flag.TRACK:
+            flags = Flag.TRACK
         ret = render.root.build_down(Dir, depth, flags)
         if not ret:
             Dir.end_of_directory()
@@ -275,4 +271,101 @@ class Node_playlist(Node):
             qobuz.registry.deleet(name='user-playlists')
             qobuz.registry.set(name='user-current-playlist-id', value=nid, noRemote=True)
         Dir.end_of_directory()
+        return True
+    
+    def set_as_current(self):
+        from gui.util import containerRefresh
+        if not self.id: raise QobuzXbmcError(who=self, what='node_without_id')
+        qobuz.registry.set(name='user-current-playlist-id', id=0, value=self.id)
+        containerRefresh()
+        return True
+
+    ''' 
+        Rename playlist 
+    '''
+    def rename(self):
+        from gui.util import Keyboard, containerRefresh
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        info(self, "renaming playlist: " + str(self.id))
+        playlist = qobuz.registry.get(name='user-playlist', id=self.id, offset=offset, limit=limit)
+        currentname = playlist['data']['name'].encode('utf8', 'replace')
+        k = Keyboard(currentname, lang(30078))
+        k.doModal()
+        if not k.isConfirmed():
+            return False
+        newname = k.getText()
+        newname = newname.strip()#.encode('utf8', 'replace')
+        print "Name: " + repr(newname)
+        if newname == currentname:
+            return True
+        res = qobuz.api.playlist_update(playlist_id=self.id, name=newname)
+        if not res:
+#            qobuz.registry.delete(name='user-playlist', id=ID)
+#            qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
+            containerRefresh()
+            return False
+        else:
+            qobuz.registry.delete(name='user-playlist', id=self.id)
+            qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
+            containerRefresh()
+            notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
+        return True
+    
+    def create(self):
+        from gui.util import containerRefresh
+        query = self.get_parameter('query')
+        #!TODO: Why we are no more logged ...
+        qobuz.registry.get(name='user')
+        if not query:
+            from gui.util import Keyboard
+            k = Keyboard('', 'Create Playlist (i8n)')
+            k.doModal()
+            if not k.isConfirmed():
+                warn(self, 'Creating playlist aborted')
+                return None
+            query = k.getText()
+        ret = qobuz.api.playlist_create(name=query, is_public=False)
+        if not ret:
+            warn(self, "Cannot create playlist name '" + query + "'")
+            return None
+        self.set_as_current()
+        qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
+        containerRefresh()
+        return ret['id']
+    
+    '''
+        Remove playlist
+    '''
+    def remove(self):
+        import xbmcgui, xbmc
+        import pprint
+        ID = self.id
+        login = qobuz.addon.getSetting('username')
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='user-playlist', id=ID, offset=offset, limit=limit)['data']
+        print pprint.pformat(data)
+        name = ''
+        if 'name' in data: name = data['name']
+        ok = xbmcgui.Dialog().yesno(lang(39010),
+                          lang(30052), 
+                          color('FFFF0000', name))
+        if not ok:
+            info(self, "Deleting playlist aborted...")
+            return False
+        res = False
+        if data['owner']['name'] == login:
+            info(self, "Deleting playlist: " + ID)
+            res = qobuz.api.playlist_delete(playlist_id=ID)
+        else:
+            info(self, 'Unsuscribe playlist' + ID)
+            res = qobuz.api.playlist_unsubscribe(playlist_id=ID)
+        if not res:
+            warn(self, "Cannot delete playlist with id " + str(ID))
+            notifyH('Qobuz remove playlist (i8n)', 'Cannot remove playlist ' + name, getImage('icon-error-256'))
+            return False
+        qobuz.registry.delete(name='user-playlists', offset=offset, limit=limit)
+        notifyH('Qobuz remove playlist (i8n)', 'Playlist ' + name + ' removed')
+        containerRefresh()
         return True

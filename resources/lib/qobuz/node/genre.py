@@ -30,7 +30,7 @@ class Node_genre(Node):
 
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_genre, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_GENRE
+        self.type = NodeFlag.NODE | NodeFlag.GENRE
         self.set_label('Genre (i8n)')
         if self.parent: self.label = self.parent.label + ' / ' + self.label
         self.id = None

@@ -31,7 +31,7 @@ class Node_purchases(Node):
     def __init__(self,parent=None,params=None):
         super(Node_purchases,self).__init__(parent,params)
         self.label = lang(30100)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
+        self.type = NodeFlag.NODE | NodeFlag.PURCHASES
         self.content_type = 'albums'
         self.image = getImage('album')
 

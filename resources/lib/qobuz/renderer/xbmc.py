@@ -56,6 +56,10 @@ class Xbmc_renderer(IRenderer):
             warn(self, ("Cannot set root node (%s, %s)") % (str(self.node_type), 
                                                             str(self.node_id)))
             return False
+        if 'nm' in qobuz.boot.params:
+            print "Executing method on node: " + qobuz.boot.params['nm']
+            getattr(self.root, qobuz.boot.params['nm'])()
+            return True
         if not self.root.pre_build_down(): return False 
         Dir = Directory(self.root, qobuz.boot.handle, False)
         self.root.build_down(Dir, self.depth, self.filter)   

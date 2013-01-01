@@ -30,7 +30,7 @@ class Node_product_by_artist(Node):
 
     def __init__(self, parent = None, parameters = None):
         super(Node_product_by_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ARTIST
+        self.type = NodeFlag.NODE | NodeFlag.ARTIST
         self.content_type = 'albums'
 
     '''

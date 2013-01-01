@@ -35,7 +35,7 @@ class Node_user_playlists(Node):
         self.label = lang(30019)
         self.image = getImage('userplaylists')
         self.label2 = 'Keep your current playlist'
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_USERPLAYLISTS
+        self.type = NodeFlag.NODE | NodeFlag.USERPLAYLISTS
         self.content_type = 'files'
         display_by = self.get_parameter('display-by')
         if not display_by: display_by = 'songs'
@@ -77,10 +77,7 @@ class Node_user_playlists(Node):
             self.add_child(node)
         self.add_pagination(data['data'])
         return True
-
-    def set_current_playlist(self, ID):
-        qobuz.registry.set(name='user-current-playlist-id', id=0, value=ID)
-    
+            
     def subscribe_playlist(self, ID):
         if qobuz.api.playlist_subscribe(playlist_id = ID):
             from gui.util import notifyH, isFreeAccount, lang
@@ -90,89 +87,6 @@ class Node_user_playlists(Node):
         else: 
             return False
         
-    def create_playlist(self, query = None):
-        #!TODO: Why we are no more logged ...
-        qobuz.registry.get(name='user')
-        if not query:
-            from gui.util import Keyboard
-            k = Keyboard('', 'Create Playlist (i8n)')
-            k.doModal()
-            if not k.isConfirmed():
-                warn(self, 'Creating playlist aborted')
-                return None
-            query = k.getText()
-        ret = qobuz.api.playlist_create(name=query, is_public=False)
-        if not ret:
-            warn(self, "Cannot create playlist name '" + query + "'")
-            return None
-        self.set_current_playlist(ret['id'])
-        qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
-        containerRefresh()
-        return ret['id']
 
-    ''' 
-        Rename playlist 
-    '''
-    def rename_playlist(self, ID):
-        from gui.util import Keyboard
-        offset = self.get_parameter('offset') or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
-        info(self, "renaming playlist: " + str(ID))
-        playlist = qobuz.registry.get(name='user-playlist', id=ID, offset=offset, limit=limit)
-        currentname = playlist['data']['name'].encode('utf8', 'replace')
-        k = Keyboard(currentname, lang(30078))
-        k.doModal()
-        if not k.isConfirmed():
-            return False
-        newname = k.getText()
-        newname = newname.strip()#.encode('utf8', 'replace')
-        print "Name: " + repr(newname)
-        if newname == currentname:
-            return True
-        res = qobuz.api.playlist_update(playlist_id=ID,name=newname)
-        if not res:
-#            qobuz.registry.delete(name='user-playlist', id=ID)
-#            qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
-            containerRefresh()
-            return False
-        else:
-            qobuz.registry.delete(name='user-playlist', id=ID)
-            qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
-            containerRefresh()
-            notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
-        return True
     
-    '''
-        Remove playlist
-    '''
-    def remove_playlist(self, ID):
-        import xbmcgui, xbmc
-        import pprint
-        login = qobuz.addon.getSetting('username')
-        offset = self.get_parameter('offset') or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.registry.get(name='user-playlist', id=ID, offset=offset, limit=limit)['data']
-        print pprint.pformat(data)
-        name = ''
-        if 'name' in data: name = data['name']
-        ok = xbmcgui.Dialog().yesno(lang(39010),
-                          lang(30052), 
-                          color('FFFF0000', name))
-        if not ok:
-            info(self, "Deleting playlist aborted...")
-            return False
-        res = False
-        if data['owner']['name'] == login:
-            info(self, "Deleting playlist: " + ID)
-            res = qobuz.api.playlist_delete(playlist_id=ID)
-        else:
-            info(self, 'Unsuscribe playlist' + ID)
-            res = qobuz.api.playlist_unsubscribe(playlist_id=ID)
-        if not res:
-            warn(self, "Cannot delete playlist with id " + str(ID))
-            notifyH('Qobuz remove playlist (i8n)', 'Cannot remove playlist ' + name, getImage('icon-error-256'))
-            return False
-        qobuz.registry.delete(name='user-playlists', offset=offset, limit=limit)
-        notifyH('Qobuz remove playlist (i8n)', 'Playlist ' + name + ' removed')
-        containerRefresh()
-        return True
+

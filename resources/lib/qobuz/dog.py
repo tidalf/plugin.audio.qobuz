@@ -34,7 +34,8 @@ class dog():
                              'track-id'   : "^\d{1,10}$",
                              'name'       : "^[\w\d_.]+$",
                              'parent-id'  : "^\d{1,10}$",
-                             'offset'     : "^\d{1,10}$"
+                             'offset'     : "^\d{1,10}$",
+                             'nm'         : "^[\w\d_]+$"
                              }
 
     ''' Match value against regexp '''

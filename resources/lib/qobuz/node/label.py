@@ -34,7 +34,7 @@ class Node_label(Node):
 
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_label, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_LABEL
+        self.type = NodeFlag.NODE | NodeFlag.LABEL
         self.set_label('Label (i8n)')
         self.url = None
         self.is_folder = True

@@ -36,7 +36,7 @@ class Node_root(Node):
 
     def __init__(self, parent = None, parameters = None):
         super(Node_root, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
+        self.type = NodeFlag.NODE | NodeFlag.ROOT
         self.content_type = 'files'
         self.label = "Qobuz"
         #self.image = qobuz.image.access.get('default')
@@ -62,3 +62,17 @@ class Node_root(Node):
             self.add_child(Node_label())
         return True
 
+
+    def cache_remove(self):
+        # ERASE CACHE
+        from gui.util import yesno, notifyH, getImage
+        from debug import log
+        if not yesno('Remove cached data', 'Do you really want to erase all cached data'):
+            log(self, "Deleting cached data aborted")
+            return False
+        if qobuz.registry.delete_by_name('^.*\.dat$'): 
+            notifyH('Qobuz cache (i8n)', 'All cached data removed')
+        else: 
+            notifyH('Qobuz cache (i8n)', 'Something went wrong while erasing cached data', getImage('icon-error-256'))
+        return True
+    

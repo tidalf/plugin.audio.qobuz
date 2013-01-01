@@ -25,7 +25,7 @@ class IRenderer(object):
         self.node_type = node_type
         self.node_id = node_id
         self.root = None
-        self.filter = NodeFlag.TYPE_NODE
+        self.filter = NodeFlag.NODE
         self.depth = 1
 
     def to_s(self):
@@ -47,6 +47,5 @@ class IRenderer(object):
         node = getattr(Module, moduleName)
         root = node(None, qobuz.boot.params)
         root.id = self.node_id
-        root.make_url()
         self.root = root
         return True

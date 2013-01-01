@@ -21,11 +21,11 @@ import xbmcgui
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from node import Node
 from friend import Node_friend
 from debug import info, warn
-from gui.util import color, getImage
+from gui.util import color, getImage, runPlugin
 
 '''
     NODE FRIEND
@@ -36,7 +36,7 @@ class Node_friend_list(Node):
 
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_friend_list, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FRIEND_LIST
+        self.type = Flag.NODE | Flag.FRIEND_LIST
         self.name = self.get_parameter('name')
         self.image = getImage('artist')
         self.label = str(self.name) + "'s Friends (i8n)" if (self.name) else "Friends (i8n)"
@@ -80,12 +80,11 @@ class Node_friend_list(Node):
 
     def attach_context_menu(self, item, menuItems = []):
         colorItem = qobuz.addon.getSetting('color_item')
-        color_warn = qobuz.addon.getSetting('color_item_caution')
+        #color_warn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
         
-        ''' SET AS CURRENT '''
-        url = self.make_url(mode=Mode.FRIEND_ADD)
-        menuItems.append((color(colorItem, 'Add friend (i8n)' + ': ') + label, "XBMC.RunPlugin("+url+")"))
+        url = self.make_url(type=Flag.FRIEND, nm='create')
+        menuItems.append((color(colorItem, 'Add friend (i8n)' + ': ') + label, runPlugin(url)))
 
         ''' Calling base class '''
         super(Node_friend_list, self).attach_context_menu(item, menuItems)

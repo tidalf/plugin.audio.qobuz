@@ -20,7 +20,7 @@ import xbmcplugin
 import xbmcgui
 
 import qobuz
-from debug import warn, debug
+from debug import warn, debug, log
 from gui.util import notifyH, isFreeAccount, lang
 
 from node.track import Node_track
@@ -34,10 +34,16 @@ class QobuzPlayer(xbmc.Player):
         self.total = None
         self.elapsed = None
 
-    def sendQobuzPlaybackEnded(self, track_id, duration):
+    def sendQobuzPlaybackEnded(self, track_id, total, elapsed):
+        duration = (total - elapsed) / 10
+        if not (track_id and total and duration):
+            return False
+        #self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
+        print "PLAYBACK END"
         qobuz.api.report_streaming_stop(track_id, duration)
 
     def sendQobuzPlaybackStarted(self, track_id):
+        print "PLAYBACK START"
         qobuz.api.report_streaming_start(track_id)
 
     def onPlayBackEnded(self):
@@ -140,13 +146,14 @@ class QobuzPlayer(xbmc.Player):
 
     def watch_playing(self, node, streaming_url):
         start = None
-        self.total = None
         self.elapsed = None
         self.total = self.getTotalTime()
         while self.isPlayingAudio() and self.getPlayingFile() == streaming_url:
+            log(self, 'Watching playback')
             self.elapsed = self.getTime()
             if not start and self.elapsed >= 5:
                 self.sendQobuzPlaybackStarted(node.id)
                 start = True
             xbmc.sleep(500)
+        self.sendQobuzPlaybackEnded(node.id, self.total, self.elapsed)
         return True

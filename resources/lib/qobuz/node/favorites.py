@@ -37,7 +37,7 @@ class Node_favorites(Node):
 
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_favorites, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FAVORITES
+        self.type = NodeFlag.NODE | NodeFlag.FAVORITES
         self.set_label(lang(30079))
         self.packby = ''  
         self.name = lang(30079)
@@ -111,9 +111,9 @@ class Node_favorites(Node):
             render.set_filter(view_filter)
             render.set_root_node()
             dir = Directory(render.root, qobuz.boot.handle, True)
-            flags = NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK
-            if render.root.type & NodeFlag.TYPE_TRACK:
-                flags = NodeFlag.TYPE_TRACK
+            flags = NodeFlag.TRACK | NodeFlag.DONTFETCHTRACK
+            if render.root.type & NodeFlag.TRACK:
+                flags = NodeFlag.TRACK
             ret = render.root.build_down(dir, depth, flags)
             if not ret: 
                 dir.end_of_directory()

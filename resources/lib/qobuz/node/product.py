@@ -34,7 +34,7 @@ class Node_product(Node):
 
     def __init__(self, parent = None, params = None):
         super(Node_product, self).__init__(parent, params)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PRODUCT
+        self.type = NodeFlag.NODE | NodeFlag.PRODUCT
         self.image = getImage('album')
         self.content_type = 'albums'
         self.is_special_purchase = False

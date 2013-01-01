@@ -22,7 +22,7 @@ import xbmcgui
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 #from debug import error
 from exception import QobuzXbmcError
 from gui.util import color,lang, runPlugin, containerUpdate
@@ -35,7 +35,7 @@ class Node(object):
         self.parameters = parameters or {}
         self.id = self.get_parameter('nid')
         self.parent = parent
-        self.type = self.get_parameter('nt') or NodeFlag.TYPE_NODE
+        self.type = self.get_parameter('nt') or Flag.NODE
         self.content_type = "files"
         self.image = None
         self.childs = []
@@ -195,11 +195,12 @@ class Node(object):
         else: ka['mode'] = int(ka['mode'])
         if not 'type' in ka: ka['type'] = self.type
         if not 'id' in ka and self.id: ka['id'] = self.id
-        url = sys.argv[0] + '?mode=' + str(ka['mode']) + "&nt=" + str(ka['type'])
+        url = sys.argv[0] + '?mode=' + str(ka['mode']) + '&nt=' + str(ka['type'])
         if 'id' in ka: url += "&nid=" + str(ka['id'])
         action = self.get_parameter('action')
         if action: url += "&action=" + action
         if 'offset' in ka: url += "&offset=" + str(ka['offset'])
+        if 'nm' in ka: url += '&nm=' + ka['nm']
         return url
 
     '''
@@ -287,7 +288,7 @@ class Node(object):
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self,xbmc_directory,lvl=1,whiteFlag=NodeFlag.TYPE_NODE):
+    def build_down(self,xbmc_directory,lvl=1,whiteFlag=Flag.NODE):
         if xbmc_directory.is_canceled():
             return False
         if lvl != -1 and lvl < 1:
@@ -298,7 +299,7 @@ class Node(object):
         count = 0
         label = self.get_label()
         for child in self.childs:
-            if not (child.type & NodeFlag.TYPE_TRACK):
+            if not (child.type & Flag.TRACK):
                 xbmc_directory.update(count,total,"Working",label,child.get_label())
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
@@ -324,15 +325,15 @@ class Node(object):
 #        menuItems.append((color(colorItem,"TEST WINDOW"),cmd))
 
         ''' VIEW BIG DIR '''
-        cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
+        cmd = runPlugin(self.make_url(mode=Mode.VIEW_BIG_DIR))
         label = lang(39002)
         menuItems.append((color(colorItem,label), cmd))
 
 
-        if self.type & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_TRACK | NodeFlag.TYPE_ARTIST):
+        if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             ''' ALL ALBUM '''
             id = self.get_artist_id()
-            url = self.make_url(mode=Mode.VIEW,type=NodeFlag.TYPE_ARTIST,id=id)
+            url = self.make_url(mode=Mode.VIEW,type=Flag.ARTIST,id=id)
             cmd = runPlugin(url)
             menuItems.append((color(colorItem,lang(39001)),cmd))
 
@@ -340,31 +341,29 @@ class Node(object):
             id = self.get_artist_id()
             import urllib
             query = urllib.quote(self.get_artist().encode('utf-8'))
-            args = sys.argv[1] + '?mode=%i&nt=%i&nid=%s&query=%s' % (Mode.VIEW,
-                                         NodeFlag.TYPE_SIMILAR_ARTIST,
-                                         id,id)
-            cmd = runPlugin(args)
+            url = self.make_url(mode=Mode.VIEW, type=Flag.SIMILAR_ARTIST, id=id)
+            cmd = runPlugin(url)
             menuItems.append((color(colorItem,lang(39004)),cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
         cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_ADD_TO_CURRENT))
         menuItems.append((color(colorItem,lang(39005)),cmd))
 
-        if self.parent and not (self.parent.type & NodeFlag.TYPE_FAVORITES):
+        if self.parent and not (self.parent.type & Flag.FAVORITES):
             ''' ADD TO FAVORITES '''
             cmd = runPlugin(self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
             menuItems.append((color(colorItem,lang(39011)),cmd))
 
         ''' ADD AS NEW '''
-        cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_ADD_AS_NEW))
+        cmd = runPlugin(self.make_url(type=Flag.USERPLAYLISTS))
         menuItems.append((color(colorItem,lang(30080)),cmd))
 
         ''' Show playlist '''
-        if not (self.type & NodeFlag.TYPE_PLAYLIST):
-            cmd = runPlugin(self.make_url(type=NodeFlag.TYPE_USERPLAYLISTS))
+        if not (self.type & Flag.PLAYLIST):
+            cmd = runPlugin(self.make_url(type=Flag.USERPLAYLISTS))
             menuItems.append((color(colorItem,lang(39005)),cmd))
 
-        if self.type & NodeFlag.TYPE_USERPLAYLISTS:
+        if self.type & Flag.USERPLAYLISTS:
             ''' CREATE '''
             cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_CREATE))
             menuItems.append((color(colorItem,lang(39008)), cmd))
@@ -379,11 +378,6 @@ class Node(object):
 
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
-        cmd = runPlugin(self.make_url(mode=Mode.ERASE_CACHE))
+        cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove"))
         menuItems.append((color(colorItem,lang(31009)),cmd))
-
-#        '''
-#        Add our items to the context menu
-#        '''
-#
 

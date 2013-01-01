@@ -31,7 +31,7 @@ class Node_similar_artist(Node):
 
     def __init__(self, parent = None, parameters = None):
         super(Node_similar_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_SIMILAR_ARTIST
+        self.type = NodeFlag.NODE | NodeFlag.SIMILAR_ARTIST
         self.content_type = 'albums'
         
     '''

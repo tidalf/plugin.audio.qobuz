@@ -31,7 +31,7 @@ class Node_track(Node):
 
     def __init__(self, parent = None, parameters = None):
         super(Node_track, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_TRACK
+        self.type = NodeFlag.NODE | NodeFlag.TRACK
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
@@ -90,7 +90,7 @@ class Node_track(Node):
             return -1
         if album: return album
         if not self.parent: return ''
-        if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+        if self.parent.get_type() & NodeFlag.PRODUCT:
             return self.parent.get_title()
         return ''
 
@@ -100,7 +100,7 @@ class Node_track(Node):
         except: pass
         if image: return image.replace('_230.', '_600.')
         if not self.parent: return ''
-        if self.parent.get_type() & (NodeFlag.TYPE_PRODUCT | NodeFlag.TYPE_PLAYLIST):
+        if self.parent.get_type() & (NodeFlag.PRODUCT | NodeFlag.PLAYLIST):
             return self.parent.get_image()
 
     def get_playlist_track_id(self):
@@ -120,7 +120,7 @@ class Node_track(Node):
         
         if genre: return genre
         if not self.parent: return ''
-        if self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+        if self.parent.get_type() & NodeFlag.PRODUCT:
             return self.parent.get_genre()
         return ''
 
@@ -163,7 +163,7 @@ class Node_track(Node):
         import time
         try:
             date = self.get_property(('album', 'released_at'))
-            if not date and self.parent and self.parent.get_type() & NodeFlag.TYPE_PRODUCT:
+            if not date and self.parent and self.parent.get_type() & NodeFlag.PRODUCT:
                 return self.parent.get_year()
         except: pass
         year = 0
@@ -264,11 +264,11 @@ class Node_track(Node):
 
     def attach_context_menu(self, item, menuItems = []):
         colorItem = qobuz.addon.getSetting('color_item')
-        if self.parent and self.parent.type & NodeFlag.TYPE_PLAYLIST:
+        if self.parent and self.parent.type & NodeFlag.PLAYLIST:
             url = self.parent.make_url(mode=Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
             menuItems.append((color(colorItem, lang(30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
         
-        if self.parent and self.parent.type & NodeFlag.TYPE_FAVORITES:
+        if self.parent and self.parent.type & NodeFlag.FAVORITES:
             ''' REMOVE '''
             url = self.make_url(mode=Mode.FAVORITE_DELETE)
             menuItems.append((color(colorItem, 'Remove from favorite') + self.label, "XBMC.RunPlugin("+url+")"))

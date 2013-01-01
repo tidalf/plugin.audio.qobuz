@@ -20,42 +20,42 @@ from exception import QobuzXbmcError
 class __NodeFlag():
     def __init__(self):
         self.DONTFETCHTRACK        = 1
-        self.TYPE_NODE             = 2
-        self.TYPE_TRACK            = 4
-        self.TYPE_PLAYLIST         = 8
-        self.TYPE_USERPLAYLISTS    = 16
-        self.TYPE_RECOMMENDATION   = 32
-        self.TYPE_ROOT             = 64
-        self.TYPE_PRODUCT          = 128
-        self.TYPE_PURCHASES        = 256
-        self.TYPE_SEARCH           = 512
-        self.TYPE_ARTIST           = 1024
-        self.TYPE_SIMILAR_ARTIST   = 2048
-        self.TYPE_FAVORITES        = 4096
-        self.TYPE_CUSTOM_SEARCH    = 8192
-        self.TYPE_FRIEND           = 16384
-        self.TYPE_FRIEND_LIST      = 32768
-        self.TYPE_GENRE            = 65536
-        self.TYPE_LABEL            = 131072    
-        self.TYPE_PAGINATION       = 262144       
+        self.NODE             = 2
+        self.TRACK            = 4
+        self.PLAYLIST         = 8
+        self.USERPLAYLISTS    = 16
+        self.RECOMMENDATION   = 32
+        self.ROOT             = 64
+        self.PRODUCT          = 128
+        self.PURCHASES        = 256
+        self.SEARCH           = 512
+        self.ARTIST           = 1024
+        self.SIMILAR_ARTIST   = 2048
+        self.FAVORITES        = 4096
+        self.CUSTOM_SEARCH    = 8192
+        self.FRIEND           = 16384
+        self.FRIEND_LIST      = 32768
+        self.GENRE            = 65536
+        self.LABEL            = 131072    
+        self.PAGINATION       = 262144       
         
     def to_s(self, flag):
-        if flag & self.TYPE_TRACK: return "track"
-        elif flag & self.TYPE_PLAYLIST: return "playlist"
-        elif flag & self.TYPE_USERPLAYLISTS: return "user_playlists"
-        elif flag & self.TYPE_RECOMMENDATION: return "recommendation"
-        elif flag & self.TYPE_ROOT: return "root"
-        elif flag & self.TYPE_PRODUCT: return "product"
-        elif flag & self.TYPE_PURCHASES: return "purchases"
-        elif flag & self.TYPE_FAVORITES: return "favorites"
-        elif flag & self.TYPE_SEARCH: return "search"
-        elif flag & self.TYPE_ARTIST: return "artist"
-        elif flag & self.TYPE_SIMILAR_ARTIST: return "similar_artist" 
-        elif flag & self.TYPE_FRIEND: return "friend"
-        elif flag & self.TYPE_FRIEND_LIST: return "friend_list"
-        elif flag & self.TYPE_GENRE: return "genre"
-        elif flag & self.TYPE_LABEL: return "label"
-        elif flag & self.TYPE_NODE: return "node"
+        if flag   & self.TRACK: return "track"
+        elif flag & self.PLAYLIST: return "playlist"
+        elif flag & self.USERPLAYLISTS: return "user_playlists"
+        elif flag & self.RECOMMENDATION: return "recommendation"
+        elif flag & self.ROOT: return "root"
+        elif flag & self.PRODUCT: return "product"
+        elif flag & self.PURCHASES: return "purchases"
+        elif flag & self.FAVORITES: return "favorites"
+        elif flag & self.SEARCH: return "search"
+        elif flag & self.ARTIST: return "artist"
+        elif flag & self.SIMILAR_ARTIST: return "similar_artist" 
+        elif flag & self.FRIEND: return "friend"
+        elif flag & self.FRIEND_LIST: return "friend_list"
+        elif flag & self.GENRE: return "genre"
+        elif flag & self.LABEL: return "label"
+        elif flag & self.NODE: return "node"
         elif flag & self.DONTFETCHTRACK: return "dont_fetch_track"
         else: raise QobuzXbmcError(who=self, what='invalid_flag', additional=repr(flag))
         

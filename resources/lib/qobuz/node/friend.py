@@ -22,11 +22,11 @@ import json
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from node import Node
 from playlist import Node_playlist
 from debug import info, warn, error
-from gui.util import color, getImage, runPlugin
+from gui.util import color, getImage, runPlugin, containerRefresh
 
 '''
     NODE FRIEND
@@ -37,7 +37,7 @@ class Node_friend(Node):
 
     def __init__(self, parent = None, parameters = None, progress = None):
         super(Node_friend, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FRIEND
+        self.type = Flag.NODE | Flag.FRIEND
         self.image = getImage('artist')
         self.name = ''
         self.set_name(self.get_parameter('name'))
@@ -77,7 +77,7 @@ class Node_friend(Node):
     def create(self, name = None):
         if not name:
             from gui.util import Keyboard
-            kb = Keyboard('', 'Add Friend (i8n)')
+            kb = Keyboard(self.get_parameter('name'), 'Add Friend (i8n)')
             kb.doModal()
             name = ''
             if not kb.isConfirmed():
@@ -102,9 +102,12 @@ class Node_friend(Node):
             self._restore_appid()
             return False
         self._restore_appid()
+        qobuz.registry.delete(name='user')
+        containerRefresh()
         return True
     
-    def remove(self, name):
+    def remove(self):
+        name = self.get_parameter('name')
         if not name: return False
         user = qobuz.registry.get(name='user')
         if not user: return False
@@ -124,6 +127,8 @@ class Node_friend(Node):
             self._restore_appid()
             return False
         self._restore_appid()
+        qobuz.registry.delete(name='user')
+        containerRefresh()
         return True
             
     def _build_down(self, xbmc_directory, lvl, flag = None):
@@ -143,11 +148,9 @@ class Node_friend(Node):
         return True
     
     def attach_context_menu(self, item, menuItems = []):
-#        colorItem = qobuz.addon.getSetting('color_item')
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         
-        ''' Delete friend'''
-        cmd = runPlugin(self.make_url(mode=Mode.FRIEND_REMOVE))
+        cmd = runPlugin(self.make_url(type=Flag.FRIEND, nm="remove"))
         menuItems.append((color(colorWarn, 'Remove friend (i8n)' + ': ') + self.name, cmd))
 
         ''' Calling base class '''
