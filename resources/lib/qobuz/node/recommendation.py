@@ -124,4 +124,4 @@ class Node_recommendation(Node):
             return self._build_recos_genre(xbmc_directory, lvl, flag)
         self.content_type = 'albums'
         return self._build_down_type_genre(xbmc_directory, lvl, flag)
-
+
