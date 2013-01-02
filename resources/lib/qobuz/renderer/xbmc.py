@@ -38,7 +38,7 @@ class XbmcWindow_musicfiles(xbmcgui.Window):
     
     def onAction(self, action):
         print 'Action: ' + repr(action.getId())
-    
+
 class Xbmc_renderer(IRenderer):
 
     def __init__(self, node_type, node_id = None):
@@ -49,7 +49,7 @@ class Xbmc_renderer(IRenderer):
         if not 'image' in ka: ka['image'] = ''
         item = ka['dir']._xbmc_item(**ka)
         ka['dir'].add_item(url=ka['url'], item=item, is_folder=ka['is_folder'])
-        
+
     def display(self):
         from gui.directory import Directory
         if not self.set_root_node():
@@ -57,8 +57,9 @@ class Xbmc_renderer(IRenderer):
                                                             str(self.node_id)))
             return False
         if 'nm' in qobuz.boot.params:
-            print "Executing method on node: " + qobuz.boot.params['nm']
-            getattr(self.root, qobuz.boot.params['nm'])()
+            methodName = qobuz.boot.params['nm']
+            log(self, "Executing method on node: " + repr(methodName))
+            getattr(self.root, methodName)()
             return True
         if not self.root.pre_build_down(): return False 
         Dir = Directory(self.root, qobuz.boot.handle, False)
@@ -94,9 +95,9 @@ class Xbmc_renderer(IRenderer):
         if not self.set_root_node():
             warn(self, "Cannot set root node (" + str(self.node_type) + ", " + str(self.node_id) + ")")
             return False
-        dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(dir, -1, NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
-        dir.set_content(self.root.content_type)
-        dir.end_of_directory()
-        notifyH('Scanning results', str(dir.total_put) + ' items where scanned', 3000)
+        Dir = Directory(self.root, qobuz.boot.handle, False)
+        self.root.build_down(Dir, -1, NodeFlag.TRACK | NodeFlag.DONTFETCHTRACK)
+        Dir.set_content(self.root.content_type)
+        Dir.end_of_directory()
+        notifyH('Scanning results', str(Dir.total_put) + ' items where scanned', 3000)
         return True
