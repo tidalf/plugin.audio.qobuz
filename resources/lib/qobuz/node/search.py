@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import qobuz
-#import pprint
+# import pprint
 
 from debug import info, warn, error, debug
 from flag import NodeFlag
@@ -28,11 +28,12 @@ from constants import Mode
 from exception import QobuzXbmcError
 from gui.util import notifyH, lang, getImage
 
-#from search.artists import Search_artists
+# from search.artists import Search_artists
+
 
 class Node_search(Node):
 
-    def __init__(self, parent = None, params = None):
+    def __init__(self, parent=None, params=None):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.NODE | NodeFlag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
@@ -48,7 +49,7 @@ class Node_search(Node):
     @property
     def search_type(self):
         return self._search_type
-    
+
     @search_type.setter
     def search_type(self, st):
         if st == 'artists':
@@ -66,16 +67,17 @@ class Node_search(Node):
         else:
             raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
         self._search_type = st
+
     @search_type.getter
     def search_type(self):
         return self._search_type
-
 
     def make_url(self, **ka):
         url = super(Node_search, self).make_url(**ka)
         url += '&search-type=' + self.search_type
         query = self.query or self.get_parameter('query')
-        if query: url+= '&query=' + query
+        if query:
+            url += '&query=' + query
         return url
 
     def _build_down(self, xbmc_directory, lvl, flag):
@@ -92,7 +94,8 @@ class Node_search(Node):
                 return False
             query = k.getText()
         query.strip()
-        data = qobuz.api.search_getResults(query=query, type=stype, limit=limit, offset=offset)
+        data = qobuz.api.search_getResults(
+            query=query, type=stype, limit=limit, offset=offset)
         if not data:
             warn(self, "Search return no data")
             return False
@@ -100,8 +103,9 @@ class Node_search(Node):
         self.notify_data_result(data)
         if self.search_type == 'albums':
             try:
-                if data['albums']['items']: pass
-            except: 
+                if data['albums']['items']:
+                    pass
+            except:
                 return False
             for json_product in data['albums']['items']:
                 artist = json_product['artist']['name']
@@ -110,8 +114,9 @@ class Node_search(Node):
                 self.add_child(product)
         elif self.search_type == 'tracks':
             try:
-                if data['tracks']['items']: pass
-            except: 
+                if data['tracks']['items']:
+                    pass
+            except:
                 return False
             for jtrack in data['tracks']['items']:
                 track = Node_track()
@@ -119,8 +124,9 @@ class Node_search(Node):
                 self.add_child(track)
         elif self.search_type == 'artists':
             try:
-                if data['artists']['items']: pass
-            except: 
+                if data['artists']['items']:
+                    pass
+            except:
                 return False
             for jartist in data['artists']['items']:
                 artist = Node_product_by_artist()
@@ -134,10 +140,8 @@ class Node_search(Node):
             warn(self, "Notify fail")
             return False
         notifyH("Qobuz Search - " + self.search_type,
-                          'Artists: ' + str(data['length']['artists']) + " / "
-                          'Products: ' + str(data['length']['products']) + " / "
-                          'Songs: ' + str(data['length']['tracks']) + "\n"
-                          , getImage('default'), 2000)
+                'Artists: ' + str(data['length']['artists']) + " / "
+                'Products: ' + str(
+                    data['length']['products']) + " / "
+                'Songs: ' + str(data['length']['tracks']) + "\n", getImage('default'), 2000)
         return True
-
-

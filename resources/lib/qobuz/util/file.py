@@ -22,12 +22,13 @@ import string
 import re
 from debug import warn
 
+
 class FileUtil():
 
     def __init__(self):
         pass
 
-    def generate_filename(self, size = 8, chars = string.ascii_letters + string.digits):
+    def generate_filename(self, size=8, chars=string.ascii_letters + string.digits):
         return ''.join(random.choice(chars) for x in range(size))
 
     def _write(self, path, flag, data):
@@ -35,12 +36,11 @@ class FileUtil():
         with os.open(path, flag) as fd:
             with os.fdopen(fd, 'wb') as fo:
                 fo.write(data)
-                #fo.flush()
-                #os.fsync(fd)
+                # fo.flush()
+                # os.fsync(fd)
                 ret = True
 
         return ret
-
 
     def _unlink(self, path):
         if not os.path.exists(path):
@@ -49,7 +49,8 @@ class FileUtil():
         retry = 3
         ret = False
         while retry > 0:
-            if not os.path.exists(path): return True
+            if not os.path.exists(path):
+                return True
             time.sleep(.250)
             retry -= 1
         return False
@@ -72,18 +73,19 @@ class FileUtil():
 
     def unlink(self, path):
         return self._safe_unlink(path)
-    
+
     ''' Find '''
-    def find(self, directory, pattern, callback = None, gData = None):
+    def find(self, directory, pattern, callback=None, gData=None):
         flist = []
         fok = re.compile(pattern)
         for dirname, dirnames, filenames in os.walk(directory):
             for filename in filenames:
                 if fok.match(filename):
                     path = os.path.join(dirname, filename)
-                    if callback: 
+                    if callback:
                         try:
-                            if not callback(path, gData): return None
+                            if not callback(path, gData):
+                                return None
                         except Exception as e:
                             warn(self, "Callback raise exception: " + repr(e))
                             return None

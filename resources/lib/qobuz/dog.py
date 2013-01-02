@@ -50,6 +50,6 @@ class dog():
             match = re.match(self.allowed_keys[key], value)
         except:
             pass
-        if match == None:
+        if not match:
             return False
         return True

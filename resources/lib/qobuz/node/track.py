@@ -27,9 +27,10 @@ from gui.util import color, lang
     NODE TRACK
 '''
 
+
 class Node_track(Node):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_track, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.TRACK
         self.content_type = 'songs'
@@ -37,7 +38,7 @@ class Node_track(Node):
         self.is_folder = False
         self.status = None
 
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         if flag & NodeFlag.DONTFETCHTRACK:
             return False
         else:
@@ -61,35 +62,38 @@ class Node_track(Node):
         ka['mode'] = Mode.PLAY
         return super(Node_track, self).make_url(**ka)
 
-    def get_label(self, sFormat = "%a - %t"):
+    def get_label(self, sFormat="%a - %t"):
         sFormat = sFormat.replace("%a", self.get_artist())
         sFormat = sFormat.replace("%t", self.get_title())
         try:
             sFormat = sFormat.replace("%A", self.get_album())
-        except: pass
+        except:
+            pass
         sFormat = sFormat.replace("%n", str(self.get_track_number()))
         sFormat = sFormat.replace("%g", self.get_genre())
         return sFormat
 
     def get_composer(self):
-        try: 
+        try:
             return self.get_property(('composer', 'name'))
         except:
             return -1
-        
+
     def get_interpreter(self):
-        try: 
+        try:
             return self.get_property(('performer', 'name'))
-        except: 
+        except:
             return -1
-        
+
     def get_album(self):
-        try: 
+        try:
             album = self.get_property(('album', 'title'))
         except:
             return -1
-        if album: return album
-        if not self.parent: return ''
+        if album:
+            return album
+        if not self.parent:
+            return ''
         if self.parent.get_type() & NodeFlag.PRODUCT:
             return self.parent.get_title()
         return ''
@@ -97,9 +101,12 @@ class Node_track(Node):
     def get_image(self):
         try:
             image = self.get_property(('album', 'image', 'large'))
-        except: pass
-        if image: return image.replace('_230.', '_600.')
-        if not self.parent: return ''
+        except:
+            pass
+        if image:
+            return image.replace('_230.', '_600.')
+        if not self.parent:
+            return ''
         if self.parent.get_type() & (NodeFlag.PRODUCT | NodeFlag.PLAYLIST):
             return self.parent.get_image()
 
@@ -117,9 +124,11 @@ class Node_track(Node):
             genre = self.get_property(('album', 'genre', 'name'))
         except:
             genre = "none"
-        
-        if genre: return genre
-        if not self.parent: return ''
+
+        if genre:
+            return genre
+        if not self.parent:
+            return ''
         if self.parent.get_type() & NodeFlag.PRODUCT:
             return self.parent.get_genre()
         return ''
@@ -127,23 +136,29 @@ class Node_track(Node):
     def get_streaming_url(self):
         nid = self.id or self.parameters['nid']
         data = qobuz.registry.get(name='user-stream-url', id=nid)
-        if not data: return None
+        if not data:
+            return None
         return data['data']['url']
 
     def get_artist(self):
         s = self.get_interpreter()
-        if s: return s
+        if s:
+            return s
         return self.get_composer()
 
     def get_artist_id(self):
         s = self.get_property(('artist', 'id'))
-        if s: return int(s)
+        if s:
+            return int(s)
         s = self.get_property(('composer', 'id'))
-        if s: return int(s)
+        if s:
+            return int(s)
         s = self.get_property(('performer', 'id'))
-        if s: return int(s)
+        if s:
+            return int(s)
         s = self.get_property(('interpreter', 'id'))
-        if s: return int(s)
+        if s:
+            return int(s)
         return None
 
     def get_track_number(self):
@@ -156,7 +171,7 @@ class Node_track(Node):
         duration = self.get_property(('duration'))
         if duration:
             return duration
-        else: 
+        else:
             return -1
 
     def get_year(self):
@@ -165,17 +180,20 @@ class Node_track(Node):
             date = self.get_property(('album', 'released_at'))
             if not date and self.parent and self.parent.get_type() & NodeFlag.PRODUCT:
                 return self.parent.get_year()
-        except: pass
+        except:
+            pass
         year = 0
-        try: year = time.strftime("%Y", time.localtime(date))
-        except: pass
-        
+        try:
+            year = time.strftime("%Y", time.localtime(date))
+        except:
+            pass
+
         return year
 
     def get_description(self):
-        if self.parent: return self.parent.get_description()
+        if self.parent:
+            return self.parent.get_description()
         return ''
-
 
     def is_sample(self):
         nid = self.id or self.parameters['nid']
@@ -183,11 +201,11 @@ class Node_track(Node):
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
-        try: 
+        try:
             return data['data']['sample']
-        except: 
+        except:
             return ''
-    
+
     def get_mimetype(self):
         nid = self.id or self.parameters['nid']
         data = qobuz.registry.get(name='user-stream-url', id=nid)
@@ -195,7 +213,7 @@ class Node_track(Node):
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
             return ''
-        try: 
+        try:
             formatId = int(data['data']['format_id'])
         except:
             warn(self, "Cannot get mime/type for track (restricted track?)")
@@ -212,17 +230,20 @@ class Node_track(Node):
 
     def make_XbmcListItem(self):
         media_number = self.get_media_number()
-        if not media_number: media_number = 1
-        else: media_number = int(media_number)
+        if not media_number:
+            media_number = 1
+        else:
+            media_number = int(media_number)
         duration = self.get_duration()
         label = self.get_label()
         isplayable = 'true'
-        
+
         # Disable free account checking here, purchased track are still playable even with free account, but we don't know yet.
-        #if qobuz.gui.is_free_account():
+        # if qobuz.gui.is_free_account():
         #    duration = 60
-        #    label = '[COLOR=FF555555]' + label + '[/COLOR] [[COLOR=55FF0000]Sample[/COLOR]]'
-        
+        # label = '[COLOR=FF555555]' + label + '[/COLOR]
+        # [[COLOR=55FF0000]Sample[/COLOR]]'
+
         mode = Mode.PLAY
         url = self.make_url(mode=mode)
         item = xbmcgui.ListItem(label,
@@ -235,23 +256,27 @@ class Node_track(Node):
             return None
         item.setPath(url)
         track_number = self.get_track_number()
-        if not track_number: track_number = 0
-        else: track_number = int(track_number)
+        if not track_number:
+            track_number = 0
+        else:
+            track_number = int(track_number)
         mlabel = self.get_property(('label', 'name'))
         description = self.get_description()
         comment = ''
-        if mlabel: comment = mlabel
-        if description: comment += ' - ' + description
-        item.setInfo(type = 'music', infoLabels = {
-                                   'title': self.get_title(),
-                                   'album': self.get_album(),
-                                   'genre': self.get_genre(),
-                                   'artist': self.get_artist(),
-                                   'tracknumber': track_number,
-                                   'duration': duration,
-                                   'year': self.get_year(),
-                                   'comment': comment
-                                   })
+        if mlabel:
+            comment = mlabel
+        if description:
+            comment += ' - ' + description
+        item.setInfo(type='music', infoLabels={
+                     'title': self.get_title(),
+                     'album': self.get_album(),
+                     'genre': self.get_genre(),
+                     'artist': self.get_artist(),
+                     'tracknumber': track_number,
+                     'duration': duration,
+                     'year': self.get_year(),
+                     'comment': comment
+                     })
         item.setProperty('discnumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
@@ -259,20 +284,21 @@ class Node_track(Node):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems,replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=False)
         return item
 
-    def attach_context_menu(self, item, menuItems = []):
+    def attach_context_menu(self, item, menuItems=[]):
         colorItem = qobuz.addon.getSetting('color_item')
         if self.parent and self.parent.type & NodeFlag.PLAYLIST:
             url = self.parent.make_url(mode=Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
-            menuItems.append((color(colorItem, lang(30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
-        
+            menuItems.append((color(colorItem, lang(
+                30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
+
         if self.parent and self.parent.type & NodeFlag.FAVORITES:
             ''' REMOVE '''
             url = self.make_url(mode=Mode.FAVORITE_DELETE)
-            menuItems.append((color(colorItem, 'Remove from favorite') + self.label, "XBMC.RunPlugin("+url+")"))
-       
+            menuItems.append((color(colorItem, 'Remove from favorite')
+                             + self.label, "XBMC.RunPlugin(" + url + ")"))
+
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menuItems)
-

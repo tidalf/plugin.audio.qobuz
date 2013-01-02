@@ -27,37 +27,39 @@ from gui.util import lang
     NODE ARTIST
 '''
 
+
 class Node_similar_artist(Node):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_similar_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.SIMILAR_ARTIST
         self.content_type = 'albums'
-        
+
     '''
-        Getter 
+        Getter
     '''
     def get_label(self):
         return lang(39000)
-    
+
     def get_label2(self):
         return self.get_label()
-        
+
     '''
         Build Down
     '''
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         query = self.get_parameter('query')
-        data = qobuz.api.artist_getSimilarArtists(artist_id=query, offset=offset, limit=limit)
-        if not data: return False
+        data = qobuz.api.artist_getSimilarArtists(
+            artist_id=query, offset=offset, limit=limit)
+        if not data:
+            return False
         total = len(data['artists']['items'])
-        
+
         for jartist in data['artists']['items']:
                 artist = Node_product_by_artist()
                 artist.data = jartist
                 self.add_child(artist)
         self.add_pagination(data)
         return total
-

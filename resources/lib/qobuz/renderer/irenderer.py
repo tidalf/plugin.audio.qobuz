@@ -16,12 +16,13 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import qobuz
 from node.flag import NodeFlag
-#from debug import info, warn, error, debug
+# from debug import info, warn, error, debug
 import pprint
+
 
 class IRenderer(object):
 
-    def __init__(self, node_type, node_id = None):
+    def __init__(self, node_type, node_id=None):
         self.node_type = node_type
         self.node_id = node_id
         self.root = None
@@ -43,7 +44,7 @@ class IRenderer(object):
         nodeName = NodeFlag.to_s(self.node_type)
         modulePath = 'node.' + nodeName
         moduleName = 'Node_' + nodeName
-        Module =__import__(modulePath, globals(), locals(), [moduleName], -1)
+        Module = __import__(modulePath, globals(), locals(), [moduleName], -1)
         node = getattr(Module, moduleName)
         root = node(None, qobuz.boot.params)
         root.id = self.node_id

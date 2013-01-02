@@ -28,9 +28,10 @@ from gui.util import color, lang, getImage, notifyH, containerRefresh
 
 from playlist import Node_playlist
 
+
 class Node_user_playlists(Node):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
         self.image = getImage('userplaylists')
@@ -38,11 +39,14 @@ class Node_user_playlists(Node):
         self.type = NodeFlag.NODE | NodeFlag.USERPLAYLISTS
         self.content_type = 'files'
         display_by = self.get_parameter('display-by')
-        if not display_by: display_by = 'songs'
+        if not display_by:
+            display_by = 'songs'
         self.set_display_by(display_by)
         display_cover = qobuz.addon.getSetting('userplaylists_display_cover')
-        if display_cover == 'true': display_cover = True
-        else: display_cover = False
+        if display_cover == 'true':
+            display_cover = True
+        else:
+            display_cover = False
         self.display_product_cover = display_cover
 
     def set_display_by(self, type):
@@ -54,17 +58,20 @@ class Node_user_playlists(Node):
     def get_display_by(self):
         return self.display_by
 
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         login = qobuz.addon.getSetting('username')
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         debug(self, "Build-down: user playlists")
-        data = qobuz.registry.get(name='user-playlists', limit=limit, offset=offset)
+        data = qobuz.registry.get(
+            name='user-playlists', limit=limit, offset=offset)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
-        cid = qobuz.registry.get(name='user-current-playlist-id', noRemote=True)
-        if cid: cid = int(cid['data'])
+        cid = qobuz.registry.get(
+            name='user-current-playlist-id', noRemote=True)
+        if cid:
+            cid = int(cid['data'])
         for playlist in data['data']['playlists']['items']:
             node = Node_playlist()
             node.data = playlist
@@ -77,9 +84,3 @@ class Node_user_playlists(Node):
             self.add_child(node)
         self.add_pagination(data['data'])
         return True
-            
-
-        
-
-    
-

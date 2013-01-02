@@ -118,7 +118,9 @@ class QobuzPlayer(xbmc.Player):
             super(QobuzPlayer, self).play(streaming_url, item, False)
         else:
             xbmcplugin.setResolvedUrl(
-                handle=qobuz.boot.handle, succeeded=True, listitem=item)
+                handle=qobuz.boot.handle,
+                succeeded=True,
+                listitem=item)
 
         '''
             Waiting for song to start

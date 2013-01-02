@@ -26,64 +26,71 @@ import weakref
     NODE ARTIST
 '''
 
+
 class Node_product_by_artist(Node):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_product_by_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.ARTIST
         self.content_type = 'albums'
 
     '''
-        Getter 
+        Getter
     '''
     def get_label(self):
         return self.get_artist()
-    
+
     def get_image(self):
         image = self.get_property(('picture'))
         # get max size image from lastfm, Qobuz default is a crappy 126p large one
         # perhaps we need a setting for low bw users
         image = image.replace('126s', '_')
         return image
-    
+
     def get_artist(self):
         return self.get_property('name')
-    
+
     def get_label2(self):
         return self.get_slug()
-    
+
     def get_slug(self):
         return self.get_property('slug')
-    
-    def get_artist_id(self): return self.id
-        
+
+    def get_artist_id(self):
+        return self.id
+
     '''
         Build Down
     '''
-    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag=None, progress=None):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.api.artist_get(artist_id=self.id, limit=limit,offset=offset,extra='albums')
+        data = qobuz.api.artist_get(
+            artist_id=self.id, limit=limit, offset=offset, extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
-        try: 
+        try:
             total = len(data['albums']['items'])
-        except: pass
+        except:
+            pass
         count = 0
         for jproduct in data['albums']['items']:
-            keys = ['artist', 'interpreter', 'composer','performer']
+            keys = ['artist', 'interpreter', 'composer', 'performer']
             for k in keys:
-                try: 
-                    if k in data['artist']: jproduct[k] = weakref.proxy(data['artist'][k])
-                except: pass
+                try:
+                    if k in data['artist']:
+                        jproduct[k] = weakref.proxy(data['artist'][k])
+                except:
+                    pass
             node = Node_product()
             node.data = jproduct
-            xbmc_directory.update(count, total, "Add album:" + node.get_label(), '')
+            xbmc_directory.update(
+                count, total, "Add album:" + node.get_label(), '')
             self.add_child(node)
             count += 1
         return True
-    
+
     '''
         Make XbmcListItem
     '''
@@ -97,6 +104,5 @@ class Node_product_by_artist(Node):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems,replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=False)
         return item
-

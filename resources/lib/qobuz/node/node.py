@@ -149,7 +149,7 @@ class Node(object):
         for p in paginated:
             if p in data:
                 items = data[p]
-                if items['limit'] == None:
+                if items['limit'] is None:
                     continue
                 if items['total'] > (items['offset'] + items['limit']):
                     need_pagination = True

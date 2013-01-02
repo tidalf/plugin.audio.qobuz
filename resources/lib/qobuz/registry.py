@@ -170,7 +170,7 @@ class QobuzLocalStorage(object):
     def load(self, **ka):
         self.hook_pre_load(**ka)
         # noRemote prevent data loading from Qobuz (local key only)
-        if 'noRemote' in ka and ka['noRemote'] == True:
+        if 'noRemote' in ka and ka['noRemote'] is True:
             return False
         key = self.make_key(**ka)
         if key in self.data and self.fresh(key):
@@ -236,7 +236,7 @@ class QobuzLocalStorage(object):
                 who=self, what='missing_parameter', additional='key')
         if not key in self.data:
             QobuzXbmcError(who=self, what='undefined_key', additional=key)
-        if value == None:
+        if value is None:
             return self.data[key]['saved']
         self.data[key]['saved'] = True if value else False
         return self
@@ -305,7 +305,7 @@ class QobuzCacheDefault(QobuzLocalStorage):
         return True
 
     def save(self, key=None):
-        if key == None:
+        if key is None:
             count = 0
             for key in self.data:
                 if not self.saved(key):
@@ -373,7 +373,7 @@ class QobuzCacheCommon(QobuzLocalStorage):
             self.data[key] = pickle.loads(data)
 
     def save(self, key=None):
-        if key == None:
+        if key is None:
             count = 0
             for key in self.data:
                 if not self.saved(key):

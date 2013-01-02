@@ -26,31 +26,35 @@ from gui.util import lang, getImage
 
 from product import Node_product
 
+
 class Node_purchases(Node):
 
-    def __init__(self,parent=None,params=None):
-        super(Node_purchases,self).__init__(parent,params)
+    def __init__(self, parent=None, params=None):
+        super(Node_purchases, self).__init__(parent, params)
         self.label = lang(30100)
         self.type = NodeFlag.NODE | NodeFlag.PURCHASES
         self.content_type = 'albums'
         self.image = getImage('album')
 
-    def _build_down(self,xbmc_directory,lvl,flag=None,progress=None):
+    def _build_down(self, xbmc_directory, lvl, flag=None, progress=None):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.registry.get(name='user-purchases', limit=limit, offset=offset)
+        data = qobuz.registry.get(
+            name='user-purchases', limit=limit, offset=offset)
         if not data:
-            error(self,"Cannot fetch purchases data")
+            error(self, "Cannot fetch purchases data")
             return False
         for product in self.filter_products(data['data']):
             self.add_child(product)
         return True
 
-    def filter_products(self,data):
+    def filter_products(self, data):
         list = []
-        if not data: return list
+        if not data:
+            return list
         # Qobuz free tracks with invalid product id
-        #blackid = ['0000020110926', '0000201011300', '0000020120220', '0000020120221']
+        # blackid = ['0000020110926', '0000201011300', '0000020120220',
+        # '0000020120221']
         albumseen = {}
         for track in data['albums']['items']:
             json = track
@@ -58,8 +62,8 @@ class Node_purchases(Node):
             product = Node_product()
             product.data = json
             id = product.id
-            if id in albumseen: continue
+            if id in albumseen:
+                continue
             albumseen[id] = 1
             list.append(product)
         return list
-
