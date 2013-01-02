@@ -45,6 +45,7 @@ from gui.util import containerRefresh, notifyH, getImage
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
+        self.locked = False
 
     def onPlayBackEnded(self):
 #        if not (self.track_id and self.total and self.elapsed):
@@ -65,14 +66,14 @@ class MyPlayer(xbmc.Player):
         return True
     
     def onPlayBackStarted(self):
-#        if not (self.track_id and self.total and self.elapsed):
-#            return False
-#        self.sendQobuzPlaybackEnded(
-#            self.track_id, (self.total - self.elapsed) / 10)
-        xbmc.sleep (2000)
-        id  = xbmcgui.Window(10000).getProperty("NID") 
-        warn (self, "play back started from monitor !!!!!!" + id )
-        # qobuz.api.report_streaming_start(id)
+        # workaroung bug, we are sometimes called multiple times.
+        if not self.locked: 
+            self.locked = True
+            id  = xbmcgui.Window(10000).getProperty("NID") 
+            warn (self, "play back started from monitor !!!!!!" + id )
+            qobuz.api.report_streaming_start(id)
+            xbmc.sleep(1000)
+            self.locked = False
         return True
         
     def onQueueNextItem(self):
@@ -85,7 +86,6 @@ class Monitor(xbmc.Monitor):
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
         self.abortRequest = False
-        self.Player = MyPlayer()
         self.last_garbage_on = time()
         self.garbage_refresh = 60
         
@@ -154,6 +154,7 @@ boot = QobuzBootstrap(__addon__, 0)
 try:
     boot.bootstrap_app()
     monitor = Monitor(qobuz)
+    player = MyPlayer()
     while not xbmc.abortRequested:
         if time() > (monitor.last_garbage_on + monitor.garbage_refresh):
             log('[QobuzCache]', 'Cleaning')
