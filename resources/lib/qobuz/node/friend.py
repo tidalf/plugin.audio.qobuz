@@ -61,25 +61,10 @@ class Node_friend(Node):
         url = super(Node_friend, self).make_url(**ka) + "&name=" + self.name
         return url
 
-    def _change_appid(self):
-        self._bak_appid = qobuz.api.appid
-        qobuz.api.appid = "477478368"
-        qobuz.registry.delete(name='user')
-        qobuz.registry.login(
-            username=qobuz.addon.getSetting('username'),
-            password=qobuz.addon.getSetting('password'))
-
-    def _restore_appid(self):
-        qobuz.api.appid = self._bak_appid
-        qobuz.registry.delete(name='user')
-        qobuz.registry.login(
-            username=qobuz.addon.getSetting('username'),
-            password=qobuz.addon.getSetting('password'))
-
     def create(self, name=None):
         if not name:
             from gui.util import Keyboard
-            kb = Keyboard(self.get_parameter('name'), 'Add Friend (i8n)')
+            kb = Keyboard(str(self.get_parameter('name')), str('Add Friend (i8n)'))
             kb.doModal()
             name = ''
             if not kb.isConfirmed():
@@ -102,12 +87,8 @@ class Node_friend(Node):
             return False
         friends.append(name)
         newdata = {'friends': friends}
-        self._change_appid()
-        if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
-            self._restore_appid()
-            return False
-        self._restore_appid()
-        qobuz.registry.delete(name='user')
+        qobuz.registry.get(name='user')
+        qobuz.api.user_update(player_settings=json.dumps(newdata))
         containerRefresh()
         return True
 
@@ -128,12 +109,9 @@ class Node_friend(Node):
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
-        self._change_appid()
         if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
             warn(self, "Cannot update remote user")
-            self._restore_appid()
             return False
-        self._restore_appid()
         qobuz.registry.delete(name='user')
         containerRefresh()
         return True
