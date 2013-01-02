@@ -83,7 +83,7 @@ class Node_artist(Node):
         image = self.get_property(('image', 'extralarge'))
         if not image: image = self.get_property(('image', 'mega'))
         if not image: image = self.get_property('picture')
-        if image: image.replace('34s', '126s')
+        if image: image = image.replace('126s', '_')
         if image: return image
         return ''
     
