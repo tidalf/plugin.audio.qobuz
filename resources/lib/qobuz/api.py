@@ -33,7 +33,7 @@ class QobuzApi:
 
     def __init__(self):
         self.authtoken = None
-        self.cookie = None
+        # self.cookie = None
         self.user_id = None
         self.auf = None
         self.token_validity_time = 3600
@@ -88,14 +88,14 @@ class QobuzApi:
         # Sending our request
         r = None
         try:
-            r = self.session.post(url,data=params,cookies=self.cookie,headers=qheaders)
+            r = self.session.post(url,data=params,headers=qheaders)
         except:
             self.last_error = "Post request fail"
             warn(self, self.last_error)
             return None
         # We have cookies
-        if r.cookies:
-                self.cookie = r.cookies
+        #if r.cookies:
+        #        self.cookie = r.cookies
         if not r.content:
             warn(self,"No content return")
             return None
@@ -134,7 +134,7 @@ class QobuzApi:
         if not 'user' in data: return None
         if not 'id' in data['user']: return None
         if not data['user']['id']: return None
-        data['cookie'] = self.cookie
+        # data['cookie'] = self.cookie
         data['user']['email'] = ''
         data['user']['firstname'] = ''
         data['user']['lastname'] = ''
