@@ -30,49 +30,49 @@ from gui.util import lang
     NODE PLAYLIST
 '''
 
+
 class Node_artist(Node):
 
-    def __init__(self, parent = None, parameters = None, progress = None):
+    def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.FAVORITES
         self.set_label(lang(30079))
         self.is_folder = True
-        
+
         self.name = lang(30079)
         self.label = lang(30079)
-        
+
         self.content_type = 'artist'
 
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         data = qobuz.registry.get(name='user-favorites')
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
         self.data = data
         albumseen = {}
-        warn (self, pprint.pformat(data))
+        warn(self, pprint.pformat(data))
         for track in data['data']['tracks']['items']:
             node = Node_track()
             node.data = track
             self.add_child(node)
-    
+
         for product in self.filter_products(data):
             self.add_child(product)
         return True
-        
-        
+
         del self._data['tracks']
-        
+
     def get_name(self):
         name = self.get_property('name')
         return name
-    
+
     def get_owner(self):
         return self.get_property(('owner', 'name'))
-            
+
     def get_description(self):
         return self.get_property('description')
-    
+
     def make_XbmcListItem(self):
         image = self.get_image()
         owner = self.get_owner()

@@ -25,42 +25,44 @@ from debug import warn
 from gui.util import color, lang, getImage
 
 RECOS_TYPE_IDS = {
-                1: 'new-releases',
-                2: 'press-awards',
-                3: 'best-sellers',
-                4: 'editor-picks',
-                5: 'most-featured'           
+    1: 'new-releases',
+    2: 'press-awards',
+    3: 'best-sellers',
+    4: 'editor-picks',
+    5: 'most-featured'
 }
 
 RECOS_TYPES = {
-                      1: lang(30084),
-                      2: lang(30083),
-                      3: lang(30085),
-                      4: lang(30086),
-                      5: lang(30102),
-                      }
+    1: lang(30084),
+    2: lang(30083),
+    3: lang(30085),
+    4: lang(30086),
+    5: lang(30102),
+}
 
 RECOS_GENRES = {
-              2: lang(30093),
-              10: lang(30095),
-              6: lang(30090),
-              59: lang(30098),
-              73: lang(30201),
-              80: lang(30089),
-              64: lang(30202),
-              91: lang(30094),
-              94: lang(30092),
-              112: lang(30087),
-              127: lang(30200),
-              123: lang(30203),
-              'null': 'All',
-              }
+    2: lang(30093),
+    10: lang(30095),
+    6: lang(30090),
+    59: lang(30098),
+    73: lang(30201),
+    80: lang(30089),
+    64: lang(30202),
+    91: lang(30094),
+    94: lang(30092),
+    112: lang(30087),
+    127: lang(30200),
+    123: lang(30203),
+    'null': 'All',
+}
 '''
     NODE RECOS
 '''
+
+
 class Node_recommendation(Node):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id')
@@ -77,16 +79,18 @@ class Node_recommendation(Node):
         return url
 
     def myid(self):
-        if not self.genre_id or not self.genre_type: return None
+        if not self.genre_id or not self.genre_type:
+            return None
         return str(self.genre_type) + '-' + str(self.genre_id)
-    
+
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
         colorItem = qobuz.addon.getSetting('color_item')
         for gid in RECOS_TYPE_IDS:
             node = Node_recommendation()
             node.genre_type = gid
-            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[gid]))
+            node.set_label(
+                self.label + ' / ' + color(colorItem, RECOS_TYPES[gid]))
             self.add_child(node)
         return True
 
@@ -117,11 +121,10 @@ class Node_recommendation(Node):
         return True
 
 # DISPATCH
-    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
+    def _build_down(self, xbmc_directory, lvl, flag=None, progress=None):
         if not self.genre_type:
             return self._build_recos_type(xbmc_directory, lvl, flag)
         elif not self.genre_id:
             return self._build_recos_genre(xbmc_directory, lvl, flag)
         self.content_type = 'albums'
         return self._build_down_type_genre(xbmc_directory, lvl, flag)
-

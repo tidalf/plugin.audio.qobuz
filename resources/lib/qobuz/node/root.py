@@ -28,20 +28,21 @@ import qobuz
 
 '''
     NODE ROOT
-    
+
     Sibling of root are playlist, recos, search, purchases...
 '''
 
+
 class Node_root(Node):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_root, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.ROOT
         self.content_type = 'files'
         self.label = "Qobuz"
-        #self.image = qobuz.image.access.get('default')
-        
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+        # self.image = qobuz.image.access.get('default')
+
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         self.add_child(Node_user_playlists())
         if qobuz.addon.getSetting('show_recommendations') == 'true':
             self.add_child(Node_recommendation())
@@ -62,7 +63,6 @@ class Node_root(Node):
             self.add_child(Node_label())
         return True
 
-
     def cache_remove(self):
         # ERASE CACHE
         from gui.util import yesno, notifyH, getImage
@@ -70,9 +70,8 @@ class Node_root(Node):
         if not yesno('Remove cached data', 'Do you really want to erase all cached data'):
             log(self, "Deleting cached data aborted")
             return False
-        if qobuz.registry.delete_by_name('^.*\.dat$'): 
+        if qobuz.registry.delete_by_name('^.*\.dat$'):
             notifyH('Qobuz cache (i8n)', 'All cached data removed')
-        else: 
+        else:
             notifyH('Qobuz cache (i8n)', 'Something went wrong while erasing cached data', getImage('icon-error-256'))
         return True
-    

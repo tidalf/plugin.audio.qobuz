@@ -32,30 +32,34 @@ from gui.util import color, getImage, runPlugin
 '''
 from track import Node_track
 
+
 class Node_friend_list(Node):
 
-    def __init__(self, parent = None, parameters = None, progress = None):
+    def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_friend_list, self).__init__(parent, parameters)
         self.type = Flag.NODE | Flag.FRIEND_LIST
         self.name = self.get_parameter('name')
         self.image = getImage('artist')
-        self.label = str(self.name) + "'s Friends (i8n)" if (self.name) else "Friends (i8n)"
+        self.label = str(self.name) + "'s Friends (i8n)" if (
+            self.name) else "Friends (i8n)"
         self.label2 = ""
         self.url = None
         self.is_folder = True
         self.content_type = 'artist'
-  
+
     def make_url(self, **ka):
         url = super(Node_friend_list, self).make_url(**ka)
-        if self.name: url+= "&name=" + self.name
+        if self.name:
+            url += "&name=" + self.name
         return url
-    
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
-            data = qobuz.registry.get(name='user-playlists',id = self.name, limit=0)
-        else: 
-            data = qobuz.registry.get(name='user-playlists',limit=0)
+            data = qobuz.registry.get(
+                name='user-playlists', id=self.name, limit=0)
+        else:
+            data = qobuz.registry.get(name='user-playlists', limit=0)
         if not data:
             warn(self, "No friend data")
             return False
@@ -65,7 +69,8 @@ class Node_friend_list(Node):
             friend_list.append(item['owner']['name'])
         # add previously stored
         if (not self.name):
-            data = qobuz.registry.get(name='user')['data']['user']['player_settings']
+            data = qobuz.registry.get(
+                name='user')['data']['user']['player_settings']
             for name in data['friends']:
                 friend_list.append(str(name))
         # remove duplicates
@@ -78,13 +83,14 @@ class Node_friend_list(Node):
             node = Node_friend(None, {'name': str(name)})
             self.add_child(node)
 
-    def attach_context_menu(self, item, menuItems = []):
+    def attach_context_menu(self, item, menuItems=[]):
         colorItem = qobuz.addon.getSetting('color_item')
-        #color_warn = qobuz.addon.getSetting('color_item_caution')
+        # color_warn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
-        
+
         url = self.make_url(type=Flag.FRIEND, nm='create')
-        menuItems.append((color(colorItem, 'Add friend (i8n)' + ': ') + label, runPlugin(url)))
+        menuItems.append((color(
+            colorItem, 'Add friend (i8n)' + ': ') + label, runPlugin(url)))
 
         ''' Calling base class '''
         super(Node_friend_list, self).attach_context_menu(item, menuItems)

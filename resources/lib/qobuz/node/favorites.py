@@ -33,22 +33,24 @@ from gui.util import color, getImage
 '''
 from track import Node_track
 
+
 class Node_favorites(Node):
 
-    def __init__(self, parent = None, parameters = None, progress = None):
+    def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_favorites, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.FAVORITES
         self.set_label(lang(30079))
-        self.packby = ''  
+        self.packby = ''
         self.name = lang(30079)
-        self.label = lang(30079)    
+        self.label = lang(30079)
         self.content_type = 'songs'
         self.image = getImage('favorites')
 
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.registry.get(name='user-favorites', limit=limit, offset=offset)
+        data = qobuz.registry.get(
+            name='user-favorites', limit=limit, offset=offset)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
@@ -62,29 +64,31 @@ class Node_favorites(Node):
             self.add_child(product)
         self.add_pagination(data['data'])
         return True
-        
+
 #    def get_name(self):
 #        name = self.get_property('name')
 #        return name
-#    
+#
 #    def get_owner(self):
 #        return self.get_property(('owner', 'name'))
-#            
+#
     def get_description(self):
         return self.get_property('description')
-    
+
     def filter_products(self, data):
         list = []
-        if not data: return list
+        if not data:
+            return list
         albumseen = {}
         for track in data['data']['albums']['items']:
-            #warn(self, 'Track ' + track)
+            # warn(self, 'Track ' + track)
             json = track
             json[u'interpreter'] = track['artist']['name']
             product = Node_product()
-            product.data = json 
+            product.data = json
             id = product.id
-            if id in albumseen: continue
+            if id in albumseen:
+                continue
             albumseen[id] = 1
             list.append(product)
         return list
@@ -93,19 +97,26 @@ class Node_favorites(Node):
             from gui.directory import Directory
             from renderer.xbmc import Xbmc_renderer as renderer
             nt = None
-            try: nt = int(self.get_parameter('nt'))
+            try:
+                nt = int(self.get_parameter('nt'))
             except:
                 warn(self, "No node type...abort")
                 return False
             id = None
-            try: id = self.get_parameter('nid')        
-            except: pass 
+            try:
+                id = self.get_parameter('nid')
+            except:
+                pass
             depth = -1
-            try: depth = int(self.get_parameter('depth'))
-            except: pass
+            try:
+                depth = int(self.get_parameter('depth'))
+            except:
+                pass
             view_filter = 0
-            try: view_filter = int(self.get_parameter('view-filter'))
-            except: pass
+            try:
+                view_filter = int(self.get_parameter('view-filter'))
+            except:
+                pass
             render = renderer(nt, id)
             render.set_depth(depth)
             render.set_filter(view_filter)
@@ -115,7 +126,7 @@ class Node_favorites(Node):
             if render.root.type & NodeFlag.TRACK:
                 flags = NodeFlag.TRACK
             ret = render.root.build_down(dir, depth, flags)
-            if not ret: 
+            if not ret:
                 dir.end_of_directory()
                 return False
             trackids = []
@@ -130,7 +141,7 @@ class Node_favorites(Node):
             qobuz.registry.delete(name='user-favorites')
             dir.end_of_directory()
             return True
-    
+
     def remove(self):
         log(self, "Removing favorite: " + repr(self.id))
         if not qobuz.api.favorite_delete(track_ids=str(self.id)):

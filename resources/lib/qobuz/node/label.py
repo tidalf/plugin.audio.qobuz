@@ -16,7 +16,8 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import pprint
 
-import xbmcgui, xbmc
+import xbmcgui
+import xbmc
 
 import qobuz
 from constants import Mode
@@ -32,25 +33,25 @@ from gui.util import color, getImage
 
 class Node_label(Node):
 
-    def __init__(self, parent = None, parameters = None, progress = None):
+    def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_label, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.LABEL
         self.set_label('Label (i8n)')
         self.url = None
         self.is_folder = True
         self.image = getImage('album')
-    
-    
+
     def hook_post_data(self):
         self.label = self.get_property('name')
         self.id = self.get_property('id')
-        
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         offset = self.get_parameter('offset') or 0
         #@bug: Qobuz service seam do don't return total so pagination is broken
-        #limit = qobuz.addon.getSetting('pagination_limit')
+        # limit = qobuz.addon.getSetting('pagination_limit')
         limit = 5000
-        data = qobuz.registry.get(name='label-list', id=self.id, limit=limit, offset=offset)
+        data = qobuz.registry.get(
+            name='label-list', id=self.id, limit=limit, offset=offset)
         if not data:
             warn(self, "No label data")
             return False
