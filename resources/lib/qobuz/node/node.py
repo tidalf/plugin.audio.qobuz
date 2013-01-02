@@ -372,8 +372,8 @@ class Node(object):
             url = self.make_url(mode=Mode.SCAN)
             try:
                 label = color(colorItem,lang(39003) + ": ") + self.get_label().decode('utf8','replace')
+                menuItems.append((label,'XBMC.UpdateLibrary("music", "%s")' % (url)))
             except: pass
-            menuItems.append((label,'XBMC.UpdateLibrary("music", "%s")' % (url)))
 
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')

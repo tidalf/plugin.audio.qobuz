@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 #import os
-import json
+# import json
 import requests
 import pprint
 from time import time
@@ -100,11 +100,11 @@ class QobuzApi:
             warn(self,"No content return")
             return None
         try:  # try to get if connexion fail we try a second time 
-            response_json = json.loads(r.content)
+            response_json = r.json()
         except:
             warn(self,"Json loads failed to load... retrying!")
             try:  # please !
-                response_json = json.loads(r.content)
+                response_json = r.json()
             except:
                 self.last_error = "Cannot load: " + url
                 warn(self,"Json loads failed a second time")
