@@ -30,9 +30,10 @@ from debug import __debugging__
 
 import qobuz
 
+
 class Progress(xbmcgui.DialogProgress):
 
-    def __init__(self, active = True):
+    def __init__(self, active=True):
         self.active = active
         self.is_cancelable = True
         if self.active:
@@ -43,13 +44,15 @@ class Progress(xbmcgui.DialogProgress):
         self.percent = 0
         self.started_on = None
 
-    def create(self, line1, line2 = '', line3 = ''):
+    def create(self, line1, line2='', line3=''):
         self.line1 = line1
         self.line2 = line2
         self.line3 = line3
-        if not self.active: return False
+        if not self.active:
+            return False
         self.started_on = time.time()
-        try:return super(Progress, self).create(line1, line2, line3)
+        try:
+            return super(Progress, self).create(line1, line2, line3)
         except:
             warn(self, "Cannot create progress bar")
             return False
@@ -60,14 +63,16 @@ class Progress(xbmcgui.DialogProgress):
         seconds = time % 60
         return '%02i:%02i:%02i' % (hours, minutes, seconds)
 
-    def update(self, percent, line1, line2 = '', line3 = ''):
+    def update(self, percent, line1, line2='', line3=''):
         if line1:
             self.line1 = line1
         self.line2 = line2
         self.line3 = line3
-        if not self.active: return False
+        if not self.active:
+            return False
         elapsed = self._pretty_time((time.time() - self.started_on))
-        try: return super(Progress, self).update(percent, '[%s] %s' % (elapsed, line1), line2, line3)
+        try:
+            return super(Progress, self).update(percent, '[%s] %s' % (elapsed, line1), line2, line3)
         except:
             warn(self, "Cannot update progress bar")
             return False
@@ -76,22 +81,28 @@ class Progress(xbmcgui.DialogProgress):
         if not line or line == self.line1:
             return False
         self.line1 = line
-        try: return self.update(self.percent, self.line1, self.line2, self.line3)
+        try:
+            return self.update(self.percent, self.line1, self.line2, self.line3)
         except:
             warn(self, "Cannot update line1 progress bar")
             return False
 
     def iscanceled(self):
-        if not self.active: return False
-        if not self.is_cancelable: return False
-        try: return super(Progress, self).iscanceled()
+        if not self.active:
+            return False
+        if not self.is_cancelable:
+            return False
+        try:
+            return super(Progress, self).iscanceled()
         except:
             warn(self, "Cannot get iscanceled progress bar status")
             return False
 
     def close(self):
-        if not self.active: return False
-        try: return super(Progress, self).close()
+        if not self.active:
+            return False
+        try:
+            return super(Progress, self).close()
         except:
             warn(self, "Cannot close progress bar")
             return False

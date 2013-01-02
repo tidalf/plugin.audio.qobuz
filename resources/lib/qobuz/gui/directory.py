@@ -10,9 +10,11 @@ import time
 from debug import warn, log
 from gui.util import notify, lang, getImage
 from exception import QobuzXbmcError
+
+
 class Directory():
 
-    def __init__(self, root, handle, ALL_AT_ONCE = False):
+    def __init__(self, root, handle, ALL_AT_ONCE=False):
         self.nodes = []
         self.label = "Qobuz / "
         self.root = root
@@ -39,17 +41,19 @@ class Directory():
         return time.time() - self.started_on
 
     def add_node(self, node):
-        if not self.ALL_AT_ONCE: return self._put_item(node)
-        #self.nodes.append(node)
+        if not self.ALL_AT_ONCE:
+            return self._put_item(node)
+        # self.nodes.append(node)
         return True
 
-    def update(self, count, total, line1, line2 = '', line3 = ''):
+    def update(self, count, total, line1, line2='', line3=''):
         percent = 100
         if total and count:
             percent = count * (1 + 100 / total)
         else:
             percent = count
-            if percent > 100: percent = 100
+            if percent > 100:
+                percent = 100
         labstat = '[%05i]' % (self.total_put)
         self.line1 = labstat
         self.line1 = line1
@@ -64,12 +68,12 @@ class Directory():
 
     def _xbmc_item(self, **ka):
         return xbmcgui.ListItem(
-                                ka['label'],
-                                ka['label'],
-                                ka['image'],
-                                ka['image'],
-                                ka['url'])
-    
+            ka['label'],
+            ka['label'],
+            ka['image'],
+            ka['image'],
+            ka['url'])
+
     def add_item(self, **ka):
         self.total_put += 1
         xbmcplugin.addDirectoryItem(self.handle,
@@ -78,20 +82,21 @@ class Directory():
                                     ka['is_folder'],
                                     self.total_put)
         return True
-        
-        
+
     def _put_item(self, node):
         self.total_put += 1
         item = node.make_XbmcListItem()
         ret = None
-        if not item: return False
+        if not item:
+            return False
         try:
             ret = self.add_item(url=node.make_url(),
-                                    item=item,
-                                    is_folder=node.is_folder)
+                                item=item,
+                                is_folder=node.is_folder)
         except:
             QobuzXbmcError(who=self, what='cannot_add_item', additional='')
-        if not ret: self.put_item_ok = False
+        if not ret:
+            self.put_item_ok = False
         return ret
 
     def close(self):
@@ -103,17 +108,19 @@ class Directory():
         success = True
         if not self.put_item_ok or (self.total_put == 0):
             success = False
-            #notify(30008, 36001, getImage('icon-error-256'))
-        xbmcplugin.setContent(handle = self.handle, content = self.content_type)
-        xbmcplugin.endOfDirectory(handle = self.handle,
-                                   succeeded = success,
-                                   updateListing = False,
-                                   cacheToDisc = success)
+            # notify(30008, 36001, getImage('icon-error-256'))
+        xbmcplugin.setContent(
+            handle=self.handle, content=self.content_type)
+        xbmcplugin.endOfDirectory(handle=self.handle,
+                                  succeeded=success,
+                                  updateListing=False,
+                                  cacheToDisc=success)
         if self.total_put == 0:
             label = self.root.get_label()
-        self.update(100, 100, lang(40003), lang(40002) + ': ' + str(self.total_put) + ' items')
+        self.update(100, 100, lang(
+            40003), lang(40002) + ': ' + str(self.total_put) + ' items')
         self.close()
-        #return success
+        # return success
         return True
 
     def set_content(self, content):

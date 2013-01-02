@@ -23,15 +23,17 @@ import xbmcgui
 import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag
-#from debug import error
+# from debug import error
 from exception import QobuzXbmcError
-from gui.util import color,lang, runPlugin, containerUpdate
+from gui.util import color, lang, runPlugin, containerUpdate
 '''
     NODE
 '''
+
+
 class Node(object):
 
-    def __init__(self,parent=None,parameters=None):
+    def __init__(self, parent=None, parameters=None):
         self.parameters = parameters or {}
         self.id = self.get_parameter('nid')
         self.parent = parent
@@ -52,7 +54,7 @@ class Node(object):
         return self._id
 
     @id.setter
-    def id(self,value):
+    def id(self, value):
         self._id = value
 
     @id.getter
@@ -67,7 +69,7 @@ class Node(object):
         return self._parent
 
     @parent.setter
-    def parent(self,parent):
+    def parent(self, parent):
         if not parent:
             self._parent = None
             return
@@ -94,9 +96,10 @@ class Node(object):
         return self._content_type
 
     @content_type.setter
-    def content_type(self,type):
-        if type not in ['songs','albums','files','artist']:
-            raise QobuzXbmcError(who=self,what='invalid_type',additional=type)
+    def content_type(self, type):
+        if type not in ['songs', 'albums', 'files', 'artist']:
+            raise QobuzXbmcError(
+                who=self, what='invalid_type', additional=type)
         self._content_type = type
 
     ''' data '''
@@ -109,7 +112,7 @@ class Node(object):
         return self._data
 
     @data.setter
-    def data(self,value):
+    def data(self, value):
         self._data = value
         self.hook_post_data()
 
@@ -118,10 +121,10 @@ class Node(object):
         pass
 
     ''' Property are just a easy way to access JSON data when set '''
-    def get_property(self,path):
+    def get_property(self, path):
         if not self._data:
             return ''
-        if isinstance(path,basestring):
+        if isinstance(path, basestring):
             if path in self._data and self._data[path] and self._data[path] != 'None':
                 return self._data[path]
             return ''
@@ -134,22 +137,25 @@ class Node(object):
             return root
         return ''
 
-    ''' 
+    '''
     Called with data from our API, adding special child if pagination
     is required
     '''
     def add_pagination(self, data):
-        paginated = ['albums', 'labels', 'tracks', 'artists', 'playlists', 'playlist']
+        paginated = ['albums', 'labels', 'tracks', 'artists',
+                     'playlists', 'playlist']
         items = None
         need_pagination = False
         for p in paginated:
-            if p in data: 
+            if p in data:
                 items = data[p]
-                if items['limit'] == None: continue
+                if items['limit'] == None:
+                    continue
                 if items['total'] > (items['offset'] + items['limit']):
                     need_pagination = True
                     break
-        if not need_pagination: return False
+        if not need_pagination:
+            return False
         url = self.make_url(offset=items['offset'] + items['limit'])
         print "URL: " + url
         self.pagination_next = url
@@ -168,9 +174,8 @@ class Node(object):
             s += 'data:' + pprint.pformat(data)
         return s
 
-
     '''
-        Parameters 
+        Parameters
         A hash for storing script parameter, each node have a copy of them.
         TODO: each node don't need to copy parameter
     '''
@@ -181,26 +186,35 @@ class Node(object):
         self.parameters[name] = value
 
     def get_parameter(self, name):
-        if not name in self.parameters: return None
+        if not name in self.parameters:
+            return None
         return self.parameters[name]
-
 
     '''
         Make url
         This function is responsible to create the link to this node.
         Class who implement custom parameter must overload this method
     '''
-    def make_url(self,**ka):
-        if not 'mode' in ka: ka['mode'] = Mode.VIEW
-        else: ka['mode'] = int(ka['mode'])
-        if not 'type' in ka: ka['type'] = self.type
-        if not 'id' in ka and self.id: ka['id'] = self.id
-        url = sys.argv[0] + '?mode=' + str(ka['mode']) + '&nt=' + str(ka['type'])
-        if 'id' in ka: url += "&nid=" + str(ka['id'])
+    def make_url(self, **ka):
+        if not 'mode' in ka:
+            ka['mode'] = Mode.VIEW
+        else:
+            ka['mode'] = int(ka['mode'])
+        if not 'type' in ka:
+            ka['type'] = self.type
+        if not 'id' in ka and self.id:
+            ka['id'] = self.id
+        url = sys.argv[0] + '?mode=' + str(ka['mode']) + '&nt=' + \
+            str(ka['type'])
+        if 'id' in ka:
+            url += "&nid=" + str(ka['id'])
         action = self.get_parameter('action')
-        if action: url += "&action=" + action
-        if 'offset' in ka: url += "&offset=" + str(ka['offset'])
-        if 'nm' in ka: url += '&nm=' + ka['nm']
+        if action:
+            url += "&action=" + action
+        if 'offset' in ka:
+            url += "&offset=" + str(ka['offset'])
+        if 'nm' in ka:
+            url += '&nm=' + ka['nm']
         return url
 
     '''
@@ -208,25 +222,29 @@ class Node(object):
         return  a xbml list item
         Class can overload this method
     '''
-    def make_XbmcListItem(self,**ka):
-        if not 'url' in ka: ka['url'] = self.make_url()
-        if not 'label' in ka: ka['label'] = self.get_label()
-        if not 'label2' in ka: ka['label2'] = self.get_label2()
-        if not 'image' in ka: ka['image'] = self.get_image()
+    def make_XbmcListItem(self, **ka):
+        if not 'url' in ka:
+            ka['url'] = self.make_url()
+        if not 'label' in ka:
+            ka['label'] = self.get_label()
+        if not 'label2' in ka:
+            ka['label2'] = self.get_label2()
+        if not 'image' in ka:
+            ka['image'] = self.get_image()
         item = xbmcgui.ListItem(
-                                ka['label'],
-                                ka['label2'],
-                                ka['image'],
-                                ka['image'],
-                                ka['url']
+            ka['label'],
+            ka['label2'],
+            ka['image'],
+            ka['image'],
+            ka['url']
         )
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems,replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=False)
         return item
 
-    def add_child(self,child):
+    def add_child(self, child):
         child.parent = self
         child.set_parameters(self.parameters)
         self.childs.append(child)
@@ -235,28 +253,30 @@ class Node(object):
     def get_childs(self):
         return self.childs
 
-    def get_siblings(self,type):
+    def get_siblings(self, type):
         list = []
         for c in self.childs:
             if c.getType() == type:
                 list.append(c)
         return list
 
-    def set_label(self,label):
-        self.label = label.encode('utf8','replace')
+    def set_label(self, label):
+        self.label = label.encode('utf8', 'replace')
         return self
 
     def get_image(self):
-        if self.image: return self.image
-        if self.parent: return self.parent.get_image()
+        if self.image:
+            return self.image
+        if self.parent:
+            return self.parent.get_image()
         return ''
 
-    def set_image(self,image):
+    def set_image(self, image):
         self.image = image
         return self
 
-    def set_label2(self,label):
-        self.label2 = label.encode('utf8','replace')
+    def set_label2(self, label):
+        self.label2 = label.encode('utf8', 'replace')
         return self
 
     def get_label(self):
@@ -265,14 +285,13 @@ class Node(object):
     def get_label2(self):
         return self.label2
 
-    def set_type(self,type):
+    def set_type(self, type):
         self.type = type
 
     def get_type(self):
         return self.type
 
-
-    def filter(self,flag):
+    def filter(self, flag):
         if not flag:
             return False
         if flag & self.get_type():
@@ -288,35 +307,37 @@ class Node(object):
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self,xbmc_directory,lvl=1,whiteFlag=Flag.NODE):
+    def build_down(self, xbmc_directory, lvl=1, whiteFlag=Flag.NODE):
         if xbmc_directory.is_canceled():
             return False
         if lvl != -1 and lvl < 1:
             return False
-        self._build_down(xbmc_directory,lvl,whiteFlag)
-        if lvl != -1: lvl -= 1
+        self._build_down(xbmc_directory, lvl, whiteFlag)
+        if lvl != -1:
+            lvl -= 1
         total = len(self.childs)
         count = 0
         label = self.get_label()
         for child in self.childs:
             if not (child.type & Flag.TRACK):
-                xbmc_directory.update(count,total,"Working",label,child.get_label())
+                xbmc_directory.update(
+                    count, total, "Working", label, child.get_label())
             if child.type & whiteFlag:
                 xbmc_directory.add_node(child)
-            child.build_down(xbmc_directory,lvl,whiteFlag)
+            child.build_down(xbmc_directory, lvl, whiteFlag)
             count += 1
         return True
 
     '''
         _build_down:
-        This method is called by build_down method, each object who 
+        This method is called by build_down method, each object who
         inherit from node object can implement their own code. Lot of object
         simply fetch data from qobuz (cached data)
     '''
-    def _build_down(self,xbmc_directory,lvl,flag):
+    def _build_down(self, xbmc_directory, lvl, flag):
         pass
 
-    def attach_context_menu(self, item, menuItems = []):
+    def attach_context_menu(self, item, menuItems=[]):
         colorItem = qobuz.addon.getSetting('color_item')
         cmd = ''
 
@@ -326,15 +347,14 @@ class Node(object):
 
         ''' VIEW BIG DIR '''
         cmd = runPlugin(self.make_url(mode=Mode.VIEW_BIG_DIR))
-        menuItems.append((color(colorItem,lang(39002)), cmd))
-
+        menuItems.append((color(colorItem, lang(39002)), cmd))
 
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             ''' ALL ALBUM '''
             id = self.get_artist_id()
-            url = self.make_url(mode=Mode.VIEW,type=Flag.ARTIST,id=id)
+            url = self.make_url(mode=Mode.VIEW, type=Flag.ARTIST, id=id)
             cmd = runPlugin(url)
-            menuItems.append((color(colorItem,lang(39001)),cmd))
+            menuItems.append((color(colorItem, lang(39001)), cmd))
 
             ''' Similar artist '''
             id = self.get_artist_id()
@@ -342,41 +362,43 @@ class Node(object):
             query = urllib.quote(self.get_artist().encode('utf-8'))
             url = self.make_url(type=Flag.SIMILAR_ARTIST, id=id)
             cmd = runPlugin(url)
-            menuItems.append((color(colorItem,lang(39004)),cmd))
+            menuItems.append((color(colorItem, lang(39004)), cmd))
 
         ''' ADD TO CURRENT PLAYLIST '''
         cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_ADD_TO_CURRENT))
-        menuItems.append((color(colorItem,lang(39005)),cmd))
+        menuItems.append((color(colorItem, lang(39005)), cmd))
 
         if self.parent and not (self.parent.type & Flag.FAVORITES):
             ''' ADD TO FAVORITES '''
             cmd = runPlugin(self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
-            menuItems.append((color(colorItem,lang(39011)),cmd))
+            menuItems.append((color(colorItem, lang(39011)), cmd))
 
         ''' ADD AS NEW '''
         cmd = runPlugin(self.make_url(type=Flag.USERPLAYLISTS))
-        menuItems.append((color(colorItem,lang(30080)),cmd))
+        menuItems.append((color(colorItem, lang(30080)), cmd))
 
         ''' Show playlist '''
         if not (self.type & Flag.PLAYLIST):
             cmd = runPlugin(self.make_url(type=Flag.USERPLAYLISTS))
-            menuItems.append((color(colorItem,lang(39005)),cmd))
+            menuItems.append((color(colorItem, lang(39005)), cmd))
 
         if self.type & Flag.USERPLAYLISTS:
             ''' CREATE '''
             cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_CREATE))
-            menuItems.append((color(colorItem,lang(39008)), cmd))
+            menuItems.append((color(colorItem, lang(39008)), cmd))
 
         ''' SCAN '''
         if qobuz.addon.getSetting('enable_scan_feature') == 'true':
             url = self.make_url(mode=Mode.SCAN)
             try:
-                label = color(colorItem,lang(39003) + ": ") + self.get_label().decode('utf8','replace')
-                menuItems.append((label,'XBMC.UpdateLibrary("music", "%s")' % (url)))
-            except: pass
+                label = color(colorItem, lang(39003) + ": ") + \
+                    self.get_label().decode('utf8', 'replace')
+                menuItems.append(
+                    (label, 'XBMC.UpdateLibrary("music", "%s")' % (url)))
+            except:
+                pass
 
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove"))
-        menuItems.append((color(colorItem,lang(31009)),cmd))
-
+        menuItems.append((color(colorItem, lang(31009)), cmd))

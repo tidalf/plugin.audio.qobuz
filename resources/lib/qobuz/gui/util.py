@@ -15,18 +15,22 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os
-import xbmc, xbmcgui,xbmcplugin
+import xbmc
+import xbmcgui
+import xbmcplugin
 from debug import log, debug
 import qobuz
 
 '''
     Keyboard
 '''
+
+
 class Keyboard(xbmc.Keyboard):
-    
-    def __init__(self, default, heading, hidden = True):
+
+    def __init__(self, default, heading, hidden=True):
         self.setHeading('Qobuz / ' + heading)
-        
+
 
 def getImage(name):
     return os.path.join(qobuz.path.image, name + '.png')
@@ -34,35 +38,48 @@ def getImage(name):
 '''
     Notify Human
 '''
-def notifyH(title, text, image = None, mstime = 2000):
-    if not image: image = getImage('icon-default-256')
-    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (title, text, mstime, image)
+
+
+def notifyH(title, text, image=None, mstime=2000):
+    if not image:
+        image = getImage('icon-default-256')
+    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (
+        title, text, mstime, image)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
 
 '''
     Notify
 '''
-def notify(title, text, image = None, mstime = 2000):
-    if not image: image = getImage('icon-default-256')
-    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (lang(title), lang(text), mstime, getImage)
+
+
+def notify(title, text, image=None, mstime=2000):
+    if not image:
+        image = getImage('icon-default-256')
+    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (
+        lang(title), lang(text), mstime, getImage)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
-    
+
+
 def dialogLoginFailure():
     import sys
     dialog = xbmcgui.Dialog()
     if dialog.yesno(lang(30008), lang(30034), lang(30040)):
         qobuz.addon.openSettings()
-        xbmcplugin.endOfDirectory(handle = int(sys.argv[1]), succeeded = False, updateListing = True, cacheToDisc = False)    
+        xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
+                                  updateListing=True, cacheToDisc=False)
     else:
         xbmc.executebuiltin('ActivateWindow(home)')
         return False
 
+
 def isFreeAccount():
     data = qobuz.registry.get(name='user')
-    if not data: return True
-    if not data['data']['user']['credential']['id']: 
+    if not data:
+        return True
+    if not data['data']['user']['credential']['id']:
         return True
     return False
+
 
 def dialogFreeAccount():
     if qobuz.addon.getSetting('warn_free_account') != 'true':
@@ -72,11 +89,14 @@ def dialogFreeAccount():
     if ok:
         qobuz.addon.setSetting('warn_free_account', 'false')
 
+
 def executeJSONRPC(json):
     return xbmc.executeJSONRPC(json)
 
+
 def color(colorItem, msg):
     return '[COLOR=' + colorItem + ']' + msg + '[/COLOR]'
+
 
 def lang(langId):
     return qobuz.addon.getLocalizedString(langId)
@@ -84,17 +104,20 @@ def lang(langId):
 
 def runPlugin(url):
     cmd = 'XBMC.RunPlugin("%s")' % (url)
-    #debug('xbmcRunPlugin', "CMD: " + cmd)
+    # debug('xbmcRunPlugin', "CMD: " + cmd)
     return cmd
+
 
 def containerUpdate(url):
     cmd = 'XBMC.ContainerUpdate("%s")' % (url)
-    #debug('xbmcContainerUpdate', "CMD: " + cmd)
+    # debug('xbmcContainerUpdate', "CMD: " + cmd)
     return cmd
+
 
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
     return dialog.yesno(heading, line1, line2, line3)
+
 
 def containerRefresh():
     xbmc.executebuiltin('Container.Refresh')
