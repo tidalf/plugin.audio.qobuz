@@ -19,8 +19,8 @@ import xbmcgui
 import qobuz
 from constants import Mode
 from flag import NodeFlag
-from node import Node
-from debug import error, warn
+from inode import INode
+from debug import warn
 from gui.util import color, lang, getImage
 
 '''
@@ -28,7 +28,7 @@ from gui.util import color, lang, getImage
 '''
 
 
-class Node_track(Node):
+class Node_track(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_track, self).__init__(parent, parameters)

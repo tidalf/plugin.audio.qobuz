@@ -72,7 +72,7 @@ class __NodeFlag():
         elif flag & self.LABEL:
             return "label"
         elif flag & self.NODE:
-            return "node"
+            return "inode"
         elif flag & self.PRODUCTS:
             return "products"
         elif flag & self.DONTFETCHTRACK:

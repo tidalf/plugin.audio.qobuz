@@ -18,23 +18,23 @@
 import xbmcgui
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag as Flag
-from node import Node
+from inode import INode
 from product import Node_product
 from debug import info, warn
 from exception import QobuzXbmcError
-from gui.util import notifyH, notify, color, lang, getImage, runPlugin, containerRefresh, containerUpdate
+from gui.util import notifyH, color, lang, getImage, runPlugin, containerRefresh, containerUpdate
+from util import getRenderer
 
 import pprint
 
 '''
-    NODE PLAYLIST
+    @class Node_playlist:
 '''
 from track import Node_track
 
 
-class Node_playlist(Node):
+class Node_playlist(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_playlist, self).__init__(parent, parameters)
@@ -181,8 +181,6 @@ class Node_playlist(Node):
         super(Node_playlist, self).attach_context_menu(item, menuItems)
 
     def remove_tracks(self, tracks_id):
-        import qobuz
-        import xbmc
         info(self, "Removing tracks: " + tracks_id)
         result = qobuz.api.playlist_deleteTracks(
             playlist_id=self.id, playlist_track_ids=tracks_id)
@@ -192,96 +190,22 @@ class Node_playlist(Node):
             return False
         info(self, "Tracks removed from playlist: " + str(self.id))
         qobuz.registry.delete(name='user-playlist', id=self.id)
-        xbmc.executebuiltin('Container.Refresh')
+        containerRefresh()
         return True
 
     def add_to_current(self):
-            from gui.directory import Directory
-            from renderer.xbmc import Xbmc_renderer as renderer
-            cid = qobuz.registry.get(
-                name='user-current-playlist-id', noRemote=True)
-            if cid:
-                cid = cid['data']
-            if not cid:
-                warn(self, 'no current playlist id')
-                notify(29000, 29001, getImage('icon-error-256'))
-                return False
-            nt = None
-            try:
-                nt = int(self.get_parameter('nt'))
-            except:
-                warn(self, "No node type...abort")
-                return False
-            ID = None
-            try:
-                ID = self.get_parameter('nid')
-            except:
-                pass
-            depth = -1
-            try:
-                depth = int(self.get_parameter('depth'))
-            except:
-                pass
-            view_filter = 0
-            try:
-                view_filter = int(self.get_parameter('view-filter'))
-            except:
-                pass
-            render = renderer(nt, ID)
-            render.set_depth(depth)
-            render.set_filter(view_filter)
-            render.set_root_node()
-            Dir = Directory(render.root, qobuz.boot.handle, True)
-            flags = Flag.TRACK | Flag.DONTFETCHTRACK
-            if render.root.type & Flag.TRACK:
-                flags = Flag.TRACK
-            ret = render.root.build_down(Dir, depth, flags)
-            if not ret:
-                Dir.end_of_directory()
-                return False
-            track_ids = []
-            if len(Dir.nodes) < 1:
-                warn(self, "No track to add to current playlist")
-                Dir.end_of_directory()
-                return False
-            for node in Dir.nodes:
-                track_ids.append(str(node.id))
-            str_tracks = ','.join(track_ids)
-            ret = qobuz.api.playlist_addTracks(
-                playlist_id=str(cid), track_ids=str_tracks)
-            if ret:
-                qobuz.registry.delete(name='user-playlist', id=cid)
-            Dir.end_of_directory()
-            return True
-
-    def add_as_new(self):
-        import sys
-        from gui.directory import Directory
-        from renderer.xbmc import Xbmc_renderer as renderer
-        render = renderer(self.type, self.id)
+        render = getRenderer(int(self.get_parameter('qnt')), self.id)
         render.depth = -1
         render.filter = Flag.TRACK | Flag.DONTFETCHTRACK
-        render.ALL_AT_ONCE = True
+        render.AS_LIST = True
         render.display()
-#        Dir = Directory(render.root, sys.argv[1], True)
-#        flags = Flag.TRACK | Flag.DONTFETCHTRACK
-#        if render.root.type & Flag.TRACK:
-#            flags = Flag.TRACK
-#        ret = render.root.build_down(Dir, -1, flags)
-#        if not ret:
-#            Dir.end_of_directory()
-#            warn(self, "Nothing to add as new playlist")
-#            return False
-        info(self, "CREATE PLAYLIST: " + repr(render.root.get_label()))
-        playlist = Node_playlist(self, {'query': render.root.get_label()})
+        playlist = Node_playlist(self, qobuz.boot.params)
         nid = playlist.create()
         if not nid:
             warn(self, "Cannot create playlist...")
-            Dir.end_of_directory()
             return False
-        if len(Dir.nodes) < 1:
+        if len(render.nodes) < 1:
             warn(self, "No track to add to current playlist")
-            Dir.end_of_directory()
             qobuz.registry.set(
                 name='user-current-playlist-id', value=nid, noRemote=True)
             qobuz.registry.delete(name='user-playlist', id=nid)
@@ -295,19 +219,50 @@ class Node_playlist(Node):
             playlist_id=nid, track_ids=strtracks)
         if ret:
             qobuz.registry.delete(name='user-playlist', id=nid)
-            qobuz.registry.deleet(name='user-playlists')
+            qobuz.registry.delete_by_name('^user.*\.dat$')
             qobuz.registry.set(
                 name='user-current-playlist-id', value=nid, noRemote=True)
-        Dir.end_of_directory()
-        return True
+            return True
+        return False
 
-    def set_as_current(self):
-        from gui.util import containerRefresh
-        if not self.id:
+    def add_as_new(self):
+        render = getRenderer(int(self.get_parameter('qnt')), self.id)
+        render.depth = -1
+        render.filter = Flag.TRACK | Flag.DONTFETCHTRACK
+        render.AS_LIST = True
+        render.display()
+        playlist = Node_playlist(self, qobuz.boot.params)
+        nid = playlist.create()
+        if not nid:
+            warn(self, "Cannot create playlist...")
+            return False
+        if len(render.nodes) < 1:
+            warn(self, "No track to add to current playlist")
+            qobuz.registry.set(
+                name='user-current-playlist-id', value=nid, noRemote=True)
+            qobuz.registry.delete(name='user-playlist', id=nid)
+            qobuz.registry.deleet(name='user-playlists')
+            return False
+        strtracks=''
+        for node in render.nodes:
+            pprint.pprint(node)
+            strtracks+='%s,' % (str(node.id))
+        ret = qobuz.api.playlist_addTracks(
+            playlist_id=nid, track_ids=strtracks)
+        if ret:
+            qobuz.registry.delete(name='user-playlist', id=nid)
+            qobuz.registry.delete_by_name('^user.*\.dat$')
+            qobuz.registry.set(
+                name='user-current-playlist-id', value=nid, noRemote=True)
+            return True
+        return False
+
+    def set_as_current(self, nid = None):
+        if not nid: nid = self.id
+        if not nid:
             raise QobuzXbmcError(who=self, what='node_without_id')
         qobuz.registry.set(
-            name='user-current-playlist-id', id=0, value=self.id)
-        containerRefresh()
+            name='user-current-playlist-id', id=0, value=nid)
         return True
 
     '''
@@ -342,7 +297,6 @@ class Node_playlist(Node):
         return True
 
     def create(self):
-        from gui.util import containerRefresh
         query = self.get_parameter('query')
         #!TODO: Why we are no more logged ...
         qobuz.registry.get(name='user')
@@ -358,9 +312,8 @@ class Node_playlist(Node):
         if not ret:
             warn(self, "Cannot create playlist name '" + query + "'")
             return None
-        self.set_as_current()
+        self.set_as_current(ret['id'])
         qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
-        containerRefresh()
         return ret['id']
 
     '''
@@ -370,12 +323,12 @@ class Node_playlist(Node):
         import xbmcgui
         import xbmc
         import pprint
-        ID = self.id
+        ID = self.get_parameter('nid')
         login = qobuz.addon.getSetting('username')
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
-            name='user-playlist', id=ID, offset=offset, limit=limit)['data']
+            name='user-playlist', id=ID, playlist_id=ID, offset=offset, limit=limit)['data']
         name = ''
         if 'name' in data:
             name = data['name']

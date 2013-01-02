@@ -19,16 +19,15 @@ import xbmc
 
 import qobuz
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from recommendation import Node_recommendation, RECOS_TYPE_IDS
 from gui.util import getImage
 
 '''
-    NODE GENRE
+    @class Node_genre:
 '''
 
-
-class Node_genre(Node):
+class Node_genre(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_genre, self).__init__(parent, parameters)

@@ -18,16 +18,17 @@ import xbmcgui
 
 import qobuz
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from product import Node_product
 from debug import warn
 import weakref
+
 '''
-    NODE ARTIST
+    @class Node_product_by_artist:
 '''
 
 
-class Node_product_by_artist(Node):
+class Node_product_by_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_product_by_artist, self).__init__(parent, parameters)

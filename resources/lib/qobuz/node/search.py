@@ -14,23 +14,18 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
 import qobuz
 
-from debug import info, warn, error, debug
+from debug import warn
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from product import Node_product
 from track import Node_track
 from product_by_artist import Node_product_by_artist
-from constants import Mode
 from exception import QobuzXbmcError
 from gui.util import notifyH, lang, getImage
 
-# from search.artists import Search_artists
-
-
-class Node_search(Node):
+class Node_search(INode):
 
     def __init__(self, parent=None, params=None):
         super(Node_search, self).__init__(parent, params)

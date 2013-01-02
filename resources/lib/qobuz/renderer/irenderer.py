@@ -28,7 +28,7 @@ class IRenderer(object):
         self.root = None
         self.filter = NodeFlag.NODE
         self.depth = 1
-        self.AS_NODE = False
+        self.AS_LIST = False
         self.nodes = []
 
     def to_s(self):
@@ -55,9 +55,11 @@ class IRenderer(object):
                                  additional=pprint.pformat(error))
         node = getattr(Module, moduleName)
         root = node(None, params)
+        print "Returning node: " + repr(root)
         return root
     
     def set_root_node(self):
+        if self.root: return False
         root = self.import_node(self.node_type, qobuz.boot.params)
         root.id = self.node_id
         self.root = root

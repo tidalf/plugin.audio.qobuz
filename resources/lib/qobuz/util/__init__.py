@@ -14,3 +14,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+from node.flag import NodeFlag as Flag
+from renderer.xbmc import Xbmc_renderer as renderer
+
+def getRenderer(nType, nId):
+    return renderer(nType ^ Flag.NODE, nId)

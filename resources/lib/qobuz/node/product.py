@@ -18,12 +18,12 @@ import xbmcgui
 
 import qobuz
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from debug import warn
 from gui.util import getImage
 
 '''
-    NODE PRODUCT
+    @class Node_product:
 '''
 
 from track import Node_track
@@ -32,7 +32,7 @@ SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']
 
 
-class Node_product(Node):
+class Node_product(INode):
 
     def __init__(self, parent=None, params=None):
         super(Node_product, self).__init__(parent, params)

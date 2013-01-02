@@ -19,7 +19,7 @@ import xbmcgui
 
 import qobuz
 from flag import NodeFlag as Flag
-from node import Node
+from inode import INode
 from product import Node_product
 from debug import warn
 from gui.util import color, lang, getImage
@@ -55,12 +55,11 @@ RECOS_GENRES = {
     123: lang(30203),
     'null': 'All',
 }
-'''
-    NODE RECOS
-'''
 
-
-class Node_recommendation(Node):
+'''
+    @class Node_recommendation:
+'''
+class Node_recommendation(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)

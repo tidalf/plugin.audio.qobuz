@@ -23,15 +23,14 @@ import xbmcgui
 import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag
-# from debug import error
 from exception import QobuzXbmcError
-from gui.util import color, lang, runPlugin, containerUpdate, containerRefresh, formatControlLabel
+from gui.util import color, lang, runPlugin, containerUpdate, formatControlLabel
+
 '''
-    NODE
+    @class Inode:
 '''
 
-
-class Node(object):
+class INode(object):
 
     def __init__(self, parent=None, parameters=None):
         self.parameters = parameters or {}
@@ -217,8 +216,15 @@ class Node(object):
             url += "&action=" + action
         if 'nm' in ka:
             url += '&nm=' + ka['nm']
+        qnt = self.get_parameter('qnt')
+        if 'qnt' in ka:
+            qnt = ka['qnt']
+        if qnt:
+            url+= '&qnt=' + str(qnt)
+            print "URL: " + repr(url)
         if 'query' in ka:
             url+= '&query=' + ka['query']
+      
         return url
 
     '''
@@ -301,7 +307,7 @@ class Node(object):
         if flag & self.get_type():
             return False
         return True
-
+      
     def _add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
         limit = qobuz.addon.getSetting('pagination_limit')
         from renderer.irenderer import IRenderer
@@ -376,12 +382,6 @@ class Node(object):
             urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id)
             menuItems.append((formatControlLabel(artist_name), 
                               containerUpdate(urlArtist)))
-#            ''' ALL ALBUM '''
-#            url = self.make_url(type=Flag.ARTIST, 
-#                                id=artist_id, mode=Mode.VIEW)
-#            cmd = containerUpdate(url)
-#            label = '%s' % (color(colorItem, lang(39001)))
-#            menuItems.append((label, cmd))
 
             ''' Similar artist '''
             url = self.make_url(type=Flag.SIMILAR_ARTIST, 
@@ -398,7 +398,7 @@ class Node(object):
       
         ''' ADD TO CURRENT PLAYLIST '''
         cmd = containerUpdate(self.make_url(type=Flag.PLAYLIST, 
-                                            nm='add_as_new'))
+                                            nm='add_to_current'))
         menuItems.append((color(colorItem, lang(39005)), cmd))
 
         if self.parent and not (self.parent.type & Flag.FAVORITES):
@@ -407,8 +407,9 @@ class Node(object):
             menuItems.append((color(colorItem, lang(39011)), cmd))
 
         ''' ADD AS NEW '''
-        cmd = containerUpdate(self.make_url(type=Flag.PLAYLIST, 
-                                            nm='create', 
+        cmd = containerUpdate(self.make_url(type=Flag.PLAYLIST,
+                                            nm='add_as_new', 
+                                            qnt=self.type,
                                             query=self.get_label()))
         menuItems.append((color(colorItem, lang(30080)), cmd))
 

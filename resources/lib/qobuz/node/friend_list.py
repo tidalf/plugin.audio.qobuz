@@ -14,26 +14,21 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
 import xbmcgui
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag as Flag
-from node import Node
+from inode import INode
 from friend import Node_friend
 from debug import info, warn
 from gui.util import color, getImage, runPlugin
 
 '''
-    NODE FRIEND
+    @class Node_friend_list:
 '''
-from track import Node_track
 
 
-class Node_friend_list(Node):
+class Node_friend_list(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_friend_list, self).__init__(parent, parameters)

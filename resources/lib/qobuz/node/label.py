@@ -20,18 +20,17 @@ import xbmcgui
 import xbmc
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
-from node import Node
-from debug import info, warn, error
-from gui.util import color, getImage
+from inode import INode
+from debug import log, warn
+from gui.util import getImage
 
 '''
-    NODE LABEL
+    @class Node_label:
 '''
 
 
-class Node_label(Node):
+class Node_label(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_label, self).__init__(parent, parameters)

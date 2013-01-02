@@ -14,27 +14,23 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
 import xbmcgui
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from product import Node_product
-from debug import warn, error, log
+from debug import warn, log
 from gui.util import lang
-from gui.util import color, getImage
+from gui.util import getImage
 
 '''
-    NODE PLAYLIST
+    @class Node_favorites:
 '''
 from track import Node_track
 
 
-class Node_favorites(Node):
+class Node_favorites(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_favorites, self).__init__(parent, parameters)

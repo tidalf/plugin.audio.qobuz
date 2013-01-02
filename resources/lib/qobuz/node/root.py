@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
 from search import Node_search
@@ -26,14 +26,13 @@ from genre import Node_genre
 from label import Node_label
 import qobuz
 
+
 '''
-    NODE ROOT
-
-    Sibling of root are playlist, recos, search, purchases...
+    @class Node_root:
 '''
 
 
-class Node_root(Node):
+class Node_root(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_root, self).__init__(parent, parameters)

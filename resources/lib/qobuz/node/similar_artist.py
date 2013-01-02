@@ -19,8 +19,7 @@
 import qobuz
 
 from flag import NodeFlag
-from node import Node
-from product_by_artist import Node_product_by_artist
+from inode import INode
 from artist import Node_artist
 from gui.util import lang
 
@@ -30,7 +29,7 @@ import pprint
 '''
 
 
-class Node_similar_artist(Node):
+class Node_similar_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_similar_artist, self).__init__(parent, parameters)

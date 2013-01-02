@@ -16,21 +16,16 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import qobuz
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from debug import error
 from gui.util import lang, getImage
-import new
-
-'''
-    NODE PURCHASES
-'''
 
 from product import Node_product
 
 """
     @class Node_purchase: 
 """
-class Node_purchases(Node):
+class Node_purchases(INode):
 
     def __init__(self, parent=None, params=None):
         super(Node_purchases, self).__init__(parent, params)

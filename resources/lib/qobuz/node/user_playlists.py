@@ -18,7 +18,7 @@ import xbmc
 
 import qobuz
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from debug import info, warn, error, debug
 from gui.util import color, lang, getImage, notifyH, containerRefresh
 
@@ -29,7 +29,7 @@ from gui.util import color, lang, getImage, notifyH, containerRefresh
 from playlist import Node_playlist
 
 
-class Node_user_playlists(Node):
+class Node_user_playlists(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_user_playlists, self).__init__(parent, parameters)
