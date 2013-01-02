@@ -123,21 +123,21 @@ class QobuzPlayer(xbmc.Player):
                 succeeded=True,
                 listitem=item)
 
-        '''
-            Waiting for song to start
-        '''
-        timeout = 10
-        debug(self, "Waiting song to start")
-        while timeout > 0:
-            if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
-                xbmc.sleep(250)
-                timeout -= 0.250
-            else:
-                break
-        if timeout <= 0:
-            warn(self, "Player can't play track: " + item.getLabel())
-            return False
-        return self.watch_playing(node, streaming_url)
+        #'''
+        #    Waiting for song to start
+        #'''
+        #timeout = 10
+        #debug(self, "Waiting song to start")
+        #while timeout > 0:
+        #    if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
+        #        xbmc.sleep(250)
+        #        timeout -= 0.250
+        #    else:
+        #        break
+        #if timeout <= 0:
+        #    warn(self, "Player can't play track: " + item.getLabel())
+        #    return False
+        #return self.watch_playing(node, streaming_url)
 
     def isPlayingAudio(self):
         try:
