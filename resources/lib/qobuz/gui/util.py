@@ -21,6 +21,8 @@ import xbmcplugin
 from debug import log, debug
 import qobuz
 
+from xbmcrpc import showNotification
+
 '''
     Keyboard
 '''
@@ -45,7 +47,8 @@ def notifyH(title, text, image=None, mstime=2000):
         image = getImage('icon-default-256')
     s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (
         title, text, mstime, image)
-    xbmc.executebuiltin(s.encode('utf-8', 'replace'))
+    showNotification(title, text, image, mstime)
+#    xbmc.executebuiltin(s.encode('utf-8', 'replace'))
 
 '''
     Notify
@@ -58,7 +61,6 @@ def notify(title, text, image=None, mstime=2000):
     s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (
         lang(title), lang(text), mstime, getImage)
     xbmc.executebuiltin(s.encode('utf-8', 'replace'))
-
 
 def dialogLoginFailure():
     import sys
