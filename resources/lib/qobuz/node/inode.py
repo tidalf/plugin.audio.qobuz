@@ -40,8 +40,8 @@ class INode(object):
         self.content_type = "files"
         self.image = None
         self.childs = []
-        self.label = ""
-        self.label2 = ""
+        self.label = ''
+        self.label2 = ''
         self.is_folder = True
         self._data = None
         self.pagination_next = None
@@ -221,7 +221,6 @@ class INode(object):
             qnt = ka['qnt']
         if qnt:
             url+= '&qnt=' + str(qnt)
-            print "URL: " + repr(url)
         if 'query' in ka:
             url+= '&query=' + ka['query']
       
@@ -318,12 +317,15 @@ class INode(object):
             params['offset'] = self.pagination_next_offset
             params['nid'] = self.id
             node = r.import_node(self.type, params)
-            node.data = self.data
+            label = self.get_label()
+            if self.label2: label = self.label2
+            #if self.parent: label = self.parent.label
             nextLabel = (
-                '[ %s  %s / %s ]') % (color(colorItem, self.label),
+                '[ %s  %s / %s ]') % (color(colorItem, label),
                                       self.pagination_next_offset,
                                       self.pagination_total)
             node.label = nextLabel
+            node.label2 = label
             self.add_child(node)
     
     # When returning False we are not displaying directory content

@@ -32,7 +32,7 @@ class Directory():
         self.percent = 0
         self.content_type = 'files'
         self.nodes = nodeList
-        print "Handle: " + repr(self.handle)
+        log(self, "Handle: " + repr(self.handle))
 
     def __del__(self):
         for node in self.nodes:
@@ -44,7 +44,6 @@ class Directory():
 
     def add_node(self, node):
         if self.AS_LIST:
-            print "Appending node..."
             self.nodes.append(node)
             return True
         return self._put_item(node)

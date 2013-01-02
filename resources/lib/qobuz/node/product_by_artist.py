@@ -51,9 +51,6 @@ class Node_product_by_artist(INode):
     def get_artist(self):
         return self.get_property('name')
 
-    def get_label2(self):
-        return self.get_slug()
-
     def get_slug(self):
         return self.get_property('slug')
 

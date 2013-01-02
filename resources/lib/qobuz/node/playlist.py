@@ -163,7 +163,7 @@ class Node_playlist(INode):
 
             url = self.make_url(type=Flag.PLAYLIST, nm='rename')
             menuItems.append((
-                color(colorItem, lang(39008)), runPlugin(url)))
+                color(colorItem, lang(39009)), runPlugin(url)))
 
         else:
             url = self.make_url(type=Flag.PLAYLIST, nm='subscribe')
@@ -241,17 +241,16 @@ class Node_playlist(INode):
             qobuz.registry.set(
                 name='user-current-playlist-id', value=nid, noRemote=True)
             qobuz.registry.delete(name='user-playlist', id=nid)
-            qobuz.registry.deleet(name='user-playlists')
+            qobuz.registry.delete_by_name('^user-playlists-.*\.dat$')
             return False
         strtracks=''
         for node in render.nodes:
-            pprint.pprint(node)
             strtracks+='%s,' % (str(node.id))
         ret = qobuz.api.playlist_addTracks(
             playlist_id=nid, track_ids=strtracks)
         if ret:
             qobuz.registry.delete(name='user-playlist', id=nid)
-            qobuz.registry.delete_by_name('^user.*\.dat$')
+            qobuz.registry.delete_by_name('^user-playlists.*\.dat$')
             qobuz.registry.set(
                 name='user-current-playlist-id', value=nid, noRemote=True)
             return True

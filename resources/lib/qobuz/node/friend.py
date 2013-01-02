@@ -38,7 +38,6 @@ class Node_friend(INode):
         self.name = ''
         self.set_name(self.get_parameter('name'))
         self.set_label(self.name)
-        self.label2 = self.label
         self.url = None
         self.is_folder = True
 

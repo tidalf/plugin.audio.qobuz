@@ -149,9 +149,6 @@ class Node_product(INode):
             label = self.get_title()
         return label
 
-    def get_label2(self):
-        return self.get_label()
-
     def get_genre(self):
         return self.get_property(('genre', 'name'))
 

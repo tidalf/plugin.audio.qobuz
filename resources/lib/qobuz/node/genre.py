@@ -36,7 +36,6 @@ class Node_genre(INode):
         if self.parent:
             self.label = self.parent.label + ' / ' + self.label
         self.id = None
-        self.label2 = self.label
         self.url = None
         self.is_folder = True
         self.image = getImage('album')

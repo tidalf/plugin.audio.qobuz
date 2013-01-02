@@ -116,7 +116,7 @@ class QobuzLocalStorage(object):
             refresh = 60 * 5
         else:
             refresh = self.options['refresh']
-        print "Refresh: " + repr(refresh)
+        log(self, "Refresh: " + repr(refresh))
         mandatory = ['name', 'id']
         for key in mandatory:
             if not key in ka:

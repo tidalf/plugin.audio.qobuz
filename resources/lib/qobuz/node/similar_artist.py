@@ -40,9 +40,6 @@ class Node_similar_artist(INode):
     def get_label(self):
         return lang(39000)
 
-    def get_label2(self):
-        return self.get_label()
-
     def pre_build_down(self, Dir, lvl, flag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist-similar', id=self.id,
