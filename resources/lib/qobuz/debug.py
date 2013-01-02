@@ -33,7 +33,7 @@ try:
     LOGERROR = xbmc.LOGERROR
     LOGSEVERE = xbmc.LOGSEVERE
     __debugging__ = False
-    if xbmcaddon.Addon(id = 'plugin.audio.qobuz').getSetting('debug') == 'true':
+    if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         __debugging__ = True
 
 except:
@@ -50,7 +50,7 @@ except:
 ###############################################################################
 # Logging helper functions
 ###############################################################################
-def log(obj, msg, lvl = LOGNOTICE):
+def log(obj, msg, lvl=LOGNOTICE):
     if not __debugging__:
         return
     name = None
