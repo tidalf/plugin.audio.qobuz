@@ -238,7 +238,8 @@ class Node_track(Node):
         label = self.get_label()
         isplayable = 'true'
 
-        # Disable free account checking here, purchased track are still playable even with free account, but we don't know yet.
+        # Disable free account checking here, purchased track are
+        # still playable even with free account, but we don't know yet.
         # if qobuz.gui.is_free_account():
         #    duration = 60
         # label = '[COLOR=FF555555]' + label + '[/COLOR]
@@ -290,7 +291,7 @@ class Node_track(Node):
     def attach_context_menu(self, item, menuItems=[]):
         colorItem = qobuz.addon.getSetting('color_item')
         if self.parent and self.parent.type & NodeFlag.PLAYLIST:
-            url = self.parent.make_url(mode=Mode.PLAYLIST_REMOVE_TRACK) + '&track-id=' + str(self.get_property('playlist_track_id'))
+            url = self.parent.make_url(mode=Mode.PLAYLIST_REMOVE_TRACK) + '&track-id='  + str(self.get_property('playlist_track_id'))
             menuItems.append((color(colorItem, lang(
                 30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
 

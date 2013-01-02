@@ -101,7 +101,10 @@ class Node_recommendation(Node):
             node = Node_recommendation()
             node.genre_type = self.genre_type
             node.genre_id = genre_id
-            node.set_label(self.label + ' / ' + color(colorItem, RECOS_TYPES[int(self.genre_type)]) + ' / ' + RECOS_GENRES[genre_id])
+            node.set_label(self.label + ' / '
+                           + color(colorItem,
+                                   RECOS_TYPES[int(self.genre_type)])
+                           + ' / ' + RECOS_GENRES[genre_id])
             self.add_child(node)
         return True
 
@@ -109,7 +112,12 @@ class Node_recommendation(Node):
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.registry.get(name='recommendation', id=self.myid(), type=RECOS_TYPE_IDS[int(self.genre_type)], genre_id=self.genre_id, limit=limit, offset=offset)
+        data = qobuz.registry.get(name='recommendation',
+                                  id=self.myid(),
+                                  type=RECOS_TYPE_IDS[int(self.genre_type)],
+                                  genre_id=self.genre_id,
+                                  limit=limit,
+                                  offset=offset)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False

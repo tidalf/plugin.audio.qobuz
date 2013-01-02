@@ -90,7 +90,9 @@ class Monitor(xbmc.Monitor):
         log(self, "Removing cached user data")
         try:
             if not qobuz.path.cache:
-                raise QobuzXbmcError(who=self, what='qobuz_core_setting_not_set', additional='setting')
+                raise QobuzXbmcError(who=self,
+                                     what='qobuz_core_setting_not_set',
+                                     additional='setting')
             fu = FileUtil()
             flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
             for fileName in flist:

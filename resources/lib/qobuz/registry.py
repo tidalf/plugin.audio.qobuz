@@ -106,7 +106,11 @@ class QobuzLocalStorage(object):
         refresh = None
         if 'refresh' in ka:
             refresh = ka['refresh']
-        elif ka['name'] in ['product', 'track', 'recommendation', 'genre-list', 'label-list']:
+        elif ka['name'] in ['product',
+                            'track',
+                            'recommendation',
+                            'genre-list',
+                            'label-list']:
             refresh = 60 * 60 * 24
         elif ka['name'] == 'user-stream-url':
             refresh = 60 * 5
@@ -191,7 +195,10 @@ class QobuzLocalStorage(object):
         elif name == 'user-playlists':
             response = self.api.playlist_getUserPlaylists(**ka)
         elif name == 'user-playlist':
-            response = self.api.playlist_get(playlist_id=id, extra='tracks', limit=ka['limit'], offset=ka['offset'])
+            response = self.api.playlist_get(playlist_id=id,
+                                             extra='tracks',
+                                             limit=ka['limit'],
+                                             offset=ka['offset'])
         elif name == 'user-favorites':
             response = self.api.favorite_getUserFavorites(**ka)
         elif name == 'track':
@@ -442,7 +449,8 @@ class QobuzRegistry():
 if __name__ == '__main__':
     pass
 #    try:
-#        QobuzXbmcError({'Who': 'TestException','What': 'test_exception','With': 'TestingException'})
+#        QobuzXbmcError({'Who': 'TestException',
+#                        'What': 'test_exception','With': 'TestingException'})
 #    except(QobuzXbmcError):
 #        pass
 #

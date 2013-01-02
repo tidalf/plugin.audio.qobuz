@@ -265,7 +265,8 @@ class QobuzBootstrap(object):
 #
 #        elif self.MODE == Mode.LIBRARY_SCAN:
 #            import urllib
-#            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '&action=scan")'
+#            s = 'UpdateLibrary("music", "' +
+#            urllib.unquote(self.params['url']) + '&action=scan")'
 #            xbmc.executebuiltin(s)
 #            return False
 #

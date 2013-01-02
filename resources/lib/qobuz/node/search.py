@@ -143,5 +143,7 @@ class Node_search(Node):
                 'Artists: ' + str(data['length']['artists']) + " / "
                 'Products: ' + str(
                     data['length']['products']) + " / "
-                'Songs: ' + str(data['length']['tracks']) + "\n", getImage('default'), 2000)
+                'Songs: ' + str(data['length']['tracks']) + "\n",
+                getImage('default'),
+                2000)
         return True

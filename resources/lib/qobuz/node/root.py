@@ -73,5 +73,7 @@ class Node_root(Node):
         if qobuz.registry.delete_by_name('^.*\.dat$'):
             notifyH('Qobuz cache (i8n)', 'All cached data removed')
         else:
-            notifyH('Qobuz cache (i8n)', 'Something went wrong while erasing cached data', getImage('icon-error-256'))
+            notifyH('Qobuz cache (i8n)',
+                    'Something went wrong while erasing cached data',
+                    getImage('icon-error-256'))
         return True

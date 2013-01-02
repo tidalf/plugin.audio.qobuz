@@ -128,7 +128,6 @@ class QobuzPlayer(xbmc.Player):
         timeout = 10
         debug(self, "Waiting song to start")
         while timeout > 0:
-            print "Playing: " + repr(self.isPlayingAudio()) + ' / ' + repr(self.getPlayingFile()) + ' / ' + streaming_url
             if not self.isPlayingAudio() or self.getPlayingFile() != streaming_url:
                 xbmc.sleep(250)
                 timeout -= 0.250
