@@ -71,6 +71,7 @@ class QobuzPlayer(xbmc.Player):
     def play(self, ID):
         node = Node_track()
         node.id = ID
+        xbmcgui.Window(10000).setProperty("NID",ID) 
         data = qobuz.registry.get(name='track', id=ID)['data']
         label = None
         item = None

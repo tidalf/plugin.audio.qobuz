@@ -19,6 +19,7 @@ import os
 import sys
 from time import time
 import xbmcaddon
+import xbmcgui
 import xbmc
 import cPickle as pickle
 
@@ -68,7 +69,8 @@ class MyPlayer(xbmc.Player):
 #            return False
 #        self.sendQobuzPlaybackEnded(
 #            self.track_id, (self.total - self.elapsed) / 10)
-        warn (self, "play back started from monitor !!!!!!")
+        id  = xbmcgui.Window(10000).getProperty("NID") 
+        warn (self, "play back started from monitor !!!!!!" + id )
         return True
         
 
