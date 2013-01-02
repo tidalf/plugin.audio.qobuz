@@ -211,11 +211,13 @@ class QobuzLocalStorage(object):
         elif name == 'recommendation':
             response = self.api.album_getFeatured(**ka)
         elif name == 'artist':
-            response = self.api.artist_get(artist_id=id, limit=ka['limit'])
+            response = self.api.artist_get(artist_id=id)
         elif name == 'genre-list':
             response = self.api.genre_list(parent_id=id, limit=ka['limit'])
         elif name == 'label-list':
             response = self.api.label_list(**ka)
+        elif name == 'artist-similar':
+            response = self.api.artist_getSimilarArtists(**ka)
         else:
             QobuzXbmcError(
                 who=self,

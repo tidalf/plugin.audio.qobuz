@@ -59,7 +59,8 @@ class Node_track(Node):
 #        return True
 
     def make_url(self, **ka):
-        ka['mode'] = Mode.PLAY
+        if not 'mode' in ka: 
+            ka['mode'] = Mode.PLAY 
         return super(Node_track, self).make_url(**ka)
 
     def get_label(self, sFormat="%a - %t"):

@@ -38,7 +38,7 @@ class __NodeFlag():
         self.FRIEND_LIST = 32768
         self.GENRE = 65536
         self.LABEL = 131072
-        self.PAGINATION = 262144
+        self.PRODUCTS = 262144
 
     def to_s(self, flag):
         if flag & self.TRACK:
@@ -73,6 +73,8 @@ class __NodeFlag():
             return "label"
         elif flag & self.NODE:
             return "node"
+        elif flag & self.PRODUCTS:
+            return "products"
         elif flag & self.DONTFETCHTRACK:
             return "dont_fetch_track"
         else:

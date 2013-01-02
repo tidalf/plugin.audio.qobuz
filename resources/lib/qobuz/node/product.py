@@ -59,14 +59,12 @@ class Node_product(Node):
             tracks = self._filter_tracks(data['data'][''])
         else:
             tracks = data
-        try:
-            for track in tracks['data']['tracks']['items']:
-                node = Node_track()
-                node.data = track
-                self.add_child(node)
-        except:
-            pass
+        for track in tracks['data']['tracks']['items']:
+            node = Node_track()
+            node.data = track
+            self.add_child(node)
         self.add_pagination(data['data'])
+        return len(tracks['data']['tracks']['items'])
 
     def _filter_tracks(self, tracks):
         ltracks = []

@@ -23,11 +23,13 @@ import qobuz
 from flag import NodeFlag
 from node import Node
 from track import Node_track
+from product import Node_product
 from debug import warn
-from gui.util import lang
+from gui.util import lang, color
+import weakref
 
 '''
-    NODE PLAYLIST
+    NODE Artist
 '''
 
 
@@ -35,34 +37,61 @@ class Node_artist(Node):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.NODE | NodeFlag.FAVORITES
-        self.set_label(lang(30079))
+        self.type = NodeFlag.NODE | NodeFlag.ARTIST
+        self.set_label(self.get_name())
         self.is_folder = True
-
-        self.name = lang(30079)
-        self.label = lang(30079)
-
+        self.slug = ''
         self.content_type = 'artist'
 
+    def hook_post_data(self):
+        self.name = self.get_property('name')
+        self.image = self.get_image()
+        self.slug = self.get_property('slug')
+        self.label = self.name
+        
     def _build_down(self, xbmc_directory, lvl, flag=None):
-        data = qobuz.registry.get(name='user-favorites')
-        if not data:
+        colorItem = qobuz.addon.getSetting('color_item')
+        print "Building down ARTIST"
+        offset = self.get_parameter('offset') or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.api.artist_get(
+            artist_id=self.id, limit=limit, offset=offset, extra='albums')
+        self.data = data
+        node_artist = Node_artist()
+        node_artist.data = self.data
+        node_artist.label = '[ %s ]' % (color(colorItem, node_artist.label))
+        self.add_child(node_artist)
+        if not self.data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
-        self.data = data
-        albumseen = {}
-        warn(self, pprint.pformat(data))
-        for track in data['data']['tracks']['items']:
-            node = Node_track()
-            node.data = track
+        if not 'albums' in data: return True
+        for pData in data['albums']['items']:
+            node = Node_product()
+            node.data = pData
             self.add_child(node)
+        warn(self, 'DATA ARTIST: ' + pprint.pformat(data))
 
-        for product in self.filter_products(data):
-            self.add_child(product)
         return True
 
         del self._data['tracks']
 
+    def get_artist_id(self):
+        return self.id
+    
+    def get_image(self):
+        image = self.get_property(('image', 'extralarge'))
+        if not image: image = self.get_property(('image', 'mega'))
+        if not image: image = self.get_property('picture')
+        if image: image.replace('34s', '126s')
+        if image: return image
+        return ''
+    
+    def get_title(self):
+        return self.get_name()
+    
+    def get_artist(self):
+        return self.get_name()
+    
     def get_name(self):
         name = self.get_property('name')
         return name
@@ -75,16 +104,22 @@ class Node_artist(Node):
 
     def make_XbmcListItem(self):
         image = self.get_image()
-        owner = self.get_owner()
         url = self.make_url()
-        item = xbmcgui.ListItem(self.label,
-                                owner,
+        name = self.get_label()
+        item = xbmcgui.ListItem(name,
+                                name,
                                 image,
                                 image,
                                 url)
+        item.setInfo('picture', {
+                               'title': self.get_property('slug')
+                    })
         if not item:
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
-        self.attach_context_menu(item)
+        menuItems = []
+        self.attach_context_menu(item, menuItems)
+        if len(menuItems) > 0:
+            item.addContextMenuItems(menuItems, replaceItems=False)
         return item
