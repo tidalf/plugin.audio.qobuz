@@ -31,6 +31,7 @@ class Directory():
         self.line3 = ''
         self.percent = 0
         self.content_type = 'files'
+        print "Handle: " + repr(self.handle)
 
     def __del__(self):
         for node in self.nodes:

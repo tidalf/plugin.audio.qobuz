@@ -14,7 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import os
+import os, sys
 import xbmc
 import xbmcgui
 import xbmcplugin
@@ -103,21 +103,14 @@ def lang(langId):
 
 
 def runPlugin(url):
-    cmd = 'XBMC.RunPlugin("%s")' % (url)
-    # debug('xbmcRunPlugin', "CMD: " + cmd)
-    return cmd
-
+    return 'XBMC.RunPlugin("%s")' % (url)
 
 def containerUpdate(url):
-    cmd = 'XBMC.ContainerUpdate("%s")' % (url)
-    # debug('xbmcContainerUpdate', "CMD: " + cmd)
-    return cmd
-
+    return ('Container.Update("%s")') % ( url)
 
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
     return dialog.yesno(heading, line1, line2, line3)
-
 
 def containerRefresh():
     xbmc.executebuiltin('Container.Refresh')

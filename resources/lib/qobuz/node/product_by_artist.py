@@ -63,6 +63,7 @@ class Node_product_by_artist(Node):
         Build Down
     '''
     def _build_down(self, xbmc_directory, lvl, flag=None, progress=None):
+        print "Build down product by artist"
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.api.artist_get(
