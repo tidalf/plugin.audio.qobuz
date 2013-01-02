@@ -211,7 +211,7 @@ class QobuzLocalStorage(object):
         elif name == 'recommendation':
             response = self.api.album_getFeatured(**ka)
         elif name == 'artist':
-            response = self.api.artist_get(artist_id=id)
+            response = self.api.artist_get(**ka)
         elif name == 'genre-list':
             response = self.api.genre_list(parent_id=id, limit=ka['limit'])
         elif name == 'label-list':

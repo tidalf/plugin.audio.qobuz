@@ -54,9 +54,9 @@ class Node_artist(Node):
         print "Building down ARTIST"
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.api.artist_get(
+        data = qobuz.registry.get(name='artist',id=self.id,
             artist_id=self.id, limit=limit, offset=offset, extra='albums')
-        self.data = data
+        self.data = data['data']
         node_artist = Node_artist()
         node_artist.data = self.data
         node_artist.label = '[ %s ]' % (color(colorItem, node_artist.label))
@@ -64,8 +64,8 @@ class Node_artist(Node):
         if not self.data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
-        if not 'albums' in data: return True
-        for pData in data['albums']['items']:
+        if not 'albums' in data['data']: return True
+        for pData in data['data']['albums']['items']:
             node = Node_product()
             node.data = pData
             self.add_child(node)
