@@ -25,7 +25,7 @@ from constants import Mode
 from flag import NodeFlag as Flag
 # from debug import error
 from exception import QobuzXbmcError
-from gui.util import color, lang, runPlugin, containerUpdate, containerRefresh
+from gui.util import color, lang, runPlugin, containerUpdate, containerRefresh, formatControlLabel
 '''
     NODE
 '''
@@ -366,19 +366,15 @@ class Node(object):
     '''
     def _build_down(self, xbmc_directory, lvl, flag):
         pass
-
+    
     def attach_context_menu(self, item, menuItems=[]):
         colorItem = qobuz.addon.getSetting('color_item')
-
-        ''' VIEW BIG DIR '''
-        cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
-        menuItems.append((color(colorItem, lang(39002)), cmd))
 
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
             artist_name = self.get_artist()
             urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id)
-            menuItems.append(('-= %s =-' % (artist_name), 
+            menuItems.append((formatControlLabel(artist_name), 
                               containerUpdate(urlArtist)))
 #            ''' ALL ALBUM '''
 #            url = self.make_url(type=Flag.ARTIST, 
@@ -393,8 +389,12 @@ class Node(object):
             cmd = containerUpdate(url)
             label = '%s' % (color(colorItem, lang(39004)))
             menuItems.append((label, cmd))
+        
+        menuItems.append((formatControlLabel('General'), containerUpdate('')))
 
-        menuItems.append(('[%s]' % ('Default (i8n)'), containerUpdate(''))) 
+        ''' VIEW BIG DIR '''
+        cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
+        menuItems.append((color(colorItem, lang(39002)), cmd))
       
         ''' ADD TO CURRENT PLAYLIST '''
         cmd = containerUpdate(self.make_url(type=Flag.PLAYLIST, 
@@ -414,7 +414,7 @@ class Node(object):
 
         ''' Show playlist '''
         if not (self.type & Flag.PLAYLIST):
-            cmd = runPlugin(self.make_url(type=Flag.USERPLAYLISTS))
+            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
             menuItems.append((color(colorItem, lang(39005)), cmd))
 
         if self.type & Flag.USERPLAYLISTS:
@@ -438,4 +438,4 @@ class Node(object):
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove"))
         menuItems.append((color(colorItem, lang(31009)), cmd))
 
-        menuItems.append(('[%s]' % ('System (i8n)'), containerUpdate(''))) 
+        menuItems.append((formatControlLabel('System (i8n)'), containerUpdate(''))) 

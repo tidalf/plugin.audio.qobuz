@@ -114,3 +114,10 @@ def yesno(heading, line1, line2='', line3=''):
 
 def containerRefresh():
     xbmc.executebuiltin('Container.Refresh')
+
+def formatControlLabel(label, sFormat=None, colorItem=None):
+    if not colorItem: 
+        colorItem = qobuz.addon.getSetting('item_section_color')
+    if not sFormat:
+        sFormat = qobuz.addon.getSetting('item_section_format')
+    return sFormat % (color(colorItem, label))

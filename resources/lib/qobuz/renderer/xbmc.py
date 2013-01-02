@@ -66,7 +66,7 @@ class Xbmc_renderer(IRenderer):
             log(self, "Executing method on node: " + repr(methodName))
             getattr(self.root, methodName)()
             return True
-        Dir = Directory(self.root, qobuz.boot.handle, False)
+        Dir = Directory(self.root, qobuz.boot.handle, self.AS_NODE, self.nodes)
 #        if not self.root.pre_build_down(Dir, self.depth, self.filter):
 #            return False
 #        if self.root.pagination_next:

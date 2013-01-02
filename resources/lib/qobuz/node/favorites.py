@@ -59,7 +59,7 @@ class Node_favorites(Node):
         return True
     
     def _build_down(self, xbmc_directory, lvl, flag=None):
-        for track in self.data['data']['tracks']['items']:
+        for track in self.data['tracks']['items']:
             node = None
             node = Node_track()
             node.data = track
@@ -76,7 +76,7 @@ class Node_favorites(Node):
         if not data:
             return list
         albumseen = {}
-        for track in data['data']['albums']['items']:
+        for track in data['albums']['items']:
             # warn(self, 'Track ' + track)
             json = track
             json[u'interpreter'] = track['artist']['name']

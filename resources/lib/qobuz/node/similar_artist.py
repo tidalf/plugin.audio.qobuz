@@ -36,29 +36,28 @@ class Node_similar_artist(Node):
         super(Node_similar_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.NODE | NodeFlag.SIMILAR_ARTIST
         self.content_type = 'artist'
+        self.offset = self.get_parameter('offset') or 0
 
-    '''
-        Getter
-    '''
     def get_label(self):
         return lang(39000)
 
     def get_label2(self):
         return self.get_label()
-    
-    '''
-        Build Down
-    '''
-    def _build_down(self, xbmc_directory, lvl, flag=None):
-        offset = self.get_parameter('offset') or 0
+
+    def pre_build_down(self, Dir, lvl, flag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist-similar', id=self.id,
-            artist_id=self.id, offset=offset, limit=limit)
+            artist_id=self.id, offset=self.offset, limit=limit)
         if not data:
-            return 0
-        for aData in data['data']['artists']['items']:
-            artist = Node_artist(self)
+            return False
+        pprint.pprint(data)
+        self.add_pagination(data['data'])
+        self.data = data['data']
+        return len(data['data']['artists']['items'])
+
+    def _build_down(self, xbmc_directory, lvl, flag=None):
+        for aData in self.data['artists']['items']:
+            artist = Node_artist(self, {'offset': 0, 'nid': self.id})
             artist.data = aData
             self.add_child(artist)
-        self.add_pagination(data)
-        return len(data['data']['artists']['items'])
+        return True

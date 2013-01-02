@@ -19,6 +19,7 @@ from flag import NodeFlag
 from node import Node
 from debug import error
 from gui.util import lang, getImage
+import new
 
 '''
     NODE PURCHASES
@@ -26,7 +27,9 @@ from gui.util import lang, getImage
 
 from product import Node_product
 
-
+"""
+    @class Node_purchase: 
+"""
 class Node_purchases(Node):
 
     def __init__(self, parent=None, params=None):

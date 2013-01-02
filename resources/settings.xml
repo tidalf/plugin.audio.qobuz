@@ -58,6 +58,8 @@
         <setting id="color_item" label="33102" type="text" default="FF59A9C5" />
         <setting id="color_item_caution" label="33103" type="text" default="FFFF0000" />
         <setting id="color_item_playlist" label="33104" type="text" default="FFFFFFFF" />
+        <setting id="item_section_color" label="item section color (i8n)" type="text" default="FF59A0FF" />
+        <setting id="item_section_format" label="item section format (i8n)" type="text" default=".o[ %s ]o." />
         
    </category>       
    <!-- Other -->

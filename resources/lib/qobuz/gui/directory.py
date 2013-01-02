@@ -14,11 +14,11 @@ from exception import QobuzXbmcError
 
 class Directory():
 
-    def __init__(self, root, handle, ALL_AT_ONCE=False):
+    def __init__(self, root, handle, AS_NODE=False, nodeList = []):
         self.nodes = []
         self.label = "Qobuz / "
         self.root = root
-        self.ALL_AT_ONCE = ALL_AT_ONCE
+        self.AS_NODES = AS_NODE
         self.handle = handle
         self.put_item_ok = True
         self.Progress = Progress(True)
@@ -31,6 +31,7 @@ class Directory():
         self.line3 = ''
         self.percent = 0
         self.content_type = 'files'
+        self.nodes = nodeList
         print "Handle: " + repr(self.handle)
 
     def __del__(self):
@@ -42,9 +43,10 @@ class Directory():
         return time.time() - self.started_on
 
     def add_node(self, node):
-        if not self.ALL_AT_ONCE:
+        if not self.AS_NODES:
             return self._put_item(node)
-        # self.nodes.append(node)
+        print "Appending node..."
+        self.nodes.append(node)
         return True
 
     def update(self, count, total, line1, line2='', line3=''):

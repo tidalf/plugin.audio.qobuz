@@ -24,7 +24,7 @@ from node import Node
 from product import Node_product
 from debug import info, warn
 from exception import QobuzXbmcError
-from gui.util import notifyH, notify, color, lang, getImage, runPlugin, containerRefresh
+from gui.util import notifyH, notify, color, lang, getImage, runPlugin, containerRefresh, containerUpdate
 
 import pprint
 
@@ -154,27 +154,28 @@ class Node_playlist(Node):
         colorItem = qobuz.addon.getSetting('color_item')
         colorWarn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
-
+        
+        menuItems.append( ('.o[ %s ]o.' % (self.get_name()), containerUpdate('')) )
         if isOwner:
             url = self.make_url(type=Flag.PLAYLIST, nm='set_as_current')
             menuItems.append((
-                color(colorItem, lang(39007) + ': ') + label, runPlugin(url)))
+                color(colorItem, lang(39007)), runPlugin(url)))
 
             url = self.make_url(type=Flag.PLAYLIST, nm='rename')
             menuItems.append((
-                color(colorItem, lang(39009) + ': ') + label, runPlugin(url)))
+                color(colorItem, lang(39008)), runPlugin(url)))
 
         else:
             url = self.make_url(type=Flag.PLAYLIST, nm='subscribe')
             menuItems.append((
-                color(colorItem, lang(39012) + ': ') + label, runPlugin(url)))
+                color(colorItem, lang(39012)), runPlugin(url)))
 
         url = self.make_url(type=Flag.PLAYLIST, nm='create')
         menuItems.append((color(colorItem, lang(39008)), runPlugin(url)))
 
         url = self.make_url(type=Flag.PLAYLIST, nm='remove')
         menuItems.append(
-            (color(colorWarn, lang(39010) + ': ') + label, runPlugin(url)))
+            (color(colorWarn, lang(39010)), runPlugin(url)))
 
         ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menuItems)
@@ -254,51 +255,30 @@ class Node_playlist(Node):
             return True
 
     def add_as_new(self):
+        import sys
         from gui.directory import Directory
-        from user_playlists import Node_user_playlists
         from renderer.xbmc import Xbmc_renderer as renderer
-        nt = None
-        try:
-            nt = int(self.get_parameter('nt'))
-        except:
-            warn(self, "No node type...abort")
-            return False
-        ID = None
-        try:
-            ID = self.get_parameter('nid')
-        except:
-            pass
-        depth = -1
-        try:
-            depth = int(self.get_parameter('depth'))
-        except:
-            pass
-        view_filter = 0
-        try:
-            view_filter = int(self.get_parameter('view-filter'))
-        except:
-            pass
-        render = renderer(nt, ID)
-        render.set_depth(depth)
-        render.set_filter(view_filter)
-        render.set_root_node()
-        Dir = Directory(render.root, qobuz.boot.handle, True)
-        flags = Flag.TRACK | Flag.DONTFETCHTRACK
-        if render.root.type & Flag.TRACK:
-            flags = Flag.TRACK
-        ret = render.root.build_down(Dir, depth, flags)
-        if not ret:
-            Dir.end_of_directory()
-            warn(self, "Nothing to add as new playlist")
-            return False
+        render = renderer(self.type, self.id)
+        render.depth = -1
+        render.filter = Flag.TRACK | Flag.DONTFETCHTRACK
+        render.ALL_AT_ONCE = True
+        render.display()
+#        Dir = Directory(render.root, sys.argv[1], True)
+#        flags = Flag.TRACK | Flag.DONTFETCHTRACK
+#        if render.root.type & Flag.TRACK:
+#            flags = Flag.TRACK
+#        ret = render.root.build_down(Dir, -1, flags)
+#        if not ret:
+#            Dir.end_of_directory()
+#            warn(self, "Nothing to add as new playlist")
+#            return False
         info(self, "CREATE PLAYLIST: " + repr(render.root.get_label()))
-        userplaylists = Node_user_playlists()
-        nid = userplaylists.create_playlist(render.root.get_label())
+        playlist = Node_playlist(self, {'query': render.root.get_label()})
+        nid = playlist.create()
         if not nid:
             warn(self, "Cannot create playlist...")
             Dir.end_of_directory()
             return False
-        trackids = []
         if len(Dir.nodes) < 1:
             warn(self, "No track to add to current playlist")
             Dir.end_of_directory()
@@ -307,9 +287,10 @@ class Node_playlist(Node):
             qobuz.registry.delete(name='user-playlist', id=nid)
             qobuz.registry.deleet(name='user-playlists')
             return False
-        for node in Dir.nodes:
-            trackids.append(str(node.id))
-        strtracks = ','.join(trackids)
+        strtracks=''
+        for node in render.nodes:
+            pprint.pprint(node)
+            strtracks+='%s,' % (str(node.id))
         ret = qobuz.api.playlist_addTracks(
             playlist_id=nid, track_ids=strtracks)
         if ret:

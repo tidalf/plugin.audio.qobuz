@@ -28,15 +28,12 @@ class IRenderer(object):
         self.root = None
         self.filter = NodeFlag.NODE
         self.depth = 1
+        self.AS_NODE = False
+        self.nodes = []
 
     def to_s(self):
         return pprint.pformat(self)
 
-    def set_depth(self, d):
-        self.depth = d
-
-    def set_filter(self, filter):
-        self.filter = filter
 
     def import_node(self, nt, params):
         nodeName = NodeFlag.to_s(nt)

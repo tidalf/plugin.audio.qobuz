@@ -204,84 +204,21 @@ class QobuzBootstrap(object):
         ''' UGLY MODE DISPATCH '''
         if self.MODE == Mode.VIEW:
             r = renderer(self.NT, self.NID)
-            r.set_depth(1)
-            r.set_filter(Flag.NODE | Flag.DONTFETCHTRACK)
+            r.depth = 1
+            r.filter = Flag.NODE | Flag.DONTFETCHTRACK
             return r.display()
 
         elif self.MODE == Mode.VIEW_BIG_DIR:
             r = renderer(self.NT, self.NID)
-            r.set_depth(-1)
-            r.set_filter(Flag.TRACK | Flag.DONTFETCHTRACK)
+            r.depth = -1
+            r.filter = Flag.TRACK | Flag.DONTFETCHTRACK
             return r.display()
 
         elif self.MODE == Mode.SCAN:
             r = renderer(self.NT, self.NID)
-            r.set_depth(-1)
-            r.set_filter(Flag.DONTFETCHTRACK)
+            r.depth = -1
+            r.filter = Flag.DONTFETCHTRACK
             return r.scan()
-
-#        elif self.MODE == Mode.PLAYLIST_SUBSCRIBE:
-#            from  node.user_playlists import Node_user_playlists
-#            node = Node_user_playlists()
-#            if node.subscribe_playlist(self.params['nid']):
-#                return False
-#            # xbmc.executebuiltin('Container.Refresh')
-#            return True
-#
-#
-#        elif self.MODE == Mode.PLAYLIST_ADD_TO_CURRENT:
-#            from  node.playlist import Node_playlist
-#            node = Node_playlist(None, self.params)
-#            if not node.add_to_current_playlist():
-#                return False
-#            return True
-#
-#        elif self.MODE == Mode.FAVORITES_ADD_TO_CURRENT:
-#            from  node.favorites import Node_favorites
-#            node = Node_favorites(None, self.params)
-#            if not node.add():
-#                return False
-#            return True
-#
-#        elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
-#            from  node.playlist import Node_playlist
-#            node = Node_playlist(None, self.params)
-#            if not node.add_as_new_playlist():
-#                return False
-#                qobuz.registry.delete_as_name('^user-playlists.*')
-#                xbmc.executebuiltin('Container.Refresh')
-#            return False
-#
-#
-#        elif self.MODE == Mode.PLAYLIST_REMOVE_TRACK:
-#            from node.playlist import Node_playlist
-#            node = Node_playlist(None, self.params)
-#            node.id = self.NID
-#            node.data = qobuz.registry.get(name='user-playlist',id=self.NID)
-#            if not node.remove_tracks(self.params['track-id']):
-#                return False
-#            xbmc.executebuiltin('Container.Refresh')
-#            return True
-#
-#        elif self.MODE == Mode.LIBRARY_SCAN:
-#            import urllib
-#            s = 'UpdateLibrary("music", "' +
-#            urllib.unquote(self.params['url']) + '&action=scan")'
-#            xbmc.executebuiltin(s)
-#            return False
-#
-#
-#        elif self.MODE == Mode.FAVORITE_DELETE:
-#            from node.favorites import Node_favorites
-#            node = Node_favorites(self, self.params)
-#            if not node.remove():
-#                notifyH('Qobuz Xbmc (i8n)', 'Cannot remove favorite')
-#                return False
-#            xbmc.executebuiltin('Container.Refresh')
-#            return True
-#
-#        elif self.MODE == Mode.TEST:
-#            import xbmcgui
 
         else:
             raise QobuzXbmcError(
