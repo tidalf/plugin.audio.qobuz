@@ -35,7 +35,7 @@ class Node_user_playlists(Node):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
         self.image = getImage('userplaylists')
-        self.label2 = 'Keep your current playlist'
+        self.label2 = self.label
         self.type = NodeFlag.NODE | NodeFlag.USERPLAYLISTS
         self.content_type = 'files'
         display_by = self.get_parameter('display-by')
@@ -48,6 +48,7 @@ class Node_user_playlists(Node):
         else:
             display_cover = False
         self.display_product_cover = display_cover
+        self.offset = self.get_parameter('offset') or 0
 
     def set_display_by(self, type):
         vtype = ('product', 'songs')
@@ -58,23 +59,28 @@ class Node_user_playlists(Node):
     def get_display_by(self):
         return self.display_by
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
-        login = qobuz.addon.getSetting('username')
-        offset = self.get_parameter('offset') or 0
+    def pre_build_down(self, Dir, lvl, flag):
         limit = qobuz.addon.getSetting('pagination_limit')
         debug(self, "Build-down: user playlists")
         data = qobuz.registry.get(
-            name='user-playlists', limit=limit, offset=offset)
+            name='user-playlists', limit=limit, offset=self.offset)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
+        self.data = data
+        self.add_pagination(data['data'])
+        return True
+    
+    def _build_down(self, xbmc_directory, lvl, flag=None):
+        login = qobuz.addon.getSetting('username')
         cid = qobuz.registry.get(
             name='user-current-playlist-id', noRemote=True)
         if cid:
             cid = int(cid['data'])
-        for playlist in data['data']['playlists']['items']:
-            node = Node_playlist()
+        for playlist in self.data['data']['playlists']['items']:
+            node = Node_playlist(self, {'offset': 0})
             node.data = playlist
+            print "OFFFFFFFFFFFFFFFFSET: " + repr(node.offset)
             if self.display_product_cover:
                 pass
             if (cid and cid == node.id):
@@ -82,5 +88,4 @@ class Node_user_playlists(Node):
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
             self.add_child(node)
-        self.add_pagination(data['data'])
         return True

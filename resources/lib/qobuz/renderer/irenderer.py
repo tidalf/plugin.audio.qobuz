@@ -38,10 +38,8 @@ class IRenderer(object):
     def set_filter(self, filter):
         self.filter = filter
 
-    def set_root_node(self):
-        import sys
-        root = None
-        nodeName = NodeFlag.to_s(self.node_type)
+    def import_node(self, nt, params):
+        nodeName = NodeFlag.to_s(nt)
         modulePath = 'node.' + nodeName
         moduleName = 'Node_' + nodeName
         try:
@@ -52,14 +50,18 @@ class IRenderer(object):
                      'modulePath': modulePath,
                      'moduleName': moduleName,
                      'nodeName': nodeName,
-                     'nodeType': self.node_type,
+                     'nodeType': nt,
                      'error': e
             }
             raise QobuzXbmcError(who=self, 
                                  what="module_loading_error", 
                                  additional=pprint.pformat(error))
         node = getattr(Module, moduleName)
-        root = node(None, qobuz.boot.params)
+        root = node(None, params)
+        return root
+    
+    def set_root_node(self):
+        root = self.import_node(self.node_type, qobuz.boot.params)
         root.id = self.node_id
         self.root = root
         return True

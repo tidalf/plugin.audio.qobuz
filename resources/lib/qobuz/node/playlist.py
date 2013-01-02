@@ -26,6 +26,8 @@ from debug import info, warn
 from exception import QobuzXbmcError
 from gui.util import notifyH, notify, color, lang, getImage, runPlugin, containerRefresh
 
+import pprint
+
 '''
     NODE PLAYLIST
 '''
@@ -49,6 +51,8 @@ class Node_playlist(Node):
             self.content_type = 'albums'
         else:
             self.content_type = 'songs'
+        self.offset = self.get_parameter('offset') or 0
+        self.image = getImage('song')
 
     def get_label(self):
         return self.get_name()
@@ -62,18 +66,27 @@ class Node_playlist(Node):
     def is_current(self):
         return self.b_is_current
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
-        offset = self.get_parameter('offset') or 0
+    def hook_post_data(self):
+        self.id = self.get_property('id')
+        self.label = self.get_name()
+        
+    def pre_build_down(self, Dir, lvl, flag):
         limit = qobuz.addon.getSetting('pagination_limit')
-        nid = self.id or self.get_parameter('nid')
         info(self, "Build-down playlist")
         data = qobuz.registry.get(
-            name='user-playlist', id=nid, offset=offset, limit=limit)
+            name='user-playlist', id=self.id, playlist_id=self.id, offset=self.offset, limit=limit, extra='tracks')
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
+        self.add_pagination(data['data'])
+        self.data = data['data']
+        pprint.pprint(data['data'])
+        return True
+    
+    def _build_down(self, xbmc_directory, lvl, flag=None):
         albumseen = {}
-        for jtrack in data['data']['tracks']['items']:
+        data = self.data
+        for jtrack in data['tracks']['items']:
             node = None
             if self.packby == 'album':
                 jalbum = jtrack['album']
@@ -85,21 +98,20 @@ class Node_playlist(Node):
                         jalbum[k] = jtrack[k]
                 if 'image' in jtrack:
                     jalbum['image'] = jtrack['image']
-                node = Node_product()
+                node = Node_product(self, {'offset': 0})
                 cdata = qobuz.registry.get(
                     name='product', id=jalbum['id'], noRemote=True)
                 node.data = cdata or jalbum
                 albumseen[jalbum['id']] = node
             else:
                 node = Node_track()
+                print "TRACK DATA" + pprint.pformat(jtrack)
                 node.data = jtrack
             self.add_child(node)
-        self.add_pagination(data['data'])
-
+        
     def get_name(self):
-        name = self.get_property('name')
-        return name
-
+        return self.get_property('name')
+    
     def get_owner(self):
         return self.get_property(('owner', 'name'))
 
@@ -184,7 +196,7 @@ class Node_playlist(Node):
         xbmc.executebuiltin('Container.Refresh')
         return True
 
-    def add_to_current_playlist(self):
+    def add_to_current(self):
             from gui.directory import Directory
             from renderer.xbmc import Xbmc_renderer as renderer
             cid = qobuz.registry.get(
@@ -243,7 +255,7 @@ class Node_playlist(Node):
             Dir.end_of_directory()
             return True
 
-    def add_as_new_playlist(self):
+    def add_as_new(self):
         from gui.directory import Directory
         from user_playlists import Node_user_playlists
         from renderer.xbmc import Xbmc_renderer as renderer

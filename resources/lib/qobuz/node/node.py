@@ -47,6 +47,7 @@ class Node(object):
         self._data = None
         self.pagination_next = None
         self.pagination_prev = None
+        self.offset = None
 
     ''' Id '''
     @property
@@ -206,13 +207,15 @@ class Node(object):
             ka['id'] = self.id
         url = sys.argv[0] + '?mode=' + str(ka['mode']) + '&nt=' + \
             str(ka['type'])
+        offset = self.offset
+        if 'offset' in ka: offset = ka['offset']
+        if offset != None:
+            url += '&offset=' + str(offset)
         if 'id' in ka:
             url += "&nid=" + str(ka['id'])
         action = self.get_parameter('action')
         if action:
             url += "&action=" + action
-        if 'offset' in ka:
-            url += "&offset=" + str(ka['offset'])
         if 'nm' in ka:
             url += '&nm=' + ka['nm']
         if 'query' in ka:
@@ -300,36 +303,61 @@ class Node(object):
             return False
         return True
 
+    def _add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
+        limit = qobuz.addon.getSetting('pagination_limit')
+        from renderer.irenderer import IRenderer
+        r = IRenderer(self.type, self.id)
+        if self.pagination_next:
+            colorItem = qobuz.addon.getSetting('color_item')
+            params = qobuz.boot.params
+            params['offset'] = self.pagination_next_offset
+            params['nid'] = self.id
+            node = r.import_node(self.type, params)
+            node.data = self.data
+            nextLabel = (
+                '[ %s  %s / %s ]') % (color(colorItem, self.label),
+                                      self.pagination_next_offset,
+                                      self.pagination_total)
+            node.label = nextLabel
+            print "NextLabel: " + repr(node.label2)
+            print "NEXT URL: " + node.make_url()
+            self.add_child(node)
+    
     # When returning False we are not displaying directory content
-    def pre_build_down(self):
+    def pre_build_down(self, xbmc_directory, lvl=1, whiteFlag=Flag.NODE):
         return True
+    
+    
     '''
         build_down:
         This method fetch data from cache recursively and build our tree
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self, xbmc_directory, lvl=1, whiteFlag=Flag.NODE):
+    def build_down(self, Dir, lvl=1, whiteFlag=Flag.NODE):
         if lvl != -1 and lvl < 1:
             return False
-        self._build_down(xbmc_directory, lvl, whiteFlag)
+        if not self.pre_build_down(Dir, lvl, whiteFlag):
+            return False
+        self._build_down(Dir, lvl, whiteFlag)
+        self._add_pagination_node(Dir, lvl, whiteFlag)
         if lvl != -1:
             lvl -= 1
-        if xbmc_directory.is_canceled():
+        if Dir.is_canceled():
             return False
         total = len(self.childs)
         count = 0
         label = self.get_label()
-        xbmc_directory.update(0, total, 'Working', label, '')
+        Dir.update(0, total, 'Working', label, '')
         for child in self.childs:
-            if xbmc_directory.is_canceled():
+            if Dir.is_canceled():
                 break
             if not (child.type & Flag.TRACK):
-                xbmc_directory.update(
+                Dir.update(
                     count, total, "Working", label, child.get_label())
             if child.type & whiteFlag:
-                xbmc_directory.add_node(child)
-            child.build_down(xbmc_directory, lvl, whiteFlag)
+                Dir.add_node(child)
+            child.build_down(Dir, lvl, whiteFlag)
             count += 1
         return True
 
@@ -353,7 +381,7 @@ class Node(object):
             artist_id = self.get_artist_id()
             artist_name = self.get_artist()
             urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id)
-            menuItems.append(('[ %s ]' % (artist_name), 
+            menuItems.append(('-= %s =-' % (artist_name), 
                               containerUpdate(urlArtist)))
 #            ''' ALL ALBUM '''
 #            url = self.make_url(type=Flag.ARTIST, 

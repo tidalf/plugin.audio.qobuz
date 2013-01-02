@@ -21,7 +21,7 @@ from constants import Mode
 from flag import NodeFlag
 from node import Node
 from debug import error, warn
-from gui.util import color, lang
+from gui.util import color, lang, getImage
 
 '''
     NODE TRACK
@@ -37,6 +37,7 @@ class Node_track(Node):
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
         self.status = None
+        self.image = getImage('song')
 
     def _build_down(self, xbmc_directory, lvl, flag=None):
         if flag & NodeFlag.DONTFETCHTRACK:
@@ -66,10 +67,7 @@ class Node_track(Node):
     def get_label(self, sFormat="%a - %t"):
         sFormat = sFormat.replace("%a", self.get_artist())
         sFormat = sFormat.replace("%t", self.get_title())
-        try:
-            sFormat = sFormat.replace("%A", self.get_album())
-        except:
-            pass
+        sFormat = sFormat.replace("%A", self.get_album())
         sFormat = sFormat.replace("%n", str(self.get_track_number()))
         sFormat = sFormat.replace("%g", self.get_genre())
         return sFormat
@@ -107,9 +105,10 @@ class Node_track(Node):
         if image:
             return image.replace('_230.', '_600.')
         if not self.parent:
-            return ''
+            return self.image
         if self.parent.get_type() & (NodeFlag.PRODUCT | NodeFlag.PLAYLIST):
             return self.parent.get_image()
+        
 
     def get_playlist_track_id(self):
         return self.get_property(('playlist_track_id'))
@@ -142,10 +141,25 @@ class Node_track(Node):
         return data['data']['url']
 
     def get_artist(self):
-        s = self.get_interpreter()
+        s = self.get_property(('artist', 'name'))
         if s:
             return s
-        return self.get_composer()
+        s = self.get_property(('composer', 'name'))
+        if s:
+            return s
+        s = self.get_property(('performer', 'name'))
+        if s:
+            return s
+        s = self.get_property(('interpreter', 'name'))
+        if s:
+            return s
+        s = self.get_property(('composer', 'name'))
+        if s:
+            return s
+        s = self.get_property(('album', 'artist', 'name'))
+        if s:
+            return s
+        return ''
 
     def get_artist_id(self):
         s = self.get_property(('artist', 'id'))
@@ -228,7 +242,7 @@ class Node_track(Node):
             warn(self, "Unknow format " + str(formatId))
             mime = 'audio/mpeg'
         return mime
-
+        
     def make_XbmcListItem(self):
         media_number = self.get_media_number()
         if not media_number:

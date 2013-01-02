@@ -18,7 +18,7 @@
 import xbmcgui
 
 import qobuz
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from node import Node
 from product import Node_product
 from debug import warn
@@ -64,11 +64,12 @@ class Node_recommendation(Node):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
-        self.type = NodeFlag.NODE | NodeFlag.RECOMMENDATION
+        self.type = Flag.NODE | Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(lang(30082))
         self.image = getImage('album')
+        self.offset = self.get_parameter('offset') or 0
 
     def make_url(self, **ka):
         url = super(Node_recommendation, self).make_url(**ka)
@@ -83,6 +84,24 @@ class Node_recommendation(Node):
             return None
         return str(self.genre_type) + '-' + str(self.genre_id)
 
+    def pre_build_down(self, xbmc_directory, lvl=1, whiteFlag=Flag.NODE):
+        if not (self.genre_type and self.genre_id):
+            return True
+        offset = self.offset or 0
+        limit = qobuz.addon.getSetting('pagination_limit')
+        data = qobuz.registry.get(name='recommendation',
+                                  id=self.myid(),
+                                  type=RECOS_TYPE_IDS[int(self.genre_type)],
+                                  genre_id=self.genre_id,
+                                  limit=limit,
+                                  offset=offset)
+        if not data:
+            warn(self, "Cannot fetch data for recommendation")
+            return False
+        self.add_pagination(data['data'])
+        self.data = data['data']
+        return True
+    
 # TYPE
     def _build_recos_type(self, xbmc_directory, lvl, flag):
         colorItem = qobuz.addon.getSetting('color_item')
@@ -110,22 +129,12 @@ class Node_recommendation(Node):
 
 # TYPE GENRE
     def _build_down_type_genre(self, xbmc_directory, lvl, flag):
-        offset = self.get_parameter('offset') or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.registry.get(name='recommendation',
-                                  id=self.myid(),
-                                  type=RECOS_TYPE_IDS[int(self.genre_type)],
-                                  genre_id=self.genre_id,
-                                  limit=limit,
-                                  offset=offset)
-        if not data:
-            warn(self, "Cannot fetch data for recommendation")
+        if not self.data:
             return False
-        for product in data['data']['albums']['items']:
+        for product in self.data['albums']['items']:
             node = Node_product()
             node.data = product
             self.add_child(node)
-        self.add_pagination(data['data'])
         return True
 
 # DISPATCH

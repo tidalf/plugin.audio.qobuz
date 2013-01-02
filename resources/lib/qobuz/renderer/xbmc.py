@@ -66,21 +66,33 @@ class Xbmc_renderer(IRenderer):
             log(self, "Executing method on node: " + repr(methodName))
             getattr(self.root, methodName)()
             return True
-        if not self.root.pre_build_down():
-            return False
         Dir = Directory(self.root, qobuz.boot.handle, False)
+#        if not self.root.pre_build_down(Dir, self.depth, self.filter):
+#            return False
+#        if self.root.pagination_next:
+#            colorItem = qobuz.addon.getSetting('color_item')
+#            nextLabel = (
+#                '[ %s  %s / %s ]') % (color(colorItem, self.root.get_label()),
+#                                      self.root.pagination_next_offset,
+#                                      self.root.pagination_total)
+#            node = self.import_node(self.root.type)
+#            node.set_parameter('offset', self.root.pagination_next_offset)
+#            node.label = nextLabel
+#            print "NEXT URL: " + node.make_url()
+#            self.root.add_child(node)
         self.root.build_down(Dir, self.depth, self.filter)
-        if self.root.pagination_next:
-            colorItem = qobuz.addon.getSetting('color_item')
-            nextString = (
-                '[ %s  %s / %s ]') % (color(colorItem, self.root.get_label()),
-                                      self.root.pagination_next_offset,
-                                      self.root.pagination_total)
-            print "NextString set: " + nextString
-            self.add_directory_item(dir=Dir,
-                                    label=nextString,
-                                    url=self.root.pagination_next,
-                                    image=getImage('next'))
+        
+#        if self.root.pagination_next:
+#            colorItem = qobuz.addon.getSetting('color_item')
+#            nextString = (
+#                '[ %s  %s / %s ]') % (color(colorItem, self.root.get_label()),
+#                                      self.root.pagination_next_offset,
+#                                      self.root.pagination_total)
+#            print "NextString set: " + nextString
+#            self.add_directory_item(dir=Dir,
+#                                    label=nextString,
+#                                    url=self.root.pagination_next,
+#                                    image=getImage('next'))
         Dir.set_content(self.root.content_type)
         methods = [
             xbmcplugin.SORT_METHOD_UNSORTED,

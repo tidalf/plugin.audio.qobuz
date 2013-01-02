@@ -40,10 +40,9 @@ class Node_product(Node):
         self.image = getImage('album')
         self.content_type = 'albums'
         self.is_special_purchase = False
+        self.offset = None
 
     def _build_down(self, xbmc_directory, lvl, flag=None):
-        offset = self.get_parameter('offset') or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
         nid = self.id
         data = None
         if self.is_special_purchase:

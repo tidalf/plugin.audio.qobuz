@@ -195,10 +195,7 @@ class QobuzLocalStorage(object):
         elif name == 'user-playlists':
             response = self.api.playlist_getUserPlaylists(**ka)
         elif name == 'user-playlist':
-            response = self.api.playlist_get(playlist_id=id,
-                                             extra='tracks',
-                                             limit=ka['limit'],
-                                             offset=ka['offset'])
+            response = self.api.playlist_get(**ka)
         elif name == 'user-favorites':
             response = self.api.favorite_getUserFavorites(**ka)
         elif name == 'track':
