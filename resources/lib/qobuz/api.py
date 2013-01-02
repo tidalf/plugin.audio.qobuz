@@ -61,7 +61,7 @@ class QobuzApi:
                 raise QobuzXbmcError(who=self,
                                      what='invalid_parameter',
                                      additional=label)
-    
+
     def set_logged(self, *args, **data):
         self.authtoken = data['data']['user_auth_token']
         self.user_id = data['data']['user']['id']
@@ -70,11 +70,15 @@ class QobuzApi:
     def __set_s4(self):
         import binascii
         from itertools import izip, cycle
-        # appid and associated secret is for this app usage only 
-        # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
+        # appid and associated secret is for this app usage only
+        # Any use of the API implies your full acceptance of the
+        # General Terms and Conditions
+        # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         s3b = "Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8="
         s3s = binascii.a2b_base64(s3b)
-        self.s4 = ''.join(chr(ord(x) ^ ord(y)) for (x, y) in izip(s3s, cycle(self.appid)))
+        self.s4 = ''.join(chr(ord(x) ^ ord(y))
+                          for (x, y) in izip(s3s,
+                                             cycle(self.appid)))
 
     def _api_request(self, params, uri, **opt):
         self.last_error = None
@@ -82,7 +86,7 @@ class QobuzApi:
         url = self.baseUrl + uri
         log(self, "Request URL: " + url + ',' + pprint.pformat(params))
         useToken = False if (opt and 'noToken' in opt) else True
-        
+
         # Setting header
         qheaders = {}
         if useToken and self.authtoken:
@@ -103,11 +107,12 @@ class QobuzApi:
         if not r.content:
             warn(self, "No content return")
             return None
-        try:  # try to get if connexion fail we try a second time 
+        # retry get if connexion fail
+        try:
             response_json = r.json()
         except:
             warn(self, "Json loads failed to load... retrying!")
-            try:  # please !
+            try:
                 response_json = r.json()
             except:
                 self.last_error = "Cannot load: " + url
@@ -117,27 +122,33 @@ class QobuzApi:
         error = None
         try:
             error = response_json['status']
-        except: pass
+        except:
+            pass
         if error == 'error':
             warn(self, ('Something went wrong with request: %s\n%s\n%s')
-                 % (url, pprint.pformat(params), pprint.pformat(response_json)))
+                 % (url, pprint.pformat(params),
+                    pprint.pformat(response_json)))
 
             '''
             When something wrong we are deleting our auth token
                 '''
             return None
         return response_json
-        
+
     '''
     User
     '''
     def user_login(self, **ka):
         self._check_ka(ka, ['username', 'password'], ['email'])
         data = self._api_request(ka, '/user/login', noToken=True)
-        if not data: return None
-        if not 'user' in data: return None
-        if not 'id' in data['user']: return None
-        if not data['user']['id']: return None
+        if not data:
+            return None
+        if not 'user' in data:
+            return None
+        if not 'id' in data['user']:
+            return None
+        if not data['user']['id']:
+            return None
         # data['cookie'] = self.cookie
         data['user']['email'] = ''
         data['user']['firstname'] = ''
@@ -148,26 +159,32 @@ class QobuzApi:
         self._check_ka(ka, [], ['player_settings'])
         data = self._api_request(ka, '/user/update')
         return data
-        
-    ''' 
-    Track 
+
+    '''
+    Track
     '''
     def track_get(self, **ka):
         self._check_ka(ka, ['track_id'])
         data = self._api_request(ka, '/track/get')
         return data
-    
+
     def track_getFileUrl(self, **ka):
         self._check_ka(ka, ['format_id', 'track_id'])
         ka['request_ts'] = time()
-        params = {'format_id'  : str(ka['format_id']),
-                  'intent'     : 'stream',
-                  'request_ts' : ka['request_ts'] ,
-                  'request_sig': str(hashlib.md5("trackgetFileUrlformat_id" + str(ka['format_id']) + "intentstream" + "track_id"
-                                + str(ka['track_id']) + str(ka['request_ts']) + self.s4).hexdigest()), 'track_id': str(ka['track_id'])
-        }
+        params = {'format_id': str(ka['format_id']),
+                  'intent': 'stream',
+                  'request_ts': ka['request_ts'],
+                  'request_sig': str(hashlib.md5("trackgetFileUrlformat_id"
+                                                 + str(ka['format_id'])
+                                                 + "intentstream"
+                                                 + "track_id"
+                                                 + str(ka['track_id'])
+                                                 + str(ka['request_ts'])
+                                                 + self.s4).hexdigest()),
+                  'track_id': str(ka['track_id'])
+                  }
         return self._api_request(params, '/track/getFileUrl')
-    
+
     # MAPI UNTESTED
     def track_search(self, **ka):
         self._check_ka(ka, ['query'], ['limit'])
@@ -204,11 +221,10 @@ class QobuzApi:
     def playlist_get(self, **ka):
         self._check_ka(ka, ['playlist_id'], ['extra', 'limit', 'offset'])
         return self._api_request(ka, '/playlist/get')
-    
-    def playlist_addTracks (self, **ka):
+
+    def playlist_addTracks(self, **ka):
         self._check_ka(ka, ['playlist_id', 'track_ids'])
         return self._api_request(ka, '/playlist/addTracks')
-    
 
     '''
     Purchase
@@ -226,14 +242,18 @@ class QobuzApi:
         self._check_ka(ka, ['query'], ['type', 'limit', 'offset'])
         mandatory = ['query', 'type']
         for label in mandatory:
-            if not label in ka: raise QobuzXbmcError(who=self, what='missing_parameter', additional=label)
+            if not label in ka:
+                raise QobuzXbmcError(who=self,
+                                     what='missing_parameter',
+                                     additional=label)
         return self._api_request(ka, '/search/getResults')
 
-
-    # REPORT #    
+    # REPORT #
     def report_streaming_start(self, track_id):
-        # Any use of the API implies your full acceptance of the General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
-        params = {  'user_id': self.user_id, 'track_id': track_id}
+        # Any use of the API implies your full acceptance
+        # of the General Terms and Conditions
+        # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
+        params = {'user_id': self.user_id, 'track_id': track_id}
         return self._api_request(params, '/track/reportStreamingStart')
 
     def report_streaming_stop(self, track_id, duration):
@@ -247,71 +267,83 @@ class QobuzApi:
         except:
             warn(self, 'No authentification token')
             return None
-        params = {  'user_id': self.user_id,
-                    'track_id': track_id,
-                    'duration': duration}
+        params = {'user_id': self.user_id,
+                  'track_id': track_id,
+                  'duration': duration
+                  }
         return self._api_request(params, '/track/reportStreamingEnd')
 
-
-    def favorite_create (self, **ka):
+    def favorite_create(self, **ka):
         mandatory = ['artist_ids', 'albums_ids', 'track_ids']
         found = None
         for label in mandatory:
-            if label in ka: found = label
+            if label in ka:
+                found = label
         if not found:
-            raise QobuzXbmcError(who=self, what='missing_parameter', additional='artist_ids|albums_ids|track_ids')
+            raise QobuzXbmcError(who=self, what='missing_parameter',
+                                 additional='artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/create')
-    
-    def favorite_delete (self, **ka):
+
+    def favorite_delete(self, **ka):
         mandatory = ['artist_ids', 'albums_ids', 'track_ids']
         found = None
         for label in mandatory:
-            if label in ka: found = label
+            if label in ka:
+                found = label
         if not found:
-            raise QobuzXbmcError(who=self, what='missing_parameter', additional='artist_ids|albums_ids|track_ids')
+            raise QobuzXbmcError(who=self, what='missing_parameter',
+                                 additional='artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/delete')
 
-    def playlist_subscribe (self, **ka):
+    def playlist_subscribe(self, **ka):
         mandatory = ['playlist_id']
         found = None
         for label in mandatory:
-            if label in ka: found = label
+            if label in ka:
+                found = label
         if not found:
-            raise QobuzXbmcError(who=self, what='missing_parameter', additional='playlist_id')
+            raise QobuzXbmcError(
+                who=self, what='missing_parameter', additional='playlist_id')
         return self._api_request(ka, '/playlist/subscribe')
-    
+
     def playlist_unsubscribe(self, **ka):
         self._check_ka(ka, ['playlist_id'])
         return self._api_request(ka, '/playlist/unsubscribe')
-    
-    def playlist_deleteTracks (self, **ka):
+
+    def playlist_deleteTracks(self, **ka):
         self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])
         return self._api_request(ka, '/playlist/deleteTracks')
 
-    def playlist_create (self, **ka):
-        self._check_ka(ka, ['name'], ['is_public', 'is_collaborative', 'tracks_id', 'album_id'])
-        if not 'is_public' in ka: ka['is_public'] = True
-        if not 'is_collaborative' in ka: ka['is_collaborative'] = False
+    def playlist_create(self, **ka):
+        self._check_ka(ka, ['name'], ['is_public',
+                       'is_collaborative', 'tracks_id', 'album_id'])
+        if not 'is_public' in ka:
+            ka['is_public'] = True
+        if not 'is_collaborative' in ka:
+            ka['is_collaborative'] = False
         return self._api_request(ka, '/playlist/create')
 
-    def playlist_delete (self, **ka):
+    def playlist_delete(self, **ka):
         self._check_ka(ka, ['playlist_id'])
-        if not 'playlist_id' in ka:  raise QobuzXbmcError(who=self, what='missing_parameter', additional='playlist_id')
+        if not 'playlist_id' in ka:
+            raise QobuzXbmcError(
+                who=self, what='missing_parameter', additional='playlist_id')
         return self._api_request(ka, '/playlist/delete')
 
-    def playlist_update (self, **ka):
-        self._check_ka(ka, ['playlist_id'], ['name', 'description', 'is_public', 'is_collaborative', 'tracks_id'])
+    def playlist_update(self, **ka):
+        self._check_ka(ka, ['playlist_id'], ['name', 'description',
+                       'is_public', 'is_collaborative', 'tracks_id'])
         res = self._api_request(ka, '/playlist/update')
         return res
 
-    def artist_getSimilarArtists (self, **ka):
+    def artist_getSimilarArtists(self, **ka):
         self._check_ka(ka, ['artist_id', 'limit', 'offset'])
         return self._api_request(ka, '/artist/getSimilarArtists')
 
-    def genre_list (self, **ka):
+    def genre_list(self, **ka):
         self._check_ka(ka, [], ['parent_id', 'limit', 'offset'])
         return self._api_request(ka, '/genre/list')
-    
-    def label_list (self, **ka):
+
+    def label_list(self, **ka):
         self._check_ka(ka, [], ['limit', 'offset'])
         return self._api_request(ka, '/label/list')

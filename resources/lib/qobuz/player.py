@@ -25,6 +25,7 @@ from gui.util import notifyH, isFreeAccount, lang
 
 from node.track import Node_track
 
+
 class QobuzPlayer(xbmc.Player):
 
     def __init__(self, *a, **ka):
@@ -38,7 +39,8 @@ class QobuzPlayer(xbmc.Player):
         duration = (total - elapsed) / 10
         if not (track_id and total and duration):
             return False
-        #self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
+        # self.sendQobuzPlaybackEnded(self.track_id, (self.total -
+        # self.elapsed) / 10)
         print "PLAYBACK END"
         qobuz.api.report_streaming_stop(track_id, duration)
 
@@ -49,21 +51,23 @@ class QobuzPlayer(xbmc.Player):
     def onPlayBackEnded(self):
         if not (self.track_id and self.total and self.elapsed):
             return False
-        self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
+        self.sendQobuzPlaybackEnded(
+            self.track_id, (self.total - self.elapsed) / 10)
         return True
-    
+
     def OnQueueNextItem(self):
         return True
-    
+
     def onPlayBackStopped(self):
         if not (self.track_id and self.total and self.elapsed):
             return False
-        self.sendQobuzPlaybackEnded(self.track_id, (self.total - self.elapsed) / 10)
+        self.sendQobuzPlaybackEnded(
+            self.track_id, (self.total - self.elapsed) / 10)
         return True
 
     def onPlaybackStarted(self):
         print "PLAYBACK STARTED"
-        
+
     def play(self, ID):
         node = Node_track()
         node.id = ID
@@ -74,10 +78,10 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Cannot get track data")
             label = "Maybe an invalid track id"
             item = xbmcgui.ListItem("No track information",
-                                '',
-                                '',
-                                '',
-                                '')
+                                    '',
+                                    '',
+                                    '',
+                                    '')
         else:
             node.data = data
             item = node.make_XbmcListItem()
@@ -86,16 +90,19 @@ class QobuzPlayer(xbmc.Player):
             warn(self, "Cannot get track stream url")
             return False
         item.setProperty('mimetype', mimetype)
-        #print 'Mime: ' + mimetype
+        # print 'Mime: ' + mimetype
         streaming_url = node.get_streaming_url()
-        # some tracks are not authorized for stream and a 60s sample is returned, in that case we overwrite the song duration
-        if node.is_sample(): 
+        # some tracks are not authorized for stream and a 60s sample is
+        # returned, in that case we overwrite the song duration
+        if node.is_sample():
             item.setInfo(
-                        'music', infoLabels = {
-                        'duration': 60,
-            })
-            # don't warn for free account (all songs except purchases are 60s limited)
-            if not isFreeAccount(): notifyH("Qobuz", "Sample returned") 
+                'music', infoLabels={
+                'duration': 60,
+                })
+            # don't warn for free account (all songs except purchases are 60s
+            # limited)
+            if not isFreeAccount():
+                notifyH("Qobuz", "Sample returned")
         item.setPath(streaming_url)
         '''
             PLaying track
@@ -110,7 +117,8 @@ class QobuzPlayer(xbmc.Player):
         if qobuz.boot.handle == -1:
             super(QobuzPlayer, self).play(streaming_url, item, False)
         else:
-            xbmcplugin.setResolvedUrl(handle = qobuz.boot.handle, succeeded = True, listitem = item)
+            xbmcplugin.setResolvedUrl(
+                handle=qobuz.boot.handle, succeeded=True, listitem=item)
 
         '''
             Waiting for song to start
@@ -130,18 +138,24 @@ class QobuzPlayer(xbmc.Player):
         return self.watch_playing(node, streaming_url)
 
     def isPlayingAudio(self):
-        try: return super(QobuzPlayer, self).isPlayingAudio()
-        except: warn(self, "EXCEPTION: isPlayingAudio")
+        try:
+            return super(QobuzPlayer, self).isPlayingAudio()
+        except:
+            warn(self, "EXCEPTION: isPlayingAudio")
         return False
 
     def getPlayingFile(self):
-        try: return super(QobuzPlayer, self).getPlayingFile()
-        except: warn(self, "EXCEPTION: getPlayingFile")
+        try:
+            return super(QobuzPlayer, self).getPlayingFile()
+        except:
+            warn(self, "EXCEPTION: getPlayingFile")
         return None
 
     def getTotalTime(self):
-        try: return super(QobuzPlayer, self).getTotalTime()
-        except: warn(self, "EXCEPTION: getTotalTime")
+        try:
+            return super(QobuzPlayer, self).getTotalTime()
+        except:
+            warn(self, "EXCEPTION: getTotalTime")
         return -1
 
     def watch_playing(self, node, streaming_url):

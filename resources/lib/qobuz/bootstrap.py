@@ -32,6 +32,8 @@ from exception import QobuzXbmcError
 from gui.util import notifyH, notify, dialogLoginFailure, getImage, yesno, containerRefresh
 
 ''' Arguments parssing '''
+
+
 def get_params():
     d = dog()
     rparam = {}
@@ -49,26 +51,28 @@ def get_params():
             splitparams = {}
             splitparams = pairsofparams[i].split('=')
             if (len(splitparams)) == 2:
-                debug('QobuzDog', "Checking script parameter: " + splitparams[0])
+                debug('QobuzDog',
+                      "Checking script parameter: " + splitparams[0])
                 if d.kv_is_ok(splitparams[0], splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
-                    warn('[DOG]', "--- Invalid key: %s / value: %s" % (splitparams[0], splitparams[1]))
+                    warn('[DOG]', "--- Invalid key: %s / value: %s" %
+                         (splitparams[0], splitparams[1]))
     return rparam
 
 
-
-        
 '''
     QobuzBootstrap
 '''
+
+
 class QobuzBootstrap(object):
 
     def __init__(self, __addon__, __handle__):
         qobuz.addon = __addon__
         self.handle = __handle__
         qobuz.boot = self
-    
+
     ''' BOTTSTRAP App '''
     def bootstrap_app(self):
         from xbmcrpc import XbmcRPC
@@ -80,24 +84,28 @@ class QobuzBootstrap(object):
     ''' BOTTSTRAP Registry '''
     def bootstrap_registry(self):
         from registry import QobuzRegistry
-        streamFormat = 6 if qobuz.addon.getSetting('streamtype') == 'flac' else 5
+        streamFormat = 6 if qobuz.addon.getSetting(
+            'streamtype') == 'flac' else 5
         try:
             qobuz.registry = QobuzRegistry(
-                                       cacheType='default', 
-                                       username=qobuz.addon.getSetting('username'), 
-                                       password=qobuz.addon.getSetting('password'), 
-                                       basePath=qobuz.path.cache,
-                                       streamFormat=streamFormat, hashKey=False)
+                cacheType='default',
+                username=qobuz.addon.getSetting(
+                    'username'),
+                password=qobuz.addon.getSetting(
+                    'password'),
+                basePath=qobuz.path.cache,
+                streamFormat=streamFormat, hashKey=False)
 
             qobuz.registry.get(name='user')
             qobuz.api = qobuz.registry.get_api()
         except QobuzXbmcError:
             dialogLoginFailure()
             #@TODO sys.exit killing XBMC? FRODO BUG ?
-            #sys.exit(1)
+            # sys.exit(1)
             containerRefresh()
-            raise QobuzXbmcError(who=self, what='invalid_login', additional=None)
-            
+            raise QobuzXbmcError(
+                who=self, what='invalid_login', additional=None)
+
     ''' BOTTSTRAP Directories '''
     def bootstrap_directories(self):
         class PathObject ():
@@ -105,10 +113,15 @@ class QobuzBootstrap(object):
                 self.base = qobuz.addon.getAddonInfo('path')
 
             def _set_dir(self):
-                self.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', qobuz.addon.getAddonInfo('id'))
+                self.profile = os.path.join(xbmc.translatePath('special://profile/'),
+                                            'addon_data',
+                                            qobuz.addon.getAddonInfo('id'))
                 self.cache = os.path.join(self.profile, 'cache')
-                self.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
-                self.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
+                self.resources = xbmc.translatePath(
+                    os.path.join(qobuz.path.base, 'resources'))
+                self.image = xbmc.translatePath(
+                    os.path.join(qobuz.path.resources, 'img'))
+
             def to_s(self):
                 out = 'profile : ' + self.profile + "\n"
                 out += 'cache   : ' + self.cache + "\n"
@@ -119,7 +132,7 @@ class QobuzBootstrap(object):
             Make dir
             '''
             def mkdir(self, dir):
-                if os.path.isdir(dir) == False:
+                if not os.path.isdir(dir):
                     try:
                         os.makedirs(dir)
                     except:
@@ -133,6 +146,7 @@ class QobuzBootstrap(object):
     ''' BOTTSTRAP Debug '''
     def bootstrap_debug(self):
         from debug import log, warn, error, info
+
         class DebugObject():
             def __init__(self):
                 self.log = log
@@ -140,7 +154,7 @@ class QobuzBootstrap(object):
                 self.error = error
                 self.info = info
         qobuz.debug = DebugObject()
-        
+
     ''' BOTTSTRAP Player '''
     def bootstrap_player(self):
         from player import QobuzPlayer
@@ -162,7 +176,8 @@ class QobuzBootstrap(object):
             debug(self, "Param: " + p + ' = ' + str(self.params[p]))
 
         self.NID = ''
-        if 'nid' in self.params: self.NID = self.params['nid']
+        if 'nid' in self.params:
+            self.NID = self.params['nid']
 
         debug(self, "NT: " + str(self.NT) + " / NID: " + self.NID)
 
@@ -173,9 +188,10 @@ class QobuzBootstrap(object):
        Dispatch
     '''
     def dispatch(self):
-        debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), Flag.to_s(int(self.params['nt']))))
+        debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
+              Flag.to_s(int(self.params['nt']))))
         ''' PLAY '''
-        
+
         if self.MODE == Mode.PLAY:
             debug(self, "Playing song")
             self.bootstrap_player()
@@ -203,7 +219,7 @@ class QobuzBootstrap(object):
             r.set_depth(-1)
             r.set_filter(Flag.DONTFETCHTRACK)
             return r.scan()
-        
+
 #        elif self.MODE == Mode.PLAYLIST_SUBSCRIBE:
 #            from  node.user_playlists import Node_user_playlists
 #            node = Node_user_playlists()
@@ -235,7 +251,7 @@ class QobuzBootstrap(object):
 #                qobuz.registry.delete_as_name('^user-playlists.*')
 #                xbmc.executebuiltin('Container.Refresh')
 #            return False
-#        
+#
 #
 #        elif self.MODE == Mode.PLAYLIST_REMOVE_TRACK:
 #            from node.playlist import Node_playlist
@@ -252,8 +268,8 @@ class QobuzBootstrap(object):
 #            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '&action=scan")'
 #            xbmc.executebuiltin(s)
 #            return False
-#        
-#        
+#
+#
 #        elif self.MODE == Mode.FAVORITE_DELETE:
 #            from node.favorites import Node_favorites
 #            node = Node_favorites(self, self.params)
@@ -262,10 +278,11 @@ class QobuzBootstrap(object):
 #                return False
 #            xbmc.executebuiltin('Container.Refresh')
 #            return True
-#        
+#
 #        elif self.MODE == Mode.TEST:
 #            import xbmcgui
 
         else:
-            raise QobuzXbmcError(who=self,what="unknow_mode", additional=self.MODE)
+            raise QobuzXbmcError(
+                who=self, what="unknow_mode", additional=self.MODE)
         return True

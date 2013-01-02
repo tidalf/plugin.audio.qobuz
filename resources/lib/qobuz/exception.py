@@ -17,18 +17,21 @@
 import pprint
 import traceback
 
+
 class QobuzXbmcError(Exception):
-    
+
     def __init__(self, **ka):
 #        exc_type, exc_value, exc_traceback = sys.exc_info()
-        if not 'additional' in ka or ka['additional'] == None: ka['additional'] = ''
-        if (not 'who' in ka) or (not 'what' in ka): 
-            raise Exception('QobuzXbmcError', 'Missing constructor arguments (who|what)')
+        if not 'additional' in ka or ka['additional'] == None:
+            ka['additional'] = ''
+        if (not 'who' in ka) or (not 'what' in ka):
+            raise Exception(
+                'QobuzXbmcError', 'Missing constructor arguments (who|what)')
         nl = "\n"
         msg = "[QobuzXbmcError]" + nl
-        msg+= " - who        : " + pprint.pformat(ka['who']) + nl
-        msg+= " - what       : " + ka['what'] + nl
-        msg+= " - additional : " + repr(ka['additional']) + nl
-        msg+= " - Stack      : " + nl
+        msg += " - who        : " + pprint.pformat(ka['who']) + nl
+        msg += " - what       : " + ka['what'] + nl
+        msg += " - additional : " + repr(ka['additional']) + nl
+        msg += " - Stack      : " + nl
         print msg
         print traceback.print_exc(10)

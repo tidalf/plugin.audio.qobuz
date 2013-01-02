@@ -16,27 +16,29 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import re
 from debug import debug
+
+
 class dog():
 
     def __init__(self):
         self.allowed_keys = {
-                             'mode'       : '^\d{1,10}$',
-                             'nid'        : '^\d{1,14}$',
-                             'nt'         : '^\d{1,10}$',
-                             'genre-type' : '^(\d+|null)$',
-                             'genre-id'   : '^(\d+|null)$',
-                             'url'        : '^.*$',
-                             'search-type': "^(artists|tracks|albums)$",
-                             'view-filter': "^\d+$",
-                             'depth'      : "^(-)?\d+$",
-                             'query'      : "^.*$",
-                             'action'     : "^(scan)$",
-                             'track-id'   : "^\d{1,10}$",
-                             'name'       : "^[\w\d_.]+$",
-                             'parent-id'  : "^\d{1,10}$",
-                             'offset'     : "^\d{1,10}$",
-                             'nm'         : "^[\w\d_]+$"
-                             }
+            'mode': '^\d{1,10}$',
+            'nid': '^\d{1,14}$',
+            'nt': '^\d{1,10}$',
+            'genre-type': '^(\d+|null)$',
+            'genre-id': '^(\d+|null)$',
+            'url': '^.*$',
+            'search-type': "^(artists|tracks|albums)$",
+            'view-filter': "^\d+$",
+            'depth': "^(-)?\d+$",
+            'query': "^.*$",
+            'action': "^(scan)$",
+            'track-id': "^\d{1,10}$",
+            'name': "^[\w\d_.]+$",
+            'parent-id': "^\d{1,10}$",
+            'offset': "^\d{1,10}$",
+            'nm': "^[\w\d_]+$"
+        }
 
     ''' Match value against regexp '''
     def kv_is_ok(self, key, value):
@@ -44,8 +46,10 @@ class dog():
         if key not in self.allowed_keys:
             return False
         match = None
-        try: match = re.match(self.allowed_keys[key], value)
-        except: pass
+        try:
+            match = re.match(self.allowed_keys[key], value)
+        except:
+            pass
         if match == None:
             return False
         return True

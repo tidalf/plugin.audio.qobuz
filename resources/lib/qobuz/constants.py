@@ -17,8 +17,9 @@
 
 __debugging__ = 0
 
+
 class __Mode():
-    
+
     def __init__(self):
         self.VIEW = 1
         self.PLAY = 2
@@ -27,8 +28,8 @@ class __Mode():
         self.SCAN = 10
         self.VIEW_BIG_DIR = 11
         self.PLAYLIST_REMOVE_TRACK = 12
-        self.PLAYLIST_SELECT_CURRENT = 13 
-        self.PLAYLIST_ADD_TO_CURRENT = 14    
+        self.PLAYLIST_SELECT_CURRENT = 13
+        self.PLAYLIST_ADD_TO_CURRENT = 14
         self.PLAYLIST_CREATE = 15
         self.PLAYLIST_RENAME = 16
         self.PLAYLIST_REMOVE = 17
@@ -40,23 +41,38 @@ class __Mode():
         self.PLAYLIST_SUBSCRIBE = 23
         self.TEST = 2000
 
-    
     def to_s(self, mode):
-        if mode == self.VIEW: return "view"
-        elif mode == self.PLAY: return "play"
-        elif mode == self.ERASE_CACHE: return "clear cache"
-        elif mode == self.LIBRARY_SCAN: return "library scan"
-        elif mode == self.SCAN: return "scan"
-        elif mode == self.VIEW_BIG_DIR: return "view big dir"
-        elif mode == self.PLAYLIST_REMOVE: return "playlist remove"
-        elif mode == self.PLAYLIST_REMOVE_TRACK: return "playlist remove track"
-        elif mode == self.PLAYLIST_CREATE: return "playlist create"
-        elif mode == self.PLAYLIST_RENAME: return "playlist rename"
-        elif mode == self.PLAYLIST_ADD_AS_NEW: return "playlist add as new"
-        elif mode == self.PLAYLIST_ADD_TO_CURRENT: return "playlist add to current"
-        elif mode == self.PLAYLIST_ADD_TO_CURRENT: return "favorites add to current"
-        elif mode == self.PLAYLIST_SELECT_CURRENT: return "playlist select current"
-        elif mode == self.PLAYLIST_SUBSCRIBE: return "playlist subscribe"
-        else: return "Unknow mode: " + str(mode)
-        
+        if mode == self.VIEW:
+            return "view"
+        elif mode == self.PLAY:
+            return "play"
+        elif mode == self.ERASE_CACHE:
+            return "clear cache"
+        elif mode == self.LIBRARY_SCAN:
+            return "library scan"
+        elif mode == self.SCAN:
+            return "scan"
+        elif mode == self.VIEW_BIG_DIR:
+            return "view big dir"
+        elif mode == self.PLAYLIST_REMOVE:
+            return "playlist remove"
+        elif mode == self.PLAYLIST_REMOVE_TRACK:
+            return "playlist remove track"
+        elif mode == self.PLAYLIST_CREATE:
+            return "playlist create"
+        elif mode == self.PLAYLIST_RENAME:
+            return "playlist rename"
+        elif mode == self.PLAYLIST_ADD_AS_NEW:
+            return "playlist add as new"
+        elif mode == self.PLAYLIST_ADD_TO_CURRENT:
+            return "playlist add to current"
+        elif mode == self.PLAYLIST_ADD_TO_CURRENT:
+            return "favorites add to current"
+        elif mode == self.PLAYLIST_SELECT_CURRENT:
+            return "playlist select current"
+        elif mode == self.PLAYLIST_SUBSCRIBE:
+            return "playlist subscribe"
+        else:
+            return "Unknow mode: " + str(mode)
+
 Mode = __Mode()

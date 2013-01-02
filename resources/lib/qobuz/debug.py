@@ -63,17 +63,22 @@ def log(obj, msg, lvl=LOGNOTICE):
             name = type(obj)
     ourlog('[' + str(name) + "] " + msg, lvl)
 
+
 def warn(obj, msg):
     log(obj, msg, LOGERROR)
+
 
 def info(obj, msg):
     log(obj, msg, LOGNOTICE)
 
+
 def debug(obj, msg):
     log(obj, msg, LOGDEBUG)
 
+
 def crit(obj, msg):
     log(obj, msg, LOGSEVERE)
+
 
 def error(obj, msg):
     log(obj, msg, LOGSEVERE)
