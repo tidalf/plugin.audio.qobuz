@@ -21,12 +21,12 @@ import xbmcaddon
 import xbmc
 
 pluginId = 'plugin.audio.qobuz'
-__addon__        = xbmcaddon.Addon(id=pluginId)
+__addon__ = xbmcaddon.Addon(id=pluginId)
 __addonversion__ = __addon__.getAddonInfo('version')
-__addonid__      = __addon__.getAddonInfo('id')
-__cwd__          = __addon__.getAddonInfo('path')
+__addonid__ = __addon__.getAddonInfo('id')
+__cwd__ = __addon__.getAddonInfo('path')
 dbg = True
-addonDir  = __addon__.getAddonInfo('path')
+addonDir = __addon__.getAddonInfo('path')
 libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
 qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
@@ -41,4 +41,4 @@ try:
     boot.bootstrap_app()
     boot.dispatch()
 except QobuzXbmcError as e:
-    warn('['+pluginId+']', "Exception while running plugin")
+    warn('[' + pluginId + ']', "Exception while running plugin")
