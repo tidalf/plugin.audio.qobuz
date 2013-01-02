@@ -80,7 +80,6 @@ class Node_user_playlists(Node):
         for playlist in self.data['data']['playlists']['items']:
             node = Node_playlist(self, {'offset': 0})
             node.data = playlist
-            print "OFFFFFFFFFFFFFFFFSET: " + repr(node.offset)
             if self.display_product_cover:
                 pass
             if (cid and cid == node.id):

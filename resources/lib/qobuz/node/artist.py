@@ -51,7 +51,6 @@ class Node_artist(Node):
         
     def _build_down(self, xbmc_directory, lvl, flag=None):
         colorItem = qobuz.addon.getSetting('color_item')
-        print "Building down ARTIST"
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist',id=self.id,

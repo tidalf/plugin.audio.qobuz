@@ -80,7 +80,6 @@ class Node_playlist(Node):
             return False
         self.add_pagination(data['data'])
         self.data = data['data']
-        pprint.pprint(data['data'])
         return True
     
     def _build_down(self, xbmc_directory, lvl, flag=None):
@@ -105,7 +104,6 @@ class Node_playlist(Node):
                 albumseen[jalbum['id']] = node
             else:
                 node = Node_track()
-                print "TRACK DATA" + pprint.pformat(jtrack)
                 node.data = jtrack
             self.add_child(node)
         
@@ -397,7 +395,6 @@ class Node_playlist(Node):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='user-playlist', id=ID, offset=offset, limit=limit)['data']
-        print pprint.pformat(data)
         name = ''
         if 'name' in data:
             name = data['name']

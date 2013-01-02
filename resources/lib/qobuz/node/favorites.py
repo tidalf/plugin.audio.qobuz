@@ -45,33 +45,29 @@ class Node_favorites(Node):
         self.label = lang(30079)
         self.content_type = 'songs'
         self.image = getImage('favorites')
-
-    def _build_down(self, xbmc_directory, lvl, flag=None):
-        offset = self.get_parameter('offset') or 0
+        self.offset = self.get_parameter('offset') or 0
+        
+    def pre_build_down(self, Dir, lvl, flag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
-            name='user-favorites', limit=limit, offset=offset)
+            name='user-favorites', limit=limit, offset=self.offset)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
-        self.data = data
-        for track in data['data']['tracks']['items']:
+        self.add_pagination(data['data'])
+        self.data = data['data']
+        return True
+    
+    def _build_down(self, xbmc_directory, lvl, flag=None):
+        for track in self.data['data']['tracks']['items']:
             node = None
             node = Node_track()
             node.data = track
             self.add_child(node)
-        for product in self.filter_products(data):
+        for product in self.filter_products(self.data):
             self.add_child(product)
-        self.add_pagination(data['data'])
         return True
 
-#    def get_name(self):
-#        name = self.get_property('name')
-#        return name
-#
-#    def get_owner(self):
-#        return self.get_property(('owner', 'name'))
-#
     def get_description(self):
         return self.get_property('description')
 

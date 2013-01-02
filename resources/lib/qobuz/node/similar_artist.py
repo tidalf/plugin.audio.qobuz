@@ -50,7 +50,6 @@ class Node_similar_artist(Node):
         Build Down
     '''
     def _build_down(self, xbmc_directory, lvl, flag=None):
-        print "Build down similar artist"
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist-similar', id=self.id,
@@ -58,10 +57,8 @@ class Node_similar_artist(Node):
         if not data:
             return 0
         for aData in data['data']['artists']['items']:
-            #pprint.pprint(aData)
             artist = Node_artist(self)
             artist.data = aData
-            #print 'Name: ' + repr(artist.get_name())
             self.add_child(artist)
         self.add_pagination(data)
         return len(data['data']['artists']['items'])

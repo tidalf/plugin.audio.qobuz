@@ -158,7 +158,6 @@ class Node(object):
         if not need_pagination:
             return False
         url = self.make_url(offset=items['offset'] + items['limit'])
-        print "URL: " + url
         self.pagination_next = url
         self.pagination_total = items['total']
         self.pagination_offset = items['offset']
@@ -319,8 +318,6 @@ class Node(object):
                                       self.pagination_next_offset,
                                       self.pagination_total)
             node.label = nextLabel
-            print "NextLabel: " + repr(node.label2)
-            print "NEXT URL: " + node.make_url()
             self.add_child(node)
     
     # When returning False we are not displaying directory content

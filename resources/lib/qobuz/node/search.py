@@ -16,7 +16,6 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
 import qobuz
-# import pprint
 
 from debug import info, warn, error, debug
 from flag import NodeFlag
