@@ -35,7 +35,7 @@ class XbmcWindow_musicfiles(xbmcgui.Window):
         # 10501 / WINDOW_MUSIC_FILES 
         # (http://wiki.xbmc.org/index.php?title=Window_IDs)
         xbmcgui.Window(10501) 
-    
+
     def onAction(self, action):
         print 'Action: ' + repr(action.getId())
 
@@ -43,7 +43,7 @@ class Xbmc_renderer(IRenderer):
 
     def __init__(self, node_type, node_id = None):
         super(Xbmc_renderer, self).__init__(node_type, node_id)
-        
+
     def add_directory_item(self, **ka):
         if not 'is_folder' in ka: ka['is_folder'] = 1
         if not 'image' in ka: ka['image'] = ''
@@ -89,7 +89,7 @@ class Xbmc_renderer(IRenderer):
         [ xbmcplugin.addSortMethod( handle=qobuz.boot.handle, sortMethod=method ) for method in methods ]
         Dir.end_of_directory()
         return True
-    
+
     def scan(self):
         from gui.directory import Directory
         if not self.set_root_node():
