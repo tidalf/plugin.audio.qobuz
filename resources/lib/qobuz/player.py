@@ -44,10 +44,6 @@ class QobuzPlayer(xbmc.Player):
         print "PLAYBACK END"
         qobuz.api.report_streaming_stop(track_id, duration)
 
-    def sendQobuzPlaybackStarted(self, track_id):
-        print "PLAYBACK START"
-        qobuz.api.report_streaming_start(track_id)
-
     def onPlayBackEnded(self):
         if not (self.track_id and self.total and self.elapsed):
             return False

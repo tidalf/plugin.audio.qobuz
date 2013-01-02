@@ -45,15 +45,14 @@ from gui.util import containerRefresh, notifyH, getImage
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
-        #self.action = kwargs[ "action" ]
-        #self.substrings = [ '-trailer', 'http://' ]
 
     def onPlayBackEnded(self):
 #        if not (self.track_id and self.total and self.elapsed):
 #            return False
 #        self.sendQobuzPlaybackEnded(
 #            self.track_id, (self.total - self.elapsed) / 10)
-        warn (self, "play back ended from monitor !!!!!!")
+        id  = xbmcgui.Window(10000).getProperty("NID")
+        warn (self, "play back ended from monitor !!!!!!" + id)
         return True
 
     def onPlayBackStopped(self):
@@ -61,7 +60,8 @@ class MyPlayer(xbmc.Player):
 #            return False
 #        self.sendQobuzPlaybackEnded(
 #            self.track_id, (self.total - self.elapsed) / 10)
-        warn (self, "play back stopped from monitor !!!!!!")
+        id  = xbmcgui.Window(10000).getProperty("NID")
+        warn (self, "play back stopped from monitor !!!!!!" + id)
         return True
     
     def onPlayBackStarted(self):
@@ -69,10 +69,16 @@ class MyPlayer(xbmc.Player):
 #            return False
 #        self.sendQobuzPlaybackEnded(
 #            self.track_id, (self.total - self.elapsed) / 10)
+        xbmc.sleep (2000)
         id  = xbmcgui.Window(10000).getProperty("NID") 
         warn (self, "play back started from monitor !!!!!!" + id )
+        # qobuz.api.report_streaming_start(id)
         return True
         
+    def onQueueNextItem(self):
+        id  = xbmcgui.Window(10000).getProperty("NID") 
+        warn (self, "next item queued from monitor !!!!!!" + id )
+        return True
 
 class Monitor(xbmc.Monitor):
 
@@ -82,7 +88,7 @@ class Monitor(xbmc.Monitor):
         self.Player = MyPlayer()
         self.last_garbage_on = time()
         self.garbage_refresh = 60
-
+        
     def onAbortRequested(self):
         self.abortRequest = True
 

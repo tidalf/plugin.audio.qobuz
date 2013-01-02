@@ -254,6 +254,7 @@ class QobuzApi:
         # of the General Terms and Conditions
         # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {'user_id': self.user_id, 'track_id': track_id}
+        warn(self, pprint.pformat(params))
         return self._api_request(params, '/track/reportStreamingStart')
 
     def report_streaming_stop(self, track_id, duration):
