@@ -88,18 +88,22 @@ class Progress(xbmcgui.DialogProgress):
         except:
             warn(self, "Cannot update line1 progress bar")
             return False
-
+    def onAction(self, key):
+        print "onKey(%s)" % (repr(key))
+        
     def iscanceled(self):
         if not self.active:
             return False
         if not self.is_cancelable:
             return False
+        bs = True
         try:
-            return super(Progress, self).iscanceled()
+            bs = super(Progress, self).iscanceled()
         except:
-            warn(self, "Cannot get iscanceled progress bar status")
-            return False
-
+            warn(self, 'Cannot cancel progress...')
+            return True
+        return bs
+   
     def close(self):
         if not self.active:
             return False

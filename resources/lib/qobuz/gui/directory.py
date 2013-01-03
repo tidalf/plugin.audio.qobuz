@@ -78,15 +78,18 @@ class Directory():
             ka['url'])
 
     def add_item(self, **ka):
-        self.total_put += 1
-        xbmcplugin.addDirectoryItem(self.handle,
+        if self.is_canceled() : return False
+        if xbmcplugin.addDirectoryItem(self.handle,
                                     ka['url'],
                                     ka['item'],
                                     ka['is_folder'],
-                                    self.total_put)
-        return True
+                                    self.total_put):
+            self.total_put += 1
+            return True
+        return False
 
     def _put_item(self, node):
+        if self.is_canceled() : return False
         self.total_put += 1
         item = node.make_XbmcListItem()
         ret = None
@@ -97,7 +100,7 @@ class Directory():
                                 item=item,
                                 is_folder=node.is_folder)
         except:
-            QobuzXbmcError(who=self, what='cannot_add_item', additional='')
+            raise QobuzXbmcError(who=self, what='cannot_add_item', additional='')
         if not ret:
             self.put_item_ok = False
         return ret

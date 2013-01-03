@@ -86,6 +86,10 @@ class QobuzBootstrap(object):
         from registry import QobuzRegistry
         streamFormat = 6 if qobuz.addon.getSetting(
             'streamtype') == 'flac' else 5
+        cacheDurationMiddle = int(
+            qobuz.addon.getSetting('cache_duration_middle')) * 60
+        cacheDurationLong = int(
+            qobuz.addon.getSetting('cache_duration_long')) * 60
         try:
             qobuz.registry = QobuzRegistry(
                 cacheType='default',
@@ -95,9 +99,9 @@ class QobuzBootstrap(object):
                     'password'),
                 basePath=qobuz.path.cache,
                 streamFormat=streamFormat, 
-                hashKey=False,
-                cacheMiddle=qobuz.addon.getSetting('cache_duration_middle'),
-                cacheLong=qobuz.addon.getSetting('cache_duration_long'),
+                hashKey=True,
+                cacheMiddle=cacheDurationMiddle,
+                cacheLong=cacheDurationLong
             )
             qobuz.registry.get(name='user')
             qobuz.api = qobuz.registry.get_api()

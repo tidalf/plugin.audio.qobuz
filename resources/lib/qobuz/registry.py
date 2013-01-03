@@ -142,7 +142,7 @@ class QobuzLocalStorage(object):
             'saved': False,
             'data': ka['value'],
             'updatedOn': time(),
-            'refresh': refresh
+            'refresh': int(refresh)
         }
         if self.options['autoSave']:
             self.save(key)
@@ -348,22 +348,31 @@ class QobuzCacheDefault(QobuzLocalStorage):
     def delete(self, **ka):
         key = self.make_key(**ka)
         info(self, '[DISK] Deleting: ' + key)
-        cache = os.path.join(self.options['basePath'], key + '.dat')
-        if not os.path.exists(cache):
+        fileName = os.path.join(self.options['basePath'], key + '.dat')
+        if not os.path.exists(fileName):
             return False
         fu = FileUtil()
-        if fu.unlink(cache):
-            super(QobuzCacheDefault, self).delete(**ka)
-
+        try:
+            if fu.unlink(fileName):
+                super(QobuzCacheDefault, self).delete(**ka)
+        except:
+            raise QobuzXbmcError(who=self, 
+                                 what='deleting_file_failed', 
+                                 additional=repr(fileName))
     def delete_by_name(self, pattern):
         fu = FileUtil()
         files = fu.find(self.options['basePath'], pattern)
         ret = True
         for fileName in files:
             log(self, "[DISK] Removing " + fileName)
-            if not fu.unlink(fileName):
-                warn(self, "[DISK] Failed to remove: " + fileName)
-                ret = False
+            try:
+                if not fu.unlink(fileName):
+                    warn(self, "[DISK] Failed to remove: " + fileName)
+                    ret = False
+            except:
+                raise QobuzXbmcError(who=self, 
+                                 what='deleting_file_failed', 
+                                 additional=repr(fileName))
         return ret
 
 

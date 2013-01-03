@@ -92,7 +92,7 @@ class Monitor(xbmc.Monitor):
         super(Monitor, self).__init__()
         self.abortRequest = False
         self.last_garbage_on = time()
-        self.garbage_refresh = 500
+        self.garbage_refresh = 10
         
     def onAbortRequested(self):
         self.abortRequest = True
@@ -118,7 +118,7 @@ class Monitor(xbmc.Monitor):
                     return False
                 finally:
                     f.close()
-            if (data['updatedOn'] + data['refresh']) < time():
+            if not data or ((int(data['updatedOn']) + int(data['refresh'])) < time()):
                 log("[QobuzCache]", (
                     "Removing old file: %s") % (repr(fileName)))
                 try:
@@ -172,6 +172,8 @@ try:
             alive = not xbmc.abortRequested
         except:
             alive = False
+        if not alive:
+            break
         if monitor.is_garbage_time():
             log(logLabel, 'Periodic cleaning...')
             monitor.cache_remove_old(limit=20)

@@ -340,6 +340,8 @@ class INode(object):
     '''
 
     def build_down(self, Dir, lvl=1, whiteFlag=Flag.NODE):
+        if Dir.Progress.iscanceled():
+            raise Exception('stop')
         if lvl != -1 and lvl < 1:
             return False
         if not self.pre_build_down(Dir, lvl, whiteFlag):
@@ -356,7 +358,7 @@ class INode(object):
         Dir.update(0, total, 'Working', label, '')
         for child in self.childs:
             if Dir.is_canceled():
-                break
+                return False
             if not (child.type & Flag.TRACK):
                 Dir.update(
                     count, total, "Working", label, child.get_label())
