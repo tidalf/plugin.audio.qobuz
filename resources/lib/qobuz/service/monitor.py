@@ -69,15 +69,16 @@ class MyPlayer(xbmc.Player):
     def onPlayBackStarted(self):
         # workaroung bug, we are sometimes called multiple times.
         id  = xbmcgui.Window(10000).getProperty("NID")
-        self.lastId = id
+        idToBeSend = id
         if not self.locked or self.lastId is not id: 
             self.locked = True
             warn (self, "play back started from monitor !!!!!!" + id )
             # wait 5s and if we're still playing the good song, send a start.
-            xbmc.sleep(5000)
-            if self.isPlayingAudio() and xbmcgui.Window(10000).getProperty("NID") == self.lastId:
+            xbmc.sleep(10000)
+            if self.isPlayingAudio() and xbmcgui.Window(10000).getProperty("NID") == idToBeSend:
                 qobuz.api.report_streaming_start(id)
             self.locked = False
+            self.lastId = id
         return True
         
     def onQueueNextItem(self):
