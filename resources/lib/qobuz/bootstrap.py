@@ -213,13 +213,13 @@ class QobuzBootstrap(object):
             r = renderer(self.NT, self.NID)
             r.depth = 1
             r.filter = Flag.NODE | Flag.DONTFETCHTRACK
-            return r.display()
+            return r.run()
 
         elif self.MODE == Mode.VIEW_BIG_DIR:
             r = renderer(self.NT, self.NID)
             r.depth = -1
             r.filter = Flag.TRACK | Flag.DONTFETCHTRACK
-            return r.display()
+            return r.run()
 
         elif self.MODE == Mode.SCAN:
             r = renderer(self.NT, self.NID)

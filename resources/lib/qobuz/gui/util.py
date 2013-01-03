@@ -40,30 +40,23 @@ def getImage(name):
 '''
     Notify Human
 '''
-
-
 def notifyH(title, text, image=None, mstime=2000):
     if not image:
         image = getImage('icon-default-256')
-    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (
-        title, text, mstime, image)
-    showNotification(title, text, image, mstime)
-#    xbmc.executebuiltin(s.encode('utf-8', 'replace'))
+    return showNotification(title=title, message=text, image=image, displaytime=mstime)
 
 '''
     Notify
 '''
-
-
 def notify(title, text, image=None, mstime=2000):
     if not image:
         image = getImage('icon-default-256')
-    s = 'XBMC.Notification("%s", "%s", "%s", "%s")' % (
-        lang(title), lang(text), mstime, getImage)
-    xbmc.executebuiltin(s.encode('utf-8', 'replace'))
+    return showNotification(title=lang(title), 
+                     message=lang(text), 
+                     image= getImage, 
+                     displaytime=mstime)
 
 def dialogLoginFailure():
-    import sys
     dialog = xbmcgui.Dialog()
     if dialog.yesno(lang(30008), lang(30034), lang(30040)):
         qobuz.addon.openSettings()
@@ -98,7 +91,7 @@ def executeJSONRPC(json):
 
 def color(colorItem, msg):
     if not msg: return ''
-    return '[COLOR=' + colorItem + ']' + msg + '[/COLOR]'
+    return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
 
 
 def lang(langId):

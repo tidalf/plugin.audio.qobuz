@@ -54,7 +54,7 @@ class Xbmc_renderer(IRenderer):
         item = ka['dir']._xbmc_item(**ka)
         ka['dir'].add_item(url=ka['url'], item=item, is_folder=ka['is_folder'])
 
-    def display(self):
+    def run(self):
         from gui.directory import Directory
         if not self.set_root_node():
             warn(

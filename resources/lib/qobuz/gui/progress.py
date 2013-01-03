@@ -35,7 +35,6 @@ class Progress(xbmcgui.DialogProgress):
 
     def __init__(self, active=True):
         self.active = active
-        self.is_cancelable = True
         if self.active:
             super(Progress, self).__init__()
         self.line1 = 'Working...'
@@ -93,9 +92,7 @@ class Progress(xbmcgui.DialogProgress):
         
     def iscanceled(self):
         if not self.active:
-            return False
-        if not self.is_cancelable:
-            return False
+            return True
         bs = True
         try:
             bs = super(Progress, self).iscanceled()

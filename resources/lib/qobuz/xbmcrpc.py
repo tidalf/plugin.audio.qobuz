@@ -2,10 +2,41 @@ import json
 import xbmc
 from exception import QobuzXbmcError
 
-def showNotification(title, message, image = None, mstime = 1000):
+def showNotification(**ka):
     rpc = XbmcRPC()
-    return rpc.showNotification(title, message, image, mstime)
+    return rpc.showNotification(**ka)
 
+def ping(**ka):
+    rpc = XbmcRPC()
+    return rpc.ping(**ka)
+
+"""
+    @class: JsonRequest
+"""
+class JsonRequest:
+    def __init__(self, method):
+        self.method = method
+        self.version = '2.0'
+        self.parameters = {}
+        self.id = None
+
+    def add_parameters(self, kDict):
+        for label in kDict:
+            self.parameters[label] = kDict[label]
+
+    def to_json(self):
+        jDict = {
+                'method': self.method,
+                'jsonrpc': self.version,
+                'params': self.parameters,
+        }
+        if self.id:
+            jDict['id'] = self.id
+        return json.dumps(jDict)
+
+"""
+    @class: XbmcRPC
+"""
 class XbmcRPC:
     def __init__(self):
         pass
@@ -14,31 +45,25 @@ class XbmcRPC:
         if not request:
             raise QobuzXbmcError(
                 who=self, what='missing_parameter', additional='request')
-        request['jsonrpc'] = '2.0'
-        request['method'] = request['method']
-        rjson = json.dumps(request)
-        ret = xbmc.executeJSONRPC(rjson)
+        
+        ret = xbmc.executeJSONRPC(request.to_json())
         return ret
 
     def ping(self):
-        request = {
-            'method': 'JSONRPC.Ping',
-            'id': 1
-        }
+        request = JsonRequest('JSONRPC.Ping')
+        request.id = 1
         return self.send(request)
 
-    def showNotification(self, title, message, image=None, displaytime=5000):
-        request = {
-            'method': 'GUI.ShowNotification',
-            'params': {
-                       'title': title,
-                       'message': message
-            }
-        }
-        if image:
-            request['params']['image'] = image
-        if displaytime:
-            request['params']['displaytime'] = displaytime
+    def showNotification(self, **ka):
+        request = JsonRequest('GUI.ShowNotification')
+        request.add_parameters({
+            'title' : ka['title'],
+            'message': ka['message']
+        })
+        if ka['displaytime']:
+            request.add_parameters({'displaytime': ka['displaytime']})
+        if ka['image']:
+            request.add_parameters({'image': ka['image']})
         return self.send(request)
 
 

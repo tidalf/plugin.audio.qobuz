@@ -198,7 +198,7 @@ class Node_playlist(INode):
         render.depth = -1
         render.filter = Flag.TRACK | Flag.DONTFETCHTRACK
         render.AS_LIST = True
-        render.display()
+        render.run()
         playlist = Node_playlist(self, qobuz.boot.params)
         nid = playlist.create()
         if not nid:
@@ -230,7 +230,7 @@ class Node_playlist(INode):
         render.depth = -1
         render.filter = Flag.TRACK | Flag.DONTFETCHTRACK
         render.AS_LIST = True
-        render.display()
+        render.run()
         playlist = Node_playlist(self, qobuz.boot.params)
         nid = playlist.create()
         if not nid:
