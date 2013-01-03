@@ -94,8 +94,11 @@ class QobuzBootstrap(object):
                 password=qobuz.addon.getSetting(
                     'password'),
                 basePath=qobuz.path.cache,
-                streamFormat=streamFormat, hashKey=False)
-
+                streamFormat=streamFormat, 
+                hashKey=False,
+                cacheMiddle=qobuz.addon.getSetting('cache_duration_middle'),
+                cacheLong=qobuz.addon.getSetting('cache_duration_long'),
+            )
             qobuz.registry.get(name='user')
             qobuz.api = qobuz.registry.get_api()
         except QobuzXbmcError:

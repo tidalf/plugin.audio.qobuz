@@ -39,7 +39,18 @@ class QobuzLocalStorage(object):
         # Regexp to filter out keys that we don't hashed
         self.hashing_exclude_keys = None
         self.hash_key_algorithm = 'md5'
-
+        self._cache_duration = {
+                               'short' : 60 * 15,
+                               'middle': 60 * 60 * 24,
+                               'long'  : 60 * 60 * 24 * 7
+        }
+        for label in ['short', 'middle', 'long']:
+            key = 'cache' + label.title()
+            if key in ka:
+                log(self, 'Setting %s => %s' % (key, ka[key]))
+                self._cache_duration[label] = ka[key]
+        if 'cacheShort' in ka:
+            self.cache_duration['short'] = ka['cacheShort']
         # Setting our options and their default
         self.options = ka
         if not 'autoSave' in self.options:
@@ -47,12 +58,11 @@ class QobuzLocalStorage(object):
         if not 'autoLoad' in self.options:
             self.options['autoLoad'] = True
         if not 'refresh' in self.options:
-            self.options['refresh'] = 60 * 60 * 12
+            self.options['refresh'] = self._cache_duration['middle']
         if not 'overwrite' in self.options:
             self.options['overwrite'] = True
         if not 'hashKey' in self.options:
             self.options['hashKey'] = False
-
         if self.options['hashKey']:
             self.hashing_exclude_keys = '^user.*$'
 
@@ -110,13 +120,14 @@ class QobuzLocalStorage(object):
                             'track',
                             'recommendation',
                             'genre-list',
-                            'label-list']:
-            refresh = 60 * 60 * 24
-        elif ka['name'] == 'user-stream-url':
-            refresh = 60 * 5
+                            'label-list',
+                            'artist-similar']:
+            refresh = self._cache_duration['long']
+        elif ka['name'] in 'user-stream-url':
+            refresh = self._cache_duration['short']
         else:
             refresh = self.options['refresh']
-        log(self, "Refresh: " + repr(refresh))
+        log(self, "[Disk] Fresh for %ss" % ( repr(refresh)))
         mandatory = ['name', 'id']
         for key in mandatory:
             if not key in ka:
@@ -179,6 +190,8 @@ class QobuzLocalStorage(object):
         key = self.make_key(**ka)
         if key in self.data and self.fresh(key):
             return self.data[key]
+        if key in self.data:
+            self.delete(**ka)
         log(self, "[REMOTE] Loading: " + key)
         response = None
         # We are deleting name and id because we don't want to send them
@@ -235,7 +248,7 @@ class QobuzLocalStorage(object):
         if (time() - self.data[key]['updatedOn']) > self.options['refresh']:
             return False
         return True
-
+         
     def saved(self, key, value=None):
         if not key:
             QobuzXbmcError(
@@ -296,7 +309,6 @@ class QobuzCacheDefault(QobuzLocalStorage):
         key = self.make_key(**ka)
         log(self, "[DISK] Loading: " + key)
         cache = self._make_path(key)
-        # cache = os.path.join(self.options['basePath'], key+'.dat');
         if not os.path.exists(cache):
             warn(self, "[DISK] Path doesn't exists: " + cache)
             return False

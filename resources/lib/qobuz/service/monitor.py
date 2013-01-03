@@ -92,12 +92,16 @@ class Monitor(xbmc.Monitor):
         super(Monitor, self).__init__()
         self.abortRequest = False
         self.last_garbage_on = time()
-        self.garbage_refresh = 60
+        self.garbage_refresh = 500
         
     def onAbortRequested(self):
         self.abortRequest = True
 
-
+    def is_garbage_time(self):
+        if time() > (self.last_garbage_on + self.garbage_refresh):
+            return True
+        return False
+    
     def cache_remove_old(self, **ka):
         self.last_garbage_on = time()
         gData = {'limit': 1}
@@ -155,16 +159,23 @@ class Monitor(xbmc.Monitor):
     def onSettingsChanged(self):
         self.cache_remove_user_data()
 
+
 boot = QobuzBootstrap(__addon__, 0)
+logLabel = '[QobuzCache]'
 try:
     boot.bootstrap_app()
     monitor = Monitor(qobuz)
     player = MyPlayer()
-    while not xbmc.abortRequested:
-        if time() > (monitor.last_garbage_on + monitor.garbage_refresh):
-            log('[QobuzCache]', 'Cleaning')
-            monitor.cache_remove_old(limit=10)
+    alive = True
+    while alive:
+        try:
+            alive = not xbmc.abortRequested
+        except:
+            alive = False
+        if monitor.is_garbage_time():
+            log(logLabel, 'Periodic cleaning...')
+            monitor.cache_remove_old(limit=20)
         xbmc.sleep(1000)
-
+    log(logLabel, 'Exiting... bye!')
 except QobuzXbmcError as e:
     warn('[' + pluginId + ']', "Exception while running plugin")

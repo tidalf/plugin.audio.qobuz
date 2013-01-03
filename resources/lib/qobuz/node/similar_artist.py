@@ -46,7 +46,6 @@ class Node_similar_artist(INode):
             artist_id=self.id, offset=self.offset, limit=limit)
         if not data:
             return False
-        pprint.pprint(data)
         self.add_pagination(data['data'])
         self.data = data['data']
         return len(data['data']['artists']['items'])

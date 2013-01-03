@@ -58,14 +58,12 @@ class Node_artist(INode):
         node_artist = Node_artist()
         node_artist.data = self.data
         node_artist.label = '[ %s ]' % (color(colorItem, node_artist.label))
-        #self.add_child(node_artist)
         
         if not 'albums' in data['data']: return True
         for pData in data['data']['albums']['items']:
             node = Node_product()
             node.data = pData
             self.add_child(node)
-        warn(self, 'DATA ARTIST: ' + pprint.pformat(data))
 
         return True
 
