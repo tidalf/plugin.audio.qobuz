@@ -8,7 +8,11 @@ def showNotification(**ka):
 
 def ping(**ka):
     rpc = XbmcRPC()
-    return rpc.ping(**ka)
+    return rpc.ping(**ka).result()
+
+def getInfoLabels(**ka):
+    rpc = XbmcRPC()
+    return rpc.getInfoLabels(**ka).result()
 
 """
     @class: JsonRequest
@@ -34,6 +38,25 @@ class JsonRequest:
             jDict['id'] = self.id
         return json.dumps(jDict)
 
+class JsonResponse:
+    def __init__(self, raw_data):
+        self.raw_data = None
+        self.id = None
+        if raw_data:
+            self.set_raw_data(raw_data)
+
+    def result(self):
+        if not self.raw_data:
+            return {}
+        if not 'result' in self.raw_data:
+            return {}
+        return self.raw_data['result']
+    
+    def set_raw_data(self, data):
+        if not data: return False
+        self.raw_data = json.loads(data)
+        return True
+        
 """
     @class: XbmcRPC
 """
@@ -45,9 +68,7 @@ class XbmcRPC:
         if not request:
             raise QobuzXbmcError(
                 who=self, what='missing_parameter', additional='request')
-        
-        ret = xbmc.executeJSONRPC(request.to_json())
-        return ret
+        return JsonResponse(xbmc.executeJSONRPC(request.to_json()))
 
     def ping(self):
         request = JsonRequest('JSONRPC.Ping')
@@ -64,6 +85,12 @@ class XbmcRPC:
             request.add_parameters({'displaytime': ka['displaytime']})
         if ka['image']:
             request.add_parameters({'image': ka['image']})
+        return self.send(request)
+    
+    def getInfoLabels(self, **ka):
+        request = JsonRequest('XBMC.GetInfoLabels')
+        request.id = 1
+        request.add_parameters({'labels': ka['labels']})
         return self.send(request)
 
 

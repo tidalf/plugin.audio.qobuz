@@ -41,12 +41,14 @@ from debug import warn, log
 import qobuz
 from util.file import FileUtil
 from gui.util import containerRefresh, notifyH, getImage
-
+from fakeipc import FakeIPC
+from node.track import Node_track
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
         self.locked = False
         self.lastId = None
+        self.IPC = FakeIPC('Qobuz.IPC.Player')
 
     def onPlayBackEnded(self):
 #        if not (self.track_id and self.total and self.elapsed):
@@ -85,14 +87,25 @@ class MyPlayer(xbmc.Player):
         id  = xbmcgui.Window(10000).getProperty("NID") 
         warn (self, "next item queued from monitor !!!!!!" + id )
         return True
-
+    
+    def poll(self):
+        from gui.directory import Directory
+        from node.flag import NodeFlag as Flag
+        data = self.IPC.read()
+        if data:
+            print 'POLL DATA:' + repr(data)
+            node = Node_track(None, {'nid': data['nid']})
+            node.pre_build_down(None, 1, Flag.TRACK)
+            self.play(data['streamingUrl'], node.makeListItem(), False)
+            self.IPC.delete()
+        
 class Monitor(xbmc.Monitor):
 
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
         self.abortRequest = False
         self.last_garbage_on = time()
-        self.garbage_refresh = 10
+        self.garbage_refresh = 60 * 5
         
     def onAbortRequested(self):
         self.abortRequest = True
@@ -177,6 +190,7 @@ try:
         if monitor.is_garbage_time():
             log(logLabel, 'Periodic cleaning...')
             monitor.cache_remove_old(limit=20)
+#        player.poll()
         xbmc.sleep(1000)
     log(logLabel, 'Exiting... bye!')
 except QobuzXbmcError as e:

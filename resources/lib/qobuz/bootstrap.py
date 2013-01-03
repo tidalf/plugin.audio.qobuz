@@ -208,23 +208,19 @@ class QobuzBootstrap(object):
 
         from renderer.xbmc import Xbmc_renderer as renderer
 
-        ''' UGLY MODE DISPATCH '''
         if self.MODE == Mode.VIEW:
             r = renderer(self.NT, self.NID)
-            r.depth = 1
-            r.filter = Flag.NODE | Flag.DONTFETCHTRACK
             return r.run()
 
         elif self.MODE == Mode.VIEW_BIG_DIR:
             r = renderer(self.NT, self.NID)
             r.depth = -1
-            r.filter = Flag.TRACK | Flag.DONTFETCHTRACK
             return r.run()
 
         elif self.MODE == Mode.SCAN:
             r = renderer(self.NT, self.NID)
             r.depth = -1
-            r.filter = Flag.DONTFETCHTRACK
+            r.filter = Flag.STOPBUILDOWN
             return r.scan()
 
         else:

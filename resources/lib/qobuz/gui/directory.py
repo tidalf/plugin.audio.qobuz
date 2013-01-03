@@ -91,7 +91,7 @@ class Directory():
     def _put_item(self, node):
         if self.is_canceled() : return False
         self.total_put += 1
-        item = node.make_XbmcListItem()
+        item = node.makeListItem()
         ret = None
         if not item:
             return False

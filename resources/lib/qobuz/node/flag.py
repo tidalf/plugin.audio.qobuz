@@ -20,7 +20,7 @@ from exception import QobuzXbmcError
 
 class __NodeFlag():
     def __init__(self):
-        self.DONTFETCHTRACK = 1
+        self.STOPBUILDOWN = 1
         self.NODE = 2
         self.TRACK = 4
         self.PLAYLIST = 8
@@ -75,8 +75,8 @@ class __NodeFlag():
             return "inode"
         elif flag & self.PRODUCTS:
             return "products"
-        elif flag & self.DONTFETCHTRACK:
-            return "dont_fetch_track"
+        elif flag & self.STOPBUILDDOWN:
+            return "stop_build_down"
         else:
             raise QobuzXbmcError(
                 who=self, what='invalid_flag', additional=repr(flag))

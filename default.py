@@ -42,3 +42,4 @@ try:
     boot.dispatch()
 except QobuzXbmcError as e:
     warn('[' + pluginId + ']', "Exception while running plugin")
+

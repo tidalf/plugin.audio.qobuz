@@ -24,7 +24,7 @@ import xbmcplugin
 import time
 
 import qobuz
-from node.flag import NodeFlag
+from node.flag import NodeFlag as Flag
 from debug import info, warn, log
 from irenderer import IRenderer
 from gui.util import notifyH, getImage, color, containerRefresh
@@ -69,7 +69,7 @@ class Xbmc_renderer(IRenderer):
                 containerRefresh()
                 return True
             return False
-        Dir = Directory(self.root, qobuz.boot.handle, self.AS_LIST, self.nodes)
+        Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
         self.root.build_down(Dir, self.depth, self.filter)
         Dir.set_content(self.root.content_type)
         methods = [
@@ -95,7 +95,7 @@ class Xbmc_renderer(IRenderer):
                 self.node_type) + ", " + str(self.node_id) + ")")
             return False
         Dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(Dir, -1, NodeFlag.TRACK | NodeFlag.DONTFETCHTRACK)
+        self.root.build_down(Dir, -1, Flag.TRACK | Flag.STOPBUILDOWN)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()
         notifyH('Scanning results', str(Dir.total_put) +

@@ -18,10 +18,10 @@ import xbmcgui
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
-from gui.util import color, lang, getImage
+from gui.util import color, lang, getImage, runPlugin
 
 '''
     NODE TRACK
@@ -32,32 +32,25 @@ class Node_track(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_track, self).__init__(parent, parameters)
-        self.type = NodeFlag.NODE | NodeFlag.TRACK
+        self.type = Flag.NODE | Flag.TRACK
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
         self.status = None
         self.image = getImage('song')
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
-        if flag & NodeFlag.DONTFETCHTRACK:
+    def pre_build_down(self, Dir, lvl = 1, flag = None):
+        if flag & Flag.STOPBUILDOWN:
             return False
-        else:
-            nid = self.get_parameter('nid')
-            self.data = qobuz.registry.get(name='track', id=nid)['data']
-            xbmc_directory.add_node(self)
-            return True
-#
-#    def set_cache(self, progress = None):
-#        nid = self.id
-#        if not id:
-#            try:
-#                id = self.get_parameter('nid')
-#            except: pass
-#        if not id:
-#            error(self, "Cannot set cache without id")
-#            return False
-#        return True
+        data = qobuz.registry.get(name='track', id=self.id)
+        if not data:
+            return False
+        self.data = data['data']
+        return True
+    
+    def _build_down(self, Dir, lvl, flag=None):
+        Dir.add_node(self)
+        return True
 
     def make_url(self, **ka):
         if not 'mode' in ka: 
@@ -93,7 +86,7 @@ class Node_track(INode):
             return album
         if not self.parent:
             return ''
-        if self.parent.get_type() & NodeFlag.PRODUCT:
+        if self.parent.get_type() & Flag.PRODUCT:
             return self.parent.get_title()
         return ''
 
@@ -106,7 +99,7 @@ class Node_track(INode):
             return image.replace('_230.', '_600.')
         if not self.parent:
             return self.image
-        if self.parent.get_type() & (NodeFlag.PRODUCT | NodeFlag.PLAYLIST):
+        if self.parent.get_type() & (Flag.PRODUCT | Flag.PLAYLIST):
             return self.parent.get_image()
         
 
@@ -129,7 +122,7 @@ class Node_track(INode):
             return genre
         if not self.parent:
             return ''
-        if self.parent.get_type() & NodeFlag.PRODUCT:
+        if self.parent.get_type() & Flag.PRODUCT:
             return self.parent.get_genre()
         return ''
 
@@ -193,7 +186,7 @@ class Node_track(INode):
         import time
         try:
             date = self.get_property(('album', 'released_at'))
-            if not date and self.parent and self.parent.get_type() & NodeFlag.PRODUCT:
+            if not date and self.parent and self.parent.get_type() & Flag.PRODUCT:
                 return self.parent.get_year()
         except:
             pass
@@ -243,7 +236,7 @@ class Node_track(INode):
             mime = 'audio/mpeg'
         return mime
         
-    def make_XbmcListItem(self):
+    def makeListItem(self):
         media_number = self.get_media_number()
         if not media_number:
             media_number = 1
@@ -297,6 +290,8 @@ class Node_track(INode):
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
+        item.setProperty('mimetype', self.get_mimetype())
+        item.setPath(self.get_streaming_url())
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
@@ -305,12 +300,14 @@ class Node_track(INode):
 
     def attach_context_menu(self, item, menuItems=[]):
         colorItem = qobuz.addon.getSetting('color_item')
-        if self.parent and self.parent.type & NodeFlag.PLAYLIST:
-            url = self.parent.make_url(mode=Mode.PLAYLIST_REMOVE_TRACK) + '&track-id='  + str(self.get_property('playlist_track_id'))
+        if self.parent and self.parent.type & Flag.PLAYLIST:
+            url = self.parent.make_url(
+                query=str(self.get_property('playlist_track_id'))
+            )
             menuItems.append((color(colorItem, lang(
-                30073)) + self.get_label(), 'XBMC.RunPlugin("%s")' % (url)))
+                30073)) + self.get_label(), runPlugin(url)))
 
-        if self.parent and self.parent.type & NodeFlag.FAVORITES:
+        if self.parent and self.parent.type & Flag.FAVORITES:
             ''' REMOVE '''
             url = self.make_url(mode=Mode.FAVORITE_DELETE)
             menuItems.append((color(colorItem, 'Remove from favorite')

@@ -96,7 +96,7 @@ class Node_artist(INode):
     def get_description(self):
         return self.get_property('description')
 
-    def make_XbmcListItem(self):
+    def makeListItem(self):
         image = self.get_image()
         url = self.make_url()
         name = self.get_label()

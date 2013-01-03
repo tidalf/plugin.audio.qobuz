@@ -92,7 +92,7 @@ class Node_product_by_artist(INode):
     '''
         Make XbmcListItem
     '''
-    def make_XbmcListItem(self):
+    def makeListItem(self):
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),
                                 self.get_image(),

@@ -34,6 +34,7 @@ class INode(object):
 
     def __init__(self, parent=None, parameters=None):
         self.parameters = parameters or {}
+        self.type = Flag.NODE
         self.id = self.get_parameter('nid')
         self.parent = parent
         self.type = self.get_parameter('nt') or Flag.NODE
@@ -231,7 +232,7 @@ class INode(object):
         return  a xbml list item
         Class can overload this method
     '''
-    def make_XbmcListItem(self, **ka):
+    def makeListItem(self, **ka):
         if not 'url' in ka:
             ka['url'] = self.make_url()
         if not 'label' in ka:
@@ -247,6 +248,8 @@ class INode(object):
             ka['image'],
             ka['url']
         )
+        item.setProperty('Node.ID', str(self.id))
+        item.setProperty('Node.Type', str(self.type))
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
@@ -329,9 +332,8 @@ class INode(object):
             self.add_child(node)
     
     # When returning False we are not displaying directory content
-    def pre_build_down(self, xbmc_directory, lvl=1, whiteFlag=Flag.NODE):
+    def pre_build_down(self, xbmc_directory, lvl=1, whiteFlag=None):
         return True
-    
     
     '''
         build_down:
@@ -339,22 +341,20 @@ class INode(object):
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self, Dir, lvl=1, whiteFlag=Flag.NODE):
-        if Dir.Progress.iscanceled():
-            raise Exception('stop')
+    def build_down(self, Dir, lvl=1, whiteFlag=None):
+        total = len(self.childs)
+        count = 0
+        label = self.get_label()
+        Dir.update(0, total, 'Working', label, '')
         if lvl != -1 and lvl < 1:
             return False
         if not self.pre_build_down(Dir, lvl, whiteFlag):
             return False
+        Dir.update(0, total, 'Fetching data', label, '')
         self._build_down(Dir, lvl, whiteFlag)
         self._add_pagination_node(Dir, lvl, whiteFlag)
         if lvl != -1:
             lvl -= 1
-        if Dir.is_canceled():
-            return False
-        total = len(self.childs)
-        count = 0
-        label = self.get_label()
         Dir.update(0, total, 'Working', label, '')
         for child in self.childs:
             if Dir.is_canceled():

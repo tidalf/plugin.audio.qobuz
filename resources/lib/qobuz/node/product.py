@@ -72,7 +72,7 @@ class Node_product(INode):
             ltracks.append(track)
         return ltracks
 
-    def make_XbmcListItem(self):
+    def makeListItem(self):
         image = self.get_image()
         item = xbmcgui.ListItem(
             label=self.get_label(),

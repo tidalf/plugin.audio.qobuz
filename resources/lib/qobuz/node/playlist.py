@@ -119,7 +119,7 @@ class Node_playlist(INode):
     def get_description(self):
         return self.get_property('description')
 
-    def make_XbmcListItem(self):
+    def makeListItem(self):
         colorItem = qobuz.addon.getSetting('color_item')
         colorPl = qobuz.addon.getSetting('color_item_playlist')
         label = self.get_name()
@@ -196,7 +196,7 @@ class Node_playlist(INode):
     def add_to_current(self):
         render = getRenderer(int(self.get_parameter('qnt')), self.id)
         render.depth = -1
-        render.filter = Flag.TRACK | Flag.DONTFETCHTRACK
+        render.filter = Flag.TRACK | Flag.STOPBUILDOWN
         render.AS_LIST = True
         render.run()
         playlist = Node_playlist(self, qobuz.boot.params)
@@ -228,7 +228,7 @@ class Node_playlist(INode):
     def add_as_new(self):
         render = getRenderer(int(self.get_parameter('qnt')), self.id)
         render.depth = -1
-        render.filter = Flag.TRACK | Flag.DONTFETCHTRACK
+        render.filter = Flag.TRACK | Flag.STOPBUILDOWN
         render.AS_LIST = True
         render.run()
         playlist = Node_playlist(self, qobuz.boot.params)
