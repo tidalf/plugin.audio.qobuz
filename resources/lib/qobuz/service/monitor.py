@@ -46,6 +46,7 @@ class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
         self.locked = False
+        self.lastId = None
 
     def onPlayBackEnded(self):
 #        if not (self.track_id and self.total and self.elapsed):
@@ -67,12 +68,15 @@ class MyPlayer(xbmc.Player):
     
     def onPlayBackStarted(self):
         # workaroung bug, we are sometimes called multiple times.
-        if not self.locked: 
+        id  = xbmcgui.Window(10000).getProperty("NID")
+        self.lastId = id
+        if not self.locked or self.lastId is not id: 
             self.locked = True
-            id  = xbmcgui.Window(10000).getProperty("NID") 
             warn (self, "play back started from monitor !!!!!!" + id )
-            qobuz.api.report_streaming_start(id)
-            xbmc.sleep(1000)
+            # wait 5s and if we're still playing the good song, send a start.
+            xbmc.sleep(5000)
+            if self.isPlayingAudio() and xbmcgui.Window(10000).getProperty("NID") == self.lastId:
+                qobuz.api.report_streaming_start(id)
             self.locked = False
         return True
         
