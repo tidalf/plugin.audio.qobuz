@@ -85,6 +85,5 @@ class IRenderer(object):
             del self.parameters['nm']
             log(self, "Executing method on node: " + repr(methodName))
             if getattr(self.root, methodName)():
-                containerRefresh()
-            return True
+                return True
         return False

@@ -449,7 +449,7 @@ class INode(object):
             menuItems.append((color(colorItem, lang(39011)), cmd))
 
         ''' ADD AS NEW '''
-        cmd = containerUpdate(self.make_url(type=Flag.PLAYLIST,
+        cmd = runPlugin(self.make_url(type=Flag.PLAYLIST,
                                             nm='add_as_new', 
                                             qnt=self.type,
                                             query=self.get_label()))
