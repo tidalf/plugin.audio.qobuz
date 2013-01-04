@@ -95,7 +95,7 @@ class Node_artist(INode):
     def get_description(self):
         return self.get_property('description')
 
-    def makeListItem(self):
+    def makeListItem(self, replaceItems=False):
         image = self.get_image()
         url = self.make_url()
         name = self.get_label()
@@ -114,5 +114,5 @@ class Node_artist(INode):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
         return item

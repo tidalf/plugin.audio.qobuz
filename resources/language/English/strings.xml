@@ -180,13 +180,13 @@
     <string id="39002">View big directory</string>
     <string id="39003">Scan</string>
     <string id="39004">Similar artist</string>
-    <string id="39005">Add to current playlist</string>
+    <string id="39005">Add to current</string>
     <string id="39006">Show playlists</string>
     <string id="39007">Set as current</string>
     <string id="39008">Create</string>
     <string id="39009">Rename</string>
     <string id="39010">Remove</string>
-    <string id="39011">Add to favorites</string>
+    <string id="39011">Favorites: Add</string>
     <string id="39012">Subscribe</string>
 
     <!-- Progress bar -->

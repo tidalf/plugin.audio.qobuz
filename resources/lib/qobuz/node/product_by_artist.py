@@ -102,5 +102,5 @@ class Node_product_by_artist(INode):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=True)
         return item

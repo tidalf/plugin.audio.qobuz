@@ -12,11 +12,11 @@ from exception import QobuzXbmcError as Qerror
 
 class Directory():
 
-    def __init__(self, root, handle, AS_LIST=False, nodeList = []):
+    def __init__(self, root, handle, asList=False, nodeList = []):
         self.nodes = []
-        self.label = "Qobuz / "
+        self.label = "Qobuz Progress"
         self.root = root
-        self.AS_LIST = AS_LIST
+        self.asList = asList
         self.handle = handle
         self.put_item_ok = True
         self.Progress = Progress(True)
@@ -30,6 +30,7 @@ class Directory():
         self.percent = 0
         self.content_type = 'files'
         self.nodes = nodeList
+        self.replaceItems = False
         log(self, "Handle: " + repr(self.handle))
 
     def __del__(self):
@@ -44,7 +45,7 @@ class Directory():
         if self.Progress.iscanceled():
             raise Qerror(who=self, what="build_down_cancel")
             return False
-        if self.AS_LIST:
+        if self.asList:
             self.nodes.append(node)
             self.total_put += 1
             return True
@@ -95,7 +96,7 @@ class Directory():
     def _put_item(self, node):
         if self.is_canceled() : 
             return False
-        item = node.makeListItem()
+        item = node.makeListItem(replaceItems=self.replaceItems)
         ret = None
         if not item:
             return False

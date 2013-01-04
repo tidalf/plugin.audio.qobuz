@@ -55,6 +55,7 @@
 		<!-- <setting id="resolver_enabled" label="33000" type="bool" default="true" 
 			/> -->
 		<setting id="debug" label="Debug" type="bool" default="false" />
+		<setting id="contextmenu_replaceitems" label="Only qobuz context menu" type="bool" default="false" />
 <!-- 		<setting id="userplaylists_display_cover" label="(i8n) Playlist - show cover"
 			type="bool" default="true" /> -->
 	</category>

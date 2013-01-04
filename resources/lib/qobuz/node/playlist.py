@@ -112,7 +112,8 @@ class Node_playlist(INode):
         if name: return name
         name = self.get_property('title')
         if name: return name
-        return 'NoName'
+        print "NoName: %s" % (self.data) 
+        return ''
     
     def get_owner(self):
         return self.get_property(('owner', 'name'))
@@ -123,7 +124,7 @@ class Node_playlist(INode):
     def get_description(self):
         return self.get_property('description')
 
-    def makeListItem(self):
+    def makeListItem(self, replaceItems=False):
         colorItem = qobuz.addon.getSetting('color_item')
         colorPl = qobuz.addon.getSetting('color_item_playlist')
         label = self.get_name()
@@ -147,7 +148,7 @@ class Node_playlist(INode):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
         return item
 
     def attach_context_menu(self, item, menuItems=[]):

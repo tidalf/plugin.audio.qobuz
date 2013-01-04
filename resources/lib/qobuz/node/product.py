@@ -69,7 +69,7 @@ class Node_product(INode):
             ltracks.append(track)
         return ltracks
 
-    def makeListItem(self):
+    def makeListItem(self, replaceItems=False):
         image = self.get_image()
         item = xbmcgui.ListItem(
             label=self.get_label(),
@@ -88,7 +88,7 @@ class Node_product(INode):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
         return item
 
     '''

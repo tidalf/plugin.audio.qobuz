@@ -64,6 +64,8 @@ class QobuzXbmcRenderer(IRenderer):
             return False
         from gui.directory import Directory
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
+        if qobuz.addon.getSetting('contextmenu_replaceitem') == 'true':
+            Dir.replaceItems = True
         try:
             ret = self.root.build_down(Dir, self.depth, 
                                        self.whiteFlag, self.blackFlag)

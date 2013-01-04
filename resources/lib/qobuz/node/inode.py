@@ -266,7 +266,7 @@ class INode(object):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=False)
+            item.addContextMenuItems(menuItems, ka['replaceItems'])
         return item
 
     def add_child(self, child):
@@ -326,7 +326,7 @@ class INode(object):
     def _add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
         limit = qobuz.addon.getSetting('pagination_limit')
         from renderer.irenderer import IRenderer
-        r = IRenderer(self.type, self.id)
+        r = IRenderer(self.type, self.parameters)
         if self.pagination_next:
             colorItem = qobuz.addon.getSetting('color_item')
             params = qobuz.boot.params
@@ -414,7 +414,9 @@ class INode(object):
     
     def attach_context_menu(self, item, menuItems=[]):
         colorItem = qobuz.addon.getSetting('color_item')
-
+        
+        menuItems.append((formatControlLabel('Qobuz'), containerUpdate('')))
+        
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
             artist_name = self.get_artist()
@@ -428,17 +430,6 @@ class INode(object):
             cmd = containerUpdate(url)
             label = '%s' % (color(colorItem, lang(39004)))
             menuItems.append((label, cmd))
-        
-        menuItems.append((formatControlLabel('General'), containerUpdate('')))
-
-        ''' VIEW BIG DIR '''
-        cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
-        menuItems.append((color(colorItem, lang(39002)), cmd))
-      
-        ''' ADD TO CURRENT PLAYLIST '''
-        cmd = containerUpdate(self.make_url(type=Flag.PLAYLIST, 
-                                            nm='add_to_current'))
-        menuItems.append((color(colorItem, lang(39005)), cmd))
 
         if self.parent and not (self.parent.type & Flag.FAVORITES):
             ''' ADD TO FAVORITES '''
@@ -447,6 +438,14 @@ class INode(object):
                                           qid=self.id, 
                                           qnt=self.type))
             menuItems.append((color(colorItem, lang(39011)), cmd))
+        
+        menuItems.append((formatControlLabel('My Playlists'), containerUpdate('')))
+            
+        ''' ADD TO CURRENT PLAYLIST '''
+        cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
+                                            nm='add_to_current'))
+        menuItems.append((color(colorItem, lang(39005)), cmd))
+
 
         ''' ADD AS NEW '''
         cmd = runPlugin(self.make_url(type=Flag.PLAYLIST,
@@ -456,7 +455,7 @@ class INode(object):
         menuItems.append((color(colorItem, lang(30080)), cmd))
 
         ''' Show playlist '''
-        if not (self.type & Flag.PLAYLIST):
+        if not (self.type & Flag.PLAYLIST == Flag.USERPLAYLISTS):
             cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
             menuItems.append((color(colorItem, lang(39005)), cmd))
 
@@ -464,6 +463,10 @@ class INode(object):
             ''' CREATE '''
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, nm="create"))
             menuItems.append((color(colorItem, lang(39008)), cmd))
+
+        ''' VIEW BIG DIR '''
+        cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
+        menuItems.append((color(colorItem, lang(39002)), cmd))
 
         ''' SCAN '''
         if qobuz.addon.getSetting('enable_scan_feature') == 'true':
@@ -475,10 +478,11 @@ class INode(object):
                     (label, 'XBMC.UpdateLibrary("music", "%s")' % (url)))
             except:
                 pass
-
+        
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove"))
         menuItems.append((color(colorItem, lang(31009)), cmd))
 
-        menuItems.append((formatControlLabel('System (i8n)'), containerUpdate(''))) 
+        menuItems.append((formatControlLabel('System'), containerUpdate(''))) 
+

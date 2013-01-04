@@ -245,7 +245,7 @@ class Node_track(INode):
         item.setProperty('mimetype', self.get_mimetype())
         item.setPath(self.get_streaming_url())
     
-    def makeListItem(self):
+    def makeListItem(self, replaceItems=False):
         media_number = self.get_media_number()
         if not media_number:
             media_number = 1
@@ -302,7 +302,7 @@ class Node_track(INode):
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=False)
+            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
         return item
 
     def attach_context_menu(self, item, menuItems=[]):
