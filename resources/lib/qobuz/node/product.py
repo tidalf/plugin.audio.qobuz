@@ -77,7 +77,7 @@ class Node_product(INode):
         image = self.get_image()
         item = xbmcgui.ListItem(
             label=self.get_label(),
-            label2=self.get_label2(),
+            label2=self.get_label(),
             iconImage=self.get_image(),
             thumbnailImage=self.get_image(),
             path=self.make_url(),

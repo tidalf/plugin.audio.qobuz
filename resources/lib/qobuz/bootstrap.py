@@ -99,7 +99,7 @@ class QobuzBootstrap(object):
                     'password'),
                 basePath=qobuz.path.cache,
                 streamFormat=streamFormat, 
-                hashKey=False,
+                hashKey=True,
                 cacheMiddle=cacheDurationMiddle,
                 cacheLong=cacheDurationLong
             )
@@ -206,8 +206,8 @@ class QobuzBootstrap(object):
             return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
             r = getRenderer(self.nodeType, self.params)
-            r.whiteFlag = Flag.ALL ^ ( Flag.TRACK | Flag.PRODUCT)
-            r.blackFlag = r.blackFlag
+            r.whiteFlag = Flag.TRACK | Flag.PRODUCT#Flag.ALL ^ ( Flag.TRACK | Flag.PRODUCT)
+#            r.blackFlag = r.blackFlag
             r.depth = -1
             return r.run()
         elif self.MODE == Mode.SCAN:

@@ -83,7 +83,7 @@ class Node_recommendation(INode):
             return None
         return str(self.genre_type) + '-' + str(self.genre_id)
 
-    def pre_build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         if not (self.genre_type and self.genre_id):
             return True
         offset = self.offset or 0
@@ -101,7 +101,7 @@ class Node_recommendation(INode):
         return True
     
 # TYPE
-    def _build_recos_type(self, xbmc_directory, lvl, flag):
+    def _build_recos_type(self, Dir, lvl, whiteFlag, blackFlag):
         colorItem = qobuz.addon.getSetting('color_item')
         for gid in RECOS_TYPE_IDS:
             node = Node_recommendation()
@@ -112,7 +112,7 @@ class Node_recommendation(INode):
         return True
 
 # GENRE
-    def _build_recos_genre(self, xbmc_directory, lvl, flag):
+    def _build_recos_genre(self, Dir, lvl, whiteFlag, blackFlag):
         colorItem = qobuz.addon.getSetting('color_item')
         for genre_id in RECOS_GENRES:
             node = Node_recommendation()
@@ -126,7 +126,7 @@ class Node_recommendation(INode):
         return True
 
 # TYPE GENRE
-    def _build_down_type_genre(self, xbmc_directory, lvl, flag):
+    def _build_down_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.data:
             return False
         for product in self.data['albums']['items']:
@@ -138,9 +138,9 @@ class Node_recommendation(INode):
 # DISPATCH
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.genre_type:
-            return self._build_recos_type(Dir, whiteFlag, blackFlag)
+            return self._build_recos_type(Dir, lvl, whiteFlag, blackFlag)
         elif not self.genre_id:
-            return self._build_recos_genre(Dir, whiteFlag, blackFlag)
+            return self._build_recos_genre(Dir, lvl, whiteFlag, blackFlag)
         self.content_type = 'albums'
-        return self._build_down_type_genre(Dir, whiteFlag, blackFlag)
+        return self._build_down_type_genre(Dir, lvl, whiteFlag, blackFlag)
 

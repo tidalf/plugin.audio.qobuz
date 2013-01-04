@@ -28,7 +28,7 @@ from node.flag import NodeFlag as Flag
 from debug import info, warn, log
 from irenderer import IRenderer
 from gui.util import notifyH, getImage, color, containerRefresh
-
+from exception import QobuzXbmcError as Qerror
 
 class XbmcWindow_musicfiles(xbmcgui.Window):
 
@@ -57,12 +57,18 @@ class QobuzXbmcRenderer(IRenderer):
     def run(self):
         from gui.directory import Directory
         if not self.set_root_node():
-            warn(
-                self, ("Cannot set root node (%s, %s) or method failed") % (str(self.node_type),
-                                                           str(self.node_id)))
+            warn(self, 
+                 ("Cannot set root node (%s, %s) or method failed") % 
+                 (str(self.node_type), str(self.root.get_parameter('nid'))))
             return False
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
-        self.root.build_down(Dir, self.depth, self.whiteFlag, self.blackFlag)
+        try:
+            ret = self.root.build_down(Dir, self.depth, self.whiteFlag, self.blackFlag)
+        except Qerror as e:
+            Dir.end_of_directory(False)
+            warn(self, 
+                 "Something went wrong while building down our tree...abort")
+            return False
         Dir.set_content(self.root.content_type)
         methods = [
             xbmcplugin.SORT_METHOD_UNSORTED,
@@ -77,14 +83,13 @@ class QobuzXbmcRenderer(IRenderer):
             xbmcplugin.SORT_METHOD_TRACKNUM, ]
         [xbmcplugin.addSortMethod(handle=qobuz.boot.handle,
                                   sortMethod=method) for method in methods]
-        Dir.end_of_directory()
-        return True
+        return Dir.end_of_directory()
 
     def scan(self):
         from gui.directory import Directory
         if not self.set_root_node():
-            warn(self, "Cannot set root node (" + str(
-                self.node_type) + ", " + str(self.node_id) + ")")
+            warn(self, "Cannot set root node ('%s')" % ( str(
+                self.node_type)))
             return False
         Dir = Directory(self.root, qobuz.boot.handle, False)
         self.root.build_down(Dir, -1, Flag.TRACK | Flag.STOPBUILD)

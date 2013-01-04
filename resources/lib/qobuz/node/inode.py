@@ -25,6 +25,7 @@ from constants import Mode
 from flag import NodeFlag as Flag
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, formatControlLabel
+from debug import log
 
 '''
     @class Inode:
@@ -41,7 +42,7 @@ class INode(object):
         self.image = None
         self.childs = []
         self.label = ''
-        self.label2 = ''
+        self.label2 = None
         self.is_folder = True
         self._data = None
         self.pagination_next = None
@@ -243,7 +244,7 @@ class INode(object):
         if not 'label' in ka:
             ka['label'] = self.get_label()
         if not 'label2' in ka:
-            ka['label2'] = self.get_label2()
+            ka['label2'] = self.get_label()
         if not 'image' in ka:
             ka['image'] = self.get_image()
         item = xbmcgui.ListItem(
@@ -253,8 +254,8 @@ class INode(object):
             ka['image'],
             ka['url']
         )
-        item.setProperty('Node.ID', str(self.id))
-        item.setProperty('Node.Type', str(self.type))
+#        item.setProperty('Node.ID', str(self.id))
+#        item.setProperty('Node.Type', str(self.type))
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:
@@ -325,7 +326,9 @@ class INode(object):
             params['offset'] = self.pagination_next_offset
             params['nid'] = self.id
             node = r.import_node(self.type, params)
-            label = self.get_label()
+            label = self.get_label() 
+            if not label and self.parent:
+                label = self.parent.get_label()
             if self.label2: label = self.label2
             #if self.parent: label = self.parent.label
             nextLabel = (
@@ -353,12 +356,12 @@ class INode(object):
         Dir.update(0, 100, 'Working', '', '')
         if lvl != -1 and lvl < 1:
             return False
-        if not self.type & Flag.STOPBUILD == Flag.STOPBUILD:
+        Dir.update(0, 100, 'Fetching', '', '')
+        if not (self.type & blackFlag == self.type):
             if not self.pre_build_down(Dir, lvl, whiteFlag, blackFlag):
                 return False
             else:
                 self.add_pagination(self.data)
-        Dir.update(0, 100, 'Fetching', '', '')
         self._build_down(Dir, lvl, whiteFlag, blackFlag)
         """ Recursive mode dont't decrement level """
         if lvl != -1:
@@ -378,10 +381,12 @@ class INode(object):
                 Dir.update(
                     count, total, "Working", label, child.get_label())
             """ Only white flagged added to the listing """
-            if self.type & whiteFlag == self.type:
+            if child.type & whiteFlag == child.type:
                 #print "Adding node " + Flag.to_s(self.type)
                 Dir.add_node(child)
                 count += 1
+            else:
+                log(self, "Skipping node: %s" % ( Flag.to_s(child.type)) )
             """ Calling builiding down on child """
             child.build_down(Dir, lvl, whiteFlag, blackFlag)
             child.childs = []

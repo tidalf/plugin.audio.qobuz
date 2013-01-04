@@ -79,18 +79,17 @@ class Directory():
 
     def add_item(self, **ka):
         if self.is_canceled() : return False
-        if xbmcplugin.addDirectoryItem(self.handle,
+        if not xbmcplugin.addDirectoryItem(self.handle,
                                     ka['url'],
                                     ka['item'],
                                     ka['is_folder'],
                                     self.total_put):
-            self.total_put += 1
-            return True
-        return False
-
+            raise QobuzXbmcError(who=self,what='xbmcdir_add_item_error')
+        self.total_put += 1
+        return True
+    
     def _put_item(self, node):
         if self.is_canceled() : return False
-        self.total_put += 1
         item = node.makeListItem()
         ret = None
         if not item:
@@ -110,24 +109,22 @@ class Directory():
             self.Progress.close()
             self.Progress = None
 
-    def end_of_directory(self):
+    def end_of_directory(self, forceStatus=None):
         success = True
+        if forceStatus != None:
+            success = forceStatus
         if not self.put_item_ok or (self.total_put == 0):
             success = False
-            # notify(30008, 36001, getImage('icon-error-256'))
         xbmcplugin.setContent(
             handle=self.handle, content=self.content_type)
         xbmcplugin.endOfDirectory(handle=self.handle,
                                   succeeded=success,
                                   updateListing=False,
                                   cacheToDisc=success)
-        if self.total_put == 0:
-            label = self.root.get_label()
-        self.update(100, 100, lang(
-            40003), lang(40002) + ': ' + str(self.total_put) + ' items')
+        self.update(100, 100, lang(40003), 
+                    "%s : %s items" % (lang(40002), str(self.total_put)))
         self.close()
-        # return success
-        return True
+        return self.total_put
 
     def set_content(self, content):
         log(self, "Set content: " + content)

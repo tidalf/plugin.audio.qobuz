@@ -39,7 +39,7 @@ class Node_playlist(INode):
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_playlist, self).__init__(parent, parameters)
         self.type = Flag.NODE | Flag.PLAYLIST
-        self.label = "Lang"
+        self.label = "Playlist"
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
@@ -67,7 +67,7 @@ class Node_playlist(INode):
 
     def hook_post_data(self):
         self.id = self.get_property('id')
-        self.label = self.get_name()
+        self.label = self.get_name() or 'No name...'
         
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
@@ -85,28 +85,33 @@ class Node_playlist(INode):
         for jtrack in data['tracks']['items']:
             node = None
             if self.packby == 'album':
-                jalbum = jtrack['album']
-                if jalbum['id'] in albumseen:
-                    continue
-                keys = ['artist', 'interpreter', 'composer']
-                for k in keys:
-                    if k in jtrack:
-                        jalbum[k] = jtrack[k]
-                if 'image' in jtrack:
-                    jalbum['image'] = jtrack['image']
-                node = Node_product(self, {'offset': 0})
-                cdata = qobuz.registry.get(
-                    name='product', id=jalbum['id'], noRemote=True)
-                node.data = cdata or jalbum
-                albumseen[jalbum['id']] = node
+                pass
+#                jalbum = jtrack['album']
+#                if jalbum['id'] in albumseen:
+#                    continue
+#                keys = ['artist', 'interpreter', 'composer']
+#                for k in keys:
+#                    if k in jtrack:
+#                        jalbum[k] = jtrack[k]
+#                if 'image' in jtrack:
+#                    jalbum['image'] = jtrack['image']
+#                node = Node_product(self, {'offset': 0})
+#                cdata = qobuz.registry.get(
+#                    name='product', id=jalbum['id'], noRemote=True)
+#                node.data = cdata or jalbum
+#                albumseen[jalbum['id']] = node
             else:
                 node = Node_track()
                 node.data = jtrack
             self.add_child(node)
         
     def get_name(self):
-        print pprint.pformat(self.data)
-        return self.get_property(('name'))
+        name = self.get_property('name') 
+        if name: return name
+        name = self.get_property('title')
+        if name: return name
+        print "NONAME: " + pprint.pformat(self.data)
+        return 'NoName'
     
     def get_owner(self):
         return self.get_property(('owner', 'name'))
@@ -224,11 +229,12 @@ class Node_playlist(INode):
         return False
 
     def add_as_new(self):
-        render = getRenderer(int(self.get_parameter('qnt')), self.id)
+        render = getRenderer(int(self.get_parameter('qnt')), self.parameters)
         render.depth = -1
-        render.filter = Flag.TRACK | Flag.STOPBUILD
+        render.whiteFlag = Flag.TRACK
         render.AS_LIST = True
         render.run()
+        print "Nodes: %s" % (pprint.pformat(render.nodes))
         playlist = Node_playlist(self, qobuz.boot.params)
         nid = playlist.create()
         if not nid:

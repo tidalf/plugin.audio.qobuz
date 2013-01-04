@@ -447,6 +447,8 @@ class QobuzRegistry():
         return self.cache.get(**ka)
 
     def set(self, **ka):
+        if not 'id' in ka:
+            ka['id'] = 0
         self.cache.set(**ka)
 
     def save(self):

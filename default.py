@@ -42,4 +42,5 @@ boot.bootstrap_app()
 boot.dispatch()
 #except QobuzXbmcError as e:
 #    warn('[' + pluginId + ']', "Exception while running plugin")
-
+import pprint, gc
+print "GC %s" % (pprint.pformat(gc.garbage))

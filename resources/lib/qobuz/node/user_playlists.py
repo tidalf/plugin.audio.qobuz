@@ -21,12 +21,13 @@ from flag import NodeFlag
 from inode import INode
 from debug import info, warn, error, debug
 from gui.util import color, lang, getImage, notifyH, containerRefresh
+from playlist import Node_playlist
+import pprint
 
 '''
     NODE USER PLAYLISTS
 '''
 
-from playlist import Node_playlist
 
 
 class Node_user_playlists(INode):
@@ -66,7 +67,7 @@ class Node_user_playlists(INode):
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
-        self.data = data
+        self.data = data['data']
         return True
     
     def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
@@ -75,9 +76,10 @@ class Node_user_playlists(INode):
             name='user-current-playlist-id', noRemote=True)
         if cid:
             cid = int(cid['data'])
-        for playlist in self.data['data']['playlists']['items']:
+        print pprint.pprint(self.data)
+        for data in self.data['playlists']['items']:
             node = Node_playlist(self, {'offset': 0})
-            node.data = playlist
+            node.data = data
             if self.display_product_cover:
                 pass
             if (cid and cid == node.id):
