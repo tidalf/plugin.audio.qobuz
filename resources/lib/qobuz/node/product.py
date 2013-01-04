@@ -56,14 +56,10 @@ class Node_product(INode):
         return True
     
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-#        if self.is_special_purchase:
-#            tracks = self._filter_tracks(self.data[''])
-#        else:
         for track in self.data['tracks']['items']:
             node = Node_track()
             node.data = track
             self.add_child(node)
-        
         return len(self.data['tracks']['items'])
 
     def _filter_tracks(self, tracks):

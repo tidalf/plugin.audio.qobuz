@@ -66,6 +66,8 @@ class QobuzXbmcRenderer(IRenderer):
             ret = self.root.build_down(Dir, self.depth, self.whiteFlag, self.blackFlag)
         except Qerror as e:
             Dir.end_of_directory(False)
+            del Dir.nodes
+            Dir = None
             warn(self, 
                  "Something went wrong while building down our tree...abort")
             return False

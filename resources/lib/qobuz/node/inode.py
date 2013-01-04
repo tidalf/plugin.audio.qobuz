@@ -25,7 +25,7 @@ from constants import Mode
 from flag import NodeFlag as Flag
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, formatControlLabel
-from debug import log
+from debug import log, warn
 
 '''
     @class Inode:
@@ -383,7 +383,10 @@ class INode(object):
             """ Only white flagged added to the listing """
             if child.type & whiteFlag == child.type:
                 #print "Adding node " + Flag.to_s(self.type)
-                Dir.add_node(child)
+                if not Dir.add_node(child):
+                    warn(self, "Something went wrong... aborting")
+                    self.childs = []
+                    raise Qerror(who=self, what='build_down_abort')
                 count += 1
             else:
                 log(self, "Skipping node: %s" % ( Flag.to_s(child.type)) )

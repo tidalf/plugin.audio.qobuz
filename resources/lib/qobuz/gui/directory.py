@@ -2,14 +2,12 @@
 import xbmcplugin
 import xbmcgui
 
-from node.flag import NodeFlag
-from constants import Mode
+
 from progress import Progress
-import qobuz
 import time
 from debug import warn, log
-from gui.util import notify, lang, getImage
-from exception import QobuzXbmcError
+from gui.util import lang
+from exception import QobuzXbmcError as Qerror
 
 
 class Directory():
@@ -43,6 +41,9 @@ class Directory():
         return time.time() - self.started_on
 
     def add_node(self, node):
+        if self.Progress.iscanceled():
+            raise Qerror(who=self, what="build_down_cancel")
+            return False
         if self.AS_LIST:
             self.nodes.append(node)
             return True
@@ -78,31 +79,29 @@ class Directory():
             ka['url'])
 
     def add_item(self, **ka):
-        if self.is_canceled() : return False
         if not xbmcplugin.addDirectoryItem(self.handle,
                                     ka['url'],
                                     ka['item'],
                                     ka['is_folder'],
                                     self.total_put):
-            raise QobuzXbmcError(who=self,what='xbmcdir_add_item_error')
-        self.total_put += 1
+            return False
+        self.total_put += 1    
         return True
     
     def _put_item(self, node):
-        if self.is_canceled() : return False
+        if self.is_canceled() : 
+            return False
         item = node.makeListItem()
         ret = None
         if not item:
             return False
-        try:
-            ret = self.add_item(url=node.make_url(),
+        if not self.add_item(url=node.make_url(),
                                 item=item,
-                                is_folder=node.is_folder)
-        except:
-            raise QobuzXbmcError(who=self, what='cannot_add_item', additional='')
-        if not ret:
+                                is_folder=node.is_folder):
             self.put_item_ok = False
-        return ret
+            return False
+        return True
+        
 
     def close(self):
         if self.Progress:
