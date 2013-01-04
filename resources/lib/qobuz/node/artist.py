@@ -22,8 +22,7 @@ from product import Node_product
 from debug import warn
 from gui.util import color
 
-import pprint
-#import xbmcgui
+import xbmcgui
 
 '''
     @class Node_artist(Inode): Artist

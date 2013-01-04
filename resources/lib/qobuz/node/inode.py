@@ -386,7 +386,7 @@ class INode(object):
             child.build_down(Dir, lvl, whiteFlag, blackFlag)
             child.childs = []
         self.childs = []
-        return True
+        return count
 
     '''
         _build_down:
