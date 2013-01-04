@@ -69,7 +69,6 @@ class QobuzXbmcRenderer(IRenderer):
                 containerRefresh()
                 return True
             return False
-        print "Build in run"
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
         self.root.build_down(Dir, self.depth, self.blackFlag)
         Dir.set_content(self.root.content_type)

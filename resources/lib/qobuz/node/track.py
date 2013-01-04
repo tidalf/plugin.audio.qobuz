@@ -40,10 +40,8 @@ class Node_track(INode):
         self.image = getImage('song')
 
     def pre_build_down(self, Dir, lvl = 1, flag = Flag.STOPBUILD):
-        print "FLAG: " + repr(flag)
         if flag & Flag.STOPBUILD == Flag.STOPBUILD:
             return False
-        print "GETTTING TRACK DATA"
         data = qobuz.registry.get(name='track', id=self.id)
         if not data:
             return False
@@ -134,7 +132,7 @@ class Node_track(INode):
         nid = self.id or self.parameters['nid']
         data = qobuz.registry.get(name='user-stream-url', id=nid)
         if not data:
-            return None
+            return ''
         return data['data']['url']
 
     def get_artist(self):
