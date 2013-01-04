@@ -61,7 +61,7 @@ def log(obj, msg, lvl=LOGNOTICE):
             name = obj.__class__.__name__
         except:
             name = type(obj)
-    ourlog('[' + str(name) + "] " + msg, lvl)
+    ourlog('[Qobuz/' + str(name) + "] " + msg, lvl)
 
 
 def warn(obj, msg):

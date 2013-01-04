@@ -88,7 +88,9 @@ class QobuzApi:
         useToken = False if (opt and 'noToken' in opt) else True
 
         # Setting header
-        qheaders = {}
+        qheaders = {
+#                    'content-type': 'application/json'
+        }
         if useToken and self.authtoken:
             qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
         qheaders["X-APP-ID"] = self.appid
@@ -133,6 +135,8 @@ class QobuzApi:
             When something wrong we are deleting our auth token
                 '''
             return None
+#        print "Header: %s" % (pprint.pformat(r.headers))
+#        print "Res: %s" % (pprint.pformat(response_json))
         return response_json
 
     '''

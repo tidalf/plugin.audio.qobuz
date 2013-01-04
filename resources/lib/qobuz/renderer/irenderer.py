@@ -75,14 +75,16 @@ class IRenderer(object):
         
     """
     def set_root_node(self):
-        if self.root: return False
+        if self.root: return self.root
         self.root = self.import_node(self.node_type, self.parameters)
+        return self.root
+    
+    def execute_method_parameter(self):
         if 'nm' in self.parameters:
             methodName = self.parameters['nm']
             del self.parameters['nm']
             log(self, "Executing method on node: " + repr(methodName))
             if getattr(self.root, methodName)():
                 containerRefresh()
-                return True
-            return False
-        return True
+            return True
+        return False

@@ -55,18 +55,20 @@ class QobuzXbmcRenderer(IRenderer):
         ka['dir'].add_item(url=ka['url'], item=item, is_folder=ka['is_folder'])
 
     def run(self):
-        from gui.directory import Directory
         if not self.set_root_node():
             warn(self, 
-                 ("Cannot set root node (%s, %s) or method failed") % 
+                 ("Cannot set root node (%s, %s)") % 
                  (str(self.node_type), str(self.root.get_parameter('nid'))))
             return False
+        if self.execute_method_parameter():
+            return False
+        from gui.directory import Directory
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
         try:
-            ret = self.root.build_down(Dir, self.depth, self.whiteFlag, self.blackFlag)
+            ret = self.root.build_down(Dir, self.depth, 
+                                       self.whiteFlag, self.blackFlag)
         except Qerror as e:
             Dir.end_of_directory(False)
-            del Dir.nodes
             Dir = None
             warn(self, 
                  "Something went wrong while building down our tree...abort")

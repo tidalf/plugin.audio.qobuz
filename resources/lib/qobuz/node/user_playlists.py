@@ -61,7 +61,6 @@ class Node_user_playlists(INode):
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
-        debug(self, "Build-down: user playlists")
         data = qobuz.registry.get(
             name='user-playlists', limit=limit, offset=self.offset)
         if not data:
@@ -76,7 +75,6 @@ class Node_user_playlists(INode):
             name='user-current-playlist-id', noRemote=True)
         if cid:
             cid = int(cid['data'])
-        print pprint.pprint(self.data)
         for data in self.data['playlists']['items']:
             node = Node_playlist(self, {'offset': 0})
             node.data = data

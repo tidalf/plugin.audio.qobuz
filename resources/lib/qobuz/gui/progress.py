@@ -72,7 +72,7 @@ class Progress(xbmcgui.DialogProgress):
         elapsed = self._pretty_time((time.time() - self.started_on))
         try:
             return super(Progress, self).update(percent,
-                                                '[%s] %s' % (elapsed, line1),
+                                                '[%s]%s' % (elapsed, line1),
                                                 line2, line3)
         except:
             warn(self, "Cannot update progress bar")

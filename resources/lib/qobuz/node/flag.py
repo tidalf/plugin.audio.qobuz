@@ -44,7 +44,6 @@ class __NodeFlag():
         self.ALL = 0
         for i in range(1, self.totalFlag):
             self.ALL |= (1 << i)
-        print "ALL: " + repr(self.ALL)
         
     def to_s(self, flag):
         if flag & self.TRACK == self.TRACK:

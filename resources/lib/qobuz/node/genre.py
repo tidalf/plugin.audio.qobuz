@@ -51,6 +51,7 @@ class Node_genre(INode):
 
     def _build_down_reco(self, directory, lvl, whiteFlag, blackFlag, ID):
         for gtype in RECOS_TYPE_IDS:
+            print "Build Node RECO %s / %s" % (ID, gtype)
             node = Node_recommendation(
                 self, {'genre-id': ID, 'genre-type': gtype})
             node.build_down(directory, -1, Flag.PRODUCT, blackFlag)

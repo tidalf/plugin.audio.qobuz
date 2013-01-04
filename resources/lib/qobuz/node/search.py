@@ -24,6 +24,7 @@ from track import Node_track
 from product_by_artist import Node_product_by_artist
 from exception import QobuzXbmcError
 from gui.util import notifyH, lang, getImage
+import urllib
 
 class Node_search(INode):
 
@@ -93,7 +94,7 @@ class Node_search(INode):
         if not data:
             warn(self, "Search return no data")
             return False
-        self.set_parameter('query', query)
+        self.set_parameter('query', (urllib.quote_plus(query)) )
         self.data = data
         return True
     

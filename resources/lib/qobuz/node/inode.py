@@ -26,6 +26,7 @@ from flag import NodeFlag as Flag
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, formatControlLabel
 from debug import log, warn
+from time import time
 
 '''
     @class Inode:
@@ -192,6 +193,12 @@ class INode(object):
             return None
         return self.parameters[name]
 
+    def del_parameter(self, name):
+        if not name in self.parameters:
+            return False
+        del self.parameters[name]
+        return True
+    
     '''
         Make url
         This function is responsible to create the link to this node.
@@ -349,14 +356,19 @@ class INode(object):
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
+    def build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None, gData=None):
         if Dir.Progress.iscanceled():
             print "Canceled..."
             return False
-        Dir.update(0, 100, 'Working', '', '')
+        if not gData:
+            gData = {
+                     'count': 0,
+                     'total': 100,
+            }
+        #Dir.update(gData, 'Working', '', '')
         if lvl != -1 and lvl < 1:
             return False
-        Dir.update(0, 100, 'Fetching', '', '')
+        Dir.update(gData, 'Fetching', '', '')
         if not (self.type & blackFlag == self.type):
             if not self.pre_build_down(Dir, lvl, whiteFlag, blackFlag):
                 return False
@@ -366,35 +378,30 @@ class INode(object):
         """ Recursive mode dont't decrement level """
         if lvl != -1:
             lvl -= 1
-        count = 0
         label = self.get_label()
-        total = len(self.childs)
-        Dir.update(count, total, 'Working', label, '')
+        gData['count'] = 0
+        gData['total'] = len(self.childs)
+        #Dir.update(gData, 'Working', label, '')
         self._add_pagination_node(Dir, lvl, whiteFlag)
-        Dir.update(count, total, 'Working', label, '')
+        Dir.update(gData, 'Working', label, '')
         """ We are looking for our childs """
         for child in self.childs:
             if Dir.is_canceled():
                 return False
-            """ We are not updating progress for each track """
-            if not (child.type & Flag.TRACK == Flag.TRACK):
-                Dir.update(
-                    count, total, "Working", label, child.get_label())
             """ Only white flagged added to the listing """
             if child.type & whiteFlag == child.type:
-                #print "Adding node " + Flag.to_s(self.type)
                 if not Dir.add_node(child):
                     warn(self, "Something went wrong... aborting")
                     self.childs = []
                     raise Qerror(who=self, what='build_down_abort')
-                count += 1
+                gData['count'] += 1
+                Dir.update(gData, "Working", label, child.get_label())
             else:
                 log(self, "Skipping node: %s" % ( Flag.to_s(child.type)) )
             """ Calling builiding down on child """
-            child.build_down(Dir, lvl, whiteFlag, blackFlag)
-            child.childs = []
+            child.build_down(Dir, lvl, whiteFlag, blackFlag, gData)
         self.childs = []
-        return count
+        return gData['count']
 
     '''
         _build_down:

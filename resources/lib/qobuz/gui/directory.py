@@ -21,9 +21,9 @@ class Directory():
         self.put_item_ok = True
         self.Progress = Progress(True)
         self.total_put = 0
-        self.started_on = time.time()
+        self.startedOn = time.time()
         self.Progress.create(self.label + root.get_label())
-        self.update(0, 100, lang(40000))
+        self.update({'count': 0, 'total':100}, lang(40000))
         self.line1 = ''
         self.line2 = ''
         self.line3 = ''
@@ -46,12 +46,15 @@ class Directory():
             return False
         if self.AS_LIST:
             self.nodes.append(node)
+            self.total_put += 1
             return True
         return self._put_item(node)
        
 
-    def update(self, count, total, line1, line2='', line3=''):
+    def update(self, gData, line1, line2='', line3=''):
         percent = 100
+        total = gData['total']
+        count = gData['count']
         if total and count:
             percent = count * (1 + 100 / total)
         else:
@@ -64,6 +67,7 @@ class Directory():
         self.line2 = line2
         self.line3 = line3
         self.percent = percent
+        line1 = "[%05i] %s" % (self.total_put, line1)
         self.Progress.update(percent, line1, line2, line3)
         return True
 
@@ -120,7 +124,7 @@ class Directory():
                                   succeeded=success,
                                   updateListing=False,
                                   cacheToDisc=success)
-        self.update(100, 100, lang(40003), 
+        self.update({'count': 100, 'total':100}, lang(40003), 
                     "%s : %s items" % (lang(40002), str(self.total_put)))
         self.close()
         return self.total_put
