@@ -15,7 +15,6 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmc
-import xbmcplugin
 import xbmcgui
 
 import qobuz
@@ -23,7 +22,6 @@ from debug import warn
 from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, getImage
 from node.flag import NodeFlag as Flag
 from node.track import Node_track
-#from fakeipc import FakeIPC
 
 """
     @class: QobuzPlayer
@@ -36,22 +34,17 @@ class QobuzPlayer(xbmc.Player):
         self.track_id = None
         self.total = None
         self.elapsed = None
-        #self.IPC = FakeIPC('Qobuz.IPC.Player')
 
     """
         Playing track given a track id
     """
     def play(self, track_id):
-        node = Node_track(None, {'nid': track_id})
-        node.pre_build_down(None, 1, Flag.TRACK)
+        track = Node_track(None, {'nid': track_id})
+        ''' We are just fetching our data '''
+        track.pre_build_down(None, 1, Flag.TRACK)
         xbmcgui.Window(10000).setProperty("NID", track_id) 
-        #self.IPC.write({
-        #            'nid': node.id,
-        #            'nt': node.type,
-        #            'streamingUrl': streaming_url,
-        #})
         item = None
-        if not node.data:
+        if not track.data:
             warn(self, "Cannot get track data")
             label = "Maybe an invalid track id"
             item = xbmcgui.ListItem("No track information",
@@ -60,17 +53,18 @@ class QobuzPlayer(xbmc.Player):
                                     getImage('icon-error-256'),
                                     '')
         else:
-            item = node.makeListItem()
-        if not node.get_mimetype():
+            item = track.makeListItem()
+            track.item_add_playing_property(item)
+        if not track.get_mimetype():
             warn(self, "Cannot get streaming URL")
             return False
         # some tracks are not authorized for stream and a 60s sample is
         # returned, in that case we overwrite the song duration
-        if node.is_sample():
+        if track.is_sample():
             item.setInfo(
                 'music', infoLabels={
                 'duration': 60,
-                })
+            })
             # don't warn for free account (all songs except purchases are 60s
             # limited)
             if not isFreeAccount():
@@ -79,12 +73,12 @@ class QobuzPlayer(xbmc.Player):
             Notify
         """
         if qobuz.addon.getSetting('notification_playingsong') == 'true':
-            notifyH(lang(34000), node.get_label(), node.get_image())
+            notifyH(lang(34000), track.get_label(), track.get_image())
         """
             We are called from playlist...
         """
         if qobuz.boot.handle == -1:
-            super(QobuzPlayer, self).play(node.get_streaming_url(), 
+            super(QobuzPlayer, self).play(track.get_streaming_url(), 
                                           item, False)
         else:
             setResolvedUrl(handle=qobuz.boot.handle,

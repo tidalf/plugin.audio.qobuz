@@ -206,21 +206,23 @@ class QobuzBootstrap(object):
                 return True
             return False
 
-        from renderer.xbmc import Xbmc_renderer as renderer
+        from util import getRenderer
 
         if self.MODE == Mode.VIEW:
-            r = renderer(self.NT, self.NID)
+            r = getRenderer(self.NT, self.NID)
+            r.blackFlag = Flag.STOPBUILD
             return r.run()
 
         elif self.MODE == Mode.VIEW_BIG_DIR:
-            r = renderer(self.NT, self.NID)
+            r = getRenderer(self.NT, self.NID)
+            r.blackFlag = Flag.STOPBUILD
             r.depth = -1
             return r.run()
 
         elif self.MODE == Mode.SCAN:
-            r = renderer(self.NT, self.NID)
+            r = getRenderer(self.NT, self.NID)
             r.depth = -1
-            r.filter = Flag.STOPBUILDOWN
+            r.filter = Flag.STOPBUILD
             return r.scan()
 
         else:

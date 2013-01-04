@@ -172,9 +172,8 @@ class Monitor(xbmc.Monitor):
     def onSettingsChanged(self):
         self.cache_remove_user_data()
 
-
 boot = QobuzBootstrap(__addon__, 0)
-logLabel = '[QobuzCache]'
+logLabel = 'QobuzCache'
 try:
     boot.bootstrap_app()
     monitor = Monitor(qobuz)

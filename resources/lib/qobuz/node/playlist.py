@@ -196,7 +196,7 @@ class Node_playlist(INode):
     def add_to_current(self):
         render = getRenderer(int(self.get_parameter('qnt')), self.id)
         render.depth = -1
-        render.filter = Flag.TRACK | Flag.STOPBUILDOWN
+        render.filter = Flag.TRACK | Flag.STOPBUILD
         render.AS_LIST = True
         render.run()
         playlist = Node_playlist(self, qobuz.boot.params)
@@ -228,7 +228,7 @@ class Node_playlist(INode):
     def add_as_new(self):
         render = getRenderer(int(self.get_parameter('qnt')), self.id)
         render.depth = -1
-        render.filter = Flag.TRACK | Flag.STOPBUILDOWN
+        render.filter = Flag.TRACK | Flag.STOPBUILD
         render.AS_LIST = True
         render.run()
         playlist = Node_playlist(self, qobuz.boot.params)

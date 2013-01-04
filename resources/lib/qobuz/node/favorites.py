@@ -114,7 +114,7 @@ class Node_favorites(INode):
             render.set_filter(view_filter)
             render.set_root_node()
             Dir = Directory(render.root, qobuz.boot.handle, True)
-            flags = Flag.TRACK | Flag.STOPBUILDOWN
+            flags = Flag.TRACK | Flag.STOPBUILD
             if render.root.type & Flag.TRACK:
                 flags = Flag.TRACK
             ret = render.root.build_down(Dir, depth, flags)

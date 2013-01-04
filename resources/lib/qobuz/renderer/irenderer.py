@@ -27,7 +27,7 @@ class IRenderer(object):
         self.node_type = node_type
         self.node_id = node_id
         self.root = None
-        self.filter = Flag.NODE | Flag.STOPBUILDOWN
+        self.blackFlag = 0 | Flag.STOPBUILD
         self.depth = 1
         self.asList = False
         self.nodes = []

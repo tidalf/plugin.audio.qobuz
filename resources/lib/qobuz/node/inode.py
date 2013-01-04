@@ -34,7 +34,6 @@ class INode(object):
 
     def __init__(self, parent=None, parameters=None):
         self.parameters = parameters or {}
-        self.type = Flag.NODE
         self.id = self.get_parameter('nid')
         self.parent = parent
         self.type = self.get_parameter('nt') or Flag.NODE
@@ -341,30 +340,31 @@ class INode(object):
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self, Dir, lvl=1, whiteFlag=None):
-        total = len(self.childs)
-        count = 0
-        label = self.get_label()
-        Dir.update(0, total, 'Working', label, '')
+    def build_down(self, Dir, lvl=1, blackFlag=Flag.NODE):
+        Dir.update(0, 100, 'Working', '', '')
         if lvl != -1 and lvl < 1:
             return False
-        if not self.pre_build_down(Dir, lvl, whiteFlag):
+        if not self.pre_build_down(Dir, lvl, blackFlag):
+            print "PreBuildDown returning False"
             return False
-        Dir.update(0, total, 'Fetching data', label, '')
-        self._build_down(Dir, lvl, whiteFlag)
-        self._add_pagination_node(Dir, lvl, whiteFlag)
-        if lvl != -1:
-            lvl -= 1
-        Dir.update(0, total, 'Working', label, '')
+        Dir.update(0, 100, 'Fetching', '', '')
+        self._build_down(Dir, lvl, blackFlag)
+        lvl -= 1
+        count = 0
+        label = self.get_label()
+        total = len(self.childs)
+        Dir.update(count, total, 'Working', label, '')
+        self._add_pagination_node(Dir, lvl, blackFlag)
+        Dir.update(count, total, 'Working', label, '')
         for child in self.childs:
             if Dir.is_canceled():
                 return False
-            if not (child.type & Flag.TRACK):
+            if not (child.type & Flag.TRACK == Flag.TRACK):
                 Dir.update(
                     count, total, "Working", label, child.get_label())
-            if child.type & whiteFlag:
-                Dir.add_node(child)
-            child.build_down(Dir, lvl, whiteFlag)
+            Dir.add_node(child)
+            if child.type & blackFlag == Flag.STOPBUILD:
+                child.build_down(Dir, lvl, blackFlag)
             count += 1
         return True
 

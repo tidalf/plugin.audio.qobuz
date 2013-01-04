@@ -41,10 +41,10 @@ class XbmcWindow_musicfiles(xbmcgui.Window):
         print 'Action: ' + repr(action.getId())
 
 
-class Xbmc_renderer(IRenderer):
+class QobuzXbmcRenderer(IRenderer):
 
     def __init__(self, node_type, node_id=None):
-        super(Xbmc_renderer, self).__init__(node_type, node_id)
+        super(QobuzXbmcRenderer, self).__init__(node_type, node_id)
 
     def add_directory_item(self, **ka):
         if not 'is_folder' in ka:
@@ -69,8 +69,9 @@ class Xbmc_renderer(IRenderer):
                 containerRefresh()
                 return True
             return False
+        print "Build in run"
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
-        self.root.build_down(Dir, self.depth, self.filter)
+        self.root.build_down(Dir, self.depth, self.blackFlag)
         Dir.set_content(self.root.content_type)
         methods = [
             xbmcplugin.SORT_METHOD_UNSORTED,
@@ -95,7 +96,7 @@ class Xbmc_renderer(IRenderer):
                 self.node_type) + ", " + str(self.node_id) + ")")
             return False
         Dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(Dir, -1, Flag.TRACK | Flag.STOPBUILDOWN)
+        self.root.build_down(Dir, -1, Flag.TRACK | Flag.STOPBUILD)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()
         notifyH('Scanning results', str(Dir.total_put) +

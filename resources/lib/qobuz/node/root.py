@@ -14,7 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from inode import INode
 from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
@@ -36,7 +36,7 @@ class Node_root(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_root, self).__init__(parent, parameters)
-        self.type = NodeFlag.NODE | NodeFlag.ROOT
+        self.type = Flag.ROOT
         self.content_type = 'files'
         self.label = "Qobuz"
         # self.image = qobuz.image.access.get('default')

@@ -20,65 +20,67 @@ from exception import QobuzXbmcError
 
 class __NodeFlag():
     def __init__(self):
-        self.STOPBUILDOWN = 1
-        self.NODE = 2
-        self.TRACK = 4
-        self.PLAYLIST = 8
-        self.USERPLAYLISTS = 16
-        self.RECOMMENDATION = 32
-        self.ROOT = 64
-        self.PRODUCT = 128
-        self.PURCHASES = 256
-        self.SEARCH = 512
-        self.ARTIST = 1024
-        self.SIMILAR_ARTIST = 2048
-        self.FAVORITES = 4096
-        self.CUSTOM_SEARCH = 8192
-        self.FRIEND = 16384
-        self.FRIEND_LIST = 32768
-        self.GENRE = 65536
-        self.LABEL = 131072
-        self.PRODUCTS = 262144
-
+        self.NODE = 1 << 1
+        self.TRACK = 1 << 2
+        self.PLAYLIST = 1 << 3
+        self.USERPLAYLISTS = 1 << 4
+        self.RECOMMENDATION = 1 << 5
+        self.ROOT = 1 << 6
+        self.PRODUCT = 1 << 7
+        self.PURCHASES = 1 << 8
+        self.SEARCH = 1 << 9
+        self.ARTIST = 1 << 10
+        self.SIMILAR_ARTIST = 1 << 11
+        self.FAVORITES = 1 << 12
+        self.FRIEND = 1 << 13
+        self.FRIEND_LIST = 1 << 14
+        self.GENRE = 1 << 15
+        self.LABEL = 1 << 16
+        self.PRODUCTS = 1 << 17
+        self.STOPBUILD = 1 << 18
+        
     def to_s(self, flag):
-        if flag & self.TRACK:
+        print "Flag: " + repr(flag)
+        if flag & self.TRACK == self.TRACK:
             return "track"
-        elif flag & self.PLAYLIST:
+        elif flag & self.PLAYLIST == self.PLAYLIST:
             return "playlist"
-        elif flag & self.USERPLAYLISTS:
+        elif flag & self.USERPLAYLISTS == self.USERPLAYLISTS:
             return "user_playlists"
-        elif flag & self.RECOMMENDATION:
+        elif flag & self.RECOMMENDATION == self.RECOMMENDATION:
             return "recommendation"
-        elif flag & self.ROOT:
+        elif flag & self.ROOT == self.ROOT:
             return "root"
-        elif flag & self.PRODUCT:
+        elif flag & self.PRODUCT == self.PRODUCT:
             return "product"
-        elif flag & self.PURCHASES:
+        elif flag & self.PURCHASES == self.PURCHASES:
             return "purchases"
-        elif flag & self.FAVORITES:
+        elif flag & self.FAVORITES == self.FAVORITES:
             return "favorites"
-        elif flag & self.SEARCH:
+        elif flag & self.SEARCH == self.SEARCH:
             return "search"
-        elif flag & self.ARTIST:
+        elif flag & self.ARTIST == self.ARTIST:
             return "artist"
-        elif flag & self.SIMILAR_ARTIST:
+        elif flag & self.SIMILAR_ARTIST == self.SIMILAR_ARTIST:
             return "similar_artist"
-        elif flag & self.FRIEND:
+        elif flag & self.FRIEND == self.FRIEND:
             return "friend"
-        elif flag & self.FRIEND_LIST:
+        elif flag & self.FRIEND_LIST == self.FRIEND_LIST:
             return "friend_list"
-        elif flag & self.GENRE:
+        elif flag & self.GENRE == self.GENRE:
             return "genre"
-        elif flag & self.LABEL:
+        elif flag & self.LABEL == self.LABEL:
             return "label"
-        elif flag & self.NODE:
+        elif flag & self.NODE == self.NODE:
             return "inode"
-        elif flag & self.PRODUCTS:
+        elif flag & self.PRODUCTS == self.PRODUCTS:
             return "products"
-        elif flag & self.STOPBUILDDOWN:
+        elif flag & self.STOPBUILD == self.STOPBUILD:
             return "stop_build_down"
         else:
             raise QobuzXbmcError(
                 who=self, what='invalid_flag', additional=repr(flag))
-
+            
 NodeFlag = __NodeFlag()
+#for i in range(1, 18):
+#    print "%i => %s" % (1 << i , NodeFlag.to_s(1 << i))

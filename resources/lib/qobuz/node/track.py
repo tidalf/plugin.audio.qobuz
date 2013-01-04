@@ -32,23 +32,27 @@ class Node_track(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_track, self).__init__(parent, parameters)
-        self.type = Flag.NODE | Flag.TRACK
+        self.type = Flag.TRACK
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
         self.status = None
         self.image = getImage('song')
 
-    def pre_build_down(self, Dir, lvl = 1, flag = None):
-        if flag & Flag.STOPBUILDOWN:
+    def pre_build_down(self, Dir, lvl = 1, flag = Flag.STOPBUILD):
+        print "FLAG: " + repr(flag)
+        if flag & Flag.STOPBUILD == Flag.STOPBUILD:
             return False
+        print "GETTTING TRACK DATA"
         data = qobuz.registry.get(name='track', id=self.id)
         if not data:
             return False
         self.data = data['data']
+        if not self.data:
+            return False
         return True
     
-    def _build_down(self, Dir, lvl, flag=None):
+    def _build_down(self, Dir, lvl, flag=Flag.STOPBUILD):
         Dir.add_node(self)
         return True
 
@@ -235,7 +239,14 @@ class Node_track(INode):
             warn(self, "Unknow format " + str(formatId))
             mime = 'audio/mpeg'
         return mime
-        
+    
+    """ We add this information only when playing item because it require
+        use to fetch data from Qobuz
+    """
+    def item_add_playing_property(self, item):
+        item.setProperty('mimetype', self.get_mimetype())
+        item.setPath(self.get_streaming_url())
+    
     def makeListItem(self):
         media_number = self.get_media_number()
         if not media_number:
@@ -290,8 +301,6 @@ class Node_track(INode):
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
-        item.setProperty('mimetype', self.get_mimetype())
-        item.setPath(self.get_streaming_url())
         menuItems = []
         self.attach_context_menu(item, menuItems)
         if len(menuItems) > 0:

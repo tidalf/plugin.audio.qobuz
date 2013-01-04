@@ -17,7 +17,7 @@
 import xbmcgui
 
 import qobuz
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
 from gui.util import getImage
@@ -36,19 +36,18 @@ class Node_product(INode):
 
     def __init__(self, parent=None, params=None):
         super(Node_product, self).__init__(parent, params)
-        self.type = NodeFlag.NODE | NodeFlag.PRODUCT
+        self.type = Flag.NODE | Flag.PRODUCT
         self.image = getImage('album')
         self.content_type = 'albums'
         self.is_special_purchase = False
         self.offset = None
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
-        nid = self.id
+    def _build_down(self, xbmc_directory, lvl, blackFlag=None):
         data = None
         if self.is_special_purchase:
-            data = qobuz.registry.get(name='purchase', id=nid)
+            data = qobuz.registry.get(name='purchase', id=self.id)
         else:
-            data = qobuz.registry.get(name='product', id=nid)
+            data = qobuz.registry.get(name='product', id=self.id)
         if not data:
             warn(self, "Cannot fetch product data")
             return False
