@@ -63,7 +63,7 @@ class Node_recommendation(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
-        self.type = Flag.NODE | Flag.RECOMMENDATION
+        self.type = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(lang(30082))

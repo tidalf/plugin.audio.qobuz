@@ -30,7 +30,7 @@ class Node_search(INode):
 
     def __init__(self, parent=None, params=None):
         super(Node_search, self).__init__(parent, params)
-        self.type = NodeFlag.NODE | NodeFlag.SEARCH
+        self.type = NodeFlag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = None
 

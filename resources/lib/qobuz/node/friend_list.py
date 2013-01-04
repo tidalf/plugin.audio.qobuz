@@ -32,7 +32,7 @@ class Node_friend_list(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_friend_list, self).__init__(parent, parameters)
-        self.type = Flag.NODE | Flag.FRIEND_LIST
+        self.type = Flag.FRIEND_LIST
         self.name = self.get_parameter('name')
         self.image = getImage('artist')
         self.label = str(self.name) + "'s Friends (i8n)" if (

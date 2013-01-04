@@ -30,7 +30,7 @@ class Node_purchases(INode):
     def __init__(self, parent=None, params=None):
         super(Node_purchases, self).__init__(parent, params)
         self.label = lang(30100)
-        self.type = NodeFlag.NODE | NodeFlag.PURCHASES
+        self.type = NodeFlag.PURCHASES
         self.content_type = 'albums'
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0

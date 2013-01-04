@@ -32,7 +32,7 @@ class Node_artist(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.NODE | NodeFlag.ARTIST
+        self.type = NodeFlag.ARTIST
         self.set_label(self.get_name())
         self.is_folder = True
         self.slug = ''

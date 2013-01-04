@@ -36,7 +36,7 @@ class Node_product(INode):
 
     def __init__(self, parent=None, params=None):
         super(Node_product, self).__init__(parent, params)
-        self.type = Flag.NODE | Flag.PRODUCT
+        self.type = Flag.PRODUCT
         self.image = getImage('album')
         self.content_type = 'albums'
         self.is_special_purchase = False

@@ -33,7 +33,7 @@ class Node_friend(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_friend, self).__init__(parent, parameters)
-        self.type = Flag.NODE | Flag.FRIEND
+        self.type = Flag.FRIEND
         self.image = getImage('artist')
         self.name = ''
         self.set_name(self.get_parameter('name'))

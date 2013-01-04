@@ -33,7 +33,7 @@ class Node_similar_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_similar_artist, self).__init__(parent, parameters)
-        self.type = Flag.NODE | Flag.SIMILAR_ARTIST
+        self.type = Flag.SIMILAR_ARTIST
         self.content_type = 'artist'
         self.offset = self.get_parameter('offset') or 0
 

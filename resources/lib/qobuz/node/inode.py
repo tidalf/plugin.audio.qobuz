@@ -455,7 +455,7 @@ class INode(object):
         menuItems.append((color(colorItem, lang(30080)), cmd))
 
         ''' Show playlist '''
-        if not (self.type & Flag.PLAYLIST == Flag.USERPLAYLISTS):
+        if not (self.type & Flag.USERPLAYLISTS == Flag.USERPLAYLISTS):
             cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
             menuItems.append((color(colorItem, lang(39005)), cmd))
 

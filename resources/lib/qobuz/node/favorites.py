@@ -34,7 +34,7 @@ class Node_favorites(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_favorites, self).__init__(parent, parameters)
-        self.type = Flag.NODE | Flag.FAVORITES
+        self.type = Flag.FAVORITES
         self.set_label(lang(30079))
         self.packby = ''
         self.name = lang(30079)

@@ -38,7 +38,7 @@ class Node_playlist(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_playlist, self).__init__(parent, parameters)
-        self.type = Flag.NODE | Flag.PLAYLIST
+        self.type = Flag.PLAYLIST
         self.label = "Playlist"
         self.registryKey = 'user-playlist'
         self.current_playlist_id = None

@@ -36,7 +36,7 @@ class Node_user_playlists(INode):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
         self.image = getImage('userplaylists')
-        self.type = NodeFlag.NODE | NodeFlag.USERPLAYLISTS
+        self.type = NodeFlag.USERPLAYLISTS
         self.content_type = 'files'
         display_by = self.get_parameter('display-by')
         if not display_by:
