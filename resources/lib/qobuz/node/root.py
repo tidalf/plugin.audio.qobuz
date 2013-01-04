@@ -41,7 +41,7 @@ class Node_root(INode):
         self.label = "Qobuz"
         # self.image = qobuz.image.access.get('default')
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(Node_user_playlists())
         if qobuz.addon.getSetting('show_recommendations') == 'true':
             self.add_child(Node_recommendation())

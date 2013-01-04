@@ -23,7 +23,7 @@ import xbmcgui
 import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag
-from exception import QobuzXbmcError
+from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, formatControlLabel
 
 '''
@@ -98,7 +98,7 @@ class INode(object):
     @content_type.setter
     def content_type(self, type):
         if type not in ['songs', 'albums', 'files', 'artist']:
-            raise QobuzXbmcError(
+            raise Qerror(
                 who=self, what='invalid_type', additional=type)
         self._content_type = type
 
@@ -142,6 +142,8 @@ class INode(object):
     is required
     '''
     def add_pagination(self, data):
+        if not data:
+            return False
         paginated = ['albums', 'labels', 'tracks', 'artists',
                      'playlists', 'playlist']
         items = None
@@ -221,9 +223,13 @@ class INode(object):
             qnt = ka['qnt']
         if qnt:
             url+= '&qnt=' + str(qnt)
+        qid = self.get_parameter('qid')
+        if 'qid' in ka:
+            qid = ka['qid']
+        if qid:
+            url+= '&qid=' + str(qid)
         if 'query' in ka:
             url+= '&query=' + ka['query']
-      
         return url
 
     '''
@@ -331,7 +337,7 @@ class INode(object):
             self.add_child(node)
     
     # When returning False we are not displaying directory content
-    def pre_build_down(self, xbmc_directory, lvl=1, whiteFlag=None):
+    def pre_build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
         return True
     
     '''
@@ -340,32 +346,46 @@ class INode(object):
         Node without cached data don't need to overload this method
     '''
 
-    def build_down(self, Dir, lvl=1, blackFlag=Flag.NODE):
+    def build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
+        if Dir.Progress.iscanceled():
+            print "Canceled..."
+            return False
         Dir.update(0, 100, 'Working', '', '')
         if lvl != -1 and lvl < 1:
             return False
-        if not self.pre_build_down(Dir, lvl, blackFlag):
-            print "PreBuildDown returning False"
-            return False
+        if not self.type & Flag.STOPBUILD == Flag.STOPBUILD:
+            if not self.pre_build_down(Dir, lvl, whiteFlag, blackFlag):
+                return False
+            else:
+                self.add_pagination(self.data)
         Dir.update(0, 100, 'Fetching', '', '')
-        self._build_down(Dir, lvl, blackFlag)
-        lvl -= 1
+        self._build_down(Dir, lvl, whiteFlag, blackFlag)
+        """ Recursive mode dont't decrement level """
+        if lvl != -1:
+            lvl -= 1
         count = 0
         label = self.get_label()
         total = len(self.childs)
         Dir.update(count, total, 'Working', label, '')
-        self._add_pagination_node(Dir, lvl, blackFlag)
+        self._add_pagination_node(Dir, lvl, whiteFlag)
         Dir.update(count, total, 'Working', label, '')
+        """ We are looking for our childs """
         for child in self.childs:
             if Dir.is_canceled():
                 return False
+            """ We are not updating progress for each track """
             if not (child.type & Flag.TRACK == Flag.TRACK):
                 Dir.update(
                     count, total, "Working", label, child.get_label())
-            Dir.add_node(child)
-            if child.type & blackFlag == Flag.STOPBUILD:
-                child.build_down(Dir, lvl, blackFlag)
-            count += 1
+            """ Only white flagged added to the listing """
+            if self.type & whiteFlag == self.type:
+                #print "Adding node " + Flag.to_s(self.type)
+                Dir.add_node(child)
+                count += 1
+            """ Calling builiding down on child """
+            child.build_down(Dir, lvl, whiteFlag, blackFlag)
+            child.childs = []
+        self.childs = []
         return True
 
     '''
@@ -407,7 +427,10 @@ class INode(object):
 
         if self.parent and not (self.parent.type & Flag.FAVORITES):
             ''' ADD TO FAVORITES '''
-            cmd = runPlugin(self.make_url(mode=Mode.FAVORITES_ADD_TO_CURRENT))
+            cmd = runPlugin(self.make_url(type=Flag.FAVORITES, 
+                                          nm='add', 
+                                          qid=self.id, 
+                                          qnt=self.type))
             menuItems.append((color(colorItem, lang(39011)), cmd))
 
         ''' ADD AS NEW '''
@@ -424,7 +447,7 @@ class INode(object):
 
         if self.type & Flag.USERPLAYLISTS:
             ''' CREATE '''
-            cmd = runPlugin(self.make_url(mode=Mode.PLAYLIST_CREATE))
+            cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, nm="create"))
             menuItems.append((color(colorItem, lang(39008)), cmd))
 
         ''' SCAN '''

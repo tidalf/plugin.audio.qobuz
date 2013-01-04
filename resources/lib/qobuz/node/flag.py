@@ -38,9 +38,15 @@ class __NodeFlag():
         self.LABEL = 1 << 16
         self.PRODUCTS = 1 << 17
         self.STOPBUILD = 1 << 18
+        self.NONE = 1 << 19
+        
+        self.totalFlag = 19
+        self.ALL = 0
+        for i in range(1, self.totalFlag):
+            self.ALL |= (1 << i)
+        print "ALL: " + repr(self.ALL)
         
     def to_s(self, flag):
-        print "Flag: " + repr(flag)
         if flag & self.TRACK == self.TRACK:
             return "track"
         elif flag & self.PLAYLIST == self.PLAYLIST:
@@ -82,5 +88,19 @@ class __NodeFlag():
                 who=self, what='invalid_flag', additional=repr(flag))
             
 NodeFlag = __NodeFlag()
-#for i in range(1, 18):
-#    print "%i => %s" % (1 << i , NodeFlag.to_s(1 << i))
+
+if __name__ == '__main__':
+    Flag = NodeFlag
+    print 'Testing Flags'
+    flag = Flag.ALL
+    if flag & Flag.FRIEND == Flag.FRIEND:
+        print "Friend set"
+    if flag & Flag.PLAYLIST == Flag.PLAYLIST:
+        print "Playlist is set"
+    flag = flag ^ Flag.PLAYLIST
+    if flag & Flag.PLAYLIST == Flag.PLAYLIST:
+        print "Playlist is set"
+    else:
+        print "Playlist is not set (2)"
+    if flag & Flag.FRIEND == Flag.FRIEND:
+        print "Friend set"

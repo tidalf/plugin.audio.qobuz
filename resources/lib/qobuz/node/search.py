@@ -74,7 +74,7 @@ class Node_search(INode):
             url += '&query=' + query
         return url
 
-    def _build_down(self, xbmc_directory, lvl, flag):
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         stype = self.search_type
@@ -93,40 +93,42 @@ class Node_search(INode):
         if not data:
             warn(self, "Search return no data")
             return False
-        self.query = query
-        self.notify_data_result(data)
+        self.set_parameter('query', query)
+        self.data = data
+        return True
+    
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type == 'albums':
             try:
-                if data['albums']['items']:
+                if self.data['albums']['items']:
                     pass
             except:
                 return False
-            for json_product in data['albums']['items']:
+            for json_product in self.data['albums']['items']:
                 artist = json_product['artist']['name']
                 product = Node_product()
                 product.data = json_product
                 self.add_child(product)
         elif self.search_type == 'tracks':
             try:
-                if data['tracks']['items']:
+                if self.data['tracks']['items']:
                     pass
             except:
                 return False
-            for jtrack in data['tracks']['items']:
+            for jtrack in self.data['tracks']['items']:
                 track = Node_track()
                 track.data = jtrack
                 self.add_child(track)
         elif self.search_type == 'artists':
             try:
-                if data['artists']['items']:
+                if self.data['artists']['items']:
                     pass
             except:
                 return False
-            for jartist in data['artists']['items']:
+            for jartist in self.data['artists']['items']:
                 artist = Node_product_by_artist()
                 artist.data = jartist
                 self.add_child(artist)
-        self.add_pagination(data)
         return True
 
     def notify_data_result(self, data):

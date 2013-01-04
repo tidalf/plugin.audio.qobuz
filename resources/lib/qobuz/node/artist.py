@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
 
 import qobuz
 from flag import NodeFlag
@@ -24,6 +23,7 @@ from debug import warn
 from gui.util import color
 
 import pprint
+#import xbmcgui
 
 '''
     @class Node_artist(Inode): Artist
@@ -45,7 +45,7 @@ class Node_artist(INode):
         self.slug = self.get_property('slug')
         self.label = self.name
         
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         colorItem = qobuz.addon.getSetting('color_item')
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
@@ -106,8 +106,8 @@ class Node_artist(INode):
                                 image,
                                 url)
         item.setInfo('picture', {
-                               'title': self.get_property('slug')
-                    })
+                    'title': self.get_property('slug')
+        })
         if not item:
             warn(self, "Error: Cannot make xbmc list item")
             return None

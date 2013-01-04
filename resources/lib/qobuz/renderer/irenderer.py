@@ -18,16 +18,18 @@ import qobuz
 from debug import log
 from exception import QobuzXbmcError
 from node.flag import NodeFlag as Flag
+from gui.util import containerRefresh
 
 import pprint
 
 class IRenderer(object):
 
-    def __init__(self, node_type, node_id=None):
+    def __init__(self, node_type, parameters=None):
         self.node_type = node_type
-        self.node_id = node_id
+        self.parameters = parameters
         self.root = None
-        self.blackFlag = 0 | Flag.STOPBUILD
+        self.whiteFlag = Flag.ALL
+        self.blackFlag = Flag.STOPBUILD
         self.depth = 1
         self.asList = False
         self.nodes = []
@@ -38,29 +40,35 @@ class IRenderer(object):
     def import_node(self, nt, params):
         """ Converting int flag to string """
         nodeName = Flag.to_s(nt)
+        #print "Loading module: " + nodeName
         modulePath = 'node.' + nodeName
         moduleName = 'Node_' + nodeName
+        #print "Info %s / %s" % (modulePath, moduleName)
         """ from node.foo import Node_foo """
-        try:
-            Module = __import__(modulePath, globals(), 
+#        try:
+        modPackage = __import__(modulePath, globals(), 
                                 locals(), [moduleName], -1)
-        except Exception as e:
-            error = {
-                     'modulePath': modulePath,
-                     'moduleName': moduleName,
-                     'nodeName': nodeName,
-                     'nodeType': nt,
-                     'error': e
-            }
-            raise QobuzXbmcError(who=self, 
-                                 what="module_loading_error", 
-                                 additional=pprint.pformat(error))
+#        except Exception as e:
+#            error = {
+#                     'modulePath': modulePath,
+#                     'moduleName': moduleName,
+#                     'nodeName': nodeName,
+#                     'nodeType': nt,
+#                     'error': e
+#            }
+#            raise QobuzXbmcError(who=self, 
+#                                 what="module_loading_error", 
+#                                 additional=pprint.pformat(error))
         """ Getting Module from Package """
-        node = getattr(Module, moduleName)
-        """ Passing default parameter to our node (?a=2&b=3..) """
-        root = node(None, params)
-        log(self, "Returning node: " + repr(root))
-        return root
+        nodeModule = getattr(modPackage, moduleName)
+        """ 
+            Initializing our new node 
+            - no parent 
+            - parameters 
+            """
+        node = nodeModule(None, params)
+        #log(self, "Returning node: " + repr(node))
+        return node
     
     """
         We are setting our root node based on nt parameter
@@ -68,6 +76,13 @@ class IRenderer(object):
     """
     def set_root_node(self):
         if self.root: return False
-        root = self.import_node(self.node_type, qobuz.boot.params)
-        self.root = root
+        self.root = self.import_node(self.node_type, self.parameters)
+        if 'nm' in self.parameters:
+            methodName = self.parameters['nm']
+            del self.parameters['nm']
+            log(self, "Executing method on node: " + repr(methodName))
+            if getattr(self.root, methodName)():
+                containerRefresh()
+                return True
+            return False
         return True

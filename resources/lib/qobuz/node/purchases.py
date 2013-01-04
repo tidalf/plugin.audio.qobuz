@@ -35,18 +35,17 @@ class Node_purchases(INode):
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
         
-    def pre_build_down(self, Dir, lvl, flag):
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='user-purchases', limit=limit, offset=self.offset)
         if not data:
             error(self, "Cannot fetch purchases data")
             return False
-        self.add_pagination(data['data'])
         self.data = data['data']
         return True
         
-    def _build_down(self, xbmc_directory, lvl, flag=None, progress=None):
+    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         for product in self.filter_products(self.data):
             self.add_child(product)
         return True

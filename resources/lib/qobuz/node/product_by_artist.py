@@ -60,7 +60,7 @@ class Node_product_by_artist(INode):
     '''
         Build Down
     '''
-    def _build_down(self, xbmc_directory, lvl, flag=None, progress=None):
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.api.artist_get(

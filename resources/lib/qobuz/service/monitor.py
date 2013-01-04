@@ -102,8 +102,8 @@ class Monitor(xbmc.Monitor):
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
         self.abortRequest = False
-        self.last_garbage_on = time()
         self.garbage_refresh = 60 * 5
+        self.last_garbage_on = time() - (self.garbage_refresh + 1)
         
     def onAbortRequested(self):
         self.abortRequest = True
@@ -130,13 +130,13 @@ class Monitor(xbmc.Monitor):
                 finally:
                     f.close()
             if not data or ((int(data['updatedOn']) + int(data['refresh'])) < time()):
-                log("[QobuzCache]", (
+                log("QobuzCache", (
                     "Removing old file: %s") % (repr(fileName)))
                 try:
                     fu.unlink(fileName)
                     gData['limit'] -= 1
                 except Exception as e:
-                    warn("[QobuzCache]", ("Can't remove file %s\n%s")
+                    warn("QobuzCache", ("Can't remove file %s\n%s")
                          % (repr(fileName), repr(e)))
                     return False
                 if gData['limit'] <= 0:

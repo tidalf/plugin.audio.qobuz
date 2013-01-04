@@ -22,12 +22,14 @@ class dog():
 
     def __init__(self):
         self.allowed_keys = {
-            'mode': '^\d{1,10}$',
-            'nid': '^\d{1,14}$',
-            'nt': '^\d{1,10}$',
-            'qnt': '^\d{1,20}$',
-            'genre-type': '^(\d+|null)$',
-            'genre-id': '^(\d+|null)$',
+            'mode': '^\d{1,10}$', # Mode View/Scan/BigDir ...
+            'nid':  '^\d{1,14}$', # Node id (node.id)
+            'nt':   '^\d{1,10}$', # Node type (node.type)
+            'qnt':  '^\d{1,20}$', # Node type in query
+            'qid':  '^\d{1,14}$', # Node id in query
+            'nm': "^[\w\d_]+$",   # Method to be called on node
+            'genre-type': '^(\d+|null)$', # Reco params
+            'genre-id': '^(\d+|null)$',   # Reco params
             'url': '^.*$',
             'search-type': "^(artists|tracks|albums)$",
             'view-filter': "^\d+$",
@@ -38,7 +40,6 @@ class dog():
             'name': "^[\w\d_.]+$",
             'parent-id': "^\d{1,10}$",
             'offset': "^\d{1,10}$",
-            'nm': "^[\w\d_]+$"
         }
 
     ''' Match value against regexp '''

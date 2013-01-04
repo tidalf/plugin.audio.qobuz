@@ -42,7 +42,8 @@ class Node_product(INode):
         self.is_special_purchase = False
         self.offset = None
 
-    def _build_down(self, xbmc_directory, lvl, blackFlag=None):
+
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         data = None
         if self.is_special_purchase:
             data = qobuz.registry.get(name='purchase', id=self.id)
@@ -52,17 +53,18 @@ class Node_product(INode):
             warn(self, "Cannot fetch product data")
             return False
         self.data = data['data']
-        tracks = None
-        if self.is_special_purchase:
-            tracks = self._filter_tracks(data['data'][''])
-        else:
-            tracks = data
-        for track in tracks['data']['tracks']['items']:
+        return True
+    
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+#        if self.is_special_purchase:
+#            tracks = self._filter_tracks(self.data[''])
+#        else:
+        for track in self.data['tracks']['items']:
             node = Node_track()
             node.data = track
             self.add_child(node)
-        self.add_pagination(data['data'])
-        return len(tracks['data']['tracks']['items'])
+        
+        return len(self.data['tracks']['items'])
 
     def _filter_tracks(self, tracks):
         ltracks = []

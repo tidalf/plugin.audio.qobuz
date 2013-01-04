@@ -48,7 +48,7 @@ class Node_friend_list(INode):
             url += "&name=" + self.name
         return url
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
             data = qobuz.registry.get(

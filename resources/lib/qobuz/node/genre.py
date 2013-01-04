@@ -60,7 +60,7 @@ class Node_genre(INode):
             node.build_down(directory, lvl, whiteFlag)
         return True
 
-    def _build_down(self, directory, lvl, flag=None):
+    def _build_down(self, directory, lvl, whiteFlag, blackFlag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(

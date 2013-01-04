@@ -109,7 +109,7 @@ class Node_friend(INode):
         containerRefresh()
         return True
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         data = qobuz.registry.get(
             name='user-playlists', username=self.name, id=self.name)['data']
         if not data:

@@ -16,5 +16,5 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from renderer.xbmc import QobuzXbmcRenderer as renderer
 
-def getRenderer(nType, nId):
-    return renderer(nType, nId)
+def getRenderer(nType, params = None):
+    return renderer(nType, params)

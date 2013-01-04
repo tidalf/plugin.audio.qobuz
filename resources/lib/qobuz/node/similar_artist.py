@@ -18,7 +18,7 @@
 
 import qobuz
 
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from inode import INode
 from artist import Node_artist
 from gui.util import lang
@@ -33,24 +33,23 @@ class Node_similar_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_similar_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.NODE | NodeFlag.SIMILAR_ARTIST
+        self.type = Flag.NODE | Flag.SIMILAR_ARTIST
         self.content_type = 'artist'
         self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
         return lang(39000)
 
-    def pre_build_down(self, Dir, lvl, flag):
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist-similar', id=self.id,
             artist_id=self.id, offset=self.offset, limit=limit)
         if not data:
             return False
-        self.add_pagination(data['data'])
         self.data = data['data']
         return len(data['data']['artists']['items'])
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
             artist = Node_artist(self, {'offset': 0, 'nid': self.id})
             artist.data = aData

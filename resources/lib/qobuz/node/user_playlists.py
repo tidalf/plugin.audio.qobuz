@@ -35,7 +35,6 @@ class Node_user_playlists(INode):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
         self.image = getImage('userplaylists')
-        self.label2 = self.label
         self.type = NodeFlag.NODE | NodeFlag.USERPLAYLISTS
         self.content_type = 'files'
         display_by = self.get_parameter('display-by')
@@ -59,7 +58,7 @@ class Node_user_playlists(INode):
     def get_display_by(self):
         return self.display_by
 
-    def pre_build_down(self, Dir, lvl, flag):
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         debug(self, "Build-down: user playlists")
         data = qobuz.registry.get(
@@ -68,10 +67,9 @@ class Node_user_playlists(INode):
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
         self.data = data
-        self.add_pagination(data['data'])
         return True
     
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         login = qobuz.addon.getSetting('username')
         cid = qobuz.registry.get(
             name='user-current-playlist-id', noRemote=True)

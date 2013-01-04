@@ -43,18 +43,17 @@ class Node_favorites(INode):
         self.image = getImage('favorites')
         self.offset = self.get_parameter('offset') or 0
         
-    def pre_build_down(self, Dir, lvl, flag):
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='user-favorites', limit=limit, offset=self.offset)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
-        self.add_pagination(data['data'])
         self.data = data['data']
         return True
     
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = None
             node = Node_track()
@@ -86,6 +85,7 @@ class Node_favorites(INode):
         return list
 
     def add(self):
+        #HEavily bugged
             from gui.directory import Directory
             from renderer.xbmc import Xbmc_renderer as renderer
             nt = None
@@ -117,7 +117,7 @@ class Node_favorites(INode):
             flags = Flag.TRACK | Flag.STOPBUILD
             if render.root.type & Flag.TRACK:
                 flags = Flag.TRACK
-            ret = render.root.build_down(Dir, depth, flags)
+            ret = render.root.build_down(Dir, depth, flags, )
             if not ret:
                 Dir.end_of_directory()
                 return False

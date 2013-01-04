@@ -99,7 +99,7 @@ class QobuzBootstrap(object):
                     'password'),
                 basePath=qobuz.path.cache,
                 streamFormat=streamFormat, 
-                hashKey=True,
+                hashKey=False,
                 cacheMiddle=cacheDurationMiddle,
                 cacheLong=cacheDurationLong
             )
@@ -174,19 +174,13 @@ class QobuzBootstrap(object):
         if not 'nt' in self.params:
             self.params['nt'] = Flag.ROOT
             self.MODE = Mode.VIEW
-        self.NT = int(self.params['nt'])
+        self.nodeType = int(self.params['nt'])
         try:
             self.MODE = int(self.params['mode'])
         except:
             warn(self, "No 'mode' parameter")
         for p in self.params:
             debug(self, "Param: " + p + ' = ' + str(self.params[p]))
-
-        self.NID = ''
-        if 'nid' in self.params:
-            self.NID = self.params['nid']
-
-        debug(self, "NT: " + str(self.NT) + " / NID: " + self.NID)
 
     def erase_cache(self):
         qobuz.registry.delete_by_name('^.*\.dat$')
@@ -197,34 +191,29 @@ class QobuzBootstrap(object):
     def dispatch(self):
         debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
               Flag.to_s(int(self.params['nt']))))
-        ''' PLAY '''
-
+   
         if self.MODE == Mode.PLAY:
             debug(self, "Playing song")
             self.bootstrap_player()
-            if qobuz.player.play(self.NID):
+            if qobuz.player.play(self.params['nid']):
                 return True
             return False
 
         from util import getRenderer
 
         if self.MODE == Mode.VIEW:
-            r = getRenderer(self.NT, self.NID)
-            r.blackFlag = Flag.STOPBUILD
+            r = getRenderer(self.nodeType, self.params)
             return r.run()
-
         elif self.MODE == Mode.VIEW_BIG_DIR:
-            r = getRenderer(self.NT, self.NID)
-            r.blackFlag = Flag.STOPBUILD
+            r = getRenderer(self.nodeType, self.params)
+            r.whiteFlag = Flag.ALL ^ ( Flag.TRACK | Flag.PRODUCT)
+            r.blackFlag = r.blackFlag
             r.depth = -1
             return r.run()
-
         elif self.MODE == Mode.SCAN:
-            r = getRenderer(self.NT, self.NID)
+            r = getRenderer(self.nodeType, self.params)
             r.depth = -1
-            r.filter = Flag.STOPBUILD
             return r.scan()
-
         else:
             raise QobuzXbmcError(
                 who=self, what="unknow_mode", additional=self.MODE)

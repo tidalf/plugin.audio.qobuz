@@ -21,3 +21,4 @@ api = None
 boot = None
 registry = None
 rpc = None
+player = None

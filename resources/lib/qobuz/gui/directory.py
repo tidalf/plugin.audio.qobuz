@@ -59,7 +59,7 @@ class Directory():
                 percent = 100
         labstat = '[%05i]' % (self.total_put)
         self.line1 = labstat
-        self.line1 = line1
+        #self.line1 = line1
         self.line2 = line2
         self.line3 = line3
         self.percent = percent

@@ -83,7 +83,7 @@ class Node_recommendation(INode):
             return None
         return str(self.genre_type) + '-' + str(self.genre_id)
 
-    def pre_build_down(self, xbmc_directory, lvl=1, whiteFlag=Flag.NODE):
+    def pre_build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         if not (self.genre_type and self.genre_id):
             return True
         offset = self.offset or 0
@@ -97,7 +97,6 @@ class Node_recommendation(INode):
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
-        self.add_pagination(data['data'])
         self.data = data['data']
         return True
     
@@ -137,11 +136,11 @@ class Node_recommendation(INode):
         return True
 
 # DISPATCH
-    def _build_down(self, xbmc_directory, lvl, flag=None, progress=None):
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.genre_type:
-            return self._build_recos_type(xbmc_directory, lvl, flag)
+            return self._build_recos_type(Dir, whiteFlag, blackFlag)
         elif not self.genre_id:
-            return self._build_recos_genre(xbmc_directory, lvl, flag)
+            return self._build_recos_genre(Dir, whiteFlag, blackFlag)
         self.content_type = 'albums'
-        return self._build_down_type_genre(xbmc_directory, lvl, flag)
+        return self._build_down_type_genre(Dir, whiteFlag, blackFlag)
 

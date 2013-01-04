@@ -39,8 +39,8 @@ class Node_track(INode):
         self.status = None
         self.image = getImage('song')
 
-    def pre_build_down(self, Dir, lvl = 1, flag = Flag.STOPBUILD):
-        if flag & Flag.STOPBUILD == Flag.STOPBUILD:
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
             return False
         data = qobuz.registry.get(name='track', id=self.id)
         if not data:
@@ -50,7 +50,7 @@ class Node_track(INode):
             return False
         return True
     
-    def _build_down(self, Dir, lvl, flag=Flag.STOPBUILD):
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         Dir.add_node(self)
         return True
 

@@ -44,7 +44,7 @@ class Node_label(INode):
         self.label = self.get_property('name')
         self.id = self.get_property('id')
 
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         offset = self.get_parameter('offset') or 0
         #@bug: Qobuz service seam do don't return total so pagination is broken
         # limit = qobuz.addon.getSetting('pagination_limit')
@@ -59,5 +59,4 @@ class Node_label(INode):
             node = Node_label()
             node.data = item
             self.add_child(node)
-        self.add_pagination(data)
         return True

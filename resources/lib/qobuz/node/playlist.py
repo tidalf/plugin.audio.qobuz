@@ -39,11 +39,10 @@ class Node_playlist(INode):
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_playlist, self).__init__(parent, parameters)
         self.type = Flag.NODE | Flag.PLAYLIST
+        self.label = "Lang"
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
-        self.label = ""
-        self.label2 = ""
         self.url = None
         self.is_folder = True
         self.packby = ''
@@ -70,19 +69,17 @@ class Node_playlist(INode):
         self.id = self.get_property('id')
         self.label = self.get_name()
         
-    def pre_build_down(self, Dir, lvl, flag):
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
-        info(self, "Build-down playlist")
         data = qobuz.registry.get(
             name='user-playlist', id=self.id, playlist_id=self.id, offset=self.offset, limit=limit, extra='tracks')
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
-        self.add_pagination(data['data'])
         self.data = data['data']
         return True
     
-    def _build_down(self, xbmc_directory, lvl, flag=None):
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         albumseen = {}
         data = self.data
         for jtrack in data['tracks']['items']:
@@ -108,7 +105,8 @@ class Node_playlist(INode):
             self.add_child(node)
         
     def get_name(self):
-        return self.get_property('name')
+        print pprint.pformat(self.data)
+        return self.get_property(('name'))
     
     def get_owner(self):
         return self.get_property(('owner', 'name'))

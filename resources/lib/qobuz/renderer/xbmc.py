@@ -43,8 +43,8 @@ class XbmcWindow_musicfiles(xbmcgui.Window):
 
 class QobuzXbmcRenderer(IRenderer):
 
-    def __init__(self, node_type, node_id=None):
-        super(QobuzXbmcRenderer, self).__init__(node_type, node_id)
+    def __init__(self, node_type, params=None):
+        super(QobuzXbmcRenderer, self).__init__(node_type, params)
 
     def add_directory_item(self, **ka):
         if not 'is_folder' in ka:
@@ -58,19 +58,11 @@ class QobuzXbmcRenderer(IRenderer):
         from gui.directory import Directory
         if not self.set_root_node():
             warn(
-                self, ("Cannot set root node (%s, %s)") % (str(self.node_type),
+                self, ("Cannot set root node (%s, %s) or method failed") % (str(self.node_type),
                                                            str(self.node_id)))
             return False
-        if 'nm' in qobuz.boot.params:
-            methodName = qobuz.boot.params['nm']
-            del qobuz.boot.params['nm']
-            log(self, "Executing method on node: " + repr(methodName))
-            if getattr(self.root, methodName)():
-                containerRefresh()
-                return True
-            return False
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
-        self.root.build_down(Dir, self.depth, self.blackFlag)
+        self.root.build_down(Dir, self.depth, self.whiteFlag, self.blackFlag)
         Dir.set_content(self.root.content_type)
         methods = [
             xbmcplugin.SORT_METHOD_UNSORTED,
