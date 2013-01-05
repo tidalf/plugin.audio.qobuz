@@ -23,13 +23,14 @@ from inode import INode
 from recommendation import Node_recommendation, RECOS_TYPE_IDS
 from gui.util import getImage
 
+import pprint
 '''
     @class Node_genre:
 '''
 
 class Node_genre(INode):
 
-    def __init__(self, parent=None, parameters=None, progress=None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_genre, self).__init__(parent, parameters)
         self.type = Flag.GENRE
         self.set_label('Genre (i8n)')
@@ -43,18 +44,17 @@ class Node_genre(INode):
         return url
 
     def hook_post_data(self):
-        self.id = self.get_property('id')
         self.label = self.get_property('name')
 
     def get_name(self):
         return self.get_property('name')
 
-    def _build_down_reco(self, directory, lvl, whiteFlag, blackFlag, ID):
+    def _build_down_reco(self, Dir, lvl, whiteFlag, blackFlag, ID):
         for gtype in RECOS_TYPE_IDS:
-            print "Build Node RECO %s / %s" % (ID, gtype)
+            print "Build Node RECO [%s] / [%s]" % (ID, gtype)
             node = Node_recommendation(
                 self, {'genre-id': ID, 'genre-type': gtype})
-            node.build_down(directory, -1, Flag.PRODUCT, blackFlag)
+            node.build_down(Dir, 1, Flag.PRODUCT, blackFlag)
         return True
 
     def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
@@ -66,16 +66,20 @@ class Node_genre(INode):
             self.data = None
             return True
         self.data = data['data']
+        print "Data: %s" % (pprint.pformat(self.data))
         return True
 
-    def _build_down(self, directory, lvl, whiteFlag, blackFlag):
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+
         if not self.data or len(self.data['genres']['items']) == 0:
-            return self._build_down_reco(directory, lvl, 
+            print "BUILD RECOOOOOOOOOOOOO: %s" % (self.id)
+            return self._build_down_reco(Dir, lvl, 
                                          whiteFlag, blackFlag, self.id)
         for genre in self.data['genres']['items']:
-            node = Node_genre(self, {'nid': self.id})
+            print "ID: %s" % (genre['id'])
+            node = Node_genre(self, {'nid': genre['id']})
             node.data = genre
-            if 'parent' in genre and genre['parent']['level'] > 1:
-                self._build_down_reco(directory, lvl, whiteFlag, genre['id'])
+#            if 'parent' in genre and genre['parent']['level'] > 1:
+#                self._build_down_reco(Dir, lvl, whiteFlag, blackFlag, self.id)
             self.add_child(node)
         return True

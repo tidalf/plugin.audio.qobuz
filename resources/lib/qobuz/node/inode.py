@@ -37,17 +37,18 @@ import urllib
 class INode(object):
 
     def __init__(self, parent=None, parameters=None):
+        self.data = None
         self.parameters = parameters or {}
         self.id = self.get_parameter('nid')
         self.parent = parent
-        self.type = self.get_parameter('nt') or Flag.NODE
+        self.type = None #self.get_parameter('nt') or Flag.NODE
         self.content_type = "files"
         self.image = None
         self.childs = []
         self.label = ''
         self.label2 = None
         self.is_folder = True
-        self._data = None
+
         self.pagination_next = None
         self.pagination_prev = None
         self.offset = None
@@ -421,7 +422,8 @@ class INode(object):
     def attach_context_menu(self, item, menu):
         ''' HOME '''
         url = self.make_url(type=Flag.ROOT)
-        menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False), pos = -5)
+        menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
+                 id='', pos = -5)
         ''' Favorite '''
         url = self.make_url(type=Flag.FAVORITES)
         menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
@@ -454,7 +456,7 @@ class INode(object):
         
         if self.type | (Flag.PLAYLIST | Flag.USERPLAYLISTS) != (Flag.PLAYLIST | Flag.USERPLAYLISTS):
             ''' PLAYLIST '''
-            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
+            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, id=''))
             menu.add(path='playlist', 
                           label="Playlist", cmd=cmd)
             ''' ADD TO CURRENT PLAYLIST '''
@@ -479,7 +481,7 @@ class INode(object):
 
             ''' Show playlist '''
             if not (self.type ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
-                cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
+                cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, id=''))
                 menu.add(path='playlist/show', 
                           label=lang(39006), cmd=cmd)
 

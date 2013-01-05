@@ -14,6 +14,7 @@ class contextMenu():
         self.defaultSection = 'qobuz'
         self.colorItemDefault = "FF59A9C5"
         self.colorItemSection = "FF59A0FF"
+        
     def get_section_path(self, **ka):
         path = self.defaultSection
         if 'path' in ka and ka['path']:

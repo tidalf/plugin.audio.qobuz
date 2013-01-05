@@ -81,7 +81,7 @@ class Node_friend_list(INode):
         label = self.get_label()
         url = self.make_url()
         menu.add(path='friend', label=label, cmd=containerUpdate(url))
-        url = self.make_url(type=Flag.FRIEND, nm='create')
+        url = self.make_url(type=Flag.FRIEND, nm='create', id=self.id)
         menu.add(path='friend/add', label='Add', cmd=runPlugin(url))
 
         ''' Calling base class '''

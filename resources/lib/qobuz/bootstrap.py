@@ -189,9 +189,10 @@ class QobuzBootstrap(object):
        Dispatch
     '''
     def dispatch(self):
-        debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
+        info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
               Flag.to_s(int(self.params['nt']))))
-   
+        info(self, "Parameters:\n %s" % (pprint.pformat(self.params) ))
+         
         if self.MODE == Mode.PLAY:
             debug(self, "Playing song")
             self.bootstrap_player()
@@ -206,8 +207,7 @@ class QobuzBootstrap(object):
             return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
             r = getRenderer(self.nodeType, self.params)
-            r.whiteFlag = Flag.TRACK | Flag.PRODUCT#Flag.ALL ^ ( Flag.TRACK | Flag.PRODUCT)
-#            r.blackFlag = r.blackFlag
+            r.whiteFlag = Flag.TRACK | Flag.PRODUCT
             r.depth = -1
             return r.run()
         elif self.MODE == Mode.SCAN:

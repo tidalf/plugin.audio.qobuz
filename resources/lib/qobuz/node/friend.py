@@ -24,7 +24,7 @@ from inode import INode
 from playlist import Node_playlist
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
-    containerUpdate
+    containerUpdate, notifyH, executeBuiltin
 
 '''
     @class Node_friend:
@@ -58,7 +58,8 @@ class Node_friend(INode):
     def create(self, name=None):
         if not name:
             from gui.util import Keyboard
-            kb = Keyboard(str(self.get_parameter('name')), str('Add Friend (i8n)'))
+            kb = Keyboard(str(self.get_parameter('name')), 
+                          str('Add Friend (i8n)'))
             kb.doModal()
             name = ''
             if not kb.isConfirmed():
@@ -78,12 +79,18 @@ class Node_friend(INode):
         else:
             friends = friends['friends']
         if name in friends:
+            notifyH('Qobuz', 'Already friend with %s' % (name))
             return False
         friends.append(name)
         newdata = {'friends': friends}
         qobuz.registry.get(name='user')
-        qobuz.api.user_update(player_settings=json.dumps(newdata))
-        containerRefresh()
+        if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
+            notifyH('Qobuz', "Cannot updata friend's list...", 
+                    'icon-error-256')
+            return False
+        notifyH('Qobuz', 'Friend %s added' % (name))
+        qobuz.registry.delete(name='user')
+        executeBuiltin(containerRefresh())
         return True
 
     def remove(self):
@@ -95,19 +102,28 @@ class Node_friend(INode):
             return False
         friends = user['data']['user']['player_settings']
         if not 'friends' in friends:
+            notifyH('Qobuz', "You don't have friend", 
+                    'icon-error-256')
             warn(self, "No friends in user/player_settings")
             return False
         friends = friends['friends']
         if not name in friends:
+            import pprint
+            pprint.pprint(friends)
+            notifyH('Qobuz', "You're not friend with %s" % (name), 
+                    'icon-error-256')
             warn(self, "Friend " + repr(name) + " not in friends data")
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
         if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
-            warn(self, "Cannot update remote user")
+            notifyH('Qobuz', 'Friend %s added' % (name))
+            notifyH('Qobuz', "Cannot updata friend's list...", 
+                    'icon-error-256')
             return False
+        notifyH('Qobuz', 'Friend %s removed' % (name))
         qobuz.registry.delete(name='user')
-        containerRefresh()
+        executeBuiltin(containerRefresh())
         return True
 
     def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
@@ -130,9 +146,10 @@ class Node_friend(INode):
         colorWarn = qobuz.addon.getSetting('color_item_caution')
 
         url=self.make_url()
-        menu.add(path='frien', label=self.name, cmd=containerUpdate(url))
+        menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
         cmd = runPlugin(self.make_url(type=Flag.FRIEND, nm="remove"))
-        menu.add(path='friend/remove', label='Remove', cmd=cmd)
+        menu.add(path='friend/remove', label='Remove', cmd=cmd, 
+                 color=colorWarn)
 
         ''' Calling base class '''
         super(Node_friend, self).attach_context_menu(item, menu)
