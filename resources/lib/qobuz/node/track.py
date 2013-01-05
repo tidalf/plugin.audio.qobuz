@@ -22,6 +22,7 @@ from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
 from gui.util import color, lang, getImage, runPlugin
+from gui.contextmenu import contextMenu
 
 '''
     NODE TRACK
@@ -299,26 +300,25 @@ class Node_track(INode):
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
-        menuItems = []
-        self.attach_context_menu(item, menuItems)
-        if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
-    def attach_context_menu(self, item, menuItems=[]):
-        colorItem = qobuz.addon.getSetting('color_item')
+    def attach_context_menu(self, item, menu):
         if self.parent and self.parent.type & Flag.PLAYLIST:
             url = self.parent.make_url(
                 query=str(self.get_property('playlist_track_id'))
             )
-            menuItems.append((color(colorItem, lang(
-                30073)) + self.get_label(), runPlugin(url)))
+            menu.add(path='playlist/remove', 
+                     label=lang(30073) + self.get_label(),
+                     cmd=runPlugin(url))
 
         if self.parent and self.parent.type & Flag.FAVORITES:
             ''' REMOVE '''
-            url = self.make_url(mode=Mode.FAVORITE_DELETE)
-            menuItems.append((color(colorItem, 'Remove from favorite')
-                             + self.label, "XBMC.RunPlugin(" + url + ")"))
+            url = self.make_url(type=Flag.FAVORITES,nm='remove')
+            menu.add(path='favorite/remove', label='Remove',
+                     cmd=runPlugin(url))
 
         ''' Calling base class '''
-        super(Node_track, self).attach_context_menu(item, menuItems)
+        super(Node_track, self).attach_context_menu(item, menu)
