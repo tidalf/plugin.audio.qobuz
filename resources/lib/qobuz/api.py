@@ -16,6 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 # import os
 # import json
+import sys
 import requests
 import pprint
 from time import time
@@ -48,6 +49,8 @@ class QobuzApi:
         self.baseUrl = 'http://player.qobuz.com/api.json/' + self.version
         self.stats = {'request': 0}
         self.session = requests.Session()
+        self.statContentSizeTotal = 0
+        self.statTotalRequest = 0
         self.__set_s4()
 
     def _check_ka(self, ka, mandatory, allowed=[]):
@@ -81,6 +84,7 @@ class QobuzApi:
                                              cycle(self.appid)))
 
     def _api_request(self, params, uri, **opt):
+        self.statTotalRequest += 1
         self.last_error = None
         self.stats['request'] += 1
         url = self.baseUrl + uri
@@ -109,6 +113,7 @@ class QobuzApi:
         if not r.content:
             warn(self, "No content return")
             return None
+        self.statContentSizeTotal += sys.getsizeof(r.content)
         # retry get if connexion fail
         try:
             response_json = r.json()
@@ -352,3 +357,4 @@ class QobuzApi:
     def label_list(self, **ka):
         self._check_ka(ka, [], ['limit', 'offset'])
         return self._api_request(ka, '/label/list')
+

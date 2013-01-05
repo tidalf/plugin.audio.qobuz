@@ -84,6 +84,7 @@ class INode(object):
         return self._parent
 
     def delete_tree(self):
+        log(self, 'Deleting node %s' % (self.type))
         for child in self.childs:
             child.delete_tree()
         del self.childs
@@ -291,7 +292,7 @@ class INode(object):
         return list
 
     def set_label(self, label):
-        self.label = label.encode('utf8', 'replace')
+        self.label = label #label.encode('utf8', 'replace')
         return self
 
     def get_image(self):
@@ -306,7 +307,7 @@ class INode(object):
         return self
 
     def set_label2(self, label):
-        self.label2 = label.encode('utf8', 'replace')
+        self.label2 = label #label.encode('utf8', 'replace')
         return self
 
     def get_label(self):
@@ -405,7 +406,7 @@ class INode(object):
                 log(self, "Skipping node: %s" % ( Flag.to_s(child.type)) )
             """ Calling builiding down on child """
             child.build_down(Dir, lvl, whiteFlag, blackFlag, gData)
-        self.childs = []
+#        self.childs = [] # UGLY
         return gData['count']
 
     '''

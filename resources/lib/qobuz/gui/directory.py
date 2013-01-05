@@ -34,10 +34,16 @@ class Directory():
         log(self, "Handle: " + repr(self.handle))
 
     def __del__(self):
-        for node in self.nodes:
-            node.delete_tree()
-        self.root = None
-
+        log(self, "Deleting tree..")
+        try:
+            for node in self.nodes:
+                node.delete_tree()
+            self.nodes = None
+            self.root = None
+        except:
+            print "Something went wrong while deleting tree"
+        
+            
     def elapsed(self):
         return time.time() - self.started_on
 
@@ -64,7 +70,6 @@ class Directory():
                 percent = 100
         labstat = '[%05i]' % (self.total_put)
         self.line1 = labstat
-        #self.line1 = line1
         self.line2 = line2
         self.line3 = line3
         self.percent = percent

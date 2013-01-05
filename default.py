@@ -40,7 +40,12 @@ boot = QobuzBootstrap(__addon__, int(sys.argv[1]))
 #try:
 boot.bootstrap_app()
 boot.dispatch()
+from qobuz import api
+from debug import log
+log('QobuzApi', 
+    '(%s request / %03i KiB)' % (api.statTotalRequest, 
+                                 api.statContentSizeTotal/1024))
 #except QobuzXbmcError as e:
 #    warn('[' + pluginId + ']', "Exception while running plugin")
 import pprint, gc
-print "GC %s" % (pprint.pformat(gc.garbage))
+log("QobuzGC", "%s" % (pprint.pformat(gc.garbage)))

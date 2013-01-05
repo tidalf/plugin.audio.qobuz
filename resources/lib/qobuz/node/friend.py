@@ -23,7 +23,8 @@ from flag import NodeFlag as Flag
 from inode import INode
 from playlist import Node_playlist
 from debug import warn
-from gui.util import color, getImage, runPlugin, containerRefresh
+from gui.util import color, getImage, runPlugin, containerRefresh, \
+    containerUpdate
 
 '''
     @class Node_friend:
@@ -125,12 +126,13 @@ class Node_friend(INode):
             self.add_child(node)
         return True
 
-    def attach_context_menu(self, item, menuItems=[]):
+    def attach_context_menu(self, item, menu):
         colorWarn = qobuz.addon.getSetting('color_item_caution')
 
+        url=self.make_url()
+        menu.add(path='frien', label=self.name, cmd=containerUpdate(url))
         cmd = runPlugin(self.make_url(type=Flag.FRIEND, nm="remove"))
-        menuItems.append(
-            (color(colorWarn, 'Remove friend (i8n)' + ': ') + self.name, cmd))
+        menu.add(path='friend/remove', label='Remove', cmd=cmd)
 
         ''' Calling base class '''
-        super(Node_friend, self).attach_context_menu(item, menuItems)
+        super(Node_friend, self).attach_context_menu(item, menu)
