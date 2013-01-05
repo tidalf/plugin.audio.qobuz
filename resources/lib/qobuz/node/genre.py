@@ -66,20 +66,19 @@ class Node_genre(INode):
             self.data = None
             return True
         self.data = data['data']
+        if 'parent' in self.data['genres'] and int(self.data['genres']['parent']['level']) > 1:
+            self._build_down_reco(Dir, lvl, whiteFlag, blackFlag, 
+                                  self.data['genres']['parent']['id'])
         print "Data: %s" % (pprint.pformat(self.data))
         return True
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
 
         if not self.data or len(self.data['genres']['items']) == 0:
-            print "BUILD RECOOOOOOOOOOOOO: %s" % (self.id)
             return self._build_down_reco(Dir, lvl, 
                                          whiteFlag, blackFlag, self.id)
         for genre in self.data['genres']['items']:
-            print "ID: %s" % (genre['id'])
             node = Node_genre(self, {'nid': genre['id']})
             node.data = genre
-#            if 'parent' in genre and genre['parent']['level'] > 1:
-#                self._build_down_reco(Dir, lvl, whiteFlag, blackFlag, self.id)
             self.add_child(node)
         return True
