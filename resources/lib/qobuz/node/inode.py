@@ -29,6 +29,7 @@ from gui.util import color, lang, runPlugin, containerUpdate, \
 from debug import log, warn
 from time import time
 from gui.contextmenu import contextMenu
+from util import getRenderer
 import urllib
 '''
     @class Inode:
@@ -353,6 +354,16 @@ class INode(object):
             node.label2 = label
             self.add_child(node)
     
+    def render_nodes(self, nt, parameters, lvl = 1, whiteFlag = Flag.ALL, 
+                     blackFlag = Flag.TRACK &Flag.STOPBUILD):
+        render = getRenderer(nt, parameters)
+        render.depth = -1
+        render.whiteFlag = whiteFlag
+        render.blackFlag = blackFlag
+        render.asList = True
+        render.run()
+        return render
+    
     # When returning False we are not displaying directory content
     def pre_build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
         return True
@@ -454,14 +465,16 @@ class INode(object):
             menu.add(path='favorites/add', 
                           label=lang(39011), cmd=runPlugin(url))
         
-        if self.type | (Flag.PLAYLIST | Flag.USERPLAYLISTS) != (Flag.PLAYLIST | Flag.USERPLAYLISTS):
+        cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
+        if self.type | cflag  != cflag:
             ''' PLAYLIST '''
             cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, id=''))
             menu.add(path='playlist', 
                           label="Playlist", cmd=cmd)
             ''' ADD TO CURRENT PLAYLIST '''
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
-                                            nm='add_to_current'))
+                                            nm='add_to_current', 
+                                            qnt=self.type))
             menu.add(path='playlist/add_to_current', 
                           label=lang(39005), cmd=cmd)
             label = self.get_label()
@@ -485,9 +498,10 @@ class INode(object):
                 menu.add(path='playlist/show', 
                           label=lang(39006), cmd=cmd)
 
-        if self.type & Flag.USERPLAYLISTS:
-            ''' CREATE '''
-            cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, nm="create"))
+        ''' PLAYLIST / CREATE '''
+        cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
+        if self.type | cflag == cflag:
+            cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, nm="gui_create"))
             menu.add(path='playlist/create', 
                           label=lang(39008), cmd=cmd)
         ''' VIEW BIG DIR '''

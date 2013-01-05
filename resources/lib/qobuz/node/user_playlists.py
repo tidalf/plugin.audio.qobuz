@@ -17,10 +17,11 @@
 import xbmc
 
 import qobuz
-from flag import NodeFlag
+from flag import NodeFlag as Flag
 from inode import INode
 from debug import info, warn, error, debug
-from gui.util import color, lang, getImage, notifyH, containerRefresh
+from gui.util import color, lang, getImage, notifyH, containerRefresh, \
+    runPlugin
 from playlist import Node_playlist
 import pprint
 
@@ -28,15 +29,13 @@ import pprint
     NODE USER PLAYLISTS
 '''
 
-
-
 class Node_user_playlists(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
         self.image = getImage('userplaylists')
-        self.type = NodeFlag.USERPLAYLISTS
+        self.type = Flag.USERPLAYLISTS
         self.content_type = 'files'
         display_by = self.get_parameter('display-by')
         if not display_by:
@@ -86,3 +85,5 @@ class Node_user_playlists(INode):
                 node.set_is_my_playlist(True)
             self.add_child(node)
         return True
+
+
