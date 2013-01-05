@@ -18,7 +18,7 @@
 import sys
 import pprint
 
-import xbmc
+import xbmc as XBMC
 import xbmcgui
 import xbmcplugin
 import time
@@ -27,18 +27,19 @@ import qobuz
 from node.flag import NodeFlag as Flag
 from debug import info, warn, log
 from irenderer import IRenderer
-from gui.util import notifyH, getImage, color, containerRefresh
+from gui.util import notifyH, getImage, color, containerRefresh, \
+    containerUpdate, executeBuiltin
 from exception import QobuzXbmcError as Qerror
 
-class XbmcWindow_musicfiles(xbmcgui.Window):
-
-    def __init__(self, **ka):
-        # 10501 / WINDOW_MUSIC_FILES
-        # (http://wiki.xbmc.org/index.php?title=Window_IDs)
-        xbmcgui.Window(10501)
-
-    def onAction(self, action):
-        print 'Action: ' + repr(action.getId())
+#class XbmcWindow_musicfiles(xbmcgui.Window):
+#
+#    def __init__(self, **ka):
+#        # 10501 / WINDOW_MUSIC_FILES
+#        # (http://wiki.xbmc.org/index.php?title=Window_IDs)
+#        xbmcgui.Window(10501)
+#
+#    def onAction(self, action):
+#        print 'Action: ' + repr(action.getId())
 
 
 class QobuzXbmcRenderer(IRenderer):
@@ -61,11 +62,12 @@ class QobuzXbmcRenderer(IRenderer):
                  (str(self.node_type), str(self.root.get_parameter('nid'))))
             return False
         if self.execute_method_parameter():
-            return False
+            executeBuiltin(containerUpdate(self.root.make_url()))
+            return True
         from gui.directory import Directory
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
         if qobuz.addon.getSetting('contextmenu_replaceitem') == 'true':
-            Dir.replaceItems = True
+            Dir.replaceItems = False
         try:
             ret = self.root.build_down(Dir, self.depth, 
                                        self.whiteFlag, self.blackFlag)

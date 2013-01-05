@@ -21,7 +21,7 @@ from flag import NodeFlag as Flag
 from inode import INode
 from friend import Node_friend
 from debug import info, warn
-from gui.util import color, getImage, runPlugin
+from gui.util import getImage, runPlugin, containerUpdate
 
 '''
     @class Node_friend_list:
@@ -77,14 +77,12 @@ class Node_friend_list(INode):
             node = Node_friend(None, {'name': str(name)})
             self.add_child(node)
 
-    def attach_context_menu(self, item, menuItems=[]):
-        colorItem = qobuz.addon.getSetting('color_item')
-        # color_warn = qobuz.addon.getSetting('color_item_caution')
+    def attach_context_menu(self, item, menu):
         label = self.get_label()
-
+        url = self.make_url()
+        menu.add(path='friend', label=label, cmd=containerUpdate(url))
         url = self.make_url(type=Flag.FRIEND, nm='create')
-        menuItems.append((color(
-            colorItem, 'Add friend (i8n)' + ': ') + label, runPlugin(url)))
+        menu.add(path='friend/add', label='Add', cmd=runPlugin(url))
 
         ''' Calling base class '''
-        super(Node_friend_list, self).attach_context_menu(item, menuItems)
+        super(Node_friend_list, self).attach_context_menu(item, menu)

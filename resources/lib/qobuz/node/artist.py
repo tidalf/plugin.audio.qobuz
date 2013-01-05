@@ -21,7 +21,7 @@ from inode import INode
 from product import Node_product
 from debug import warn
 from gui.util import color
-
+from gui.contextmenu import contextMenu
 import xbmcgui
 
 '''
@@ -111,8 +111,7 @@ class Node_artist(INode):
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
-        menuItems = []
-        self.attach_context_menu(item, menuItems)
-        if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item

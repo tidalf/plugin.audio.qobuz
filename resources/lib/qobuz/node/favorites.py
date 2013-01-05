@@ -87,7 +87,7 @@ class Node_favorites(INode):
     def add(self):
         #HEavily bugged
             from gui.directory import Directory
-            from renderer.xbmc import Xbmc_renderer as renderer
+            from renderer.xbmc import QobuzXbmcRenderer as renderer
             nt = None
             try:
                 nt = int(self.get_parameter('nt'))

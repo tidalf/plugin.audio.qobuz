@@ -25,7 +25,7 @@ from debug import info, warn
 from exception import QobuzXbmcError
 from gui.util import notifyH, color, lang, getImage, runPlugin, containerRefresh, containerUpdate
 from util import getRenderer
-
+from gui.contextmenu import contextMenu
 import pprint
 
 '''
@@ -82,9 +82,10 @@ class Node_playlist(INode):
     
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         albumseen = {}
-        data = self.data
-        #pprint.pprint(data)
-        for jtrack in data['tracks']['items']:
+        if not 'tracks' in self.data:
+            warn(self, "No tracks in this playlist %i" % (self.id))
+            return False
+        for jtrack in self.data['tracks']['items']:
             node = None
             if self.packby == 'album':
                 pass
@@ -106,6 +107,7 @@ class Node_playlist(INode):
                 node = Node_track()
                 node.data = jtrack
             self.add_child(node)
+        return True
         
     def get_name(self):
         name = self.get_property('name') 
@@ -145,45 +147,41 @@ class Node_playlist(INode):
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
-        menuItems = []
-        self.attach_context_menu(item, menuItems)
-        if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
-    def attach_context_menu(self, item, menuItems=[]):
+    def attach_context_menu(self, item, menu):
         login = qobuz.addon.getSetting('username')
         isOwner = True
         if login != self.get_property(('owner', 'name')):
             isOwner = False
-        colorItem = qobuz.addon.getSetting('color_item')
-        colorWarn = qobuz.addon.getSetting('color_item_caution')
         label = self.get_label()
         
-        menuItems.append( ('.o[ %s ]o.' % (self.get_name()), containerUpdate('')) )
         if isOwner:
             url = self.make_url(type=Flag.PLAYLIST, nm='set_as_current')
-            menuItems.append((
-                color(colorItem, lang(39007)), runPlugin(url)))
+            menu.add(path='playlist/set_as_current', label=lang(39007), 
+                    cmd=runPlugin(url))
 
             url = self.make_url(type=Flag.PLAYLIST, nm='rename')
-            menuItems.append((
-                color(colorItem, lang(39009)), runPlugin(url)))
+            menu.add(path='playlist/rename', label=lang(39009), 
+                        cmd=runPlugin(url))
 
         else:
             url = self.make_url(type=Flag.PLAYLIST, nm='subscribe')
-            menuItems.append((
-                color(colorItem, lang(39012)), runPlugin(url)))
+            menu.add(path='playlist/subscribe', label=lang(39012), 
+                    cmd=runPlugin(url))
 
         url = self.make_url(type=Flag.PLAYLIST, nm='create')
-        menuItems.append((color(colorItem, lang(39008)), runPlugin(url)))
+        menu.add(path='playlist/create', label=lang(39008), 
+            cmd=runPlugin(url))
 
         url = self.make_url(type=Flag.PLAYLIST, nm='remove')
-        menuItems.append(
-            (color(colorWarn, lang(39010)), runPlugin(url)))
+        menu.add(path='playlist/remove', label=lang(39010), cmd=runPlugin(url))
 
         ''' Calling base class '''
-        super(Node_playlist, self).attach_context_menu(item, menuItems)
+        super(Node_playlist, self).attach_context_menu(item, menu)
 
     def remove_tracks(self, tracks_id):
         info(self, "Removing tracks: " + tracks_id)
@@ -344,7 +342,13 @@ class Node_playlist(INode):
             warn(self, "Cannot create playlist name '" + query + "'")
             return None
         self.set_as_current(ret['id'])
+        limit = qobuz.addon.getSetting('pagination_limit')
         qobuz.registry.delete_by_name(name='^user-playlists-.*\.dat$')
+        data = qobuz.registry.get(name='user-playlist', id=ret['id'], 
+                                  playlist_id=ret['id'], 
+                                  offset=self.offset, limit=limit)
+        if data:
+            self.data = data
         return ret['id']
 
     '''

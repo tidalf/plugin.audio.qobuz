@@ -24,10 +24,12 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag
 from exception import QobuzXbmcError as Qerror
-from gui.util import color, lang, runPlugin, containerUpdate, formatControlLabel
+from gui.util import color, lang, runPlugin, containerUpdate, \
+    formatControlLabel, containerRefresh
 from debug import log, warn
 from time import time
-
+from gui.contextmenu import contextMenu
+import urllib
 '''
     @class Inode:
 '''
@@ -263,10 +265,9 @@ class INode(object):
         )
 #        item.setProperty('Node.ID', str(self.id))
 #        item.setProperty('Node.Type', str(self.type))
-        menuItems = []
-        self.attach_context_menu(item, menuItems)
-        if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, ka['replaceItems'])
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
         return item
 
     def add_child(self, child):
@@ -412,69 +413,87 @@ class INode(object):
     def _build_down(self, xbmc_directory, lvl, flag):
         pass
     
-    def attach_context_menu(self, item, menuItems=[]):
-        colorItem = qobuz.addon.getSetting('color_item')
-        
-        menuItems.append((formatControlLabel('Qobuz'), containerUpdate('')))
-        
+    def attach_context_menu(self, item, menu):
+        ''' HOME '''
+        url = self.make_url(type=Flag.ROOT)
+        menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, True))
+        ''' Favorite '''
+        url = self.make_url(type=Flag.FAVORITES)
+        menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
+        ''' System '''
+        menu.add(path='system', label="System", cmd=containerRefresh(), pos=10)        
+        ''' ARTIST '''
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
             artist_name = self.get_artist()
             urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id)
-            menuItems.append((formatControlLabel(artist_name), 
-                              containerUpdate(urlArtist)))
+            menu.add(path='artist', 
+                          label=artist_name, cmd=containerUpdate(urlArtist))
 
             ''' Similar artist '''
             url = self.make_url(type=Flag.SIMILAR_ARTIST, 
                                 id=artist_id, mode=Mode.VIEW)
-            cmd = containerUpdate(url)
-            label = '%s' % (color(colorItem, lang(39004)))
-            menuItems.append((label, cmd))
-
+            menu.add(path='artist/similar', 
+                          label=lang(39004), 
+                          cmd=containerUpdate(url))
+        ''' FAVORITES '''
+        
         if self.parent and not (self.parent.type & Flag.FAVORITES):
             ''' ADD TO FAVORITES '''
-            cmd = runPlugin(self.make_url(type=Flag.FAVORITES, 
+            url = self.make_url(type=Flag.FAVORITES, 
                                           nm='add', 
                                           qid=self.id, 
-                                          qnt=self.type))
-            menuItems.append((color(colorItem, lang(39011)), cmd))
+                                          qnt=self.type)
+            menu.add(path='favorites/add', 
+                          label=lang(39011), cmd=runPlugin(url))
         
-        menuItems.append((formatControlLabel('My Playlists'), containerUpdate('')))
-            
-        ''' ADD TO CURRENT PLAYLIST '''
-        cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
+        if self.type | (Flag.PLAYLIST | Flag.USERPLAYLISTS) != (Flag.PLAYLIST | Flag.USERPLAYLISTS):
+            ''' PLAYLIST '''
+            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
+            menu.add(path='playlist', 
+                          label="Playlist", cmd=cmd)
+            ''' ADD TO CURRENT PLAYLIST '''
+            cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
                                             nm='add_to_current'))
-        menuItems.append((color(colorItem, lang(39005)), cmd))
-
-
-        ''' ADD AS NEW '''
-        cmd = runPlugin(self.make_url(type=Flag.PLAYLIST,
+            menu.add(path='playlist/add_to_current', 
+                          label=lang(39005), cmd=cmd)
+            label = self.get_label()
+            try:
+                label = label.encode('utf8', 'replace')
+            except:
+                warn(self, "Cannot set query..." + repr(label))
+                label = ''
+            label = urllib.quote(label)
+            ''' ADD AS NEW '''
+            cmd = runPlugin(self.make_url(type=Flag.PLAYLIST,
                                             nm='add_as_new', 
                                             qnt=self.type,
-                                            query=self.get_label()))
-        menuItems.append((color(colorItem, lang(30080)), cmd))
+                                            query=label))
+            menu.add(path='playlist/add_as_new', 
+                          label=lang(30080), cmd=cmd)
 
-        ''' Show playlist '''
-        if not (self.type & Flag.USERPLAYLISTS == Flag.USERPLAYLISTS):
-            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
-            menuItems.append((color(colorItem, lang(39005)), cmd))
+            ''' Show playlist '''
+            if not (self.type ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
+                cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS))
+                menu.add(path='playlist/show', 
+                          label=lang(39006), cmd=cmd)
 
         if self.type & Flag.USERPLAYLISTS:
             ''' CREATE '''
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, nm="create"))
-            menuItems.append((color(colorItem, lang(39008)), cmd))
-
+            menu.add(path='playlist/create', 
+                          label=lang(39008), cmd=cmd)
         ''' VIEW BIG DIR '''
         cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
-        menuItems.append((color(colorItem, lang(39002)), cmd))
-
+        menu.add(path='qobuz/big_dir', 
+                          label=lang(39002), cmd=cmd)
         ''' SCAN '''
         if qobuz.addon.getSetting('enable_scan_feature') == 'true':
             url = self.make_url(mode=Mode.SCAN)
             try:
                 label = color(colorItem, lang(39003) + ": ") + \
-                    self.get_label().decode('utf8', 'replace')
-                menuItems.append(
+                    self.get_label().encode('utf8', 'replace')
+                menu.append(
                     (label, 'XBMC.UpdateLibrary("music", "%s")' % (url)))
             except:
                 pass
@@ -482,7 +501,5 @@ class INode(object):
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove"))
-        menuItems.append((color(colorItem, lang(31009)), cmd))
-
-        menuItems.append((formatControlLabel('System'), containerUpdate(''))) 
-
+        menu.add(path='qobuz/erase_cache', 
+                          label=lang(31009), cmd=cmd, color=colorItem)

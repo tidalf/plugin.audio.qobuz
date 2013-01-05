@@ -21,6 +21,7 @@ from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
 from gui.util import getImage
+from gui.contextmenu import contextMenu
 
 '''
     @class Node_product:
@@ -85,10 +86,9 @@ class Node_product(INode):
             'title': self.get_title(),
             'album': self.get_title(),
         })
-        menuItems = []
-        self.attach_context_menu(item, menuItems)
-        if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=replaceItems)
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
     '''

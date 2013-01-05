@@ -102,16 +102,23 @@ def lang(langId):
 def runPlugin(url):
     return 'XBMC.RunPlugin("%s")' % (url)
 
-def containerUpdate(url):
-    return ('Container.Update("%s")') % ( url)
-
+def containerUpdate(url, replace = True):
+    if replace: 
+        replace = ', "replace"' 
+    else: replace = ''
+    str = 'Container.Update("%s"%s)' % ( url, replace)
+    print str
+    return str
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
     return dialog.yesno(heading, line1, line2, line3)
 
 def containerRefresh():
-    xbmc.executebuiltin('Container.Refresh')
+    return ('Container.Refresh')
 
+def executeBuiltin(cmd):
+    xbmc.executebuiltin("%s" % (cmd))
+    
 def formatControlLabel(label, sFormat=None, colorItem=None):
     if not colorItem: 
         colorItem = qobuz.addon.getSetting('item_section_color')
