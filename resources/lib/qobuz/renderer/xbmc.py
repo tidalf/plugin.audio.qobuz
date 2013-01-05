@@ -62,7 +62,7 @@ class QobuzXbmcRenderer(IRenderer):
                  (str(self.node_type), str(self.root.get_parameter('nid'))))
             return False
         if self.execute_method_parameter():
-            executeBuiltin(containerUpdate(self.root.make_url()))
+            #executeBuiltin(containerUpdate(self.root.make_url()))
             return True
         from gui.directory import Directory
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)

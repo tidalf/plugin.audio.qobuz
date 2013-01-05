@@ -173,7 +173,7 @@ class Node_playlist(INode):
             menu.add(path='playlist/subscribe', label=lang(39012), 
                     cmd=runPlugin(url))
 
-        url = self.make_url(type=Flag.PLAYLIST, nm='remove')
+        url = self.make_url(type=Flag.PLAYLIST, nm='gui_remove')
         menu.add(path='playlist/remove', label=lang(39010), cmd=containerUpdate(url))
 
         ''' Calling base class '''
@@ -342,13 +342,14 @@ class Node_playlist(INode):
         self.set_as_current(ret['id'])
         qobuz.registry.delete(name='user-playlists')
         qobuz.registry.delete(name='user-playlist', id=ret['id'])
-        executeBuiltin(containerUpdate(self.make_url(nt='')))
+        url = self.make_url(type=Flag.USERPLAYLISTS, nt='')
+        executeBuiltin(containerUpdate(url))
         return ret['id']
 
     '''
         Remove playlist
     '''
-    def remove(self):
+    def gui_remove(self):
         import xbmcgui
         import xbmc
         import pprint
@@ -379,9 +380,11 @@ class Node_playlist(INode):
             notifyH('Qobuz remove playlist (i8n)', 'Cannot remove playlist ' +
                     name, getImage('icon-error-256'))
             return False
-        qobuz.registry.delete_by_name(name='^user-playlists.*\.dat$')
+        qobuz.registry.delete(name='user-playlist', id=ID)
+        qobuz.registry.delete(name='user-playlists')
         notifyH('Qobuz playlist removed(i8n)', "Playlist %s removed" % (name))
-        containerRefresh()
+        url = self.make_url(nm='')
+       # executeBuiltin(containerUpdate(self.make_url(type=Flag.USERPLAYLISTS)))
         return False
 
     def subscribe(self):
