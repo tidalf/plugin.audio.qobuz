@@ -42,8 +42,8 @@ def getImage(name):
 def notifyH(title, text, image=None, mstime=2000):
     if not image:
         image = getImage('icon-default-256')
-    print "CurrentViewMode: %s" % (containerViewMode())
-    print "CurrentViewMode: %s" % (containerSortMethod())
+#    print "CurrentViewMode: %s" % (containerViewMode())
+#    print "CurrentViewMode: %s" % (containerSortMethod())
     return showNotification(title=title, message=text, image=image, displaytime=mstime)
 
 '''
@@ -108,7 +108,7 @@ def containerUpdate(url, replace = False):
         replace = ', "replace"' 
     else: replace = ''
     str = 'Container.Update("%s"%s)' % ( url, replace)
-    print str
+#    print str
     return str
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
@@ -137,8 +137,8 @@ def containerViewMode():
 def containerSortMethod():
     label = 'Container.SortMethod'
     data = getInfoLabels(labels=[label])
-    print "ID" + repr(getInfoLabels(labels=['ListItem.Property(Node.ID)']))
-    print "ID" + repr(getInfoLabels(labels=['ListItem.Property(Node.Type)']))
+#    print "ID" + repr(getInfoLabels(labels=['ListItem.Property(Node.ID)']))
+#    print "ID" + repr(getInfoLabels(labels=['ListItem.Property(Node.Type)']))
     if data: 
         return data[label]
     return ''

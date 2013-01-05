@@ -107,7 +107,7 @@ class Node_recommendation(INode):
             node = Node_recommendation()
             node.genre_type = gid
             node.set_label(
-                self.label + ' / ' + color(colorItem, RECOS_TYPES[gid]))
+                self.label + ' / ' + RECOS_TYPES[gid])
             self.add_child(node)
         return True
 
@@ -118,10 +118,10 @@ class Node_recommendation(INode):
             node = Node_recommendation()
             node.genre_type = self.genre_type
             node.genre_id = genre_id
-            node.set_label(self.label + ' / '
-                           + color(colorItem,
-                                   RECOS_TYPES[int(self.genre_type)])
-                           + ' / ' + RECOS_GENRES[genre_id])
+            label = '%s / %s / %s' % (self.label, 
+                                      RECOS_TYPES[int(self.genre_type)],
+                                     RECOS_GENRES[genre_id])  
+            node.set_label(label) 
             self.add_child(node)
         return True
 

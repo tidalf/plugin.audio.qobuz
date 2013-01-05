@@ -40,7 +40,7 @@ from bootstrap import QobuzBootstrap
 from debug import warn, log
 import qobuz
 from util.file import FileUtil
-from gui.util import containerRefresh, notifyH, getImage
+from gui.util import containerRefresh, notifyH, getImage, executeBuiltin
 from node.track import Node_track
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
@@ -159,7 +159,7 @@ class Monitor(xbmc.Monitor):
                     log(self, "Removing file " + fileName)
                     if not fu.unlink(fileName):
                         warn(self, "Failed to remove " + fileName)
-            containerRefresh()
+            executeBuiltin(containerRefresh())
         except:
             warn(self, "Error while removing cached data")
             notifyH('Qobuz (i8n)',

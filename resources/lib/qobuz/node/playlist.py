@@ -237,8 +237,8 @@ class Node_playlist(INode):
         render.whiteFlag = Flag.TRACK
         render.asList = True
         render.run()
-        if not name and render.root.get_parameter('query'):
-            name = render.root.get_parameter('query')
+        if not name and render.root.get_parameter('query', unQuote=True):
+            name = render.root.get_parameter('query', unQuote=True)
         else:
             name = self.get_parameter('query') or self.get_label()
         print "NAme: " + repr(name)

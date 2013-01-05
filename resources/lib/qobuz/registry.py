@@ -25,6 +25,11 @@ from debug import *
 import hashlib
 import re
 
+'''
+    Deleting key are not very well tested... 
+    - offset, hashKey need more testing
+    This class must be easier to setup and use
+'''
 
 class QobuzLocalStorage(object):
 
@@ -348,17 +353,22 @@ class QobuzCacheDefault(QobuzLocalStorage):
     def delete(self, **ka):
         key = self.make_key(**ka)
         info(self, '[DISK] Deleting: ' + key)
-        fileName = os.path.join(self.options['basePath'], key + '.dat')
-        if not os.path.exists(fileName):
-            return False
         fu = FileUtil()
-        try:
-            if fu.unlink(fileName):
-                super(QobuzCacheDefault, self).delete(**ka)
-        except:
-            raise QobuzXbmcError(who=self, 
+        files = fu.find(self.options['basePath'], '^' + key + '.*\.dat')
+        if len(files) == 0:
+            warn(self, "Cannot delete key: %s" % (key))
+            return False
+        for fileName in files:
+            try:
+                if fu.unlink(fileName):
+                    log(self, '[DISK] file deleted: %s' % (fileName))
+                    super(QobuzCacheDefault, self).delete(**ka)
+            except:
+                raise QobuzXbmcError(who=self, 
                                  what='deleting_file_failed', 
                                  additional=repr(fileName))
+        return True
+    
     def delete_by_name(self, pattern):
         fu = FileUtil()
         files = fu.find(self.options['basePath'], pattern)

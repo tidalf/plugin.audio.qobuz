@@ -187,12 +187,16 @@ class INode(object):
     def set_parameters(self, params):
         self.parameters = params
 
-    def set_parameter(self, name, value):
+    def set_parameter(self, name, value, **ka):
+        if 'quote' in ka and ka['quote'] == True:
+            value = urllib.quote_plus(value)
         self.parameters[name] = value
 
-    def get_parameter(self, name):
+    def get_parameter(self, name, **ka):
         if not name in self.parameters:
             return None
+        if 'unQuote' in ka and ka['unQuote'] == True:
+            return urllib.unquote_plus(self.parameters[name])
         return self.parameters[name]
 
     def del_parameter(self, name):
@@ -416,7 +420,7 @@ class INode(object):
     def attach_context_menu(self, item, menu):
         ''' HOME '''
         url = self.make_url(type=Flag.ROOT)
-        menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, True), pos = -5)
+        menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False), pos = -5)
         ''' Favorite '''
         url = self.make_url(type=Flag.FAVORITES)
         menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))

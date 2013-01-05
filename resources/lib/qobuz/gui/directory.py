@@ -14,7 +14,7 @@ class Directory():
 
     def __init__(self, root, handle, asList=False, nodeList = []):
         self.nodes = []
-        self.label = "Qobuz Progress"
+        self.label = "Qobuz Progress / "
         self.root = root
         self.asList = asList
         self.handle = handle

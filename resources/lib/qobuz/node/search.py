@@ -94,7 +94,7 @@ class Node_search(INode):
         if not data:
             warn(self, "Search return no data")
             return False
-        self.set_parameter('query', (urllib.quote_plus(query)) )
+        self.set_parameter('query', query, quote=True)
         self.data = data
         return True
     
