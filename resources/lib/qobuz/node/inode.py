@@ -416,7 +416,7 @@ class INode(object):
     def attach_context_menu(self, item, menu):
         ''' HOME '''
         url = self.make_url(type=Flag.ROOT)
-        menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, True))
+        menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, True), pos = -5)
         ''' Favorite '''
         url = self.make_url(type=Flag.FAVORITES)
         menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
@@ -428,7 +428,7 @@ class INode(object):
             artist_name = self.get_artist()
             urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id)
             menu.add(path='artist', 
-                          label=artist_name, cmd=containerUpdate(urlArtist))
+                          label=artist_name, cmd=containerUpdate(urlArtist), pos=-10)
 
             ''' Similar artist '''
             url = self.make_url(type=Flag.SIMILAR_ARTIST, 
@@ -501,5 +501,5 @@ class INode(object):
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove"))
-        menu.add(path='qobuz/erase_cache', 
+        menu.add(path='system/erase_cache', 
                           label=lang(31009), cmd=cmd, color=colorItem)

@@ -92,6 +92,7 @@ def executeJSONRPC(json):
 
 def color(colorItem, msg):
     if not msg: return ''
+    if not colorItem: return msg
     return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
 
 

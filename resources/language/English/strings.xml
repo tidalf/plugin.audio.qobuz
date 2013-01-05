@@ -177,7 +177,7 @@
     <!-- Context Menu -->
     <string id="39000">This album</string>
     <string id="39001">All albums</string>
-    <string id="39002">View big directory</string>
+    <string id="39002">Big directory</string>
     <string id="39003">Scan</string>
     <string id="39004">Similar artist</string>
     <string id="39005">Add to current</string>
@@ -186,7 +186,7 @@
     <string id="39008">Create</string>
     <string id="39009">Rename</string>
     <string id="39010">Remove</string>
-    <string id="39011">Favorites: Add</string>
+    <string id="39011">Add</string>
     <string id="39012">Subscribe</string>
 
     <!-- Progress bar -->

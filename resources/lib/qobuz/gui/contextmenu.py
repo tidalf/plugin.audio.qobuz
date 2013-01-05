@@ -12,8 +12,8 @@ class contextMenu():
     def __init__(self):
         self.data = {}
         self.defaultSection = 'qobuz'
-        self.colorItem = "blue"
-        
+        self.colorItemDefault = "FF59A9C5"
+        self.colorItemSection = "FF59A0FF"
     def get_section_path(self, **ka):
         path = self.defaultSection
         if 'path' in ka and ka['path']:
@@ -61,7 +61,6 @@ class contextMenu():
     
     def getTuples(self):
         menuItems = []
-       
         def sectionSort(key):
             return self.data[key]['pos']
                
@@ -69,11 +68,18 @@ class contextMenu():
                 return item['pos']        
         
         for section in sorted(self.data, key=sectionSort):
+            colorItem = self.colorItemSection
             data = self.data[section]
-            label = '{ %s } ' % (color(self.colorItem, data['label']))
+            if 'color' in data: 
+                colorItem = data['color']
+            label = '{ %s } ' % (color(colorItem, data['label']))
             menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
-                menuItems.append((item['label'], item['cmd']))
+                colorItem = self.colorItemDefault
+                if 'color' in item:
+                    colorItem = item['color']
+                label = '%s' % (color(colorItem, item['label']))
+                menuItems.append((label, item['cmd']))
         return menuItems
             
 if __name__ == '__main__':
