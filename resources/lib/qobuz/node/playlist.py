@@ -178,7 +178,7 @@ class Node_playlist(INode):
             cmd=runPlugin(url))
 
         url = self.make_url(type=Flag.PLAYLIST, nm='remove')
-        menu.add(path='playlist/remove', label=lang(39010), cmd=runPlugin(url))
+        menu.add(path='playlist/remove', label=lang(39010), cmd=containerUpdate(url))
 
         ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menu)

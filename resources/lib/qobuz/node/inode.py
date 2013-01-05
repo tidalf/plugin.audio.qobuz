@@ -491,8 +491,8 @@ class INode(object):
         if qobuz.addon.getSetting('enable_scan_feature') == 'true':
             url = self.make_url(mode=Mode.SCAN)
             try:
-                label = color(colorItem, lang(39003) + ": ") + \
-                    self.get_label().encode('utf8', 'replace')
+                label = "%s: %s" % (lang(39003), 
+                                    self.get_label().encode('utf8', 'replace'))
                 menu.append(
                     (label, 'XBMC.UpdateLibrary("music", "%s")' % (url)))
             except:

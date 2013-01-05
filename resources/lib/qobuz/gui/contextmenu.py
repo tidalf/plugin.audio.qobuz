@@ -24,7 +24,6 @@ class contextMenu():
             path = None
         else:
             path = '-'.join(xPath)
-#        print "Section: %s, Path: %s" % (section, path)
         return section, path
     
     def add(self, **ka):
@@ -61,11 +60,9 @@ class contextMenu():
         return root
     
     def getTuples(self):
-#        print "[Attach]"
         menuItems = []
        
         def sectionSort(key):
-#            print "Key: %s" % key
             return self.data[key]['pos']
                
         def itemSort(item):
@@ -73,11 +70,9 @@ class contextMenu():
         
         for section in sorted(self.data, key=sectionSort):
             data = self.data[section]
-#            print "Section: %s / %s %s" % (section, data['label'], pprint.pformat(data))
             label = '{ %s } ' % (color(self.colorItem, data['label']))
             menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
-#                print "- %s" % (item['label'])
                 menuItems.append((item['label'], item['cmd']))
         return menuItems
             

@@ -102,7 +102,7 @@ def lang(langId):
 def runPlugin(url):
     return 'XBMC.RunPlugin("%s")' % (url)
 
-def containerUpdate(url, replace = True):
+def containerUpdate(url, replace = False):
     if replace: 
         replace = ', "replace"' 
     else: replace = ''
