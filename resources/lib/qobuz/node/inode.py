@@ -444,7 +444,8 @@ class INode(object):
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
             artist_name = self.get_artist()
-            urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id)
+            urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id, 
+                                      mode=Mode.VIEW)
             menu.add(path='artist', 
                           label=artist_name, cmd=containerUpdate(urlArtist), pos=-10)
 

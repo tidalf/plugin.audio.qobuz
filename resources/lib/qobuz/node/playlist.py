@@ -162,7 +162,7 @@ class Node_playlist(INode):
         if isOwner:
             url = self.make_url(type=Flag.PLAYLIST, nm='set_as_current')
             menu.add(path='playlist/set_as_current', label=lang(39007), 
-                    cmd=runPlugin(url))
+                    cmd=containerUpdate(url))
 
             url = self.make_url(type=Flag.PLAYLIST, nm='rename')
             menu.add(path='playlist/rename', label=lang(39009), 
