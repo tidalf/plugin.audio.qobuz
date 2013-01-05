@@ -23,7 +23,6 @@ from inode import INode
 from recommendation import Node_recommendation, RECOS_TYPE_IDS
 from gui.util import getImage
 
-import pprint
 '''
     @class Node_genre:
 '''
@@ -51,7 +50,6 @@ class Node_genre(INode):
 
     def _build_down_reco(self, Dir, lvl, whiteFlag, blackFlag, ID):
         for gtype in RECOS_TYPE_IDS:
-            print "Build Node RECO [%s] / [%s]" % (ID, gtype)
             node = Node_recommendation(
                 self, {'genre-id': ID, 'genre-type': gtype})
             node.build_down(Dir, 1, Flag.PRODUCT, blackFlag)
@@ -64,16 +62,15 @@ class Node_genre(INode):
             name='genre-list', id=self.id, offset=offset, limit=limit)
         if not data: 
             self.data = None
-            return True
+            return True # Nothing return trigger reco build in build_down
         self.data = data['data']
-        if 'parent' in self.data['genres'] and int(self.data['genres']['parent']['level']) > 1:
+        g = self.data['genres']
+        if 'parent' in g and int(g['parent']['level']) > 1:
             self._build_down_reco(Dir, lvl, whiteFlag, blackFlag, 
-                                  self.data['genres']['parent']['id'])
-        print "Data: %s" % (pprint.pformat(self.data))
+                                  g['parent']['id'])
         return True
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-
         if not self.data or len(self.data['genres']['items']) == 0:
             return self._build_down_reco(Dir, lvl, 
                                          whiteFlag, blackFlag, self.id)
