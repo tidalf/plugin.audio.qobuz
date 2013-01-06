@@ -48,10 +48,6 @@ class Node_article_rubrics(INode):
         l = self.get_property('title')
         if not l: return "Articles"
         return l
-#        
-#    def hook_post_data(self):
-#        self.label = self.get_property('name')
-
 
     def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
@@ -62,7 +58,6 @@ class Node_article_rubrics(INode):
         if not data: 
             return False
         self.data = data['data']
-        print pprint.pformat(self.data)
         return True
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):

@@ -51,7 +51,7 @@ class Node_similar_artist(INode):
 
     def _build_down(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
-            artist = Node_artist(self, {'offset': 0, 'nid': self.id})
+            artist = Node_artist(self, {'offset': 0, 'nid': aData['id']})
             artist.data = aData
             self.add_child(artist)
         return True

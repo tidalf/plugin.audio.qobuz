@@ -21,7 +21,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from gui.util import getImage
-
+from gui.contextmenu import contextMenu
 import pprint
 '''
     @class Node_articles
@@ -56,12 +56,33 @@ class Node_article(INode):
         super(Node_article, self).__init__(parent, parameters)
         self.type = Flag.ARTICLE
         self.is_folder = True
-        self.hasWidget = False
+        self.hasWidget = True
 
     def get_label(self):
-        return '%s / %s' % ( self.get_property('author'),
+        author = self.get_property('author')
+        if author:
+            author += '%s / ' % (author)
+        return '%s%s' % ( author,
                              self.get_property('title'))
 
+    def makeListItem(self, **ka):
+
+        item = xbmcgui.ListItem(
+            self.get_label(),
+            self.get_property('source'),
+            self.get_image(),
+            self.get_image(),
+            'url=:p'
+        )
+#        item.setInfo('Music', {
+#            'lyrics': self.get_property('abstract')
+#        })
+#        item.setProperty('Node.ID', str(self.id))
+#        item.setProperty('Node.Type', str(self.type))
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
+        return item
 #    def make_url(self, **ka):
 #        url = super(Node_genre, self).make_url(**ka)
 #        if self.parent and self.parent.id:
@@ -73,8 +94,12 @@ class Node_article(INode):
         self.image = self.get_property('image')
 
     def get_image(self):
-        return self.get_property('image')
-
+        image = self.get_property('image')
+        if image:
+            image = image.replace('http://player.', 'http://www.')
+#        print "Image: %s" % (image)
+        return image
+    
     def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
         print "Build donw article ..."
         data = qobuz.registry.get(
@@ -87,14 +112,11 @@ class Node_article(INode):
 
     def _build_down(self, Dir, lvl , whiteFlag, blackFlag):
         pass
-
+        
     def displayWidget(self):
-#        self.pre_build_down(None, None, None, None)
-#        w = WidgetArticle(xbmcgui.getCurrentWindowId())#'MyMusicSongs.xml', qobuz.addon.getAddonInfo('path'), data=self.data)
-#        w.myInit(self.data)
-        #w.addItem('plop')
-#        w.doModal()
-#        del w
-#        dialog = xbmcgui.Dialog()
-#        fn = dialog.select('Tpez', ['plop', 'plop'])
+        w = xbmcgui.WindowXMLDialog('plugin.audio.qobuz-article.xml', qobuz.path.base)
+        w.show()
+        w.doModal()
+        w.close()
+        del w
         return True
