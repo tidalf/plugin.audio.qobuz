@@ -284,7 +284,7 @@ class QobuzApi:
         return self._api_request(params, '/track/reportStreamingEnd')
 
     def favorite_create(self, **ka):
-        mandatory = ['artist_ids', 'albums_ids', 'track_ids']
+        mandatory = ['artist_ids', 'album_ids', 'track_ids']
         found = None
         for label in mandatory:
             if label in ka:

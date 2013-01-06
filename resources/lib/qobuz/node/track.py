@@ -89,7 +89,7 @@ class Node_track(INode):
             return album
         if not self.parent:
             return ''
-        if self.parent.get_type() & Flag.PRODUCT:
+        if self.parent.type & Flag.PRODUCT:
             return self.parent.get_title()
         return ''
 
@@ -102,7 +102,7 @@ class Node_track(INode):
             return image.replace('_230.', '_600.')
         if not self.parent:
             return self.image
-        if self.parent.get_type() & (Flag.PRODUCT | Flag.PLAYLIST):
+        if self.parent.type & (Flag.PRODUCT | Flag.PLAYLIST):
             return self.parent.get_image()
         
 
@@ -125,7 +125,7 @@ class Node_track(INode):
             return genre
         if not self.parent:
             return ''
-        if self.parent.get_type() & Flag.PRODUCT:
+        if self.parent.type & Flag.PRODUCT:
             return self.parent.get_genre()
         return ''
 
@@ -189,7 +189,7 @@ class Node_track(INode):
         import time
         try:
             date = self.get_property(('album', 'released_at'))
-            if not date and self.parent and self.parent.get_type() & Flag.PRODUCT:
+            if not date and self.parent and self.parent.type & Flag.PRODUCT:
                 return self.parent.get_year()
         except:
             pass

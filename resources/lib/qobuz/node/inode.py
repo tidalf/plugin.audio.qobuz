@@ -14,6 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 import weakref
 import pprint
@@ -146,8 +147,8 @@ class INode(object):
         return ''
 
     '''
-    Called with data from our API, adding special child if pagination
-    is required
+        Called juste after data is set, adding pagination if required
+   
     '''
     def add_pagination(self, data):
         if not data:
@@ -309,51 +310,12 @@ class INode(object):
         self.image = image
         return self
 
-    def set_label2(self, label):
-        self.label2 = label #label.encode('utf8', 'replace')
-        return self
-
     def get_label(self):
         return self.label
 
     def get_label2(self):
         return self.label2
 
-    def set_type(self, type):
-        self.type = type
-
-    def get_type(self):
-        return self.type
-
-    def filter(self, flag):
-        if not flag:
-            return False
-        if flag & self.get_type():
-            return False
-        return True
-      
-    def _add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
-        limit = qobuz.addon.getSetting('pagination_limit')
-        from renderer.irenderer import IRenderer
-        r = IRenderer(self.type, self.parameters)
-        if self.pagination_next:
-            colorItem = qobuz.addon.getSetting('color_item')
-            params = qobuz.boot.params
-            params['offset'] = self.pagination_next_offset
-            params['nid'] = self.id
-            node = r.import_node(self.type, params)
-            label = self.get_label() 
-            if not label and self.parent:
-                label = self.parent.get_label()
-            if self.label2: label = self.label2
-            #if self.parent: label = self.parent.label
-            nextLabel = (
-                '[ %s  %s / %s ]') % (color(colorItem, label),
-                                      self.pagination_next_offset,
-                                      self.pagination_total)
-            node.label = nextLabel
-            node.label2 = label
-            self.add_child(node)
     
     def render_nodes(self, nt, parameters, lvl = 1, whiteFlag = Flag.ALL, 
                      blackFlag = Flag.TRACK &Flag.STOPBUILD):
@@ -422,15 +384,43 @@ class INode(object):
 #        self.childs = [] # UGLY
         return gData['count']
 
-    '''
+    """
         _build_down:
         This method is called by build_down method, each object who
         inherit from node object can implement their own code. Lot of object
         simply fetch data from qobuz (cached data)
-    '''
+    """
     def _build_down(self, xbmc_directory, lvl, flag):
         pass
     
+    """
+        Called by build_down to add special node when pagination is
+        required
+    """
+    def _add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
+        limit = qobuz.addon.getSetting('pagination_limit')
+        from renderer.irenderer import IRenderer
+        r = IRenderer(self.type, self.parameters)
+        if self.pagination_next:
+            colorItem = qobuz.addon.getSetting('color_item')
+            params = qobuz.boot.params
+            params['offset'] = self.pagination_next_offset
+            params['nid'] = self.id
+            node = r.import_node(self.type, params)
+            label = self.get_label() 
+            if not label and self.parent:
+                label = self.parent.get_label()
+            if self.label2: label = self.label2
+            #if self.parent: label = self.parent.label
+            nextLabel = (
+                '[ %s  %s / %s ]') % (color(colorItem, label),
+                                      self.pagination_next_offset,
+                                      self.pagination_total)
+            node.label = nextLabel
+            node.label2 = label
+            self.add_child(node)
+
+
     def attach_context_menu(self, item, menu):
         ''' HOME '''
         url = self.make_url(type=Flag.ROOT)
@@ -461,13 +451,22 @@ class INode(object):
         ''' FAVORITES '''
         
         if self.parent and not (self.parent.type & Flag.FAVORITES):
-            ''' ADD TO FAVORITES '''
+            ''' ADD TO FAVORITES / TRACKS'''
             url = self.make_url(type=Flag.FAVORITES, 
-                                          nm='add', 
+                                          nm='add_tracks', 
                                           qid=self.id, 
-                                          qnt=self.type)
-            menu.add(path='favorites/add', 
-                          label=lang(39011), cmd=runPlugin(url))
+                                          qnt=self.type, 
+                                          mode=Mode.VIEW)
+            menu.add(path='favorites/add_tracks', 
+                          label=lang(39011) + ' tracks', cmd=runPlugin(url))
+            ''' ADD TO FAVORITES / Albums'''
+            url = self.make_url(type=Flag.FAVORITES, 
+                                          nm='gui_add_albums', 
+                                          qid=self.id, 
+                                          qnt=self.type, 
+                                          mode=Mode.VIEW)
+            menu.add(path='favorites/add_albums', 
+                          label=lang(39011) + ' albums', cmd=runPlugin(url))
         
         cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
         if self.type | cflag  != cflag:

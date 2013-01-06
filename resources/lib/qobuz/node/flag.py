@@ -16,6 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
 from exception import QobuzXbmcError
+from debug import warn
 
 class _ContainerView_():
     def __init__(self):
@@ -58,6 +59,10 @@ class __NodeFlag():
             self.ALL |= (1 << i)
         
     def to_s(self, flag):
+        if not flag:
+            warn(self, "Missing flag parameter")
+            return ''
+        flag = int(flag)
         if flag & self.TRACK == self.TRACK:
             return "track"
         elif flag & self.PLAYLIST == self.PLAYLIST:
