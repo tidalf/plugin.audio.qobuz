@@ -239,7 +239,7 @@ class QobuzApi:
     Purchase
     '''
     def purchase_getUserPurchases(self, **ka):
-        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit'])
+        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit', 'offset'])
         return self._api_request(ka, "/purchase/getUserPurchases")
 
     def favorite_getUserFavorites(self, **ka):

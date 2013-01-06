@@ -222,7 +222,7 @@ class QobuzLocalStorage(object):
             response = self.api.track_getFileUrl(
                 track_id=id, format_id=self.options['streamFormat'])
         elif name == 'user-purchases':
-            response = self.api.purchase_getUserPurchases(limit=ka['limit'])
+            response = self.api.purchase_getUserPurchases(**ka)
         elif name == 'recommendation':
             response = self.api.album_getFeatured(**ka)
         elif name == 'artist':

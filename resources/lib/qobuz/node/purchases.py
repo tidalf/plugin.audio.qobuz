@@ -21,6 +21,7 @@ from debug import error
 from gui.util import lang, getImage
 
 from product import Node_product
+from track import Node_track
 
 """
     @class Node_purchase: 
@@ -45,27 +46,23 @@ class Node_purchases(INode):
         self.data = data['data']
         return True
         
-    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
-        for product in self.filter_products(self.data):
-            self.add_child(product)
-        return True
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        if 'albums' in self.data:
+            self._build_down_albums(Dir, lvl, whiteFlag, blackFlag)
+        elif 'tracks' in self.data:
+            self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
 
-    def filter_products(self, data):
-        list = []
-        if not data:
-            return list
-        # Qobuz free tracks with invalid product id
-        # blackid = ['0000020110926', '0000201011300', '0000020120220',
-        # '0000020120221']
-        albumseen = {}
-        for track in data['albums']['items']:
-            json = track
-            json[u'interpreter'] = track['artist']['name']
-            product = Node_product()
-            product.data = json
-            id = product.id
-            if id in albumseen:
-                continue
-            albumseen[id] = 1
-            list.append(product)
+    def _build_down_albums(self, Dir, lvl, whiteFlag, blackFlag):
+        for album in self.data['albums']['items']:
+            node = Node_product()
+            node.data = album
+            self.add_child(node)
         return list
+    
+    def _build_down_tracks(self, Dir, lvl, whiteFlag, blackFlag):
+        for track in self.data['tracks']['items']:
+            node = Node_track()
+            node.data = track
+            self.add_child(node)
+        return list
+    

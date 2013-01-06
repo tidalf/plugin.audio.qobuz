@@ -42,6 +42,7 @@ class Node_product(INode):
         self.content_type = 'albums'
         self.is_special_purchase = False
         self.offset = None
+        self.imageDefaultSize = qobuz.addon.getSetting('image_default_size')
 
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
@@ -127,17 +128,23 @@ class Node_product(INode):
     def get_title(self):
         return self.get_property('title')
 
-    def get_image(self):
-        image = self.get_property(('image', 'large'))
-        if image:
-            self.image = image
-            return image
-        if self.parent:
-            image = self.parent.get_image()
-            if image:
-                self.image = image
-        image = self.image.replace('_230.', '_600.')
-        return self.image
+    def get_image(self, size = None):
+        if not size:
+            size = self.imageDefaultSize
+        image = self.get_property(('image', size))
+        if not image:
+            image = self.get_property(('image', 'large'))
+        if not image:
+            image = self.get_property(('image', 'small'))
+        if not image:
+            image = self.get_property(('image', 'thumbnail'))
+#        newimage = image
+#        if self.imageDefaultSize == 'large':
+# @todo : I think this is useless...
+#            newimage = newimage.replace('_230.', '_600.')
+#        if newimage != image:
+#            print "We replace image..."
+        return image
 
     def get_label(self):
         try:
