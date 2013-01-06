@@ -498,7 +498,8 @@ class INode(object):
 
             ''' Show playlist '''
             if not (self.type ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
-                cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, id=''))
+                cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
+                                    id='', mode=Mode.VIEW))
                 menu.add(path='playlist/show', 
                           label=lang(39006), cmd=cmd)
 

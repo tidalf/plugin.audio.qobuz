@@ -15,7 +15,8 @@
 		<setting id="password" type="text" option="hidden" label="37001"
 			default="" />
 	</category>
-	<!-- Stream -->
+	
+	<!-- Options -->
 	<category label="38001">
 		<setting id="streamtype" label="32000" type="labelenum"
 			values="flac|mp3" default="flac" />
@@ -39,9 +40,9 @@
 	<!-- Notification -->
 	<!-- <category label="36002"> </category> -->
 
-	<!-- Colors -->
+	<!-- Display -->
 	<category label="33101">
-		<setting id="color_item" label="33102" type="text" default="FF59A9C5" />
+<!-- 		<setting id="color_item" label="33102" type="text" default="FF59A9C5" />
 		<setting id="color_item_caution" label="33103" type="text"
 			default="FFFF0000" />
 		<setting id="item_section_color" label="33104"
@@ -49,9 +50,9 @@
 		<setting id="item_section_format" label="33105"
 			type="text" default=".o[ %s ]o." />
 		<setting id="view_navigation" label="View navigation"
-            type="text" default="bigicon" />
-
+            type="text" default="bigicon" /> -->
 	</category>
+	
 	<!-- Other -->
 	<category label="38003">
 		<!-- <setting id="show_recommendations" label="38004" type="bool" default="true" 
