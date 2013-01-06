@@ -25,7 +25,7 @@ from playlist import Node_playlist
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin
-
+from api import api
 '''
     @class Node_friend:
 '''
@@ -84,7 +84,7 @@ class Node_friend(INode):
         friends.append(name)
         newdata = {'friends': friends}
         qobuz.registry.get(name='user')
-        if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
+        if not api.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', "Cannot updata friend's list...", 
                     'icon-error-256')
             return False
@@ -116,7 +116,7 @@ class Node_friend(INode):
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
-        if not qobuz.api.user_update(player_settings=json.dumps(newdata)):
+        if not api.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', 'Friend %s added' % (name))
             notifyH('Qobuz', "Cannot updata friend's list...", 
                     'icon-error-256')

@@ -28,7 +28,12 @@ from debug import warn, info
 
 socket.timeout = 5
 
-class QobuzApi:
+def __api_error_string(self, url="", params={}, json=""): 
+        return 'Something went wrong with request: %s\n%s\n%s' % (
+                url, pprint.pformat(params),
+                pprint.pformat(json))
+
+class __API__:
 
     def __init__(self):
         self.appid = "285473059"
@@ -38,6 +43,7 @@ class QobuzApi:
         self.user_auth_token = None
         self.user_id = None
         self.error = None
+        self.status_code = None
         self._baseUrl = self.baseUrl + self.version
         self.session = requests.Session()
         self.statContentSizeTotal = 0
@@ -45,14 +51,14 @@ class QobuzApi:
         self.error = None
         self.__set_s4()
 
-    """
+    def _check_ka(self, ka, mandatory, allowed=[]):
+        """
         Checking parameters before sending our request
         - if mandatory parameter is missing raise error
-        - if a given parameter is neither in mandatory or issue
-        raise error (Creating exception class like QobuzApiMissingParameter
+        - if a given parameter is neither in mandatory or allowed
+        raise error (Creating exception class like MissingParameter
         may be a good idea)
-    """
-    def _check_ka(self, ka, mandatory, allowed=[]):
+        """
         for label in mandatory:
             if not label in ka:
                 raise QobuzXbmcError(who=self,
@@ -65,12 +71,13 @@ class QobuzApi:
                                      additional=label)
 
     def __set_s4(self):
+        """appid and associated secret is for this app usage only
+        Any use of the API implies your full acceptance of the
+        General Terms and Conditions
+        (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
+        """
         import binascii
         from itertools import izip, cycle
-        # appid and associated secret is for this app usage only
-        # Any use of the API implies your full acceptance of the
-        # General Terms and Conditions
-        # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         s3b = "Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8="
         s3s = binascii.a2b_base64(s3b)
         self.s4 = ''.join(chr(ord(x) ^ ord(y))
@@ -78,8 +85,32 @@ class QobuzApi:
                                              cycle(self.appid)))
 
     def _api_request(self, params, uri, **opt):
+        """Qobuz API HTTP get request
+            Arguments:
+            params:    parameters dictionary
+            uri   :    service/method
+            opt   :    Optionnal named parameters 
+                        - noToken=True/False
+                       
+            Return None if something went wrong
+            Return raw data from qobuz on success as dictionary
+            
+            * on error you can check error and status_code
+            
+            Example: 
+            
+                ret = api._api_request({'username':'foo', 
+                                  'password':'bar'}, 
+                                 'user/login', noToken=True)
+                print 'Error: %s [%s]' % (api.error, api.status_code)
+                
+            This should produce something like:
+            Error: [200]
+            Error: Bad Request [400]
+        """
         self.statTotalRequest += 1
         self.error = None
+        self.status_code = None
         url = self._baseUrl + uri
         useToken = False if (opt and 'noToken' in opt) else True
         headers = {}
@@ -93,8 +124,23 @@ class QobuzApi:
             self.error = "Post request fail"
             warn(self, self.error)
             return None
+        self.status_code = r.status_code
+        if r.status_code != 200:
+            if r.status_code == 400:
+                self.error = "Bad request"
+            elif r.status_code == 401:
+                self.error = "Unauthorized"
+            elif r.status_code == 402:
+                self.error = "Request Failed"
+            elif r.status_code == 404:
+                self.error = "Not Found"
+            else:
+                self.error = "Server error"
+            self.error = __api_error_string(url, params)
+            warn(self, self.error)
+            return None
         if not r.content:
-            self.error = "No content"
+            self.error = "Request return no content"
             warn(self, self.error)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
@@ -113,15 +159,17 @@ class QobuzApi:
         try:
             status = response_json['status']
         except:
-            self.error = 'No status response'
+            pass
         if status == 'error':
-            self.error = 'Something went wrong with request: %s\n%s\n%s' % (
-                url, pprint.pformat(params),
-                pprint.pformat(response_json))
+            self.error = __api_error_string(url, params, response_json)
             warn(self, self.error)
             return None
         return response_json
 
+    """
+        This method is used when you are caching token and want to skip
+        login
+    """
     def set_user_data(self, user_id, user_auth_token):
         if not (user_id or user_auth_token):
             raise QobuzXbmcError(who=self, what='missing_argument', 
@@ -130,6 +178,9 @@ class QobuzApi:
         self.user_id = user_id 
         self.logged_on = time()
 
+    """
+        Erase user specific data
+    """
     def logout(self):
         self.user_auth_token = None
         self.user_id = None
@@ -382,3 +433,5 @@ class QobuzApi:
     def article_get(self, **ka):
         self._check_ka(ka, ['article_id'])
         return self._api_request(ka, '/article/get')
+    
+api = __API__()

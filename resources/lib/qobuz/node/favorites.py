@@ -24,6 +24,7 @@ from debug import warn, log
 from gui.util import lang
 from gui.util import getImage, notifyH
 from util import getRenderer
+from api import api
 '''
     @class Node_favorites:
 '''
@@ -143,7 +144,7 @@ class Node_favorites(INode):
         return nodes
     
     def add_albums(self, album_ids):
-        ret = qobuz.api.favorite_create(album_ids=album_ids)
+        ret = api.favorite_create(album_ids=album_ids)
         if not ret:
             print "Cannot add album_ids to favorite"
             return False
@@ -196,7 +197,7 @@ class Node_favorites(INode):
         return nodes
     
     def add_tracks(self, track_ids):
-        ret = qobuz.api.favorite_create(track_ids=track_ids)
+        ret = api.favorite_create(track_ids=track_ids)
         if not ret:
             print "Cannot add album_ids to favorite"
             return False
@@ -206,7 +207,7 @@ class Node_favorites(INode):
     
     def remove(self):
         log(self, "Removing favorite: " + repr(self.id))
-        if not qobuz.api.favorite_delete(track_ids=str(self.id)):
+        if not api.favorite_delete(track_ids=str(self.id)):
             return False
         qobuz.registry.delete(name='user-favorites')
         return True

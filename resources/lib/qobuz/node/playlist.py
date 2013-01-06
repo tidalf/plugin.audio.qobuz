@@ -29,6 +29,7 @@ from gui.util import notifyH, color, lang, getImage, runPlugin, \
 from util import getRenderer
 from gui.contextmenu import contextMenu
 import pprint
+from api import api
 
 '''
     @class Node_playlist:
@@ -184,7 +185,7 @@ class Node_playlist(INode):
 
     def remove_tracks(self, tracks_id):
         info(self, "Removing tracks: " + tracks_id)
-        result = qobuz.api.playlist_deleteTracks(
+        result = api.playlist_deleteTracks(
             playlist_id=self.id, playlist_track_ids=tracks_id)
         if not result:
             warn(self, "Cannot remove tracks from playlist: " + str(self.id))
@@ -233,7 +234,7 @@ class Node_playlist(INode):
                 warn(self, "Not a Node_track node")
                 continue
             strtracks+='%s,' % (str(node.id))
-        ret = qobuz.api.playlist_addTracks(
+        ret = api.playlist_addTracks(
             playlist_id=playlist_id, track_ids=strtracks)
         if ret:
             qobuz.registry.delete(name='user-playlist', id=playlist_id)
@@ -308,7 +309,7 @@ class Node_playlist(INode):
         newname = newname.strip()
         if newname == currentname:
             return True
-        res = qobuz.api.playlist_update(playlist_id=ID, name=newname)
+        res = api.playlist_update(playlist_id=ID, name=newname)
         if not res:
             warn(self, "Cannot rename playlist with name %s" % (newname) )
             return False
@@ -322,7 +323,7 @@ class Node_playlist(INode):
         return True
     
     def create(self, name, isPublic=True, isCollaborative=False):
-        return qobuz.api.playlist_create(name=name, 
+        return api.playlist_create(name=name, 
                                         is_public=isPublic, 
                                         is_collaborative=isCollaborative)
     
@@ -374,10 +375,10 @@ class Node_playlist(INode):
         res = False
         if data['owner']['name'] == login:
             info(self, "Deleting playlist: " + ID)
-            res = qobuz.api.playlist_delete(playlist_id=ID)
+            res = api.playlist_delete(playlist_id=ID)
         else:
             info(self, 'Unsuscribe playlist' + ID)
-            res = qobuz.api.playlist_unsubscribe(playlist_id=ID)
+            res = api.playlist_unsubscribe(playlist_id=ID)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(ID))
             notifyH('Qobuz remove playlist (i8n)', 'Cannot remove playlist ' +
@@ -392,7 +393,7 @@ class Node_playlist(INode):
 
     def subscribe(self):
         ID = self.id
-        if qobuz.api.playlist_subscribe(playlist_id=ID):
+        if api.playlist_subscribe(playlist_id=ID):
             from gui.util import notifyH, isFreeAccount, lang
             notifyH("Qobuz subscribed", "(i8n) playlist subscribed")
             qobuz.registry.delete_by_name('^user-playlists.*\.dat$')

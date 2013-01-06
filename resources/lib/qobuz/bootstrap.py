@@ -104,7 +104,6 @@ class QobuzBootstrap(object):
                 cacheLong=cacheDurationLong
             )
             qobuz.registry.get(name='user')
-            qobuz.api = qobuz.registry.get_api()
         except QobuzXbmcError:
             dialogLoginFailure()
             #@TODO sys.exit killing XBMC? FRODO BUG ?

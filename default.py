@@ -44,7 +44,7 @@ xbmcplugin.setPluginFanart(__handle__, color1='0xFF0000FF')
 #try:
 boot.bootstrap_app()
 boot.dispatch()
-from qobuz import api
+from api import api
 from debug import log
 
 log('QobuzApi', 

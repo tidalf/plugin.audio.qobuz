@@ -22,7 +22,7 @@ from inode import INode
 from product import Node_product
 from debug import warn
 import weakref
-
+from api import api
 '''
     @class Node_product_by_artist:
 '''
@@ -63,7 +63,7 @@ class Node_product_by_artist(INode):
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
-        data = qobuz.api.artist_get(
+        data = api.artist_get(
             artist_id=self.id, limit=limit, offset=offset, extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())

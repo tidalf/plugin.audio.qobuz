@@ -42,6 +42,7 @@ import qobuz
 from util.file import FileUtil
 from gui.util import containerRefresh, notifyH, getImage, executeBuiltin
 from node.track import Node_track
+from api import api
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
@@ -76,7 +77,7 @@ class MyPlayer(xbmc.Player):
             # wait 5s and if we're still playing the good song, send a start.
             xbmc.sleep(10000)
             if self.isPlayingAudio() and xbmcgui.Window(10000).getProperty("NID") == idToBeSend:
-                qobuz.api.track_resportStreamingStart(id)
+                api.track_resportStreamingStart(id)
             self.locked = False
             self.lastId = id
         return True

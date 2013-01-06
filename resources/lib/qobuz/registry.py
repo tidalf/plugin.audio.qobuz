@@ -16,7 +16,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import pprint
 from exception import QobuzXbmcError
-from api import QobuzApi
+from api import api
 from time import time
 from util.file import FileUtil
 import cPickle as pickle
@@ -75,7 +75,7 @@ class QobuzLocalStorage(object):
         self.data = {}
 
         # Qobuz API
-        self.api = QobuzApi()
+        self.api = api
         if not self.login(**ka):
             print "Error: %s" % (self.api.error)
             user = None
@@ -112,12 +112,12 @@ class QobuzLocalStorage(object):
         # since our data come from the cache we are setting user information
         # back to our api (We don't want to issue login on 
         # each request
-        self.api.set_user_data(data['data']['user']['id'], 
+        api.set_user_data(data['data']['user']['id'], 
                                data['data']['user_auth_token'] )
         return True
 
     def lastError(self):
-        return self.api.last_error
+        return api.error
 
     def set(self, **ka):
         refresh = None
@@ -209,38 +209,38 @@ class QobuzLocalStorage(object):
         del ka['id']
         # Switching on name
         if name == 'user':
-            response = self.api.user_login(**ka)
+            response = api.user_login(**ka)
         elif name == 'product':
-            response = self.api.album_get(album_id=id)
+            response = api.album_get(album_id=id)
         elif name == 'user-playlists':
-            response = self.api.playlist_getUserPlaylists(**ka)
+            response = api.playlist_getUserPlaylists(**ka)
         elif name == 'user-playlist':
-            response = self.api.playlist_get(**ka)
+            response = api.playlist_get(**ka)
         elif name == 'user-favorites':
-            response = self.api.favorite_getUserFavorites(**ka)
+            response = api.favorite_getUserFavorites(**ka)
         elif name == 'track':
-            response = self.api.track_get(track_id=id)
+            response = api.track_get(track_id=id)
         elif name == 'user-stream-url':
-            response = self.api.track_getFileUrl(
+            response = api.track_getFileUrl(
                 track_id=id, format_id=self.options['streamFormat'])
         elif name == 'user-purchases':
-            response = self.api.purchase_getUserPurchases(**ka)
+            response = api.purchase_getUserPurchases(**ka)
         elif name == 'recommendation':
-            response = self.api.album_getFeatured(**ka)
+            response = api.album_getFeatured(**ka)
         elif name == 'artist':
-            response = self.api.artist_get(**ka)
+            response = api.artist_get(**ka)
         elif name == 'genre-list':
-            response = self.api.genre_list(parent_id=id, limit=ka['limit'])
+            response = api.genre_list(parent_id=id, limit=ka['limit'])
         elif name == 'label-list':
-            response = self.api.label_list(**ka)
+            response = api.label_list(**ka)
         elif name == 'artist-similar':
-            response = self.api.artist_getSimilarArtists(**ka)
+            response = api.artist_getSimilarArtists(**ka)
         elif name == 'article_listrubrics':
-            response = self.api.article_listRubrics(**ka)
+            response = api.article_listRubrics(**ka)
         elif name == 'article_listlastarticles':
-            response = self.api.article_listLastArticles(**ka)
+            response = api.article_listLastArticles(**ka)
         elif name == 'article':
-            response = self.api.article_get(**ka)
+            response = api.article_get(**ka)
         else:
             QobuzXbmcError(
                 who=self,
@@ -452,10 +452,7 @@ class QobuzRegistry():
             QobuzXbmcError(who=self, what='unknown_cache_type',
                            additionnal=ka['cacheType'])
         return None
-
-    def get_api(self):
-        return self.cache.api
-
+    
     def lastError(self):
         return self.cache.lastError()
 
