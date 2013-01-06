@@ -1,12 +1,6 @@
 from exception import QobuzXbmcError as Qerror
 import pprint
 from gui.util import color
-
-class _cmdType_: 
-    def __init__(self):
-        self.runPlugin =  1 << 1,
-        self.containerUpdate =  1 << 2
-cmdType = _cmdType_()
         
 class contextMenu():
     def __init__(self):
@@ -32,8 +26,6 @@ class contextMenu():
             if not key in ka:
                 raise Qerror(who=self, 
                              what='missing_parameter', additional=key)
-        if not 'cmdType' in ka:
-            ka['cmdType'] = cmdType.runPlugin
         section, path = self.get_section_path(**ka)
         root = self.data
         pos = 0
