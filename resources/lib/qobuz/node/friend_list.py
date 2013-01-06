@@ -39,7 +39,7 @@ class Node_friend_list(INode):
             self.name) else "Friends (i8n)"
         self.url = None
         self.is_folder = True
-        self.content_type = 'artist'
+        self.content_type = 'artists'
 
     def make_url(self, **ka):
         url = super(Node_friend_list, self).make_url(**ka)

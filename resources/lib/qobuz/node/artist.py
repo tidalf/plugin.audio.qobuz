@@ -36,7 +36,7 @@ class Node_artist(INode):
         self.set_label(self.get_name())
         self.is_folder = True
         self.slug = ''
-        self.content_type = 'artists'
+        self.content_type = 'albums'
 
     def hook_post_data(self):
         self.name = self.get_property('name')
@@ -104,9 +104,9 @@ class Node_artist(INode):
                                 image,
                                 image,
                                 url)
-        item.setInfo('music', {
-                    'artist': self.get_label(),
-        })
+#        item.setInfo('music', {
+#                    'artist': self.get_label(),
+#        })
         if not item:
             warn(self, "Error: Cannot make xbmc list item")
             return None

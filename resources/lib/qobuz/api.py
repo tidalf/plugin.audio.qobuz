@@ -28,7 +28,7 @@ from debug import warn, info
 
 socket.timeout = 5
 
-def __api_error_string(self, url="", params={}, json=""): 
+def _api_error_string(self, url="", params={}, json=""): 
         return 'Something went wrong with request: %s\n%s\n%s' % (
                 url, pprint.pformat(params),
                 pprint.pformat(json))
@@ -125,6 +125,7 @@ class __API__:
             warn(self, self.error)
             return None
         self.status_code = r.status_code
+        _api_error_string('azdazdaz', 'azdazdza')
         if r.status_code != 200:
             if r.status_code == 400:
                 self.error = "Bad request"
@@ -136,7 +137,7 @@ class __API__:
                 self.error = "Not Found"
             else:
                 self.error = "Server error"
-            self.error = __api_error_string(url, params)
+            self.error = _api_error_string(url, params)
             warn(self, self.error)
             return None
         if not r.content:
@@ -161,7 +162,7 @@ class __API__:
         except:
             pass
         if status == 'error':
-            self.error = __api_error_string(url, params, response_json)
+            self.error = _api_error_string(url, params, response_json)
             warn(self, self.error)
             return None
         return response_json
