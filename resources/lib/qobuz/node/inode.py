@@ -91,9 +91,12 @@ class INode(object):
         log(self, 'Deleting node %s' % (self.type))
         for child in self.childs:
             child.delete_tree()
-        del self.childs
-        del self.parent
-        del self.parameters
+        self.childs = None
+        self.parent = None
+        self.parameters = None
+#        del self.childs
+#        del self.parent
+#        del self.parameters
 
     ''' content_type '''
     @property
@@ -453,7 +456,7 @@ class INode(object):
         if self.parent and not (self.parent.type & Flag.FAVORITES):
             ''' ADD TO FAVORITES / TRACKS'''
             url = self.make_url(type=Flag.FAVORITES, 
-                                          nm='add_tracks', 
+                                          nm='gui_add_tracks', 
                                           qid=self.id, 
                                           qnt=self.type, 
                                           mode=Mode.VIEW)

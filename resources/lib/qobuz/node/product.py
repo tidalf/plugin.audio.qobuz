@@ -39,7 +39,7 @@ class Node_product(INode):
         super(Node_product, self).__init__(parent, params)
         self.type = Flag.PRODUCT
         self.image = getImage('album')
-        self.content_type = 'albums'
+        self.content_type = 'songs'
         self.is_special_purchase = False
         self.offset = None
         self.imageDefaultSize = qobuz.addon.getSetting('image_default_size')

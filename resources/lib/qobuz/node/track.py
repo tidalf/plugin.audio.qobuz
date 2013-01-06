@@ -56,6 +56,7 @@ class Node_track(INode):
         return True
 
     def make_url(self, **ka):
+        #if not self.parent:
         if not 'mode' in ka: 
             ka['mode'] = Mode.PLAY 
         return super(Node_track, self).make_url(**ka)

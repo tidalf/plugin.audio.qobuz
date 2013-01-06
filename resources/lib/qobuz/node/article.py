@@ -90,7 +90,7 @@ class Node_article(INode):
 
     def displayWidget(self):
 #        self.pre_build_down(None, None, None, None)
-        w = WidgetArticle(xbmcgui.getCurrentWindowId())#'MyMusicSongs.xml', qobuz.addon.getAddonInfo('path'), data=self.data)
+#        w = WidgetArticle(xbmcgui.getCurrentWindowId())#'MyMusicSongs.xml', qobuz.addon.getAddonInfo('path'), data=self.data)
 #        w.myInit(self.data)
         #w.addItem('plop')
 #        w.doModal()

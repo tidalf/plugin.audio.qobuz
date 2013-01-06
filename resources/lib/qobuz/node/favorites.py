@@ -90,9 +90,9 @@ class Node_favorites(INode):
             return False
         album_ids = ','.join([node.id for node in nodes])
         if not self.add_albums(album_ids):
-            notifyH(heading, 'Cannot add albums to favorite')
+            notifyH(heading, 'Cannot add album(s) to favorite')
             return False
-        notifyH(heading, 'Albums added to favorite')
+        notifyH(heading, 'Album(s) added to favorite')
         return True
     
     def list_albums(self, qnt, qid):
@@ -119,7 +119,7 @@ class Node_favorites(INode):
             render = getRenderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.PRODUCT
-            render.blackFlag = Flag.STOPBUILD & Flag.TRACK & Flag.PRODUCT
+            render.blackFlag = Flag.STOPBUILD & Flag.TRACK
             render.asList = True
             render.run()
             for node in render.nodes:
@@ -151,21 +151,59 @@ class Node_favorites(INode):
         print "albums_ids added to favorite"
         return True
     
-    def add_tracks(self):
-        print "!!!! WORK IN PROGRESS !!!!"
-        qnt = self.get_parameter('qnt')
-        print "Adding favorites %s / %s" % (qnt, self.id)
-        render = getRenderer(qnt, self.parameters)
-        render.depth = -1
-        render.whiteFlag = Flag.TRACK
-        render.blackFlag = Flag.TRACK & Flag.STOPBUILD
-        render.asList = True
-        render.run()
-        for node in render.nodes:
-            print "Node %s id: %s" % (Flag.to_s(node.type),
-                                      node.id)
+    def gui_add_tracks(self):
+        heading = 'Qobuz Favorites (i8n)'
+        qnt = int(self.get_parameter('qnt'))
+        qid = self.get_parameter('qid')
+        nodes = self.list_tracks(qnt, qid)
+        if len(nodes) == 0:
+            notifyH(heading, 'Nothing to add')
+            return False
+        ret = xbmcgui.Dialog().select('Add this tracks to favorites? (i8n)', [
+           node.get_label() for node in nodes                              
+        ])
+        if ret == -1:
+            return False
+        track_ids = ','.join([str(node.id) for node in nodes])
+        print 'TrackIDS %s' % (track_ids)
+#        return True
+        if not self.add_tracks(track_ids):
+            notifyH(heading, 'Cannot add track(s) to favorite')
+            return False
+        notifyH(heading, 'Track(s) added to favorite')
         return True
-
+    
+    def list_tracks(self, qnt, qid):
+        track_ids = {}
+        nodes = []
+        if qnt & Flag.TRACK == Flag.TRACK:
+            print "Adding one track :)"
+            node = Node_track(None, {'nid': qid})
+            node.pre_build_down(None, None, None, Flag.NONE)
+            track_ids[str(node.id)] = 1
+            nodes.append(node)
+        else:
+            render = getRenderer(qnt, self.parameters)
+            render.depth = -1
+            render.whiteFlag = Flag.TRACK
+#            render.blackFlag = Flag.STOPBUILD & Flag.TRACK & Flag.PRODUCT
+            render.asList = True
+            render.run()
+            for node in render.nodes:
+                if not str(node.id) in track_ids:
+                    nodes.append(node)
+                    track_ids[str(node.id)] = 1
+        return nodes
+    
+    def add_tracks(self, track_ids):
+        ret = qobuz.api.favorite_create(track_ids=track_ids)
+        if not ret:
+            print "Cannot add album_ids to favorite"
+            return False
+        qobuz.registry.delete(name='user-favorites')
+        print "albums_ids added to favorite"
+        return True
+    
     def remove(self):
         log(self, "Removing favorite: " + repr(self.id))
         if not qobuz.api.favorite_delete(track_ids=str(self.id)):
