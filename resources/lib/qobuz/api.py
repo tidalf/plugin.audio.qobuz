@@ -15,16 +15,16 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import sys
-import requests
 import pprint
 from time import time
 import math
 import hashlib
+import socket
+
+import requests
 
 from exception import QobuzXbmcError
-from debug import warn, log, info
-
-import socket
+from debug import warn, info
 
 socket.timeout = 5
 
@@ -63,8 +63,6 @@ class QobuzApi:
                 raise QobuzXbmcError(who=self,
                                      what='invalid_parameter',
                                      additional=label)
-
-
 
     def __set_s4(self):
         import binascii
@@ -136,7 +134,7 @@ class QobuzApi:
         self.user_auth_token = None
         self.user_id = None
         self.logged_on = None
-        
+
     def user_login(self, **ka):
         data = self._user_login(**ka)
         if data:
@@ -145,6 +143,7 @@ class QobuzApi:
             return data
         self.logout()
         return None
+
     '''
     User
     '''
@@ -199,7 +198,7 @@ class QobuzApi:
         self._check_ka(ka, ['query'], ['limit'])
         data = self._api_request(ka, '/track/search')
         return data
-    
+
     def track_resportStreamingStart(self, track_id):
         # Any use of the API implies your full acceptance
         # of the General Terms and Conditions
@@ -225,6 +224,7 @@ class QobuzApi:
                   'duration': duration
                   }
         return self._api_request(params, '/track/reportStreamingEnd')
+
     '''
     Album
     '''
@@ -236,16 +236,12 @@ class QobuzApi:
         self._check_ka(ka, [], ['type', 'genre_id', 'limit', 'offset'])
         return self._api_request(ka, '/album/getFeatured')
 
-  
-
     '''
     Purchase
     '''
     def purchase_getUserPurchases(self, **ka):
         self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit', 'offset'])
         return self._api_request(ka, "/purchase/getUserPurchases")
-
-
 
     # SEARCH #
     def search_getResults(self, **ka):
@@ -301,7 +297,6 @@ class QobuzApi:
         data = self._api_request(ka, '/playlist/getUserPlaylists')
         return data
 
-    
     def playlist_addTracks(self, **ka):
         self._check_ka(ka, ['playlist_id', 'track_ids'])
         return self._api_request(ka, '/playlist/addTracks')
@@ -358,7 +353,7 @@ class QobuzApi:
         self._check_ka(ka, ['artist_id'], ['extra', 'limit', 'offset'])
         data = self._api_request(ka, '/artist/get')
         return data
- 
+
     """
         Genre
     """
@@ -372,20 +367,18 @@ class QobuzApi:
     def label_list(self, **ka):
         self._check_ka(ka, [], ['limit', 'offset'])
         return self._api_request(ka, '/label/list')
-    
+
     """
         Article
     """
     def article_listRubrics(self, **ka):
         self._check_ka(ka, [], ['extra', 'limit', 'offset'])
         return self._api_request(ka, '/article/listRubrics')
-    
+
     def article_listLastArticles(self, **ka):
         self._check_ka(ka, [], ['rubric_ids', 'offset', 'limit'])
         return self._api_request(ka, '/article/listLastArticles')
-    
+
     def article_get(self, **ka):
         self._check_ka(ka, ['article_id'])
         return self._api_request(ka, '/article/get')
-    
-    
