@@ -17,7 +17,7 @@
 import qobuz
 from flag import NodeFlag
 from inode import INode
-from debug import error
+from debug import warn
 from gui.util import lang, getImage
 
 from product import Node_product
@@ -41,7 +41,7 @@ class Node_purchases(INode):
         data = qobuz.registry.get(
             name='user-purchases', limit=limit, offset=self.offset)
         if not data:
-            error(self, "Cannot fetch purchases data")
+            warn(self, "Cannot fetch purchases data")
             return False
         self.data = data['data']
         return True

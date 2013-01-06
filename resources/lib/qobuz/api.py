@@ -30,29 +30,30 @@ import socket
 
 socket.timeout = 5
 
-
 class QobuzApi:
 
     def __init__(self):
-        self.authtoken = None
-        # self.cookie = None
-        self.user_id = None
-        self.auf = None
-        self.token_validity_time = 3600
-        self.retry_time = [1, 3, 5, 10]
-        self.retry_num = 0
         self.appid = "285473059"
-        self.last_error = None
-        self.user = None
-        self.password = None
         self.version = '0.2'
-        self.baseUrl = 'http://player.qobuz.com/api.json/' + self.version
-        self.stats = {'request': 0}
+        self.baseUrl = 'http://www.qobuz.com/api.json/'
+        
+        self.user_auth_token = None
+        self.user_id = None
+        self.error = None
+        self._baseUrl = self.baseUrl + self.version
         self.session = requests.Session()
         self.statContentSizeTotal = 0
         self.statTotalRequest = 0
+        self.error = None
         self.__set_s4()
 
+    """
+        Checking parameters before sending our request
+        - if mandatory parameter is missing raise error
+        - if a given parameter is neither in mandatory or issue
+        raise error (Creating exception class like QobuzApiMissingParameter
+        may be a good idea)
+    """
     def _check_ka(self, ka, mandatory, allowed=[]):
         for label in mandatory:
             if not label in ka:
@@ -65,10 +66,7 @@ class QobuzApi:
                                      what='invalid_parameter',
                                      additional=label)
 
-    def set_logged(self, *args, **data):
-        self.authtoken = data['data']['user_auth_token']
-        self.user_id = data['data']['user']['id']
-        self.logged_on = time()
+
 
     def __set_s4(self):
         import binascii
@@ -85,36 +83,26 @@ class QobuzApi:
 
     def _api_request(self, params, uri, **opt):
         self.statTotalRequest += 1
-        self.last_error = None
-        self.stats['request'] += 1
-        url = self.baseUrl + uri
-        #log(self, "Request URL: " + url + ',' + pprint.pformat(params))
+        self.error = None
+        url = self._baseUrl + uri
         useToken = False if (opt and 'noToken' in opt) else True
-
-        # Setting header
-        qheaders = {
-#                    'content-type': 'application/json'
-        }
-        if useToken and self.authtoken:
-            qheaders["X-USER-AUTH-TOKEN"] = self.authtoken
-        qheaders["X-APP-ID"] = self.appid
-
-        # Sending our request
+        headers = {}
+        if useToken and self.user_auth_token:
+            headers["x-user-auth-token"] = self.user_auth_token
+        headers["x-app-id"] = self.appid
         r = None
         try:
-            r = self.session.post(url, data=params, headers=qheaders)
+            r = self.session.post(url, data=params, headers=headers)
         except:
-            self.last_error = "Post request fail"
-            warn(self, self.last_error)
+            self.error = "Post request fail"
+            warn(self, self.error)
             return None
-        # We have cookies
-        # if r.cookies:
-        #        self.cookie = r.cookies
         if not r.content:
-            warn(self, "No content return")
+            self.error = "No content"
+            warn(self, self.error)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
-        # retry get if connexion fail
+        """ Retry get if connexion fail """
         try:
             response_json = r.json()
         except:
@@ -122,32 +110,47 @@ class QobuzApi:
             try:
                 response_json = r.json()
             except:
-                self.last_error = "Cannot load: " + url
-                warn(self, "Json loads failed a second time")
+                self.error = "Failed to load json two times...abort"
+                warn(self, self.error)
                 return 0
-
-        error = None
+        status = None
         try:
-            error = response_json['status']
+            status = response_json['status']
         except:
-            pass
-        if error == 'error':
-            warn(self, ('Something went wrong with request: %s\n%s\n%s')
-                 % (url, pprint.pformat(params),
-                    pprint.pformat(response_json)))
-
-            '''
-            When something wrong we are deleting our auth token
-                '''
+            self.error = 'No status response'
+        if status == 'error':
+            self.error = 'Something went wrong with request: %s\n%s\n%s' % (
+                url, pprint.pformat(params),
+                pprint.pformat(response_json))
+            warn(self, self.error)
             return None
-#        print "Header: %s" % (pprint.pformat(r.headers))
-#        print "Res: %s" % (pprint.pformat(response_json))
         return response_json
 
+    def set_user_data(self, user_id, user_auth_token):
+        if not (user_id or user_auth_token):
+            raise QobuzXbmcError(who=self, what='missing_argument', 
+                                 additional='uid|token')
+        self.user_auth_token = user_auth_token
+        self.user_id = user_id 
+        self.logged_on = time()
+
+    def logout(self):
+        self.user_auth_token = None
+        self.user_id = None
+        self.logged_on = None
+        
+    def user_login(self, **ka):
+        data = self._user_login(**ka)
+        if data:
+            self.set_user_data(data['user_auth_token'], 
+                               data['user']['id'])
+            return data
+        self.logout()
+        return None
     '''
     User
     '''
-    def user_login(self, **ka):
+    def _user_login(self, **ka):
         self._check_ka(ka, ['username', 'password'], ['email'])
         data = self._api_request(ka, '/user/login', noToken=True)
         if not data:
@@ -158,7 +161,6 @@ class QobuzApi:
             return None
         if not data['user']['id']:
             return None
-        # data['cookie'] = self.cookie
         data['user']['email'] = ''
         data['user']['firstname'] = ''
         data['user']['lastname'] = ''
@@ -271,9 +273,10 @@ class QobuzApi:
         if duration < 5:
             info(self, 'Duration lesser than 5s, abort reporting')
             return None
-        token = ''
+        #@todo ???
+        user_auth_token = ''
         try:
-            token = self.authtoken
+            user_auth_token = self.user_auth_token
         except:
             warn(self, 'No authentification token')
             return None

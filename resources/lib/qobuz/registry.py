@@ -77,6 +77,7 @@ class QobuzLocalStorage(object):
         # Qobuz API
         self.api = QobuzApi()
         if not self.login(**ka):
+            print "Error: %s" % (self.api.error)
             user = None
             if 'username' in ka:
                 user = ka['username']
@@ -104,14 +105,15 @@ class QobuzLocalStorage(object):
                 who=self, what='invalid_exclude_pattern', additional=pattern)
 
     def login(self, **ka):
-        # Login into Qobuz our raise exception
-        # key = self.make_key(name='user', id=0)
-        data = self.get(name='user', id=0, username=ka['username'],
+        data = self.get(name='user', id=0, username=ka['username'], 
                         password=ka['password'])
         if not data:
             return False
-        # We feed our api wit user data (auth_token, rights ...)
-        self.api.set_logged(**data)
+        # since our data come from the cache we are setting user information
+        # back to our api (We don't want to issue login on 
+        # each request
+        self.api.set_user_data(data['data']['user']['id'], 
+                               data['data']['user_auth_token'] )
         return True
 
     def lastError(self):
