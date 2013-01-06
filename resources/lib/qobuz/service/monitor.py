@@ -76,7 +76,7 @@ class MyPlayer(xbmc.Player):
             # wait 5s and if we're still playing the good song, send a start.
             xbmc.sleep(10000)
             if self.isPlayingAudio() and xbmcgui.Window(10000).getProperty("NID") == idToBeSend:
-                qobuz.api.report_streaming_start(id)
+                qobuz.api.track_resportStreamingStart(id)
             self.locked = False
             self.lastId = id
         return True

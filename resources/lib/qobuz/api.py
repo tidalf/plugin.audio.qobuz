@@ -14,8 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-# import os
-# import json
 import sys
 import requests
 import pprint
@@ -201,66 +199,8 @@ class QobuzApi:
         self._check_ka(ka, ['query'], ['limit'])
         data = self._api_request(ka, '/track/search')
         return data
-    '''
-    Artist
-    '''
-    def artist_get(self, **ka):
-        self._check_ka(ka, ['artist_id'], ['extra', 'limit', 'offset'])
-        data = self._api_request(ka, '/artist/get')
-        return data
-    '''
-    Album
-    '''
-    def album_get(self, **ka):
-        self._check_ka(ka, ['album_id'])
-        return self._api_request(ka, '/album/get')
-
-    def album_getFeatured(self, **ka):
-        self._check_ka(ka, [], ['type', 'genre_id', 'limit', 'offset'])
-        return self._api_request(ka, '/album/getFeatured')
-
-    '''
-    Playlist
-    '''
-    def playlist_getUserPlaylists(self, **ka):
-        self._check_ka(ka, [], ['user_id', 'username', 'offset', 'limit'])
-        if not 'user_id' in ka and not 'username' in ka:
-            ka['user_id'] = self.user_id
-        data = self._api_request(ka, '/playlist/getUserPlaylists')
-        return data
-
-    def playlist_get(self, **ka):
-        self._check_ka(ka, ['playlist_id'], ['extra', 'limit', 'offset'])
-        return self._api_request(ka, '/playlist/get')
-
-    def playlist_addTracks(self, **ka):
-        self._check_ka(ka, ['playlist_id', 'track_ids'])
-        return self._api_request(ka, '/playlist/addTracks')
-
-    '''
-    Purchase
-    '''
-    def purchase_getUserPurchases(self, **ka):
-        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit', 'offset'])
-        return self._api_request(ka, "/purchase/getUserPurchases")
-
-    def favorite_getUserFavorites(self, **ka):
-        self._check_ka(ka, [], ['user_id', 'type', 'limit', 'offset'])
-        return self._api_request(ka, '/favorite/getUserFavorites')
-
-    # SEARCH #
-    def search_getResults(self, **ka):
-        self._check_ka(ka, ['query'], ['type', 'limit', 'offset'])
-        mandatory = ['query', 'type']
-        for label in mandatory:
-            if not label in ka:
-                raise QobuzXbmcError(who=self,
-                                     what='missing_parameter',
-                                     additional=label)
-        return self._api_request(ka, '/search/getResults')
-
-    # REPORT #
-    def report_streaming_start(self, track_id):
+    
+    def track_resportStreamingStart(self, track_id):
         # Any use of the API implies your full acceptance
         # of the General Terms and Conditions
         # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
@@ -268,7 +208,7 @@ class QobuzApi:
         warn(self, pprint.pformat(params))
         return self._api_request(params, '/track/reportStreamingStart')
 
-    def report_streaming_stop(self, track_id, duration):
+    def track_resportStreamingEnd(self, track_id, duration):
         duration = math.floor(int(duration))
         if duration < 5:
             info(self, 'Duration lesser than 5s, abort reporting')
@@ -285,6 +225,45 @@ class QobuzApi:
                   'duration': duration
                   }
         return self._api_request(params, '/track/reportStreamingEnd')
+    '''
+    Album
+    '''
+    def album_get(self, **ka):
+        self._check_ka(ka, ['album_id'])
+        return self._api_request(ka, '/album/get')
+
+    def album_getFeatured(self, **ka):
+        self._check_ka(ka, [], ['type', 'genre_id', 'limit', 'offset'])
+        return self._api_request(ka, '/album/getFeatured')
+
+  
+
+    '''
+    Purchase
+    '''
+    def purchase_getUserPurchases(self, **ka):
+        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit', 'offset'])
+        return self._api_request(ka, "/purchase/getUserPurchases")
+
+
+
+    # SEARCH #
+    def search_getResults(self, **ka):
+        self._check_ka(ka, ['query'], ['type', 'limit', 'offset'])
+        mandatory = ['query', 'type']
+        for label in mandatory:
+            if not label in ka:
+                raise QobuzXbmcError(who=self,
+                                     what='missing_parameter',
+                                     additional=label)
+        return self._api_request(ka, '/search/getResults')
+
+    """
+        Favorite
+    """
+    def favorite_getUserFavorites(self, **ka):
+        self._check_ka(ka, [], ['user_id', 'type', 'limit', 'offset'])
+        return self._api_request(ka, '/favorite/getUserFavorites')
 
     def favorite_create(self, **ka):
         mandatory = ['artist_ids', 'album_ids', 'track_ids']
@@ -308,6 +287,29 @@ class QobuzApi:
                                  additional='artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/delete')
 
+    """
+    Playlist
+    """
+    def playlist_get(self, **ka):
+        self._check_ka(ka, ['playlist_id'], ['extra', 'limit', 'offset'])
+        return self._api_request(ka, '/playlist/get')
+
+    def playlist_getUserPlaylists(self, **ka):
+        self._check_ka(ka, [], ['user_id', 'username', 'offset', 'limit'])
+        if not 'user_id' in ka and not 'username' in ka:
+            ka['user_id'] = self.user_id
+        data = self._api_request(ka, '/playlist/getUserPlaylists')
+        return data
+
+    
+    def playlist_addTracks(self, **ka):
+        self._check_ka(ka, ['playlist_id', 'track_ids'])
+        return self._api_request(ka, '/playlist/addTracks')
+
+    def playlist_deleteTracks(self, **ka):
+        self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])
+        return self._api_request(ka, '/playlist/deleteTracks')
+       
     def playlist_subscribe(self, **ka):
         mandatory = ['playlist_id']
         found = None
@@ -322,10 +324,6 @@ class QobuzApi:
     def playlist_unsubscribe(self, **ka):
         self._check_ka(ka, ['playlist_id'])
         return self._api_request(ka, '/playlist/unsubscribe')
-
-    def playlist_deleteTracks(self, **ka):
-        self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])
-        return self._api_request(ka, '/playlist/deleteTracks')
 
     def playlist_create(self, **ka):
         self._check_ka(ka, ['name'], ['is_public',
@@ -349,18 +347,35 @@ class QobuzApi:
         res = self._api_request(ka, '/playlist/update')
         return res
 
+    """
+        Artist
+    """
     def artist_getSimilarArtists(self, **ka):
         self._check_ka(ka, ['artist_id', 'limit', 'offset'])
         return self._api_request(ka, '/artist/getSimilarArtists')
 
+    def artist_get(self, **ka):
+        self._check_ka(ka, ['artist_id'], ['extra', 'limit', 'offset'])
+        data = self._api_request(ka, '/artist/get')
+        return data
+ 
+    """
+        Genre
+    """
     def genre_list(self, **ka):
         self._check_ka(ka, [], ['parent_id', 'limit', 'offset'])
         return self._api_request(ka, '/genre/list')
 
+    """
+        Label
+    """
     def label_list(self, **ka):
         self._check_ka(ka, [], ['limit', 'offset'])
         return self._api_request(ka, '/label/list')
-
+    
+    """
+        Article
+    """
     def article_listRubrics(self, **ka):
         self._check_ka(ka, [], ['extra', 'limit', 'offset'])
         return self._api_request(ka, '/article/listRubrics')
