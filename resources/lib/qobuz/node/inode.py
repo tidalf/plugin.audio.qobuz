@@ -22,7 +22,7 @@ import xbmcgui
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag as Flag
+from flag import NodeFlag as Flag, Eview
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, \
     formatControlLabel, containerRefresh
@@ -49,10 +49,11 @@ class INode(object):
         self.label = ''
         self.label2 = None
         self.is_folder = True
-
+        self.containerView = Eview.NAVIGATION
         self.pagination_next = None
         self.pagination_prev = None
         self.offset = None
+        self.hasWidget = False
 
     ''' Id '''
     @property
@@ -302,7 +303,7 @@ class INode(object):
             return self.image
         if self.parent:
             return self.parent.get_image()
-        return ''
+        return self.get_property('image')
 
     def set_image(self, image):
         self.image = image
@@ -443,6 +444,8 @@ class INode(object):
         ''' ARTIST '''
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
+            if not artist_id:
+                print pprint.pformat(self.data)
             artist_name = self.get_artist()
             urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id, 
                                       mode=Mode.VIEW)

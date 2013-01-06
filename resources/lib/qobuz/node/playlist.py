@@ -18,6 +18,7 @@
 import xbmcgui
 
 import qobuz
+from constants import Mode
 from flag import NodeFlag as Flag
 from inode import INode
 from product import Node_product
@@ -160,7 +161,8 @@ class Node_playlist(INode):
         label = self.get_label()
         
         if isOwner:
-            url = self.make_url(type=Flag.PLAYLIST, nm='set_as_current')
+            url = self.make_url(type=Flag.PLAYLIST, mode=Mode.VIEW,
+                                nm='set_as_current')
             menu.add(path='playlist/set_as_current', label=lang(39007), 
                     cmd=containerUpdate(url))
 
@@ -174,7 +176,8 @@ class Node_playlist(INode):
                     cmd=runPlugin(url))
 
         url = self.make_url(type=Flag.PLAYLIST, nm='gui_remove')
-        menu.add(path='playlist/remove', label=lang(39010), cmd=containerUpdate(url))
+        menu.add(path='playlist/remove', label=lang(39010), 
+                 cmd=containerUpdate(url))
 
         ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menu)

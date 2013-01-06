@@ -26,7 +26,6 @@ from xbmcrpc import showNotification, getInfoLabels
 '''
     Keyboard
 '''
-
 class Keyboard(xbmc.Keyboard):
 
     def __init__(self, default, heading, hidden=True):

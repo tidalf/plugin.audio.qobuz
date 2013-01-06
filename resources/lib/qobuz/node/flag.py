@@ -17,6 +17,13 @@
 
 from exception import QobuzXbmcError
 
+class _ContainerView_():
+    def __init__(self):
+        self.NAVIGATION = 1
+        self.MEDIA = 2
+
+Eview = _ContainerView_()
+
 
 class __NodeFlag():
     def __init__(self):
@@ -37,12 +44,17 @@ class __NodeFlag():
         self.GENRE = 1 << 15
         self.LABEL = 1 << 16
         self.PRODUCTS = 1 << 17
-        self.STOPBUILD = 1 << 18
-        self.NONE = 1 << 19
+        self.ARTICLES = 1 << 18
+        self.ARTICLE = 1 << 19
+        self.ARTICLE_RUBRICS = 1 << 20
         
-        self.totalFlag = 19
+        self.STOPBUILD = 1 <<  100
+        self.NONE = 1 << 101
+        
+        
+        self.totalFlag = 20
         self.ALL = 0
-        for i in range(1, self.totalFlag):
+        for i in range(1, self.totalFlag+1):
             self.ALL |= (1 << i)
         
     def to_s(self, flag):
@@ -82,6 +94,12 @@ class __NodeFlag():
             return "products"
         elif flag & self.STOPBUILD == self.STOPBUILD:
             return "stop_build_down"
+        elif flag & self.ARTICLES == self.ARTICLES:
+            return "articles"
+        elif flag & self.ARTICLE == self.ARTICLE:
+            return "article"
+        elif flag & self.ARTICLE_RUBRICS == self.ARTICLE_RUBRICS:
+            return "article_rubrics"
         else:
             raise QobuzXbmcError(
                 who=self, what='invalid_flag', additional=repr(flag))

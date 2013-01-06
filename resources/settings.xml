@@ -44,6 +44,8 @@
 			type="text" default="FF59A0FF" />
 		<setting id="item_section_format" label="33105"
 			type="text" default=".o[ %s ]o." />
+		<setting id="view_navigation" label="View navigation"
+            type="text" default="bigicon" />
 
 	</category>
 	<!-- Other -->

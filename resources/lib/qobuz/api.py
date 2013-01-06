@@ -358,3 +358,16 @@ class QobuzApi:
         self._check_ka(ka, [], ['limit', 'offset'])
         return self._api_request(ka, '/label/list')
 
+    def article_listRubrics(self, **ka):
+        self._check_ka(ka, [], ['extra', 'limit', 'offset'])
+        return self._api_request(ka, '/article/listRubrics')
+    
+    def article_listLastArticles(self, **ka):
+        self._check_ka(ka, [], ['rubric_ids', 'offset', 'limit'])
+        return self._api_request(ka, '/article/listLastArticles')
+    
+    def article_get(self, **ka):
+        self._check_ka(ka, ['article_id'])
+        return self._api_request(ka, '/article/get')
+    
+    

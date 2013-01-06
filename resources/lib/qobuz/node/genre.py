@@ -35,7 +35,8 @@ class Node_genre(INode):
         self.set_label('Genre (i8n)')
         self.is_folder = True
         self.image = getImage('album')
-
+        self.offset = self.get_parameter('offset') or 0
+        
     def make_url(self, **ka):
         url = super(Node_genre, self).make_url(**ka)
         if self.parent and self.parent.id:
@@ -56,10 +57,9 @@ class Node_genre(INode):
         return True
 
     def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
-        offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
-            name='genre-list', id=self.id, offset=offset, limit=limit)
+            name='genre-list', id=self.id, offset=self.offset, limit=limit)
         if not data: 
             self.data = None
             return True # Nothing return trigger reco build in build_down

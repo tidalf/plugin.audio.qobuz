@@ -233,6 +233,12 @@ class QobuzLocalStorage(object):
             response = self.api.label_list(**ka)
         elif name == 'artist-similar':
             response = self.api.artist_getSimilarArtists(**ka)
+        elif name == 'article_listrubrics':
+            response = self.api.article_listRubrics(**ka)
+        elif name == 'article_listlastarticles':
+            response = self.api.article_listLastArticles(**ka)
+        elif name == 'article':
+            response = self.api.article_get(**ka)
         else:
             QobuzXbmcError(
                 who=self,

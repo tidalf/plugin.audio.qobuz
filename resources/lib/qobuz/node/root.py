@@ -24,6 +24,7 @@ from purchases import Node_purchases
 from friend_list import Node_friend_list
 from genre import Node_genre
 from label import Node_label
+from article_rubrics import Node_article_rubrics
 import qobuz
 
 
@@ -60,6 +61,7 @@ class Node_root(INode):
         self.add_child(Node_friend_list())
         self.add_child(Node_genre())
         self.add_child(Node_label())
+        self.add_child(Node_article_rubrics())
         return True
 
     def cache_remove(self):

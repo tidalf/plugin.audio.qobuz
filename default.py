@@ -35,13 +35,18 @@ sys.path.append(qobuzDir)
 from exception import QobuzXbmcError
 from bootstrap import QobuzBootstrap
 from debug import warn
-boot = QobuzBootstrap(__addon__, int(sys.argv[1]))
+__handle__ = int(sys.argv[1])
+boot = QobuzBootstrap(__addon__, __handle__)
+import xbmcplugin
+xbmcplugin.setPluginCategory(__handle__, "Qobuz Online Music")
+xbmcplugin.setPluginFanart(__handle__, color1='0xFF0000FF')
 
 #try:
 boot.bootstrap_app()
 boot.dispatch()
 from qobuz import api
 from debug import log
+
 log('QobuzApi', 
     '(%s request / %03i KiB)' % (api.statTotalRequest, 
                                  api.statContentSizeTotal/1024))

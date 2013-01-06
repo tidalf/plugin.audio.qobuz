@@ -61,6 +61,8 @@ class QobuzXbmcRenderer(IRenderer):
                  ("Cannot set root node (%s, %s)") % 
                  (str(self.node_type), str(self.root.get_parameter('nid'))))
             return False
+        if self.root.hasWidget:
+            return self.root.displayWidget()
         if self.execute_method_parameter():
             #executeBuiltin(containerUpdate(self.root.make_url()))
             return True
