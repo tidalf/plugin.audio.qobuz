@@ -109,7 +109,7 @@ class INode(object):
 
     @content_type.setter
     def content_type(self, type):
-        if type not in ['songs', 'albums', 'files', 'artist']:
+        if type not in ['songs', 'albums', 'files', 'artists']:
             raise Qerror(
                 who=self, what='invalid_type', additional=type)
         self._content_type = type
