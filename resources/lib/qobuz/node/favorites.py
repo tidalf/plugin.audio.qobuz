@@ -55,10 +55,10 @@ class Node_favorites(INode):
         return True
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        if 'tracks' in self.data:
-            self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
         if 'albums' in self.data:
             self._build_down_albums(Dir, lvl, whiteFlag, blackFlag)
+        if 'tracks' in self.data:
+            self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
         return True
         
     def _build_down_tracks(self, Dir, lvl, whiteFlag, blackFlag):
