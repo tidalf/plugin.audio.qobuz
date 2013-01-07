@@ -112,6 +112,7 @@ class __API__:
         self.error = None
         self.status_code = None
         url = self._baseUrl + uri
+        print "Request: %s %s" % (url, pprint.pformat(params))
         useToken = False if (opt and 'noToken' in opt) else True
         headers = {}
         if useToken and self.user_auth_token:
@@ -325,7 +326,7 @@ class __API__:
         return self._api_request(ka, '/favorite/create')
 
     def favorite_delete(self, **ka):
-        mandatory = ['artist_ids', 'albums_ids', 'track_ids']
+        mandatory = ['artist_ids', 'album_ids', 'track_ids']
         found = None
         for label in mandatory:
             if label in ka:

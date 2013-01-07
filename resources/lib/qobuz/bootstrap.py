@@ -179,7 +179,7 @@ class QobuzBootstrap(object):
         except:
             warn(self, "No 'mode' parameter")
         for p in self.params:
-            debug(self, "Param: " + p + ' = ' + str(self.params[p]))
+            info(self, "Param: " + p + ' = ' + str(self.params[p]))
 
     def erase_cache(self):
         qobuz.registry.delete_by_name('^.*\.dat$')

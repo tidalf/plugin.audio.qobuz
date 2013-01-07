@@ -425,11 +425,11 @@ class INode(object):
 
     def attach_context_menu(self, item, menu):
         ''' HOME '''
-        url = self.make_url(type=Flag.ROOT)
+        url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='')
         menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
                  id='', pos = -5)
         ''' Favorite '''
-        url = self.make_url(type=Flag.FAVORITES)
+        url = self.make_url(type=Flag.FAVORITES, mode=Mode.VIEW, nm='')
         menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
         ''' System '''
         menu.add(path='system', label="System", cmd=containerRefresh(), pos=10)        
@@ -470,6 +470,13 @@ class INode(object):
             menu.add(path='favorites/add_albums', 
                           label=lang(39011) + ' albums', cmd=runPlugin(url))
         
+        if self.parent and (self.parent.type & Flag.FAVORITES):
+            url = self.make_url(type=Flag.FAVORITES, nm='gui_remove',
+                                qid=self.id, qnt=self.type,
+                                mode=Mode.VIEW)
+            menu.add(path='favorites/remove', label='Remove %s' % (self.get_label()), 
+                     cmd=runPlugin(url), color='red')
+            
         cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
         if self.type | cflag  != cflag:
             ''' PLAYLIST '''

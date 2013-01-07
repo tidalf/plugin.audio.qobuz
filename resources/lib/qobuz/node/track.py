@@ -309,17 +309,18 @@ class Node_track(INode):
     def attach_context_menu(self, item, menu):
         if self.parent and self.parent.type & Flag.PLAYLIST:
             url = self.parent.make_url(
-                query=str(self.get_property('playlist_track_id'))
-            )
+                query=str(self.get_property('playlist_track_id')),
+                mode=Mode.VIEW)
             menu.add(path='playlist/remove', 
                      label=lang(30073) + self.get_label(),
                      cmd=runPlugin(url))
 
-        if self.parent and self.parent.type & Flag.FAVORITES:
-            ''' REMOVE '''
-            url = self.make_url(type=Flag.FAVORITES,nm='remove')
-            menu.add(path='favorite/remove', label='Remove',
-                     cmd=runPlugin(url))
+#        if self.parent and self.parent.type & Flag.FAVORITES:
+#            ''' REMOVE '''
+#            url = self.make_url(type=Flag.FAVORITES,nm='gui_remove', 
+#                                qid=self.id, qnt=self.type, mode=Mode.VIEW)
+#            menu.add(path='favorites/remove', label='Remove from favorite',
+#                     cmd=runPlugin(url))
 
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menu)

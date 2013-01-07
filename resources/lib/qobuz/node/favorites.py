@@ -20,17 +20,20 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from product import Node_product
-from debug import warn, log
+from debug import warn
 from gui.util import lang
-from gui.util import getImage, notifyH
-from util import getRenderer
+from gui.util import getImage, notifyH, executeBuiltin, containerUpdate
+from util import getRenderer, getNode
 from api import api
+from exception import QobuzXbmcError as Qerror
+from track import Node_track
+
 '''
     @class Node_favorites:
 '''
-from track import Node_track
 
-import pprint
+registryKey = 'user-favorites'
+dialogHeading = 'Qobuz favorite (i8n)'
 
 class Node_favorites(INode):
 
@@ -43,11 +46,11 @@ class Node_favorites(INode):
         self.content_type = 'albums'
         self.image = getImage('favorites')
         self.offset = self.get_parameter('offset') or 0
-        
+
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
-            name='user-favorites', limit=limit, offset=self.offset)
+            name=registryKey, limit=limit, offset=self.offset)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
@@ -60,7 +63,7 @@ class Node_favorites(INode):
         if 'tracks' in self.data:
             self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
         return True
-        
+
     def _build_down_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
@@ -78,12 +81,10 @@ class Node_favorites(INode):
         return self.get_property('description')
 
     def gui_add_albums(self):
-        heading = 'Qobuz Favorites (i8n)'
-        qnt = int(self.get_parameter('qnt'))
-        qid = self.get_parameter('qid')
+        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_albums(qnt, qid)
         if len(nodes) == 0:
-            notifyH(heading, 'Nothing to add')
+            notifyH(dialogHeading, 'Nothing to add (i8n)')
             return False
         ret = xbmcgui.Dialog().select('Add albums to favorites? (i8n)', [
            node.get_label() for node in nodes                              
@@ -92,11 +93,11 @@ class Node_favorites(INode):
             return False
         album_ids = ','.join([node.id for node in nodes])
         if not self.add_albums(album_ids):
-            notifyH(heading, 'Cannot add album(s) to favorite')
+            notifyH(dialogHeading, 'Cannot add album(s) to favorite')
             return False
-        notifyH(heading, 'Album(s) added to favorite')
+        notifyH(dialogHeading, 'Album(s) added to favorite')
         return True
-    
+
     def list_albums(self, qnt, qid):
         album_ids = {}
         nodes = []
@@ -143,23 +144,19 @@ class Node_favorites(INode):
                             nodes.append(newnode)
                             album_ids[str(newnode.id)] = 1
         return nodes
-    
+
     def add_albums(self, album_ids):
         ret = api.favorite_create(album_ids=album_ids)
         if not ret:
-            print "Cannot add album_ids to favorite"
             return False
-        qobuz.registry.delete(name='user-favorites')
-        print "albums_ids added to favorite"
+        self._delete_cache()
         return True
-    
+
     def gui_add_tracks(self):
-        heading = 'Qobuz Favorites (i8n)'
-        qnt = int(self.get_parameter('qnt'))
-        qid = self.get_parameter('qid')
+        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_tracks(qnt, qid)
         if len(nodes) == 0:
-            notifyH(heading, 'Nothing to add')
+            notifyH(dialogHeading, 'Nothing to add')
             return False
         ret = xbmcgui.Dialog().select('Add this tracks to favorites? (i8n)', [
            node.get_label() for node in nodes                              
@@ -167,19 +164,16 @@ class Node_favorites(INode):
         if ret == -1:
             return False
         track_ids = ','.join([str(node.id) for node in nodes])
-        print 'TrackIDS %s' % (track_ids)
-#        return True
         if not self.add_tracks(track_ids):
-            notifyH(heading, 'Cannot add track(s) to favorite')
+            notifyH(dialogHeading, 'Cannot add track(s) to favorite')
             return False
-        notifyH(heading, 'Track(s) added to favorite')
+        notifyH(dialogHeading, 'Track(s) added to favorite')
         return True
-    
+
     def list_tracks(self, qnt, qid):
         track_ids = {}
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
-            print "Adding one track :)"
             node = Node_track(None, {'nid': qid})
             node.pre_build_down(None, None, None, Flag.NONE)
             track_ids[str(node.id)] = 1
@@ -188,7 +182,6 @@ class Node_favorites(INode):
             render = getRenderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.TRACK
-#            render.blackFlag = Flag.STOPBUILD & Flag.TRACK & Flag.PRODUCT
             render.asList = True
             render.run()
             for node in render.nodes:
@@ -196,19 +189,47 @@ class Node_favorites(INode):
                     nodes.append(node)
                     track_ids[str(node.id)] = 1
         return nodes
-    
+
     def add_tracks(self, track_ids):
         ret = api.favorite_create(track_ids=track_ids)
         if not ret:
-            print "Cannot add album_ids to favorite"
             return False
-        qobuz.registry.delete(name='user-favorites')
-        print "albums_ids added to favorite"
+        self._delete_cache()
         return True
-    
-    def remove(self):
-        log(self, "Removing favorite: " + repr(self.id))
-        if not api.favorite_delete(track_ids=str(self.id)):
+
+    def _delete_cache(self):
+        qobuz.registry.delete(name=registryKey)
+        return True
+
+    def del_track(self, track_id):
+        if api.favorite_delete(track_ids=track_id):
+            self._delete_cache()
+            return True
+        return False
+
+    def del_album(self, album_id):
+        if api.favorite_delete(album_ids=album_id):
+            self._delete_cache()
+            return True
+        return False
+
+    def gui_remove(self):
+        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
+        node = getNode(qnt, {'nid': qid})
+        ret = None
+        if qnt & Flag.TRACK == Flag.TRACK:
+            ret = self.del_track(node.id)
+        elif qnt & Flag.PRODUCT == Flag.PRODUCT:
+            ret = self.del_album(node.id)
+        else:
+            raise Qerror(who=self, what='invalid_node_type', 
+                         additional=self.type)
+        if not ret:
+            notifyH(dialogHeading, 
+                    'Cannot remove item: %s' % (node.get_label()))
             return False
-        qobuz.registry.delete(name='user-favorites')
+        notifyH(dialogHeading, 
+                    'Item successfully removed: %s' % (node.get_label()))
+        url = self.make_url(nt=self.type, nid='', nm='')
+        executeBuiltin(containerUpdate(url, True))
         return True
