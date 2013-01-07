@@ -25,8 +25,7 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag, Eview
 from exception import QobuzXbmcError as Qerror
-from gui.util import color, lang, runPlugin, containerUpdate, \
-    formatControlLabel, containerRefresh
+from gui.util import color, lang, runPlugin, containerUpdate, containerRefresh
 from debug import log, warn
 from time import time
 from gui.contextmenu import contextMenu
@@ -453,6 +452,10 @@ class INode(object):
 
 
     def attach_context_menu(self, item, menu):
+        """
+            Note: Url made with make_url must set mode (like mode=Mode.VIEW)
+            else we are copying current mode (for track it's Mode.PLAY ...)
+        """
         ''' HOME '''
         url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='')
         menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
@@ -503,19 +506,22 @@ class INode(object):
             url = self.make_url(type=Flag.FAVORITES, nm='gui_remove',
                                 qid=self.id, qnt=self.type,
                                 mode=Mode.VIEW)
-            menu.add(path='favorites/remove', label='Remove %s' % (self.get_label()), 
+            menu.add(path='favorites/remove', 
+                     label='Remove %s' % (self.get_label()), 
                      cmd=runPlugin(url), color='red')
             
         cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
         if self.type | cflag  != cflag:
             ''' PLAYLIST '''
-            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, id=''))
+            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
+                                    id='', mode=Mode.VIEW))
             menu.add(path='playlist', 
-                          label="Playlist", cmd=cmd)
+                          label="Playlist", cmd=cmd, mode=Mode.VIEW)
             ''' ADD TO CURRENT PLAYLIST '''
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
-                                            nm='add_to_current', 
-                                            qnt=self.type))
+                                            nm='gui_add_to_current', 
+                                            qnt=self.type,
+                                            mode=Mode.VIEW))
             menu.add(path='playlist/add_to_current', 
                           label=lang(39005), cmd=cmd)
             label = self.get_label()
@@ -524,12 +530,14 @@ class INode(object):
             except:
                 warn(self, "Cannot set query..." + repr(label))
                 label = ''
-            label = urllib.quote(label)
+            label = urllib.quote_plus(label)
             ''' ADD AS NEW '''
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST,
-                                            nm='add_as_new', 
+                                            nm='gui_add_as_new', 
                                             qnt=self.type,
-                                            query=label))
+                                            query=label,
+                                            mode=Mode.VIEW,
+                                            qid=self.id))
             menu.add(path='playlist/add_as_new', 
                           label=lang(30080), cmd=cmd)
 
@@ -543,7 +551,8 @@ class INode(object):
         ''' PLAYLIST / CREATE '''
         cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
         if self.type | cflag == cflag:
-            cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, nm="gui_create"))
+            cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
+                                          nm="gui_create", mode=Mode.VIEW))
             menu.add(path='playlist/create', 
                           label=lang(39008), cmd=cmd)
         ''' VIEW BIG DIR '''
@@ -563,6 +572,7 @@ class INode(object):
         
         ''' ERASE CACHE '''
         colorItem = qobuz.addon.getSetting('color_item_caution')
-        cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove"))
+        cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
+                                      mode=Mode.VIEW))
         menu.add(path='system/erase_cache', 
                           label=lang(31009), cmd=cmd, color=colorItem)

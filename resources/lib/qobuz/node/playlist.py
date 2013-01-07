@@ -26,7 +26,7 @@ from debug import info, warn
 from exception import QobuzXbmcError
 from gui.util import notifyH, color, lang, getImage, runPlugin, \
     containerRefresh, containerUpdate, executeBuiltin
-from util import getRenderer
+from util import getRenderer, getNode
 from gui.contextmenu import contextMenu
 import pprint
 from api import api
@@ -36,6 +36,7 @@ from api import api
 '''
 from track import Node_track
 
+registryKey = 'user-playlist'
 
 class Node_playlist(INode):
 
@@ -43,7 +44,6 @@ class Node_playlist(INode):
         super(Node_playlist, self).__init__(parent, parameters)
         self.type = Flag.PLAYLIST
         self.label = "Playlist"
-        self.registryKey = 'user-playlist'
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
@@ -196,7 +196,7 @@ class Node_playlist(INode):
         containerRefresh()
         return True
 
-    def add_to_current(self):
+    def gui_add_to_current(self):
         cpl = qobuz.registry.get(name='user-current-playlist-id')
         if not cpl:
             notifyH('Qobuz', "No current playlist")
@@ -204,13 +204,26 @@ class Node_playlist(INode):
             return False
         cid = cpl['data']
         qnt = int(self.get_parameter('qnt'))
+        qid = self.get_parameter('qid')
+        nodes = []
         if qnt & Flag.SEARCH:
             self.del_parameter('query')
-        render = getRenderer(qnt, self.parameters)
-        render.depth = -1
-        render.whiteFlag = Flag.TRACK
-        render.asList = True
-        render.run()
+        if qnt & Flag.TRACK == Flag.TRACK:
+            node = getNode(qnt, {'nid': qid})
+            node.pre_build_down(None, None, None, Flag.NONE)
+            nodes.append(node)
+        else:
+            render = getRenderer(qnt, self.parameters)
+            render.depth = -1
+            render.whiteFlag = Flag.TRACK
+            render.asList = True
+            render.run()
+            nodes = render.nodes
+        ret = xbmcgui.Dialog().select('Add to current playlist', [
+           node.get_label() for node in nodes                              
+        ])
+        if ret == -1:
+            return False
         ret = self._add_tracks(cid, render.nodes)
         if not ret:
             notifyH('Qobuz', 
@@ -244,32 +257,45 @@ class Node_playlist(INode):
             return True
         return False
         
-    def add_as_new(self, name=None):
+    def gui_add_as_new(self, name=None):
+        nodes = []
         qnt = int(self.get_parameter('qnt'))
+        qid = self.get_parameter('qid')
         if qnt & Flag.SEARCH:
             self.del_parameter('query')
-        render = getRenderer(qnt, self.parameters)
-        render.depth = -1
-        render.whiteFlag = Flag.TRACK
-        render.asList = True
-        render.run()
-        if not name and render.root.get_parameter('query', unQuote=True):
-            name = render.root.get_parameter('query', unQuote=True)
+        if qnt & Flag.TRACK == Flag.TRACK:
+            print "Adding one track"
+            node = getNode(qnt, {'nid': qid})
+            node.pre_build_down(None,None,None, Flag.NONE)
+            nodes.append(node)
         else:
-            name = self.get_parameter('query') or self.get_label()
+            render = getRenderer(qnt, self.parameters)
+            render.depth = -1
+            render.whiteFlag = Flag.TRACK
+            render.asList = True
+            render.run()
+            nodes = render.nodes
+            if not name and render.root.get_parameter('query', unQuote=True):
+                name = render.root.get_parameter('query', unQuote=True)
+        if not name:
+            name = self.get_parameter('query', 
+                                      unQuote=True) or self.get_label()
+        ret = xbmcgui.Dialog().select('Create playlist %s' % (name), [
+           node.get_label() for node in nodes                              
+        ])
+        if ret == -1:
+            return False
         playlist = self.create(name)
         if not playlist:
             notifyH('Qobuz', 'Playlist creationg failed', 'icon-error-256')
             warn(self, "Cannot create playlist...")
             return False
-        self.id = playlist['id']
-        if not self._add_tracks(self.id, render.nodes):
+        if not self._add_tracks(playlist['id'], nodes):
             notifyH('Qobuz / Cannot add tracks', 
                     "%s" % (name), 'icon-error-256')
-            qobuz.registry.delete(name='user-playlist', id=self.id)
             return False
         notifyH('Qobuz / Playlist added', 
-                '[%s] %s' % (len(render.nodes), name)) 
+                '[%s] %s' % (len(nodes), name)) 
         return True
     
     def set_as_current(self, nid = None):
@@ -284,13 +310,12 @@ class Node_playlist(INode):
         Rename playlist
     '''
     def rename(self, ID = None):
-        registryKey = self.registryKey
         if not ID:
             ID = self.id
         if not ID:
             warn(self, "Can't rename playlist without id")
             return False
-        from gui.util import Keyboard, containerRefresh
+        from gui.util import Keyboard
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         info(self, "renaming playlist: " + str(ID))
@@ -315,11 +340,9 @@ class Node_playlist(INode):
             return False
         self.data['name'] = newname
         self.data = None
-        qobuz.registry.delete(name=registryKey, id=ID)
-        qobuz.registry.delete(name='user-playlists')
-        qobuz.registry.get(name=registryKey, id=ID, playlist_id=ID, 
-                           offset=offset, limit=limit)
+        self.delete_cache(ID)
         notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
+        executeBuiltin(containerRefresh())
         return True
     
     def create(self, name, isPublic=True, isCollaborative=False):
@@ -362,7 +385,8 @@ class Node_playlist(INode):
         offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
-            name=self.registryKey, id=ID, playlist_id=ID, offset=offset, limit=limit)['data']
+            name=registryKey, id=ID, playlist_id=ID, offset=offset, 
+            limit=limit)['data']
         name = ''
         if 'name' in data:
             name = data['name']
@@ -384,19 +408,24 @@ class Node_playlist(INode):
             notifyH('Qobuz remove playlist (i8n)', 'Cannot remove playlist ' +
                     name, getImage('icon-error-256'))
             return False
-        qobuz.registry.delete(name='user-playlist', id=ID)
-        qobuz.registry.delete(name='user-playlists')
+        self.delete_cache(ID)
         notifyH('Qobuz playlist removed(i8n)', "Playlist %s removed" % (name))
-        url = self.make_url(nm='')
-       # executeBuiltin(containerUpdate(self.make_url(type=Flag.USERPLAYLISTS)))
+        url = self.make_url(type=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
+                            id='')
+        executeBuiltin(containerRefresh())
         return False
-
+    
     def subscribe(self):
         ID = self.id
         if api.playlist_subscribe(playlist_id=ID):
             from gui.util import notifyH, isFreeAccount, lang
             notifyH("Qobuz subscribed", "(i8n) playlist subscribed")
-            qobuz.registry.delete_by_name('^user-playlists.*\.dat$')
+            qobuz.registry.delete(name='user-playlists')
             return True
         else:
             return False
+
+    def delete_cache(self, ID):
+        qobuz.registry.delete(name=registryKey, id=ID)
+        qobuz.registry.delete(name='user-playlists')
+        

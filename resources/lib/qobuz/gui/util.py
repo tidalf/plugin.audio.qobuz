@@ -18,6 +18,7 @@ import os, sys
 import xbmc
 import xbmcgui
 import xbmcplugin
+import xbmcaddon
 from debug import log, debug
 import qobuz
 
@@ -119,12 +120,12 @@ def containerRefresh():
 def executeBuiltin(cmd):
     xbmc.executebuiltin("%s" % (cmd))
     
-def formatControlLabel(label, sFormat=None, colorItem=None):
-    if not colorItem: 
-        colorItem = qobuz.addon.getSetting('item_section_color')
-    if not sFormat:
-        sFormat = qobuz.addon.getSetting('item_section_format')
-    return sFormat % (color(colorItem, label))
+#def formatControlLabel(label, sFormat=None, colorItem=None):
+#    if not colorItem: 
+#        colorItem = qobuz.addon.getSetting('item_section_color')
+#    if not sFormat:
+#        sFormat = qobuz.addon.getSetting('item_section_format')
+#    return sFormat % (color(colorItem, label))
 
 def containerViewMode():
     label = 'Container.Viewmode'
@@ -144,3 +145,8 @@ def containerSortMethod():
 
 def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
+
+def getSetting(key, **ka):
+    data = xbmcaddon.getSetting(key)
+    if not data:
+        return ''

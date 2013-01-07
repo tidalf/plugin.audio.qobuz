@@ -14,23 +14,17 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmc
-
 import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
-from debug import info, warn, error, debug
-from gui.util import color, lang, getImage, notifyH, containerRefresh, \
-    runPlugin
+from debug import warn, error
+from gui.util import lang, getImage
 from playlist import Node_playlist
-import pprint
-
-'''
-    NODE USER PLAYLISTS
-'''
 
 class Node_user_playlists(INode):
-
+    """User playlists node
+        This node list playlist made by user and saved on Qobuz server
+    """
     def __init__(self, parent=None, parameters=None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
@@ -67,8 +61,8 @@ class Node_user_playlists(INode):
             return False
         self.data = data['data']
         return True
-    
-    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
+
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         login = qobuz.addon.getSetting('username')
         cid = qobuz.registry.get(
             name='user-current-playlist-id', noRemote=True)
@@ -85,5 +79,3 @@ class Node_user_playlists(INode):
                 node.set_is_my_playlist(True)
             self.add_child(node)
         return True
-
-
