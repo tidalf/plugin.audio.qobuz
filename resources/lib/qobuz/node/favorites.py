@@ -53,7 +53,14 @@ class Node_favorites(INode):
             return False
         self.data = data['data']
         return True
-    
+
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        if 'tracks' in self.data:
+            self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
+        if 'albums' in self.data:
+            self._build_down_albums(Dir, lvl, whiteFlag, blackFlag)
+        return True
+        
     def _build_down_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
@@ -66,12 +73,6 @@ class Node_favorites(INode):
             node.data = album
             self.add_child(node)
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        if 'tracks' in self.data:
-            self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
-        if 'albums' in self.data:
-            self._build_down_albums(Dir, lvl, whiteFlag, blackFlag)
-        return True
 
     def get_description(self):
         return self.get_property('description')

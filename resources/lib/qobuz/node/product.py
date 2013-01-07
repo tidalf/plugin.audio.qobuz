@@ -143,6 +143,7 @@ class Node_product(INode):
 # @todo : I think this is useless...
 #            newimage = newimage.replace('_230.', '_600.')
 #        if newimage != image:
+#            image = newimage
 #            print "We replace image..."
         return image
 
