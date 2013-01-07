@@ -43,7 +43,7 @@ class INode(object):
         self.parameters = parameters or {}
         self.id = self.get_parameter('nid')
         self.parent = parent
-        self.type = None #self.get_parameter('nt') or Flag.NODE
+        self.type = None
         self.content_type = "files"
         self.image = None
         self.childs = []
@@ -136,16 +136,15 @@ class INode(object):
     def get_property(self, path):
         if not self._data:
             return ''
-        if isinstance(path, basestring):
-            if path in self._data and self._data[path] and self._data[path] != 'None':
-                return self._data[path]
-            return ''
+        xPath = path.split('/')
         root = self._data
-        for i in range(0, len(path)):
-            if not path[i] in root:
+        for i in range(0, len(xPath)):
+#            print "Path[%s] %s" % (str(i), xPath[i])
+            if not xPath[i] in root:
                 return ''
-            root = root[path[i]]
+            root = root[xPath[i]]
         if root and root != 'None':
+#            print "Value: %s" % (repr(root))
             return root
         return ''
 

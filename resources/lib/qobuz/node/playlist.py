@@ -120,10 +120,10 @@ class Node_playlist(INode):
         return ''
     
     def get_owner(self):
-        return self.get_property(('owner', 'name'))
+        return self.get_property('owner/name')
 
     def get_owner_id(self):
-        return self.get_property(('owner', 'id'))
+        return self.get_property('owner/id')
 
     def get_description(self):
         return self.get_property('description')
@@ -157,7 +157,7 @@ class Node_playlist(INode):
     def attach_context_menu(self, item, menu):
         login = qobuz.addon.getSetting('username')
         isOwner = True
-        if login != self.get_property(('owner', 'name')):
+        if login != self.get_property('owner/name'):
             isOwner = False
         label = self.get_label()
         

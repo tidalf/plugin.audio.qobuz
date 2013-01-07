@@ -96,13 +96,13 @@ class Node_product(INode):
     PROPERTIES
     '''
     def get_artist(self):
-        a = self.get_property(('artist', 'name'))
+        a = self.get_property('artist/name')
         if a:
             return a
-        a = self.get_property(('interpreter', 'name'))
+        a = self.get_property('interpreter/name')
         if a:
             return a
-        a = self.get_property(('composer', 'name'))
+        a = self.get_property('composer/name')
         if a:
             return a
         return ''
@@ -114,13 +114,13 @@ class Node_product(INode):
         return album
 
     def get_artist_id(self):
-        a = self.get_property(('artist', 'id'))
+        a = self.get_property('artist/id')
         if a:
             return int(a)
-        a = self.get_property(('interpreter', 'id'))
+        a = self.get_property('interpreter/id')
         if a:
             return int(a)
-        a = self.get_property(('composer', 'id'))
+        a = self.get_property('composer/id')
         if a:
             return int(a)
         return ''
@@ -131,13 +131,13 @@ class Node_product(INode):
     def get_image(self, size = None):
         if not size:
             size = self.imageDefaultSize
-        image = self.get_property(('image', size))
+        image = self.get_property('image/%s' % (size))
         if not image:
-            image = self.get_property(('image', 'large'))
+            image = self.get_property('image/large')
         if not image:
-            image = self.get_property(('image', 'small'))
+            image = self.get_property('image/small')
         if not image:
-            image = self.get_property(('image', 'thumbnail'))
+            image = self.get_property('image/thumbnail')
 #        newimage = image
 #        if self.imageDefaultSize == 'large':
 # @todo : I think this is useless...
@@ -155,13 +155,13 @@ class Node_product(INode):
         return label
 
     def get_genre(self):
-        return self.get_property(('genre', 'name'))
+        return self.get_property('genre/name')
 
     def get_year(self):
         import time
-        date = self.get_property(('released_at'))
+        date = self.get_property('released_at')
         if not date:
-            date = self.get_property(('released_at'))
+            date = self.get_property('released_at')
         year = 0
         try:
             year = time.strftime("%Y", time.localtime(date))
@@ -173,4 +173,5 @@ class Node_product(INode):
         description = self.get_property('description')
         if description:
             return description
-        return self.get_property(('data', 'description'))
+        #@todo: Must be remove, data is from the past
+        return self.get_property('data', 'description')

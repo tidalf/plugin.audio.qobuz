@@ -71,19 +71,19 @@ class Node_track(INode):
 
     def get_composer(self):
         try:
-            return self.get_property(('composer', 'name'))
+            return self.get_property('composer/name')
         except:
             return -1
 
     def get_interpreter(self):
         try:
-            return self.get_property(('performer', 'name'))
+            return self.get_property('performer/name')
         except:
             return -1
 
     def get_album(self):
         try:
-            album = self.get_property(('album', 'title'))
+            album = self.get_property('album/title')
         except:
             return -1
         if album:
@@ -96,7 +96,7 @@ class Node_track(INode):
 
     def get_image(self):
         try:
-            image = self.get_property(('album', 'image', 'large'))
+            image = self.get_property('album/image/large')
         except:
             pass
         if image:
@@ -108,17 +108,17 @@ class Node_track(INode):
         
 
     def get_playlist_track_id(self):
-        return self.get_property(('playlist_track_id'))
+        return self.get_property('playlist_track_id')
 
     def get_position(self):
-        return self.get_property(('position'))
+        return self.get_property('position')
 
     def get_title(self):
         return self.get_property('title')
 
     def get_genre(self):
         try:
-            genre = self.get_property(('album', 'genre', 'name'))
+            genre = self.get_property('album/genre/name')
         except:
             genre = "none"
 
@@ -138,49 +138,49 @@ class Node_track(INode):
         return data['data']['url']
 
     def get_artist(self):
-        s = self.get_property(('artist', 'name'))
+        s = self.get_property('artist/name')
         if s:
             return s
-        s = self.get_property(('composer', 'name'))
+        s = self.get_property('composer/name')
         if s:
             return s
-        s = self.get_property(('performer', 'name'))
+        s = self.get_property('performer/name')
         if s:
             return s
-        s = self.get_property(('interpreter', 'name'))
+        s = self.get_property('interpreter/name')
         if s:
             return s
-        s = self.get_property(('composer', 'name'))
+        s = self.get_property('composer/name')
         if s:
             return s
-        s = self.get_property(('album', 'artist', 'name'))
+        s = self.get_property('album/artist/name')
         if s:
             return s
         return ''
 
     def get_artist_id(self):
-        s = self.get_property(('artist', 'id'))
+        s = self.get_property('artist/id')
         if s:
             return int(s)
-        s = self.get_property(('composer', 'id'))
+        s = self.get_property('composer/id')
         if s:
             return int(s)
-        s = self.get_property(('performer', 'id'))
+        s = self.get_property('performer/id')
         if s:
             return int(s)
-        s = self.get_property(('interpreter', 'id'))
+        s = self.get_property('interpreter/id')
         if s:
             return int(s)
         return None
 
     def get_track_number(self):
-        return self.get_property(('track_number'))
+        return self.get_property('track_number')
 
     def get_media_number(self):
-        return self.get_property(('media_number'))
+        return self.get_property('media_number')
 
     def get_duration(self):
-        duration = self.get_property(('duration'))
+        duration = self.get_property('duration')
         if duration:
             return duration
         else:
@@ -189,7 +189,7 @@ class Node_track(INode):
     def get_year(self):
         import time
         try:
-            date = self.get_property(('album', 'released_at'))
+            date = self.get_property('album/released_at')
             if not date and self.parent and self.parent.type & Flag.PRODUCT:
                 return self.parent.get_year()
         except:
@@ -280,7 +280,7 @@ class Node_track(INode):
             track_number = 0
         else:
             track_number = int(track_number)
-        mlabel = self.get_property(('label', 'name'))
+        mlabel = self.get_property('label/name')
         description = self.get_description()
         comment = ''
         if mlabel:
