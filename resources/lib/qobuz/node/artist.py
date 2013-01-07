@@ -37,33 +37,34 @@ class Node_artist(INode):
         self.is_folder = True
         self.slug = ''
         self.content_type = 'albums'
-
+        self.offset = self.get_parameter('offset') or 0
+        
     def hook_post_data(self):
         self.name = self.get_property('name')
         self.image = self.get_image()
         self.slug = self.get_property('slug')
         self.label = self.name
         
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        colorItem = qobuz.addon.getSetting('color_item')
-        offset = self.get_parameter('offset') or 0
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist',id=self.id,
-            artist_id=self.id, limit=limit, offset=offset, extra='albums')
+            artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
         if not data:
-            warn(self, "Build-down: Cannot fetch favorites data")
+            warn(self, "Build-down: Cannot fetch artist data")
             return False
         self.data = data['data']
+        return True
+    
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         node_artist = Node_artist()
         node_artist.data = self.data
-        node_artist.label = '[ %s ]' % (color(colorItem, node_artist.label))
-        
-        if not 'albums' in data['data']: return True
-        for pData in data['data']['albums']['items']:
+        node_artist.label = '[ %s ]' % (node_artist.label)
+        if not 'albums' in self.data: 
+            return True
+        for pData in self.data['albums']['items']:
             node = Node_product()
             node.data = pData
             self.add_child(node)
-
         return True
 
         del self._data['tracks']

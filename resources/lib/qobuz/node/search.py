@@ -33,7 +33,8 @@ class Node_search(INode):
         super(Node_search, self).__init__(parent, params)
         self.type = NodeFlag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
-        self.query = None
+        self.query = self.get_parameter('query', unQuote=True)
+        self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
         return self.label
@@ -71,17 +72,14 @@ class Node_search(INode):
     def make_url(self, **ka):
         url = super(Node_search, self).make_url(**ka)
         url += '&search-type=' + self.search_type
-        query = self.query or self.get_parameter('query')
-        if query:
-            url += '&query=' + query
+        if self.query:
+            url += '&query=' + self.query
         return url
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        offset = self.get_parameter('offset') or 0
         limit = qobuz.addon.getSetting('pagination_limit')
         stype = self.search_type
-        search = None
-        query = self.get_parameter('query')
+        query = self.get_parameter('query', unQuote=True)
         if not query:
             from gui.util import Keyboard
             k = Keyboard('', stype)
@@ -91,57 +89,30 @@ class Node_search(INode):
             query = k.getText()
         query.strip()
         data = api.search_getResults(
-            query=query, type=stype, limit=limit, offset=offset)
+            query=query, type=stype, limit=limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")
             return False
+        if data[stype]['total'] == 0:
+            return 0
         self.set_parameter('query', query, quote=True)
         self.data = data
         return True
     
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type == 'albums':
-            try:
-                if self.data['albums']['items']:
-                    pass
-            except:
-                return False
-            for json_product in self.data['albums']['items']:
-                artist = json_product['artist']['name']
-                product = Node_product()
-                product.data = json_product
-                self.add_child(product)
+            for album in self.data['albums']['items']:
+                node= Node_product()
+                node.data = album
+                self.add_child(node)
         elif self.search_type == 'tracks':
-            try:
-                if self.data['tracks']['items']:
-                    pass
-            except:
-                return False
-            for jtrack in self.data['tracks']['items']:
-                track = Node_track()
-                track.data = jtrack
-                self.add_child(track)
+            for track in self.data['tracks']['items']:
+                node = Node_track()
+                node.data = track
+                self.add_child(node)
         elif self.search_type == 'artists':
-            try:
-                if self.data['artists']['items']:
-                    pass
-            except:
-                return False
-            for jartist in self.data['artists']['items']:
-                artist = Node_product_by_artist()
-                artist.data = jartist
-                self.add_child(artist)
-        return True
-
-    def notify_data_result(self, data):
-        if not 'length' in data:
-            warn(self, "Notify fail")
-            return False
-        notifyH("Qobuz Search - " + self.search_type,
-                'Artists: ' + str(data['length']['artists']) + " / "
-                'Products: ' + str(
-                    data['length']['products']) + " / "
-                'Songs: ' + str(data['length']['tracks']) + "\n",
-                getImage('default'),
-                2000)
+            for artist in self.data['artists']['items']:
+                node = Node_product_by_artist()
+                node.data = artist
+                self.add_child(node)
         return True

@@ -23,6 +23,7 @@ from product import Node_product
 from debug import warn
 import weakref
 from api import api
+from gui.contextmenu import contextMenu
 '''
     @class Node_product_by_artist:
 '''
@@ -34,7 +35,7 @@ class Node_product_by_artist(INode):
         super(Node_product_by_artist, self).__init__(parent, parameters)
         self.type = NodeFlag.ARTIST
         self.content_type = 'albums'
-
+        self.offset = self.get_parameter('offset') or 0
     '''
         Getter
     '''
@@ -60,47 +61,48 @@ class Node_product_by_artist(INode):
     '''
         Build Down
     '''
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        offset = self.get_parameter('offset') or 0
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = api.artist_get(
-            artist_id=self.id, limit=limit, offset=offset, extra='albums')
+            artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
-        try:
-            total = len(data['albums']['items'])
-        except:
-            pass
+        self.data = data
+        return True
+    
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        import pprint
         count = 0
-        for jproduct in data['albums']['items']:
+        total = len(self.data['albums']['items'])
+        for album in self.data['albums']['items']:
             keys = ['artist', 'interpreter', 'composer', 'performer']
             for k in keys:
                 try:
-                    if k in data['artist']:
-                        jproduct[k] = weakref.proxy(data['artist'][k])
+                    if k in self.data['artist']:
+                        album[k] = weakref.proxy(self.data['artist'][k])
                 except:
+                    warn(self, "Strange thing happen")
                     pass
+            print pprint.pformat(album)
             node = Node_product()
-            node.data = jproduct
-            xbmc_directory.update(
-                count, total, "Add album:" + node.get_label(), '')
-            self.add_child(node)
+            node.data = album
             count += 1
+            Dir.update(count, total, "Add album:" + node.get_label(), '')
+            self.add_child(node)
         return True
 
     '''
         Make XbmcListItem
     '''
-    def makeListItem(self):
+    def makeListItem(self, replaceItems=False):
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),
                                 self.get_image(),
                                 self.get_image(),
                                 self.make_url(),
                                 )
-        menuItems = []
-        self.attach_context_menu(item, menuItems)
-        if len(menuItems) > 0:
-            item.addContextMenuItems(menuItems, replaceItems=True)
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item

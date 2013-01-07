@@ -112,7 +112,13 @@ class __API__:
         self.error = None
         self.status_code = None
         url = self._baseUrl + uri
-        print "Request: %s %s" % (url, pprint.pformat(params))
+        """ DEBUG """
+        import copy
+        _copy_params = copy.deepcopy(params)
+        if 'password' in _copy_params:
+            _copy_params['password'] = '***'
+        info(self, "Request: %s %s" % (url, pprint.pformat(_copy_params)))
+        """ END / DEBUG """
         useToken = False if (opt and 'noToken' in opt) else True
         headers = {}
         if useToken and self.user_auth_token:
