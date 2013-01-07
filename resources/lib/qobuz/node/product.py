@@ -174,4 +174,4 @@ class Node_product(INode):
         if description:
             return description
         #@todo: Must be remove, data is from the past
-        return self.get_property('data', 'description')
+        return self.get_property('data/description')
