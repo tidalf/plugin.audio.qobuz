@@ -170,11 +170,9 @@ class INode(object):
             return root
         return ''
 
-    '''
-        Called juste after data is set, adding pagination if required
-   
-    '''
     def __add_pagination(self, data):
+        """build_down helper: Add pagination data when needed
+        """
         if not data:
             return False
         paginated = ['albums', 'labels', 'tracks', 'artists',
@@ -199,6 +197,8 @@ class INode(object):
         self.pagination_next_offset = items['offset'] + items['limit']
 
     def to_s(self):
+        """Return node as a string
+        """
         s = "[Node][" + str(self.type) + "\n"
         s += " id: " + str(self.id) + "\n"
         s += " Label : " + str(self.label) + "\n"
@@ -213,10 +213,22 @@ class INode(object):
         A hash for storing script parameter, each node have a copy of them.
         TODO: each node don't need to copy parameter
     '''
-    def set_parameters(self, params):
-        self.parameters = params
+    def set_parameters(self, parameters):
+        """Setting parameters property
+            Parameter:
+                parameters: Dictionary
+        """
+        self.parameters = parameters
 
     def set_parameter(self, name, value, **ka):
+        """Setting a parameter
+            Parameters:
+                name: parameter name
+                value: parameter value
+            
+            * Optional quote=True/False, when quote=True we are using
+            urllib.quote_plus befoer setting value
+        """
         if 'quote' in ka and ka['quote'] == True:
             value = urllib.quote_plus(value)
         self.parameters[name] = value
@@ -386,10 +398,8 @@ class INode(object):
         label = self.get_label()
         gData['count'] = 0
         gData['total'] = len(self.childs)
-        #Dir.update(gData, 'Working', label, '')
         self.__add_pagination_node(Dir, lvl, whiteFlag)
         Dir.update(gData, 'Working', label, '')
-        """ We are looking for our childs """
         for child in self.childs:
             if Dir.is_canceled():
                 return False
@@ -408,20 +418,18 @@ class INode(object):
 #        self.childs = [] # UGLY
         return gData['count']
 
-    """
-        _build_down:
-        This method is called by build_down method, each object who
-        inherit from node object can implement their own code. Lot of object
-        simply fetch data from qobuz (cached data)
-    """
     def _build_down(self, xbmc_directory, lvl, flag):
+        """Hook/_build_down:
+        This method is called by build_down, each object who
+        inherit from Inode can overide it. Lot of object
+        simply fetch data from qobuz (cached data)
+        """
         pass
     
-    """
-        Called by build_down to add special node when pagination is
-        required
-    """
     def __add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
+        """Helper/Called by build_down to add special node when pagination is
+        required
+        """
         limit = qobuz.addon.getSetting('pagination_limit')
         from renderer.irenderer import IRenderer
         r = IRenderer(self.type, self.parameters)
@@ -435,7 +443,6 @@ class INode(object):
             if not label and self.parent:
                 label = self.parent.get_label()
             if self.label2: label = self.label2
-            #if self.parent: label = self.parent.label
             nextLabel = (
                 '[ %s  %s / %s ]') % (color(colorItem, label),
                                       self.pagination_next_offset,
