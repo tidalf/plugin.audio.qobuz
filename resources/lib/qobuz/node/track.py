@@ -138,37 +138,18 @@ class Node_track(INode):
         return data['data']['url']
 
     def get_artist(self):
-        s = self.get_property('artist/name')
-        if s:
-            return s
-        s = self.get_property('composer/name')
-        if s:
-            return s
-        s = self.get_property('performer/name')
-        if s:
-            return s
-        s = self.get_property('interpreter/name')
-        if s:
-            return s
-        s = self.get_property('composer/name')
-        if s:
-            return s
-        s = self.get_property('album/artist/name')
-        if s:
-            return s
-        return ''
+        return self.get_property(['artist/name',
+                               'composer/name',
+                               'performer/name',
+                               'interpreter/name',
+                               'composer/name',
+                               'album/artist/name'])
 
     def get_artist_id(self):
-        s = self.get_property('artist/id')
-        if s:
-            return int(s)
-        s = self.get_property('composer/id')
-        if s:
-            return int(s)
-        s = self.get_property('performer/id')
-        if s:
-            return int(s)
-        s = self.get_property('interpreter/id')
+        s = self.get_property(['artist/id',
+                               'composer/id',
+                               'performer/id',
+                               'interpreter/id'])
         if s:
             return int(s)
         return None
@@ -314,13 +295,6 @@ class Node_track(INode):
             menu.add(path='playlist/remove', 
                      label=lang(30073) + self.get_label(),
                      cmd=runPlugin(url))
-
-#        if self.parent and self.parent.type & Flag.FAVORITES:
-#            ''' REMOVE '''
-#            url = self.make_url(type=Flag.FAVORITES,nm='gui_remove', 
-#                                qid=self.id, qnt=self.type, mode=Mode.VIEW)
-#            menu.add(path='favorites/remove', label='Remove from favorite',
-#                     cmd=runPlugin(url))
 
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menu)

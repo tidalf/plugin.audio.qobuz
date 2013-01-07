@@ -74,20 +74,10 @@ class Node_article(INode):
             self.get_image(),
             'url=:p'
         )
-#        item.setInfo('Music', {
-#            'lyrics': self.get_property('abstract')
-#        })
-#        item.setProperty('Node.ID', str(self.id))
-#        item.setProperty('Node.Type', str(self.type))
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
         return item
-#    def make_url(self, **ka):
-#        url = super(Node_genre, self).make_url(**ka)
-#        if self.parent and self.parent.id:
-#            url += "&parent-id=" + self.parent.id
-#        return url
 
     def hook_post_data(self):
         self.label = self.get_property('title')
@@ -97,9 +87,8 @@ class Node_article(INode):
         image = self.get_property('image')
         if image:
             image = image.replace('http://player.', 'http://www.')
-#        print "Image: %s" % (image)
         return image
-    
+
     def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
         print "Build donw article ..."
         data = qobuz.registry.get(

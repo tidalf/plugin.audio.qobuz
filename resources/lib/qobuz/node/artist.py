@@ -70,14 +70,14 @@ class Node_artist(INode):
 
     def get_artist_id(self):
         return self.id
-    
+
     def get_image(self):
-        image = self.get_property('image/extralarge')
-        if not image: image = self.get_property('image/mega')
-        if not image: image = self.get_property('picture')
-        if image: image = image.replace('126s', '_')
-        if image: return image
-        return ''
+        image = self.get_property(['image/extralarge', 
+                                   'image/mega', 
+                                   'picture'])
+        if image: 
+            image = image.replace('126s', '_')
+        return image
     
     def get_title(self):
         return self.get_name()
@@ -86,8 +86,7 @@ class Node_artist(INode):
         return self.get_name()
     
     def get_name(self):
-        name = self.get_property('name')
-        return name
+        return self.get_property('name')
 
     def get_owner(self):
         return self.get_property('owner/name')

@@ -132,19 +132,41 @@ class INode(object):
     def hook_post_data(self):
         pass
 
-    ''' Property are just a easy way to access JSON data when set '''
-    def get_property(self, path):
+    def get_property(self, pathList):
+        """Property are just a easy way to access JSON data (self.data)
+            Parameters:
+            pathList: a string or a list of string, each string can be
+                a path like 'album/image/large'
+            Return:
+                string (empty string when all fail or when there's no data)
+            * When passing array of string the method return the first
+            path returning data
+            
+            Example:
+                image = self.get_property(['image/extralarge', 
+                                       'image/mega', 
+                                       'picture'])
+        """
+        if isinstance(pathList, basestring):
+            return self.__get_property(pathList)
+        for path in pathList:
+            data = self.__get_property(path)
+            if data:
+                return data
+        return ''
+
+    def __get_property(self, path):
+        """Helper used by get_property method
+        """
         if not self._data:
             return ''
         xPath = path.split('/')
         root = self._data
         for i in range(0, len(xPath)):
-#            print "Path[%s] %s" % (str(i), xPath[i])
             if not xPath[i] in root:
                 return ''
             root = root[xPath[i]]
         if root and root != 'None':
-#            print "Value: %s" % (repr(root))
             return root
         return ''
 
@@ -152,7 +174,7 @@ class INode(object):
         Called juste after data is set, adding pagination if required
    
     '''
-    def add_pagination(self, data):
+    def __add_pagination(self, data):
         if not data:
             return False
         paginated = ['albums', 'labels', 'tracks', 'artists',
@@ -290,12 +312,12 @@ class INode(object):
     def get_childs(self):
         return self.childs
 
-    def get_siblings(self, type):
-        list = []
-        for c in self.childs:
-            if c.getType() == type:
-                list.append(c)
-        return list
+#    def get_siblings(self, type):
+#        list = []
+#        for c in self.childs:
+#            if c.getType() == type:
+#                list.append(c)
+#        return list
 
     def set_label(self, label):
         self.label = label #label.encode('utf8', 'replace')
@@ -356,7 +378,7 @@ class INode(object):
             if not self.pre_build_down(Dir, lvl, whiteFlag, blackFlag):
                 return False
             else:
-                self.add_pagination(self.data)
+                self.__add_pagination(self.data)
         self._build_down(Dir, lvl, whiteFlag, blackFlag)
         """ Recursive mode dont't decrement level """
         if lvl != -1:
@@ -365,7 +387,7 @@ class INode(object):
         gData['count'] = 0
         gData['total'] = len(self.childs)
         #Dir.update(gData, 'Working', label, '')
-        self._add_pagination_node(Dir, lvl, whiteFlag)
+        self.__add_pagination_node(Dir, lvl, whiteFlag)
         Dir.update(gData, 'Working', label, '')
         """ We are looking for our childs """
         for child in self.childs:
@@ -399,7 +421,7 @@ class INode(object):
         Called by build_down to add special node when pagination is
         required
     """
-    def _add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
+    def __add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
         limit = qobuz.addon.getSetting('pagination_limit')
         from renderer.irenderer import IRenderer
         r = IRenderer(self.type, self.parameters)

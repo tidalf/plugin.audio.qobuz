@@ -64,13 +64,6 @@ class Node_product(INode):
             self.add_child(node)
         return len(self.data['tracks']['items'])
 
-    def _filter_tracks(self, tracks):
-        ltracks = []
-        id = self.id
-        for track in tracks:
-            ltracks.append(track)
-        return ltracks
-
     def makeListItem(self, replaceItems=False):
         image = self.get_image()
         item = xbmcgui.ListItem(
@@ -96,16 +89,9 @@ class Node_product(INode):
     PROPERTIES
     '''
     def get_artist(self):
-        a = self.get_property('artist/name')
-        if a:
-            return a
-        a = self.get_property('interpreter/name')
-        if a:
-            return a
-        a = self.get_property('composer/name')
-        if a:
-            return a
-        return ''
+        return self.get_property(['artist/name',
+                               'interpreter/name', 
+                               'composer/name'])
 
     def get_album(self):
         album = self.get_property('name')
@@ -114,13 +100,9 @@ class Node_product(INode):
         return album
 
     def get_artist_id(self):
-        a = self.get_property('artist/id')
-        if a:
-            return int(a)
-        a = self.get_property('interpreter/id')
-        if a:
-            return int(a)
-        a = self.get_property('composer/id')
+        a = self.get_property(['artist/id',
+                               'interpreter/id',
+                              'composer/id'])
         if a:
             return int(a)
         return ''
@@ -131,21 +113,10 @@ class Node_product(INode):
     def get_image(self, size = None):
         if not size:
             size = self.imageDefaultSize
-        image = self.get_property('image/%s' % (size))
-        if not image:
-            image = self.get_property('image/large')
-        if not image:
-            image = self.get_property('image/small')
-        if not image:
-            image = self.get_property('image/thumbnail')
-#        newimage = image
-#        if self.imageDefaultSize == 'large':
-# @todo : I think this is useless...
-#            newimage = newimage.replace('_230.', '_600.')
-#        if newimage != image:
-#            image = newimage
-#            print "We replace image..."
-        return image
+        return self.get_property(['image/%s' % (size),
+                                   'image/large', 
+                                   'image/small',
+                                   'image/thumbnail'])
 
     def get_label(self):
         try:
@@ -160,8 +131,6 @@ class Node_product(INode):
     def get_year(self):
         import time
         date = self.get_property('released_at')
-        if not date:
-            date = self.get_property('released_at')
         year = 0
         try:
             year = time.strftime("%Y", time.localtime(date))
@@ -170,8 +139,4 @@ class Node_product(INode):
         return year
 
     def get_description(self):
-        description = self.get_property('description')
-        if description:
-            return description
-        #@todo: Must be remove, data is from the past
-        return self.get_property('data/description')
+        return self.get_property('description')
