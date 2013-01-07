@@ -65,7 +65,8 @@ class contextMenu():
             data = self.data[section]
             if 'color' in data: 
                 colorItem = data['color']
-            label = '{ %s } ' % (color(colorItem, data['label']))
+            ch = '--- ---'
+            label = '%soO[ %s ]Oo%s' % (ch, color(colorItem, data['label']), ch)
             menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
                 colorItem = self.colorItemDefault

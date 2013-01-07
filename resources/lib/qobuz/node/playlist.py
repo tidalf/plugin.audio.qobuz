@@ -37,6 +37,7 @@ from api import api
 from track import Node_track
 
 registryKey = 'user-playlist'
+dialogHeading = 'Qobuz playlist'
 
 class Node_playlist(INode):
 
@@ -76,7 +77,8 @@ class Node_playlist(INode):
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(
-            name='user-playlist', id=self.id, playlist_id=self.id, offset=self.offset, limit=limit, extra='tracks')
+            name=registryKey, id=self.id, playlist_id=self.id, 
+            offset=self.offset, limit=limit, extra='tracks')
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
@@ -84,31 +86,9 @@ class Node_playlist(INode):
         return True
     
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        albumseen = {}
-        if not 'tracks' in self.data:
-            warn(self, "No tracks in this playlist %i" % (self.id))
-            return False
-        for jtrack in self.data['tracks']['items']:
-            node = None
-            if self.packby == 'album':
-                pass
-#                jalbum = jtrack['album']
-#                if jalbum['id'] in albumseen:
-#                    continue
-#                keys = ['artist', 'interpreter', 'composer']
-#                for k in keys:
-#                    if k in jtrack:
-#                        jalbum[k] = jtrack[k]
-#                if 'image' in jtrack:
-#                    jalbum['image'] = jtrack['image']
-#                node = Node_product(self, {'offset': 0})
-#                cdata = qobuz.registry.get(
-#                    name='product', id=jalbum['id'], noRemote=True)
-#                node.data = cdata or jalbum
-#                albumseen[jalbum['id']] = node
-            else:
-                node = Node_track()
-                node.data = jtrack
+        for track in self.data['tracks']['items']:
+            node = Node_track()
+            node.data = track
             self.add_child(node)
         return True
         
@@ -188,14 +168,18 @@ class Node_playlist(INode):
         result = api.playlist_deleteTracks(
             playlist_id=self.id, playlist_track_ids=tracks_id)
         if not result:
-            warn(self, "Cannot remove tracks from playlist: " + str(self.id))
-            notifyH('Qobuz Playlist / Remove track', "Fail to remove track")
             return False
-        info(self, "Tracks removed from playlist: " + str(self.id))
-        qobuz.registry.delete(name='user-playlist', id=self.id)
-        containerRefresh()
         return True
 
+    def gui_remove_track(self):
+        qid = self.get_parameter('qid')
+        if not self.remove_tracks(qid):
+            notifyH(dialogHeading, 'Cannot remove track!', 'icon-error-256')
+            return False
+            self.delete_cache(self.id)
+            notifyH(dialogHeading, 'Track removed from playlist')
+        return True
+    
     def gui_add_to_current(self):
         cpl = qobuz.registry.get(name='user-current-playlist-id')
         if not cpl:
@@ -224,17 +208,14 @@ class Node_playlist(INode):
         ])
         if ret == -1:
             return False
-        ret = self._add_tracks(cid, render.nodes)
+        ret = self._add_tracks(cid, nodes)
         if not ret:
             notifyH('Qobuz', 
                 'Failed to add tracks') 
             return False
-        qobuz.registry.delete(name='user-playlist', id=cid)
-        qobuz.registry.delete(name='user-playlists')
-        qobuz.registry.set(name='user-current-playlist-id', 
-                           value=cid, noRemote=True)
+        self.delete_cache(cid)
         notifyH('Qobuz / Tracks added', 
-                '%s added' % (len(render.nodes))) 
+                '%s added' % (len(nodes))) 
         return True
            
     def _add_tracks(self, playlist_id, nodes):
@@ -247,16 +228,9 @@ class Node_playlist(INode):
                 warn(self, "Not a Node_track node")
                 continue
             strtracks+='%s,' % (str(node.id))
-        ret = api.playlist_addTracks(
+        return api.playlist_addTracks(
             playlist_id=playlist_id, track_ids=strtracks)
-        if ret:
-            qobuz.registry.delete(name='user-playlist', id=playlist_id)
-            qobuz.registry.delete(name='user-playlists')
-            qobuz.registry.set(name='user-current-playlist-id', 
-                               value=playlist_id, noRemote=True)
-            return True
-        return False
-        
+
     def gui_add_as_new(self, name=None):
         nodes = []
         qnt = int(self.get_parameter('qnt'))
@@ -294,6 +268,7 @@ class Node_playlist(INode):
             notifyH('Qobuz / Cannot add tracks', 
                     "%s" % (name), 'icon-error-256')
             return False
+        self.delete_cache(playlist['id'])
         notifyH('Qobuz / Playlist added', 
                 '[%s] %s' % (len(nodes), name)) 
         return True
@@ -412,7 +387,7 @@ class Node_playlist(INode):
         notifyH('Qobuz playlist removed(i8n)', "Playlist %s removed" % (name))
         url = self.make_url(type=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
                             id='')
-        executeBuiltin(containerRefresh())
+        executeBuiltin(containerUpdate(url))
         return False
     
     def subscribe(self):

@@ -47,8 +47,6 @@ class Node_track(INode):
         if not data:
             return False
         self.data = data['data']
-        if not self.data:
-            return False
         return True
     
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
@@ -117,11 +115,7 @@ class Node_track(INode):
         return self.get_property('title')
 
     def get_genre(self):
-        try:
-            genre = self.get_property('album/genre/name')
-        except:
-            genre = "none"
-
+        genre = self.get_property('album/genre/name')
         if genre:
             return genre
         if not self.parent:
@@ -131,8 +125,8 @@ class Node_track(INode):
         return ''
 
     def get_streaming_url(self):
-        nid = self.id or self.parameters['nid']
-        data = qobuz.registry.get(name='user-stream-url', id=nid)
+        data = qobuz.registry.get(name='user-stream-url', 
+                                  id=self.id)
         if not data:
             return ''
         return data['data']['url']
@@ -289,8 +283,10 @@ class Node_track(INode):
 
     def attach_context_menu(self, item, menu):
         if self.parent and self.parent.type & Flag.PLAYLIST:
-            url = self.parent.make_url(
-                query=str(self.get_property('playlist_track_id')),
+            url = self.parent.make_url(type=Flag.PLAYLIST,
+                id=self.parent.id,
+                qid=self.id,
+                nm='gui_remove_track',
                 mode=Mode.VIEW)
             menu.add(path='playlist/remove', 
                      label=lang(30073) + self.get_label(),

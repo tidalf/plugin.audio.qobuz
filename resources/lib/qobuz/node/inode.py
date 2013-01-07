@@ -464,7 +464,7 @@ class INode(object):
         url = self.make_url(type=Flag.FAVORITES, mode=Mode.VIEW, nm='')
         menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
         ''' System '''
-        menu.add(path='system', label="System", cmd=containerRefresh(), pos=10)        
+#        menu.add(path='system', label="System", cmd=containerRefresh(), pos=10)        
         ''' ARTIST '''
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
@@ -521,7 +521,8 @@ class INode(object):
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
                                             nm='gui_add_to_current', 
                                             qnt=self.type,
-                                            mode=Mode.VIEW))
+                                            mode=Mode.VIEW,
+                                            qid=self.id))
             menu.add(path='playlist/add_to_current', 
                           label=lang(39005), cmd=cmd)
             label = self.get_label()
@@ -575,4 +576,5 @@ class INode(object):
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
                                       mode=Mode.VIEW))
         menu.add(path='system/erase_cache', 
-                          label=lang(31009), cmd=cmd, color=colorItem)
+                          label=lang(31009), cmd=cmd, 
+                          color=colorItem, pos=10)
