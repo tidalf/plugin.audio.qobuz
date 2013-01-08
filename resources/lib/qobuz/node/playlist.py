@@ -158,7 +158,7 @@ class Node_playlist(INode):
 
         url = self.make_url(type=Flag.PLAYLIST, nm='gui_remove')
         menu.add(path='playlist/remove', label=lang(39010), 
-                 cmd=containerUpdate(url))
+                 cmd=runPlugin(url))
 
         ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menu)
@@ -386,7 +386,9 @@ class Node_playlist(INode):
         self.delete_cache(ID)
         notifyH('Qobuz playlist removed(i8n)', "Playlist %s removed" % (name))
         url = self.make_url(type=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
-                            id='')
+                            nid='', nt='')
+        # Unsetting data will prevent node to build_down on refresh
+        self.data = None
         executeBuiltin(containerUpdate(url, True))
         return False
     
