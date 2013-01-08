@@ -157,10 +157,10 @@ class INode(object):
     def __get_property(self, path):
         """Helper used by get_property method
         """
-        if not self._data:
+        if not self.data:
             return ''
         xPath = path.split('/')
-        root = self._data
+        root = self.data
         for i in range(0, len(xPath)):
             if not xPath[i] in root:
                 return ''

@@ -37,6 +37,8 @@ from api import api
 from track import Node_track
 
 registryKey = 'user-playlist'
+registryCplID = 'user-current-playlist-id'
+
 dialogHeading = 'Qobuz playlist'
 
 class Node_playlist(INode):
@@ -71,6 +73,8 @@ class Node_playlist(INode):
         return self.b_is_current
 
     def hook_post_data(self):
+        if not self.data:
+            return
         self.id = self.get_property('id')
         self.label = self.get_name() or 'No name...'
         
@@ -147,7 +151,7 @@ class Node_playlist(INode):
             menu.add(path='playlist/set_as_current', label=lang(39007), 
                     cmd=containerUpdate(url))
 
-            url = self.make_url(type=Flag.PLAYLIST, nm='rename')
+            url = self.make_url(type=Flag.PLAYLIST, nm='gui_rename')
             menu.add(path='playlist/rename', label=lang(39009), 
                         cmd=runPlugin(url))
 
@@ -181,8 +185,8 @@ class Node_playlist(INode):
         return True
     
     def gui_add_to_current(self):
-        cpl = qobuz.registry.get(name='user-current-playlist-id')
-        if not cpl:
+        cpl = qobuz.registry.get(name=registryCplID)
+        if not cpl or not cpl['data']:
             notifyH('Qobuz', "No current playlist")
             warn(self, "No current playlist")
             return False
@@ -278,13 +282,13 @@ class Node_playlist(INode):
         if not nid:
             raise QobuzXbmcError(who=self, what='node_without_id')
         qobuz.registry.set(
-            name='user-current-playlist-id', id=0, value=nid)
+            name=registryCplID, id=0, value=nid)
         return True
 
     '''
         Rename playlist
     '''
-    def rename(self, ID = None):
+    def gui_rename(self, ID = None):
         if not ID:
             ID = self.id
         if not ID:
@@ -307,14 +311,16 @@ class Node_playlist(INode):
             return False
         newname = k.getText()
         newname = newname.strip()
+        if not newname:
+            notifyH(dialogHeading, "Don't u call ure child something?", 
+                    'icon-error-256')
+            return False
         if newname == currentname:
             return True
         res = api.playlist_update(playlist_id=ID, name=newname)
         if not res:
             warn(self, "Cannot rename playlist with name %s" % (newname) )
             return False
-        self.data['name'] = newname
-        self.data = None
         self.delete_cache(ID)
         notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
         executeBuiltin(containerRefresh())
@@ -355,7 +361,8 @@ class Node_playlist(INode):
         import xbmcgui
         import xbmc
         import pprint
-        ID = self.get_parameter('nid')
+        cpl = qobuz.registry.get(name=registryCplID)
+        ID = int(self.get_parameter('nid'))
         login = getSetting('username')
         offset = self.get_parameter('offset') or 0
         limit = getSetting('pagination_limit')
@@ -373,10 +380,10 @@ class Node_playlist(INode):
             return False
         res = False
         if data['owner']['name'] == login:
-            info(self, "Deleting playlist: " + ID)
+            info(self, "Deleting playlist: " + str(ID))
             res = api.playlist_delete(playlist_id=ID)
         else:
-            info(self, 'Unsuscribe playlist' + ID)
+            info(self, 'Unsuscribe playlist' + str(ID))
             res = api.playlist_unsubscribe(playlist_id=ID)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(ID))
@@ -384,11 +391,11 @@ class Node_playlist(INode):
                     name, getImage('icon-error-256'))
             return False
         self.delete_cache(ID)
+        if cpl and cpl['data'] == ID:
+            qobuz.registry.delete(name=registryCplID)
         notifyH('Qobuz playlist removed(i8n)', "Playlist %s removed" % (name))
         url = self.make_url(type=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
                             nid='', nt='')
-        # Unsetting data will prevent node to build_down on refresh
-        self.data = None
         executeBuiltin(containerUpdate(url, True))
         return False
     

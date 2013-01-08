@@ -79,6 +79,11 @@ class IRenderer(object):
         self.root = self.import_node(self.node_type, self.parameters)
         return self.root
     
+    def has_method_parameter(self):
+        if 'nm' in self.parameters:
+            return True
+        return False
+    
     def execute_method_parameter(self):
         if 'nm' in self.parameters:
             methodName = self.parameters['nm']
@@ -86,4 +91,4 @@ class IRenderer(object):
             log(self, "Executing method on node: " + repr(methodName))
             if getattr(self.root, methodName)():
                 return True
-        return False
+            return False

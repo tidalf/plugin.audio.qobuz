@@ -58,9 +58,8 @@ class QobuzXbmcRenderer(IRenderer):
             return False
         if self.root.hasWidget:
             return self.root.displayWidget()
-        if self.execute_method_parameter():
-            #executeBuiltin(containerUpdate(self.root.make_url()))
-            return True
+        if self.has_method_parameter():
+            return self.execute_method_parameter()
         from gui.directory import Directory
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
         if getSetting('contextmenu_replaceitem', isBool=True):
