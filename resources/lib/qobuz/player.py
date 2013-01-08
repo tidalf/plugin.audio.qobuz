@@ -27,6 +27,8 @@ from node.track import Node_track
 """
     @class: QobuzPlayer
 """
+keyTrackId = 'QobuzPlayerTrackId'
+
 class QobuzPlayer(xbmc.Player):
 
     def __init__(self, **ka):
@@ -43,7 +45,7 @@ class QobuzPlayer(xbmc.Player):
         track = Node_track(None, {'nid': track_id})
         ''' We are just fetching our data '''
         track.pre_build_down(None, 1, Flag.TRACK, Flag.NONE)
-        xbmcgui.Window(10000).setProperty("NID", track_id) 
+        xbmcgui.Window(10000).setProperty(keyTrackId, track_id) 
         item = None
         if not track.data:
             warn(self, "Cannot get track data")

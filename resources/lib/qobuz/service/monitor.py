@@ -43,62 +43,79 @@ from util.file import FileUtil
 from gui.util import containerRefresh, notifyH, getImage, executeBuiltin
 from node.track import Node_track
 from api import api
+import threading
+
+keyTrackId = 'QobuzPlayerTrackId'
+keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
-        self.locked = False
         self.lastId = None
+        self.lock = threading.Lock()
+
+    def getProperty(self, key):
+        """Wrapper to retrieve property from Xbmc Main Window
+            Parameter:
+                key: string, property that you want to get
+            * Lock may be useless ...
+        """
+        try:
+            if not self.lock.acquire(5):
+                warn(self, "getProperty: Cannot acquire lock!")
+                return ''
+            return xbmcgui.Window(10000).getProperty(key)
+        finally:
+            self.lock.release()
+
+    def setProperty(self, key, value):
+        """Wrapper to set Xbmc Main window property
+            Parameter:
+                key: string, property name to set
+                value: string, value to set
+        """
+        try:
+            if not self.lock.acquire(5):
+                warn(self, "setProperty: Cannot acquire lock!")
+                return
+            xbmcgui.Window(10000).setProperty(key, value)
+        finally:
+            self.lock.release()
 
     def onPlayBackEnded(self):
-#        if not (self.track_id and self.total and self.elapsed):
-#            return False
-#        self.sendQobuzPlaybackEnded(
-#            self.track_id, (self.total - self.elapsed) / 10)
-        id  = xbmcgui.Window(10000).getProperty("NID")
-        warn (self, "play back ended from monitor !!!!!!" + id)
+        nid  = self.getProperty(keyTrackId)
+        warn (self, "play back ended from monitor !!!!!!" + nid)
         return True
 
     def onPlayBackStopped(self):
-#        if not (self.track_id and self.total and self.elapsed):
-#            return False
-#        self.sendQobuzPlaybackEnded(
-#            self.track_id, (self.total - self.elapsed) / 10)
-        id  = xbmcgui.Window(10000).getProperty("NID")
-        warn (self, "play back stopped from monitor !!!!!!" + id)
+        nid  = self.getProperty(keyTrackId)
+        warn (self, "play back stopped from monitor !!!!!!" + nid)
         return True
-    
+
     def onPlayBackStarted(self):
         # workaroung bug, we are sometimes called multiple times.
-        id  = xbmcgui.Window(10000).getProperty("NID")
-        idToBeSend = id
-        if not self.locked or self.lastId is not id: 
-            self.locked = True
-            warn (self, "play back started from monitor !!!!!!" + id )
-            # wait 5s and if we're still playing the good song, send a start.
-            xbmc.sleep(10000)
-            if self.isPlayingAudio() and xbmcgui.Window(10000).getProperty("NID") == idToBeSend:
-                api.track_resportStreamingStart(id)
-            self.locked = False
-            self.lastId = id
+        mid = self.getProperty(keyMonitoredTrackId)
+        if mid:
+            warn(self, "Already monitoring song id: %s" % (mid)) 
+            return False
+        nid  = self.getProperty(keyTrackId)
+        if not nid:
+            warn(self, "No track id set by the player...")
+            return False
+        self.setProperty(keyMonitoredTrackId, nid)
+        idToBeSend = nid
+        log(self, "play back started from monitor !!!!!!" + nid )
+        xbmc.sleep(10000)
+        if self.isPlayingAudio() and self.getProperty(keyTrackId) == idToBeSend:
+            self.setProperty(keyMonitoredTrackId, '')
+            api.track_resportStreamingStart(nid)
         return True
-        
+
     def onQueueNextItem(self):
-        id  = xbmcgui.Window(10000).getProperty("NID") 
-        warn (self, "next item queued from monitor !!!!!!" + id )
+        nid  = self.getProperty(keyTrackId) 
+        warn (self, "next item queued from monitor !!!!!!" + nid )
         return True
-    
-#    def poll(self):
-#        from gui.directory import Directory
-#        from node.flag import NodeFlag as Flag
-#        data = self.IPC.read()
-#        if data:
-#            print 'POLL DATA:' + repr(data)
-#            node = Node_track(None, {'nid': data['nid']})
-#            node.pre_build_down(None, 1, Flag.TRACK)
-#            self.play(data['streamingUrl'], node.makeListItem(), False)
-#            self.IPC.delete()
-        
+
 class Monitor(xbmc.Monitor):
 
     def __init__(self, qobuz):
