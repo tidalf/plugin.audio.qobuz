@@ -102,6 +102,7 @@ class Directory():
         if self.is_canceled() : 
             return False
         item = node.makeListItem(replaceItems=self.replaceItems)
+        print "URL %s" % (node.make_url())
         ret = None
         if not item:
             return False

@@ -36,7 +36,8 @@ def _api_error_string(self, url="", params={}, json=""):
 class __API__:
 
     def __init__(self):
-        self.appid = "285473059"
+        self.appid = "285473059" # XBMC
+        #self.appid = "214748364" # :]
         self.version = '0.2'
         self.baseUrl = 'http://www.qobuz.com/api.json/'
         
@@ -112,18 +113,18 @@ class __API__:
         self.error = ''
         self.status_code = None
         url = self._baseUrl + uri
-        """ DEBUG """
-        import copy
-        _copy_params = copy.deepcopy(params)
-        if 'password' in _copy_params:
-            _copy_params['password'] = '***'
-        info(self, "Request: %s %s" % (url, pprint.pformat(_copy_params)))
-        """ END / DEBUG """
         useToken = False if (opt and 'noToken' in opt) else True
         headers = {}
         if useToken and self.user_auth_token:
             headers["x-user-auth-token"] = self.user_auth_token
         headers["x-app-id"] = self.appid
+        """ DEBUG """
+        import copy
+        _copy_params = copy.deepcopy(params)
+        if 'password' in _copy_params:
+            _copy_params['password'] = '***'
+        info(self, "Request: %s %s [%s]" % (url, pprint.pformat(_copy_params), pprint.pformat(headers)))
+        """ END / DEBUG """
         r = None
         try:
             r = self.session.post(url, data=params, headers=headers)
@@ -133,7 +134,8 @@ class __API__:
             return None
         self.status_code = r.status_code
         _api_error_string('azdazdaz', 'azdazdza')
-        if r.status_code != 200:
+        print "Code %s" % r.status_code
+        if int(r.status_code) != 200:
             if r.status_code == 400:
                 self.error = "Bad request"
             elif r.status_code == 401:
@@ -151,6 +153,7 @@ class __API__:
             self.error = "Request return no content"
             warn(self, self.error)
             return None
+        print pprint.pprint(r.content)
         self.statContentSizeTotal += sys.getsizeof(r.content)
         """ Retry get if connexion fail """
         try:

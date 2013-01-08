@@ -58,7 +58,7 @@ class Node_track(INode):
         #if not self.parent:
         if not 'mode' in ka: 
             ka['mode'] = Mode.PLAY 
-        return super(Node_track, self).make_url(**ka)
+        return super(Node_track, self).make_url(**ka)#+ '&fakeExt=FakeFile.flac'
 
     def get_label(self, sFormat="%a - %t"):
         sFormat = sFormat.replace("%a", self.get_artist())
@@ -162,7 +162,7 @@ class Node_track(INode):
 
     def get_duration(self):
         duration = self.get_property('duration')
-        if duration:
+        if duration and int(duration) != 0:
             return duration
         else:
             return -1
@@ -240,6 +240,9 @@ class Node_track(INode):
         else:
             media_number = int(media_number)
         duration = self.get_duration()
+        if duration == -1:
+            import pprint
+            print "Error: no duration\n%s" % (pprint.pformat(self.data))
         label = self.get_label()
         isplayable = 'true'
 
@@ -281,7 +284,7 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': comment
+                     'comment': '"qobuz_track_id": "%s"' % (str(self.id))
                      })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
@@ -293,14 +296,15 @@ class Node_track(INode):
         return item
 
     def attach_context_menu(self, item, menu):
-        if self.parent and self.parent.type & Flag.PLAYLIST:
+        if self.parent and (self.parent.type & Flag.PLAYLIST == Flag.PLAYLIST):
             url = self.parent.make_url(type=Flag.PLAYLIST,
                 id=self.parent.id,
                 qid=self.id,
                 nm='gui_remove_track',
                 mode=Mode.VIEW)
+            print "URL %s" % (url)
             menu.add(path='playlist/remove', 
-                     label=lang(30073) + self.get_label(),
+                     label=lang(30073),
                      cmd=runPlugin(url))
 
         ''' Calling base class '''

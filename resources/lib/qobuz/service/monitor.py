@@ -40,10 +40,14 @@ from bootstrap import QobuzBootstrap
 from debug import warn, log
 import qobuz
 from util.file import FileUtil
-from gui.util import containerRefresh, notifyH, getImage, executeBuiltin
+from gui.util import containerRefresh, notifyH, getImage, executeBuiltin, \
+    setResolvedUrl
 from node.track import Node_track
 from api import api
 import threading
+from xbmcrpc import rpc
+from util import getNode
+from node.flag import NodeFlag as Flag
 
 keyTrackId = 'QobuzPlayerTrackId'
 keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
@@ -53,6 +57,7 @@ class MyPlayer(xbmc.Player):
         xbmc.Player.__init__(self)
         self.trackId= None
         self.lock = threading.Lock()
+        self.playlist = xbmc.PlayList(0)
 
     def getProperty(self, key):
         """Wrapper to retrieve property from Xbmc Main Window
@@ -93,6 +98,8 @@ class MyPlayer(xbmc.Player):
         return True
 
     def onPlayBackStarted(self):
+        print "PB START"
+        return False
         # workaroung bug, we are sometimes called multiple times.
         if self.trackId:
             if self.getProperty(keyTrackId) != self.trackId:
@@ -123,6 +130,44 @@ class MyPlayer(xbmc.Player):
     def onQueueNextItem(self):
         nid  = self.getProperty(keyTrackId) 
         warn (self, "next item queued from monitor !!!!!!" + nid )
+        pos = self.playlist.getposition()
+        if pos == -1:
+            print "-1"
+            pos = len(self.playlist) - 1
+        res = rpc.getInfoLabels(labels=['Container(50).Position','MusicPlayer.PlaylistPosition', 'MusicPlayer.PlaylistLength', 'ListItem.FileName']).result()
+        pos = int(res['Container(50).Position']) - 1
+        print "Position: %s" % (repr(pos))
+        itempath = self.playlist[pos].getfilename()
+
+        print "Item: %s" % (itempath)
+        label = xbmc.getInfoLabel('ListItem.Path')
+        print "Label: %s" % (label)
+        import re
+        m = re.search('^musicdb://.*/(\d+)(\?.*)$', itempath)
+        if m:
+            res = rpc.getSongDetails(m.group(1)).result()
+            print "GetInfo %s" % (res)
+            m2 = re.search('"qobuz_track_id": "(\d+)"', 
+                           res['songdetails']['comment'])
+            node = getNode(Flag.TRACK, {'nid': m2.group(1)})
+            node.pre_build_down(None, None,None, Flag.NONE)
+            setResolvedUrl(handle=1,
+                succeeded=True,
+                listitem=node.makeListItem())
+#            super(MyPlayer, self).play(node.get_streaming_url(), 
+#                                          node.makeListItem(), False)
+            self.playlist.remove(itempath)
+            self.playlist.add(node.get_streaming_url(), node.makeListItem(), pos)
+   
+            super(MyPlayer, self).play(node.get_streaming_url(), 
+                                          node.makeListItem(), False)
+
+#        else:
+#            super(MyPlayer, self).play(itempath, 
+#                                          xbmcgui.ListItem(itempath), True)
+ 
+        #print m.group(1)
+        #print "GetInfo %s" % (rpc.getSongDetails().result())
         return True
 
 class Monitor(xbmc.Monitor):
@@ -215,6 +260,7 @@ class Monitor(xbmc.Monitor):
 
 boot = QobuzBootstrap(__addon__, 0)
 logLabel = 'QobuzMonitor'
+import pprint
 try:
     boot.bootstrap_app()
     monitor = Monitor(qobuz)
@@ -233,5 +279,6 @@ try:
             monitor.cache_remove_old(limit=20)
         xbmc.sleep(1000)
     print '[%s] Exiting... bye!' % (logLabel)
-except:
+except Exception as e:
     print '[%s] Exiting monitor' % (pluginId)
+    print 'Exception: %s' % (pprint.pformat(e)) 

@@ -26,17 +26,6 @@ from irenderer import IRenderer
 from gui.util import notifyH, getSetting
 from exception import QobuzXbmcError as Qerror
 
-#class XbmcWindow_musicfiles(xbmcgui.Window):
-#
-#    def __init__(self, **ka):
-#        # 10501 / WINDOW_MUSIC_FILES
-#        # (http://wiki.xbmc.org/index.php?title=Window_IDs)
-#        xbmcgui.Window(10501)
-#
-#    def onAction(self, action):
-#        print 'Action: ' + repr(action.getId())
-
-
 class QobuzXbmcRenderer(IRenderer):
 
     def __init__(self, node_type, params=None):
@@ -96,8 +85,11 @@ class QobuzXbmcRenderer(IRenderer):
             warn(self, "Cannot set root node ('%s')" % ( str(
                 self.node_type)))
             return False
-        Dir = Directory(self.root, qobuz.boot.handle, False)
-        self.root.build_down(Dir, -1, Flag.TRACK | Flag.STOPBUILD)
+        handle = qobuz.boot.handle
+        print "Handle: %s" % (handle)
+        Dir = Directory(self.root, handle, self.asList, self.nodes)
+        ret = self.root.build_down(Dir, self.depth, 
+                                       self.whiteFlag, self.blackFlag)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()
         notifyH('Scanning results', str(Dir.total_put) +

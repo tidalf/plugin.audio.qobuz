@@ -29,7 +29,8 @@ from gui.util import color, lang, runPlugin, containerUpdate, \
     getSetting
 from debug import log, warn
 from gui.contextmenu import contextMenu
-from util import getRenderer, getNode
+from util import getNode
+from renderer import renderer
 import urllib
 '''
     @class Inode:
@@ -354,7 +355,7 @@ class INode(object):
     
     def render_nodes(self, nt, parameters, lvl = 1, whiteFlag = Flag.ALL, 
                      blackFlag = Flag.TRACK &Flag.STOPBUILD):
-        render = getRenderer(nt, parameters)
+        render = renderer(nt, parameters)
         render.depth = -1
         render.whiteFlag = whiteFlag
         render.blackFlag = blackFlag
@@ -560,18 +561,20 @@ class INode(object):
         ''' SCAN '''
         if getSetting('enable_scan_feature', isBool=True):
             url = self.make_url(mode=Mode.SCAN)
-            try:
-                label = "%s: %s" % (lang(39003), 
-                                    self.get_label().encode('utf8', 'replace'))
-                menu.append(
-                    (label, 'XBMC.UpdateLibrary("music", "%s")' % (url)))
-            except:
-                pass
+#            label = "%s: %s" % (lang(39003), 
+#                                    self.get_label().encode('utf8', 'replace'))
+            menu.add(path='qobuz/scan', 
+                            cmd='XBMC.UpdateLibrary("music", "%s")' % (url),
+                            label='scan')
         
+        url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='test_rpc')
+        menu.add(path='test/rpc', 
+                            cmd=runPlugin(url),
+                            label='Test RPC')
         ''' ERASE CACHE '''
         colorItem = getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
                                       mode=Mode.VIEW))
-        menu.add(path='system/erase_cache', 
+        menu.add(path='qobuz/erase_cache', 
                           label=lang(31009), cmd=cmd, 
                           color=colorItem, pos=10)

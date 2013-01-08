@@ -196,19 +196,20 @@ class QobuzBootstrap(object):
                 return True
             return False
 
-        from util import getRenderer
+        from renderer import renderer
 
         if self.MODE == Mode.VIEW:
-            r = getRenderer(self.nodeType, self.params)
+            r = renderer(self.nodeType, self.params)
             return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
-            r = getRenderer(self.nodeType, self.params)
+            r = renderer(self.nodeType, self.params)
             r.whiteFlag = Flag.TRACK | Flag.PRODUCT
             r.depth = -1
             return r.run()
         elif self.MODE == Mode.SCAN:
-            r = getRenderer(self.nodeType, self.params)
+            r = renderer(self.nodeType, self.params)
             r.depth = -1
+#            r.asList = True
             return r.scan()
         else:
             raise QobuzXbmcError(

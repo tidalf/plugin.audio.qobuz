@@ -1,6 +1,8 @@
 import json
 import xbmc
 from exception import QobuzXbmcError
+import pprint
+from debug import log
 
 def showNotification(**ka):
     rpc = XbmcRPC()
@@ -36,16 +38,29 @@ class JsonRequest:
         }
         if self.id:
             jDict['id'] = self.id
-        return json.dumps(jDict)
-
+        data = json.dumps(jDict)
+        print "Data: %s" % (data)
+        return data
+    
 class JsonResponse:
+    
     def __init__(self, raw_data):
         self.raw_data = None
         self.id = None
         if raw_data:
             self.set_raw_data(raw_data)
 
+    def error(self):
+        if not self.raw_data:
+            return ''
+        if 'error' in self.raw_data:
+            return pprint.pformat(self.raw_data['error'])
+        return ''
+        
     def result(self):
+        error = self.error()
+        if error:
+            log(self, "Error: %s" % (error))
         if not self.raw_data:
             return {}
         if not 'result' in self.raw_data:
@@ -87,10 +102,42 @@ class XbmcRPC:
             request.add_parameters({'image': ka['image']})
         return self.send(request)
     
-    def getInfoLabels(self, **ka):
+    def getInfoLabels(self, labels):
         request = JsonRequest('XBMC.GetInfoLabels')
         request.id = 1
-        request.add_parameters({'labels': ka['labels']})
+        request.add_parameters({'labels': labels})
         return self.send(request)
 
+    def getSongDetails(self, sid):
+        request = JsonRequest('AudioLibrary.GetSongDetails')
+        request.id = 1
+        request.add_parameters({'songid': int(sid), 
+                                "properties": [      "title", 
+      "artist", 
+      "albumartist", 
+      "genre", 
+      "year", 
+      "rating", 
+      "album", 
+      "track", 
+      "duration", 
+      "comment", 
+      "lyrics", 
+      "musicbrainztrackid", 
+      "musicbrainzartistid", 
+      "musicbrainzalbumid", 
+      "musicbrainzalbumartistid", 
+      "playcount", 
+      "fanart", 
+      "thumbnail", 
+      "file", 
+      "albumid", 
+      "lastplayed", 
+      "disc", 
+      "genreid", 
+      "artistid", 
+      "displayartist", 
+      "albumartistid"]})
+        return self.send(request)
 
+rpc = XbmcRPC()

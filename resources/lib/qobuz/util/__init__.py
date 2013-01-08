@@ -14,14 +14,15 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from renderer.xbmc import QobuzXbmcRenderer as renderer
-from node.flag import NodeFlag as Flag
 
-def getRenderer(nType, params = None):
-    return renderer(nType, params)
+from node.flag import NodeFlag as Flag
+from debug import log
+
+
 
 def getNode(qnt, params = {}):
         nodeName = Flag.to_s(qnt)
+        log('getNode', 'Returning %s node' % (nodeName))
         modulePath = 'node.' + nodeName
         moduleName = 'Node_' + nodeName
         """ from node.foo import Node_foo """

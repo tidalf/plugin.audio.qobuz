@@ -26,7 +26,8 @@ from debug import info, warn
 from exception import QobuzXbmcError
 from gui.util import notifyH, color, lang, getImage, runPlugin, \
     containerRefresh, containerUpdate, executeBuiltin, getSetting
-from util import getRenderer, getNode
+from util import  getNode
+from renderer import renderer
 from gui.contextmenu import contextMenu
 import pprint
 from api import api
@@ -169,6 +170,7 @@ class Node_playlist(INode):
 
     def remove_tracks(self, tracks_id):
         info(self, "Removing tracks: " + tracks_id)
+        qobuz.registry.get(name='user')
         result = api.playlist_deleteTracks(
             playlist_id=self.id, playlist_track_ids=tracks_id)
         if not result:
@@ -177,11 +179,13 @@ class Node_playlist(INode):
 
     def gui_remove_track(self):
         qid = self.get_parameter('qid')
+        print "Removing track %s from playlist %s" % (qid, self.id)
         if not self.remove_tracks(qid):
             notifyH(dialogHeading, 'Cannot remove track!', 'icon-error-256')
             return False
-            self.delete_cache(self.id)
-            notifyH(dialogHeading, 'Track removed from playlist')
+        self.delete_cache(self.id)
+        print "Error API: %s (%s)" % (api.error, api.status_code)
+        notifyH(dialogHeading, 'Track removed from playlist')
         return True
     
     def gui_add_to_current(self):
@@ -201,7 +205,7 @@ class Node_playlist(INode):
             node.pre_build_down(None, None, None, Flag.NONE)
             nodes.append(node)
         else:
-            render = getRenderer(qnt, self.parameters)
+            render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.TRACK
             render.asList = True
@@ -247,7 +251,7 @@ class Node_playlist(INode):
             node.pre_build_down(None,None,None, Flag.NONE)
             nodes.append(node)
         else:
-            render = getRenderer(qnt, self.parameters)
+            render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.TRACK
             render.asList = True

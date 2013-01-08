@@ -23,7 +23,8 @@ from product import Node_product
 from debug import warn
 from gui.util import lang, getSetting
 from gui.util import getImage, notifyH, executeBuiltin, containerUpdate 
-from util import getRenderer, getNode
+from util import getNode
+from renderer import renderer
 from api import api
 from exception import QobuzXbmcError as Qerror
 from track import Node_track
@@ -107,7 +108,7 @@ class Node_favorites(INode):
             album_ids[str(node.id)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
-            render = getRenderer(qnt, self.parameters)
+            render = renderer(qnt, self.parameters)
             render.depth = 1
             render.whiteFlag = Flag.TRACK
             render.blackFlag = Flag.NONE
@@ -119,7 +120,7 @@ class Node_favorites(INode):
                 album_ids[str(node.id)] = 1
                 nodes.append(node)
         else:
-            render = getRenderer(qnt, self.parameters)
+            render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.PRODUCT
             render.blackFlag = Flag.STOPBUILD & Flag.TRACK
@@ -131,7 +132,7 @@ class Node_favorites(INode):
                         album_ids[str(node.id)] = 1
                         nodes.append(node)
                 if node.type & Flag.TRACK:
-                    render = getRenderer(qnt, self.parameters)
+                    render = renderer(qnt, self.parameters)
                     render.depth = 1
                     render.whiteFlag = Flag.TRACK
                     render.blackFlag = Flag.NONE
@@ -179,7 +180,7 @@ class Node_favorites(INode):
             track_ids[str(node.id)] = 1
             nodes.append(node)
         else:
-            render = getRenderer(qnt, self.parameters)
+            render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.TRACK
             render.asList = True

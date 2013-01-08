@@ -79,3 +79,22 @@ class Node_root(INode):
                     'Something went wrong while erasing cached data',
                     getImage('icon-error-256'))
         return True
+
+    def test_rpc(self):
+        from xbmcrpc import rpc
+        import xbmc
+        import pprint
+        kb = xbmc.Keyboard('0', 'heading')
+        kb.doModal()
+        if not kb.isConfirmed():
+            return False
+        str = "musicdb://9/2012/2/3?year=2012"
+        import re
+        m = re.search('^musicdb://.*/(\d+)\?.*$', str)
+        print m.group(1)
+
+        res = rpc.getSongDetails(kb.getText())
+        print pprint.pformat(res.result())
+        return True
+        
+        

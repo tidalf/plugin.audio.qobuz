@@ -40,6 +40,7 @@ class dog():
             'name': "^[\w\d_.]+$",
             'parent-id': "^\d{1,10}$",
             'offset': "^\d{1,10}$",
+            'fakeExt': '^FakeFile\.flac$'
         }
 
     ''' Match value against regexp '''
