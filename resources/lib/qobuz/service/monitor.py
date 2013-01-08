@@ -51,7 +51,7 @@ keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
-        self.lastId = None
+        self.trackId= None
         self.lock = threading.Lock()
 
     def getProperty(self, key):
@@ -94,20 +94,18 @@ class MyPlayer(xbmc.Player):
 
     def onPlayBackStarted(self):
         # workaroung bug, we are sometimes called multiple times.
-        mid = self.getProperty(keyMonitoredTrackId)
-        if mid:
-            warn(self, "Already monitoring song id: %s" % (mid)) 
+        if self.trackId:
+            warn(self, "Already monitoring song id: %s" % (self.trackId)) 
             return False
         nid  = self.getProperty(keyTrackId)
         if not nid:
             warn(self, "No track id set by the player...")
             return False
-        self.setProperty(keyMonitoredTrackId, nid)
-        idToBeSend = nid
+        self.trackId = nid
         log(self, "play back started from monitor !!!!!!" + nid )
         xbmc.sleep(10000)
-        if self.isPlayingAudio() and self.getProperty(keyTrackId) == idToBeSend:
-            self.setProperty(keyMonitoredTrackId, '')
+        if self.isPlayingAudio() and self.getProperty(keyTrackId) == self.trackId:
+            self.trackId = None
             api.track_resportStreamingStart(nid)
         return True
 
