@@ -43,6 +43,7 @@ from util.file import FileUtil
 from gui.util import containerRefresh, notifyH, getImage, executeBuiltin
 from node.track import Node_track
 from api import api
+
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
@@ -102,25 +103,38 @@ class Monitor(xbmc.Monitor):
 
     def __init__(self, qobuz):
         super(Monitor, self).__init__()
-        self.abortRequest = False
+        self.abortRequested = False
         self.garbage_refresh = 60 * 5
         self.last_garbage_on = time() - (self.garbage_refresh + 1)
+        self.Player = MyPlayer()
         
     def onAbortRequested(self):
-        self.abortRequest = True
+        self.abortRequested = True
+        print "Abort requested"
 
     def is_garbage_time(self):
         if time() > (self.last_garbage_on + self.garbage_refresh):
             return True
         return False
-    
+
+    def isIdle(self, since = 1):
+        try:
+            if xbmc.getGlobalIdleTime() >= since:
+                return True
+            return False
+        except:
+            return False
+
     def cache_remove_old(self, **ka):
+        timeStarted = time()
         self.last_garbage_on = time()
-        gData = {'limit': 1}
+        gData = {'limit': 1, 'count': 0}
         if 'limit' in ka:
             gData['limit'] = ka['limit']
-        """ function for deleting one file"""
+        """Callback deleting one file
+        """
         def delete_one(fileName, gData):
+            gData['count'] += 1
             data = None
             with open(fileName, 'rb') as f:
                 f = open(fileName, 'rb')
@@ -145,6 +159,8 @@ class Monitor(xbmc.Monitor):
             return True
         fu = FileUtil()
         fu.find(qobuz.path.cache, '^.*\.dat$', delete_one, gData)
+        log(self, "%s cached file(s) checked in %2.1s s" % (str(gData['count']), 
+            str(time() - timeStarted) ))
         return True
 
     def cache_remove_user_data(self):
@@ -172,23 +188,24 @@ class Monitor(xbmc.Monitor):
         self.cache_remove_user_data()
 
 boot = QobuzBootstrap(__addon__, 0)
-logLabel = 'QobuzCache'
+logLabel = 'QobuzMonitor'
 try:
     boot.bootstrap_app()
     monitor = Monitor(qobuz)
-    player = MyPlayer()
     alive = True
     while alive:
+        alive = False
         try:
-            alive = not xbmc.abortRequested
-        except:
-            alive = False
+            alive = not monitor.abortRequested
+        except Exception as e:
+            print "Exception while getting abortRequested..."
+            raise e
         if not alive:
             break
-        if monitor.is_garbage_time():
+        if monitor.isIdle(60) and monitor.is_garbage_time():
             log(logLabel, 'Periodic cleaning...')
             monitor.cache_remove_old(limit=20)
         xbmc.sleep(1000)
-    log(logLabel, 'Exiting... bye!')
-except QobuzXbmcError as e:
-    warn('[' + pluginId + ']', "Exception while running plugin")
+    print '[%s] Exiting... bye!' % (logLabel)
+except:
+    print '[%s] Exiting monitor' % (pluginId)
