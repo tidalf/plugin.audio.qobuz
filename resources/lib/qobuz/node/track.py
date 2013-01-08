@@ -132,7 +132,7 @@ class Node_track(INode):
             return ''
         if not 'data' in data or not 'url' in data['data']:
             warn(self, 
-                 "User stream return no error but contain no data\n" +  
+                 "streaming_url, no url returned\n" +  
                  "API Error: %s" % (api.error)) 
             return ''
         return data['data']['url']

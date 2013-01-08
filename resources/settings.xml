@@ -68,4 +68,6 @@
 	</category>
 	<setting id="warn_free_account" type="bool" default="true"
 		option="hidden" />
+	<setting id="show_recommendations" type="bool" default="true"
+        option="hidden" />
 </settings>
