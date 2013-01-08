@@ -95,19 +95,30 @@ class MyPlayer(xbmc.Player):
     def onPlayBackStarted(self):
         # workaroung bug, we are sometimes called multiple times.
         if self.trackId:
-            warn(self, "Already monitoring song id: %s" % (self.trackId)) 
-            return False
+            if self.getProperty(keyTrackId) != self.trackId:
+                self.trackId = None
+            else:
+                warn(self, "Already monitoring song id: %s" % (self.trackId)) 
+                return False
         nid  = self.getProperty(keyTrackId)
         if not nid:
             warn(self, "No track id set by the player...")
             return False
         self.trackId = nid
         log(self, "play back started from monitor !!!!!!" + nid )
-        xbmc.sleep(10000)
-        if self.isPlayingAudio() and self.getProperty(keyTrackId) == self.trackId:
-            self.trackId = None
-            api.track_resportStreamingStart(nid)
-        return True
+        elapsed = 0
+        while elapsed <= 10:
+            if not self.isPlayingAudio():
+                self.trackId = None
+                return False
+            if self.getProperty(keyTrackId) != self.trackId:
+                self.trackId = None
+                return False 
+            elapsed+=1
+            xbmc.sleep(1000)
+        api.track_resportStreamingStart(nid)
+        self.trackId = None
+        return False
 
     def onQueueNextItem(self):
         nid  = self.getProperty(keyTrackId) 
