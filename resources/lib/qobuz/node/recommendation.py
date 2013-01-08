@@ -22,7 +22,7 @@ from flag import NodeFlag as Flag
 from inode import INode
 from product import Node_product
 from debug import warn
-from gui.util import color, lang, getImage
+from gui.util import getSetting, lang, getImage
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -87,7 +87,7 @@ class Node_recommendation(INode):
         if not (self.genre_type and self.genre_id):
             return True
         offset = self.offset or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='recommendation',
                                   id=self.myid(),
                                   type=RECOS_TYPE_IDS[int(self.genre_type)],
@@ -102,7 +102,6 @@ class Node_recommendation(INode):
     
 # TYPE
     def _build_recos_type(self, Dir, lvl, whiteFlag, blackFlag):
-        colorItem = qobuz.addon.getSetting('color_item')
         for gid in RECOS_TYPE_IDS:
             node = Node_recommendation()
             node.genre_type = gid
@@ -113,7 +112,6 @@ class Node_recommendation(INode):
 
 # GENRE
     def _build_recos_genre(self, Dir, lvl, whiteFlag, blackFlag):
-        colorItem = qobuz.addon.getSetting('color_item')
         for genre_id in RECOS_GENRES:
             node = Node_recommendation()
             node.genre_type = self.genre_type

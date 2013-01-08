@@ -19,7 +19,8 @@ import xbmcgui
 
 import qobuz
 from debug import warn
-from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, getImage
+from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, getImage, \
+    getSetting
 from node.flag import NodeFlag as Flag
 from node.track import Node_track
 
@@ -54,10 +55,9 @@ class QobuzPlayer(xbmc.Player):
                                     '')
         else:
             item = track.makeListItem()
-            track.item_add_playing_property(item)
-        if not track.get_mimetype():
-            warn(self, "Cannot get streaming URL")
-            return False
+            if not track.item_add_playing_property(item):
+                warn(self, "Cannot get streaming URL")
+                return False
         # some tracks are not authorized for stream and a 60s sample is
         # returned, in that case we overwrite the song duration
         if track.is_sample():
@@ -72,7 +72,7 @@ class QobuzPlayer(xbmc.Player):
         """
             Notify
         """
-        if qobuz.addon.getSetting('notification_playingsong') == 'true':
+        if getSetting('notification_playingsong', isBool=True):
             notifyH(lang(34000), track.get_label(), track.get_image())
         """
             We are called from playlist...

@@ -23,7 +23,7 @@ import qobuz
 from flag import NodeFlag
 from inode import INode
 from debug import log, warn
-from gui.util import getImage
+from gui.util import getImage, getSetting
 
 '''
     @class Node_label:
@@ -47,8 +47,7 @@ class Node_label(INode):
     def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         offset = self.get_parameter('offset') or 0
         #@bug: Qobuz service seam do don't return total so pagination is broken
-        # limit = qobuz.addon.getSetting('pagination_limit')
-        limit = 5000
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='label-list', id=self.id, limit=limit, offset=offset)
         if not data:

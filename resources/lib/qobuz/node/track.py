@@ -23,6 +23,7 @@ from inode import INode
 from debug import warn
 from gui.util import color, lang, getImage, runPlugin
 from gui.contextmenu import contextMenu
+from api import api
 
 '''
     NODE TRACK
@@ -129,6 +130,11 @@ class Node_track(INode):
                                   id=self.id)
         if not data:
             return ''
+        if not 'data' in data or not 'url' in data['data']:
+            warn(self, 
+                 "User stream return no error but contain no data\n" +  
+                 "API Error: %s" % (api.error)) 
+            return ''
         return data['data']['url']
 
     def get_artist(self):
@@ -219,8 +225,13 @@ class Node_track(INode):
         use to fetch data from Qobuz
     """
     def item_add_playing_property(self, item):
-        item.setProperty('mimetype', self.get_mimetype())
+        mime = self.get_mimetype()
+        if not mime:
+            warn(self, "Cannot set item streaming url")
+            return False
+        item.setProperty('mimetype', mime)
         item.setPath(self.get_streaming_url())
+        return True
     
     def makeListItem(self, replaceItems=False):
         media_number = self.get_media_number()
@@ -272,7 +283,7 @@ class Node_track(INode):
                      'year': self.get_year(),
                      'comment': comment
                      })
-        item.setProperty('discnumber', str(media_number))
+        item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)

@@ -109,7 +109,7 @@ class __API__:
             Error: Bad Request [400]
         """
         self.statTotalRequest += 1
-        self.error = None
+        self.error = ''
         self.status_code = None
         url = self._baseUrl + uri
         """ DEBUG """

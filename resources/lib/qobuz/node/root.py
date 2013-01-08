@@ -25,6 +25,7 @@ from friend_list import Node_friend_list
 from genre import Node_genre
 from label import Node_label
 from article_rubrics import Node_article_rubrics
+from gui.util import getSetting
 import qobuz
 
 
@@ -44,11 +45,11 @@ class Node_root(INode):
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(Node_user_playlists())
-        if qobuz.addon.getSetting('show_recommendations') == 'true':
+        if getSetting('show_recommendations', isBool=True):
             self.add_child(Node_recommendation())
         self.add_child(Node_purchases())
         self.add_child(Node_favorites())
-        if qobuz.addon.getSetting('search_enabled') == 'true':
+        if getSetting('search_enabled', isBool=True):
             search = Node_search()
             search.search_type = 'albums'
             self.add_child(search)

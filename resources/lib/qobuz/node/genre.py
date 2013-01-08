@@ -21,7 +21,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from recommendation import Node_recommendation, RECOS_TYPE_IDS
-from gui.util import getImage
+from gui.util import getImage, getSetting
 
 '''
     @class Node_genre:
@@ -57,7 +57,7 @@ class Node_genre(INode):
         return True
 
     def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='genre-list', id=self.id, offset=self.offset, limit=limit)
         if not data: 

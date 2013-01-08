@@ -24,12 +24,12 @@ import pprint
 import xbmc
 
 from constants import Mode
-from debug import info, debug, warn, error
+from debug import info, debug, warn
 from dog import dog
 import qobuz
 from node.flag import NodeFlag as Flag
 from exception import QobuzXbmcError
-from gui.util import notifyH, notify, dialogLoginFailure, getImage, yesno, containerRefresh
+from gui.util import dialogLoginFailure, getSetting, containerRefresh
 
 ''' Arguments parssing '''
 
@@ -84,19 +84,16 @@ class QobuzBootstrap(object):
     ''' BOTTSTRAP Registry '''
     def bootstrap_registry(self):
         from registry import QobuzRegistry
-        streamFormat = 6 if qobuz.addon.getSetting(
-            'streamtype') == 'flac' else 5
-        cacheDurationMiddle = int(
-            qobuz.addon.getSetting('cache_duration_middle')) * 60
-        cacheDurationLong = int(
-            qobuz.addon.getSetting('cache_duration_long')) * 60
+        streamFormat = 6 if getSetting('streamtype') == 'flac' else 5
+        cacheDurationMiddle = getSetting('cache_duration_middle', 
+                                         isInt=True) * 60
+        cacheDurationLong = getSetting('cache_duration_long', 
+                                       isInt=True) * 60
         try:
             qobuz.registry = QobuzRegistry(
                 cacheType='default',
-                username=qobuz.addon.getSetting(
-                    'username'),
-                password=qobuz.addon.getSetting(
-                    'password'),
+                username=getSetting('username'),
+                password=getSetting('password'),
                 basePath=qobuz.path.cache,
                 streamFormat=streamFormat, 
                 hashKey=True,

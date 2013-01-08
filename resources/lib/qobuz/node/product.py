@@ -20,7 +20,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
-from gui.util import getImage
+from gui.util import getImage, getSetting
 from gui.contextmenu import contextMenu
 
 '''
@@ -42,7 +42,7 @@ class Node_product(INode):
         self.content_type = 'songs'
         self.is_special_purchase = False
         self.offset = None
-        self.imageDefaultSize = qobuz.addon.getSetting('image_default_size')
+        self.imageDefaultSize = getSetting('image_default_size')
 
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):

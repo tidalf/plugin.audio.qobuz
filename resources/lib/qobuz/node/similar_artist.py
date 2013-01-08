@@ -21,7 +21,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from artist import Node_artist
-from gui.util import lang
+from gui.util import lang, getSetting
 
 import pprint
 '''
@@ -41,7 +41,7 @@ class Node_similar_artist(INode):
         return lang(39000)
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist-similar', id=self.id,
             artist_id=self.id, offset=self.offset, limit=limit)
         if not data:

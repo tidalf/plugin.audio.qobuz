@@ -24,6 +24,7 @@ from debug import warn
 import weakref
 from api import api
 from gui.contextmenu import contextMenu
+from gui.util import getSetting
 '''
     @class Node_product_by_artist:
 '''
@@ -62,7 +63,7 @@ class Node_product_by_artist(INode):
         Build Down
     '''
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = api.artist_get(
             artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
         if not data:

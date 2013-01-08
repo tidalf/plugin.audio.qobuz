@@ -18,7 +18,7 @@ import os, sys
 import xbmc
 import xbmcgui
 import xbmcplugin
-import xbmcaddon
+
 from debug import log, debug
 import qobuz
 
@@ -147,6 +147,19 @@ def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
 
 def getSetting(key, **ka):
-    data = xbmcaddon.getSetting(key)
+    """Helper to access xbmcaddon.getSetting
+        Parameter:
+        key: The key to retrieve from setting
+        * optional: isBool (convert 'true' and 'false to python boolean), 
+            isInt (return data as integer) 
+    """
+    data = qobuz.addon.getSetting(key)
     if not data:
         return ''
+    if 'isBool' in ka and ka['isBool']:
+        if data == 'true':
+            return True
+        return False
+    if 'isInt' in ka and ka['isInt']:
+        return int(data)
+    return data

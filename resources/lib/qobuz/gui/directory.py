@@ -124,9 +124,11 @@ class Directory():
             success = forceStatus
         if not self.put_item_ok or (self.total_put == 0):
             success = False
-        xbmcplugin.setContent(
-            handle=self.handle, content=self.content_type)
-        xbmcplugin.endOfDirectory(handle=self.handle,
+        if not self.asList:
+            xbmcplugin.setContent(
+                                  handle=self.handle, 
+                                  content=self.content_type)
+            xbmcplugin.endOfDirectory(handle=self.handle,
                                   succeeded=success,
                                   updateListing=False,
                                   cacheToDisc=success)

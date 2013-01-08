@@ -23,7 +23,7 @@ from product import Node_product
 from track import Node_track
 from product_by_artist import Node_product_by_artist
 from exception import QobuzXbmcError
-from gui.util import notifyH, lang, getImage
+from gui.util import notifyH, lang, getImage, getSetting
 import urllib
 from api import api
 
@@ -77,7 +77,7 @@ class Node_search(INode):
         return url
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         stype = self.search_type
         query = self.get_parameter('query', unQuote=True)
         if not query:

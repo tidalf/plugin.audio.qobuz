@@ -25,7 +25,7 @@ from product import Node_product
 from debug import info, warn
 from exception import QobuzXbmcError
 from gui.util import notifyH, color, lang, getImage, runPlugin, \
-    containerRefresh, containerUpdate, executeBuiltin
+    containerRefresh, containerUpdate, executeBuiltin, getSetting
 from util import getRenderer, getNode
 from gui.contextmenu import contextMenu
 import pprint
@@ -75,7 +75,7 @@ class Node_playlist(INode):
         self.label = self.get_name() or 'No name...'
         
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name=registryKey, id=self.id, playlist_id=self.id, 
             offset=self.offset, limit=limit, extra='tracks')
@@ -109,8 +109,8 @@ class Node_playlist(INode):
         return self.get_property('description')
 
     def makeListItem(self, replaceItems=False):
-        colorItem = qobuz.addon.getSetting('color_item')
-        colorPl = qobuz.addon.getSetting('color_item_playlist')
+        colorItem = getSetting('color_item')
+        colorPl = getSetting('color_item_playlist')
         label = self.get_name()
         image = self.get_image()
         owner = self.get_owner()
@@ -135,7 +135,7 @@ class Node_playlist(INode):
         return item
 
     def attach_context_menu(self, item, menu):
-        login = qobuz.addon.getSetting('username')
+        login = getSetting('username')
         isOwner = True
         if login != self.get_property('owner/name'):
             isOwner = False
@@ -292,7 +292,7 @@ class Node_playlist(INode):
             return False
         from gui.util import Keyboard
         offset = self.get_parameter('offset') or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         info(self, "renaming playlist: " + str(ID))
         playlist = qobuz.registry.get(
             name=registryKey, id=ID, playlist_id=ID, offset=offset, limit=limit)
@@ -356,9 +356,9 @@ class Node_playlist(INode):
         import xbmc
         import pprint
         ID = self.get_parameter('nid')
-        login = qobuz.addon.getSetting('username')
+        login = getSetting('username')
         offset = self.get_parameter('offset') or 0
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name=registryKey, id=ID, playlist_id=ID, offset=offset, 
             limit=limit)['data']
@@ -387,7 +387,7 @@ class Node_playlist(INode):
         notifyH('Qobuz playlist removed(i8n)', "Playlist %s removed" % (name))
         url = self.make_url(type=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
                             id='')
-        executeBuiltin(containerUpdate(url))
+        executeBuiltin(containerUpdate(url, True))
         return False
     
     def subscribe(self):

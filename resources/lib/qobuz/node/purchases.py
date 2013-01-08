@@ -18,7 +18,7 @@ import qobuz
 from flag import NodeFlag
 from inode import INode
 from debug import warn
-from gui.util import lang, getImage
+from gui.util import lang, getImage, getSetting
 
 from product import Node_product
 from track import Node_track
@@ -37,7 +37,7 @@ class Node_purchases(INode):
         self.offset = self.get_parameter('offset') or 0
         
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='user-purchases', limit=limit, offset=self.offset)
         if not data:

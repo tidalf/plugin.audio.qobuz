@@ -21,8 +21,8 @@ from flag import NodeFlag as Flag
 from inode import INode
 from product import Node_product
 from debug import warn
-from gui.util import lang
-from gui.util import getImage, notifyH, executeBuiltin, containerUpdate
+from gui.util import lang, getSetting
+from gui.util import getImage, notifyH, executeBuiltin, containerUpdate 
 from util import getRenderer, getNode
 from api import api
 from exception import QobuzXbmcError as Qerror
@@ -48,7 +48,7 @@ class Node_favorites(INode):
         self.offset = self.get_parameter('offset') or 0
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name=registryKey, limit=limit, offset=self.offset)
         if not data:

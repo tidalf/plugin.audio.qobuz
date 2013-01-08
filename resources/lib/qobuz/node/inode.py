@@ -25,11 +25,11 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag, Eview
 from exception import QobuzXbmcError as Qerror
-from gui.util import color, lang, runPlugin, containerUpdate, containerRefresh
+from gui.util import color, lang, runPlugin, containerUpdate, \
+    getSetting
 from debug import log, warn
-from time import time
 from gui.contextmenu import contextMenu
-from util import getRenderer
+from util import getRenderer, getNode
 import urllib
 '''
     @class Inode:
@@ -429,15 +429,12 @@ class INode(object):
         """Helper/Called by build_down to add special node when pagination is
         required
         """
-        limit = qobuz.addon.getSetting('pagination_limit')
-        from renderer.irenderer import IRenderer
-        r = IRenderer(self.type, self.parameters)
         if self.pagination_next:
-            colorItem = qobuz.addon.getSetting('color_item')
+            colorItem = getSetting('color_item')
             params = qobuz.boot.params
             params['offset'] = self.pagination_next_offset
             params['nid'] = self.id
-            node = r.import_node(self.type, params)
+            node = getNode(self.type, params)
             label = self.get_label() 
             if not label and self.parent:
                 label = self.parent.get_label()
@@ -561,7 +558,7 @@ class INode(object):
         menu.add(path='qobuz/big_dir', 
                           label=lang(39002), cmd=cmd)
         ''' SCAN '''
-        if qobuz.addon.getSetting('enable_scan_feature') == 'true':
+        if getSetting('enable_scan_feature', isBool=True):
             url = self.make_url(mode=Mode.SCAN)
             try:
                 label = "%s: %s" % (lang(39003), 
@@ -572,7 +569,7 @@ class INode(object):
                 pass
         
         ''' ERASE CACHE '''
-        colorItem = qobuz.addon.getSetting('color_item_caution')
+        colorItem = getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
                                       mode=Mode.VIEW))
         menu.add(path='system/erase_cache', 

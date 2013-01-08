@@ -18,7 +18,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn, error
-from gui.util import lang, getImage
+from gui.util import lang, getImage, getSetting
 from playlist import Node_playlist
 
 class Node_user_playlists(INode):
@@ -35,11 +35,7 @@ class Node_user_playlists(INode):
         if not display_by:
             display_by = 'songs'
         self.set_display_by(display_by)
-        display_cover = qobuz.addon.getSetting('userplaylists_display_cover')
-        if display_cover == 'true':
-            display_cover = True
-        else:
-            display_cover = False
+        display_cover = getSetting('userplaylists_display_cover', isBool=True)
         self.display_product_cover = display_cover
         self.offset = self.get_parameter('offset') or 0
 
@@ -53,7 +49,7 @@ class Node_user_playlists(INode):
         return self.display_by
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='user-playlists', limit=limit, offset=self.offset)
         if not data:
@@ -63,7 +59,7 @@ class Node_user_playlists(INode):
         return True
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        login = qobuz.addon.getSetting('username')
+        login = getSetting('username')
         cid = qobuz.registry.get(
             name='user-current-playlist-id', noRemote=True)
         if cid:

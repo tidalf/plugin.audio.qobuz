@@ -15,20 +15,15 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
 import xbmc as XBMC
 import xbmcgui
 import xbmcplugin
-import time
 
 import qobuz
 from node.flag import NodeFlag as Flag
-from debug import info, warn, log
+from debug import warn
 from irenderer import IRenderer
-from gui.util import notifyH, getImage, color, containerRefresh, \
-    containerUpdate, executeBuiltin
+from gui.util import notifyH, getSetting
 from exception import QobuzXbmcError as Qerror
 
 #class XbmcWindow_musicfiles(xbmcgui.Window):
@@ -68,7 +63,7 @@ class QobuzXbmcRenderer(IRenderer):
             return True
         from gui.directory import Directory
         Dir = Directory(self.root, qobuz.boot.handle, self.asList, self.nodes)
-        if qobuz.addon.getSetting('contextmenu_replaceitem') == 'true':
+        if getSetting('contextmenu_replaceitem', isBool=True):
             Dir.replaceItems = False
         try:
             ret = self.root.build_down(Dir, self.depth, 
@@ -77,21 +72,22 @@ class QobuzXbmcRenderer(IRenderer):
             Dir.end_of_directory(False)
             Dir = None
             warn(self, 
-                 "Something went wrong while building down our tree...abort")
+                 "Error while populating our directory: %s" % (repr(e)))
             return False
-        Dir.set_content(self.root.content_type)
-        methods = [
-            xbmcplugin.SORT_METHOD_UNSORTED,
-            xbmcplugin.SORT_METHOD_LABEL,
-            xbmcplugin.SORT_METHOD_DATE,
-            xbmcplugin.SORT_METHOD_TITLE,
-            xbmcplugin.SORT_METHOD_VIDEO_YEAR,
-            xbmcplugin.SORT_METHOD_GENRE,
-            xbmcplugin.SORT_METHOD_ARTIST,
-            xbmcplugin.SORT_METHOD_ALBUM,
-            xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
-            xbmcplugin.SORT_METHOD_TRACKNUM, ]
-        [xbmcplugin.addSortMethod(handle=qobuz.boot.handle,
+        if not self.asList:
+            Dir.set_content(self.root.content_type)
+            methods = [
+                       xbmcplugin.SORT_METHOD_UNSORTED,
+                       xbmcplugin.SORT_METHOD_LABEL,
+                       xbmcplugin.SORT_METHOD_DATE,
+                       xbmcplugin.SORT_METHOD_TITLE,
+                       xbmcplugin.SORT_METHOD_VIDEO_YEAR,
+                       xbmcplugin.SORT_METHOD_GENRE,
+                       xbmcplugin.SORT_METHOD_ARTIST,
+                       xbmcplugin.SORT_METHOD_ALBUM,
+                       xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
+                       xbmcplugin.SORT_METHOD_TRACKNUM, ]
+            [xbmcplugin.addSortMethod(handle=qobuz.boot.handle,
                                   sortMethod=method) for method in methods]
         return Dir.end_of_directory()
 

@@ -24,7 +24,7 @@ from inode import INode
 from playlist import Node_playlist
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
-    containerUpdate, notifyH, executeBuiltin
+    containerUpdate, notifyH, executeBuiltin, getSetting
 from api import api
 '''
     @class Node_friend:
@@ -43,7 +43,7 @@ class Node_friend(INode):
         self.is_folder = True
 
     def set_label(self, label):
-        colorItem = qobuz.addon.getSetting('color_item')
+        colorItem = getSetting('color_item')
         self.label = color(colorItem, label)
 
     def set_name(self, name):
@@ -143,8 +143,7 @@ class Node_friend(INode):
         return True
 
     def attach_context_menu(self, item, menu):
-        colorWarn = qobuz.addon.getSetting('color_item_caution')
-
+        colorWarn = getSetting('color_item_caution')
         url=self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
         cmd = runPlugin(self.make_url(type=Flag.FRIEND, nm="remove"))

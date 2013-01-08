@@ -20,7 +20,7 @@ from flag import NodeFlag
 from inode import INode
 from product import Node_product
 from debug import warn
-from gui.util import color
+from gui.util import getSetting
 from gui.contextmenu import contextMenu
 import xbmcgui
 
@@ -46,7 +46,7 @@ class Node_artist(INode):
         self.label = self.name
         
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist',id=self.id,
             artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
         if not data:

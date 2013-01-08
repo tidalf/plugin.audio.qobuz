@@ -21,7 +21,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from article import Node_article
-from gui.util import getImage
+from gui.util import getImage, getSetting
 
 import pprint
 '''
@@ -44,7 +44,7 @@ class Node_articles(INode):
         return l
 
     def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
-        limit = qobuz.addon.getSetting('pagination_limit')
+        limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='article_listlastarticles',
                                       id=self.id, 
                                       rubric_ids=self.id,
