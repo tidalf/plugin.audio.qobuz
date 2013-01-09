@@ -19,8 +19,6 @@ import sys
 import weakref
 import pprint
 
-import xbmcgui
-
 import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag, Eview
@@ -293,6 +291,7 @@ class INode(object):
         Class can overload this method
     '''
     def makeListItem(self, **ka):
+        import xbmcgui
         if not 'url' in ka:
             ka['url'] = self.make_url()
         if not 'label' in ka:
@@ -560,11 +559,13 @@ class INode(object):
                           label=lang(39002), cmd=cmd)
         ''' SCAN '''
         if getSetting('enable_scan_feature', isBool=True):
-            url = self.make_url(mode=Mode.SCAN)
+            query = urllib.quote_plus(self.make_url(mode=Mode.SCAN))
+            url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW,
+                                nm='gui_scan', query=query)
 #            label = "%s: %s" % (lang(39003), 
 #                                    self.get_label().encode('utf8', 'replace'))
             menu.add(path='qobuz/scan', 
-                            cmd='XBMC.UpdateLibrary("music", "%s")' % (url),
+                            cmd=runPlugin(url),
                             label='scan')
         
         url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='test_rpc')

@@ -437,6 +437,12 @@ class QobuzCacheCommon(QobuzLocalStorage):
 class QobuzRegistry():
 
     def __init__(self, *args, **ka):
+        if not 'basePath' in ka:
+            raise QobuzXbmcError(who=self, what='missing_parameter', 
+                                 addtional='basePath' )
+        if not os.path.exists(ka['basePath']):
+            raise QobuzXbmcError(who=self, what='invalid_parameter', 
+                                 additional='basePath: %s' % (ka['basePath']))
         if not 'cacheType' in ka:
             ka['cacheType'] = 'default'
         if ka['cacheType'] == 'default':

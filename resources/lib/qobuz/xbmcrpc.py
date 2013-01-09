@@ -1,5 +1,9 @@
 import json
-import xbmc
+try:
+    import xbmc
+except:
+    print "Outsided xbmc"
+    
 from exception import QobuzXbmcError
 import pprint
 from debug import log

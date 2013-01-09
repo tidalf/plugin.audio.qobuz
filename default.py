@@ -37,9 +37,6 @@ from bootstrap import QobuzBootstrap
 from debug import warn
 __handle__ = int(sys.argv[1])
 boot = QobuzBootstrap(__addon__, __handle__)
-import xbmcplugin
-xbmcplugin.setPluginCategory(__handle__, "Qobuz Online Music")
-xbmcplugin.setPluginFanart(__handle__, color1='0xFF0000FF')
 
 #try:
 boot.bootstrap_app()

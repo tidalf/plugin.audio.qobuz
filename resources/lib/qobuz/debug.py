@@ -14,9 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>..
-
-import os
-
 __debugging__ = True
 ourlog = None
 LOGDEBUG = None
@@ -35,7 +32,6 @@ try:
     __debugging__ = False
     if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         __debugging__ = True
-
 except:
     LOGDEBUG = '[DEBUG]'
     LOGNOTICE = '[NOTICE]'
@@ -46,11 +42,11 @@ except:
         print lvl + msg
     ourlog = logfunc
 
-
-###############################################################################
-# Logging helper functions
-###############################################################################
 def log(obj, msg, lvl=LOGNOTICE):
+    """Base for all logging function, run in/out Xbmc
+        Inside Xbmc loggin functions use xbmc.log else they just print
+        message to STDOUT
+    """
     if not __debugging__:
         return
     name = None
@@ -63,24 +59,22 @@ def log(obj, msg, lvl=LOGNOTICE):
             name = type(obj)
     ourlog('[Qobuz/' + str(name) + "] " + msg, lvl)
 
-
 def warn(obj, msg):
+    """facility: LOGERROR
+    """
     log(obj, msg, LOGERROR)
 
-
 def info(obj, msg):
+    """facility: LOGNOTICE
+    """
     log(obj, msg, LOGNOTICE)
 
-
 def debug(obj, msg):
+    """facility: LOGDEBUG
+    """
     log(obj, msg, LOGDEBUG)
 
-
-def crit(obj, msg):
-    log(obj, msg, LOGSEVERE)
-
-
 def error(obj, msg):
+    """facility: LOGSEVERE
+    """
     log(obj, msg, LOGSEVERE)
-    log(obj, 'Exiting...', LOGSEVERE)
-    raise Exception(msg)

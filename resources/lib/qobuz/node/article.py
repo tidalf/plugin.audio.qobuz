@@ -56,7 +56,7 @@ class Node_article(INode):
         super(Node_article, self).__init__(parent, parameters)
         self.type = Flag.ARTICLE
         self.is_folder = True
-        self.hasWidget = True
+        self.hasWidget = False
 
     def get_label(self):
         author = self.get_property('author')

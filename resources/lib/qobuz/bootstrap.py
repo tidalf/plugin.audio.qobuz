@@ -17,11 +17,7 @@
 import sys
 import os
 
-import urllib
-import json
 import pprint
-
-import xbmc
 
 from constants import Mode
 from debug import info, debug, warn
@@ -31,10 +27,10 @@ from node.flag import NodeFlag as Flag
 from exception import QobuzXbmcError
 from gui.util import dialogLoginFailure, getSetting, containerRefresh
 
-''' Arguments parssing '''
-
-
 def get_params():
+    """Helper that parse system arguments and validate them with our little
+    dog
+    """
     d = dog()
     rparam = {}
     if len(sys.argv) <= 1:
@@ -60,29 +56,28 @@ def get_params():
                          (splitparams[0], splitparams[1]))
     return rparam
 
-
-'''
-    QobuzBootstrap
-'''
-
-
 class QobuzBootstrap(object):
-
+    """Just to set some boot properties
+    and route query based on parameters
+    """
     def __init__(self, __addon__, __handle__):
         qobuz.addon = __addon__
         self.handle = __handle__
         qobuz.boot = self
 
-    ''' BOTTSTRAP App '''
     def bootstrap_app(self):
+        """General bootstrap
+        """
         from xbmcrpc import XbmcRPC
         self.bootstrap_directories()
         self.bootstrap_registry()
         self.bootstrap_sys_args()
         qobuz.rpc = XbmcRPC()
 
-    ''' BOTTSTRAP Registry '''
     def bootstrap_registry(self):
+        """Bootstrap our registry that permit to access qobuz data and
+        cache them localy
+        """
         from registry import QobuzRegistry
         streamFormat = 6 if getSetting('streamtype') == 'flac' else 5
         cacheDurationMiddle = getSetting('cache_duration_middle', 
@@ -109,14 +104,18 @@ class QobuzBootstrap(object):
             raise QobuzXbmcError(
                 who=self, what='invalid_login', additional=None)
 
-    ''' BOTTSTRAP Directories '''
     def bootstrap_directories(self):
+        """Setting some common path used by our application
+            cache, image...
+        """
+        import xbmc
         class PathObject ():
             def __init__(self):
                 self.base = qobuz.addon.getAddonInfo('path')
 
             def _set_dir(self):
-                self.profile = os.path.join(xbmc.translatePath('special://profile/'),
+                profile = xbmc.translatePath('special://profile/')
+                self.profile = os.path.join(profile,
                                             'addon_data',
                                             qobuz.addon.getAddonInfo('id'))
                 self.cache = os.path.join(self.profile, 'cache')
@@ -146,25 +145,9 @@ class QobuzBootstrap(object):
         qobuz.path._set_dir()
         qobuz.path.mkdir(qobuz.path.cache)
 
-    ''' BOTTSTRAP Debug '''
-    def bootstrap_debug(self):
-        from debug import log, warn, error, info
-
-        class DebugObject():
-            def __init__(self):
-                self.log = log
-                self.warn = warn
-                self.error = error
-                self.info = info
-        qobuz.debug = DebugObject()
-
-    ''' BOTTSTRAP Player '''
-    def bootstrap_player(self):
-        from player import QobuzPlayer
-        qobuz.player = QobuzPlayer()
-
-    ''' BOOTSTRAP Parse system parameters '''
     def bootstrap_sys_args(self):
+        """Parsing sys arg parameters and store them
+        """
         self.MODE = None
         self.params = get_params()
         if not 'nt' in self.params:
@@ -179,20 +162,22 @@ class QobuzBootstrap(object):
             info(self, "Param: " + p + ' = ' + str(self.params[p]))
 
     def erase_cache(self):
+        """Erasing all cached data
+        """
         qobuz.registry.delete_by_name('^.*\.dat$')
 
-    '''
-       Dispatch
-    '''
     def dispatch(self):
+        """Routing based on parameters
+        """
         info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
               Flag.to_s(int(self.params['nt']))))
         info(self, "Parameters:\n %s" % (pprint.pformat(self.params) ))
          
         if self.MODE == Mode.PLAY:
+            from player import QobuzPlayer
             debug(self, "Playing song")
-            self.bootstrap_player()
-            if qobuz.player.play(self.params['nid']):
+            player = QobuzPlayer()
+            if player.play(self.params['nid']):
                 return True
             return False
 
@@ -208,8 +193,9 @@ class QobuzBootstrap(object):
             return r.run()
         elif self.MODE == Mode.SCAN:
             r = renderer(self.nodeType, self.params)
+            r.enable_progress = False
+            r.whiteFlag = Flag.TRACK 
             r.depth = -1
-#            r.asList = True
             return r.scan()
         else:
             raise QobuzXbmcError(

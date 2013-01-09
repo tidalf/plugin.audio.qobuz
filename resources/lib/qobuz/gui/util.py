@@ -15,41 +15,51 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os, sys
-import xbmc
-import xbmcgui
-import xbmcplugin
+try:
+    """
+    Dirty trick that permit to import this module outside of xbmc
+    All function using xbmc module will fail ...
+    """
+    import xbmc
+    import xbmcgui
+    import xbmcplugin
+    '''
+    Keyboard
+    '''
+    class Keyboard(xbmc.Keyboard):
 
+        def __init__(self, default, heading, hidden=True):
+            self.setHeading('Qobuz / ' + heading)
+        
+except:
+    print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"
+    
 from debug import log, debug
 import qobuz
 
 from xbmcrpc import showNotification, getInfoLabels
 
-'''
-    Keyboard
-'''
-class Keyboard(xbmc.Keyboard):
-
-    def __init__(self, default, heading, hidden=True):
-        self.setHeading('Qobuz / ' + heading)
-
-
 def getImage(name):
+    if not qobuz.path:
+        return ''
     return os.path.join(qobuz.path.image, name + '.png')
 
 '''
     Notify Human
 '''
 def notifyH(title, text, image=None, mstime=2000):
+    """Notify for human... not using localized string :p
+    """
     if not image:
         image = getImage('icon-default-256')
-#    print "CurrentViewMode: %s" % (containerViewMode())
-#    print "CurrentViewMode: %s" % (containerSortMethod())
     return showNotification(title=title, message=text, image=image, displaytime=mstime)
 
 '''
     Notify
 '''
 def notify(title, text, image=None, mstime=2000):
+    """Notification that wrap title and text parameter into lang()
+    """
     if not image:
         image = getImage('icon-default-256')
     return showNotification(title=lang(title), 
@@ -58,6 +68,8 @@ def notify(title, text, image=None, mstime=2000):
                      displaytime=mstime)
 
 def dialogLoginFailure():
+    """Dialog to be shown when we can't login into Qobuz
+    """
     dialog = xbmcgui.Dialog()
     if dialog.yesno(lang(30008), lang(30034), lang(30040)):
         qobuz.addon.openSettings()
@@ -67,8 +79,9 @@ def dialogLoginFailure():
         xbmc.executebuiltin('ActivateWindow(home)')
         return False
 
-
 def isFreeAccount():
+    """Check if account if it's a Qobuz paid account
+    """
     data = qobuz.registry.get(name='user')
     if not data:
         return True
@@ -78,6 +91,8 @@ def isFreeAccount():
 
 
 def dialogFreeAccount():
+    """Show dialog when using free acccount
+    """
     if qobuz.addon.getSetting('warn_free_account') != 'true':
         return
     dialog = xbmcgui.Dialog()
@@ -95,7 +110,6 @@ def color(colorItem, msg):
     if not colorItem: return msg
     return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
 
-
 def lang(langId):
     return qobuz.addon.getLocalizedString(langId)
 
@@ -108,8 +122,8 @@ def containerUpdate(url, replace = False):
         replace = ', "replace"' 
     else: replace = ''
     str = 'Container.Update("%s"%s)' % ( url, replace)
-#    print str
     return str
+
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
     return dialog.yesno(heading, line1, line2, line3)
@@ -119,13 +133,6 @@ def containerRefresh():
 
 def executeBuiltin(cmd):
     xbmc.executebuiltin("%s" % (cmd))
-    
-#def formatControlLabel(label, sFormat=None, colorItem=None):
-#    if not colorItem: 
-#        colorItem = qobuz.addon.getSetting('item_section_color')
-#    if not sFormat:
-#        sFormat = qobuz.addon.getSetting('item_section_format')
-#    return sFormat % (color(colorItem, label))
 
 def containerViewMode():
     label = 'Container.Viewmode'
@@ -137,8 +144,6 @@ def containerViewMode():
 def containerSortMethod():
     label = 'Container.SortMethod'
     data = getInfoLabels(labels=[label])
-#    print "ID" + repr(getInfoLabels(labels=['ListItem.Property(Node.ID)']))
-#    print "ID" + repr(getInfoLabels(labels=['ListItem.Property(Node.Type)']))
     if data: 
         return data[label]
     return ''

@@ -146,7 +146,7 @@ class __API__:
                 self.error = "Not Found"
             else:
                 self.error = "Server error"
-            self.error = _api_error_string(url, params)
+            self.error = _api_error_string(url, _copy_params)
             warn(self, self.error)
             return None
         if not r.content:
@@ -158,8 +158,8 @@ class __API__:
         """ Retry get if connexion fail """
         try:
             response_json = r.json()
-        except:
-            warn(self, "Json loads failed to load... retrying!")
+        except Exception as e:
+            warn(self, "Json loads failed to load... retrying!\n%s" %(repr(e)))
             try:
                 response_json = r.json()
             except:
@@ -172,7 +172,7 @@ class __API__:
         except:
             pass
         if status == 'error':
-            self.error = _api_error_string(url, params, response_json)
+            self.error = _api_error_string(url, _copy_params, response_json)
             warn(self, self.error)
             return None
         return response_json

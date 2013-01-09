@@ -32,6 +32,8 @@ class QobuzXbmcError(Exception):
         msg += " - who        : " + pprint.pformat(ka['who']) + nl
         msg += " - what       : " + ka['what'] + nl
         msg += " - additional : " + repr(ka['additional']) + nl
+#        msg += " - type       : " + self.exc_type + nl
+#        msg += " - value      : " + self.exc_value + nl
         msg += " - Stack      : " + nl
         print msg
         print traceback.print_exc(10)

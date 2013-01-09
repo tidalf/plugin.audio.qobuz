@@ -25,7 +25,7 @@ from friend_list import Node_friend_list
 from genre import Node_genre
 from label import Node_label
 from article_rubrics import Node_article_rubrics
-from gui.util import getSetting
+from gui.util import getSetting, executeBuiltin
 import qobuz
 
 
@@ -96,5 +96,11 @@ class Node_root(INode):
         res = rpc.getSongDetails(kb.getText())
         print pprint.pformat(res.result())
         return True
+        
+    def gui_scan(self):
+        query = self.get_parameter('query', unQuote=True)
+        query+='&handle=%s' % (str(qobuz.boot.handle))
+        print "Scanning folder: %s" % (query)
+        executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))
         
         

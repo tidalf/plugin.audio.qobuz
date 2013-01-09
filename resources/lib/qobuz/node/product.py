@@ -60,7 +60,10 @@ class Node_product(INode):
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
+            if not 'image' in track:
+                track['image'] = self.get_image()
             node.data = track
+            
             self.add_child(node)
         return len(self.data['tracks']['items'])
 

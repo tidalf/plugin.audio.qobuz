@@ -14,8 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
-
 import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag
@@ -55,10 +53,11 @@ class Node_track(INode):
         return True
 
     def make_url(self, **ka):
-        #if not self.parent:
+        if 'trackAsLocalURL' in ka and ka['trackAsLocalURL']:
+            return 'http://127.0.0.1:80/qobuz/track/%s.mp3' % (str(self.id))
         if not 'mode' in ka: 
             ka['mode'] = Mode.PLAY 
-        return super(Node_track, self).make_url(**ka)#+ '&fakeExt=FakeFile.flac'
+        return super(Node_track, self).make_url(**ka)
 
     def get_label(self, sFormat="%a - %t"):
         sFormat = sFormat.replace("%a", self.get_artist())
@@ -94,17 +93,17 @@ class Node_track(INode):
         return ''
 
     def get_image(self):
-        try:
-            image = self.get_property('album/image/large')
-        except:
-            pass
+        import pprint
+        image = self.get_property(['album/image/large', 'image/large', 
+                                      'image/small',
+                                      'image/thumbnail', 'image'])
+        print "Image: %s" % (image)
         if image:
             return image.replace('_230.', '_600.')
         if not self.parent:
             return self.image
         if self.parent.type & (Flag.PRODUCT | Flag.PLAYLIST):
             return self.parent.get_image()
-        
 
     def get_playlist_track_id(self):
         return self.get_property('playlist_track_id')
@@ -234,6 +233,7 @@ class Node_track(INode):
         return True
     
     def makeListItem(self, replaceItems=False):
+        import xbmcgui
         media_number = self.get_media_number()
         if not media_number:
             media_number = 1
@@ -252,7 +252,7 @@ class Node_track(INode):
         #    duration = 60
         # label = '[COLOR=FF555555]' + label + '[/COLOR]
         # [[COLOR=55FF0000]Sample[/COLOR]]'
-
+        print "MakeItem %s" % (self.get_image())
         mode = Mode.PLAY
         url = self.make_url(mode=mode)
         item = xbmcgui.ListItem(label,

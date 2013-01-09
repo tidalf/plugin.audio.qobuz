@@ -57,8 +57,10 @@ class MyPlayer(xbmc.Player):
         xbmc.Player.__init__(self)
         self.trackId= None
         self.lock = threading.Lock()
-        self.playlist = xbmc.PlayList(0)
-
+    
+    def playlist(self):
+        return xbmc.PlayList(0)
+    
     def getProperty(self, key):
         """Wrapper to retrieve property from Xbmc Main Window
             Parameter:
@@ -126,18 +128,24 @@ class MyPlayer(xbmc.Player):
         api.track_resportStreamingStart(nid)
         self.trackId = None
         return False
-
+    def onPlay(self, url, item, b):
+        print "starting playback"
+        
     def onQueueNextItem(self):
+        return True
         nid  = self.getProperty(keyTrackId) 
         warn (self, "next item queued from monitor !!!!!!" + nid )
-        pos = self.playlist.getposition()
+        pos = self.playlist().getposition()
         if pos == -1:
             print "-1"
-            pos = len(self.playlist) - 1
+            pos = len(self.playlist()) - 1
         res = rpc.getInfoLabels(labels=['Container(50).Position','MusicPlayer.PlaylistPosition', 'MusicPlayer.PlaylistLength', 'ListItem.FileName']).result()
-        pos = int(res['Container(50).Position']) - 1
+        pos = res['Container(50).Position']
+        if not pos:
+            pos = len(self.playlist())
+        pos = int(pos) - 1
         print "Position: %s" % (repr(pos))
-        itempath = self.playlist[pos].getfilename()
+        itempath = self.playlist()[pos].getfilename()
 
         print "Item: %s" % (itempath)
         label = xbmc.getInfoLabel('ListItem.Path')
@@ -151,16 +159,19 @@ class MyPlayer(xbmc.Player):
                            res['songdetails']['comment'])
             node = getNode(Flag.TRACK, {'nid': m2.group(1)})
             node.pre_build_down(None, None,None, Flag.NONE)
-            setResolvedUrl(handle=1,
-                succeeded=True,
-                listitem=node.makeListItem())
+
+#    
+            self.play(node.get_streaming_url(), 
+                                          node.makeListItem(), True)
+            self.playlist().add(node.get_streaming_url(), node.makeListItem(), pos + 1)
+            self.playlist().remove(itempath)
+            setResolvedUrl(handle=qobuz.boot.handle,
+            succeeded=True,
+            listitem=node.makeListItem())
+            return True
+   
 #            super(MyPlayer, self).play(node.get_streaming_url(), 
 #                                          node.makeListItem(), False)
-            self.playlist.remove(itempath)
-            self.playlist.add(node.get_streaming_url(), node.makeListItem(), pos)
-   
-            super(MyPlayer, self).play(node.get_streaming_url(), 
-                                          node.makeListItem(), False)
 
 #        else:
 #            super(MyPlayer, self).play(itempath, 
@@ -168,7 +179,7 @@ class MyPlayer(xbmc.Player):
  
         #print m.group(1)
         #print "GetInfo %s" % (rpc.getSongDetails().result())
-        return True
+        #return super(MyPlayer, self).onQueueNextItem()
 
 class Monitor(xbmc.Monitor):
 
@@ -177,7 +188,7 @@ class Monitor(xbmc.Monitor):
         self.abortRequested = False
         self.garbage_refresh = 60 * 5
         self.last_garbage_on = time() - (self.garbage_refresh + 1)
-        self.Player = MyPlayer()
+#        self.Player = MyPlayer()
         
     def onAbortRequested(self):
         self.abortRequested = True
@@ -264,6 +275,7 @@ import pprint
 try:
     boot.bootstrap_app()
     monitor = Monitor(qobuz)
+    player = MyPlayer()
     alive = True
     while alive:
         alive = False
