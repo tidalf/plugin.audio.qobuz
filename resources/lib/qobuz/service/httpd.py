@@ -5,9 +5,10 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import re
 import sys
 import socket
-username = password = base_path = None
+username = password = base_path = stream_type = stream_format = None
 cache_duration_long = 60*60*24*365
 cache_duration_middle = 60*60*24*365
+stream_format = 5
 __image__ = ''
 
 def __xbmc_abort_requested ():
@@ -42,6 +43,11 @@ try:
         return xbmc.abortRequested
     xbmc_abort_requested = __abort_requested()
     print "XBMC INIT DONE"
+    stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
+    cache_durationm_middle = int(__addon__.
+                                 getSetting('cache_duration_middle')) * 60
+    cache_duration_long = int(__addon__.
+                              getSetting('cache_duration_long')) * 60
 except Exception as e:
     print "Raise %s" % (repr(e))
     #raise e
@@ -49,9 +55,14 @@ except Exception as e:
     password = 'YOUR_PASSWORD'
     base_path = 'CACHE_BASE_PATH'
 finally:
-    print "%s / %s (%s)" % (username, password, base_path)
+#    print "%s / *** (%s)" % (username, base_path)
     if not (username or password or base_path):
         raise Exception("Missing Mandatory Parameter")
+if stream_format == 6:
+    stream_mime = 'audio/flac'
+else:
+    stream_mime = 'audio/mpeg'
+    
 from node.track import Node_track
 from registry import QobuzRegistry
 from debug import log
@@ -61,7 +72,7 @@ qobuz.registry = QobuzRegistry(
                 username=username,
                 password=password,
                 basePath=base_path,
-                streamFormat=5, 
+                streamFormat=stream_format, 
                 hashKey=True,
                 cacheMiddle=cache_duration_middle,
                 cacheLong=cache_duration_long
@@ -138,6 +149,7 @@ class QobuzResponse:
     def has_audio_file_ext(self):
         if not self.fileExt:
             return False
+        return True
         if not (self.fileExt == '.mp3' or self.fileExt == '.flac'):
             return False
         return True
@@ -161,6 +173,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
                 streaming_url = node.get_streaming_url()
                 if not streaming_url:
                     raise RequestFailed()
+#                self.send_header('content-type', stream_mime)
                 self.send_response(303, "Resolved")
                 self.send_header('location', streaming_url)
                 self.end_headers()
@@ -187,7 +200,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             request = QobuzResponse(self)
             if request.type == 'track' and request.has_audio_file_ext():
                 self.send_response(200, "Ok ;)")
-                self.send_header('content-type', 'audio/flac')
+                self.send_header('content-type', stream_mime)
                 self.end_headers()
                 msg = 'OK %s %s' % (self.address_string(), self.path)
                 self.log_message(msg)
@@ -211,8 +224,9 @@ class QobuzHttpResolver(HTTPServer):
     def abort_requested(self):
         try:
             return xbmc_abort_requested()
-        except:
-            return False
+        except Exception as e:
+            print "Error: %s" % (repr(e))
+            return True
 
     def server_forever(self):
         if self.abort_requested():

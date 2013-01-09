@@ -54,7 +54,7 @@ class Node_track(INode):
 
     def make_url(self, **ka):
         if 'trackAsLocalURL' in ka and ka['trackAsLocalURL']:
-            return 'http://127.0.0.1:80/qobuz/track/%s.mp3' % (str(self.id))
+            return 'http://127.0.0.1:80/qobuz/track/%s.mkv' % (str(self.id))
         if not 'mode' in ka: 
             ka['mode'] = Mode.PLAY 
         return super(Node_track, self).make_url(**ka)
@@ -97,7 +97,6 @@ class Node_track(INode):
         image = self.get_property(['album/image/large', 'image/large', 
                                       'image/small',
                                       'image/thumbnail', 'image'])
-        print "Image: %s" % (image)
         if image:
             return image.replace('_230.', '_600.')
         if not self.parent:
@@ -252,7 +251,7 @@ class Node_track(INode):
         #    duration = 60
         # label = '[COLOR=FF555555]' + label + '[/COLOR]
         # [[COLOR=55FF0000]Sample[/COLOR]]'
-        print "MakeItem %s" % (self.get_image())
+#        print "MakeItem %s" % (self.get_image())
         mode = Mode.PLAY
         url = self.make_url(mode=mode)
         item = xbmcgui.ListItem(label,

@@ -100,8 +100,6 @@ class MyPlayer(xbmc.Player):
         return True
 
     def onPlayBackStarted(self):
-        print "PB START"
-        return False
         # workaroung bug, we are sometimes called multiple times.
         if self.trackId:
             if self.getProperty(keyTrackId) != self.trackId:
@@ -128,58 +126,46 @@ class MyPlayer(xbmc.Player):
         api.track_resportStreamingStart(nid)
         self.trackId = None
         return False
-    def onPlay(self, url, item, b):
-        print "starting playback"
-        
-    def onQueueNextItem(self):
-        return True
-        nid  = self.getProperty(keyTrackId) 
-        warn (self, "next item queued from monitor !!!!!!" + nid )
-        pos = self.playlist().getposition()
-        if pos == -1:
-            print "-1"
-            pos = len(self.playlist()) - 1
-        res = rpc.getInfoLabels(labels=['Container(50).Position','MusicPlayer.PlaylistPosition', 'MusicPlayer.PlaylistLength', 'ListItem.FileName']).result()
-        pos = res['Container(50).Position']
-        if not pos:
-            pos = len(self.playlist())
-        pos = int(pos) - 1
-        print "Position: %s" % (repr(pos))
-        itempath = self.playlist()[pos].getfilename()
 
-        print "Item: %s" % (itempath)
-        label = xbmc.getInfoLabel('ListItem.Path')
-        print "Label: %s" % (label)
-        import re
-        m = re.search('^musicdb://.*/(\d+)(\?.*)$', itempath)
-        if m:
-            res = rpc.getSongDetails(m.group(1)).result()
-            print "GetInfo %s" % (res)
-            m2 = re.search('"qobuz_track_id": "(\d+)"', 
-                           res['songdetails']['comment'])
-            node = getNode(Flag.TRACK, {'nid': m2.group(1)})
-            node.pre_build_down(None, None,None, Flag.NONE)
-
-#    
-            self.play(node.get_streaming_url(), 
-                                          node.makeListItem(), True)
-            self.playlist().add(node.get_streaming_url(), node.makeListItem(), pos + 1)
-            self.playlist().remove(itempath)
-            setResolvedUrl(handle=qobuz.boot.handle,
-            succeeded=True,
-            listitem=node.makeListItem())
-            return True
-   
-#            super(MyPlayer, self).play(node.get_streaming_url(), 
-#                                          node.makeListItem(), False)
-
-#        else:
-#            super(MyPlayer, self).play(itempath, 
-#                                          xbmcgui.ListItem(itempath), True)
- 
-        #print m.group(1)
-        #print "GetInfo %s" % (rpc.getSongDetails().result())
-        #return super(MyPlayer, self).onQueueNextItem()
+#    def onQueueNextItem(self):
+#        return True
+#        nid  = self.getProperty(keyTrackId) 
+#        warn (self, "next item queued from monitor !!!!!!" + nid )
+#        pos = self.playlist().getposition()
+#        if pos == -1:
+#            print "-1"
+#            pos = len(self.playlist()) - 1
+#        res = rpc.getInfoLabels(labels=['Container(50).Position','MusicPlayer.PlaylistPosition', 'MusicPlayer.PlaylistLength', 'ListItem.FileName']).result()
+#        pos = res['Container(50).Position']
+#        if not pos:
+#            pos = len(self.playlist())
+#        pos = int(pos) - 1
+#        print "Position: %s" % (repr(pos))
+#        itempath = self.playlist()[pos].getfilename()
+#
+#        print "Item: %s" % (itempath)
+#        label = xbmc.getInfoLabel('ListItem.Path')
+#        print "Label: %s" % (label)
+#        import re
+#        m = re.search('^musicdb://.*/(\d+)(\?.*)$', itempath)
+#        if m:
+#            res = rpc.getSongDetails(m.group(1)).result()
+#            print "GetInfo %s" % (res)
+#            m2 = re.search('"qobuz_track_id": "(\d+)"', 
+#                           res['songdetails']['comment'])
+#            node = getNode(Flag.TRACK, {'nid': m2.group(1)})
+#            node.pre_build_down(None, None,None, Flag.NONE)
+#            self.play(node.get_streaming_url(), 
+#                                          node.makeListItem(), True)
+#            self.playlist().add(node.get_streaming_url(), node.makeListItem(), pos + 1)
+#            self.playlist().remove(itempath)
+#            setResolvedUrl(handle=qobuz.boot.handle,
+#            succeeded=True,
+#            listitem=node.makeListItem())
+#            return True
+#        print m.group(1)
+#        print "GetInfo %s" % (rpc.getSongDetails().result())
+#        return super(MyPlayer, self).onQueueNextItem()
 
 class Monitor(xbmc.Monitor):
 
@@ -188,11 +174,9 @@ class Monitor(xbmc.Monitor):
         self.abortRequested = False
         self.garbage_refresh = 60 * 5
         self.last_garbage_on = time() - (self.garbage_refresh + 1)
-#        self.Player = MyPlayer()
-        
+
     def onAbortRequested(self):
         self.abortRequested = True
-        print "Abort requested"
 
     def is_garbage_time(self):
         if time() > (self.last_garbage_on + self.garbage_refresh):
@@ -226,7 +210,8 @@ class Monitor(xbmc.Monitor):
                     return False
                 finally:
                     f.close()
-            if not data or ((int(data['updatedOn']) + int(data['refresh'])) < time()):
+            if not data or ((int(data['updatedOn']) + 
+                            int(data['refresh'])) < time()):
                 log("QobuzCache", (
                     "Removing old file: %s") % (repr(fileName)))
                 try:
@@ -241,8 +226,9 @@ class Monitor(xbmc.Monitor):
             return True
         fu = FileUtil()
         fu.find(qobuz.path.cache, '^.*\.dat$', delete_one, gData)
-        log(self, "%s cached file(s) checked in %2.1s s" % (str(gData['count']), 
-            str(time() - timeStarted) ))
+        log(self, "%s cached file(s) checked in %2.1s s" 
+            % (str(gData['count']), 
+               str(time() - timeStarted) ))
         return True
 
     def cache_remove_user_data(self):
