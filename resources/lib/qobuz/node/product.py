@@ -14,8 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
-
 import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
@@ -42,8 +40,11 @@ class Node_product(INode):
         self.content_type = 'songs'
         self.is_special_purchase = False
         self.offset = None
-        self.imageDefaultSize = getSetting('image_default_size')
-
+        self.imageDefaultSize = 'large'
+        try:
+            self.imageDefaultSize = getSetting('image_default_size')
+        except:
+            pass
 
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
         data = None
@@ -67,13 +68,21 @@ class Node_product(INode):
             self.add_child(node)
         return len(self.data['tracks']['items'])
 
+    def make_url(self, **ka):
+        if 'asLocalURL' in ka and ka['asLocalURL']:
+            from constants import Mode
+            ka['mode'] = Mode.SCAN
+        return super(Node_product, self).make_url(**ka)
+    
     def makeListItem(self, replaceItems=False):
+        import xbmc, xbmcgui
         image = self.get_image()
+        thumb = xbmc.getCacheThumbName(image)
         item = xbmcgui.ListItem(
             label=self.get_label(),
             label2=self.get_label(),
-            iconImage=self.get_image(),
-            thumbnailImage=self.get_image(),
+            iconImage=image,
+            thumbnailImage=image,
             path=self.make_url(),
         )
         item.setInfo('music', infoLabels={

@@ -65,7 +65,7 @@ class Directory():
         self.content_type = 'files'
         self.nodes = nodeList
         self.replaceItems = False
-        self.trackAsLocalURL = False
+        self.asLocalURL = False
         log(self, "Handle: " + repr(self.handle))
 
     def __del__(self):
@@ -112,7 +112,9 @@ class Directory():
         item = node.makeListItem(replaceItems=self.replaceItems)
         if not item:
             return False
-        if not self.add_to_xbmc_directory(url=node.make_url(trackAsLocalURL=self.trackAsLocalURL),
+        url = node.make_url(asLocalURL=self.asLocalURL)
+        print "url: %s" % (url)
+        if not self.add_to_xbmc_directory(url=url,
                                 item=item,
                                 is_folder=node.is_folder):
             self.put_item_ok = False
@@ -172,6 +174,7 @@ class Directory():
                 item: xbmc.ListItem
                 is_folder: bool
         """
+        print "HANDLE: %s" % (repr(self.handle)) 
         if not xbmcplugin.addDirectoryItem(self.handle,
                                     ka['url'],
                                     ka['item'],

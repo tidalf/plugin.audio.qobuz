@@ -53,8 +53,13 @@ class Node_track(INode):
         return True
 
     def make_url(self, **ka):
-        if 'trackAsLocalURL' in ka and ka['trackAsLocalURL']:
-            return 'http://127.0.0.1:80/qobuz/track/%s.mkv' % (str(self.id))
+        if 'asLocalURL' in ka and ka['asLocalURL']:
+            import pprint
+            print pprint.pformat(self.data)
+            return 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mp3' % (
+                    str(self.get_artist_id()),
+                    str(self.parent.id),
+                    str(self.id))
         if not 'mode' in ka: 
             ka['mode'] = Mode.PLAY 
         return super(Node_track, self).make_url(**ka)
@@ -254,11 +259,14 @@ class Node_track(INode):
 #        print "MakeItem %s" % (self.get_image())
         mode = Mode.PLAY
         url = self.make_url(mode=mode)
+        image = self.get_image()
         item = xbmcgui.ListItem(label,
                                 label,
-                                str(self.get_image()),
-                                str(self.get_image()),
+                                image,
+                                image,
                                 url)
+        item.setIconImage(image)
+        item.setThumbnailImage(image)
         if not item:
             warn(self, "Cannot create xbmc list item")
             return None
@@ -276,6 +284,7 @@ class Node_track(INode):
         if description:
             comment += ' - ' + description
         item.setInfo(type='music', infoLabels={
+                     'count': self.id,
                      'title': self.get_title(),
                      'album': self.get_album(),
                      'genre': self.get_genre(),
@@ -283,7 +292,8 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': '"qobuz_track_id": "%s"' % (str(self.id))
+                     'comment': 'Qobuz Music Streaming',
+                     'lyrics': "Chant down babylon lalalala" 
                      })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)

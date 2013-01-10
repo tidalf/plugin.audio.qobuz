@@ -94,6 +94,7 @@ class QobuzXbmcRenderer(IRenderer):
         return Dir.end_of_directory()
 
     def scan(self):
+        import sys
         """Building tree when using Xbmc library scanning 
         feature
         """
@@ -105,9 +106,9 @@ class QobuzXbmcRenderer(IRenderer):
         handle = qobuz.boot.handle
         print "Handle: %s" % (handle)
         Dir = Directory(self.root, self.nodes, withProgress=False)
-        Dir.handle = handle
+        Dir.handle = int(sys.argv[1])
         Dir.asList = False
-        Dir.trackAsLocalURL = True
+        Dir.asLocalURL = True
         ret = self.root.build_down(Dir, self.depth, 
                                        self.whiteFlag, self.blackFlag)
         Dir.set_content(self.root.content_type)

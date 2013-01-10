@@ -458,8 +458,8 @@ class INode(object):
         menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
                  id='', pos = -5)
         ''' Favorite '''
-        url = self.make_url(type=Flag.FAVORITES, mode=Mode.VIEW, nm='')
-        menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
+#        url = self.make_url(type=Flag.FAVORITES, mode=Mode.VIEW, nm='')
+#        menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
         ''' System '''
 #        menu.add(path='system', label="System", cmd=containerRefresh(), pos=10)        
         ''' ARTIST '''
@@ -481,8 +481,9 @@ class INode(object):
                           cmd=containerUpdate(url))
         ''' FAVORITES '''
         
-        if self.parent and not (self.parent.type & Flag.FAVORITES):
+        if 1 or self.parent and not (self.parent.type & Flag.FAVORITES == Flag.FAVORITES):
             ''' ADD TO FAVORITES / TRACKS'''
+            print "Attach fav"
             url = self.make_url(type=Flag.FAVORITES, 
                                           nm='gui_add_tracks', 
                                           qid=self.id, 
