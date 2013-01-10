@@ -194,18 +194,15 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         w.close()
     
     def __GET_track(self, request):
-        node = Node_track(None, {'nid': request.id})
-        if request.subtype == 'file':
-            streaming_url = node.get_streaming_url()
-            if not streaming_url:
-                raise RequestFailed()
-            self.send_response(303, "Resolved")
-            self.send_header('content-type', stream_mime)
-            self.send_header('location', streaming_url)
-            self.end_headers()
-        else:
+        node = Node_track(None, {'nid': request.track_id})
+        streaming_url = node.get_streaming_url()
+        if not streaming_url:
             raise RequestFailed()
-            
+        self.send_response(303, "Resolved")
+        self.send_header('content-type', stream_mime)
+        self.send_header('location', streaming_url)
+        self.end_headers()
+
     def __GET_album_nfo(self, request):
         print "Serving album.nfo for %s" % (request.album_id)
         node = Node_product(None, {'nid': request.album_id})
@@ -227,6 +224,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.__write_dir(node)
         return True        
+    
     def do_GET(self):
         try:
             request = QobuzResponse(self)
