@@ -134,7 +134,7 @@ class QobuzLocalStorage(object):
             refresh = self._cache_duration['short']
         else:
             refresh = self.options['refresh']
-        log(self, "[Disk] Fresh for %ss" % ( repr(refresh)))
+        # log(self, "[Disk] Fresh for %ss" % ( repr(refresh)))
         mandatory = ['name', 'id']
         for key in mandatory:
             if not key in ka:
@@ -199,7 +199,7 @@ class QobuzLocalStorage(object):
             return self.data[key]
         if key in self.data:
             self.delete(**ka)
-        log(self, "[REMOTE] Loading: " + key)
+        # log(self, "[REMOTE] Loading: " + key)
         response = None
         # We are deleting name and id because we don't want to send them
         # to Qobuz
@@ -320,7 +320,7 @@ class QobuzCacheDefault(QobuzLocalStorage):
 
     def hook_pre_load(self, **ka):
         key = self.make_key(**ka)
-        log(self, "[DISK] Loading: " + key)
+        # log(self, "[DISK] Loading: " + key)
         cache = self._make_path(key)
         if not os.path.exists(cache):
             warn(self, "[DISK] Path doesn't exists: " + cache)
@@ -346,7 +346,7 @@ class QobuzCacheDefault(QobuzLocalStorage):
         if not key in self.data:
             raise QobuzXbmcError(
                 who=self, what='undefined_key', additional=key)
-        log(self, "[DISK] Saving: " + key)
+        # log(self, "[DISK] Saving: " + key)
         cache = self._make_path(key)
         with open(cache, 'wb') as f:
             s = pickle.dump(

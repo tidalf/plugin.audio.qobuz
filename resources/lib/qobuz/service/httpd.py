@@ -319,7 +319,7 @@ def main():
     server = None
     try:
         server = QobuzHttpResolver(('127.0.0.1', 33574), QobuzHttpResolver_Handler)
-        log(server, 'Starting...')
+        log(server, 'Qobuz http resolver Starting...')
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'
