@@ -21,7 +21,7 @@ from flag import NodeFlag as Flag
 from inode import INode
 from friend import Node_friend
 from debug import info, warn
-from gui.util import getImage, runPlugin, containerUpdate
+from gui.util import getImage, runPlugin, containerUpdate, lang
 
 '''
     @class Node_friend_list:
@@ -35,8 +35,8 @@ class Node_friend_list(INode):
         self.type = Flag.FRIEND_LIST
         self.name = self.get_parameter('name')
         self.image = getImage('artist')
-        self.label = str(self.name) + lang(41000) if (
-            self.name) else lang(41001)
+        self.label = str(self.name) + lang(41100) if (
+            self.name) else lang(41101)
         self.url = None
         self.is_folder = True
         self.content_type = 'artists'

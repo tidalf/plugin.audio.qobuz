@@ -21,7 +21,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from recommendation import Node_recommendation, RECOS_TYPE_IDS
-from gui.util import getImage, getSetting
+from gui.util import getImage, getSetting, lang
 
 '''
     @class Node_genre:

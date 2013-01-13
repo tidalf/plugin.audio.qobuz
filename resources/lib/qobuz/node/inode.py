@@ -570,10 +570,10 @@ class INode(object):
                             cmd=runPlugin(url),
                             label='scan')
         
-        url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='test_rpc')
-        menu.add(path='test/rpc', 
-                            cmd=runPlugin(url),
-                            label='Test RPC')
+        #url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='test_rpc')
+        #menu.add(path='test/rpc', 
+        #                    cmd=runPlugin(url),
+        #                    label='Test RPC')
         ''' ERASE CACHE '''
         colorItem = getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 

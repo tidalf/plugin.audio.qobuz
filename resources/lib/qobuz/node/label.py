@@ -23,7 +23,7 @@ import qobuz
 from flag import NodeFlag
 from inode import INode
 from debug import log, warn
-from gui.util import getImage, getSetting
+from gui.util import getImage, getSetting, lang
 
 '''
     @class Node_label:

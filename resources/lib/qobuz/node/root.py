@@ -61,8 +61,8 @@ class Node_root(INode):
             self.add_child(search)
         self.add_child(Node_friend_list())
         self.add_child(Node_genre())
-        self.add_child(Node_label())
-        self.add_child(Node_article_rubrics())
+        #self.add_child(Node_label())
+        #self.add_child(Node_article_rubrics())
         return True
 
     def cache_remove(self):

@@ -210,9 +210,9 @@
     <string id="41003">Qobuz stream mp3 and FLAC</string>
     
     <!-- Friends -->
-	<string id="41000">'s Friends</string>
-    <string id="41001">Friends</string>
-    <string id="41002">Add Friend</string>
+	<string id="41100">'s Friends</string>
+    <string id="41101">Friends</string>
+    <string id="41102">Add Friend</string>
     
     <!-- playlists -->
 	<string id="42000">Create Playlist</string>

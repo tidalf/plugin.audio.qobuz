@@ -24,7 +24,7 @@ from inode import INode
 from playlist import Node_playlist
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
-    containerUpdate, notifyH, executeBuiltin, getSetting
+    containerUpdate, notifyH, executeBuiltin, getSetting, lang
 from api import api
 '''
     @class Node_friend:
@@ -59,7 +59,7 @@ class Node_friend(INode):
         if not name:
             from gui.util import Keyboard
             kb = Keyboard(str(self.get_parameter('name')), 
-                          str(lang(41002)))
+                          str(lang(41102)))
             kb.doModal()
             name = ''
             if not kb.isConfirmed():
