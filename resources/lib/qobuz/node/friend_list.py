@@ -35,8 +35,8 @@ class Node_friend_list(INode):
         self.type = Flag.FRIEND_LIST
         self.name = self.get_parameter('name')
         self.image = getImage('artist')
-        self.label = str(self.name) + "'s Friends (i8n)" if (
-            self.name) else "Friends (i8n)"
+        self.label = str(self.name) + lang(41000) if (
+            self.name) else lang(41001)
         self.url = None
         self.is_folder = True
         self.content_type = 'artists'

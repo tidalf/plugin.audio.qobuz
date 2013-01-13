@@ -35,7 +35,7 @@ class Node_label(INode):
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_label, self).__init__(parent, parameters)
         self.type = NodeFlag.LABEL
-        self.set_label('Label (i8n)')
+        self.set_label(lang(42100))
         self.url = None
         self.is_folder = True
         self.image = getImage('album')

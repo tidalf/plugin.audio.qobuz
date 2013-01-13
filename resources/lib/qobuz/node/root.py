@@ -69,14 +69,13 @@ class Node_root(INode):
         # ERASE CACHE
         from gui.util import yesno, notifyH, getImage
         from debug import log
-        if not yesno('Remove cached data', 'Do you really want to erase all cached data'):
+        if not yesno(lang(31102), lang(31103)):
             log(self, "Deleting cached data aborted")
             return False
         if qobuz.registry.delete_by_name('^.*\.dat$'):
-            notifyH('Qobuz cache (i8n)', 'All cached data removed')
+            notifyH(lang(31100), lang(31104))
         else:
-            notifyH('Qobuz cache (i8n)',
-                    'Something went wrong while erasing cached data',
+            notifyH(lang(31100), lang(31101),
                     getImage('icon-error-256'))
         return True
 

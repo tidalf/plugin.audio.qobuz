@@ -342,7 +342,7 @@ class Node_playlist(INode):
         qobuz.registry.get(name='user')
         if not query:
             from gui.util import Keyboard
-            k = Keyboard('', 'Create Playlist (i8n)')
+            k = Keyboard('', lang(42000))
             k.doModal()
             if not k.isConfirmed():
                 warn(self, 'Creating playlist aborted')
@@ -392,13 +392,13 @@ class Node_playlist(INode):
             res = api.playlist_unsubscribe(playlist_id=ID)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(ID))
-            notifyH('Qobuz remove playlist (i8n)', 'Cannot remove playlist ' +
+            notifyH(lang(42001), lang(42004) +
                     name, getImage('icon-error-256'))
             return False
         self.delete_cache(ID)
         if cpl and cpl['data'] == ID:
             qobuz.registry.delete(name=registryCplID)
-        notifyH('Qobuz playlist removed(i8n)', "Playlist %s removed" % (name))
+        notifyH(lang(42001), (lang(42002) + "%s" + lang(42003)) % (name))
         url = self.make_url(type=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
                             nid='', nt='')
         executeBuiltin(containerUpdate(url, True))
@@ -408,7 +408,7 @@ class Node_playlist(INode):
         ID = self.id
         if api.playlist_subscribe(playlist_id=ID):
             from gui.util import notifyH, isFreeAccount, lang
-            notifyH("Qobuz subscribed", "(i8n) playlist subscribed")
+            notifyH(lang(42001), lang(42005))
             qobuz.registry.delete(name='user-playlists')
             return True
         else:

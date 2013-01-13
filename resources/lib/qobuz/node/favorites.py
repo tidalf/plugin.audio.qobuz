@@ -34,7 +34,7 @@ from track import Node_track
 '''
 
 registryKey = 'user-favorites'
-dialogHeading = 'Qobuz favorite (i8n)'
+dialogHeading = lang(30081)
 
 class Node_favorites(INode):
 
@@ -85,9 +85,9 @@ class Node_favorites(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_albums(qnt, qid)
         if len(nodes) == 0:
-            notifyH(dialogHeading, 'Nothing to add (i8n)')
+            notifyH(dialogHeading, lang(36004))
             return False
-        ret = xbmcgui.Dialog().select('Add albums to favorites? (i8n)', [
+        ret = xbmcgui.Dialog().select(lang(36004), [
            node.get_label() for node in nodes                              
         ])
         if ret == -1:
@@ -159,7 +159,7 @@ class Node_favorites(INode):
         if len(nodes) == 0:
             notifyH(dialogHeading, 'Nothing to add')
             return False
-        ret = xbmcgui.Dialog().select('Add this tracks to favorites? (i8n)', [
+        ret = xbmcgui.Dialog().select(lang(36006), [
            node.get_label() for node in nodes                              
         ])
         if ret == -1:

@@ -247,7 +247,7 @@ class Monitor(xbmc.Monitor):
             executeBuiltin(containerRefresh())
         except:
             warn(self, "Error while removing cached data")
-            notifyH('Qobuz (i8n)',
+            notifyH('Qobuz',
                     'Failed to remove user data', getImage('icon-error-256'))
             return False
         return True
