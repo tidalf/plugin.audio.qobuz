@@ -159,7 +159,7 @@ class QobuzResponse:
         if not m.group(2):
             self.fileWanted = 'dir'
             return True
-        m = re.search('^(\d+)\.(mp3|mkv|flac)', m.group(2))
+        m = re.search('^(\d+)\.(mp3|mpc|flac)', m.group(2))
         if not m:
             return False
         self.track_id = m.group(1)
@@ -190,7 +190,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         for track in node.data['tracks']['items']:
             ntrack = Node_track(node)
             ntrack.data = track
-            w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.mkv<br>\n')
+            w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.flac<br>\n')
         w.close()
     
     def __GET_track(self, request):
