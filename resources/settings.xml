@@ -65,8 +65,7 @@
 		<setting id="contextmenu_replaceitems" label="Only qobuz context menu" type="bool" default="false" />
 <!-- 		<setting id="userplaylists_display_cover" label="(i8n) Playlist - show cover"
 			type="bool" default="true" /> -->
-		  <setting id="show_recommendations" type="bool" default="false"
-        option="" />
+		  <setting id="show_recommendations" type="bool" default="true" label="42200" option="" />
 	</category>
 	<setting id="warn_free_account" type="bool" default="true"
 		option="hidden" />

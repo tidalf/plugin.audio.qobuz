@@ -174,6 +174,7 @@
     <string id="38003">Autre</string>
     <string id="38004">Montrer les recommandations</string>
     <string id="38005">Activer la fonction scan (experimental)</string>
+    <string id="38006">Nombre d'items par page</string>
 
     <!-- Context Menu -->
     <string id="39000">Cet album</string>
@@ -211,4 +212,8 @@
     <!-- nodes -->
     <string id="42100">Label</string>
 	<string id="42101">Genre</string>
+	
+	<!-- options -->                                 
+	<string id="42200">Afficher les recommandations</string> 
+	
 </strings>
