@@ -190,7 +190,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         for track in node.data['tracks']['items']:
             ntrack = Node_track(node)
             ntrack.data = track
-            w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.mp3<br>\n')
+            w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.mkv<br>\n')
         w.close()
     
     def __GET_track(self, request):
