@@ -108,15 +108,15 @@
     <string id="30100">Show Purchases</string>
     <string id="30101">Show News</string>
     <string id="30102">Most featured</string>
-    <string id="30200">Rap / HipHop / R&amp;B / Soul</string>
+    <string id="30200">Rap / HipHop / RB / Soul</string>
     <string id="30201">Childs / Karakoke / Ambiance</string>
     <string id="30202">Techno</string>
     <string id="30203">Reggae</string>
 
-    <!-- AddonSetting: Cache-->
+    <!-- Cache Addon Menu -->
     <string id="31000">Time in minute for various Qobuz data to be held in&#10;		cache[CR][I]- Set to zero to disable caching[/I]</string>
-    <string id="31001">Cache duration long</string>
-    <string id="31002">Cache duration normal</string>
+    <string id="31001">Album cache duration</string>
+    <string id="31002">Artist cache duration</string>
     <string id="31003">Track cache duration</string>
     <string id="31004">Recommendation cache duration</string>
     <string id="31005">User playlist cache duration</string>
@@ -138,12 +138,11 @@
     <string id="33000">Resolver enable</string>
 
     <!-- Color -->
-    <string id="33101">Display</string>
-    <string id="33102">Color normal </string>
-    <string id="33103">Color warning</string>
-    <string id="33104">Color normal / section</string>
-    <string id="33105">Format string section</string>
-    
+    <string id="33101">Colors</string>
+    <string id="33102">Context menu items color</string>
+    <string id="33103">Context menu items warning color</string>
+    <string id="33104">Playlist items color</string>
+
     <!-- Qobuz Player -->
     <string id="34000">Qobuz Player</string>
     <string id="34001">Playing song</string>
@@ -165,29 +164,27 @@
     <string id="37000">Username</string>
     <string id="37001">Password</string>
 
-    <!-- Addon / Settings -->
+    <!-- Sort -->
     <string id="38000">User credentials</string>
-    <string id="38001">Options</string>
+    <string id="38001">Stream</string>
     <string id="38002">Search limit</string>
     <string id="38003">Other</string>
     <string id="38004">Show recommandations items</string>
     <string id="38005">Enable scan feature (experimental)</string>
-    <string id="38006">Pagination limit</string>
-    
+
     <!-- Context Menu -->
     <string id="39000">This album</string>
     <string id="39001">All albums</string>
-    <string id="39002">Big directory</string>
+    <string id="39002">View big directory</string>
     <string id="39003">Scan</string>
     <string id="39004">Similar artist</string>
-    <string id="39005">Add to current</string>
+    <string id="39005">Add to current playlist</string>
     <string id="39006">Show playlists</string>
     <string id="39007">Set as current</string>
     <string id="39008">Create</string>
     <string id="39009">Rename</string>
     <string id="39010">Remove</string>
-    <string id="39011">Add</string>
-    <string id="39012">Subscribe</string>
+    <string id="39011">Add to favorites</string>
 
     <!-- Progress bar -->
     <string id="40000">Starting</string>
