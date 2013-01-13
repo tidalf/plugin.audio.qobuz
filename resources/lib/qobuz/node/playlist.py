@@ -186,6 +186,7 @@ class Node_playlist(INode):
         self.delete_cache(self.id)
         print "Error API: %s (%s)" % (api.error, api.status_code)
         notifyH(dialogHeading, 'Track removed from playlist')
+        executeBuiltin(containerRefresh())
         return True
     
     def gui_add_to_current(self):

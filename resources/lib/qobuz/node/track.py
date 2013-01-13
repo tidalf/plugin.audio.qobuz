@@ -308,7 +308,7 @@ class Node_track(INode):
         if self.parent and (self.parent.type & Flag.PLAYLIST == Flag.PLAYLIST):
             url = self.parent.make_url(type=Flag.PLAYLIST,
                 id=self.parent.id,
-                qid=self.id,
+                qid=self.get_playlist_track_id(),
                 nm='gui_remove_track',
                 mode=Mode.VIEW)
             print "URL %s" % (url)
