@@ -75,7 +75,8 @@ class Node_friend_list(INode):
         # and add them to the directory
         for name in friend_list:
             node = Node_friend(None, {'name': str(name)})
-            self.add_child(node)
+            if name != self.name:
+                self.add_child(node)
 
     def attach_context_menu(self, item, menu):
         label = self.get_label()
