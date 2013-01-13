@@ -85,7 +85,7 @@ class Node_product_by_artist(INode):
                 except:
                     warn(self, "Strange thing happen")
                     pass
-            print pprint.pformat(album)
+            # print pprint.pformat(album)
             node = Node_product()
             node.data = album
             count += 1

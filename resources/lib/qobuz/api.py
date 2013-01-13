@@ -123,7 +123,7 @@ class __API__:
         _copy_params = copy.deepcopy(params)
         if 'password' in _copy_params:
             _copy_params['password'] = '***'
-        info(self, "Request: %s %s [%s]" % (url, pprint.pformat(_copy_params), pprint.pformat(headers)))
+        # info(self, "Request: %s %s [%s]" % (url, pprint.pformat(_copy_params), pprint.pformat(headers)))
         """ END / DEBUG """
         r = None
         try:
@@ -134,7 +134,7 @@ class __API__:
             return None
         self.status_code = r.status_code
         _api_error_string('azdazdaz', 'azdazdza')
-        print "Code %s" % r.status_code
+        # print "Code %s" % r.status_code
         if int(r.status_code) != 200:
             if r.status_code == 400:
                 self.error = "Bad request"
@@ -266,7 +266,7 @@ class __API__:
         # of the General Terms and Conditions
         # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {'user_id': self.user_id, 'track_id': track_id}
-        warn(self, pprint.pformat(params))
+        # warn(self, pprint.pformat(params))
         return self._api_request(params, '/track/reportStreamingStart')
 
     def track_resportStreamingEnd(self, track_id, duration):

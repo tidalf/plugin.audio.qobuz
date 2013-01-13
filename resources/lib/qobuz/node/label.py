@@ -53,7 +53,7 @@ class Node_label(INode):
         if not data:
             warn(self, "No label data")
             return False
-        print pprint.pformat(data)
+        # print pprint.pformat(data)
         for item in data['data']['labels']['items']:
             node = Node_label()
             node.data = item

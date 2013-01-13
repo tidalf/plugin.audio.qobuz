@@ -25,7 +25,7 @@ from friend_list import Node_friend_list
 from genre import Node_genre
 from label import Node_label
 from article_rubrics import Node_article_rubrics
-from gui.util import getSetting, executeBuiltin
+from gui.util import getSetting, executeBuiltin, lang
 import qobuz
 
 
@@ -90,10 +90,10 @@ class Node_root(INode):
         str = "musicdb://9/2012/2/3?year=2012"
         import re
         m = re.search('^musicdb://.*/(\d+)\?.*$', str)
-        print m.group(1)
+        # print m.group(1)
 
         res = rpc.getSongDetails(kb.getText())
-        print pprint.pformat(res.result())
+        # print pprint.pformat(res.result())
         return True
         
     def gui_scan(self):

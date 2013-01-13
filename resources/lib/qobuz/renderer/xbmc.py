@@ -104,7 +104,7 @@ class QobuzXbmcRenderer(IRenderer):
                 self.node_type)))
             return False
         handle = qobuz.boot.handle
-        print "Handle: %s" % (handle)
+        # print "Handle: %s" % (handle)
         Dir = Directory(self.root, self.nodes, withProgress=False)
         Dir.handle = int(sys.argv[1])
         Dir.asList = False

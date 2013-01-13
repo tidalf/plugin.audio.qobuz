@@ -109,7 +109,7 @@ class Node_friend(INode):
         friends = friends['friends']
         if not name in friends:
             import pprint
-            pprint.pprint(friends)
+            # pprint.pprint(friends)
             notifyH('Qobuz', "You're not friend with %s" % (name), 
                     'icon-error-256')
             warn(self, "Friend " + repr(name) + " not in friends data")

@@ -113,7 +113,7 @@ class Directory():
         if not item:
             return False
         url = node.make_url(asLocalURL=self.asLocalURL)
-        print "url: %s" % (url)
+        # print "url: %s" % (url)
         if not self.add_to_xbmc_directory(url=url,
                                 item=item,
                                 is_folder=node.is_folder):
@@ -174,7 +174,7 @@ class Directory():
                 item: xbmc.ListItem
                 is_folder: bool
         """
-        print "HANDLE: %s" % (repr(self.handle)) 
+        # print "HANDLE: %s" % (repr(self.handle)) 
         if not xbmcplugin.addDirectoryItem(self.handle,
                                     ka['url'],
                                     ka['item'],

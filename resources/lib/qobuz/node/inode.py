@@ -483,7 +483,7 @@ class INode(object):
         
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             ''' ADD TO FAVORITES / TRACKS'''
-            print "Attach fav"
+            # print "Attach fav"
             url = self.make_url(type=Flag.FAVORITES, 
                                           nm='gui_add_tracks', 
                                           qid=self.id, 

@@ -169,9 +169,9 @@ class QobuzBootstrap(object):
     def dispatch(self):
         """Routing based on parameters
         """
-        info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
-              Flag.to_s(int(self.params['nt']))))
-        info(self, "Parameters:\n %s" % (pprint.pformat(self.params) ))
+        #info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
+        #      Flag.to_s(int(self.params['nt']))))
+        # info(self, "Parameters:\n %s" % (pprint.pformat(self.params) ))
          
         if self.MODE == Mode.PLAY:
             from player import QobuzPlayer

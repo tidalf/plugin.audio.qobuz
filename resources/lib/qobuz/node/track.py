@@ -311,7 +311,7 @@ class Node_track(INode):
                 qid=self.get_playlist_track_id(),
                 nm='gui_remove_track',
                 mode=Mode.VIEW)
-            print "URL %s" % (url)
+            # print "URL %s" % (url)
             menu.add(path='playlist/remove', 
                      label=lang(30073),
                      cmd=runPlugin(url))
