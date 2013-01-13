@@ -481,7 +481,7 @@ class INode(object):
                           cmd=containerUpdate(url))
         ''' FAVORITES '''
         
-        if 1 or self.parent and not (self.parent.type & Flag.FAVORITES == Flag.FAVORITES):
+        if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             ''' ADD TO FAVORITES / TRACKS'''
             print "Attach fav"
             url = self.make_url(type=Flag.FAVORITES, 
@@ -489,6 +489,7 @@ class INode(object):
                                           qid=self.id, 
                                           qnt=self.type, 
                                           mode=Mode.VIEW)
+            menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True),pos=-9)   
             menu.add(path='favorites/add_tracks', 
                           label=lang(39011) + ' tracks', cmd=runPlugin(url))
             ''' ADD TO FAVORITES / Albums'''
