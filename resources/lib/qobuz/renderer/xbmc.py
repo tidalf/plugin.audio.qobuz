@@ -64,8 +64,8 @@ class QobuzXbmcRenderer(IRenderer):
                         withProgress=self.enable_progress)
         Dir.asList = self.asList
         Dir.handle = qobuz.boot.handle
-        if getSetting('contextmenu_replaceitem', isBool=True):
-            Dir.replaceItems = False
+        if getSetting('contextmenu_replaceitems', isBool=True):
+            Dir.replaceItems = True
         try:
             ret = self.root.build_down(Dir, self.depth, 
                                        self.whiteFlag, self.blackFlag)

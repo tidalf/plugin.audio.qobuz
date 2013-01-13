@@ -20,8 +20,6 @@
 	<category label="38001">
 		<setting id="streamtype" label="32000" type="labelenum"
 			values="flac|mp3" default="flac" />
-		<setting id="search_enabled" label="35000" type="bool"
-			default="true" />
 		<setting id="pagination_limit" type="labelenum" label="38006"
 			default="100" values="6|12|25|50|100|500|1000|5000|10000" />
 		<setting type="sep" />
@@ -41,8 +39,8 @@
 	<!-- <category label="36002"> </category> -->
 
 	<!-- Display -->
-	<category label="33101">
-<!-- 		<setting id="color_item" label="33102" type="text" default="FF59A9C5" />
+	<!-- <category label="33101">
+ 		<setting id="color_item" label="33102" type="text" default="FF59A9C5" />
 		<setting id="color_item_caution" label="33103" type="text"
 			default="FFFF0000" />
 		<setting id="item_section_color" label="33104"
@@ -50,22 +48,22 @@
 		<setting id="item_section_format" label="33105"
 			type="text" default=".o[ %s ]o." />
 		<setting id="view_navigation" label="View navigation"
-            type="text" default="bigicon" /> -->
-	</category>
+            type="text" default="bigicon" /> 
+	</category> -->
 	
 	<!-- Other -->
 	<category label="38003">
 		<!-- <setting id="show_recommendations" label="38004" type="bool" default="true" 
 			/> -->
-		<setting id="enable_scan_feature" label="38005" type="bool"
-			default="false" />
+		<setting id="enable_scan_feature" label="38005" type="bool" default="false" />
 		<!-- <setting id="resolver_enabled" label="33000" type="bool" default="true" 
 			/> -->
 		<setting id="debug" label="Debug" type="bool" default="false" />
 		<setting id="contextmenu_replaceitems" label="Only qobuz context menu" type="bool" default="false" />
 <!-- 		<setting id="userplaylists_display_cover" label="(i8n) Playlist - show cover"
 			type="bool" default="true" /> -->
-		  <setting id="show_recommendations" type="bool" default="true" label="42200" option="" />
+		<setting id="show_recommendations" type="bool" default="true" label="42200" option="" />
+		<setting id="search_enabled" label="35000" type="bool" default="true" />
 	</category>
 	<setting id="warn_free_account" type="bool" default="true"
 		option="hidden" />
