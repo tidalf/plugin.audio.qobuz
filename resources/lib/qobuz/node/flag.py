@@ -18,14 +18,6 @@
 from exception import QobuzXbmcError
 from debug import warn
 
-class _ContainerView_():
-    def __init__(self):
-        self.NAVIGATION = 1
-        self.MEDIA = 2
-
-Eview = _ContainerView_()
-
-
 class __NodeFlag():
     def __init__(self):
         self.NODE = 1 << 1
@@ -110,19 +102,3 @@ class __NodeFlag():
                 who=self, what='invalid_flag', additional=repr(flag))
             
 NodeFlag = __NodeFlag()
-
-if __name__ == '__main__':
-    Flag = NodeFlag
-    print 'Testing Flags'
-    flag = Flag.ALL
-    if flag & Flag.FRIEND == Flag.FRIEND:
-        print "Friend set"
-    if flag & Flag.PLAYLIST == Flag.PLAYLIST:
-        print "Playlist is set"
-    flag = flag ^ Flag.PLAYLIST
-    if flag & Flag.PLAYLIST == Flag.PLAYLIST:
-        print "Playlist is set"
-    else:
-        print "Playlist is not set (2)"
-    if flag & Flag.FRIEND == Flag.FRIEND:
-        print "Friend set"

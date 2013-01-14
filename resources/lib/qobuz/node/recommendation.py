@@ -56,11 +56,9 @@ RECOS_GENRES = {
     'null': 'All',
 }
 
-'''
-    @class Node_recommendation:
-'''
 class Node_recommendation(INode):
-
+    '''Recommendation node, displaying music ordered by category and genre
+    '''
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
         self.type = Flag.RECOMMENDATION
@@ -100,8 +98,9 @@ class Node_recommendation(INode):
         self.data = data['data']
         return True
     
-# TYPE
-    def _build_recos_type(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
+        ''' Populate type, we don't have genre_type nor genre_id
+        '''
         for gid in RECOS_TYPE_IDS:
             node = Node_recommendation()
             node.genre_type = gid
@@ -110,8 +109,9 @@ class Node_recommendation(INode):
             self.add_child(node)
         return True
 
-# GENRE
-    def _build_recos_genre(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_genre(self, Dir, lvl, whiteFlag, blackFlag):
+        '''Populate genre, we have genre_type but no genre_id
+        '''
         for genre_id in RECOS_GENRES:
             node = Node_recommendation()
             node.genre_type = self.genre_type
@@ -123,8 +123,9 @@ class Node_recommendation(INode):
             self.add_child(node)
         return True
 
-# TYPE GENRE
-    def _build_down_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
+        '''Populate album selected by genre_type and genre_id
+        '''
         if not self.data:
             return False
         for product in self.data['albums']['items']:
@@ -133,12 +134,13 @@ class Node_recommendation(INode):
             self.add_child(node)
         return True
 
-# DISPATCH
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        '''We are populating our node based on genre_type and genre_id
+        '''
         if not self.genre_type:
-            return self._build_recos_type(Dir, lvl, whiteFlag, blackFlag)
+            return self.__populate_type(Dir, lvl, whiteFlag, blackFlag)
         elif not self.genre_id:
-            return self._build_recos_genre(Dir, lvl, whiteFlag, blackFlag)
+            return self.__populate_genre(Dir, lvl, whiteFlag, blackFlag)
         self.content_type = 'albums'
-        return self._build_down_type_genre(Dir, lvl, whiteFlag, blackFlag)
+        return self.__populate_type_genre(Dir, lvl, whiteFlag, blackFlag)
 

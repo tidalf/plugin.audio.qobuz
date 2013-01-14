@@ -23,11 +23,9 @@ from gui.util import lang, getImage, getSetting
 from product import Node_product
 from track import Node_track
 
-"""
-    @class Node_purchase: 
-"""
 class Node_purchases(INode):
-
+    '''Displaying product purchased by user (track and album)
+    '''
     def __init__(self, parent=None, params=None):
         super(Node_purchases, self).__init__(parent, params)
         self.label = lang(30100)
@@ -48,18 +46,18 @@ class Node_purchases(INode):
         
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         if 'albums' in self.data:
-            self._build_down_albums(Dir, lvl, whiteFlag, blackFlag)
+            self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
         elif 'tracks' in self.data:
-            self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
+            self.__populate_tracks(Dir, lvl, whiteFlag, blackFlag)
 
-    def _build_down_albums(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
             node = Node_product()
             node.data = album
             self.add_child(node)
         return list
     
-    def _build_down_tracks(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
             node.data = track

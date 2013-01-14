@@ -29,15 +29,12 @@ from api import api
 from exception import QobuzXbmcError as Qerror
 from track import Node_track
 
-'''
-    @class Node_favorites:
-'''
-
 registryKey = 'user-favorites'
 dialogHeading = lang(30081)
 
 class Node_favorites(INode):
-
+    '''Displaying user favorites (track and album)
+    '''
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_favorites, self).__init__(parent, parameters)
         self.type = Flag.FAVORITES
@@ -60,18 +57,18 @@ class Node_favorites(INode):
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         if 'albums' in self.data:
-            self._build_down_albums(Dir, lvl, whiteFlag, blackFlag)
+            self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
         if 'tracks' in self.data:
-            self._build_down_tracks(Dir, lvl, whiteFlag, blackFlag)
+            self.__populate_tracks(Dir, lvl, whiteFlag, blackFlag)
         return True
 
-    def _build_down_tracks(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
             node.data = track
             self.add_child(node)
 
-    def _build_down_albums(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
             node = Node_product()
             node.data = album

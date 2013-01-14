@@ -23,18 +23,12 @@ from favorites import Node_favorites
 from purchases import Node_purchases
 from friend_list import Node_friend_list
 from genre import Node_genre
-from gui.util import getSetting, executeBuiltin, lang, runPlugin
-from constants import Mode
+from gui.util import getSetting, executeBuiltin, lang
 import qobuz
 
-
-'''
-    @class Node_root:
-'''
-
-
 class Node_root(INode):
-
+    '''Our root node, we are displaying all qobuz nodes from here
+    '''
     def __init__(self, parent=None, parameters=None):
         super(Node_root, self).__init__(parent, parameters)
         self.type = Flag.ROOT
@@ -62,7 +56,8 @@ class Node_root(INode):
         return True
 
     def cache_remove(self):
-        # ERASE CACHE
+        '''GUI/Removing all cached data
+        '''
         from gui.util import yesno, notifyH, getImage
         from debug import log
         if not yesno(lang(31102), lang(31103)):
@@ -76,6 +71,8 @@ class Node_root(INode):
         return True
 
     def gui_scan(self):
+        '''Scanning directory specified in query parameter
+        '''
         query = self.get_parameter('query', unQuote=True)
         query+='&handle=%s' % (str(qobuz.boot.handle))
         print "Scanning folder: %s" % (query)

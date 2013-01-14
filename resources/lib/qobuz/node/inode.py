@@ -20,7 +20,7 @@ import weakref
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag as Flag, Eview
+from flag import NodeFlag as Flag
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, \
     getSetting
@@ -29,12 +29,22 @@ from gui.contextmenu import contextMenu
 from util import getNode
 from renderer import renderer
 import urllib
-'''
-    @class Inode:
-'''
+from time import time
 
 class INode(object):
-
+    '''Our base node, every node must inherit or mimic is behaviour
+        Parameters:
+            parent: object, does this node have a parent
+            parameters: dictionary, system argument parsed as dictionary
+        
+        Calling build_down on a node start the building process
+            - pre_build_down: Retrieve data (disk, internet...) and store
+                result in self.data
+            - _build_down: If pre_build_down return true, parse data
+                and populate our node with child
+        The main buil_down method is responsible for the logic flow (recursive,
+            depth, whiteFlag, blackFlag...)
+    '''
     def __init__(self, parent=None, parameters=None):
         self.data = None
         self.parameters = parameters or {}
@@ -47,7 +57,6 @@ class INode(object):
         self.label = ''
         self.label2 = None
         self.is_folder = True
-        self.containerView = Eview.NAVIGATION
         self.pagination_next = None
         self.pagination_prev = None
         self.offset = None
@@ -239,13 +248,12 @@ class INode(object):
             return False
         del self.parameters[name]
         return True
-    
-    '''
-        Make url
-        This function is responsible to create the link to this node.
-        Class who implement custom parameter must overload this method
-    '''
+
     def make_url(self, **ka):
+        '''Generate URL to navigate between nodes
+            Nodes with custom parameters must override this method
+            @todo: Ugly need rewrite =]
+        '''
         if not 'mode' in ka:
             ka['mode'] = Mode.VIEW
         else:
@@ -339,7 +347,7 @@ class INode(object):
     def get_label2(self):
         return self.label2
 
-    
+
     def render_nodes(self, nt, parameters, lvl = 1, whiteFlag = Flag.ALL, 
                      blackFlag = Flag.TRACK &Flag.STOPBUILD):
         render = renderer(nt, parameters)
@@ -352,23 +360,18 @@ class INode(object):
     
     # When returning False we are not displaying directory content
     def pre_build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
+        '''This method fetch data from cache
+        '''
         return True
-    
-    '''
-        build_down:
-        This method fetch data from cache recursively and build our tree
-        Node without cached data don't need to overload this method
-    '''
 
     def build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None, gData=None):
         if Dir.Progress.iscanceled():
             print "Canceled..."
             return False
         if not gData:
-            gData = {
-                     'count': 0,
+            gData = {'count': 0,
                      'total': 100,
-            }
+                     'startedOn': time()}
         #Dir.update(gData, 'Working', '', '')
         if lvl != -1 and lvl < 1:
             return False
