@@ -157,7 +157,7 @@ class Node_favorites(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_tracks(qnt, qid)
         if len(nodes) == 0:
-            notifyH(dialogHeading, 'Nothing to add')
+            notifyH(dialogHeading, lang(3600))
             return False
         ret = xbmcgui.Dialog().select(lang(36006), [
            node.get_label() for node in nodes                              

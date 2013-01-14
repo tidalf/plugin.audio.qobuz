@@ -73,6 +73,9 @@ class contextMenu():
                     colorItem = item['color']
                 label = '%s' % (color(colorItem, item['label']))
                 menuItems.append((label, item['cmd']))
+#        menuItems = []
+#        for i in range(0, 20):
+#            menuItems.append(('plop %s' % str(i), 'plop'))
 #        import pprint
 #        print pprint.pformat(menuItems)
         return menuItems

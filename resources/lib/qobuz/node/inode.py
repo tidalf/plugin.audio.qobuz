@@ -306,6 +306,7 @@ class INode(object):
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
+        item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
         return item
 
     def add_child(self, child):
@@ -495,15 +496,15 @@ class INode(object):
                      label='Remove %s' % (self.get_label()), 
                      cmd=runPlugin(url), color='red')
             
-        ''' PLAYLIST '''
-        cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
-                                    id='', mode=Mode.VIEW))
-        menu.add(path='playlist', 
-                          label="Playlist", cmd=cmd, mode=Mode.VIEW)
         wf = self.type & (~Flag.PLAYLIST & ~Flag.USERPLAYLISTS)
         if self.parent:
             wf = wf and self.parent.type & (~Flag.USERPLAYLISTS)
         if wf: 
+            ''' PLAYLIST '''
+            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
+                                    id='', mode=Mode.VIEW))
+            menu.add(path='playlist', pos = 1,
+                          label="Playlist", cmd=cmd, mode=Mode.VIEW)
 
             ''' ADD TO CURRENT PLAYLIST '''
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
@@ -556,10 +557,11 @@ class INode(object):
             menu.add(path='qobuz/scan', 
                             cmd=runPlugin(url),
                             label='scan')
-        ''' ERASE CACHE '''
-        colorItem = getSetting('color_item_caution')
-        cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
+        if self.type & (Flag.ALL & ~Flag.PRODUCT & ~Flag.TRACK):
+            ''' ERASE CACHE '''
+            colorItem = getSetting('color_item_caution')
+            cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
                                       mode=Mode.VIEW))
-        menu.add(path='qobuz/erase_cache', 
+            menu.add(path='qobuz/erase_cache', 
                           label=lang(31009), cmd=cmd, 
                           color=colorItem, pos=10)

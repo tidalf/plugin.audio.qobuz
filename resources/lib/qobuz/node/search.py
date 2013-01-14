@@ -94,7 +94,9 @@ class Node_search(INode):
             warn(self, "Search return no data")
             return False
         if data[stype]['total'] == 0:
-            return 0
+            return False
+        if not 'items' in data[stype]:
+            return False
         self.set_parameter('query', query, quote=True)
         self.data = data
         return True

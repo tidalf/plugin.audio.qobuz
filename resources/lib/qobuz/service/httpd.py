@@ -216,7 +216,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         if not node.pre_build_down(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
-        self.send_header('content-type', 'text/html')
+        self.send_header('content-type', 'x-directory/normal')
         self.end_headers()
         self.__write_dir(node)
         return True        
@@ -250,7 +250,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             request = QobuzResponse(self)
             if request.fileWanted == 'dir':
                 self.send_response(200, "Ok ;)")
-                self.send_header('content-type', 'text/html')
+                self.send_header('content-type', 'x-directory/normal')
                 self.end_headers()
                 return True
             if request.fileWanted == 'album.nfo':

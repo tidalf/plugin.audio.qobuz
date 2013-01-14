@@ -298,6 +298,7 @@ class Node_track(INode):
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
+#        item.setProperty('mimetype', 'audio/mpeg')
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)

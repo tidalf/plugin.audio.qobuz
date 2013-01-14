@@ -23,7 +23,8 @@ from favorites import Node_favorites
 from purchases import Node_purchases
 from friend_list import Node_friend_list
 from genre import Node_genre
-from gui.util import getSetting, executeBuiltin, lang
+from gui.util import getSetting, executeBuiltin, lang, runPlugin
+from constants import Mode
 import qobuz
 
 
