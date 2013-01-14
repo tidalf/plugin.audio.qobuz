@@ -55,7 +55,7 @@ class Node_track(INode):
     def make_url(self, **ka):
         if 'asLocalURL' in ka and ka['asLocalURL']:
             import pprint
-            print pprint.pformat(self.data)
+            # print pprint.pformat(self.data)
             return 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
                     str(self.get_artist_id()),
                     str(self.parent.id),
