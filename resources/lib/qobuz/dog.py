@@ -35,17 +35,17 @@ class dog():
             'view-filter': "^\d+$",
             'depth': "^(-)?\d+$",
             'query': "^.*$",
-            'action': "^(scan)$",
+#            'action': "^(scan)$",
             'track-id': "^\d{1,10}$",
             'name': "^[\w\d_.]+$",
             'parent-id': "^\d{1,10}$",
             'offset': "^\d{1,10}$",
-            'fakeExt': '^FakeFile\.flac$'
+#            'fakeExt': '^FakeFile\.flac$'
         }
 
     ''' Match value against regexp '''
     def kv_is_ok(self, key, value):
-        debug(self, key + ' - ' + value)
+#        debug(self, key + ' - ' + value)
         if key not in self.allowed_keys:
             return False
         match = None

@@ -1,5 +1,4 @@
 from exception import QobuzXbmcError as Qerror
-import pprint
 from gui.util import color
         
 class contextMenu():
@@ -84,7 +83,6 @@ if __name__ == '__main__':
     c.add(path='friends/titi', label='Titi', cmd='nop', pos = 1)
     c.add(path='friends/toto', label='Toto', cmd='nop', pos = 4)
     c.add(path='friends/plop', label='Plop', cmd='nop', pos = 0)
-    # pprint.pprint(c.data)
     c.getTuples()
     
         

@@ -14,8 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import pprint
-
 import xbmcgui
 import xbmc
 
@@ -53,7 +51,6 @@ class Node_label(INode):
         if not data:
             warn(self, "No label data")
             return False
-        # print pprint.pformat(data)
         for item in data['data']['labels']['items']:
             node = Node_label()
             node.data = item

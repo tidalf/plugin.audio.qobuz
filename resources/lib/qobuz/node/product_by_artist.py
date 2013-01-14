@@ -16,7 +16,6 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-import qobuz
 from flag import NodeFlag
 from inode import INode
 from product import Node_product
@@ -25,10 +24,10 @@ import weakref
 from api import api
 from gui.contextmenu import contextMenu
 from gui.util import getSetting
+
 '''
     @class Node_product_by_artist:
 '''
-
 
 class Node_product_by_artist(INode):
 
@@ -73,7 +72,6 @@ class Node_product_by_artist(INode):
         return True
     
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
-        import pprint
         count = 0
         total = len(self.data['albums']['items'])
         for album in self.data['albums']['items']:
@@ -85,7 +83,6 @@ class Node_product_by_artist(INode):
                 except:
                     warn(self, "Strange thing happen")
                     pass
-            # print pprint.pformat(album)
             node = Node_product()
             node.data = album
             count += 1

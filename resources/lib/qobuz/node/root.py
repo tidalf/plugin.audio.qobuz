@@ -23,8 +23,6 @@ from favorites import Node_favorites
 from purchases import Node_purchases
 from friend_list import Node_friend_list
 from genre import Node_genre
-from label import Node_label
-from article_rubrics import Node_article_rubrics
 from gui.util import getSetting, executeBuiltin, lang
 import qobuz
 
@@ -41,7 +39,6 @@ class Node_root(INode):
         self.type = Flag.ROOT
         self.content_type = 'files'
         self.label = "Qobuz"
-        # self.image = qobuz.image.access.get('default')
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(Node_user_playlists())
@@ -61,8 +58,6 @@ class Node_root(INode):
             self.add_child(search)
         self.add_child(Node_friend_list())
         self.add_child(Node_genre())
-        #self.add_child(Node_label())
-        #self.add_child(Node_article_rubrics())
         return True
 
     def cache_remove(self):
@@ -79,27 +74,8 @@ class Node_root(INode):
                     getImage('icon-error-256'))
         return True
 
-    def test_rpc(self):
-        from xbmcrpc import rpc
-        import xbmc
-        import pprint
-        kb = xbmc.Keyboard('0', 'heading')
-        kb.doModal()
-        if not kb.isConfirmed():
-            return False
-        str = "musicdb://9/2012/2/3?year=2012"
-        import re
-        m = re.search('^musicdb://.*/(\d+)\?.*$', str)
-        # print m.group(1)
-
-        res = rpc.getSongDetails(kb.getText())
-        # print pprint.pformat(res.result())
-        return True
-        
     def gui_scan(self):
         query = self.get_parameter('query', unQuote=True)
         query+='&handle=%s' % (str(qobuz.boot.handle))
         print "Scanning folder: %s" % (query)
         executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))
-        
-        

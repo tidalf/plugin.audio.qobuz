@@ -23,11 +23,9 @@ from inode import INode
 from artist import Node_artist
 from gui.util import lang, getSetting
 
-import pprint
 '''
     NODE ARTIST
 '''
-
 
 class Node_similar_artist(INode):
 

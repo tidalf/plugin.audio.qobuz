@@ -21,7 +21,6 @@ import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag
 from inode import INode
-from product import Node_product
 from debug import info, warn
 from exception import QobuzXbmcError
 from gui.util import notifyH, color, lang, getImage, runPlugin, \
@@ -29,7 +28,6 @@ from gui.util import notifyH, color, lang, getImage, runPlugin, \
 from util import  getNode
 from renderer import renderer
 from gui.contextmenu import contextMenu
-import pprint
 from api import api
 
 '''
@@ -365,7 +363,6 @@ class Node_playlist(INode):
     def gui_remove(self):
         import xbmcgui
         import xbmc
-        import pprint
         cpl = qobuz.registry.get(name=registryCplID)
         ID = int(self.get_parameter('nid'))
         login = getSetting('username')

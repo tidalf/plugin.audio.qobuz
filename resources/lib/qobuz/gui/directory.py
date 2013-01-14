@@ -72,7 +72,6 @@ class Directory():
         """Cleaning our tree on delete
             @attention: may be useless
         """
-        log(self, "Deleting tree..")
         try:
             for node in self.nodes:
                 node.delete_tree()

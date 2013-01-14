@@ -19,7 +19,7 @@ from constants import Mode
 from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
-from gui.util import color, lang, getImage, runPlugin
+from gui.util import lang, getImage, runPlugin
 from gui.contextmenu import contextMenu
 from api import api
 
@@ -98,7 +98,6 @@ class Node_track(INode):
         return ''
 
     def get_image(self):
-        import pprint
         image = self.get_property(['album/image/large', 'image/large', 
                                       'image/small',
                                       'image/thumbnail', 'image'])

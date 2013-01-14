@@ -17,7 +17,6 @@
 
 import sys
 import weakref
-import pprint
 
 import qobuz
 from constants import Mode
@@ -195,6 +194,7 @@ class INode(object):
         self.pagination_next_offset = items['offset'] + items['limit']
 
     def to_s(self):
+        import pprint
         """Return node as a string
         """
         s = "[Node][" + str(self.type) + "\n"
@@ -456,16 +456,12 @@ class INode(object):
         ''' HOME '''
         url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='')
         menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
-                 id='', pos = -5)
-        ''' Favorite '''
-#        url = self.make_url(type=Flag.FAVORITES, mode=Mode.VIEW, nm='')
-#        menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True))
-        ''' System '''
-#        menu.add(path='system', label="System", cmd=containerRefresh(), pos=10)        
+                 id='', pos = -5)     
         ''' ARTIST '''
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
             if not artist_id:
+                import pprint
                 print pprint.pformat(self.data)
             artist_name = self.get_artist()
             urlArtist = self.make_url(type=Flag.ARTIST, id=artist_id, 
@@ -483,7 +479,6 @@ class INode(object):
         
         if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
             ''' ADD TO FAVORITES / TRACKS'''
-            # print "Attach fav"
             url = self.make_url(type=Flag.FAVORITES, 
                                           nm='gui_add_tracks', 
                                           qid=self.id, 
@@ -564,16 +559,9 @@ class INode(object):
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN))
             url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW,
                                 nm='gui_scan', query=query)
-#            label = "%s: %s" % (lang(39003), 
-#                                    self.get_label().encode('utf8', 'replace'))
             menu.add(path='qobuz/scan', 
                             cmd=runPlugin(url),
                             label='scan')
-        
-        #url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='test_rpc')
-        #menu.add(path='test/rpc', 
-        #                    cmd=runPlugin(url),
-        #                    label='Test RPC')
         ''' ERASE CACHE '''
         colorItem = getSetting('color_item_caution')
         cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 

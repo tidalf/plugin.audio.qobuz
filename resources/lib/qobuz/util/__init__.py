@@ -14,11 +14,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
 from node.flag import NodeFlag as Flag
 from debug import log
-
-
 
 def getNode(qnt, params = {}):
         nodeName = Flag.to_s(qnt)
@@ -26,20 +23,8 @@ def getNode(qnt, params = {}):
         modulePath = 'node.' + nodeName
         moduleName = 'Node_' + nodeName
         """ from node.foo import Node_foo """
-#        try:
         modPackage = __import__(modulePath, globals(), 
                                 locals(), [moduleName], -1)
-#        except Exception as e:
-#            error = {
-#                     'modulePath': modulePath,
-#                     'moduleName': moduleName,
-#                     'nodeName': nodeName,
-#                     'nodeType': nt,
-#                     'error': e
-#            }
-#            raise QobuzXbmcError(who=self, 
-#                                 what="module_loading_error", 
-#                                 additional=pprint.pformat(error))
         """ Getting Module from Package """
         nodeModule = getattr(modPackage, moduleName)
         """ 

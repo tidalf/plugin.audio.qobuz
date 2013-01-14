@@ -17,7 +17,6 @@
 from debug import log
 from node.flag import NodeFlag as Flag
 from util import getNode
-import pprint
 
 class IRenderer(object):
     """Base class for our renderer
@@ -37,6 +36,7 @@ class IRenderer(object):
         self.enable_progress = True
 
     def to_s(self):
+        import pprint
         """Return this object as a string
         """
         return pprint.pformat(self)

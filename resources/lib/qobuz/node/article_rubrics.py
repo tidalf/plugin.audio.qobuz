@@ -23,7 +23,6 @@ from inode import INode
 from articles import Node_articles
 from gui.util import getImage, getSetting
 
-import pprint
 '''
     @class Node_article_rubrics
 '''

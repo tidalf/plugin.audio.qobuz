@@ -23,7 +23,6 @@ from inode import INode
 from article import Node_article
 from gui.util import getImage, getSetting
 
-import pprint
 '''
     @class Node_articles
 '''
@@ -53,12 +52,10 @@ class Node_articles(INode):
         if not data: 
             return False
         self.data = data['data']
-#        print pprint.pformat(self.data)
         return True
 
     def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         for article in self.data['articles']['items']:
-#            print pprint.pformat(article)
             node = Node_article(self, {'nid': article['id']})
             node.data = article
             self.add_child(node)
