@@ -43,7 +43,6 @@ try:
     def __abort_requested():
         return xbmc.abortRequested
     xbmc_abort_requested = __abort_requested()
-    print "XBMC INIT DONE"
     stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
     cache_durationm_middle = int(__addon__.getSetting('cache_duration_middle')) * 60
     cache_duration_long = int(__addon__.getSetting('cache_duration_long')) * 60
@@ -55,7 +54,6 @@ except Exception as e:
     password = ''
     base_path = ''
 finally:
-#    print "%s / *** (%s)" % (username, base_path)
     if not (username or password or base_path):
         raise Exception("Missing Mandatory Parameter")
 if stream_format == 6:
@@ -130,8 +128,6 @@ class QobuzResponse:
     def reset_request(self):
         self.path = None
         self.request = None
-#        self.type = None
-#        self.id = None
         self.fileExt = None
         self.track_id = None
         self.album_id = None
@@ -143,7 +139,7 @@ class QobuzResponse:
         if not m:
             return False
         self.artist_id = m.group(1)
-        print "ArtistID: %s" % (str(self.artist_id))
+#        print "ArtistID: %s" % (str(self.artist_id))
         if m.group(2) == 'artist.nfo':
             self.fileWanted = 'artist.nfo'
             return True
@@ -151,7 +147,7 @@ class QobuzResponse:
         if not m:
             return False
         self.album_id = m.group(1)
-        print "AlbumID: %s" % (str(self.album_id))
+#        print "AlbumID: %s" % (str(self.album_id))
         if m.group(2) == 'album.nfo':
             self.fileWanted = 'album.nfo'
             print "Serve album.nfo"
@@ -165,7 +161,7 @@ class QobuzResponse:
         self.track_id = m.group(1)
         self.fileExt = m.group(2)
         self.fileWanted = 'music'
-        print "TrackID: %s" % (self.track_id)
+#        print "TrackID: %s" % (self.track_id)
         return True
     
 class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
@@ -266,14 +262,6 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
                 self.send_response(200, "Ok ;)")
                 self.send_header('content-type', stream_mime)
                 self.end_headers()
-#            if request.subtype == 'album' and request.fileExt == 'jpg':
-#                    self.send_response(200, "Ok ;)")
-#                    self.send_header('content-type', 'image/jpeg')
-#                    self.end_headers()
-#            elif request.subtype == 'album' and request.fileExt == 'nfo':
-#                    self.send_response(200, "Ok ;)")
-#                    self.send_header('content-type', 'text/plain')
-#                    self.end_headers()
             else:
                 raise BadRequest()
         except BadRequest as e:
@@ -288,9 +276,6 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
                                                   repr(e))
             self.log_message(msg)
             self.send_error(500, msg)
-    
-    def handle_error(self):
-        pass
 
 class QobuzHttpResolver(HTTPServer):
     
@@ -311,10 +296,7 @@ class QobuzHttpResolver(HTTPServer):
         if self.abort_requested():
             raise XbmcAbort()
         super(QobuzHttpResolver, self).serve_forever()
-    
-    def handle_error(self, request, client_address):
-        pass
-    
+
 def main():
     server = None
     try:

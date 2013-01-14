@@ -85,15 +85,11 @@ class INode(object):
         return self._parent
 
     def delete_tree(self):
-        log(self, 'Deleting node %s' % (self.type))
         for child in self.childs:
             child.delete_tree()
         self.childs = None
         self.parent = None
         self.parameters = None
-#        del self.childs
-#        del self.parent
-#        del self.parameters
 
     ''' content_type '''
     @property
@@ -307,8 +303,6 @@ class INode(object):
             ka['image'],
             ka['url']
         )
-#        item.setProperty('Node.ID', str(self.id))
-#        item.setProperty('Node.Type', str(self.type))
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
@@ -322,13 +316,6 @@ class INode(object):
 
     def get_childs(self):
         return self.childs
-
-#    def get_siblings(self, type):
-#        list = []
-#        for c in self.childs:
-#            if c.getType() == type:
-#                list.append(c)
-#        return list
 
     def set_label(self, label):
         self.label = label #label.encode('utf8', 'replace')
@@ -476,15 +463,19 @@ class INode(object):
                           label=lang(39004), 
                           cmd=containerUpdate(url))
         ''' FAVORITES '''
-        
-        if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
+        wf = self.type & (~Flag.FAVORITES)
+        if self.parent:
+            wf = wf and self.parent.type & ~Flag.FAVORITES
+        if wf:
             ''' ADD TO FAVORITES / TRACKS'''
+            url = self.make_url(type=Flag.FAVORITES,
+                                nm='', mode=Mode.VIEW)
+            menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True),pos=-9)   
             url = self.make_url(type=Flag.FAVORITES, 
                                           nm='gui_add_tracks', 
                                           qid=self.id, 
                                           qnt=self.type, 
                                           mode=Mode.VIEW)
-            menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True),pos=-9)   
             menu.add(path='favorites/add_tracks', 
                           label=lang(39011) + ' tracks', cmd=runPlugin(url))
             ''' ADD TO FAVORITES / Albums'''
@@ -504,13 +495,16 @@ class INode(object):
                      label='Remove %s' % (self.get_label()), 
                      cmd=runPlugin(url), color='red')
             
-        cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
-        if self.type | cflag  != cflag:
-            ''' PLAYLIST '''
-            cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
+        ''' PLAYLIST '''
+        cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
                                     id='', mode=Mode.VIEW))
-            menu.add(path='playlist', 
+        menu.add(path='playlist', 
                           label="Playlist", cmd=cmd, mode=Mode.VIEW)
+        wf = self.type & (~Flag.PLAYLIST & ~Flag.USERPLAYLISTS)
+        if self.parent:
+            wf = wf and self.parent.type & (~Flag.USERPLAYLISTS)
+        if wf: 
+
             ''' ADD TO CURRENT PLAYLIST '''
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
                                             nm='gui_add_to_current', 
@@ -536,12 +530,12 @@ class INode(object):
             menu.add(path='playlist/add_as_new', 
                           label=lang(30080), cmd=cmd)
 
-            ''' Show playlist '''
-            if not (self.type ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
-                cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
-                                    id='', mode=Mode.VIEW))
-                menu.add(path='playlist/show', 
-                          label=lang(39006), cmd=cmd)
+#            ''' Show playlist '''
+#            if not (self.type ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
+#                cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
+#                                    id='', mode=Mode.VIEW))
+#                menu.add(path='playlist/show', 
+#                          label=lang(39006), cmd=cmd)
 
         ''' PLAYLIST / CREATE '''
         cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)

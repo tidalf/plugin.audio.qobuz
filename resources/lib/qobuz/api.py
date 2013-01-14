@@ -153,7 +153,6 @@ class __API__:
             self.error = "Request return no content"
             warn(self, self.error)
             return None
-        print pprint.pprint(r.content)
         self.statContentSizeTotal += sys.getsizeof(r.content)
         """ Retry get if connexion fail """
         try:

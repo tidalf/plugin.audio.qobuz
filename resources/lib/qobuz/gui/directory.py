@@ -66,7 +66,6 @@ class Directory():
         self.nodes = nodeList
         self.replaceItems = False
         self.asLocalURL = False
-        log(self, "Handle: " + repr(self.handle))
 
     def __del__(self):
         """Cleaning our tree on delete
@@ -216,5 +215,4 @@ class Directory():
     def set_content(self, content):
         """Set Xbmc directory content
         """
-        log(self, "Set content: " + content)
         self.content_type = content

@@ -41,6 +41,7 @@ class Node_product(INode):
         self.is_special_purchase = False
         self.offset = None
         self.imageDefaultSize = 'large'
+        self.label = 'Album'
         try:
             self.imageDefaultSize = getSetting('image_default_size')
         except:
@@ -131,10 +132,8 @@ class Node_product(INode):
                                    'image/thumbnail'])
 
     def get_label(self):
-        try:
-            label = ''.join((self.get_artist(), ' - ', self.get_title()))
-        except:
-            label = self.get_title()
+        artist = self.get_artist() or 'VA'
+        label = '%s - %s' % (artist, self.get_title())
         return label
 
     def get_genre(self):

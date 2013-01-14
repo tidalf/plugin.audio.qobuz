@@ -73,6 +73,8 @@ class contextMenu():
                     colorItem = item['color']
                 label = '%s' % (color(colorItem, item['label']))
                 menuItems.append((label, item['cmd']))
+#        import pprint
+#        print pprint.pformat(menuItems)
         return menuItems
             
 if __name__ == '__main__':

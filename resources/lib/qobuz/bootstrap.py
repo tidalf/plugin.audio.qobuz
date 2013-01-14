@@ -27,9 +27,8 @@ from node.flag import NodeFlag as Flag
 from exception import QobuzXbmcError
 from gui.util import dialogLoginFailure, getSetting, containerRefresh
 
-def get_params():
-    """Helper that parse system arguments and validate them with our little
-    dog
+def get_checked_parameters():
+    """Parse parameters passed to xbmc plugin as sys.argv
     """
     d = dog()
     rparam = {}
@@ -55,7 +54,7 @@ def get_params():
     return rparam
 
 class QobuzBootstrap(object):
-    """Just to set some boot properties
+    """Set some boot properties
     and route query based on parameters
     """
     def __init__(self, __addon__, __handle__):
@@ -73,8 +72,7 @@ class QobuzBootstrap(object):
         qobuz.rpc = XbmcRPC()
 
     def bootstrap_registry(self):
-        """Bootstrap our registry that permit to access qobuz data and
-        cache them localy
+        """Bootstrap our registry (access Qobuz data)
         """
         from registry import QobuzRegistry
         streamFormat = 6 if getSetting('streamtype') == 'flac' else 5
@@ -147,7 +145,7 @@ class QobuzBootstrap(object):
         """Parsing sys arg parameters and store them
         """
         self.MODE = None
-        self.params = get_params()
+        self.params = get_checked_parameters()
         if not 'nt' in self.params:
             self.params['nt'] = Flag.ROOT
             self.MODE = Mode.VIEW

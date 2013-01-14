@@ -60,7 +60,7 @@ class Node_playlist(INode):
         self.image = getImage('song')
 
     def get_label(self):
-        return self.get_name()
+        return self.get_name() or self.label
 
     def set_is_my_playlist(self, b):
         self.is_my_playlist = b
