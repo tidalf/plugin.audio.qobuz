@@ -560,7 +560,8 @@ class INode(object):
             menu.add(path='qobuz/scan', 
                             cmd=runPlugin(url),
                             label='scan')
-        if self.type & (Flag.ALL & ~Flag.PRODUCT & ~Flag.TRACK):
+        if self.type & (Flag.ALL & ~Flag.PRODUCT & ~Flag.TRACK 
+                        & ~Flag.PLAYLIST):
             ''' ERASE CACHE '''
             colorItem = getSetting('color_item_caution')
             cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
