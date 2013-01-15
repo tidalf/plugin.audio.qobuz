@@ -14,71 +14,57 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import qobuz
-from node.flag import NodeFlag
-from debug import info, warn, error, debug
-import pprint
+from debug import log
+from node.flag import NodeFlag as Flag
+from util import getNode
 
 class IRenderer(object):
-
-    def __init__(self, node_type, node_id = None):
+    """Base class for our renderer
+        Parameters:
+        node_type: int, type of node (see node.NodeFlag)
+        parameters: dictionary, parameters passed to our plugin
+    """
+    def __init__(self, node_type, parameters=None):
         self.node_type = node_type
-        self.node_id = node_id
+        self.parameters = parameters
         self.root = None
-        self.filter = NodeFlag.TYPE_NODE
+        self.whiteFlag = Flag.ALL
+        self.blackFlag = Flag.STOPBUILD
+        self.depth = 1
+        self.asList = False
+        self.nodes = []
+        self.enable_progress = True
 
     def to_s(self):
+        import pprint
+        """Return this object as a string
+        """
         return pprint.pformat(self)
 
-    def set_depth(self, d):
-        self.depth = d
-
-    def set_filter(self, filter):
-        self.filter = filter
-
     def set_root_node(self):
-        root = None
-        if self.node_type & NodeFlag.TYPE_ROOT:
-            from node.root import Node_root
-            root = Node_root(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_TRACK:
-            from node.track import Node_track
-            root = Node_track(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_USERPLAYLISTS:
-            from node.user_playlists import Node_user_playlists
-            root = Node_user_playlists(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_PLAYLIST:
-            from node.playlist import Node_playlist
-            root = Node_playlist(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_RECOMMENDATION:
-            from node.recommendation import Node_recommendation
-            root = Node_recommendation(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_PRODUCT:
-            from node.product import Node_product
-            root = Node_product(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_PURCHASES:
-            from node.purchases import Node_purchases
-            root = Node_purchases(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_SEARCH:
-            from node.search import Node_search
-            root = Node_search(None, qobuz.boot.params)
-            root.set_search_type(qobuz.boot.params['search-type'])
-        elif self.node_type & NodeFlag.TYPE_ARTIST:
-            from node.product_by_artist import Node_product_by_artist
-            root = Node_product_by_artist(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_SIMILAR_ARTIST:
-            from node.similar_artists import Node_similar_artist
-            root = Node_similar_artist(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_FAVORITES:
-            from node.favorites import Node_favorites
-            root = Node_favorites(None, qobuz.boot.params)
-        elif self.node_type & NodeFlag.TYPE_CUSTOM_SEARCH:
-            from node.custom_search import Node_custom_search
-            root = Node_custom_search(None, qobuz.boot.params)
-        else:
-            warn(self, "Cannot set root node!")
+        """Import correct node object based on node_type parameter, setting
+        self.root
+        """
+        if self.root: return self.root
+        self.root = getNode(self.node_type, self.parameters)
+        return self.root
+
+    def has_method_parameter(self):
+        """Return true if our plugin has been called with a node method
+        parameter (nm=foo)
+        """
+        if 'nm' in self.parameters:
+            return True
+        return False
+
+    def execute_method_parameter(self):
+        """Excute node method (nm=foo) if present and delete nm key
+        from parameter
+        """
+        if 'nm' in self.parameters:
+            methodName = self.parameters['nm']
+            del self.parameters['nm']
+            log(self, "Executing method on node: " + repr(methodName))
+            if getattr(self.root, methodName)():
+                return True
             return False
-        root.set_id(self.node_id)
-        root.get_url()
-        self.root = root
-        return True

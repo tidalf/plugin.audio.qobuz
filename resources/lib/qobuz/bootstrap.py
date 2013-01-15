@@ -17,22 +17,19 @@
 import sys
 import os
 
-import urllib
-
-import xbmc
-
-from constants import Mode
-from debug import info, debug, warn, error
-from dog import dog
-import qobuz
-from node.flag import NodeFlag
-
-from exception import QobuzXbmcError
-import json
 import pprint
 
-''' Arguments parssing '''
-def get_params():
+from constants import Mode
+from debug import info, debug, warn
+from dog import dog
+import qobuz
+from node.flag import NodeFlag as Flag
+from exception import QobuzXbmcError
+from gui.util import dialogLoginFailure, getSetting, containerRefresh
+
+def get_checked_parameters():
+    """Parse parameters passed to xbmc plugin as sys.argv
+    """
     d = dog()
     rparam = {}
     if len(sys.argv) <= 1:
@@ -49,304 +46,154 @@ def get_params():
             splitparams = {}
             splitparams = pairsofparams[i].split('=')
             if (len(splitparams)) == 2:
-                debug('QobuzDog', "Checking script parameter: " + splitparams[0])
                 if d.kv_is_ok(splitparams[0], splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
-                    warn('[DOG]', "--- Invalid key: %s / value: %s" % (splitparams[0], splitparams[1]))
+                    warn('[DOG]', "--- Invalid key: %s / value: %s" %
+                         (splitparams[0], splitparams[1]))
     return rparam
 
-
-class XbmcRPC:
-    def __init__(self):
-        pass
-    
-    def send(self, request):
-        if not request: raise QobuzXbmcError(who=self, what='missing_parameter', additional='request')
-        request['jsonrpc'] = '2.0'
-        request['method'] = 'JSONRPC.' + request['method']
-        if not 'id' in request: request['id'] = 1
-        rjson = json.dumps(request)
-        print 'REQUEST: ' + rjson
-        ret = xbmc.executeJSONRPC(rjson)
-        return ret
-
-    def ping(self):
-        request = {
-                   'method': 'Ping',
-        }
-        return self.send(request)
-        
-'''
-    QobuzBootstrap
-'''
 class QobuzBootstrap(object):
-
+    """Set some boot properties
+    and route query based on parameters
+    """
     def __init__(self, __addon__, __handle__):
         qobuz.addon = __addon__
         self.handle = __handle__
         qobuz.boot = self
-        
+
     def bootstrap_app(self):
+        """General bootstrap
+        """
+        from xbmcrpc import XbmcRPC
         self.bootstrap_directories()
-        self.bootstrap_lang()
-        self.bootstrap_utils()
-        self.bootstrap_gui()
         self.bootstrap_registry()
         self.bootstrap_sys_args()
-        
-
-    def bootstrap_lang(self):
-        qobuz.lang = qobuz.addon.getLocalizedString
+        qobuz.rpc = XbmcRPC()
 
     def bootstrap_registry(self):
+        """Bootstrap our registry (access Qobuz data)
+        """
         from registry import QobuzRegistry
-        streamFormat = 6 if qobuz.addon.getSetting('streamtype') == 'flac' else 5
+        streamFormat = 6 if getSetting('streamtype') == 'flac' else 5
+        cacheDurationMiddle = getSetting('cache_duration_middle', 
+                                         isInt=True) * 60
+        cacheDurationLong = getSetting('cache_duration_long', 
+                                       isInt=True) * 60
         try:
             qobuz.registry = QobuzRegistry(
-                                       cacheType='default', 
-                                       username=qobuz.addon.getSetting('username'), 
-                                       password=qobuz.addon.getSetting('password'), 
-                                       basePath=qobuz.path.cache,
-                                       streamFormat=streamFormat, hashKey=False)
-
+                cacheType='default',
+                username=getSetting('username'),
+                password=getSetting('password'),
+                basePath=qobuz.path.cache,
+                streamFormat=streamFormat, 
+                hashKey=True,
+                cacheMiddle=cacheDurationMiddle,
+                cacheLong=cacheDurationLong
+            )
             qobuz.registry.get(name='user')
-            qobuz.api = qobuz.registry.get_api()
         except QobuzXbmcError:
-            qobuz.gui.show_login_failure()
+            dialogLoginFailure()
             #@TODO sys.exit killing XBMC? FRODO BUG ?
-            #sys.exit(1)
-            raise QobuzXbmcError(who=self, what='invalid_login', additional=None)
-            
-    def bootstrap_utils(self):
-        import utils.string
-        class Utils():
-            def __init__(self):
-                self.color = utils.string.color
-                self.lang = qobuz.addon.getLocalizedString
-        qobuz.utils = Utils()
+            # sys.exit(1)
+            containerRefresh()
+            raise QobuzXbmcError(
+                who=self, what='invalid_login', additional=None)
 
     def bootstrap_directories(self):
-        class path ():
-            def __init__(s):
-                s.base = qobuz.addon.getAddonInfo('path')
+        """Setting some common path used by our application
+            cache, image...
+        """
+        import xbmc
+        class PathObject ():
+            def __init__(self):
+                self.base = qobuz.addon.getAddonInfo('path')
 
-            def _set_dir(s):
-                s.profile = os.path.join(xbmc.translatePath('special://profile/'), 'addon_data', qobuz.addon.getAddonInfo('id'))
-                s.cache = os.path.join(s.profile, 'cache')
-                s.resources = xbmc.translatePath(os.path.join(qobuz.path.base, 'resources'))
-                s.image = xbmc.translatePath(os.path.join(qobuz.path.resources, 'img'))
-            def to_s(s):
-                out = 'profile : ' + s.profile + "\n"
-                out += 'cache   : ' + s.cache + "\n"
-                out += 'resources: ' + s.resources + "\n"
-                out += 'image   : ' + s.image + "\n"
+            def _set_dir(self):
+                profile = xbmc.translatePath('special://profile/')
+                self.profile = os.path.join(profile,
+                                            'addon_data',
+                                            qobuz.addon.getAddonInfo('id'))
+                self.cache = os.path.join(self.profile, 'cache')
+                self.resources = xbmc.translatePath(
+                    os.path.join(qobuz.path.base, 'resources'))
+                self.image = xbmc.translatePath(
+                    os.path.join(qobuz.path.resources, 'img'))
+
+            def to_s(self):
+                out = 'profile : ' + self.profile + "\n"
+                out += 'cache   : ' + self.cache + "\n"
+                out += 'resources: ' + self.resources + "\n"
+                out += 'image   : ' + self.image + "\n"
                 return out
             '''
             Make dir
             '''
-            def mkdir(s, dir):
-                if os.path.isdir(dir) == False:
+            def mkdir(self, dir):
+                if not os.path.isdir(dir):
                     try:
                         os.makedirs(dir)
                     except:
                         warn("Cannot create directory: " + dir)
                         exit(2)
                     info(self, "Directory created: " + dir)
-        qobuz.path = path()
+        qobuz.path = PathObject()
         qobuz.path._set_dir()
         qobuz.path.mkdir(qobuz.path.cache)
 
-    def bootstrap_debug(self):
-        from debug import log, warn, error, info
-        class d():
-            def __init__(s):
-                s.log = log
-                s.warn = warn
-                s.error = error
-                s.info = info
-        qobuz.debug = d()
-
-    def bootstrap_gui(self):
-        from gui.utils import Utils
-        qobuz.gui = Utils()
-
-    def bootstrap_player(self):
-        from player import QobuzPlayer
-        qobuz.player = QobuzPlayer()
-
-
-    '''
-        Parse system parameters
-    '''
     def bootstrap_sys_args(self):
+        """Parsing sys arg parameters and store them
+        """
         self.MODE = None
-        self.params = get_params()
+        self.params = get_checked_parameters()
         if not 'nt' in self.params:
-            self.params['nt'] = NodeFlag.TYPE_ROOT
+            self.params['nt'] = Flag.ROOT
             self.MODE = Mode.VIEW
-        self.NT = int(self.params['nt'])
-        ''' 
-        set mode 
-        '''
+        self.nodeType = int(self.params['nt'])
         try:
             self.MODE = int(self.params['mode'])
         except:
             warn(self, "No 'mode' parameter")
         for p in self.params:
-            debug(self, "Param: " + p + ' = ' + str(self.params[p]))
-
-        self.NID = ''
-        if 'nid' in self.params: self.NID = self.params['nid']
-
-        debug(self, "NT: " + str(self.NT) + " / NID: " + self.NID)
+            info(self, "Param: " + p + ' = ' + str(self.params[p]))
 
     def erase_cache(self):
-        from utils.cache_manager import cache_manager
-        cm = cache_manager()
-        cm.delete_all_data()
+        """Erasing all cached data
+        """
+        qobuz.registry.delete_by_name('^.*\.dat$')
 
-
-    '''
-        Execute methode based on MODE
-    '''
     def dispatch(self):
-        import pprint, xbmc
-        import time
-        ret = False
-
-        debug(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE), NodeFlag.to_s(int(self.params['nt']))))
-
-        ''' PLAY '''
+        """Routing based on parameters
+        """
+        #info(self, "Mode: %s, Node: %s" % (Mode.to_s(self.MODE),
+        #      Flag.to_s(int(self.params['nt']))))
+        # info(self, "Parameters:\n %s" % (pprint.pformat(self.params) ))
+         
         if self.MODE == Mode.PLAY:
+            from player import QobuzPlayer
             debug(self, "Playing song")
-            self.bootstrap_player()
-#            if qobuz.addon.getSetting('notification_playingsong') == 'true':
-#                qobuz.gui.notify(34000, 34001)
-            try:
-                context_type = urllib.unquote(self.params["context_type"])
-            except:
-                context_type = "playlist"
-            if qobuz.player.play(self.NID):
+            player = QobuzPlayer()
+            if player.play(self.params['nid']):
                 return True
             return False
 
-        # ERASE CACHE
-        elif self.MODE == Mode.ERASE_CACHE:
-            import xbmcgui
-            ok = xbmcgui.Dialog().yesno('Remove cached data',
-                          'Do you really want to erase all cached data')
-            if not ok:
-                info(self, "Deleting cached data aborted")
-                return False
-            self.erase_cache()
-            qobuz.gui.notifyH("Qobuz cache", "All cached data removed")
-            return True
+        from renderer import renderer
 
-        from renderer.xbmc import Xbmc_renderer as renderer
-        ''' SET Node type '''
-        nt = None
-        try: nt = int(self.params['nt'])
-        except:
-            warn(self, "No node type...abort")
-            return False
-        debug(self, "Node type: " + str(nt))
-        ''' SET Node id '''
-        id = None
-        try: id = self.params['nid']
-        except: pass
-
-        ''' UGLY MODE DISPATCH '''
         if self.MODE == Mode.VIEW:
-            r = renderer(nt, id)
-            r.set_depth(1)
-            r.set_filter(NodeFlag.TYPE_NODE | NodeFlag.DONTFETCHTRACK)
-            return r.display()
-
+            r = renderer(self.nodeType, self.params)
+            return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
-            r = renderer(nt, id)
-            r.set_depth(-1)
-            r.set_filter(NodeFlag.TYPE_TRACK | NodeFlag.DONTFETCHTRACK)
-            return r.display()
-
+            r = renderer(self.nodeType, self.params)
+            r.whiteFlag = Flag.TRACK | Flag.PRODUCT
+            r.depth = -1
+            return r.run()
         elif self.MODE == Mode.SCAN:
-            r = renderer(nt, id)
-            r.set_depth(-1)
-            r.set_filter(NodeFlag.DONTFETCHTRACK)
+            r = renderer(self.nodeType, self.params)
+            r.enable_progress = False
+            r.whiteFlag = Flag.TRACK 
+            r.depth = -1
             return r.scan()
-
-        elif self.MODE == Mode.PLAYLIST_SELECT_CURRENT:
-            from  node.user_playlists import Node_user_playlists
-            node = Node_user_playlists()
-            if node.set_current_playlist(self.params['nid']):
-                return False
-            xbmc.executebuiltin('Container.Refresh')
-            return True
-
-        elif self.MODE == Mode.PLAYLIST_CREATE:
-            from  node.user_playlists import Node_user_playlists
-            node = Node_user_playlists()
-            if not node.create_playlist():
-                qobuz.gui.notify(30078, 30046)
-                return False
-            xbmc.executebuiltin('Container.Refresh')
-            return True
-
-        elif self.MODE == Mode.PLAYLIST_ADD_TO_CURRENT:
-            from  node.playlist import Node_playlist
-            node = Node_playlist(None, self.params)
-            if not node.add_to_current_playlist():
-                return False
-            return True
-
-        elif self.MODE == Mode.FAVORITES_ADD_TO_CURRENT:
-            from  node.favorites import Node_favorites
-            node = Node_favorites(None, self.params)
-            if not node.add_to_favorites():
-                return False
-            return True
-
-        elif self.MODE == Mode.PLAYLIST_ADD_AS_NEW:
-            from  node.playlist import Node_playlist
-            node = Node_playlist(None, self.params)
-            if not node.add_as_new_playlist():
-                return False
-            return True
-        
-        elif self.MODE == Mode.PLAYLIST_RENAME:
-            from  node.user_playlists import Node_user_playlists
-            node = Node_user_playlists()
-            if not node.rename_playlist(self.NID):
-                return False
-            xbmc.executebuiltin('Container.Refresh')
-            return True
-
-        elif self.MODE == Mode.PLAYLIST_REMOVE:
-            from node.user_playlists import Node_user_playlists
-            node = Node_user_playlists()
-            if not node.remove_playlist(self.NID):
-                return False
-            xbmc.executebuiltin('Container.Refresh')
-            return True
-
-        elif self.MODE == Mode.PLAYLIST_REMOVE_TRACK:
-            from node.playlist import Node_playlist
-            node = Node_playlist(None, self.params)
-            node.set_id(self.NID)
-            node.set_data(qobuz.registry.get(name='user-playlist',id=self.NID))
-            if not node.remove_tracks(self.params['track-id']):
-                return False
-            xbmc.executebuiltin('Container.Refresh')
-            return True
-
-        elif self.MODE == Mode.LIBRARY_SCAN:
-            import urllib
-            s = 'UpdateLibrary("music", "' + urllib.unquote(self.params['url']) + '&action=scan")'
-            xbmc.executebuiltin(s)
-            return False
-
         else:
-            error(self, "Unknow mode: " + str(self.MODE))
-            return False
-
+            raise QobuzXbmcError(
+                who=self, what="unknow_mode", additional=self.MODE)
         return True
