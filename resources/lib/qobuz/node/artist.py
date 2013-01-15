@@ -14,93 +14,104 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import sys
-import pprint
-
-import xbmcgui
 
 import qobuz
-from constants import Mode
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from product import Node_product
-from debug import info, warn, error
+from debug import warn
+from gui.util import getSetting
+from gui.contextmenu import contextMenu
+import xbmcgui
 
 '''
-    NODE PLAYLIST
+    @class Node_artist(Inode): Artist
 '''
 
-class Node_artist(Node):
+class Node_artist(INode):
 
-    def __init__(self, parent = None, parameters = None, progress = None):
+    def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_FAVORITES
-        self.set_label(qobuz.lang(30079))
-        self.set_is_folder(True)
+        self.type = NodeFlag.ARTIST
+        self.set_label(self.get_name())
+        self.is_folder = True
+        self.slug = ''
+        self.content_type = 'albums'
+        self.offset = self.get_parameter('offset') or 0
         
-        self.name = qobuz.lang(30079)
-        self.label = qobuz.lang(30079)
+    def hook_post_data(self):
+        self.name = self.get_property('name')
+        self.image = self.get_image()
+        self.slug = self.get_property('slug')
+        self.label = self.name
         
-        self.set_content_type('artist')
-
-    def _build_down(self, xbmc_directory, lvl, flag = None):
-#        if not self.set_cache():
-#            error(self, "Cannot set cache!")
-#            return False
-        data = qobuz.registry.get(name='favorites')
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        limit = getSetting('pagination_limit')
+        data = qobuz.registry.get(name='artist',id=self.id,
+            artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
         if not data:
-            warn(self, "Build-down: Cannot fetch favorites data")
+            warn(self, "Build-down: Cannot fetch artist data")
             return False
-        self.set_data(data)
-        albumseen = {}
-        warn (self, pprint.pformat(data))
-        for track in data['data']['tracks']['items']:
-            node = None
-            node = Node_track()
-            node.set_data(track)
-            self.add_child(node)
-    
-        for product in self.filter_products(data):
-            self.add_child(product)
+        self.data = data['data']
         return True
-        
-        
-        del self._data['tracks']
-        
-    def get_name(self):
-        name = self.get_property('name')
-        return name
     
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        node_artist = Node_artist()
+        node_artist.data = self.data
+        node_artist.label = '[ %s ]' % (node_artist.label)
+        if not 'albums' in self.data: 
+            return True
+        for pData in self.data['albums']['items']:
+            node = Node_product()
+            node.data = pData
+            self.add_child(node)
+        return True
+
+        del self._data['tracks']
+
+    def get_artist_id(self):
+        return self.id
+
+    def get_image(self):
+        image = self.get_property(['image/extralarge', 
+                                   'image/mega', 
+                                   'picture'])
+        if image: 
+            image = image.replace('126s', '_')
+        return image
+    
+    def get_title(self):
+        return self.get_name()
+    
+    def get_artist(self):
+        return self.get_name()
+    
+    def get_name(self):
+        return self.get_property('name')
+
     def get_owner(self):
-        return self.get_property(('owner', 'name'))
-            
+        return self.get_property('owner/name')
+
     def get_description(self):
         return self.get_property('description')
-    
-    def make_XbmcListItem(self):
-        color_item = qobuz.addon.getSetting('color_item')
-        color_pl = qobuz.addon.getSetting('color_item_playlist')
-        # label = self.get_name() 
+
+    def makeListItem(self, replaceItems=False):
         image = self.get_image()
-        owner = self.get_owner()
         url = self.make_url()
-        #if not self.is_my_playlist: 
-        #    label = qobuz.utils.color(color_item, owner) + ' - ' + self.get_name() 
-        # label = qobuz.utils.color(color_pl, label)
-        item = xbmcgui.ListItem(self.label,
-                                owner,
+        name = self.get_label()
+        item = xbmcgui.ListItem(name,
+                                name,
                                 image,
                                 image,
                                 url)
+#        item.setInfo('music', {
+#                    'artist': self.get_label(),
+#        })
         if not item:
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
-        self.attach_context_menu(item)
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
-
-    def hook_attach_context_menu(self, item, menuItems):
-        color = qobuz.addon.getSetting('color_item')
-        color_warn = qobuz.addon.getSetting('color_item_caution')
-        label = self.get_label()
-                     

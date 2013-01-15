@@ -14,3 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+from renderer.xbmc import QobuzXbmcRenderer as OurRenderer
+
+def renderer(nType, params = None):
+    return OurRenderer(nType, params)

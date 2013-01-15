@@ -16,46 +16,51 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import qobuz
 from flag import NodeFlag
-from node import Node
-from debug import error
-
-'''
-    NODE PURCHASES
-'''
+from inode import INode
+from debug import warn
+from gui.util import lang, getImage, getSetting
 
 from product import Node_product
+from track import Node_track
 
-class Node_purchases(Node):
-
-    def __init__(self,parent=None,params=None):
-        super(Node_purchases,self).__init__(parent,params)
-        self.label = qobuz.lang(30100)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_PURCHASES
-        self.set_content_type('albums')
-
-    def _build_down(self,xbmc_directory,lvl,flag=None,progress=None):
-        data = qobuz.registry.get(name='purchases')
+class Node_purchases(INode):
+    '''Displaying product purchased by user (track and album)
+    '''
+    def __init__(self, parent=None, params=None):
+        super(Node_purchases, self).__init__(parent, params)
+        self.label = lang(30100)
+        self.type = NodeFlag.PURCHASES
+        self.content_type = 'albums'
+        self.image = getImage('album')
+        self.offset = self.get_parameter('offset') or 0
+        
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        limit = getSetting('pagination_limit')
+        data = qobuz.registry.get(
+            name='user-purchases', limit=limit, offset=self.offset)
         if not data:
-            error(self,"Cannot fetch purchases data")
+            warn(self, "Cannot fetch purchases data")
             return False
-        for product in self.filter_products(data['data']):
-            self.add_child(product)
+        self.data = data['data']
         return True
+        
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        if 'albums' in self.data:
+            self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
+        elif 'tracks' in self.data:
+            self.__populate_tracks(Dir, lvl, whiteFlag, blackFlag)
 
-    def filter_products(self,data):
-        list = []
-        if not data: return list
-        # Qobuz free tracks with invalid product id
-        #blackid = ['0000020110926', '0000201011300', '0000020120220', '0000020120221']
-        albumseen = {}
-        for track in data['albums']['items']:
-            json = track
-            json[u'interpreter'] = track['artist']['name']
-            product = Node_product()
-            product.set_data(json)
-            id = product.get_id()
-            if id in albumseen: continue
-            albumseen[id] = 1
-            list.append(product)
+    def __populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
+        for album in self.data['albums']['items']:
+            node = Node_product()
+            node.data = album
+            self.add_child(node)
         return list
-
+    
+    def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
+        for track in self.data['tracks']['items']:
+            node = Node_track()
+            node.data = track
+            self.add_child(node)
+        return list
+    

@@ -12,6 +12,9 @@ Main Features :
 - Integrate with xbmc gapless play
 - Support flac or mp3 play (using settings)
 - Show and manage favorites
+- musicdb support (without patchs)
+- Add/Remove Friends & browse their public playlists
+- Browse by genre
 
 Configuration:
 --------------
@@ -23,7 +26,7 @@ notes:
 
 Known Issues:
 -------------
-- Xbmc library mode are work in progress using patched xbmc, download binaries for various plateforms or the patch there : https://github.com/tidalf/plugin.audio.qobuz/wiki
+- covers are not retrived when using musicdb
 
 
 This application uses the Qobuz API but is not certified by Qobuz.

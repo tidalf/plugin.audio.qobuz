@@ -16,82 +16,91 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-import qobuz
 from flag import NodeFlag
-from node import Node
+from inode import INode
 from product import Node_product
 from debug import warn
 import weakref
+from api import api
+from gui.contextmenu import contextMenu
+from gui.util import getSetting
+
 '''
-    NODE ARTIST
+    @class Node_product_by_artist:
 '''
 
-class Node_product_by_artist(Node):
+class Node_product_by_artist(INode):
 
-    def __init__(self, parent = None, parameters = None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_product_by_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ARTIST
-        self.set_content_type('albums')
-
+        self.type = NodeFlag.ARTIST
+        self.content_type = 'albums'
+        self.offset = self.get_parameter('offset') or 0
     '''
-        Getter 
+        Getter
     '''
     def get_label(self):
         return self.get_artist()
-    
+
     def get_image(self):
-        image = self.get_property(('picture'))
+        image = self.get_property('picture')
         # get max size image from lastfm, Qobuz default is a crappy 126p large one
         # perhaps we need a setting for low bw users
         image = image.replace('126s', '_')
         return image
-    
+
     def get_artist(self):
         return self.get_property('name')
-    
-    def get_label2(self):
-        return self.get_slug()
-    
+
     def get_slug(self):
         return self.get_property('slug')
-    
-    def get_artist_id(self): return self.get_id()
-        
+
+    def get_artist_id(self):
+        return self.id
+
     '''
         Build Down
     '''
-    def _build_down(self, xbmc_directory, lvl, flag = None, progress = None):
-        data = qobuz.api.artist_get(artist_id=self.get_id(), limit=qobuz.addon.getSetting('artistsearchlimit'),extra='albums')
+    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        limit = getSetting('pagination_limit')
+        data = api.artist_get(
+            artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
-        try: 
-            total = len(data['albums']['items'])
-        except: pass
-        count = 0
-        for jproduct in data['albums']['items']:
-            keys = ['artist', 'interpreter', 'composer','performer']
-            for k in keys:
-                try: 
-                    if k in data['artist']: jproduct[k] = weakref.proxy(data['artist'][k])
-                except: pass
-            node = Node_product()
-            node.set_data(jproduct)
-            xbmc_directory.update(count, total, "Add album:" + node.get_label(), '')
-            self.add_child(node)
-            count += 1
+        self.data = data
         return True
     
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+        count = 0
+        total = len(self.data['albums']['items'])
+        for album in self.data['albums']['items']:
+            keys = ['artist', 'interpreter', 'composer', 'performer']
+            for k in keys:
+                try:
+                    if k in self.data['artist']:
+                        album[k] = weakref.proxy(self.data['artist'][k])
+                except:
+                    warn(self, "Strange thing happen")
+                    pass
+            node = Node_product()
+            node.data = album
+            count += 1
+            Dir.update(count, total, "Add album:" + node.get_label(), '')
+            self.add_child(node)
+        return True
+
     '''
         Make XbmcListItem
     '''
-    def make_XbmcListItem(self):
+    def makeListItem(self, replaceItems=False):
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),
                                 self.get_image(),
                                 self.get_image(),
                                 self.make_url(),
                                 )
-        self.attach_context_menu(item)
+        ctxMenu = contextMenu()
+        self.attach_context_menu(item, ctxMenu)
+        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
-

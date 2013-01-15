@@ -14,48 +14,66 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from flag import NodeFlag
-from node import Node
+from flag import NodeFlag as Flag
+from inode import INode
 from user_playlists import Node_user_playlists
 from recommendation import Node_recommendation
 from search import Node_search
 from favorites import Node_favorites
 from purchases import Node_purchases
-from custom_search import Node_custom_search
+from friend_list import Node_friend_list
+from genre import Node_genre
+from gui.util import getSetting, executeBuiltin, lang
 import qobuz
 
-'''
-    NODE ROOT
-    
-    Sibling of root are playlist, recos, search, purchases...
-'''
-
-class Node_root(Node):
-
-    def __init__(self, parent = None, parameters = None):
+class Node_root(INode):
+    '''Our root node, we are displaying all qobuz nodes from here
+    '''
+    def __init__(self, parent=None, parameters=None):
         super(Node_root, self).__init__(parent, parameters)
-        self.type = NodeFlag.TYPE_NODE | NodeFlag.TYPE_ROOT
-        self.set_content_type('files')
+        self.type = Flag.ROOT
+        self.content_type = 'files'
         self.label = "Qobuz"
-        #self.image = qobuz.image.access.get('default')
-        
-    def _build_down(self, xbmc_directory, lvl, flag = None):
+
+    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(Node_user_playlists())
-        if qobuz.addon.getSetting('show_recommendations') == 'true':
+        if getSetting('show_recommendations', isBool=True):
             self.add_child(Node_recommendation())
         self.add_child(Node_purchases())
         self.add_child(Node_favorites())
-        if qobuz.addon.getSetting('search_enabled') == 'true':
+        if getSetting('search_enabled', isBool=True):
             search = Node_search()
-            search.set_search_type('albums')
+            search.search_type = 'albums'
             self.add_child(search)
             search = Node_search()
-            search.set_search_type('songs')
+            search.search_type = 'tracks'
             self.add_child(search)
             search = Node_search()
-            search.set_search_type('artists')
+            search.search_type = 'artists'
             self.add_child(search)
-#            search = Node_custom_search()
-#            self.add_child(search)
+        self.add_child(Node_friend_list())
+        self.add_child(Node_genre())
         return True
 
+    def cache_remove(self):
+        '''GUI/Removing all cached data
+        '''
+        from gui.util import yesno, notifyH, getImage
+        from debug import log
+        if not yesno(lang(31102), lang(31103)):
+            log(self, "Deleting cached data aborted")
+            return False
+        if qobuz.registry.delete_by_name('^.*\.dat$'):
+            notifyH(lang(31100), lang(31104))
+        else:
+            notifyH(lang(31100), lang(31101),
+                    getImage('icon-error-256'))
+        return True
+
+    def gui_scan(self):
+        '''Scanning directory specified in query parameter
+        '''
+        query = self.get_parameter('query', unQuote=True)
+        query+='&handle=%s' % (str(qobuz.boot.handle))
+        print "Scanning folder: %s" % (query)
+        executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))
