@@ -45,7 +45,7 @@ class Node_playlist(INode):
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_playlist, self).__init__(parent, parameters)
         self.type = Flag.PLAYLIST
-        self.label = "Playlist"
+        self.label = None
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
@@ -60,7 +60,7 @@ class Node_playlist(INode):
         self.image = getImage('song')
 
     def get_label(self):
-        return self.get_name() or self.label
+        return self.label or self.get_name()
 
     def set_is_my_playlist(self, b):
         self.is_my_playlist = b
@@ -71,11 +71,11 @@ class Node_playlist(INode):
     def is_current(self):
         return self.b_is_current
 
-    def hook_post_data(self):
-        if not self.data:
-            return
-        self.id = self.get_property('id')
-        self.label = self.get_name() or 'No name...'
+#    def hook_post_data(self):
+#        if not self.data:
+#            return
+#        self.id = self.get_property('id')
+#        self.label = self.get_name() or 'No name...'
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
@@ -96,11 +96,7 @@ class Node_playlist(INode):
         return True
         
     def get_name(self):
-        name = self.get_property('name') 
-        if name: return name
-        name = self.get_property('title')
-        if name: return name
-        return ''
+        return self.get_property(['name', 'title']) 
     
     def get_image(self):
         user = qobuz.registry.get(name='user')
@@ -121,17 +117,18 @@ class Node_playlist(INode):
         return self.get_property('description')
 
     def makeListItem(self, replaceItems=False):
-        colorItem = getSetting('color_item')
-        colorPl = getSetting('color_item_playlist')
-        label = self.get_name()
+        colorItem = getSetting('item_default_color')
+        colorPl = getSetting('item_section_color')
+        label = self.get_label()
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
-        if self.b_is_current:
-            label = ''.join(('-o] ', color(colorItem, label), ' [o-'))
         if not self.is_my_playlist:
-            label = color(colorItem, owner) + ' - ' + self.get_name()
-        label = color(colorPl, label)
+            label = '%s - %s' % (color(colorItem,owner), label)
+        if self.b_is_current:
+            label = '-o] %s [o-' % (color(colorPl, label))
+
+        #label = color(colorPl, label)
         item = xbmcgui.ListItem(label,
                                 owner,
                                 image,
