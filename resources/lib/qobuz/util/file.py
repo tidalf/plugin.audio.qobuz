@@ -32,15 +32,13 @@ class FileUtil():
         return ''.join(random.choice(chars) for x in range(size))
 
     def _write(self, path, flag, data):
-        ret = False
         with os.open(path, flag) as fd:
             with os.fdopen(fd, 'wb') as fo:
                 fo.write(data)
-                # fo.flush()
-                # os.fsync(fd)
-                ret = True
-
-        return ret
+                fo.flush()
+                os.fsync(fd)
+                return True
+        return False
 
     def _unlink(self, path):
         if not os.path.exists(path):
@@ -64,7 +62,7 @@ class FileUtil():
         os.rename(path, newpath)
         if not os.path.exists(newpath):
             return False
-        return self._unlink(newpath)
+        self._unlink(newpath)
 
     def write(self, path, data):
         if os.path.exists(path):
