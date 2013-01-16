@@ -154,7 +154,7 @@ def setResolvedUrl(**ka):
 def getSetting(key, **ka):
     """Helper to access xbmcaddon.getSetting
         Parameter:
-        key: The key to retrieve from setting
+        key: Key to retrieve from setting
         * optional: isBool (convert 'true' and 'false to python boolean), 
             isInt (return data as integer) 
     """

@@ -47,7 +47,21 @@ class Node_friend_list(INode):
             url += "&name=" + self.name
         return url
 
-    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
+    def get_image(self):
+        data = qobuz.registry.get(name='user')
+        if not data:
+            return ''
+        return data['data']['user']['avatar']
+        
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+        from friend import Node_friend
+        node = Node_friend(None, {})
+        node.create('qobuz.com')
+        return True
+    
+    def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
+        user_data = qobuz.registry.get(name='user')
+        friend_data = user_data['data']['user']['player_settings']['friends']
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
             data = qobuz.registry.get(
@@ -60,12 +74,12 @@ class Node_friend_list(INode):
         # extract all owner names from the list
         friend_list = []
         for item in data['data']['playlists']['items']:
+            if item['owner']['name'] == user_data['data']['user']['login']:
+                continue
             friend_list.append(item['owner']['name'])
         # add previously stored
         if (not self.name):
-            data = qobuz.registry.get(
-                name='user')['data']['user']['player_settings']
-            for name in data['friends']:
+            for name in friend_data:
                 friend_list.append(str(name))
         # remove duplicates
         keys = {}
@@ -75,14 +89,17 @@ class Node_friend_list(INode):
         # and add them to the directory
         for name in friend_list:
             node = Node_friend(None, {'name': str(name)})
-            if name != self.name:
-                self.add_child(node)
+            if name == self.name:
+                continue
+            if name in friend_data:
+                node.label = 'Friend / %s' % (node.label)
+            self.add_child(node)
 
     def attach_context_menu(self, item, menu):
         label = self.get_label()
         url = self.make_url()
         menu.add(path='friend', label=label, cmd=containerUpdate(url))
-        url = self.make_url(type=Flag.FRIEND, nm='create', id=self.id)
+        url = self.make_url(type=Flag.FRIEND, nm='gui_create', id=self.id)
         menu.add(path='friend/add', label='Add', cmd=runPlugin(url))
 
         ''' Calling base class '''

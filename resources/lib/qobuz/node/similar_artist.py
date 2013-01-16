@@ -38,7 +38,7 @@ class Node_similar_artist(INode):
     def get_label(self):
         return lang(39000)
 
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist-similar', id=self.id,
             artist_id=self.id, offset=self.offset, limit=limit)
@@ -47,7 +47,7 @@ class Node_similar_artist(INode):
         self.data = data['data']
         return len(data['data']['artists']['items'])
 
-    def _build_down(self, Dir, lvl, whiteflag, blackFlag):
+    def populate(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
             artist = Node_artist(self, {'offset': 0, 'nid': aData['id']})
             artist.data = aData

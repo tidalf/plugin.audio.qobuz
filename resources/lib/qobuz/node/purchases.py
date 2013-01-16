@@ -34,7 +34,7 @@ class Node_purchases(INode):
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
         
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='user-purchases', limit=limit, offset=self.offset)
@@ -44,7 +44,7 @@ class Node_purchases(INode):
         self.data = data['data']
         return True
         
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if 'albums' in self.data:
             self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
         elif 'tracks' in self.data:

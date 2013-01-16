@@ -35,7 +35,7 @@ class Node_root(INode):
         self.content_type = 'files'
         self.label = "Qobuz"
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(Node_user_playlists())
         if getSetting('show_recommendations', isBool=True):
             self.add_child(Node_recommendation())

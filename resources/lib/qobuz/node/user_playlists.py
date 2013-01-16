@@ -48,7 +48,7 @@ class Node_user_playlists(INode):
     def get_display_by(self):
         return self.display_by
 
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name='user-playlists', limit=limit, offset=self.offset)
@@ -58,7 +58,7 @@ class Node_user_playlists(INode):
         self.data = data['data']
         return True
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         login = getSetting('username')
         cid = qobuz.registry.get(
             name='user-current-playlist-id', noRemote=True)

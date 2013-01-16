@@ -77,7 +77,7 @@ class Node_playlist(INode):
         self.id = self.get_property('id')
         self.label = self.get_name() or 'No name...'
         
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name=registryKey, id=self.id, playlist_id=self.id, 
@@ -88,7 +88,7 @@ class Node_playlist(INode):
         self.data = data['data']
         return True
     
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
             node.data = track
@@ -101,6 +101,15 @@ class Node_playlist(INode):
         name = self.get_property('title')
         if name: return name
         return ''
+    
+    def get_image(self):
+        user = qobuz.registry.get(name='user')
+        if not user:
+            return True
+        user = user['data']
+        if self.get_owner() == user['user']['login']:
+            return user['user']['avatar']
+        return getImage('song')
     
     def get_owner(self):
         return self.get_property('owner/name')
@@ -138,8 +147,13 @@ class Node_playlist(INode):
         return item
 
     def attach_context_menu(self, item, menu):
+        colorCaution = getSetting('item_caution_color')
         login = getSetting('username')
         isOwner = True
+        cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
+                                    id='', mode=Mode.VIEW))
+        menu.add(path='playlist', pos = 1,
+                          label="Playlist", cmd=cmd, mode=Mode.VIEW)
         if login != self.get_property('owner/name'):
             isOwner = False
         label = self.get_label()
@@ -161,7 +175,7 @@ class Node_playlist(INode):
 
         url = self.make_url(type=Flag.PLAYLIST, nm='gui_remove')
         menu.add(path='playlist/remove', label=lang(39010), 
-                 cmd=runPlugin(url))
+                 cmd=runPlugin(url), color=colorCaution)
 
         ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menu)
@@ -201,7 +215,7 @@ class Node_playlist(INode):
             self.del_parameter('query')
         if qnt & Flag.TRACK == Flag.TRACK:
             node = getNode(qnt, {'nid': qid})
-            node.pre_build_down(None, None, None, Flag.NONE)
+            node.fetch(None, None, None, Flag.NONE)
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
@@ -247,7 +261,7 @@ class Node_playlist(INode):
         if qnt & Flag.TRACK == Flag.TRACK:
             # print "Adding one track"
             node = getNode(qnt, {'nid': qid})
-            node.pre_build_down(None,None,None, Flag.NONE)
+            node.fetch(None,None,None, Flag.NONE)
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)

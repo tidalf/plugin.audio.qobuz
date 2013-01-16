@@ -47,7 +47,7 @@ class Node_product(INode):
         except:
             pass
 
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         data = None
         if self.is_special_purchase:
             data = qobuz.registry.get(name='purchase', id=self.id)
@@ -59,7 +59,7 @@ class Node_product(INode):
         self.data = data['data']
         return True
     
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
             if not 'image' in track:

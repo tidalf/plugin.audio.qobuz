@@ -45,7 +45,7 @@ class Node_favorites(INode):
         self.image = getImage('favorites')
         self.offset = self.get_parameter('offset') or 0
 
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name=registryKey, limit=limit, offset=self.offset)
@@ -55,7 +55,7 @@ class Node_favorites(INode):
         self.data = data['data']
         return True
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if 'albums' in self.data:
             self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
         if 'tracks' in self.data:
@@ -101,7 +101,7 @@ class Node_favorites(INode):
         nodes = []
         if qnt & Flag.PRODUCT == Flag.PRODUCT:
             node = Node_product(None, {'nid': qid})
-            node.pre_build_down(None, None, None, None)
+            node.fetch(None, None, None, None)
             album_ids[str(node.id)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
@@ -173,7 +173,7 @@ class Node_favorites(INode):
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
             node = Node_track(None, {'nid': qid})
-            node.pre_build_down(None, None, None, Flag.NONE)
+            node.fetch(None, None, None, Flag.NONE)
             track_ids[str(node.id)] = 1
             nodes.append(node)
         else:

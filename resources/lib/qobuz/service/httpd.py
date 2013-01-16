@@ -149,9 +149,6 @@ class QobuzResponse:
         if not m:
             return False
         self.album_id = m.group(1)
-        if m.group(2) == 'folder.jpg':
-            self.fileWanted = 'folder.jpg'
-            return True
 #        print "AlbumID: %s" % (str(self.album_id))
         if m.group(2) == 'album.nfo':
             self.fileWanted = 'album.nfo'
@@ -160,7 +157,7 @@ class QobuzResponse:
         if not m.group(2):
             self.fileWanted = 'dir'
             return True
-        m = re.search('^(\d+)\.(mp3|mpc|flac|tbn)', m.group(2))
+        m = re.search('^(\d+)\.(mp3|mpc|flac)', m.group(2))
         if not m:
             return False
         self.track_id = m.group(1)
@@ -191,12 +188,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         for track in node.data['tracks']['items']:
             ntrack = Node_track(node)
             ntrack.data = track
-            url = ntrack.id
-            w.write("<tr><td valign=\"top\"><img src=\"/icons/unknown.gif\" alt=\"[   ]\"></td><td><a href=\"" + str(url) + ".mpc\">" + str(url) + ".mpc</a></td><td align=\"right\">16-Oct-2009 04:45  </td><td align=\"right\">8.5K</td></tr><br>\n")
-            w.write("<tr><td valign=\"top\"><img src=\"/icons/unknown.gif\" alt=\"[   ]\"></td><td><a href=\"" + str(url) + ".tbn\">" + str(url) + ".tbn</a></td><td align=\"right\">16-Oct-2009 04:45  </td><td align=\"right\">8.5K</td></tr><br>\n")
-            #w.write("<a href=\"" + str(url) + ".tbn\">" + str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.tbn<a><br>\n')
-            # <tr><td valign="top"><img src="/icons/unknown.gif" alt="[   ]"></td><td><a href="fringe.205.dream.logic-sitv.nfo"</a></td><td align="right">16-Oct-2009 04:45  </td><td align="right">8.5K</td></tr>
-        w.write("<tr><td valign=\"top\"><img src=\"/icons/unknown.gif\" alt=\"[   ]\"></td><td><a href=\"folder.jpg\">folder.jpg</a></td><td align=\"right\">16-Oct-2009 04:45  </td><td align=\"right\">8.5K</td></tr><br>\n")
+            w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.flac<br>\n')
         w.close()
     
     def __GET_track(self, request):
@@ -209,39 +201,10 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         self.send_header('location', streaming_url)
         self.end_headers()
 
-    def __GET_thumbnail(self, request):
-        # node = Node_track(None, {'nid': request.track_id})
-        import pprint
-        # print pprint.pformat()
-        album = Node_product(None, {'nid': request.album_id})
-        if not album.pre_build_down(None, None, None, Flag.NONE):
-            raise RequestFailed()
-        image = album.get_image()
-        print image
-        #if not image:
-        #    raise RequestFailed()
-        self.send_response(200, "Ok")
-        self.send_header('content-type', 'image/jpeg')
-        self.end_headers()
-        w = self.wfile
-        import requests
-        r = requests.get(image)
-        #from PIL import Image
-        #from StringIO import StringIO
-        #i = Image.open(StringIO(r.content))
-        w.write(r.content)
-        w.close()
-        #self.send_response(303, "Resolved")
-        #self.send_header('content-type', "image/jpeg")
-        #print str(image)
-        #self.send_header('location', image)
-        #self.end_headers()
-
-
     def __GET_album_nfo(self, request):
         print "Serving album.nfo for %s" % (request.album_id)
         node = Node_product(None, {'nid': request.album_id})
-        if not node.pre_build_down(None, None, None, Flag.NONE):
+        if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
         self.send_header('content-type', 'text/html')
@@ -252,11 +215,10 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def __GET_dir(self, request):
         print "Serving dir for %s" % (request.album_id)
         node = Node_product(None, {'nid': request.album_id})
-        if not node.pre_build_down(None, None, None, Flag.NONE):
+        if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
-        self.send_header('content-type', 'text/html')
-        self.send_header('charset','utf-8')
+        self.send_header('content-type', 'x-directory/normal')
         self.end_headers()
         self.__write_dir(node)
         return True        
@@ -264,16 +226,12 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             request = QobuzResponse(self)
-            #if request.fileWanted == 'dir':
-            #    return self.__GET_dir(request)
-            if request.fileWanted == 'album.nfo':
+            if request.fileWanted == 'dir':
+                return self.__GET_dir(request)
+            elif request.fileWanted == 'album.nfo':
                 return self.__GET_album_nfo(request)
-            elif request.fileWanted == 'music' and request.fileExt == 'mpc':
+            elif request.fileWanted == 'music':
                 return self.__GET_track(request)
-            elif request.fileWanted == 'music' and request.fileExt == 'tbn':
-                return self.__GET_thumbnail(request)
-            elif request.fileWanted == 'folder.jpg':
-                return self.__GET_thumbnail(request)
             else:
                 raise BadRequest()
         except BadRequest as e:
@@ -292,28 +250,20 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         try:
             request = QobuzResponse(self)
-            import pprint
-            print pprint.pformat(request)
-            #if request.fileWanted == 'dir':
-            #    self.send_response(200, "Ok ;)")
-            #    self.send_header('content-type', 'x-directory/normal')
-            #    self.end_headers()
-            #    return True
+            if request.fileWanted == 'dir':
+                self.send_response(200, "Ok ;)")
+                self.send_header('content-type', 'x-directory/normal')
+                self.end_headers()
+                return True
             if request.fileWanted == 'album.nfo':
                     self.send_response(200, "Ok ;)")
                     self.send_header('content-type', 'text/html')
-                    self.send_header('charset','utf-8')
                     self.end_headers()
                     return True
-            if request.fileExt == 'tbn':
-                self.send_response(200, "OK ;)")
-                self.send_header('content-type', 'image/jpeg')
-                self.end_headers()
-                return True     
             if request.fileWanted == 'music':
                 self.send_response(200, "Ok ;)")
                 self.send_header('content-type', stream_mime)
-                self.end_headers()           
+                self.end_headers()
             else:
                 raise BadRequest()
         except BadRequest as e:
@@ -321,9 +271,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         except Unauthorized as e:
             self.send_error(e.code, e.message)
         except RequestFailed as e:
-            try:
-                self.send_error(e.code, e.message)
-            except: pass
+            self.send_error(e.code, e.message)
         except Exception as e:
             msg = 'Server errors (%s / %s)\n%s' % (
                                                   sys.exc_type, sys.exc_value,
