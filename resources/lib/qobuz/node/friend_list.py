@@ -51,8 +51,6 @@ class Node_friend_list(INode):
         data = qobuz.registry.get(name='user')
         if not data:
             return ''
-        import pprint
-        print pprint.pformat(data)
         return data['data']['user']['avatar']
         
     def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):

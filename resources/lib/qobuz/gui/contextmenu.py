@@ -28,8 +28,13 @@ class contextMenu():
         self.defaultSection = 'qobuz'
         self.color_default = getSetting('item_default_color')
         self.color_section = getSetting('item_section_color')
-        self.format_section = getSetting('item_section_format')
-
+        formatStr = getSetting('item_section_format')
+        try:
+            test = formatStr % ('plop')
+        except:
+            formatStr = '[ %s ]'
+        self.format_section = formatStr
+    
     def get_section_path(self, **ka):
         path = self.defaultSection
         if 'path' in ka and ka['path']:
