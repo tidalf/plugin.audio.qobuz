@@ -77,7 +77,7 @@ class Node_playlist(INode):
         self.id = self.get_property('id')
         self.label = self.get_name() or 'No name...'
         
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
             name=registryKey, id=self.id, playlist_id=self.id, 
@@ -88,7 +88,7 @@ class Node_playlist(INode):
         self.data = data['data']
         return True
     
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()
             node.data = track
@@ -215,7 +215,7 @@ class Node_playlist(INode):
             self.del_parameter('query')
         if qnt & Flag.TRACK == Flag.TRACK:
             node = getNode(qnt, {'nid': qid})
-            node.pre_build_down(None, None, None, Flag.NONE)
+            node.fetch(None, None, None, Flag.NONE)
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
@@ -261,7 +261,7 @@ class Node_playlist(INode):
         if qnt & Flag.TRACK == Flag.TRACK:
             # print "Adding one track"
             node = getNode(qnt, {'nid': qid})
-            node.pre_build_down(None,None,None, Flag.NONE)
+            node.fetch(None,None,None, Flag.NONE)
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)

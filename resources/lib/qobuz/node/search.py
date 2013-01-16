@@ -76,7 +76,7 @@ class Node_search(INode):
             url += '&query=' + self.query
         return url
 
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         stype = self.search_type
         query = self.get_parameter('query', unQuote=True)
@@ -101,7 +101,7 @@ class Node_search(INode):
         self.data = data
         return True
     
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type == 'albums':
             for album in self.data['albums']['items']:
                 node= Node_product()

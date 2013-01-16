@@ -81,7 +81,7 @@ class Node_recommendation(INode):
             return None
         return str(self.genre_type) + '-' + str(self.genre_id)
 
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if not (self.genre_type and self.genre_id):
             return True
         offset = self.offset or 0
@@ -134,7 +134,7 @@ class Node_recommendation(INode):
             self.add_child(node)
         return True
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         '''We are populating our node based on genre_type and genre_id
         '''
         if not self.genre_type:

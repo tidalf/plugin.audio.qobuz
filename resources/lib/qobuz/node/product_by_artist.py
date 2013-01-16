@@ -61,7 +61,7 @@ class Node_product_by_artist(INode):
     '''
         Build Down
     '''
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.artist_get(
             artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
@@ -71,7 +71,7 @@ class Node_product_by_artist(INode):
         self.data = data
         return True
     
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         count = 0
         total = len(self.data['albums']['items'])
         for album in self.data['albums']['items']:

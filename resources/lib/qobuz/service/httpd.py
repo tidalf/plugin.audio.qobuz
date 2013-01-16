@@ -204,7 +204,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def __GET_album_nfo(self, request):
         print "Serving album.nfo for %s" % (request.album_id)
         node = Node_product(None, {'nid': request.album_id})
-        if not node.pre_build_down(None, None, None, Flag.NONE):
+        if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
         self.send_header('content-type', 'text/html')
@@ -215,7 +215,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def __GET_dir(self, request):
         print "Serving dir for %s" % (request.album_id)
         node = Node_product(None, {'nid': request.album_id})
-        if not node.pre_build_down(None, None, None, Flag.NONE):
+        if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
         self.send_header('content-type', 'x-directory/normal')

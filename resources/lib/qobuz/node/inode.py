@@ -359,12 +359,12 @@ class INode(object):
         return render
     
     # When returning False we are not displaying directory content
-    def pre_build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
+    def fetch(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
         '''This method fetch data from cache
         '''
         return True
 
-    def build_down(self, Dir, lvl=1, whiteFlag=None, blackFlag=None, gData=None):
+    def populating(self, Dir, lvl=1, whiteFlag=None, blackFlag=None, gData=None):
         if Dir.Progress.iscanceled():
             print "Canceled..."
             return False
@@ -377,11 +377,11 @@ class INode(object):
             return False
         Dir.update(gData, 'Fetching', '', '')
         if not (self.type & blackFlag == self.type):
-            if not self.pre_build_down(Dir, lvl, whiteFlag, blackFlag):
+            if not self.fetch(Dir, lvl, whiteFlag, blackFlag):
                 return False
             else:
                 self.__add_pagination(self.data)
-        self._build_down(Dir, lvl, whiteFlag, blackFlag)
+        self.populate(Dir, lvl, whiteFlag, blackFlag)
         """ Recursive mode dont't decrement level """
         if lvl != -1:
             lvl -= 1
@@ -404,11 +404,11 @@ class INode(object):
             else:
                 log(self, "Skipping node: %s" % ( Flag.to_s(child.type)) )
             """ Calling builiding down on child """
-            child.build_down(Dir, lvl, whiteFlag, blackFlag, gData)
+            child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
 #        self.childs = [] # UGLY
         return gData['count']
 
-    def _build_down(self, xbmc_directory, lvl, flag):
+    def populate(self, xbmc_directory, lvl, flag):
         """Hook/_build_down:
         This method is called by build_down, each object who
         inherit from Inode can overide it. Lot of object

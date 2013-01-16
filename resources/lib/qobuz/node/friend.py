@@ -134,7 +134,7 @@ class Node_friend(INode):
         executeBuiltin(containerRefresh())
         return True
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         data = qobuz.registry.get(
             name='user-playlists', username=self.name, id=self.name)
         if not data:

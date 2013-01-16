@@ -45,7 +45,7 @@ class Node_artist(INode):
         self.slug = self.get_property('slug')
         self.label = self.name
         
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='artist',id=self.id,
             artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
@@ -55,7 +55,7 @@ class Node_artist(INode):
         self.data = data['data']
         return True
     
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         node_artist = Node_artist()
         node_artist.data = self.data
         node_artist.label = '[ %s ]' % (node_artist.label)

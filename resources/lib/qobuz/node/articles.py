@@ -42,7 +42,7 @@ class Node_articles(INode):
         if not l: return "Articles"
         return l
 
-    def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl , whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='article_listlastarticles',
                                       id=self.id, 
@@ -54,7 +54,7 @@ class Node_articles(INode):
         self.data = data['data']
         return True
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for article in self.data['articles']['items']:
             node = Node_article(self, {'nid': article['id']})
             node.data = article

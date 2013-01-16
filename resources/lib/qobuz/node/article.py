@@ -89,7 +89,7 @@ class Node_article(INode):
             image = image.replace('http://player.', 'http://www.')
         return image
 
-    def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl , whiteFlag, blackFlag):
         print "Build donw article ..."
         data = qobuz.registry.get(
             name='article', id=self.id, article_id=self.id)
@@ -99,7 +99,7 @@ class Node_article(INode):
         print pprint.pformat(self.data)
         return True
 
-    def _build_down(self, Dir, lvl , whiteFlag, blackFlag):
+    def populate(self, Dir, lvl , whiteFlag, blackFlag):
         pass
         
     def displayWidget(self):

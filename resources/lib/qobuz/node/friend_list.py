@@ -53,13 +53,13 @@ class Node_friend_list(INode):
             return ''
         return data['data']['user']['avatar']
         
-    def pre_build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         from friend import Node_friend
         node = Node_friend(None, {})
         node.create('qobuz.com')
         return True
     
-    def _build_down(self, xbmc_directory, lvl, whiteFlag, blackFlag):
+    def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         user_data = qobuz.registry.get(name='user')
         friend_data = user_data['data']['user']['player_settings']['friends']
         info(self, "Build-down friends list " + repr(self.name))

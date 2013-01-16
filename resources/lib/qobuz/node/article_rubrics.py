@@ -48,7 +48,7 @@ class Node_article_rubrics(INode):
         if not l: return "Articles"
         return l
 
-    def pre_build_down(self, Dir, lvl , whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl , whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
                                   name='article_listrubrics', 
@@ -59,7 +59,7 @@ class Node_article_rubrics(INode):
         self.data = data['data']
         return True
 
-    def _build_down(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for rubric in self.data['rubrics']['items']:
             node = Node_articles(self, {'nid': rubric['id']})
             node.data = rubric

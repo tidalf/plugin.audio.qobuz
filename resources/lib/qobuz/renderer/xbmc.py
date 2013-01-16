@@ -67,7 +67,7 @@ class QobuzXbmcRenderer(IRenderer):
         if getSetting('contextmenu_replaceitems', isBool=True):
             Dir.replaceItems = True
         try:
-            ret = self.root.build_down(Dir, self.depth, 
+            ret = self.root.populating(Dir, self.depth, 
                                        self.whiteFlag, self.blackFlag)
         except Qerror as e:
             Dir.end_of_directory(False)
@@ -109,7 +109,7 @@ class QobuzXbmcRenderer(IRenderer):
         Dir.handle = int(sys.argv[1])
         Dir.asList = False
         Dir.asLocalURL = True
-        ret = self.root.build_down(Dir, self.depth, 
+        ret = self.root.populating(Dir, self.depth, 
                                        self.whiteFlag, self.blackFlag)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()

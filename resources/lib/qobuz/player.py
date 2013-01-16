@@ -44,7 +44,7 @@ class QobuzPlayer(xbmc.Player):
     def play(self, track_id):
         track = Node_track(None, {'nid': track_id})
         ''' We are just fetching our data '''
-        track.pre_build_down(None, 1, Flag.TRACK, Flag.NONE)
+        track.fetch(None, 1, Flag.TRACK, Flag.NONE)
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id) 
         item = None
         if not track.data:
