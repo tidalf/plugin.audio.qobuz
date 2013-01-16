@@ -445,6 +445,8 @@ class INode(object):
             else we are copying current mode (for track it's Mode.PLAY ...)
         """
         ''' HOME '''
+        colorCaution = getSetting('item_caution_color')
+
         url = self.make_url(type=Flag.ROOT, mode=Mode.VIEW, nm='')
         menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
                  id='', pos = -5)     
@@ -492,12 +494,15 @@ class INode(object):
                           label=lang(39011) + ' albums', cmd=runPlugin(url))
         
         if self.parent and (self.parent.type & Flag.FAVORITES):
+            url = self.make_url(type=Flag.FAVORITES,
+                                nm='', mode=Mode.VIEW)
+            menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True),pos=-9)  
             url = self.make_url(type=Flag.FAVORITES, nm='gui_remove',
                                 qid=self.id, qnt=self.type,
                                 mode=Mode.VIEW)
             menu.add(path='favorites/remove', 
                      label='Remove %s' % (self.get_label()), 
-                     cmd=runPlugin(url), color='red')
+                     cmd=runPlugin(url), color=colorCaution)
             
         wf = self.type & (~Flag.PLAYLIST & ~Flag.USERPLAYLISTS)
         if self.parent:
@@ -563,9 +568,8 @@ class INode(object):
         if self.type & (Flag.ALL & ~Flag.PRODUCT & ~Flag.TRACK 
                         & ~Flag.PLAYLIST):
             ''' ERASE CACHE '''
-            colorItem = getSetting('color_item_caution')
             cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 
                                       mode=Mode.VIEW))
             menu.add(path='qobuz/erase_cache', 
                           label=lang(31009), cmd=cmd, 
-                          color=colorItem, pos=10)
+                          color=colorCaution, pos=10)

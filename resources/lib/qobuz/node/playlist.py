@@ -138,6 +138,7 @@ class Node_playlist(INode):
         return item
 
     def attach_context_menu(self, item, menu):
+        colorCaution = getSetting('item_caution_color')
         login = getSetting('username')
         isOwner = True
         if login != self.get_property('owner/name'):
@@ -161,7 +162,7 @@ class Node_playlist(INode):
 
         url = self.make_url(type=Flag.PLAYLIST, nm='gui_remove')
         menu.add(path='playlist/remove', label=lang(39010), 
-                 cmd=runPlugin(url))
+                 cmd=runPlugin(url), color=colorCaution)
 
         ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menu)

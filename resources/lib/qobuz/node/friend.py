@@ -141,7 +141,7 @@ class Node_friend(INode):
         return True
 
     def attach_context_menu(self, item, menu):
-        colorWarn = getSetting('color_item_caution')
+        colorWarn = getSetting('item_caution_color')
         url=self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
         cmd = runPlugin(self.make_url(type=Flag.FRIEND, nm="remove"))

@@ -16,15 +16,20 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, getSetting
-        
+
 class contextMenu():
+    '''Creating context menu:
+        add(path='test', cmd='foo' ...)
+        add(path='test/test_one', cmd='bar', ...)
+        ...
+    '''
     def __init__(self):
         self.data = {}
         self.defaultSection = 'qobuz'
         self.color_default = getSetting('item_default_color')
         self.color_section = getSetting('item_section_color')
         self.format_section = getSetting('item_section_format')
-        
+
     def get_section_path(self, **ka):
         path = self.defaultSection
         if 'path' in ka and ka['path']:
@@ -36,8 +41,15 @@ class contextMenu():
         else:
             path = '-'.join(xPath)
         return section, path
-    
+
     def add(self, **ka):
+        '''Add menu entry
+            Parameters:
+                path: string, <section>/<id> (id juste need to be unique)
+                cmd: string, xbmc command to run
+                color: string, override default color
+                pos: int, position in menu
+        '''
         for key in  ['label', 'cmd']:
             if not key in ka:
                 raise Qerror(who=self, 
@@ -45,29 +57,35 @@ class contextMenu():
         section, path = self.get_section_path(**ka)
         root = self.data
         pos = 0
-        if 'pos' in ka: pos = ka['pos']
+        if 'pos' in ka: 
+            pos = ka['pos']
         cmd = ''
-        if 'cmd' in ka: cmd = ka['cmd']
+        if 'cmd' in ka: 
+            cmd = ka['cmd']
+        color = ''
+        if 'color' in ka:
+            color = ka['color']
         if not section in root:
             root[section] = {
                 'label': section,
                 'childs': [],
                 'pos': pos,
-                'cmd': cmd
+                'cmd': cmd,
+                'color': color
             }
         if not path:
             root[section]['label'] = ka['label']
             root[section]['cmd'] = cmd
             root[section]['pos'] = pos
+            root[section]['color'] = color
         else:
-            item = {
-                    'label': ka['label'],
+            item = {'label': ka['label'],
                     'cmd': cmd,
-                    'pos': pos
-                    }
+                    'pos': pos,
+                    'color': color }
             root[section]['childs'].append(item)
         return root
-    
+
     def getTuples(self):
         menuItems = []
         def sectionSort(key):
@@ -78,15 +96,15 @@ class contextMenu():
         for section in sorted(self.data, key=sectionSort):
             colorItem = self.color_section
             data = self.data[section]
-            if 'color' in data: 
+            if 'color' in data and data['color']: 
                 colorItem = data['color']
             label = self.format_section % (color(colorItem, data['label']))
             menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
                 colorItem = self.color_default
-                if 'color' in item:
+                if 'color' in item and item['color']:
                     colorItem = item['color']
-                label = self.format_section % (color(colorItem, item['label']))
+                label = '%s' % (color(colorItem, item['label']))
                 menuItems.append((label, item['cmd']))
         return menuItems
 

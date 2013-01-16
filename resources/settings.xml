@@ -63,9 +63,11 @@
 			type="bool" default="true" /> -->
 		<setting id="show_recommendations" type="bool" default="true" label="42200" option="" />
 		<setting id="search_enabled" label="35000" type="bool" default="true" />
-	    <setting id="item_default_color" label="33102" type="text" default="FF56BBDB" />
-	    <setting id="item_section_color" label="33104" type="text" default="FF59A0FF" />
+	    <setting id="item_default_color" label="33102" type="text" default="FFDB7656" />
+	    <setting id="item_section_color" label="33104" type="text" default="FF56BBDB" />
 	    <setting id="item_section_format" label="33105" type="text" default=".o[ %s ]o." />
+	    <setting id="item_caution_color" label="33103" type="text"
+            default="FFDBB956" />
 	</category>
 	<setting id="warn_free_account" type="bool" default="true"
 		option="hidden" />

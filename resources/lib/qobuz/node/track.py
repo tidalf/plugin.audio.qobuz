@@ -19,7 +19,7 @@ from constants import Mode
 from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
-from gui.util import lang, getImage, runPlugin
+from gui.util import lang, getImage, runPlugin, getSetting
 from gui.contextmenu import contextMenu
 from api import api
 
@@ -306,6 +306,7 @@ class Node_track(INode):
 
     def attach_context_menu(self, item, menu):
         if self.parent and (self.parent.type & Flag.PLAYLIST == Flag.PLAYLIST):
+            colorCaution = getSetting('item_caution_color')
             url = self.parent.make_url(type=Flag.PLAYLIST,
                 id=self.parent.id,
                 qid=self.get_playlist_track_id(),
@@ -314,7 +315,7 @@ class Node_track(INode):
             # print "URL %s" % (url)
             menu.add(path='playlist/remove', 
                      label=lang(30073),
-                     cmd=runPlugin(url))
+                     cmd=runPlugin(url), color=colorCaution)
 
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menu)
