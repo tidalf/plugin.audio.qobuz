@@ -1,12 +1,29 @@
+#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
+#
+#     This file is part of xbmc-qobuz.
+#
+#     xbmc-qobuz is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     xbmc-qobuz is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from exception import QobuzXbmcError as Qerror
-from gui.util import color
+from gui.util import color, getSetting
         
 class contextMenu():
     def __init__(self):
         self.data = {}
         self.defaultSection = 'qobuz'
-        self.colorItemDefault = "FF59A9C5"
-        self.colorItemSection = "FF59A0FF"
+        self.color_default = getSetting('item_default_color')
+        self.color_section = getSetting('item_section_color')
+        self.format_section = getSetting('item_section_format')
         
     def get_section_path(self, **ka):
         path = self.defaultSection
@@ -58,28 +75,21 @@ class contextMenu():
                
         def itemSort(item):
                 return item['pos']        
-        
         for section in sorted(self.data, key=sectionSort):
-            colorItem = self.colorItemSection
+            colorItem = self.color_section
             data = self.data[section]
             if 'color' in data: 
                 colorItem = data['color']
-            ch = '--- ---'
-            label = '%soO[ %s ]Oo%s' % (ch, color(colorItem, data['label']), ch)
+            label = self.format_section % (color(colorItem, data['label']))
             menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
-                colorItem = self.colorItemDefault
+                colorItem = self.color_default
                 if 'color' in item:
                     colorItem = item['color']
-                label = '%s' % (color(colorItem, item['label']))
+                label = self.format_section % (color(colorItem, item['label']))
                 menuItems.append((label, item['cmd']))
-#        menuItems = []
-#        for i in range(0, 20):
-#            menuItems.append(('plop %s' % str(i), 'plop'))
-#        import pprint
-#        print pprint.pformat(menuItems)
         return menuItems
-            
+
 if __name__ == '__main__':
     c = contextMenu()
     c.add(path='qobuz', label='Qobuz', cmd='playlist', pos = 1)
@@ -89,5 +99,3 @@ if __name__ == '__main__':
     c.add(path='friends/toto', label='Toto', cmd='nop', pos = 4)
     c.add(path='friends/plop', label='Plop', cmd='nop', pos = 0)
     c.getTuples()
-    
-        
