@@ -282,12 +282,25 @@ class Node_track(INode):
             comment = mlabel
         if description:
             comment += ' - ' + description
+        '''Xbmc Library fix: Compilation showing one entry by track
+            We are setting artist like 'VA / Artist'
+            Data snippet:
+                {u'id': 26887, u'name': u'Interpr\xe8tes Divers'}
+                {u'id': 145383, u'name': u'Various Artists'}
+                {u'id': 255948, u'name': u'Multi Interpretes'}
+        '''
+        artist = self.get_artist()
+        if self.parent and hasattr(self.parent, 'get_artist_id'):
+            artist_id = str(self.parent.get_artist_id())
+            if artist_id in ['26887', '145383', '255948']:
+                artist = '%s / %s' % (self.parent.get_artist(), artist)
+                
         item.setInfo(type='music', infoLabels={
                      'count': self.id,
                      'title': self.get_title(),
                      'album': self.get_album(),
                      'genre': self.get_genre(),
-                     'artist': self.get_artist(),
+                     'artist': artist,
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),

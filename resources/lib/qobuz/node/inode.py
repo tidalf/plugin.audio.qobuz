@@ -426,7 +426,8 @@ class INode(object):
             params['offset'] = self.pagination_next_offset
             params['nid'] = self.id
             node = getNode(self.type, params)
-            label = self.get_label() 
+            node.data = self.data
+            label = self.get_label()
             if not label and self.parent:
                 label = self.parent.get_label()
             if self.label2: label = self.label2

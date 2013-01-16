@@ -113,12 +113,9 @@ class Node_product(INode):
         return album
 
     def get_artist_id(self):
-        a = self.get_property(['artist/id',
+        return self.get_property(['artist/id',
                                'interpreter/id',
                               'composer/id'])
-        if a:
-            return int(a)
-        return ''
 
     def get_title(self):
         return self.get_property('title')
