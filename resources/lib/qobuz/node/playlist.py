@@ -102,6 +102,15 @@ class Node_playlist(INode):
         if name: return name
         return ''
     
+    def get_image(self):
+        user = qobuz.registry.get(name='user')
+        if not user:
+            return True
+        user = user['data']
+        if self.get_owner() == user['user']['login']:
+            return user['user']['avatar']
+        return getImage('song')
+    
     def get_owner(self):
         return self.get_property('owner/name')
 
@@ -141,6 +150,10 @@ class Node_playlist(INode):
         colorCaution = getSetting('item_caution_color')
         login = getSetting('username')
         isOwner = True
+        cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
+                                    id='', mode=Mode.VIEW))
+        menu.add(path='playlist', pos = 1,
+                          label="Playlist", cmd=cmd, mode=Mode.VIEW)
         if login != self.get_property('owner/name'):
             isOwner = False
         label = self.get_label()
