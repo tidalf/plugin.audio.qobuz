@@ -16,7 +16,6 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from product import Node_product
@@ -25,7 +24,7 @@ from gui.util import lang, getSetting
 from gui.util import getImage, notifyH, executeBuiltin, containerUpdate 
 from util import getNode
 from renderer import renderer
-from api import api
+from api import easyapi
 from exception import QobuzXbmcError as Qerror
 from track import Node_track
 
@@ -47,12 +46,14 @@ class Node_favorites(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(
-            name=registryKey, limit=limit, offset=self.offset)
+        data = easyapi.get('favorite/getUserFavorites', 
+                           user_id=easyapi.user_id, 
+                           limit=limit, 
+                           offset=self.offset)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
-        self.data = data['data']
+        self.data = data
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

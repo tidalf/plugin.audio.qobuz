@@ -14,14 +14,13 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import qobuz
 from flag import NodeFlag
 from inode import INode
 from debug import warn
-from gui.util import lang, getImage, getSetting
-
+from api import easyapi
 from product import Node_product
 from track import Node_track
+from gui.util import lang, getImage, getSetting
 
 class Node_purchases(INode):
     '''Displaying product purchased by user (track and album)
@@ -36,12 +35,12 @@ class Node_purchases(INode):
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(
-            name='user-purchases', limit=limit, offset=self.offset)
+        data = easyapi.get('/purchase/getUserPurchases', limit=limit, 
+                           offset=self.offset)
         if not data:
             warn(self, "Cannot fetch purchases data")
             return False
-        self.data = data['data']
+        self.data = data
         return True
         
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

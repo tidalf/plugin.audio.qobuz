@@ -17,14 +17,14 @@
 from flag import NodeFlag as Flag
 from inode import INode
 from user_playlists import Node_user_playlists
-#from recommendation import Node_recommendation
-#from search import Node_search
-#from favorites import Node_favorites
-#from purchases import Node_purchases
-#from friend_list import Node_friend_list
+from recommendation import Node_recommendation
+from search import Node_search
+from favorites import Node_favorites
+from purchases import Node_purchases
+from friend_list import Node_friend_list
 #from genre import Node_genre
-#from gui.util import getSetting, executeBuiltin, lang
-#import qobuz
+from gui.util import getSetting, executeBuiltin, lang
+from cache import cache, cacheutil
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -37,21 +37,21 @@ class Node_root(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(Node_user_playlists())
-#        if getSetting('show_recommendations', isBool=True):
-#            self.add_child(Node_recommendation())
-#        self.add_child(Node_purchases())
-#        self.add_child(Node_favorites())
-#        if getSetting('search_enabled', isBool=True):
-#            search = Node_search()
-#            search.search_type = 'albums'
-#            self.add_child(search)
-#            search = Node_search()
-#            search.search_type = 'tracks'
-#            self.add_child(search)
-#            search = Node_search()
-#            search.search_type = 'artists'
-#            self.add_child(search)
-#        self.add_child(Node_friend_list())
+        if getSetting('show_recommendations', isBool=True):
+            self.add_child(Node_recommendation())
+        self.add_child(Node_purchases())
+        self.add_child(Node_favorites())
+        if getSetting('search_enabled', isBool=True):
+            search = Node_search()
+            search.search_type = 'albums'
+            self.add_child(search)
+            search = Node_search()
+            search.search_type = 'tracks'
+            self.add_child(search)
+            search = Node_search()
+            search.search_type = 'artists'
+            self.add_child(search)
+        self.add_child(Node_friend_list())
 #        self.add_child(Node_genre())
         return True
 
@@ -63,7 +63,7 @@ class Node_root(INode):
         if not yesno(lang(31102), lang(31103)):
             log(self, "Deleting cached data aborted")
             return False
-        if qobuz.registry.delete_by_name('^.*\.dat$'):
+        if cacheutil.clean_old(cache):
             notifyH(lang(31100), lang(31104))
         else:
             notifyH(lang(31100), lang(31101),

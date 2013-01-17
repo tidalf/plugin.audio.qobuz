@@ -1,11 +1,10 @@
-import pprint
 from time import time
 __version__ = "0.0.1"
 __author__ = "d@corp/cache/%s" % (__version__)
 __magic__ = 0
 for i in [ord(c) for c in __author__[:]]:
     __magic__ += i
-    
+
 BadMagic = 1 << 1
 BadKey = 1 << 2
 NoData = 1 << 3
@@ -17,8 +16,8 @@ class CacheBaseDecorator(object):
     have form func(path, parameters = { 'type'="foo", 'has_audio'=False }
     '''
     def __init__(self, *a, **ka):
-        self.ttl = ka['TTL'] if 'TTL' in ka else 3600
-    
+        pass
+
     def cached(self, f, *a, **ka):
         that = self
         def wrapped_f(self, *a, **ka):
@@ -31,6 +30,7 @@ class CacheBaseDecorator(object):
                 elif not that.check_key(self, data, key, *a, **ka):
                     that.error &= BadKey
                 elif that.is_fresh(self, key, data, *a, **ka):
+                    print "Is FRESH :]"
                     return data['data']
                 if not that.delete(self, key):
                     that.error = DeleteError
@@ -53,14 +53,13 @@ class CacheBaseDecorator(object):
                 that.error &= StoreError
             return data
         return wrapped_f
-    
+
     def is_fresh(self, obj, key, data, *a, **ka):
         if not 'updated_on' in data:
             return False
         updated_on = data['updated_on']
         ttl = data['ttl']
         diff = (updated_on + ttl) - time()
-        print "Diff: %s" % (str(diff))
         if diff < 0:
             return False
         return True
@@ -78,22 +77,25 @@ class CacheBaseDecorator(object):
         if data['key'] != key:
             return False
         return True
-    
+
     def retrieve(self, obj, key, *a, **ka):
         ''' return tuple (Status, Data)
             Status: Bool
             Data: Arbitrary data
         '''
         raise NotImplemented()
-
+    
+    def load_from_store(self, *a, **ka):
+        raise NotImplemented()
+    
     def store(self, obj, key, data, *a, **ka):
         raise NotImplemented()
-    
+
     def delete(self, obj, key, *a, **ka):
         raise NotImplemented()
-    
+
     def make_key(self, obj, key, *a, **ka):
         raise NotImplemented()
-    
+
     def get_ttl(self, obj, key, *a, **ka):
         raise NotImplemented

@@ -16,12 +16,12 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from friend import Node_friend
 from debug import info, warn
 from gui.util import getImage, runPlugin, containerUpdate, lang
+from api import easyapi
 
 '''
     @class Node_friend_list:
@@ -48,10 +48,11 @@ class Node_friend_list(INode):
         return url
 
     def get_image(self):
-        data = qobuz.registry.get(name='user')
-        if not data:
-            return ''
-        return data['data']['user']['avatar']
+        return ''
+#        data = easyapi.get('user/login', user)
+#        if not data:
+#            return ''
+#        return data['data']['user']['avatar']
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         from friend import Node_friend
@@ -60,21 +61,26 @@ class Node_friend_list(INode):
         return True
     
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
-        user_data = qobuz.registry.get(name='user')
-        friend_data = user_data['data']['user']['player_settings']['friends']
+        username = easyapi.username
+        password = easyapi.password
+        user_id = easyapi.user_id
+        user_data = easyapi.get('user/login', username=username, 
+                                password=password)
+        friend_data = user_data['user']['player_settings']['friends']
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
-            data = qobuz.registry.get(
-                name='user-playlists', id=self.name, limit=0)
+            data = easyapi.get('playlist/getUserPlaylists', 
+                               name=self.name, limit=0)
         else:
-            data = qobuz.registry.get(name='user-playlists', limit=0)
+            data = easyapi.get('playlist/getUserPlaylists', 
+                               user_id=user_id, limit=0)
         if not data:
             warn(self, "No friend data")
             return False
         # extract all owner names from the list
         friend_list = []
-        for item in data['data']['playlists']['items']:
-            if item['owner']['name'] == user_data['data']['user']['login']:
+        for item in data['playlists']['items']:
+            if item['owner']['name'] == user_data['user']['login']:
                 continue
             friend_list.append(item['owner']['name'])
         # add previously stored

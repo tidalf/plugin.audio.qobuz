@@ -18,14 +18,13 @@ import xbmcgui
 import xbmc
 import json
 
-import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from playlist import Node_playlist
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, getSetting, lang
-from api import api
+from api import easyapi
 '''
     @class Node_friend:
 '''
@@ -75,17 +74,17 @@ class Node_friend(INode):
         return True
     
     def create(self, name=None):
-        friendpl = qobuz.registry.get(
-            name='user-playlists', username=name, id=name)
+        username = easyapi.username
+        password = easyapi.password
+        friendpl = easyapi.get('playlist/getUserPlaylists', username=name)
         if not friendpl:
             return False
-        friendpl = friendpl['data']
-        user = qobuz.registry.get(name='user')
-        if user['data']['user']['login'] == name:
+        user = easyapi.get('user/login', username=username, password=password)
+        if user['user']['login'] == name:
             return False
         if not user:
             return False
-        friends = user['data']['user']['player_settings']
+        friends = user['user']['player_settings']
         if not 'friends' in friends:
             friends = []
         else:
@@ -94,10 +93,10 @@ class Node_friend(INode):
             return False
         friends.append(name)
         newdata = {'friends': friends}
-        qobuz.registry.get(name='user')
-        if not api.user_update(player_settings=json.dumps(newdata)):
+        #easyapi.get(name='user')
+        if not easyapi.user_update(player_settings=json.dumps(newdata)):
             return False
-        qobuz.registry.delete(name='user')
+#        qobuz.registry.delete(name='user')
         executeBuiltin(containerRefresh())
         return True
 
@@ -124,7 +123,7 @@ class Node_friend(INode):
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
-        if not api.user_update(player_settings=json.dumps(newdata)):
+        if not easyapi.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', 'Friend %s added' % (name))
             notifyH('Qobuz', "Cannot updata friend's list...", 
                     'icon-error-256')
@@ -135,12 +134,10 @@ class Node_friend(INode):
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        data = qobuz.registry.get(
-            name='user-playlists', username=self.name, id=self.name)
+        data = easyapi.get('playlist/getUserPlaylists', username=self.name)
         if not data:
             warn(self, "No friend data")
             return False
-        data = data['data']
         from friend_list import Node_friend_list
         self.add_child(Node_friend_list(self, self.parameters))
         for pl in data['playlists']['items']:

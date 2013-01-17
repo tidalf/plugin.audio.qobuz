@@ -17,7 +17,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-import qobuz
+from api import easyapi
 from flag import NodeFlag as Flag
 from inode import INode
 from product import Node_product
@@ -86,8 +86,7 @@ class Node_recommendation(INode):
             return True
         offset = self.offset or 0
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(name='recommendation',
-                                  id=self.myid(),
+        data = easyapi.get('/album/getFeatured',
                                   type=RECOS_TYPE_IDS[int(self.genre_type)],
                                   genre_id=self.genre_id,
                                   limit=limit,
@@ -95,7 +94,7 @@ class Node_recommendation(INode):
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
-        self.data = data['data']
+        self.data = data
         return True
     
     def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):

@@ -13,12 +13,8 @@ class MissingClassProperty(Exception):
 class CacheFileDecorator(CacheBaseDecorator):
 
     def retrieve(self, obj, key, *a, **ka):
-        cache = self._make_path(obj, key)
-        if not os.path.exists(cache):
-            return None
-        with open(cache, 'rb') as f:
-            return pickle.load(f)
-        return None
+        filename = self._make_path(obj, key)
+        return self.load_from_store(filename)
 
     def make_key(self, obj, *a, **ka):
         argstr = '/'.join(a[:])
@@ -49,7 +45,14 @@ class CacheFileDecorator(CacheBaseDecorator):
                 f.flush()
                 os.fsync(f)
         return True
-
+    
+    def load_from_store(self, filename):
+        if not os.path.exists(filename):
+            return None
+        with open(filename, 'rb') as f:
+            return pickle.load(f)
+        return None
+    
     def get_ttl(self, obj, *a, **ka):
         return 3600
 

@@ -14,13 +14,12 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
 from gui.util import getImage, getSetting, htm2xbmc
 from gui.contextmenu import contextMenu
-
+from api import easyapi
 '''
     @class Node_product:
 '''
@@ -48,17 +47,16 @@ class Node_product(INode):
             pass
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = None
-        if self.is_special_purchase:
-            data = qobuz.registry.get(name='purchase', id=self.id)
-        else:
-            data = qobuz.registry.get(name='product', id=self.id)
+#        if self.is_special_purchase:
+#            data = easyapi.get('/purchases/getd=self.id)
+#        else:
+        data = easyapi.get('album/get', album_id=self.id)
         if not data:
             warn(self, "Cannot fetch product data")
             return False
-        self.data = data['data']
+        self.data = data
         return True
-    
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
             node = Node_track()

@@ -14,15 +14,14 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
-import qobuz
 from flag import NodeFlag
 from inode import INode
 from product import Node_product
 from debug import warn
 from gui.util import getSetting
 from gui.contextmenu import contextMenu
-import xbmcgui
+
+from api import easyapi
 
 '''
     @class Node_artist(Inode): Artist
@@ -47,12 +46,12 @@ class Node_artist(INode):
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(name='artist',id=self.id,
-            artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
+        data = easyapi.get('artist/get', artist_id=self.id, limit=limit, 
+                           offset=self.offset, extra='albums')
         if not data:
             warn(self, "Build-down: Cannot fetch artist data")
             return False
-        self.data = data['data']
+        self.data = data
         return True
     
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
@@ -96,6 +95,7 @@ class Node_artist(INode):
         return self.get_property('description')
 
     def makeListItem(self, replaceItems=False):
+        import xbmcgui
         image = self.get_image()
         url = self.make_url()
         name = self.get_label()

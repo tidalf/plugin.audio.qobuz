@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import qobuz
 from constants import Mode
 from flag import NodeFlag as Flag
 from inode import INode
@@ -42,10 +41,10 @@ class Node_track(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
             return False
-        data = qobuz.registry.get(name='track', id=self.id)
+        data = easyapi.get('/track/get', track_id=self.id)
         if not data:
             return False
-        self.data = data['data']
+        self.data = data
         return True
     
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
@@ -129,16 +128,17 @@ class Node_track(INode):
         return ''
 
     def get_streaming_url(self):
-        data = qobuz.registry.get(name='user-stream-url', 
-                                  id=self.id)
+        format_id = 6 if getSetting('streamtype') == 'flac' else 5
+        data = easyapi.get('/track/getFileUrl', format_id=format_id,
+                           track_id=self.id)
         if not data:
             return ''
-        if not 'data' in data or not 'url' in data['data']:
+        if not 'url' in data:
             warn(self, 
                  "streaming_url, no url returned\n" +  
-                 "API Error: %s" % (api.error)) 
+                 "API Error: %s" % (easyapi.error)) 
             return ''
-        return data['data']['url']
+        return data['url']
 
     def get_artist(self):
         return self.get_property(['artist/name',
@@ -192,25 +192,27 @@ class Node_track(INode):
         return ''
 
     def is_sample(self):
-        nid = self.id or self.parameters['nid']
-        data = qobuz.registry.get(name='user-stream-url', id=nid)
+        format_id = 6 if getSetting('streamtype') == 'flac' else 5
+        data = easyapi.get('/track/getFileUrl', format_id=format_id,
+                           track_id=self.id)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
         try:
-            return data['data']['sample']
+            return data['sample']
         except:
             return ''
 
     def get_mimetype(self):
-        nid = self.id or self.parameters['nid']
-        data = qobuz.registry.get(name='user-stream-url', id=nid)
+        format_id = 6 if getSetting('streamtype') == 'flac' else 5
+        data = easyapi.get('/track/getFileUrl', format_id=format_id,
+                           track_id=self.id)
         formatId = None
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
             return ''
         try:
-            formatId = int(data['data']['format_id'])
+            formatId = int(data['format_id'])
         except:
             warn(self, "Cannot get mime/type for track (restricted track?)")
             return ''

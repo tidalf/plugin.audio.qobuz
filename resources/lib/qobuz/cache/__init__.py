@@ -16,3 +16,6 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from qobuz import CacheQobuzDecorator
 cache = CacheQobuzDecorator()
+
+from cacheutil import CacheUtil
+cacheutil = CacheUtil()

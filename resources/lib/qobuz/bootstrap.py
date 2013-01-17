@@ -17,15 +17,13 @@
 import sys
 import os
 
-import pprint
-
 from constants import Mode
 from debug import info, debug, warn
 from dog import dog
-import qobuz
 from node.flag import NodeFlag as Flag
 from exception import QobuzXbmcError
 from gui.util import dialogLoginFailure, getSetting, containerRefresh
+import qobuz
 
 def get_checked_parameters():
     """Parse parameters passed to xbmc plugin as sys.argv
@@ -73,8 +71,9 @@ class QobuzBootstrap(object):
 
     def bootstrap_registry(self):
         from api import easyapi
-        
-        
+        print "Base Path: %s" % (qobuz.path.cache)
+        easyapi.cache_base_path = qobuz.path.cache
+        easyapi.stream_format = 6 if getSetting('streamtype') == 'flac' else 5
 #        """Bootstrap our registry (access Qobuz data)
 #        """
 #        from registry import QobuzRegistry
