@@ -25,6 +25,7 @@ from friend_list import Node_friend_list
 #from genre import Node_genre
 from gui.util import getSetting, executeBuiltin, lang
 from cache import cache, cacheutil
+import qobuz
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here

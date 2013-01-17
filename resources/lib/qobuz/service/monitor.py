@@ -38,17 +38,16 @@ sys.path.append(qobuzDir)
 from exception import QobuzXbmcError
 from bootstrap import QobuzBootstrap
 from debug import warn, log
-import qobuz
 from util.file import FileUtil
 from gui.util import containerRefresh, notifyH, getImage, executeBuiltin, \
     setResolvedUrl
 from node.track import Node_track
-from api import api
+from api import easyapi
 import threading
 from xbmcrpc import rpc
 from util import getNode
 from node.flag import NodeFlag as Flag
-
+import qobuz
 keyTrackId = 'QobuzPlayerTrackId'
 keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
@@ -123,13 +122,13 @@ class MyPlayer(xbmc.Player):
                 return False 
             elapsed+=1
             xbmc.sleep(1000)
-        api.track_resportStreamingStart(nid)
+        easyapi.track_resportStreamingStart(nid)
         self.trackId = None
         return False
 
 class Monitor(xbmc.Monitor):
 
-    def __init__(self, qobuz):
+    def __init__(self):
         super(Monitor, self).__init__()
         self.abortRequested = False
         self.garbage_refresh = 60 * 5
@@ -258,7 +257,7 @@ logLabel = 'QobuzMonitor'
 import pprint
 try:
     boot.bootstrap_app()
-    monitor = Monitor(qobuz)
+    monitor = Monitor()
     player = MyPlayer()
     alive = True
     while alive:
