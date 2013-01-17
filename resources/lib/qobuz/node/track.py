@@ -96,7 +96,16 @@ class Node_track(INode):
         if self.parent.type & Flag.PRODUCT:
             return self.parent.get_title()
         return ''
-
+    
+    def get_album_id(self):
+        try:
+            albumid = self.get_property('album/id')
+        except:
+            return -1
+        if albumid:
+            return albumid
+        return ''
+    
     def get_image(self):
         image = self.get_property(['album/image/large', 'image/large', 
                                       'image/small',
@@ -300,7 +309,7 @@ class Node_track(INode):
             artist_id = str(self.parent.get_artist_id())
             if artist_id in ['26887', '145383', '255948']:
                 artist = '%s / %s' % (self.parent.get_artist(), artist)
-                
+        desc = description or 'Qobuz Music Streaming'
         item.setInfo(type='music', infoLabels={
                      'count': self.id,
                      'title': self.get_title(),
@@ -310,7 +319,7 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': description or 'Qobuz Music Streaming',
+                     'comment': desc + ' (aid=' + self.get_album_id() + ')',
                      'lyrics': "Chant down babylon lalalala" 
                      })
         item.setProperty('DiscNumber', str(media_number))
