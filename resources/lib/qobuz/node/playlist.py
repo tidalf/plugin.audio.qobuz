@@ -28,7 +28,7 @@ from gui.util import notifyH, color, lang, getImage, runPlugin, \
 from util import  getNode
 from renderer import renderer
 from gui.contextmenu import contextMenu
-from api import api
+from api import easyapi
 
 '''
     @class Node_playlist:
@@ -79,13 +79,15 @@ class Node_playlist(INode):
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(
-            name=registryKey, id=self.id, playlist_id=self.id, 
+        data = easyapi.get('/playlist/get',playlist_id=self.id, 
             offset=self.offset, limit=limit, extra='tracks')
+#        data = qobuz.registry.get(
+#            name=registryKey, id=self.id, playlist_id=self.id, 
+#            offset=self.offset, limit=limit, extra='tracks')
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
-        self.data = data['data']
+        self.data = data
         return True
     
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
@@ -99,12 +101,12 @@ class Node_playlist(INode):
         return self.get_property(['name', 'title']) 
     
     def get_image(self):
-        user = qobuz.registry.get(name='user')
-        if not user:
-            return True
-        user = user['data']
-        if self.get_owner() == user['user']['login']:
-            return user['user']['avatar']
+#        user = qobuz.registry.get(name='user')
+#        if not user:
+#            return True
+#        user = user['data']
+#        if self.get_owner() == user['user']['login']:
+#            return user['user']['avatar']
         return getImage('song')
     
     def get_owner(self):

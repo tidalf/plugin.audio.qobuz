@@ -53,7 +53,7 @@ class Node_genre(INode):
         for gtype in RECOS_TYPE_IDS:
             node = Node_recommendation(
                 self, {'genre-id': ID, 'genre-type': gtype})
-            node.build_down(Dir, 1, Flag.PRODUCT, blackFlag)
+            node.populating(Dir, 1, Flag.PRODUCT, blackFlag)
         return True
 
     def fetch(self, Dir, lvl , whiteFlag, blackFlag):

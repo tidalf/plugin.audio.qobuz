@@ -14,10 +14,5 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-addon = None
-debug = None
-path = None
-boot = None
-registry = None
-rpc = None
-player = None
+from easy import QobuzApiEasy
+easyapi = QobuzApiEasy()

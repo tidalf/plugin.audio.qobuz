@@ -33,7 +33,7 @@ def _api_error_string(self, url="", params={}, json=""):
                 url, pprint.pformat(params),
                 pprint.pformat(json))
 
-class __API__:
+class QobuzApiRaw(object):
 
     def __init__(self):
         self.appid = "285473059" # XBMC
@@ -443,5 +443,3 @@ class __API__:
     def article_get(self, **ka):
         self._check_ka(ka, ['article_id'])
         return self._api_request(ka, '/article/get')
-    
-api = __API__()

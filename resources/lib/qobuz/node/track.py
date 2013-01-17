@@ -21,7 +21,7 @@ from inode import INode
 from debug import warn
 from gui.util import lang, getImage, runPlugin, getSetting
 from gui.contextmenu import contextMenu
-from api import api
+from api import easyapi
 
 '''
     NODE TRACK
@@ -56,6 +56,7 @@ class Node_track(INode):
         if 'asLocalURL' in ka and ka['asLocalURL']:
             import pprint
             # print pprint.pformat(self.data)
+            print "ALBUM ID %s" % str(self.parent.id)
             return 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
                     str(self.get_artist_id()),
                     str(self.parent.id),
@@ -280,8 +281,11 @@ class Node_track(INode):
         comment = ''
         if mlabel:
             comment = mlabel
+        import pprint
+#        print pprint.pformat(self.parent.data)
         if description:
             comment += ' - ' + description
+#        print "Description: %s" % (repr(description))
         '''Xbmc Library fix: Compilation showing one entry by track
             We are setting artist like 'VA / Artist'
             Data snippet:
@@ -304,7 +308,7 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': 'Qobuz Music Streaming',
+                     'comment': description or 'Qobuz Music Streaming',
                      'lyrics': "Chant down babylon lalalala" 
                      })
         item.setProperty('DiscNumber', str(media_number))

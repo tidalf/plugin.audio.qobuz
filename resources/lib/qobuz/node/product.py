@@ -18,7 +18,7 @@ import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn
-from gui.util import getImage, getSetting
+from gui.util import getImage, getSetting, htm2xbmc
 from gui.contextmenu import contextMenu
 
 '''
@@ -92,6 +92,7 @@ class Node_product(INode):
             'artist': self.get_artist(),
             'title': self.get_title(),
             'album': self.get_title(),
+            'description': self.get_description()
         })
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
@@ -147,4 +148,4 @@ class Node_product(INode):
         return year
 
     def get_description(self):
-        return self.get_property('description')
+        return htm2xbmc(self.get_property('description'))

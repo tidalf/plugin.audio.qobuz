@@ -14,7 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-
+# Should consider: http://stackoverflow.com/questions/12003805/threadsafe-and-fault-tolerant-file-writes
 import os
 import time
 import random

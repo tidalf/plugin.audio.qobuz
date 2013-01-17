@@ -15,6 +15,8 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os, sys
+import re
+  
 try:
     """
     Dirty trick that permit to import this module outside of xbmc
@@ -38,6 +40,11 @@ from debug import log, debug
 import qobuz
 
 from xbmcrpc import showNotification, getInfoLabels
+
+def htm2xbmc(htm):
+    def replace(m):
+        return '[' + m.group(1) + m.group(2).upper() + ']'
+    return re.sub('<(/?)(i|b)>', replace, htm, re.IGNORECASE)
 
 def getImage(name):
     if not qobuz.path:

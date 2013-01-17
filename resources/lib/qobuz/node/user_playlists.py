@@ -20,6 +20,8 @@ from inode import INode
 from debug import warn, error
 from gui.util import lang, getImage, getSetting
 from playlist import Node_playlist
+from api import easyapi
+#from api import api
 
 class Node_user_playlists(INode):
     """User playlists node
@@ -50,20 +52,21 @@ class Node_user_playlists(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(
-            name='user-playlists', limit=limit, offset=self.offset)
+        data = easyapi.get('/playlist/getUserPlaylists', limit=limit, 
+                                offset=self.offset, user_id=easyapi.user_id)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
-        self.data = data['data']
+        self.data = data
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         login = getSetting('username')
-        cid = qobuz.registry.get(
-            name='user-current-playlist-id', noRemote=True)
-        if cid:
-            cid = int(cid['data'])
+        cid = None
+#        cid = qobuz.registry.get(
+#            name='user-current-playlist-id', noRemote=True)
+#        if cid:
+#            cid = int(cid['data'])
         for data in self.data['playlists']['items']:
             node = Node_playlist(self, {'offset': 0})
             node.data = data

@@ -26,6 +26,6 @@
 	</extension>
 	<extension point="xbmc.service"
 	    library="resources/lib/qobuz/service/monitor.py" start='login' />
-    <extension point="xbmc.service" 
-	    library="resources/lib/qobuz/service/httpd.py" start='login' />
+<!--     <extension point="xbmc.service" 
+	    library="resources/lib/qobuz/service/httpd.py" start='login' /> -->
 </addon>
