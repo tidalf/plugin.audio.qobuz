@@ -236,13 +236,13 @@ class Node_track(INode):
         return True
     
     def get_album_id(self):
-        try:
-            albumid = self.get_property('album/id')
-        except:
-            return -1
+        albumid = self.get_property('album/id')
+        if not albumid and self.parent:
+            return self.parent.id
         if albumid:
-            return albumid
-        return ''    
+                return albumid
+        else: 
+            return ''
     
     def makeListItem(self, replaceItems=False):
         import xbmcgui

@@ -303,7 +303,9 @@ class QobuzCacheDefault(QobuzLocalStorage):
         subp = key[:size]
         root = os.path.join(os.path.join(*xpath), subp)
         if not os.path.exists(root):
-            os.mkdir(root)
+            try: 
+                os.mkdir(root)
+            except: pass
         xpath.append(subp)
         count -= 1
         return self._make_sub_path(xpath, key[size:], size, count)

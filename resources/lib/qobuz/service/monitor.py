@@ -163,12 +163,10 @@ class Monitor(xbmc.Monitor):
             cur.execute('SELECT DISTINCT(IdAlbum), comment from song')
             data = cur.fetchall()
             for line in data:
-                print line[0]
                 musicdb_idAlbum = line[0]
                 import re
                 try:
-                    print line[1]
-                    qobuz_idAlbum = re.search(r'aid=(\d+)', line[1]).group(1)
+                    qobuz_idAlbum = re.search(u'aid=(\d+)', line[1]).group(1)
                 except: continue
                 sqlcmd = "SELECT rowid from art WHERE media_id=?" 
                 print sqlcmd + str(musicdb_idAlbum)
