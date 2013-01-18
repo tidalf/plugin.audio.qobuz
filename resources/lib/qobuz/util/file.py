@@ -14,7 +14,6 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-# Should consider: http://stackoverflow.com/questions/12003805/threadsafe-and-fault-tolerant-file-writes
 import os
 import time
 import random
@@ -24,6 +23,7 @@ import tempfile
 
 from debug import warn
 
+# From http://stackoverflow.com/questions/12003805/threadsafe-and-fault-tolerant-file-writes
 class RenamedTemporaryFile(object):
     """
     A temporary file object which will be renamed to the specified
@@ -38,7 +38,8 @@ class RenamedTemporaryFile(object):
         if tmpfile_dir is None:
             tmpfile_dir = os.path.dirname(final_path)
 
-        self.tmpfile = tempfile.NamedTemporaryFile(dir=tmpfile_dir, **kwargs)
+        self.tmpfile = tempfile.NamedTemporaryFile(dir=tmpfile_dir, 
+                                                   delete=False, **kwargs)
         print "%s / %s" % (tmpfile_dir, self.tmpfile.name)
         self.final_path = final_path
         
@@ -54,11 +55,13 @@ class RenamedTemporaryFile(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
-            os.rename(self.tmpfile.name, self.final_path)
-            result = self.tmpfile.__exit__(exc_type, exc_val, exc_tb)
-        else:
             self.tmpfile.delete = False
             result = self.tmpfile.__exit__(exc_type, exc_val, exc_tb)
+            os.rename(self.tmpfile.name, self.final_path)
+        else:
+            self.tmpfile.delete = True
+            result = self.tmpfile.__exit__(exc_type, exc_val, exc_tb)
+            os.unlink(self.tmpfile.name)
         return result
 
 class FileUtil():
