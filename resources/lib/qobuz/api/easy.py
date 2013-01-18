@@ -26,8 +26,22 @@ class QobuzApiEasy(QobuzApiRaw):
         methname = '%s_%s' % (xpath[0], xpath[1])
         if not hasattr(self, methname):
             raise InvalidQuery(path)
+        '''Passing user_id create different key for the cache...
+        '''
+        for label in self.__clean_ka(xpath[0], xpath[1], **ka):
+            del ka[label]
         return getattr(self, methname)(**ka)
 
+    def __clean_ka(self, endpoint, method, **ka):
+        keys = []
+        if endpoint == 'track' and method == 'getFileUrl':
+            if 'user_id' in ka:
+                keys.append('user_id')
+        if endpoint == 'purchase' and method == 'getUserPurchases':
+            if 'user_id' in ka:
+                keys.append('user_id')
+        return keys
+        
     def login(self, username, password):
         self.username = username
         self.password = password

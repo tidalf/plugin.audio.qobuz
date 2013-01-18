@@ -136,7 +136,7 @@ class Node_track(INode):
     def get_streaming_url(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         data = easyapi.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id)
+                           track_id=self.id, user_id=easyapi.user_id)
         if not data:
             return ''
         if not 'url' in data:
@@ -200,7 +200,7 @@ class Node_track(INode):
     def is_sample(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         data = easyapi.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id)
+                           track_id=self.id, user_id=easyapi.user_id)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
@@ -212,7 +212,7 @@ class Node_track(INode):
     def get_mimetype(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         data = easyapi.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id)
+                           track_id=self.id, user_id=easyapi.user_id)
         formatId = None
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")

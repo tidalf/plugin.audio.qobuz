@@ -14,14 +14,12 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import qobuz
 from flag import NodeFlag as Flag
 from inode import INode
 from debug import warn, error
 from gui.util import lang, getImage, getSetting
 from playlist import Node_playlist
 from api import easyapi
-#from api import api
 
 class Node_user_playlists(INode):
     """User playlists node
@@ -41,11 +39,11 @@ class Node_user_playlists(INode):
         self.display_product_cover = display_cover
         self.offset = self.get_parameter('offset') or 0
 
-    def set_display_by(self, type):
+    def set_display_by(self, dtype):
         vtype = ('product', 'songs')
-        if not type in vtype:
-            error(self, "Invalid display by: " + type)
-        self.display_by = type
+        if not dtype in vtype:
+            error(self, "Invalid display by: " + dtype)
+        self.display_by = dtype
 
     def get_display_by(self):
         return self.display_by

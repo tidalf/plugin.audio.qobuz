@@ -36,7 +36,7 @@ class Node_purchases(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = easyapi.get('/purchase/getUserPurchases', limit=limit, 
-                           offset=self.offset)
+                           offset=self.offset, user_id=easyapi.user_id)
         if not data:
             warn(self, "Cannot fetch purchases data")
             return False
