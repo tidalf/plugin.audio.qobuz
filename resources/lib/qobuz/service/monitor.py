@@ -155,6 +155,7 @@ class Monitor(xbmc.Monitor):
                 import re
                 qobuz_idAlbum = re.search(r'aid=(\d+)', line[1]).group(1)
                 sqlcmd = "SELECT rowid from art WHERE media_id=?" 
+                data=None
                 try:
                     cur.execute(sqlcmd,str(musicdb_idAlbum))
                     data = cur.fetchone()
