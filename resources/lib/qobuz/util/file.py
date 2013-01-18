@@ -20,8 +20,46 @@ import time
 import random
 import string
 import re
+import tempfile
+
 from debug import warn
 
+class RenamedTemporaryFile(object):
+    """
+    A temporary file object which will be renamed to the specified
+    path on exit.
+    """
+    def __init__(self, final_path, **kwargs):
+        tmpfile_dir = kwargs.pop('dir', None)
+
+        # Put temporary file in the same directory as the location for the
+        # final file so that an atomic move into place can occur.
+
+        if tmpfile_dir is None:
+            tmpfile_dir = os.path.dirname(final_path)
+
+        self.tmpfile = tempfile.NamedTemporaryFile(dir=tmpfile_dir, **kwargs)
+        print "%s / %s" % (tmpfile_dir, self.tmpfile.name)
+        self.final_path = final_path
+        
+    def __getattr__(self, attr):
+        """
+        Delegate attribute access to the underlying temporary file object.
+        """
+        return getattr(self.tmpfile, attr)
+
+    def __enter__(self):
+        self.tmpfile.__enter__()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            os.rename(self.tmpfile.name, self.final_path)
+            result = self.tmpfile.__exit__(exc_type, exc_val, exc_tb)
+        else:
+            self.tmpfile.delete = False
+            result = self.tmpfile.__exit__(exc_type, exc_val, exc_tb)
+        return result
 
 class FileUtil():
 
@@ -32,12 +70,11 @@ class FileUtil():
         return ''.join(random.choice(chars) for x in range(size))
 
     def _write(self, path, flag, data):
-        with os.open(path, flag) as fd:
-            with os.fdopen(fd, 'wb') as fo:
-                fo.write(data)
-                fo.flush()
-                os.fsync(fd)
-                return True
+        with RenamedTemporaryFile(path) as fo:
+            fo.write(data)
+            fo.flush()
+            os.fsync(fo)
+            return True
         return False
 
     def _unlink(self, path):

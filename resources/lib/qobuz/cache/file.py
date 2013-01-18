@@ -1,14 +1,9 @@
-import pprint
 import hashlib
-from time import time
 import pickle
 import os
 
 from base import CacheBaseDecorator
-from util.file import FileUtil
-
-class MissingClassProperty(Exception):
-    pass
+from util.file import FileUtil, RenamedTemporaryFile
 
 class CacheFileDecorator(CacheBaseDecorator):
     
@@ -33,18 +28,15 @@ class CacheFileDecorator(CacheBaseDecorator):
         return os.path.join(os.path.join(*xpath), fileName)
 
     def store(self, obj, key, data):
-        cache = self._make_path(obj, key)
-        print 'Cache: %s' % (cache)
-        #@todo: We are living file on error ...
-        with open(cache, 'wb') as f:
-            try:
-                pickle.dump(
-                            data, f, protocol=pickle.HIGHEST_PROTOCOL)
-            except:
-                return False
-            finally:
-                f.flush()
-                os.fsync(f)
+        filename = self._make_path(obj, key)
+        try:
+            with RenamedTemporaryFile(filename) as fo:
+                pickle.dump(data, fo, protocol=pickle.HIGHEST_PROTOCOL)
+                fo.flush()
+                os.fsync(fo)
+        except Exception as e:
+            print "Error: writing failed %s\nMessage %s" % (filename, e)
+            return False
         return True
     
     def load_from_store(self, filename):

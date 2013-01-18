@@ -14,14 +14,11 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-#import xbmcgui
-
-import qobuz
-
 from flag import NodeFlag as Flag
 from inode import INode
 from artist import Node_artist
 from gui.util import lang, getSetting
+from api import easyapi
 
 '''
     NODE ARTIST
@@ -40,12 +37,12 @@ class Node_similar_artist(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(name='artist-similar', id=self.id,
-            artist_id=self.id, offset=self.offset, limit=limit)
+        data = easyapi.get('/artist/getSimilarArtists', artist_id=self.id, 
+                           offset=self.offset, limit=limit)
         if not data:
             return False
-        self.data = data['data']
-        return len(data['data']['artists']['items'])
+        self.data = data
+        return len(data['artists']['items'])
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
