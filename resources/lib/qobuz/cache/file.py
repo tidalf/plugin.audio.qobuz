@@ -11,6 +11,9 @@ class MissingClassProperty(Exception):
     pass
 
 class CacheFileDecorator(CacheBaseDecorator):
+    
+    def __init__(self):
+        self.base_path = None
 
     def retrieve(self, obj, key, *a, **ka):
         filename = self._make_path(obj, key)
@@ -24,10 +27,8 @@ class CacheFileDecorator(CacheBaseDecorator):
         return m.hexdigest()
 
     def _make_path(self, obj, key):
-        if not hasattr(obj, 'cache_base_path'):
-            raise MissingClassProperty('cache_base_path')
         xpath = []
-        xpath.append(obj.cache_base_path)
+        xpath.append(self.base_path)
         fileName = key + '.dat'
         return os.path.join(os.path.join(*xpath), fileName)
 
@@ -47,7 +48,8 @@ class CacheFileDecorator(CacheBaseDecorator):
         return True
     
     def load_from_store(self, filename):
-        if not os.path.exists(filename):
+        path = os.path.join(self.base_path, filename)
+        if not os.path.exists(path):
             return None
         with open(filename, 'rb') as f:
             return pickle.load(f)

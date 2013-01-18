@@ -30,7 +30,6 @@ class CacheBaseDecorator(object):
                 elif not that.check_key(self, data, key, *a, **ka):
                     that.error &= BadKey
                 elif that.is_fresh(self, key, data, *a, **ka):
-                    print "Is FRESH :]"
                     return data['data']
                 if not that.delete(self, key):
                     that.error = DeleteError
@@ -60,9 +59,9 @@ class CacheBaseDecorator(object):
         updated_on = data['updated_on']
         ttl = data['ttl']
         diff = (updated_on + ttl) - time()
-        if diff < 0:
-            return False
-        return True
+        if diff <= 0:
+            return 0
+        return diff
 
     def check_magic(self, obj, data, *a, **ka):
         if not 'magic' in data:

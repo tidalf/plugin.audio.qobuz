@@ -48,6 +48,8 @@ from xbmcrpc import rpc
 from util import getNode
 from node.flag import NodeFlag as Flag
 import qobuz
+from cache import cacheutil, cache
+
 keyTrackId = 'QobuzPlayerTrackId'
 keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
@@ -131,7 +133,7 @@ class Monitor(xbmc.Monitor):
     def __init__(self):
         super(Monitor, self).__init__()
         self.abortRequested = False
-        self.garbage_refresh = 60 * 5
+        self.garbage_refresh = 60
         self.last_garbage_on = time() - (self.garbage_refresh + 1)
 
     def onAbortRequested(self):
@@ -153,20 +155,24 @@ class Monitor(xbmc.Monitor):
                 print line[0]
                 musicdb_idAlbum = line[0]
                 import re
-                qobuz_idAlbum = re.search(r'aid=(\d+)', line[1]).group(1)
+                search = re.search(r'aid=(\d+)', line[1])
+                if not search:
+                    continue
+                qobuz_idAlbum = search.group(1) 
                 sqlcmd = "SELECT rowid from art WHERE media_id=?" 
                 data=None
                 try:
                     cur.execute(sqlcmd,str(musicdb_idAlbum))
-                    data = cur.fetchone()
+                    data2 = cur.fetchone()
                 except: pass
-                if  data is None : 
+                if  data2 is None : 
                     print "no data try to insert"
                     sqlcmd2 = "INSERT INTO art VALUES ( NULL, (?) , 'album', 'thumb', (?) )"
                     subdir = qobuz_idAlbum[:4]
                     url = "http://static.qobuz.com/images/jaquettes/" + subdir + "/" + qobuz_idAlbum + "_600.jpg"
+                    print "Url: %s" % (url)
                     try:
-                       cur.execute (sqlcmd2,(str(musicdb_idAlbum), url))
+                        cur.execute (sqlcmd2,(str(musicdb_idAlbum), url))
                     except: pass
             con.commit()
         except lite.Error, e:
@@ -193,68 +199,12 @@ class Monitor(xbmc.Monitor):
             return False
 
     def cache_remove_old(self, **ka):
-        timeStarted = time()
         self.last_garbage_on = time()
-        gData = {'limit': 1, 'count': 0}
-        if 'limit' in ka:
-            gData['limit'] = ka['limit']
-        """Callback deleting one file
-        """
-        def delete_one(fileName, gData):
-            gData['count'] += 1
-            data = None
-            with open(fileName, 'rb') as f:
-                f = open(fileName, 'rb')
-                try:
-                    data = pickle.load(f)
-                except:
-                    return False
-                finally:
-                    f.close()
-            if not data or ((int(data['updatedOn']) + 
-                            int(data['refresh'])) < time()):
-                log("QobuzCache", (
-                    "Removing old file: %s") % (repr(fileName)))
-                try:
-                    fu.unlink(fileName)
-                    gData['limit'] -= 1
-                except Exception as e:
-                    warn("QobuzCache", ("Can't remove file %s\n%s")
-                         % (repr(fileName), repr(e)))
-                    return False
-                if gData['limit'] <= 0:
-                    return False
-            return True
-        fu = FileUtil()
-        fu.find(qobuz.path.cache, '^.*\.dat$', delete_one, gData)
-        log(self, "%s cached file(s) checked in %2.1s s" 
-            % (str(gData['count']), 
-               str(time() - timeStarted) ))
-        return True
-
-    def cache_remove_user_data(self):
-        log(self, "Removing cached user data")
-        try:
-            if not qobuz.path.cache:
-                raise QobuzXbmcError(who=self,
-                                     what='qobuz_core_setting_not_set',
-                                     additional='setting')
-            fu = FileUtil()
-            flist = fu.find(qobuz.path.cache, '^user.*\.dat$')
-            for fileName in flist:
-                    log(self, "Removing file " + fileName)
-                    if not fu.unlink(fileName):
-                        warn(self, "Failed to remove " + fileName)
-            executeBuiltin(containerRefresh())
-        except:
-            warn(self, "Error while removing cached data")
-            notifyH('Qobuz',
-                    'Failed to remove user data', getImage('icon-error-256'))
-            return False
-        return True
-
+        cacheutil.clean_old(cache)
+        
     def onSettingsChanged(self):
-        self.cache_remove_user_data()
+#        self.cache_remove_user_data()
+        pass
 
 boot = QobuzBootstrap(__addon__, 0)
 logLabel = 'QobuzMonitor'

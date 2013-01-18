@@ -64,7 +64,7 @@ class Node_root(INode):
         if not yesno(lang(31102), lang(31103)):
             log(self, "Deleting cached data aborted")
             return False
-        if cacheutil.clean_old(cache):
+        if cacheutil.clean_all(cache):
             notifyH(lang(31100), lang(31104))
         else:
             notifyH(lang(31100), lang(31101),

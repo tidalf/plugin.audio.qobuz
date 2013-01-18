@@ -98,13 +98,10 @@ class Node_track(INode):
         return ''
     
     def get_album_id(self):
-        try:
-            albumid = self.get_property('album/id')
-        except:
-            return -1
-        if albumid:
-            return albumid
-        return ''
+        aid = self.get_property('album/id')
+        if not aid and self.parent:
+            return self.parent.id
+        return aid
     
     def get_image(self):
         image = self.get_property(['album/image/large', 'image/large', 

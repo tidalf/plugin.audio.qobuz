@@ -90,7 +90,7 @@ class Node_product(INode):
             'artist': self.get_artist(),
             'title': self.get_title(),
             'album': self.get_title(),
-            'description': self.get_description()
+            'comment': self.get_description()
         })
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)

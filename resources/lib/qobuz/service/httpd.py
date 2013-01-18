@@ -48,8 +48,10 @@ while not (try_get_settings()):
         # raise Exception("Missing Mandatory Parameter")
 
 import qobuz
+from api import easyapi
+easyapi.cache_base_path = qobuz.path.cache
+easyapi.login(username, password)
 
-base_path = qobuz.path.cache
 
 stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
 cache_durationm_middle = int(__addon__.getSetting('cache_duration_middle')) * 60
@@ -131,7 +133,7 @@ class QobuzResponse:
         if not m:
             return False
         self.artist_id = m.group(1)
-#        print "ArtistID: %s" % (str(self.artist_id))
+        print "ArtistID: %s" % (str(self.artist_id))
         if m.group(2) == 'artist.nfo':
             self.fileWanted = 'artist.nfo'
             return True
@@ -139,7 +141,7 @@ class QobuzResponse:
         if not m:
             return False
         self.album_id = m.group(1)
-#        print "AlbumID: %s" % (str(self.album_id))
+        print "AlbumID: %s" % (str(self.album_id))
         if m.group(2) == 'album.nfo':
             self.fileWanted = 'album.nfo'
             print "Serve album.nfo"
