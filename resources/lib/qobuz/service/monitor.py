@@ -150,6 +150,51 @@ class Monitor(xbmc.Monitor):
             return False
         except:
             return False
+        
+    def onDatabaseUpdated( self, database ):
+        import sqlite3 as lite
+        if database != 'music':
+            return 0
+        dbfile = os.path.join(xbmc.translatePath('special://profile/')
+                              ,"Database\MyMusic32.db")
+        try:
+            con = lite.connect(dbfile)
+            cur = con.cursor()    
+            cur.execute('SELECT DISTINCT(IdAlbum), comment from song')
+            data = cur.fetchall()
+            for line in data:
+                print line[0]
+                musicdb_idAlbum = line[0]
+                import re
+                try:
+                    print line[1]
+                    qobuz_idAlbum = re.search(r'aid=(\d+)', line[1]).group(1)
+                except: continue
+                sqlcmd = "SELECT rowid from art WHERE media_id=?" 
+                print sqlcmd + str(musicdb_idAlbum)
+                data = None
+                try:
+                    cur.execute(sqlcmd,str(musicdb_idAlbum))
+                    data = cur.fetchone()
+                except: pass
+                if  data is None : 
+                    print "no data try to insert"
+                    sqlcmd2 = "INSERT INTO art VALUES ( NULL, (?) , 'album', 'thumb', (?) )"
+                    subdir = qobuz_idAlbum[:4]
+                    url = "http://static.qobuz.com/images/jaquettes/" + subdir + "/" + qobuz_idAlbum + "_600.jpg"
+                    try:
+                       cur.execute (sqlcmd2,(str(musicdb_idAlbum), url))
+                    except: pass
+                else:
+                    print "already someting"
+            con.commit()
+        except lite.Error, e:
+            print "Error %s:" % e.args[0]
+            return -1;
+        finally:
+            if con:
+                con.commit()
+                con.close()   
 
     def cache_remove_old(self, **ka):
         timeStarted = time()

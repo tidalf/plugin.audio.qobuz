@@ -235,6 +235,15 @@ class Node_track(INode):
         item.setPath(self.get_streaming_url())
         return True
     
+    def get_album_id(self):
+        try:
+            albumid = self.get_property('album/id')
+        except:
+            return -1
+        if albumid:
+            return albumid
+        return ''    
+    
     def makeListItem(self, replaceItems=False):
         import xbmcgui
         media_number = self.get_media_number()
@@ -304,7 +313,7 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': 'Qobuz Music Streaming',
+                     'comment': description + ' (aid=' + self.get_album_id() + ')',
                      'lyrics': "Chant down babylon lalalala" 
                      })
         item.setProperty('DiscNumber', str(media_number))
