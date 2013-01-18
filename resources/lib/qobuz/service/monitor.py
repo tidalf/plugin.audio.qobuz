@@ -138,6 +138,7 @@ class Monitor(xbmc.Monitor):
         self.abortRequested = True
 
     def onDatabaseUpdated( self, database ):
+        print "DB UPDATE"
         import sqlite3 as lite
         if database != 'music':
             return 0
@@ -172,8 +173,10 @@ class Monitor(xbmc.Monitor):
             return -1;
         finally:
             if con:
+                print "Closing handle"
                 con.commit()
-                con.close()        
+                con.close()
+        return True       
 
     def is_garbage_time(self):
         if time() > (self.last_garbage_on + self.garbage_refresh):

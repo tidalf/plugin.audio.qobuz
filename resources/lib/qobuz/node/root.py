@@ -75,6 +75,5 @@ class Node_root(INode):
         '''Scanning directory specified in query parameter
         '''
         query = self.get_parameter('query', unQuote=True)
-        query+='&handle=%s' % (str(qobuz.boot.handle))
         print "Scanning folder: %s" % (query)
         executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))

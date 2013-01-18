@@ -14,47 +14,46 @@ cache_duration_middle = 60*60*24*365
 stream_format = 5
 __image__ = ''
 
-#def try_get_settings():
-#    try:
-#        boot.bootstrap_registry()
-#        username = __addon__.getSetting('username')
-#        password = __addon__.getSetting('password')
-#        if (username and password):
-#            return True
-#        else:
-#            return False
-#    except: pass
-#
-#import xbmcaddon, xbmcplugin, xbmc
-#
-#import os
-#pluginId = 'plugin.audio.qobuz'
-#__addon__ = xbmcaddon.Addon(id=pluginId)
-#__addonversion__ = __addon__.getAddonInfo('version')
-#__addonid__ = __addon__.getAddonInfo('id')
-#__cwd__ = __addon__.getAddonInfo('path')
-#__addondir__ = __addon__.getAddonInfo('path')
-#__libdir__ = xbmc.translatePath(os.path.join(__addondir__, 'resources', 'lib'))
-#__qobuzdir__ = xbmc.translatePath(os.path.join(__libdir__, 'qobuz'))
-#sys.path.append(__libdir__)
-#sys.path.append(__qobuzdir__)
+def try_get_settings():
+    try:
+        username = __addon__.getSetting('username')
+        password = __addon__.getSetting('password')
+        if (username and password):
+            return True
+        else:
+            return False
+    except: pass
 
-#from bootstrap import QobuzBootstrap
-#__handle__ = -1
-#boot = QobuzBootstrap(__addon__, __handle__)
-#boot.bootstrap_directories()
-#
-#while not (try_get_settings()):
-#    xbmc.sleep(5000)
-#        # raise Exception("Missing Mandatory Parameter")
+import xbmcaddon, xbmcplugin, xbmc
 
-#import qobuz
-#
-#base_path = qobuz.path.cache
-#
-#stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
-#cache_durationm_middle = int(__addon__.getSetting('cache_duration_middle')) * 60
-#cache_duration_long = int(__addon__.getSetting('cache_duration_long')) * 60
+import os
+pluginId = 'plugin.audio.qobuz'
+__addon__ = xbmcaddon.Addon(id=pluginId)
+__addonversion__ = __addon__.getAddonInfo('version')
+__addonid__ = __addon__.getAddonInfo('id')
+__cwd__ = __addon__.getAddonInfo('path')
+__addondir__ = __addon__.getAddonInfo('path')
+__libdir__ = xbmc.translatePath(os.path.join(__addondir__, 'resources', 'lib'))
+__qobuzdir__ = xbmc.translatePath(os.path.join(__libdir__, 'qobuz'))
+sys.path.append(__libdir__)
+sys.path.append(__qobuzdir__)
+
+from bootstrap import QobuzBootstrap
+__handle__ = -1
+boot = QobuzBootstrap(__addon__, __handle__)
+boot.bootstrap_directories()
+
+while not (try_get_settings()):
+    xbmc.sleep(5000)
+        # raise Exception("Missing Mandatory Parameter")
+
+import qobuz
+
+base_path = qobuz.path.cache
+
+stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
+cache_durationm_middle = int(__addon__.getSetting('cache_duration_middle')) * 60
+cache_duration_long = int(__addon__.getSetting('cache_duration_long')) * 60
 
 username = ''
 password = ''
@@ -65,22 +64,11 @@ if stream_format == 6:
 else:
     stream_mime = 'audio/mpeg'
     
-from registry import QobuzRegistry
 from debug import log
 from node.flag import NodeFlag as Flag
 from node.track import Node_track
 from node.product import Node_product
-import qobuz
-qobuz.registry = QobuzRegistry(
-                cacheType='default',
-                username=username,
-                password=password,
-                basePath=base_path,
-                streamFormat=stream_format, 
-                hashKey=True,
-                cacheMiddle=cache_duration_middle,
-                cacheLong=cache_duration_long
-            )
+
 
 class XbmcAbort(Exception):
     def __init__(self, *a, **ka):
