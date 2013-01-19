@@ -45,11 +45,20 @@ class Node_product(INode):
             self.imageDefaultSize = getSetting('image_default_size')
         except:
             pass
+        
+        @property
+        def id(self):
+            return self._id
+        @id.getter
+        def id(self):
+            return self._id
+        @id.setter
+        def id(self, value):
+            self._id = value
+            if value in SPECIAL_PURCHASES:
+                self.is_special_purchase = True
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-#        if self.is_special_purchase:
-#            data = easyapi.get('/purchases/getd=self.id)
-#        else:
         data = easyapi.get('album/get', album_id=self.id)
         if not data:
             warn(self, "Cannot fetch product data")

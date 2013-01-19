@@ -1,3 +1,13 @@
+'''
+    qobuz.storage.cacheutil
+    ~~~~~~~~~~~~~~~~~~
+
+    Little utility class for cleaning cache purpose
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+
 from util.file import FileUtil
 
 class CacheUtil(object):

@@ -48,6 +48,9 @@ class Node_user_playlists(INode):
     def get_display_by(self):
         return self.display_by
 
+    def set_current_playlist_id(self, id):
+        store = storage.get('current_playlist_id')
+    
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = easyapi.get('/playlist/getUserPlaylists', limit=limit, 

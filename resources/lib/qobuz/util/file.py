@@ -23,6 +23,14 @@ import tempfile
 
 from debug import warn
 
+def file_unlink(filename):
+    if not os.path.exists(filename):
+        return False
+    tmpfile = tempfile.mktemp('.del', '', os.path.dirname(filename))
+    print "TmpFile: %s" % (tmpfile)
+    os.rename(filename, tmpfile)
+    os.unlink(tmpfile)
+        
 # From http://stackoverflow.com/questions/12003805/threadsafe-and-fault-tolerant-file-writes
 class RenamedTemporaryFile(object):
     """

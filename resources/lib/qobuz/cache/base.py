@@ -1,3 +1,15 @@
+'''
+    qobuz.storage.base
+    ~~~~~~~~~~~~~~~~~~
+
+    A class to handle caching
+    
+    ::cached decorator that will cache a function call based on his
+    positional and named parameter
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from time import time
 __version__ = "0.0.1"
 __author__ = "d@corp/cache/%s" % (__version__)
@@ -11,27 +23,29 @@ NoData = 1 << 3
 StoreError = 1 << 4
 DeleteError = 1 << 5
 
-class CacheBaseDecorator(object):
-    ''' A base decorator class, This is for caching function that
-    have form func(path, parameters = { 'type'="foo", 'has_audio'=False }
+class CacheBase(object):
+    ''' A base class for caching
     '''
     def __init__(self, *a, **ka):
         pass
 
     def cached(self, f, *a, **ka):
+        '''Decorator
+            All positional and named parameters are used to make the key
+        '''
         that = self
-        def wrapped_f(self, *a, **ka):
+        def wrapped_function(self, *a, **ka):
             that.error = 0
-            key = that.make_key(self, *a, **ka)
-            data = that.retrieve(self, key, *a, **ka)
+            key = that.make_key(*a, **ka)
+            data = that.load(key, *a, **ka)
             if data:
-                if not that.check_magic(self, data, *a, **ka):
+                if not that.check_magic(data, *a, **ka):
                     that.error &= BadMagic
-                elif not that.check_key(self, data, key, *a, **ka):
+                elif not that.check_key(data, key, *a, **ka):
                     that.error &= BadKey
-                elif that.is_fresh(self, key, data, *a, **ka):
+                elif that.is_fresh(key, data, *a, **ka):
                     return data['data']
-                if not that.delete(self, key):
+                if not that.delete(key):
                     that.error = DeleteError
             data = f(self, *a, **ka)
             if data is None:
@@ -42,42 +56,45 @@ class CacheBaseDecorator(object):
             entry = {
                  'updated_on': time(),
                  'data': data,
-                 'ttl': that.get_ttl(self, key, *a, **ka),
+                 'ttl': that.get_ttl(key, *a, **ka),
                  'pa': a,
                  'ka': ka,
                  'magic': __magic__,
                  'key': key
             }
-            if not that.store(self, key, entry):
+            if not that.sync(key, entry):
                 that.error &= StoreError
             return data
-        return wrapped_f
+        return wrapped_function
 
-    def is_fresh(self, obj, key, data, *a, **ka):
+    def is_fresh(self, key, data, *a, **ka):
         if not 'updated_on' in data:
             return False
         updated_on = data['updated_on']
         ttl = data['ttl']
+        print "Is Fresh"
+        if ttl == 0:
+            return -1
         diff = (updated_on + ttl) - time()
         if diff <= 0:
             return 0
         return diff
 
-    def check_magic(self, obj, data, *a, **ka):
+    def check_magic(self, data, *a, **ka):
         if not 'magic' in data:
             return False
         if data['magic'] != __magic__:
             return False
         return True
 
-    def check_key(self, obj, data, key, *a, **ka):
+    def check_key(self, data, key, *a, **ka):
         if not 'key' in data:
             return False
         if data['key'] != key:
             return False
         return True
 
-    def retrieve(self, obj, key, *a, **ka):
+    def load(self, key, *a, **ka):
         ''' return tuple (Status, Data)
             Status: Bool
             Data: Arbitrary data
@@ -87,14 +104,14 @@ class CacheBaseDecorator(object):
     def load_from_store(self, *a, **ka):
         raise NotImplemented()
     
-    def store(self, obj, key, data, *a, **ka):
+    def sync(self, key, data, *a, **ka):
         raise NotImplemented()
 
-    def delete(self, obj, key, *a, **ka):
+    def delete(self, key, *a, **ka):
         raise NotImplemented()
 
-    def make_key(self, obj, key, *a, **ka):
+    def make_key(self, key, *a, **ka):
         raise NotImplemented()
 
-    def get_ttl(self, obj, key, *a, **ka):
+    def get_ttl(self, key, *a, **ka):
         raise NotImplemented
