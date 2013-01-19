@@ -14,6 +14,8 @@ class CacheQobuz(CacheFile):
 
     def __init__(self, *a, **ka):
         self._store = {}
+        self.black_keys = ['password']
+        super(CacheQobuz, self).__init__()
 
     def get_ttl(self, key, *a, **ka):
         if len(a) > 0:

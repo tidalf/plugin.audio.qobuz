@@ -1,6 +1,5 @@
 import pprint
 from itable import Itable
-import qobuz
 class Track(Itable):
 
     def __init__(self, id = None):

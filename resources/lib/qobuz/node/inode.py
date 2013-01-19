@@ -31,6 +31,7 @@ from renderer import renderer
 import urllib
 from time import time
 
+
 class INode(object):
     '''Our base node, every node must inherit or mimic is behaviour
         Parameters:

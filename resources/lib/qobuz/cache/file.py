@@ -12,12 +12,13 @@ import pickle
 import os
 
 from base import CacheBase
-from util.file import FileUtil, RenamedTemporaryFile, file_unlink
+from util.file import RenamedTemporaryFile, unlink
 
 class CacheFile(CacheBase):
 
     def __init__(self):
         self.base_path = None
+        self.ventile = False
         super(CacheFile, self).__init__()
 
     def load(self, key, *a, **ka):
@@ -39,7 +40,7 @@ class CacheFile(CacheBase):
 
     def sync(self, key, data):
         filename = self._make_path(key)
-        file_unlink(filename)
+        unlink(filename)
         try:
             with RenamedTemporaryFile(filename) as fo:
                 pickle.dump(data, fo, protocol=pickle.HIGHEST_PROTOCOL)
@@ -63,5 +64,4 @@ class CacheFile(CacheBase):
 
     def delete(self, key, *a, **ka):
         cache = self._make_path(key)
-        fu = FileUtil()
-        return fu.unlink(cache)
+        return unlink(cache)

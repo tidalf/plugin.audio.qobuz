@@ -38,7 +38,7 @@ sys.path.append(qobuzDir)
 from exception import QobuzXbmcError
 from bootstrap import QobuzBootstrap
 from debug import warn, log
-from util.file import FileUtil
+from util.file import find, unlink
 from gui.util import containerRefresh, notifyH, getImage, executeBuiltin, \
     setResolvedUrl
 from node.track import Node_track
@@ -48,7 +48,8 @@ from xbmcrpc import rpc
 from util import getNode
 from node.flag import NodeFlag as Flag
 import qobuz
-from cache import cacheutil, cache
+from cache import cache
+from cache.cacheutil import clean_old
 
 keyTrackId = 'QobuzPlayerTrackId'
 keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
@@ -200,7 +201,7 @@ class Monitor(xbmc.Monitor):
 
     def cache_remove_old(self, **ka):
         self.last_garbage_on = time()
-        cacheutil.clean_old(cache)
+        clean_old(cache)
         
     def onSettingsChanged(self):
 #        self.cache_remove_user_data()

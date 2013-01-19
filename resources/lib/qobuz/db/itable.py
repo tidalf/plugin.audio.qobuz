@@ -11,7 +11,7 @@ class Itable(object):
         self.table_name = None
         self.fields_name = []
         self.pk = None
-        self.auto_fetch = True
+        self.auto_fetch = False
 
     def _create(self, handle, query):
         cursor = handle.cursor()
@@ -22,16 +22,22 @@ class Itable(object):
         return True
 
     def create(self, handle):
-        first = False
         count = 0
         lkeys = self.fields_name.keys()
         size = len(lkeys)
         txt = ''
+        fn = self.fields_name
+        pprint.pprint(fn)
         for f in lkeys:
-            txt += "%s %s " % (f, self.fields_name[f]['sqltype'])
-            if count < (size - 1): txt += ', '
+            if 'ref' in fn[f]:
+                count += 1
+                continue
+#            print "F %s" % (f)
+            txt += "%s %s" % (f, fn[f]['type'].upper())
+            if count < (size - 1): 
+                txt += ', '
             count += 1
-        query = "CREATE TABLE %s (%s);" % (self.table_name, txt)
+        query = "CREATE TABLE IF NOT EXISTS %s (%s);" % (self.table_name, txt)
         return self._create(handle, query)
 
     def get(self, handle, id):
@@ -60,6 +66,16 @@ class Itable(object):
             if not path[0] in struct: return None
             return self.get_property(struct[path[0]], path[1:])
 
+    def insert_json(self, handle, json):
+        where = {}
+        for field in self.fields_name.keys():
+            f = self.fields_name[field]
+            if not f['jsonmap']: continue
+            value = self.get_property(json,f['jsonmap'])
+            if not value: continue
+            where[field] = value
+        return self.insert(handle,where)
+    
     def insert(self, handle, where):
         if self.pk and not where.get(self.pk):
             print "[IGNORE] Cannot insert data without Primary Key: " + repr(self.pk)

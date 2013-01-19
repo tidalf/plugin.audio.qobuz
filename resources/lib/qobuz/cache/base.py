@@ -11,12 +11,13 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from time import time
-__version__ = "0.0.1"
-__author__ = "d@corp/cache/%s" % (__version__)
+__seed__ = __name__ + '0.0.1'
 __magic__ = 0
-for i in [ord(c) for c in __author__[:]]:
-    __magic__ += i
-
+pos = 0
+for i in [ ord(c) for c in __seed__[:]]:
+    __magic__ += i * 2**pos
+    pos+=1
+print "Magic: %s" % __magic__
 BadMagic = 1 << 1
 BadKey = 1 << 2
 NoData = 1 << 3
@@ -27,13 +28,15 @@ class CacheBase(object):
     ''' A base class for caching
     '''
     def __init__(self, *a, **ka):
-        pass
-
+        self.cached_function_name = __name__
+        self.black_keys = []
+    
     def cached(self, f, *a, **ka):
         '''Decorator
             All positional and named parameters are used to make the key
         '''
         that = self
+        self.cached_function_name = f.__name__
         def wrapped_function(self, *a, **ka):
             that.error = 0
             key = that.make_key(*a, **ka)
@@ -51,8 +54,12 @@ class CacheBase(object):
             if data is None:
                 that.error &= NoData
                 return None
-            if 'password' in ka:
-                ka['password'] = '***'
+            for key in that.black_keys:
+                if key in ka:
+                    print "Named parameter removed from cache %s" % (key)
+                    del ka[key]
+#            if 'password' in ka:
+#                ka['password'] = '***'
             entry = {
                  'updated_on': time(),
                  'data': data,
@@ -72,7 +79,6 @@ class CacheBase(object):
             return False
         updated_on = data['updated_on']
         ttl = data['ttl']
-        print "Is Fresh"
         if ttl == 0:
             return -1
         diff = (updated_on + ttl) - time()

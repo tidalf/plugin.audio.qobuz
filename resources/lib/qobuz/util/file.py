@@ -23,14 +23,13 @@ import tempfile
 
 from debug import warn
 
-def file_unlink(filename):
+def unlink(filename):
     if not os.path.exists(filename):
         return False
-    tmpfile = tempfile.mktemp('.del', '', os.path.dirname(filename))
-    print "TmpFile: %s" % (tmpfile)
+    tmpfile = tempfile.mktemp('.dat', 'invalid-', os.path.dirname(filename))
     os.rename(filename, tmpfile)
-    os.unlink(tmpfile)
-        
+    return os.unlink(tmpfile)
+    
 # From http://stackoverflow.com/questions/12003805/threadsafe-and-fault-tolerant-file-writes
 class RenamedTemporaryFile(object):
     """
@@ -48,7 +47,6 @@ class RenamedTemporaryFile(object):
 
         self.tmpfile = tempfile.NamedTemporaryFile(dir=tmpfile_dir, 
                                                    delete=False, **kwargs)
-        print "%s / %s" % (tmpfile_dir, self.tmpfile.name)
         self.final_path = final_path
         
     def __getattr__(self, attr):
@@ -72,56 +70,9 @@ class RenamedTemporaryFile(object):
             os.unlink(self.tmpfile.name)
         return result
 
-class FileUtil():
 
-    def __init__(self):
-        pass
-
-    def generate_filename(self, size=8, chars=string.ascii_letters + string.digits):
-        return ''.join(random.choice(chars) for x in range(size))
-
-    def _write(self, path, flag, data):
-        with RenamedTemporaryFile(path) as fo:
-            fo.write(data)
-            fo.flush()
-            os.fsync(fo)
-            return True
-        return False
-
-    def _unlink(self, path):
-        if not os.path.exists(path):
-            return False
-        os.unlink(path)
-        retry = 3
-        ret = False
-        while retry > 0:
-            if not os.path.exists(path):
-                return True
-            time.sleep(.250)
-            retry -= 1
-        return False
-
-    def _safe_unlink(self, path):
-        if not os.path.exists(path):
-            return True
-        basepath = os.path.dirname(path)
-        new = self.generate_filename() + '.' + self.generate_filename(3)
-        newpath = os.path.join(basepath, new)
-        os.rename(path, newpath)
-        if not os.path.exists(newpath):
-            return False
-        self._unlink(newpath)
-
-    def write(self, path, data):
-        if os.path.exists(path):
-            return False
-        return self._write(path, os.O_WRONLY | os.O_EXCL | os.O_CREAT, data)
-
-    def unlink(self, path):
-        return self._safe_unlink(path)
-
-    ''' Find '''
-    def find(self, directory, pattern, callback=None, gData=None):
+''' Find '''
+def find(directory, pattern, callback=None, gData=None):
         flist = []
         fok = re.compile(pattern)
         for dirname, dirnames, filenames in os.walk(directory):
@@ -133,7 +84,7 @@ class FileUtil():
                             if not callback(path, gData):
                                 return None
                         except Exception as e:
-                            warn(self, "Callback raise exception: " + repr(e))
+                            warn('[find]', "Callback raise exception: " + repr(e))
                             return None
                     flist.append(path)
         return flist

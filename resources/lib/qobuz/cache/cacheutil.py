@@ -8,39 +8,36 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 
-from util.file import FileUtil
+from util.file import find
 
-class CacheUtil(object):
-
-    def __init__(self):
-        pass
-
-    def clean_old(self, cache):
+def clean_old(cache):
         """Callback deleting one file
         """
         def delete_one(filename, info):
-            info['count'] += 1
             data = cache.load_from_store(filename)
-            ttl = cache.is_fresh(None, None, data)
+            if not cache.check_magic(data):
+                raise TypeError('magic mismatch')
+            ttl = cache.is_fresh( data['key'], data)
             if ttl:
                 return True
             print "TTL: %s / Delete: %s" % (str(ttl), filename)
-            cache.delete(None, data['key'])
+            cache.delete(data['key'])
             return True
-        info = {'count': 0}
-        fu = FileUtil()
-        fu.find(cache.base_path, '^.*\.dat$', delete_one, info)
+        find(cache.base_path, '^.*\.dat$', delete_one)
         return True
 
-    def clean_all(self, cache):
-        """Callback deleting one file
-        """
+def clean_all(cache):
+        '''Clean all data from cache
+        '''
         def delete_one(filename, info):
-            info['count'] += 1
+            '''::callback that delete one file
+            '''
+            print "Deleting filename: %s" % (filename)
             data = cache.load_from_store(filename)
-            cache.delete(None, data['key'])
+            if not cache.check_magic(data):
+                print "Error: bad magic, skipping file %s" % (filename)
+                return True
+            cache.delete(data['key'])
             return True
-        info = {'count': 0}
-        fu = FileUtil()
-        fu.find(cache.base_path, '^.*\.dat$', delete_one, info)
+        find(cache.base_path, '^.*\.dat$', delete_one)
         return True

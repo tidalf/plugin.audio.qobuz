@@ -24,8 +24,8 @@ from purchases import Node_purchases
 from friend_list import Node_friend_list
 #from genre import Node_genre
 from gui.util import getSetting, executeBuiltin, lang
-from cache import cache, cacheutil
-import qobuz
+from cache import cache
+from cache.cacheutil import clean_all
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -64,7 +64,7 @@ class Node_root(INode):
         if not yesno(lang(31102), lang(31103)):
             log(self, "Deleting cached data aborted")
             return False
-        if cacheutil.clean_all(cache):
+        if clean_all(cache):
             notifyH(lang(31100), lang(31104))
         else:
             notifyH(lang(31100), lang(31101),

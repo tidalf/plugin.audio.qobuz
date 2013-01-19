@@ -49,7 +49,8 @@ while not (try_get_settings()):
 
 import qobuz
 from api import easyapi
-easyapi.cache_base_path = qobuz.path.cache
+from cache import cache
+cache.base_path = qobuz.path.cache
 easyapi.login(username, password)
 
 

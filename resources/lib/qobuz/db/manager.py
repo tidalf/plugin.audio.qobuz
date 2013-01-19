@@ -31,7 +31,8 @@ class DbmHandle():
         self.path = path
         
     def __enter__(self):
-        handle = sqlite.connect(path)
+        print "Path: %s" % (self.path)
+        handle = sqlite.connect(self.path)
         if handle is None:
             raise DbmErrors()
         self.handle = handle
@@ -50,7 +51,7 @@ class Manager():
         self.handle = None
         self.tables = {
                        'track':  Track(),
-                       'product':  Album(),
+                       'album':  Album(),
                        'artist': Artist(),
                        'genre': Genre(),
                        'label': Label()
@@ -70,8 +71,8 @@ class Manager():
     def connect(self, path = None):
         if path: self.path = path
         else: path = self.path
-        if self.exists():
-            os.unlink(self.path)
+#        if self.exists():
+#            os.unlink(self.path)
         if not self.exists():
             if not self.auto_create:
                 self.error = "Database doesn't exist and auto create is false."
