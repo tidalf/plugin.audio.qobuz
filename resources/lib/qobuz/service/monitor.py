@@ -155,7 +155,7 @@ class Monitor(xbmc.Monitor):
                 print line[0]
                 musicdb_idAlbum = line[0]
                 import re
-                search = re.search(r'aid=(\d+)', line[1])
+                search = re.search(u'aid=(\d+)', line[1])
                 if not search:
                     continue
                 qobuz_idAlbum = search.group(1) 
