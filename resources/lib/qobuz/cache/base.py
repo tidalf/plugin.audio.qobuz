@@ -53,9 +53,7 @@ class CacheBase(object):
                 that.error &= NoData
                 return None
             for black_key in that.black_keys:
-                print "Black keys ... %s" % (black_key)
                 if black_key in ka:
-                    print "Named parameter removed from cache %s" % (black_key)
                     del ka[black_key]
             entry = {
                  'updated_on': time(),
