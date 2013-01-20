@@ -17,7 +17,6 @@ pos = 0
 for i in [ ord(c) for c in __seed__[:]]:
     __magic__ += i * 2**pos
     pos+=1
-print "Magic: %s" % __magic__
 BadMagic = 1 << 1
 BadKey = 1 << 2
 NoData = 1 << 3
@@ -29,8 +28,7 @@ class CacheBase(object):
     '''
     def __init__(self, *a, **ka):
         self.cached_function_name = __name__
-        self.black_keys = []
-    
+
     def cached(self, f, *a, **ka):
         '''Decorator
             All positional and named parameters are used to make the key
@@ -54,12 +52,11 @@ class CacheBase(object):
             if data is None:
                 that.error &= NoData
                 return None
-            for key in that.black_keys:
-                if key in ka:
-                    print "Named parameter removed from cache %s" % (key)
-                    del ka[key]
-#            if 'password' in ka:
-#                ka['password'] = '***'
+            for black_key in that.black_keys:
+                print "Black keys ... %s" % (black_key)
+                if black_key in ka:
+                    print "Named parameter removed from cache %s" % (black_key)
+                    del ka[black_key]
             entry = {
                  'updated_on': time(),
                  'data': data,
@@ -106,10 +103,10 @@ class CacheBase(object):
             Data: Arbitrary data
         '''
         raise NotImplemented()
-    
+
     def load_from_store(self, *a, **ka):
         raise NotImplemented()
-    
+
     def sync(self, key, data, *a, **ka):
         raise NotImplemented()
 

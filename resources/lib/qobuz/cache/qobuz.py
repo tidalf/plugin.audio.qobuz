@@ -24,3 +24,15 @@ class CacheQobuz(CacheFile):
         if 'user_id' in ka:
             return getSetting('cache_duration_middle', isInt=True) * 60
         return getSetting('cache_duration_long', isInt=True) * 60
+    
+    def sync(self, key, data):
+        '''We don't want to store password in the cache'''
+        import pprint    
+#        if 'password' in data['ka']:
+#            data['ka']['password'] = '***'
+        if 'user' in data['data']:
+            if 'password' in data['data']['user']:
+                print 'Removing password from cached data'
+                data['data']['user']['password'] = '***'
+        print "SAVING: %s" % (pprint.pformat(data))
+        return super(CacheQobuz, self).sync(key, data)

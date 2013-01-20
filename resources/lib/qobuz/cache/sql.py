@@ -15,6 +15,7 @@ class CacheSQL(CacheBase):
 
     def __init__(self, *a, **ka):
         self.parseable = ['albums', 'album']
+        self.black_keys = ['password']
         super(CacheSQL, self).__init__()
 
     def load(self, key, *a, **ka):
