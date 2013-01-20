@@ -19,7 +19,7 @@ from inode import INode
 from debug import warn, error
 from gui.util import lang, getImage, getSetting
 from playlist import Node_playlist
-from api import easyapi
+from api import api
 
 class Node_user_playlists(INode):
     """User playlists node
@@ -53,8 +53,8 @@ class Node_user_playlists(INode):
     
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = easyapi.get('/playlist/getUserPlaylists', limit=limit, 
-                                offset=self.offset, user_id=easyapi.user_id)
+        data = api.get('/playlist/getUserPlaylists', limit=limit, 
+                                offset=self.offset, user_id=api.user_id)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False

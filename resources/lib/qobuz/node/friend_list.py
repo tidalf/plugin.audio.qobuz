@@ -21,7 +21,7 @@ from inode import INode
 from friend import Node_friend
 from debug import info, warn
 from gui.util import getImage, runPlugin, containerUpdate, lang
-from api import easyapi
+from api import api
 
 '''
     @class Node_friend_list:
@@ -61,18 +61,18 @@ class Node_friend_list(INode):
         return True
     
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
-        username = easyapi.username
-        password = easyapi.password
-        user_id = easyapi.user_id
-        user_data = easyapi.get('user/login', username=username, 
+        username = api.username
+        password = api.password
+        user_id = api.user_id
+        user_data = api.get('user/login', username=username, 
                                 password=password)
         friend_data = user_data['user']['player_settings']['friends']
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
-            data = easyapi.get('playlist/getUserPlaylists', 
+            data = api.get('playlist/getUserPlaylists', 
                                name=self.name, limit=0)
         else:
-            data = easyapi.get('playlist/getUserPlaylists', 
+            data = api.get('playlist/getUserPlaylists', 
                                user_id=user_id, limit=0)
         if not data:
             warn(self, "No friend data")

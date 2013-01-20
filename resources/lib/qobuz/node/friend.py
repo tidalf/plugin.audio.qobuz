@@ -24,7 +24,7 @@ from playlist import Node_playlist
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, getSetting, lang
-from api import easyapi
+from api import api
 '''
     @class Node_friend:
 '''
@@ -74,12 +74,12 @@ class Node_friend(INode):
         return True
     
     def create(self, name=None):
-        username = easyapi.username
-        password = easyapi.password
-        friendpl = easyapi.get('playlist/getUserPlaylists', username=name)
+        username = api.username
+        password = api.password
+        friendpl = api.get('playlist/getUserPlaylists', username=name)
         if not friendpl:
             return False
-        user = easyapi.get('user/login', username=username, password=password)
+        user = api.get('user/login', username=username, password=password)
         if user['user']['login'] == name:
             return False
         if not user:
@@ -94,7 +94,7 @@ class Node_friend(INode):
         friends.append(name)
         newdata = {'friends': friends}
         #easyapi.get(name='user')
-        if not easyapi.user_update(player_settings=json.dumps(newdata)):
+        if not api.user_update(player_settings=json.dumps(newdata)):
             return False
 #        qobuz.registry.delete(name='user')
         executeBuiltin(containerRefresh())
@@ -123,7 +123,7 @@ class Node_friend(INode):
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
-        if not easyapi.user_update(player_settings=json.dumps(newdata)):
+        if not api.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', 'Friend %s added' % (name))
             notifyH('Qobuz', "Cannot updata friend's list...", 
                     'icon-error-256')
@@ -134,7 +134,7 @@ class Node_friend(INode):
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        data = easyapi.get('playlist/getUserPlaylists', username=self.name)
+        data = api.get('playlist/getUserPlaylists', username=self.name)
         if not data:
             warn(self, "No friend data")
             return False

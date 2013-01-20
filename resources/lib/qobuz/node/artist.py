@@ -21,7 +21,7 @@ from debug import warn
 from gui.util import getSetting
 from gui.contextmenu import contextMenu
 
-from api import easyapi
+from api import api
 
 '''
     @class Node_artist(Inode): Artist
@@ -46,7 +46,7 @@ class Node_artist(INode):
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = easyapi.get('artist/get', artist_id=self.id, limit=limit, 
+        data = api.get('/artist/get', artist_id=self.id, limit=limit, 
                            offset=self.offset, extra='albums')
         if not data:
             warn(self, "Build-down: Cannot fetch artist data")

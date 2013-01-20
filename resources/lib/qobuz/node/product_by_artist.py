@@ -21,7 +21,7 @@ from inode import INode
 from product import Node_product
 from debug import warn
 import weakref
-from api import easyapi
+from api import api
 from gui.contextmenu import contextMenu
 from gui.util import getSetting
 
@@ -63,7 +63,7 @@ class Node_product_by_artist(INode):
     '''
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = easyapi.get('artist/getSimilarArtist',
+        data = api.get('artist/getSimilarArtist',
             artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())

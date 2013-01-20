@@ -20,7 +20,7 @@ from inode import INode
 from debug import warn
 from gui.util import lang, getImage, runPlugin, getSetting
 from gui.contextmenu import contextMenu
-from api import easyapi
+from api import api
 
 '''
     NODE TRACK
@@ -41,7 +41,7 @@ class Node_track(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
             return False
-        data = easyapi.get('/track/get', track_id=self.id)
+        data = api.get('/track/get', track_id=self.id)
         if not data:
             return False
         self.data = data
@@ -132,14 +132,14 @@ class Node_track(INode):
 
     def get_streaming_url(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
-        data = easyapi.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id, user_id=easyapi.user_id)
+        data = api.get('/track/getFileUrl', format_id=format_id,
+                           track_id=self.id, user_id=api.user_id)
         if not data:
             return ''
         if not 'url' in data:
             warn(self, 
                  "streaming_url, no url returned\n" +  
-                 "API Error: %s" % (easyapi.error)) 
+                 "API Error: %s" % (api.error)) 
             return ''
         return data['url']
 
@@ -196,8 +196,8 @@ class Node_track(INode):
 
     def is_sample(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
-        data = easyapi.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id, user_id=easyapi.user_id)
+        data = api.get('/track/getFileUrl', format_id=format_id,
+                           track_id=self.id, user_id=api.user_id)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
@@ -208,8 +208,8 @@ class Node_track(INode):
 
     def get_mimetype(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
-        data = easyapi.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id, user_id=easyapi.user_id)
+        data = api.get('/track/getFileUrl', format_id=format_id,
+                           track_id=self.id, user_id=api.user_id)
         formatId = None
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")

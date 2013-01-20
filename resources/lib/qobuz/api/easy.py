@@ -2,8 +2,8 @@
     qobuz.api.easy
     ~~~~~~~~~~~~~~~~~~
 
-    Add get to qobuz.api.raw
-    
+    Add get to qobuz.api.raw, All requests made trough this method are cached (
+    see qobuz.cache.qobuz)
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
@@ -22,17 +22,41 @@ class QobuzApiEasy(QobuzApiRaw):
         self.cache_base_path = None
         super(QobuzApiEasy, self).__init__()
         self.is_logged = False
+        ''' Setting default stream format to mp3 '''
         self.stream_format = 5
 
     @cache.cached
     @sql.cached
     def get(self, *a, **ka):
+        '''Wrapper that cache query to our raw api. We are enforcing format
+        because cache entry key are made based on *a and **ka parameters. 
+        ('artist/get' and '/artist/get' will generate different key)
+        Path are mapped to raw api and raise InvalidQuery on error
+
+        ::example
+        from api import api
+        from cache import cache
+        cace.base_path = '/srv/qobuz/cache/'
+        data = api.get('/artist/get')
+        data = api.get('/user/login', 
+                        username=api.username, 
+                        password=api.password)
+                        
+        :: note Named parameters are sorted before we generate our key
+        
+        ::return
+            Pyton Dictionary on success
+            None on error
+            
+        ::note api.error will contain last error message
+        '''
         path = '/'.join(a)
         path.replace('//', '/') # Defected for n / ...
-        if path.startswith('/'):
-            path = path[1:]
+        if not path.startswith('/'):
+            raise InvalidQuery("Missing starting << / >>")
+        path = path[1:]
         if path.endswith('/'):
-            path = path[0:len(path) - 1]
+            raise InvalidQuery('Invalid trailing << / >>')
         xpath = path.split('/')
         if len(xpath) < 1:
             raise InvalidQuery(path)
@@ -46,6 +70,8 @@ class QobuzApiEasy(QobuzApiRaw):
         return getattr(self, methname)(**ka)
 
     def __clean_ka(self, endpoint, method, **ka):
+        ''' We are removing some key that are not needed by our raw api but 
+        generate different cache entry (Data bound to specific user...) '''
         keys = []
         if endpoint == 'track' and method == 'getFileUrl':
             if 'user_id' in ka:
@@ -56,6 +82,12 @@ class QobuzApiEasy(QobuzApiRaw):
         return keys
         
     def login(self, username, password):
+        '''We are stocking our authentication token back to our raw api on 
+        success.
+
+        ::return 
+            True on success, else False
+        '''
         self.username = username
         self.password = password
         data = self.get('user/login', username=username, password=password)

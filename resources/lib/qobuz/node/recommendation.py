@@ -17,7 +17,7 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-from api import easyapi
+from api import api
 from flag import NodeFlag as Flag
 from inode import INode
 from product import Node_product
@@ -86,7 +86,7 @@ class Node_recommendation(INode):
             return True
         offset = self.offset or 0
         limit = getSetting('pagination_limit')
-        data = easyapi.get('/album/getFeatured',
+        data = api.get('/album/getFeatured',
                                   type=RECOS_TYPE_IDS[int(self.genre_type)],
                                   genre_id=self.genre_id,
                                   limit=limit,

@@ -24,7 +24,7 @@ from gui.util import lang, getSetting
 from gui.util import getImage, notifyH, executeBuiltin, containerUpdate 
 from util import getNode
 from renderer import renderer
-from api import easyapi
+from api import api
 from exception import QobuzXbmcError as Qerror
 from track import Node_track
 
@@ -46,8 +46,8 @@ class Node_favorites(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = easyapi.get('favorite/getUserFavorites', 
-                           user_id=easyapi.user_id, 
+        data = api.get('favorite/getUserFavorites', 
+                           user_id=api.user_id, 
                            limit=limit, 
                            offset=self.offset)
         if not data:

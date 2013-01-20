@@ -18,7 +18,7 @@ from flag import NodeFlag as Flag
 from inode import INode
 from artist import Node_artist
 from gui.util import lang, getSetting
-from api import easyapi
+from api import api
 
 '''
     NODE ARTIST
@@ -37,7 +37,7 @@ class Node_similar_artist(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = easyapi.get('/artist/getSimilarArtists', artist_id=self.id, 
+        data = api.get('/artist/getSimilarArtists', artist_id=self.id, 
                            offset=self.offset, limit=limit)
         if not data:
             return False

@@ -19,7 +19,7 @@ from inode import INode
 from debug import warn
 from gui.util import getImage, getSetting, htm2xbmc
 from gui.contextmenu import contextMenu
-from api import easyapi
+from api import api
 '''
     @class Node_product:
 '''
@@ -59,7 +59,7 @@ class Node_product(INode):
                 self.is_special_purchase = True
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = easyapi.get('album/get', album_id=self.id)
+        data = api.get('/album/get', album_id=self.id)
         if not data:
             warn(self, "Cannot fetch product data")
             return False

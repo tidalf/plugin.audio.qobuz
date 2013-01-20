@@ -17,7 +17,7 @@
 from flag import NodeFlag
 from inode import INode
 from debug import warn
-from api import easyapi
+from api import api
 from product import Node_product
 from track import Node_track
 from gui.util import lang, getImage, getSetting
@@ -35,8 +35,8 @@ class Node_purchases(INode):
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = easyapi.get('/purchase/getUserPurchases', limit=limit, 
-                           offset=self.offset, user_id=easyapi.user_id)
+        data = api.get('/purchase/getUserPurchases', limit=limit, 
+                           offset=self.offset, user_id=api.user_id)
         if not data:
             warn(self, "Cannot fetch purchases data")
             return False

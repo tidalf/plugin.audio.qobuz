@@ -25,7 +25,7 @@ from product_by_artist import Node_product_by_artist
 from exception import QobuzXbmcError
 from gui.util import notifyH, lang, getImage, getSetting
 import urllib
-from api import easyapi
+from api import api
 
 class Node_search(INode):
 
@@ -88,7 +88,7 @@ class Node_search(INode):
                 return False
             query = k.getText()
         query.strip()
-        data = easyapi.get('search/getResults', query=query, type=stype, 
+        data = api.get('search/getResults', query=query, type=stype, 
                            limit=limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")

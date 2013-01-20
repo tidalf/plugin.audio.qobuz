@@ -28,7 +28,7 @@ from gui.util import notifyH, color, lang, getImage, runPlugin, \
 from util import  getNode
 from renderer import renderer
 from gui.contextmenu import contextMenu
-from api import easyapi
+from api import api
 
 '''
     @class Node_playlist:
@@ -79,7 +79,7 @@ class Node_playlist(INode):
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = easyapi.get('/playlist/get',playlist_id=self.id, 
+        data = api.get('/playlist/get',playlist_id=self.id, 
             offset=self.offset, limit=limit, extra='tracks')
 #        data = qobuz.registry.get(
 #            name=registryKey, id=self.id, playlist_id=self.id, 
@@ -181,7 +181,12 @@ class Node_playlist(INode):
 
     def remove_tracks(self, tracks_id):
         info(self, "Removing tracks: " + tracks_id)
-        qobuz.registry.get(name='user')
+        limit = getSetting('pagination_limit')
+        data = api.get('/user/login', artist_id=self.id, 
+                           offset=self.offset, limit=limit)
+        if not data:
+            return False
+        #qobuz.registry.get(name='user')
         result = api.playlist_deleteTracks(
             playlist_id=self.id, playlist_track_ids=tracks_id)
         if not result:
