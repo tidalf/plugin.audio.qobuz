@@ -64,15 +64,15 @@ class Node_friend_list(INode):
         username = api.username
         password = api.password
         user_id = api.user_id
-        user_data = api.get('user/login', username=username, 
+        user_data = api.get('/user/login', username=username, 
                                 password=password)
         friend_data = user_data['user']['player_settings']['friends']
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
-            data = api.get('playlist/getUserPlaylists', 
+            data = api.get('/playlist/getUserPlaylists', 
                                name=self.name, limit=0)
         else:
-            data = api.get('playlist/getUserPlaylists', 
+            data = api.get('/playlist/getUserPlaylists', 
                                user_id=user_id, limit=0)
         if not data:
             warn(self, "No friend data")

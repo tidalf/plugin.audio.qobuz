@@ -50,10 +50,10 @@ class QobuzApiEasy(QobuzApiRaw):
             
         ::note api.error will contain last error message
         '''
+        if not a[0] or not a[0].startswith('/'):
+            raise InvalidQuery("Missing starting << / >>")
         path = '/'.join(a)
         path.replace('//', '/') # Defected for n / ...
-        if not path.startswith('/'):
-            raise InvalidQuery("Missing starting << / >>")
         path = path[1:]
         if path.endswith('/'):
             raise InvalidQuery('Invalid trailing << / >>')
@@ -90,7 +90,7 @@ class QobuzApiEasy(QobuzApiRaw):
         '''
         self.username = username
         self.password = password
-        data = self.get('user/login', username=username, password=password)
+        data = self.get('/user/login', username=username, password=password)
         if not data:
             return False
         user = data['user']

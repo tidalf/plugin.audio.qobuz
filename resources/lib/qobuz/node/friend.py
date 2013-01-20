@@ -76,10 +76,10 @@ class Node_friend(INode):
     def create(self, name=None):
         username = api.username
         password = api.password
-        friendpl = api.get('playlist/getUserPlaylists', username=name)
+        friendpl = api.get('/playlist/getUserPlaylists', username=name)
         if not friendpl:
             return False
-        user = api.get('user/login', username=username, password=password)
+        user = api.get('/user/login', username=username, password=password)
         if user['user']['login'] == name:
             return False
         if not user:
@@ -134,7 +134,7 @@ class Node_friend(INode):
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('playlist/getUserPlaylists', username=self.name)
+        data = api.get('/playlist/getUserPlaylists', username=self.name)
         if not data:
             warn(self, "No friend data")
             return False

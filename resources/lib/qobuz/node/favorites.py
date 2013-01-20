@@ -46,7 +46,7 @@ class Node_favorites(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('favorite/getUserFavorites', 
+        data = api.get('/favorite/getUserFavorites', 
                            user_id=api.user_id, 
                            limit=limit, 
                            offset=self.offset)
