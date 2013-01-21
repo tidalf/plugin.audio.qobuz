@@ -23,6 +23,8 @@ from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, getSetting, lang
 from api import api
+from cache import cache
+
 from node import Flag, getNode
 
 class Node_friend(INode):
@@ -99,16 +101,28 @@ class Node_friend(INode):
         executeBuiltin(containerRefresh())
         return True
 
+    def get_user_data(self):
+        data = api.get('/user/login', username=api.username, 
+                       password=api.password)
+        if not data: 
+            return None
+        return data['user']
+    
+    def delete_cache(self):
+        key = cache.make_key('/user/login', username=api.username, 
+                             password=api.password)
+        cache.delete(key)
+        
     def remove(self):
         name = self.get_parameter('name')
         if name == 'qobuz.com':
             return False
         if not name:
             return False
-        user = qobuz.registry.get(name='user')
+        user = self.get_user_data()
         if not user:
             return False
-        friends = user['data']['user']['player_settings']
+        friends = user['player_settings']
         if not 'friends' in friends:
             notifyH('Qobuz', "You don't have friend", 
                     'icon-error-256')
@@ -128,7 +142,7 @@ class Node_friend(INode):
                     'icon-error-256')
             return False
         notifyH('Qobuz', 'Friend %s removed' % (name))
-        qobuz.registry.delete(name='user')
+        self.delete_cache()
         executeBuiltin(containerRefresh())
         return True
 

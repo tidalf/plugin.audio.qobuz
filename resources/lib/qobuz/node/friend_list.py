@@ -69,7 +69,7 @@ class Node_friend_list(INode):
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
             data = api.get('/playlist/getUserPlaylists', 
-                               name=self.name, limit=0)
+                               username=self.name, limit=0)
         else:
             data = api.get('/playlist/getUserPlaylists', 
                                user_id=user_id, limit=0)

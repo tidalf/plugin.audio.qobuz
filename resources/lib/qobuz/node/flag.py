@@ -20,7 +20,6 @@ from debug import warn
 
 class __Flag__():
     def __init__(self):
-        print "Setting flags"
         self.NODE = 1 << 1
         self.TRACK = 1 << 2
         self.PLAYLIST = 1 << 3

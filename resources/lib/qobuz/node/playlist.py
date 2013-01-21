@@ -137,7 +137,6 @@ class Node_playlist(INode):
                           label="Playlist", cmd=cmd, mode=Mode.VIEW)
         if login != self.get_property('owner/name'):
             isOwner = False
-        label = self.get_label()
         
         if isOwner:
             url = self.make_url(type=Flag.PLAYLIST, mode=Mode.VIEW,
