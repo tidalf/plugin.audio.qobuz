@@ -267,6 +267,12 @@ class Node_favorites(INode):
             return True
         return False
 
+    def del_artist(self, artist_id):
+        if api.favorite_delete(artist_ids=artist_id):
+            self._delete_cache()
+            return True
+        return False
+
     def gui_remove(self):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         node = getNode(qnt, {'nid': qid})
@@ -275,6 +281,8 @@ class Node_favorites(INode):
             ret = self.del_track(node.nid)
         elif qnt & Flag.ALBUM == Flag.ALBUM:
             ret = self.del_album(node.nid)
+        elif qnt & Flag.ARTIST == Flag.ARTIST:
+            ret = self.del_artist(node.nid)
         else:
             raise Qerror(who=self, what='invalid_node_type', 
                          additional=self.nt)
