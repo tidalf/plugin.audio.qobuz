@@ -293,7 +293,7 @@ class Node_playlist(INode):
             warn(self, "Can't rename playlist without id")
             return False
         from gui.util import Keyboard
-        data = api.get('playlist/get', playlist_id=playlist_id)
+        data = api.get('/playlist/get', playlist_id=playlist_id)
         if not data:
             warn(self, "Something went wrong while renaming playlist")
             return False
@@ -328,7 +328,7 @@ class Node_playlist(INode):
     def gui_create(self):
         query = self.get_parameter('query', unQuote=True)
         #!TODO: Why we are no more logged ...
-        qobuz.registry.get(name='user')
+#        qobuz.registry.get(name='user')
         if not query:
             from gui.util import Keyboard
             k = Keyboard('', lang(42000))
@@ -342,7 +342,7 @@ class Node_playlist(INode):
             warn(self, "Cannot create playlist named '" + query + "'")
             return None
         self.set_as_current(ret['id'])
-        self.delete_cache(ret[id])
+        self.delete_cache(ret['id'])
         url = self.make_url(type=Flag.USERPLAYLISTS, nt='')
         executeBuiltin(containerUpdate(url))
         return ret['id']

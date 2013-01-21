@@ -25,7 +25,6 @@ from gui.util import color, getImage, runPlugin, containerRefresh, \
 from api import api
 from node import Flag, getNode
 
-
 class Node_friend(INode):
     '''
     @class Node_friend:
