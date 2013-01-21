@@ -21,7 +21,6 @@ from time import time
 import xbmcaddon
 import xbmcgui
 import xbmc
-import cPickle as pickle
 
 pluginId = 'plugin.audio.qobuz'
 __addon__ = xbmcaddon.Addon(id=pluginId)
@@ -35,22 +34,14 @@ qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
 sys.path.append(libDir)
 sys.path.append(qobuzDir)
 
-from exception import QobuzXbmcError
 from bootstrap import QobuzBootstrap
 from debug import warn, log
-from util.file import find, unlink
-from gui.util import containerRefresh, notifyH, getImage, executeBuiltin, \
-    setResolvedUrl
-from node.track import Node_track
 from api import api
 import threading
-from xbmcrpc import rpc
-from util import getNode
-from node.flag import NodeFlag as Flag
 import qobuz
 from cache import cache
 from cache.cacheutil import clean_old
-
+from node import getNode, Flag
 keyTrackId = 'QobuzPlayerTrackId'
 keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
@@ -207,7 +198,6 @@ class Monitor(xbmc.Monitor):
         clean_old(cache)
         
     def onSettingsChanged(self):
-#        self.cache_remove_user_data()
         pass
 
 boot = QobuzBootstrap(__addon__, 0)

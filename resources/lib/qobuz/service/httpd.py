@@ -64,9 +64,7 @@ else:
     stream_mime = 'audio/mpeg'
     
 from debug import log
-from node.flag import NodeFlag as Flag
-from node.track import Node_track
-from node.product import Node_product
+from node import getNode, Flag
 
 
 class XbmcAbort(Exception):
@@ -180,14 +178,14 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def __write_dir(self, node):
         w = self.wfile
         for track in node.data['tracks']['items']:
-            ntrack = Node_track(node)
+            ntrack = getNode(Flag.TRACK, {'parent': node})
             ntrack.data = track
             w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.flac<br>\n')
         w.close()
     
     def __GET_track(self, request):
         api.login(api.username, api.password)
-        node = Node_track(None, {'nid': request.track_id})
+        node = getNode(Flag.TRACK, {'nid': request.track_id})
         streaming_url = node.get_streaming_url()
         if not streaming_url:
             raise RequestFailed()
@@ -197,7 +195,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         self.end_headers()
         
     def __GET_cover(self, request):
-        node = Node_product(None, {'nid': request.album_id})
+        node = getNode(Flag.ALBUM, {'nid': request.album_id})
         node.fetch(None, None, None, None)
         self.send_response(200, "Ok")
         self.send_header('content-type', 'image/png')
@@ -208,7 +206,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         
     def __GET_album_nfo(self, request):
         print "Serving album.nfo for %s" % (request.album_id)
-        node = Node_product(None, {'nid': request.album_id})
+        node = getNode(Flag.ALBUM, {'nid': request.album_id})
         if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
@@ -219,7 +217,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     
     def __GET_dir(self, request):
         print "Serving dir for %s" % (request.album_id)
-        node = Node_product(None, {'nid': request.album_id})
+        node = getNode(Flag.ALBUM, {'nid': request.album_id})
         if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
