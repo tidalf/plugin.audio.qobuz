@@ -61,8 +61,11 @@ class Node_artist(INode):
         return self.nid
 
     def get_image(self):
-        image = self.get_property(['image/extralarge', 
-                                   'image/mega', 
+        image = self.get_property(['image/extralarge',
+                                   'image/mega',
+                                   'image/large',
+                                   'image/medium',
+                                   'image/small',
                                    'picture'])
         if image: 
             image = image.replace('126s', '_')

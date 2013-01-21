@@ -79,6 +79,7 @@ class Node_favorites(INode):
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST)
             node.data = artist
+            node.fetch(None, None, None, Flag.NONE)
             self.add_child(node)
 
     def get_description(self):
