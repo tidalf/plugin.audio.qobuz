@@ -42,7 +42,7 @@ from util.file import find, unlink
 from gui.util import containerRefresh, notifyH, getImage, executeBuiltin, \
     setResolvedUrl
 from node.track import Node_track
-from api import easyapi
+from api import api
 import threading
 from xbmcrpc import rpc
 from util import getNode
@@ -125,7 +125,7 @@ class MyPlayer(xbmc.Player):
                 return False 
             elapsed+=1
             xbmc.sleep(1000)
-        easyapi.track_resportStreamingStart(nid)
+        api.track_resportStreamingStart(nid)
         self.trackId = None
         return False
 

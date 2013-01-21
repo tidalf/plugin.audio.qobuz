@@ -14,15 +14,6 @@ cache_duration_middle = 60*60*24*365
 stream_format = 5
 __image__ = ''
 
-def try_get_settings():
-    try:
-        username = __addon__.getSetting('username')
-        password = __addon__.getSetting('password')
-        if (username and password):
-            return True
-        else:
-            return False
-    except: pass
 
 import xbmcaddon, xbmcplugin, xbmc
 
@@ -43,24 +34,29 @@ __handle__ = -1
 boot = QobuzBootstrap(__addon__, __handle__)
 boot.bootstrap_directories()
 
+def try_get_settings():
+    global username, password
+    username = __addon__.getSetting('username')
+    password = __addon__.getSetting('password')
+    if username and password:
+        return True
+    return False
+
 while not (try_get_settings()):
     xbmc.sleep(5000)
         # raise Exception("Missing Mandatory Parameter")
 
+print "USERNAME %s " % (username)
 import qobuz
-from api import easyapi
+from api import api
 from cache import cache
 cache.base_path = qobuz.path.cache
-easyapi.login(username, password)
+api.login(username, password)
 
 
 stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
 cache_durationm_middle = int(__addon__.getSetting('cache_duration_middle')) * 60
 cache_duration_long = int(__addon__.getSetting('cache_duration_long')) * 60
-
-username = ''
-password = ''
-base_path = ''
 
 if stream_format == 6:
     stream_mime = 'audio/flac'
@@ -190,6 +186,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         w.close()
     
     def __GET_track(self, request):
+        api.login(api.username, api.password)
         node = Node_track(None, {'nid': request.track_id})
         streaming_url = node.get_streaming_url()
         if not streaming_url:
@@ -289,6 +286,8 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.send_error(e.code, e.message)
         except RequestFailed as e:
             self.send_error(e.code, e.message)
+        except socket.error:
+            print "Socket error..."
         except Exception as e:
             msg = 'Server errors (%s / %s)\n%s' % (
                                                   sys.exc_type, sys.exc_value,
@@ -297,14 +296,22 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.send_error(500, msg)
 
 class QobuzHttpResolver(HTTPServer):
+
+    def __init__(self, server_address, RequestHandlerClass):
+        self.alive = True
+        HTTPServer.__init__(self, server_address, RequestHandlerClass)
     
     def get_request(self):
         """Get the request and client address from the socket."""
         # 10 second timeout
-        print "Waiting for request"
-        self.socket.settimeout(5.0)
+
+        self.socket.settimeout(2.0)
         result = None
         while result is None:
+            print "Waiting for request"
+            if not self.alive:
+                self.shutdown()
+                raise KeyboardInterrupt()
             try:
                 result = self.socket.accept()
             except socket.timeout:
@@ -312,22 +319,44 @@ class QobuzHttpResolver(HTTPServer):
         # Reset timeout on the new socket
         result[0].settimeout(None)
         return result
-    
+
     def verify_request(self, path, client_address): 
         host, port = client_address
         if host == '127.0.0.1': 
             return True
         return False
+    
+import threading
 
-#    def server_forever(self):
-#        if self.abort_requested():
-#            raise XbmcAbort()
-#        super(QobuzHttpResolver, self).serve_forever()
+class MonitorThread(threading.Thread, xbmc.Monitor):
+    
+    def __init__(self, httpd):        
+        self._stopevent = threading.Event()
+        threading.Thread.__init__(self)
+        xbmc.Monitor.__init__(self)
+        self.httpd = httpd
+        
+    def run(self):
+        while 1:
+            self._stopevent.wait(2)
+
+    def onAbortRequested(self):
+        self.httpd.shutdown()
+        raise KeyboardInterrupt()
+ 
+class QobuzXbmcHttpResolver(QobuzHttpResolver):
+
+    def __init__(self):
+        self.monitor = MonitorThread(self)
+        self.monitor.setDaemon(True)
+        self.monitor.start()
+        QobuzHttpResolver.__init__(self, ('127.0.0.1', 33574), 
+                                                    QobuzHttpResolver_Handler)
 
 def main():
     server = None
     try:
-        server = QobuzHttpResolver(('127.0.0.1', 33574), QobuzHttpResolver_Handler)
+        server = QobuzXbmcHttpResolver()
         log(server, 'Qobuz http resolver Starting...')
         server.serve_forever()
     except KeyboardInterrupt:

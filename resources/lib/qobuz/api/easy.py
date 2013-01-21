@@ -83,7 +83,7 @@ class QobuzApiEasy(QobuzApiRaw):
         return keys
         
     def login(self, username, password):
-        '''We are stocking our authentication token back to our raw api on 
+        '''We are storing our authentication token back to our raw api on 
         success.
 
         ::return 
