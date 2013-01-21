@@ -16,7 +16,6 @@ def getNode(qnt, params = {}):
         nodeName = Flag.to_s(qnt)
         modulePath = nodeName
         moduleName = 'Node_' + nodeName
-        print "Node %s / %s" % (modulePath, moduleName)
         """ from node.foo import Node_foo """
         modPackage = __import__(modulePath, globals(), 
                                 locals(), [moduleName], -1)
