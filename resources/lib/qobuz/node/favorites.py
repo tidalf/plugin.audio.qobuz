@@ -90,7 +90,7 @@ class Node_favorites(INode):
         if len(nodes) == 0:
             notifyH(dialogHeading, lang(36004))
             return False
-        ret = xbmcgui.Dialog().select(lang(36004), [
+        ret = xbmcgui.Dialog().select(lang(36005), [
            node.get_label() for node in nodes                              
         ])
         if ret == -1:
@@ -108,7 +108,7 @@ class Node_favorites(INode):
         if len(nodes) == 0:
             notifyH(dialogHeading, lang(36004))
             return False
-        ret = xbmcgui.Dialog().select(lang(36004), [
+        ret = xbmcgui.Dialog().select(lang(36007), [
            node.get_label() for node in nodes                              
         ])
         if ret == -1:
@@ -117,7 +117,7 @@ class Node_favorites(INode):
         if not self.add_artists(artist_ids):
             notifyH(dialogHeading, 'Cannot add artist(s) to favorite')
             return False
-        notifyH(dialogHeading, 'Album(s) added to favorite')
+        notifyH(dialogHeading, 'Artist(s) added to favorite')
         return True
     
 
