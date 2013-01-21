@@ -55,12 +55,12 @@ class Node_favorites(INode):
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
+        if 'artists' in self.data:
+            self.__populate_artists(Dir, lvl, whiteFlag, blackFlag)    
         if 'albums' in self.data:
             self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
         if 'tracks' in self.data:
             self.__populate_tracks(Dir, lvl, whiteFlag, blackFlag)
-        if 'artists' in self.data:
-            self.__populate_artists(Dir, lvl, whiteFlag, blackFlag)    
         return True
 
     def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
@@ -76,7 +76,7 @@ class Node_favorites(INode):
             self.add_child(node)
             
     def __populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
-        for album in self.data['artists']['items']:
+        for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST)
             node.data = artist
             self.add_child(node)
