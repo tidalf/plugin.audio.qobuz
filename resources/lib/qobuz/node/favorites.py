@@ -104,7 +104,7 @@ class Node_favorites(INode):
 
     def gui_add_artists(self):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
-        nodes = self.list_arists(qnt, qid)
+        nodes = self.list_artists(qnt, qid)
         if len(nodes) == 0:
             notifyH(dialogHeading, lang(36004))
             return False
@@ -113,7 +113,7 @@ class Node_favorites(INode):
         ])
         if ret == -1:
             return False
-        artist_ids = ','.join([node.nid for node in nodes])
+        artist_ids = ','.join([str(node.nid) for node in nodes])
         if not self.add_artists(artist_ids):
             notifyH(dialogHeading, 'Cannot add artist(s) to favorite')
             return False
@@ -221,23 +221,28 @@ class Node_favorites(INode):
         return nodes
 
     def list_artists(self, qnt, qid):
-        track_ids = {}
+        artist_ids = {}
         nodes = []
-        if qnt & Flag.TRACK == Flag.TRACK:
-            node = getNode(Flag.TRACK, {'nid': qid})
+        if qnt & Flag.ARTIST == Flag.ARTIST:
+            node = getNode(Flag.ARTIST, {'nid': qid})
             node.fetch(None, None, None, Flag.NONE)
-            track_ids[str(node.nid)] = 1
+            artist_ids[str(node.nid)] = 1
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
             render.depth = -1
-            render.whiteFlag = Flag.TRACK
+            render.whiteFlag = Flag.ALBUM & Flag.TRACK
+            render.blackFlag = Flag.TRACK & Flag.STOPBUILD
             render.asList = True
             render.run()
             for node in render.nodes:
-                if not str(node.nid) in track_ids:
-                    nodes.append(node)
-                    track_ids[str(node.nid)] = 1
+                print "Artist %s" % (node.get_artist_id())
+                artist = getNode(Flag.ARTIST, {'nid': node.get_artist_id()})
+                if not artist.fetch(None, None, None, Flag.NONE):
+                    continue
+                if not str(artist.nid) in artist_ids:
+                    nodes.append(artist)
+                    artist_ids[str(artist.nid)] = 1
         return nodes
 
     def add_tracks(self, track_ids):
