@@ -26,7 +26,7 @@ class Node_root(INode):
     '''
     def __init__(self, parent=None, parameters=None):
         super(Node_root, self).__init__(parent, parameters)
-        self.type = Flag.ROOT
+        self.nt = Flag.ROOT
         self.content_type = 'files'
         self.label = "Qobuz"
 

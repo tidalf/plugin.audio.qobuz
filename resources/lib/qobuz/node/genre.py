@@ -30,7 +30,7 @@ class Node_genre(INode):
     '''
     def __init__(self, parent=None, parameters=None):
         super(Node_genre, self).__init__(parent, parameters)
-        self.type = Flag.GENRE
+        self.nt = Flag.GENRE
         self.set_label(lang(42101))
         self.is_folder = True
         self.image = getImage('album')
@@ -38,8 +38,8 @@ class Node_genre(INode):
         
     def make_url(self, **ka):
         url = super(Node_genre, self).make_url(**ka)
-        if self.parent and self.parent.id:
-            url += "&parent-id=" + self.parent.id
+        if self.parent and self.parent.nid:
+            url += "&parent-id=" + self.parent.nid
         return url
 
     def hook_post_data(self):
@@ -57,7 +57,7 @@ class Node_genre(INode):
 
     def fetch(self, Dir, lvl , whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/genre/list', parent_id=self.id, offset=self.offset, 
+        data = api.get('/genre/list', parent_id=self.nid, offset=self.offset, 
                        limit=limit)
         if not data: 
             self.data = None
@@ -72,7 +72,7 @@ class Node_genre(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.data or len(self.data['genres']['items']) == 0:
             return self.populate_reco(Dir, lvl, 
-                                         whiteFlag, blackFlag, self.id)
+                                         whiteFlag, blackFlag, self.nid)
         for genre in self.data['genres']['items']:
             node = Node_genre(self, {'nid': genre['id']})
             node.data = genre

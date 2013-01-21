@@ -28,7 +28,7 @@ class Node_track(INode):
     '''
     def __init__(self, parent=None, parameters=None):
         super(Node_track, self).__init__(parent, parameters)
-        self.type = Flag.TRACK
+        self.nt = Flag.TRACK
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
@@ -38,7 +38,7 @@ class Node_track(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
             return False
-        data = api.get('/track/get', track_id=self.id)
+        data = api.get('/track/get', track_id=self.nid)
         if not data:
             return False
         self.data = data
@@ -52,8 +52,8 @@ class Node_track(INode):
         if 'asLocalURL' in ka and ka['asLocalURL']:
             return 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
                     str(self.get_artist_id()),
-                    str(self.parent.id),
-                    str(self.id))
+                    str(self.parent.nid),
+                    str(self.nid))
         if not 'mode' in ka: 
             ka['mode'] = Mode.PLAY 
         return super(Node_track, self).make_url(**ka)
@@ -87,14 +87,14 @@ class Node_track(INode):
             return album
         if not self.parent:
             return ''
-        if self.parent.type & Flag.ALBUM:
+        if self.parent.nt & Flag.ALBUM:
             return self.parent.get_title()
         return ''
     
     def get_album_id(self):
         aid = self.get_property('album/id')
         if not aid and self.parent:
-            return self.parent.id
+            return self.parent.nid
         return aid
     
     def get_image(self):
@@ -105,7 +105,7 @@ class Node_track(INode):
             return image.replace('_230.', '_600.')
         if not self.parent:
             return self.image
-        if self.parent.type & (Flag.ALBUM | Flag.PLAYLIST):
+        if self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
             return self.parent.get_image()
 
     def get_playlist_track_id(self):
@@ -123,14 +123,14 @@ class Node_track(INode):
             return genre
         if not self.parent:
             return ''
-        if self.parent.type & Flag.ALBUM:
+        if self.parent.nt & Flag.ALBUM:
             return self.parent.get_genre()
         return ''
 
     def get_streaming_url(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         data = api.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id, user_id=api.user_id)
+                           track_id=self.nid, user_id=api.user_id)
         if not data:
             return ''
         if not 'url' in data:
@@ -174,7 +174,7 @@ class Node_track(INode):
         import time
         try:
             date = self.get_property('album/released_at')
-            if not date and self.parent and self.parent.type & Flag.ALBUM:
+            if not date and self.parent and self.parent.nt & Flag.ALBUM:
                 return self.parent.get_year()
         except:
             pass
@@ -194,7 +194,7 @@ class Node_track(INode):
     def is_sample(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         data = api.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id, user_id=api.user_id)
+                           track_id=self.nid, user_id=api.user_id)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return ''
@@ -206,7 +206,7 @@ class Node_track(INode):
     def get_mimetype(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         data = api.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.id, user_id=api.user_id)
+                           track_id=self.nid, user_id=api.user_id)
         formatId = None
         if not data:
             warn(self, "Cannot get mime/type for track (network problem?)")
@@ -302,7 +302,7 @@ class Node_track(INode):
                 artist = '%s / %s' % (self.parent.get_artist(), artist)
         desc = description or 'Qobuz Music Streaming'
         item.setInfo(type='music', infoLabels={
-                     'count': self.id,
+                     'count': self.nid,
                      'title': self.get_title(),
                      'album': self.get_album(),
                      'genre': self.get_genre(),
@@ -324,10 +324,10 @@ class Node_track(INode):
         return item
 
     def attach_context_menu(self, item, menu):
-        if self.parent and (self.parent.type & Flag.PLAYLIST == Flag.PLAYLIST):
+        if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
             colorCaution = getSetting('item_caution_color')
-            url = self.parent.make_url(type=Flag.PLAYLIST,
-                id=self.parent.id,
+            url = self.parent.make_url(nt=Flag.PLAYLIST,
+                id=self.parent.nid,
                 qid=self.get_playlist_track_id(),
                 nm='gui_remove_track',
                 mode=Mode.VIEW)

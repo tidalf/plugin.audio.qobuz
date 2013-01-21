@@ -60,7 +60,7 @@ class Node_recommendation(INode):
     '''
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
-        self.type = Flag.RECOMMENDATION
+        self.nt = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
         self.set_label(lang(30082))
@@ -99,9 +99,11 @@ class Node_recommendation(INode):
     def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
         ''' Populate type, we don't have genre_type nor genre_id
         '''
+        import pprint
+        pprint.pprint(self.parameters)
         for gid in RECOS_TYPE_IDS:
-            node = Node_recommendation()
-            node.genre_type = gid
+            node = getNode(Flag.RECOMMENDATION, {'genre-type': gid})
+#            node.genre_type = gid
             node.set_label(
                 self.label + ' / ' + RECOS_TYPES[gid])
             self.add_child(node)
@@ -111,9 +113,10 @@ class Node_recommendation(INode):
         '''Populate genre, we have genre_type but no genre_id
         '''
         for genre_id in RECOS_GENRES:
-            node = Node_recommendation()
-            node.genre_type = self.genre_type
-            node.genre_id = genre_id
+            node = getNode(Flag.RECOMMENDATION, {'genre-type': self.genre_type,
+                                                 'genre-id': genre_id })
+#            node.genre_type = self.genre_type
+#            node.genre_id = genre_id
             label = '%s / %s / %s' % (self.label, 
                                       RECOS_TYPES[int(self.genre_type)],
                                      RECOS_GENRES[genre_id])  

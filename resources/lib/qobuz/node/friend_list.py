@@ -14,25 +14,20 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
-
 from inode import INode
 from debug import info, warn
 from gui.util import getImage, runPlugin, containerUpdate, lang
 from api import api
 from node import getNode, Flag
 
-'''
-    @class Node_friend_list:
-'''
-
-
 class Node_friend_list(INode):
-
-    def __init__(self, parent=None, parameters=None, progress=None):
+    '''
+    @class Node_friend_list:
+    '''
+    def __init__(self, parent=None, parameters=None):
         super(Node_friend_list, self).__init__(parent, parameters)
-        self.type = Flag.FRIEND_LIST
-        self.name = self.get_parameter('name')
+        self.nt = Flag.FRIEND_LIST
+        self.name = self.get_parameter('query')
         self.image = getImage('artist')
         self.label = str(self.name) + lang(41100) if (
             self.name) else lang(41101)
@@ -43,7 +38,7 @@ class Node_friend_list(INode):
     def make_url(self, **ka):
         url = super(Node_friend_list, self).make_url(**ka)
         if self.name:
-            url += "&name=" + self.name
+            url += "&query=" + self.name
         return url
 
     def get_image(self):
@@ -54,8 +49,7 @@ class Node_friend_list(INode):
 #        return data['data']['user']['avatar']
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        from friend import Node_friend
-        node = Node_friend(None, {})
+        node = getNode(Flag.FRIEND)
         node.create('qobuz.com')
         return True
     
@@ -93,7 +87,7 @@ class Node_friend_list(INode):
         friend_list = keys.keys()
         # and add them to the directory
         for name in friend_list:
-            node = getNode(Flag.FRIEND, {'name': str(name)})
+            node = getNode(Flag.FRIEND, {'query': str(name)})
             if name == self.name:
                 continue
             if name in friend_data:
@@ -104,7 +98,7 @@ class Node_friend_list(INode):
         label = self.get_label()
         url = self.make_url()
         menu.add(path='friend', label=label, cmd=containerUpdate(url))
-        url = self.make_url(type=Flag.FRIEND, nm='gui_create', id=self.id)
+        url = self.make_url(nt=Flag.FRIEND, nm='gui_create', nid=self.nid)
         menu.add(path='friend/add', label='Add', cmd=runPlugin(url))
 
         ''' Calling base class '''

@@ -14,9 +14,9 @@ from debug import log
 def getNode(qnt, params = {}):
         ''' Caching import ??? '''
         nodeName = Flag.to_s(qnt)
-#        log('getNode', 'Returning %s node' % (nodeName))
         modulePath = nodeName
         moduleName = 'Node_' + nodeName
+        print "Node %s / %s" % (modulePath, moduleName)
         """ from node.foo import Node_foo """
         modPackage = __import__(modulePath, globals(), 
                                 locals(), [moduleName], -1)
@@ -27,5 +27,9 @@ def getNode(qnt, params = {}):
             - no parent 
             - parameters 
             """
-        node = nodeModule(None, params)
+        parent = None
+        if 'parent' in params:
+            parent = params['parent']
+            del params['parent']
+        node = nodeModule(parent, params)
         return node

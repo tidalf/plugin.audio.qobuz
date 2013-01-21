@@ -27,9 +27,9 @@ from node import getNode, Flag
 
 class Node_search(INode):
 
-    def __init__(self, parent=None, params=None):
-        super(Node_search, self).__init__(parent, params)
-        self.type = Flag.SEARCH
+    def __init__(self, parent=None, parameters=None):
+        super(Node_search, self).__init__(parent, parameters)
+        self.nt = Flag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
         self.offset = self.get_parameter('offset') or 0
@@ -69,7 +69,7 @@ class Node_search(INode):
 
     def make_url(self, **ka):
         url = super(Node_search, self).make_url(**ka)
-        url += '&search-type=' + self.search_type
+        url += '&search-nt=' + self.search_type
         if self.query:
             url += '&query=' + self.query
         return url
@@ -86,7 +86,7 @@ class Node_search(INode):
                 return False
             query = k.getText()
         query.strip()
-        data = api.get('/search/getResults', query=query, type=stype, 
+        data = api.get('/search/getResults', query=query, nt=stype, 
                            limit=limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")

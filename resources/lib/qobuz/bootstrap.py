@@ -161,7 +161,7 @@ class QobuzBootstrap(object):
             return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
             r = renderer(self.nodeType, self.params)
-            r.whiteFlag = Flag.TRACK | Flag.PRODUCT
+            r.whiteFlag = Flag.TRACK | Flag.ALBUM
             r.depth = -1
             return r.run()
         elif self.MODE == Mode.SCAN:

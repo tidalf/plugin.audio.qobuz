@@ -20,9 +20,9 @@ class Node_album(INode):
     '''
         @class Node_product:
     '''
-    def __init__(self, parent=None, params=None):
+    def __init__(self, parent, params):
         super(Node_album, self).__init__(parent, params)
-        self.type = Flag.ALBUM
+        self.nt = Flag.ALBUM
         self.image = getImage('album')
         self.content_type = 'songs'
         self.is_special_purchase = False
@@ -35,19 +35,19 @@ class Node_album(INode):
             pass
         
         @property
-        def id(self):
-            return self._id
-        @id.getter
-        def id(self):
-            return self._id
-        @id.setter
-        def id(self, value):
+        def nid(self):
+            return self._nid
+        @nid.getter
+        def nid(self):
+            return self._nid
+        @nid.setter
+        def nid(self, value):
             self._id = value
             if value in SPECIAL_PURCHASES:
                 self.is_special_purchase = True
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/album/get', album_id=self.id)
+        data = api.get('/album/get', album_id=self.nid)
         if not data:
             warn(self, "Cannot fetch product data")
             return False

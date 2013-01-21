@@ -22,7 +22,7 @@ class Node_article_rubrics(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_article_rubrics, self).__init__(parent, parameters)
-        self.type = Flag.ARTICLE_RUBRICS
+        self.nt = Flag.ARTICLE_RUBRICS
         self.rubric_id = self.get_parameter('qid')
         self.is_folder = True
         self.image = getImage('album')
@@ -43,7 +43,7 @@ class Node_article_rubrics(INode):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
                                   name='article_listrubrics', 
-                                  id=self.id, offset=self.offset, 
+                                  id=self.nid, offset=self.offset, 
                                   limit=limit)
         if not data: 
             return False

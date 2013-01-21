@@ -14,11 +14,10 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from node import Flag
+from node import Flag, getNode
 from inode import INode
 from debug import warn, error
 from gui.util import lang, getImage, getSetting
-from playlist import Node_playlist
 from api import api
 
 class Node_user_playlists(INode):
@@ -29,7 +28,7 @@ class Node_user_playlists(INode):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30019)
         self.image = getImage('userplaylists')
-        self.type = Flag.USERPLAYLISTS
+        self.nt = Flag.USERPLAYLISTS
         self.content_type = 'files'
         display_by = self.get_parameter('display-by')
         if not display_by:
@@ -58,7 +57,7 @@ class Node_user_playlists(INode):
         if not 'current_playlist' in userdata:
             return None
         return int(userdata['current_playlist'])
-        
+
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/playlist/getUserPlaylists', limit=limit, 
@@ -73,11 +72,11 @@ class Node_user_playlists(INode):
         login = getSetting('username')
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
-            node = Node_playlist(self, {'offset': 0})
+            node = getNode(Flag.PLAYLIST, {'parent': self, 'offset': 0})
             node.data = data
             if self.display_product_cover:
                 pass
-            if (cid and cid == node.id):
+            if (cid and cid == node.nid):
                 node.set_is_current(True)
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)

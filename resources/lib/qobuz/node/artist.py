@@ -17,9 +17,9 @@ from node import getNode, Flag
 
 class Node_artist(INode):
 
-    def __init__(self, parent=None, parameters=None, progress=None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_artist, self).__init__(parent, parameters)
-        self.type = Flag.ARTIST
+        self.nt = Flag.ARTIST
         self.set_label(self.get_name())
         self.is_folder = True
         self.slug = ''
@@ -34,7 +34,7 @@ class Node_artist(INode):
         
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/artist/get', artist_id=self.id, limit=limit, 
+        data = api.get('/artist/get', artist_id=self.nid, limit=limit, 
                            offset=self.offset, extra='albums')
         if not data:
             warn(self, "Build-down: Cannot fetch artist data")
@@ -57,7 +57,7 @@ class Node_artist(INode):
         del self._data['tracks']
 
     def get_artist_id(self):
-        return self.id
+        return self.nid
 
     def get_image(self):
         image = self.get_property(['image/extralarge', 

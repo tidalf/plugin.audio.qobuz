@@ -23,21 +23,21 @@ class dog():
     def __init__(self):
         self.allowed_keys = {
             'mode': '^\d{1,10}$', # Mode View/Scan/BigDir ...
-            'nid':  '^\d{1,14}$', # Node id (node.id)
+            'nid':  '^\d{1,14}$', # Node id (node.nid)
             'nt':   '^\d{1,10}$', # Node type (node.type)
             'qnt':  '^\d{1,20}$', # Node type in query
             'qid':  '^\d{1,14}$', # Node id in query
             'nm': "^[\w\d_]+$",   # Method to be called on node
             'genre-type': '^(\d+|null)$', # Reco params
             'genre-id': '^(\d+|null)$',   # Reco params
-            'url': '^.*$',
+#            'url': '^.*$',
             'search-type': "^(artists|tracks|albums)$",
-            'view-filter': "^\d+$",
+#            'view-filter': "^\d+$",
             'depth': "^(-)?\d+$",
             'query': "^.*$",
 #            'action': "^(scan)$",
             'track-id': "^\d{1,10}$",
-            'name': "^[\w\d_.]+$",
+#            'name': "^[\w\d_.]+$",
             'parent-id': "^\d{1,10}$",
             'offset': "^\d{1,10}$",
 #            'fakeExt': '^FakeFile\.flac$'

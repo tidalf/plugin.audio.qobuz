@@ -14,9 +14,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from flag import NodeFlag as Flag
 from inode import INode
-from artist import Node_artist
+from node import getNode, Flag
 from gui.util import lang, getSetting
 from api import api
 
@@ -28,7 +27,7 @@ class Node_similar_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_similar_artist, self).__init__(parent, parameters)
-        self.type = Flag.SIMILAR_ARTIST
+        self.nt = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
         self.offset = self.get_parameter('offset') or 0
 
@@ -37,7 +36,7 @@ class Node_similar_artist(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/artist/getSimilarArtists', artist_id=self.id, 
+        data = api.get('/artist/getSimilarArtists', artist_id=self.nid, 
                            offset=self.offset, limit=limit)
         if not data:
             return False
@@ -46,7 +45,8 @@ class Node_similar_artist(INode):
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
-            artist = Node_artist(self, {'offset': 0, 'nid': aData['id']})
+            artist = getNode(Flag.ARTIST, {'parent': self, 
+                                           'offset': 0, 'nid': aData['id']})
             artist.data = aData
             self.add_child(artist)
         return True

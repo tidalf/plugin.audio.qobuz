@@ -43,9 +43,8 @@ import os
 class Node_article(INode):
 
     def __init__(self, parent=None, parameters=None):
-
         super(Node_article, self).__init__(parent, parameters)
-        self.type = Flag.ARTICLE
+        self.nt = Flag.ARTICLE
         self.is_folder = True
         self.hasWidget = False
 
@@ -83,7 +82,7 @@ class Node_article(INode):
     def fetch(self, Dir, lvl , whiteFlag, blackFlag):
         print "Build donw article ..."
         data = qobuz.registry.get(
-            name='article', id=self.id, article_id=self.id)
+            name='article', id=self.nid, article_id=self.nid)
         if not data: 
             return False
         self.data = data['data']

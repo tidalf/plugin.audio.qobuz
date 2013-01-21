@@ -32,9 +32,9 @@ dialogHeading = lang(30081)
 class Node_favorites(INode):
     '''Displaying user favorites (track and album)
     '''
-    def __init__(self, parent=None, parameters=None, progress=None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_favorites, self).__init__(parent, parameters)
-        self.type = Flag.FAVORITES
+        self.nt = Flag.FAVORITES
         self.set_label(lang(30079))
         self.name = lang(30079)
         self.label = lang(30079)
@@ -88,7 +88,7 @@ class Node_favorites(INode):
         ])
         if ret == -1:
             return False
-        album_ids = ','.join([node.id for node in nodes])
+        album_ids = ','.join([node.nid for node in nodes])
         if not self.add_albums(album_ids):
             notifyH(dialogHeading, 'Cannot add album(s) to favorite')
             return False
@@ -101,7 +101,7 @@ class Node_favorites(INode):
         if qnt & Flag.ALBUM == Flag.ALBUM:
             node = getNode(Flag.ALBUM, {'nid': qid})
             node.fetch(None, None, None, None)
-            album_ids[str(node.id)] = 1
+            album_ids[str(node.nid)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
             render = renderer(qnt, self.parameters)
@@ -113,7 +113,7 @@ class Node_favorites(INode):
             if len(render.nodes) > 0:
                 node = getNode(Flag.ALBUM)
                 node.data = render.nodes[0].data['album']
-                album_ids[str(node.id)] = 1
+                album_ids[str(node.nid)] = 1
                 nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
@@ -123,11 +123,11 @@ class Node_favorites(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if node.type & Flag.ALBUM: 
-                    if not str(node.id) in album_ids:
-                        album_ids[str(node.id)] = 1
+                if node.nt & Flag.ALBUM: 
+                    if not str(node.nid) in album_ids:
+                        album_ids[str(node.nid)] = 1
                         nodes.append(node)
-                if node.type & Flag.TRACK:
+                if node.nt & Flag.TRACK:
                     render = renderer(qnt, self.parameters)
                     render.depth = 1
                     render.whiteFlag = Flag.TRACK
@@ -137,9 +137,9 @@ class Node_favorites(INode):
                     if len(render.nodes) > 0:
                         newnode = getNode(Flag.ALBUM)
                         newnode.data = render.nodes[0].data['album']
-                        if not str(newnode.id) in album_ids:
+                        if not str(newnode.nid) in album_ids:
                             nodes.append(newnode)
-                            album_ids[str(newnode.id)] = 1
+                            album_ids[str(newnode.nid)] = 1
         return nodes
 
     def add_albums(self, album_ids):
@@ -160,7 +160,7 @@ class Node_favorites(INode):
         ])
         if ret == -1:
             return False
-        track_ids = ','.join([str(node.id) for node in nodes])
+        track_ids = ','.join([str(node.nid) for node in nodes])
         if not self.add_tracks(track_ids):
             notifyH(dialogHeading, 'Cannot add track(s) to favorite')
             return False
@@ -173,7 +173,7 @@ class Node_favorites(INode):
         if qnt & Flag.TRACK == Flag.TRACK:
             node = getNode(Flag.TRACK, {'nid': qid})
             node.fetch(None, None, None, Flag.NONE)
-            track_ids[str(node.id)] = 1
+            track_ids[str(node.nid)] = 1
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
@@ -182,9 +182,9 @@ class Node_favorites(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if not str(node.id) in track_ids:
+                if not str(node.nid) in track_ids:
                     nodes.append(node)
-                    track_ids[str(node.id)] = 1
+                    track_ids[str(node.nid)] = 1
         return nodes
 
     def add_tracks(self, track_ids):
@@ -219,18 +219,18 @@ class Node_favorites(INode):
         node = getNode(qnt, {'nid': qid})
         ret = None
         if qnt & Flag.TRACK == Flag.TRACK:
-            ret = self.del_track(node.id)
+            ret = self.del_track(node.nid)
         elif qnt & Flag.ALBUM == Flag.ALBUM:
-            ret = self.del_album(node.id)
+            ret = self.del_album(node.nid)
         else:
             raise Qerror(who=self, what='invalid_node_type', 
-                         additional=self.type)
+                         additional=self.nt)
         if not ret:
             notifyH(dialogHeading, 
                     'Cannot remove item: %s' % (node.get_label()))
             return False
         notifyH(dialogHeading, 
                     'Item successfully removed: %s' % (node.get_label()))
-        url = self.make_url(nt=self.type, nid='', nm='')
+        url = self.make_url(nt=self.nt, nid='', nm='')
         executeBuiltin(containerUpdate(url, True))
         return True

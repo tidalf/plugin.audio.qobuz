@@ -28,7 +28,7 @@ class QobuzXbmcRenderer(IRenderer):
             params: dictionary, parameters passed to our plugin
         * You can set parameter after init (see renderer.Irenderer)
     """
-    def __init__(self, node_type, params=None):
+    def __init__(self, node_type, params={}):
         super(QobuzXbmcRenderer, self).__init__(node_type, params)
 
     def add_directory_item(self, **ka):

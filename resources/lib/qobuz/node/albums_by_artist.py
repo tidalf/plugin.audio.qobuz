@@ -27,11 +27,11 @@ from node import getNode, Flag
     @class Node_product_by_artist:
 '''
 
-class Node_album_by_artist(INode):
+class Node_albums_by_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
-        super(Node_album_by_artist, self).__init__(parent, parameters)
-        self.type = Flag.ALBUM_BY_ARTIST
+        super(Node_albums_by_artist, self).__init__(parent, parameters)
+        self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
         self.offset = self.get_parameter('offset') or 0
     '''
@@ -54,7 +54,7 @@ class Node_album_by_artist(INode):
         return self.get_property('slug')
 
     def get_artist_id(self):
-        return self.id
+        return self.nid
 
     '''
         Build Down
@@ -62,7 +62,7 @@ class Node_album_by_artist(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/artist/getSimilarArtist',
-            artist_id=self.id, limit=limit, offset=self.offset, extra='albums')
+            artist_id=self.nid, limit=limit, offset=self.offset, extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
@@ -81,7 +81,7 @@ class Node_album_by_artist(INode):
                 except:
                     warn(self, "Strange thing happen")
                     pass
-            node = Node_product()
+            node = getNode(Flag.ALBUM)
             node.data = album
             count += 1
             Dir.update(count, total, "Add album:" + node.get_label(), '')

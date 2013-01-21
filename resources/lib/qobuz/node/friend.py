@@ -32,12 +32,12 @@ class Node_friend(INode):
     @class Node_friend:
     '''
 
-    def __init__(self, parent=None, parameters=None, progress=None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_friend, self).__init__(parent, parameters)
-        self.type = Flag.FRIEND
+        self.nt = Flag.FRIEND
         self.image = getImage('artist')
         self.name = ''
-        self.set_name(self.get_parameter('name'))
+        self.set_name(self.get_parameter('query'))
         self.set_label(self.name)
         self.url = None
         self.is_folder = True
@@ -52,11 +52,11 @@ class Node_friend(INode):
         return self
 
     def make_url(self, **ka):
-        url = super(Node_friend, self).make_url(**ka) + "&name=" + self.name
+        url = super(Node_friend, self).make_url(**ka) + "&query=" + self.name
         return url
 
     def gui_create(self):
-        name = self.get_parameter('name')
+        name = self.get_parameter('query')
         if not name:
             from gui.util import Keyboard
             kb = Keyboard('', 
@@ -114,7 +114,7 @@ class Node_friend(INode):
         cache.delete(key)
         
     def remove(self):
-        name = self.get_parameter('name')
+        name = self.get_parameter('query')
         if name == 'qobuz.com':
             return False
         if not name:
@@ -151,13 +151,13 @@ class Node_friend(INode):
         if not data:
             warn(self, "No friend data")
             return False
-        from friend_list import Node_friend_list
-        self.add_child(Node_friend_list(self, self.parameters))
+        if lvl != -1:
+            self.add_child(getNode(Flag.FRIEND_LIST, self.parameters))
         for pl in data['playlists']['items']:
             node = getNode(Flag.PLAYLIST)
             node.data = pl
             if node.get_owner() == self.label:
-                self.id = node.get_owner_id()
+                self.nid = node.get_owner_id()
             self.add_child(node)
         return True
 
@@ -165,7 +165,7 @@ class Node_friend(INode):
         colorWarn = getSetting('item_caution_color')
         url=self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
-        cmd = runPlugin(self.make_url(type=Flag.FRIEND, nm="remove"))
+        cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm="remove"))
         menu.add(path='friend/remove', label='Remove', cmd=cmd, 
                  color=colorWarn)
 

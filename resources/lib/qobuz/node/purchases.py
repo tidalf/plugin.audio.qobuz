@@ -23,10 +23,10 @@ from gui.util import lang, getImage, getSetting
 class Node_purchases(INode):
     '''Displaying product purchased by user (track and album)
     '''
-    def __init__(self, parent=None, params=None):
-        super(Node_purchases, self).__init__(parent, params)
+    def __init__(self, parent=None, parameters=None):
+        super(Node_purchases, self).__init__(parent, parameters)
         self.label = lang(30100)
-        self.type = Flag.PURCHASES
+        self.nt = Flag.PURCHASES
         self.content_type = 'albums'
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
