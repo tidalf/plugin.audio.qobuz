@@ -573,3 +573,10 @@ class INode(object):
                             str(api.user_id))
         self.user_storage = _Storage(filename)
         return self.user_storage
+    
+    def get_user_data(self):
+        data = api.get('/user/login', username=api.username, 
+                       password=api.password)
+        if not data: 
+            return None
+        return data['user']

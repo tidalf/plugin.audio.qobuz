@@ -101,13 +101,6 @@ class Node_friend(INode):
         executeBuiltin(containerRefresh())
         return True
 
-    def get_user_data(self):
-        data = api.get('/user/login', username=api.username, 
-                       password=api.password)
-        if not data: 
-            return None
-        return data['user']
-    
     def delete_cache(self):
         key = cache.make_key('/user/login', username=api.username, 
                              password=api.password)

@@ -85,12 +85,10 @@ class Node_playlist(INode):
         return self.get_property(['name', 'title']) 
     
     def get_image(self):
-#        user = qobuz.registry.get(name='user')
-#        if not user:
-#            return True
-#        user = user['data']
-#        if self.get_owner() == user['user']['login']:
-#            return user['user']['avatar']
+        userdata = self.get_user_data()
+        if userdata:
+            if self.get_owner() == userdata['login']:
+                return userdata['avatar']
         return getImage('song')
     
     def get_owner(self):
@@ -320,16 +318,14 @@ class Node_playlist(INode):
         notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
         executeBuiltin(containerRefresh())
         return True
-    
+
     def create(self, name, isPublic=True, isCollaborative=False):
         return api.playlist_create(name=name, 
                                         is_public=isPublic, 
                                         is_collaborative=isCollaborative)
-    
+
     def gui_create(self):
         query = self.get_parameter('query', unQuote=True)
-        #!TODO: Why we are no more logged ...
-#        qobuz.registry.get(name='user')
         if not query:
             from gui.util import Keyboard
             k = Keyboard('', lang(42000))
@@ -392,7 +388,7 @@ class Node_playlist(INode):
                             nid='')
         executeBuiltin(containerUpdate(url, True))
         return False
-    
+
     def subscribe(self):
         if api.playlist_subscribe(playlist_id=self.nid):
             from gui.util import notifyH, isFreeAccount, lang
@@ -410,4 +406,3 @@ class Node_playlist(INode):
             offset=self.offset, limit=limit, extra='tracks')
         cache.delete(upkey)
         cache.delete(pkey)
-        
