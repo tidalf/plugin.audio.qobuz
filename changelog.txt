@@ -1,5 +1,9 @@
 0.11.1
 -----
+* \ are not /
+
+0.11.1
+-----
 * fix some bugs in friend list
 * re-add colors
 * add cover hack (the scan now show covers)

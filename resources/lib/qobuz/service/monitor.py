@@ -156,7 +156,7 @@ class Monitor(xbmc.Monitor):
         if database != 'music':
             return 0
         dbfile = os.path.join(xbmc.translatePath('special://profile/')
-                              ,"Database\MyMusic32.db")
+                              ,"Database","MyMusic32.db")
         try:
             con = lite.connect(dbfile)
             cur = con.cursor()    
