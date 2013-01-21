@@ -27,6 +27,7 @@ class Node_artist(INode):
         self.offset = self.get_parameter('offset') or 0
         
     def hook_post_data(self):
+        self.nid = self.get_property('id')
         self.name = self.get_property('name')
         self.image = self.get_image()
         self.slug = self.get_property('slug')
@@ -43,7 +44,7 @@ class Node_artist(INode):
         return True
     
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        node_artist = Node_artist()
+        node_artist = getNode(Flag.ARTIST)
         node_artist.data = self.data
         node_artist.label = '[ %s ]' % (node_artist.label)
         if not 'albums' in self.data: 

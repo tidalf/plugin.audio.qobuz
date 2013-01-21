@@ -82,7 +82,7 @@ class Node_article(INode):
     def fetch(self, Dir, lvl , whiteFlag, blackFlag):
         print "Build donw article ..."
         data = qobuz.registry.get(
-            name='article', id=self.nid, article_id=self.nid)
+            name='article', article_id=self.nid)
         if not data: 
             return False
         self.data = data['data']

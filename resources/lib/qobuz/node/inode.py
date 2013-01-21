@@ -202,19 +202,6 @@ class INode(object):
         self.pagination_limit = items['limit']
         self.pagination_next_offset = items['offset'] + items['limit']
 
-#    def __str__(self, *args, **kwargs):
-#        import pprint
-#        """Return node as a string
-#        """
-#        s = "[Node][" + Flag.to_s(self.nt) + "]\n"
-#        s += " id: " + str(self.nid) + "\n"
-#        s += " Label : " + str(self.label) + "\n"
-#        s += " label2: " + str(self.label2) + "\n"
-#        data = self.data
-#        if data:
-#            s += 'data:' + pprint.pformat(data)
-#        return s
-
     '''
         Parameters
         A hash for storing script parameter, each node have a copy of them.
@@ -463,14 +450,14 @@ class INode(object):
             #    import pprint
             #    print pprint.pformat(self.data)
             artist_name = self.get_artist()
-            urlArtist = self.make_url(nt=Flag.ARTIST, id=artist_id, 
+            urlArtist = self.make_url(nt=Flag.ARTIST, nid=artist_id, 
                                       mode=Mode.VIEW)
             menu.add(path='artist', 
                           label=artist_name, cmd=containerUpdate(urlArtist), pos=-10)
 
             ''' Similar artist '''
             url = self.make_url(nt=Flag.SIMILAR_ARTIST, 
-                                id=artist_id, mode=Mode.VIEW)
+                                nid=artist_id, mode=Mode.VIEW)
             menu.add(path='artist/similar', 
                           label=lang(39004), 
                           cmd=containerUpdate(url))
@@ -515,7 +502,7 @@ class INode(object):
         if wf: 
             ''' PLAYLIST '''
             cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS, 
-                                    id='', mode=Mode.VIEW))
+                                    nid='', mode=Mode.VIEW))
             menu.add(path='playlist', pos = 1,
                           label="Playlist", cmd=cmd, mode=Mode.VIEW)
 
