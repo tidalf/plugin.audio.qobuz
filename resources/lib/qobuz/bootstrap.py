@@ -20,7 +20,7 @@ import os
 from constants import Mode
 from debug import info, debug, warn
 from dog import dog
-from node.flag import NodeFlag as Flag
+from node import Flag
 from exception import QobuzXbmcError
 from gui.util import dialogLoginFailure, getSetting, containerRefresh
 import qobuz

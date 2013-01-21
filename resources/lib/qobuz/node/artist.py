@@ -1,28 +1,16 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from flag import NodeFlag
+'''
+    qobuz.node.artist
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from inode import INode
-from product import Node_product
 from debug import warn
 from gui.util import getSetting
 from gui.contextmenu import contextMenu
-
 from api import api
-
+from node import getNode, Flag
 '''
     @class Node_artist(Inode): Artist
 '''
@@ -31,7 +19,7 @@ class Node_artist(INode):
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.ARTIST
+        self.type = Flag.ARTIST
         self.set_label(self.get_name())
         self.is_folder = True
         self.slug = ''
@@ -61,7 +49,7 @@ class Node_artist(INode):
         if not 'albums' in self.data: 
             return True
         for pData in self.data['albums']['items']:
-            node = Node_product()
+            node = getNode(Flag.ALBUM)
             node.data = pData
             self.add_child(node)
         return True
@@ -104,9 +92,6 @@ class Node_artist(INode):
                                 image,
                                 image,
                                 url)
-#        item.setInfo('music', {
-#                    'artist': self.get_label(),
-#        })
         if not item:
             warn(self, "Error: Cannot make xbmc list item")
             return None

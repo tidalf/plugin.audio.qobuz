@@ -14,12 +14,10 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from flag import NodeFlag
 from inode import INode
 from debug import warn
 from api import api
-from product import Node_product
-from track import Node_track
+from node import Flag, getNode
 from gui.util import lang, getImage, getSetting
 
 class Node_purchases(INode):
@@ -28,7 +26,7 @@ class Node_purchases(INode):
     def __init__(self, parent=None, params=None):
         super(Node_purchases, self).__init__(parent, params)
         self.label = lang(30100)
-        self.type = NodeFlag.PURCHASES
+        self.type = Flag.PURCHASES
         self.content_type = 'albums'
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
@@ -51,14 +49,14 @@ class Node_purchases(INode):
 
     def __populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
-            node = Node_product()
+            node = getNode(Flag.ALBUM)
             node.data = album
             self.add_child(node)
         return list
     
     def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = Node_track()
+            node = getNode(Flag.TRACK)
             node.data = track
             self.add_child(node)
         return list

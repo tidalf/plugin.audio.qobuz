@@ -16,12 +16,11 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-from flag import NodeFlag as Flag
 from inode import INode
-from friend import Node_friend
 from debug import info, warn
 from gui.util import getImage, runPlugin, containerUpdate, lang
 from api import api
+from node import getNode, Flag
 
 '''
     @class Node_friend_list:
@@ -94,7 +93,7 @@ class Node_friend_list(INode):
         friend_list = keys.keys()
         # and add them to the directory
         for name in friend_list:
-            node = Node_friend(None, {'name': str(name)})
+            node = getNode(Flag.FRIEND, {'name': str(name)})
             if name == self.name:
                 continue
             if name in friend_data:

@@ -15,20 +15,17 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from constants import Mode
-from flag import NodeFlag as Flag
+from node import Flag
 from inode import INode
 from debug import warn
 from gui.util import lang, getImage, runPlugin, getSetting
 from gui.contextmenu import contextMenu
 from api import api
 
-'''
-    NODE TRACK
-'''
-
-
 class Node_track(INode):
-
+    '''
+        NODE TRACK
+    '''
     def __init__(self, parent=None, parameters=None):
         super(Node_track, self).__init__(parent, parameters)
         self.type = Flag.TRACK
@@ -90,7 +87,7 @@ class Node_track(INode):
             return album
         if not self.parent:
             return ''
-        if self.parent.type & Flag.PRODUCT:
+        if self.parent.type & Flag.ALBUM:
             return self.parent.get_title()
         return ''
     
@@ -108,7 +105,7 @@ class Node_track(INode):
             return image.replace('_230.', '_600.')
         if not self.parent:
             return self.image
-        if self.parent.type & (Flag.PRODUCT | Flag.PLAYLIST):
+        if self.parent.type & (Flag.ALBUM | Flag.PLAYLIST):
             return self.parent.get_image()
 
     def get_playlist_track_id(self):
@@ -126,7 +123,7 @@ class Node_track(INode):
             return genre
         if not self.parent:
             return ''
-        if self.parent.type & Flag.PRODUCT:
+        if self.parent.type & Flag.ALBUM:
             return self.parent.get_genre()
         return ''
 
@@ -177,7 +174,7 @@ class Node_track(INode):
         import time
         try:
             date = self.get_property('album/released_at')
-            if not date and self.parent and self.parent.type & Flag.PRODUCT:
+            if not date and self.parent and self.parent.type & Flag.ALBUM:
                 return self.parent.get_year()
         except:
             pass

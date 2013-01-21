@@ -15,8 +15,8 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from debug import log
-from node.flag import NodeFlag as Flag
-from util import getNode
+from node import Flag
+from node import getNode
 
 class IRenderer(object):
     """Base class for our renderer

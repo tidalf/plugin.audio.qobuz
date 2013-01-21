@@ -17,17 +17,16 @@
 import xbmcgui
 import qobuz
 from constants import Mode
-from flag import NodeFlag as Flag
 from inode import INode
 from gui.util import notifyH, color, lang, getImage, runPlugin, \
     containerRefresh, containerUpdate, executeBuiltin, getSetting
-from util import  getNode
+from node import getNode, Flag
 from renderer import renderer
 from gui.contextmenu import contextMenu
 from api import api
 from cache import cache
 from track import Node_track
-
+from debug import warn, info, log
 dialogHeading = 'Qobuz playlist'
 
 class Node_playlist(INode):

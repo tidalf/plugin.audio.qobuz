@@ -1,40 +1,28 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from flag import NodeFlag as Flag
+'''
+    qobuz.node.album
+    ~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from inode import INode
 from debug import warn
 from gui.util import getImage, getSetting, htm2xbmc
 from gui.contextmenu import contextMenu
 from api import api
-'''
-    @class Node_product:
-'''
-
-from track import Node_track
+from node import getNode, Flag
 
 SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']
 
 
-class Node_product(INode):
-
+class Node_album(INode):
+    '''
+        @class Node_product:
+    '''
     def __init__(self, parent=None, params=None):
-        super(Node_product, self).__init__(parent, params)
-        self.type = Flag.PRODUCT
+        super(Node_album, self).__init__(parent, params)
+        self.type = Flag.ALBUM
         self.image = getImage('album')
         self.content_type = 'songs'
         self.is_special_purchase = False
@@ -68,7 +56,7 @@ class Node_product(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = Node_track()
+            node = getNode(Flag.TRACK)
             if not 'image' in track:
                 track['image'] = self.get_image()
             node.data = track
@@ -80,7 +68,7 @@ class Node_product(INode):
         if 'asLocalURL' in ka and ka['asLocalURL']:
             from constants import Mode
             ka['mode'] = Mode.SCAN
-        return super(Node_product, self).make_url(**ka)
+        return super(Node_album, self).make_url(**ka)
     
     def makeListItem(self, replaceItems=False):
         import xbmc, xbmcgui

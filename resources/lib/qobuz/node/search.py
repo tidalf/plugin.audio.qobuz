@@ -17,21 +17,19 @@
 import qobuz
 
 from debug import warn
-from flag import NodeFlag
+
 from inode import INode
-from product import Node_product
-from track import Node_track
-from product_by_artist import Node_product_by_artist
 from exception import QobuzXbmcError
 from gui.util import notifyH, lang, getImage, getSetting
 import urllib
 from api import api
+from node import getNode, Flag
 
 class Node_search(INode):
 
     def __init__(self, parent=None, params=None):
         super(Node_search, self).__init__(parent, params)
-        self.type = NodeFlag.SEARCH
+        self.type = Flag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
         self.offset = self.get_parameter('offset') or 0
@@ -104,17 +102,17 @@ class Node_search(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type == 'albums':
             for album in self.data['albums']['items']:
-                node= Node_product()
+                node = getNode(Flag.ALBUM)
                 node.data = album
                 self.add_child(node)
         elif self.search_type == 'tracks':
             for track in self.data['tracks']['items']:
-                node = Node_track()
+                node = getNode(Flag.TRACK)
                 node.data = track
                 self.add_child(node)
         elif self.search_type == 'artists':
             for artist in self.data['artists']['items']:
-                node = Node_product_by_artist()
+                node = getNode(Flag.ARTIST)
                 node.data = artist
                 self.add_child(node)
         return True

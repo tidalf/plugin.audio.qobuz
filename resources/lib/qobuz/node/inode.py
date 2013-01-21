@@ -20,13 +20,13 @@ import weakref
 
 import qobuz
 from constants import Mode
-from flag import NodeFlag as Flag
+from node import Flag
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, \
     getSetting
 from debug import log, warn
 from gui.contextmenu import contextMenu
-from util import getNode
+from node import getNode
 from renderer import renderer
 import urllib
 from time import time
@@ -353,7 +353,7 @@ class INode(object):
 
 
     def render_nodes(self, nt, parameters, lvl = 1, whiteFlag = Flag.ALL, 
-                     blackFlag = Flag.TRACK &Flag.STOPBUILD):
+                     blackFlag = Flag.TRACK & Flag.STOPBUILD):
         render = renderer(nt, parameters)
         render.depth = -1
         render.whiteFlag = whiteFlag
@@ -397,7 +397,7 @@ class INode(object):
         for child in self.childs:
             if Dir.is_canceled():
                 return False
-            """ Only white flagged added to the listing """
+            """ Only white Flagged added to the listing """
             if child.type & whiteFlag == child.type:
                 if not Dir.add_node(child):
                     warn(self, "Something went wrong... aborting")
@@ -412,7 +412,7 @@ class INode(object):
 #        self.childs = [] # UGLY
         return gData['count']
 
-    def populate(self, xbmc_directory, lvl, flag):
+    def populate(self, xbmc_directory, lvl, Flag):
         """Hook/_build_down:
         This method is called by build_down, each object who
         inherit from Inode can overide it. Lot of object
@@ -456,7 +456,7 @@ class INode(object):
         menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
                  id='', pos = -5)     
         ''' ARTIST '''
-        if self.type & (Flag.PRODUCT | Flag.TRACK | Flag.ARTIST):
+        if self.type & (Flag.ALBUM | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
             #if not artist_id:
             #    import pprint
@@ -552,8 +552,8 @@ class INode(object):
 #                          label=lang(39006), cmd=cmd)
 
         ''' PLAYLIST / CREATE '''
-        cflag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
-        if self.type | cflag == cflag:
+        cFlag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
+        if self.type | cFlag == cFlag:
             cmd = runPlugin(self.make_url(type=Flag.PLAYLIST, 
                                           nm="gui_create", mode=Mode.VIEW))
             menu.add(path='playlist/create', 
@@ -570,7 +570,7 @@ class INode(object):
             menu.add(path='qobuz/scan', 
                             cmd=runPlugin(url),
                             label='scan')
-        if self.type & (Flag.ALL & ~Flag.PRODUCT & ~Flag.TRACK 
+        if self.type & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK 
                         & ~Flag.PLAYLIST):
             ''' ERASE CACHE '''
             cmd = runPlugin(self.make_url(type=Flag.ROOT, nm="cache_remove", 

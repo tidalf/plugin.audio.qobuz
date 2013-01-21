@@ -14,7 +14,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from flag import NodeFlag as Flag
+from node import Flag
 from inode import INode
 from debug import warn, error
 from gui.util import lang, getImage, getSetting

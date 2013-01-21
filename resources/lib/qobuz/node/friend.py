@@ -18,18 +18,18 @@ import xbmcgui
 import xbmc
 import json
 
-from flag import NodeFlag as Flag
 from inode import INode
-from playlist import Node_playlist
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, getSetting, lang
 from api import api
-'''
-    @class Node_friend:
-'''
+from node import Flag, getNode
+
 
 class Node_friend(INode):
+    '''
+    @class Node_friend:
+    '''
 
     def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_friend, self).__init__(parent, parameters)
@@ -141,7 +141,7 @@ class Node_friend(INode):
         from friend_list import Node_friend_list
         self.add_child(Node_friend_list(self, self.parameters))
         for pl in data['playlists']['items']:
-            node = Node_playlist()
+            node = getNode(Flag.PLAYLIST)
             node.data = pl
             if node.get_owner() == self.label:
                 self.id = node.get_owner_id()

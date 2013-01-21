@@ -18,11 +18,10 @@
 import xbmcgui
 
 from api import api
-from flag import NodeFlag as Flag
 from inode import INode
-from product import Node_product
-from debug import warn
+from node import getNode, Flag
 from gui.util import getSetting, lang, getImage
+from debug import warn
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -128,7 +127,7 @@ class Node_recommendation(INode):
         if not self.data:
             return False
         for product in self.data['albums']['items']:
-            node = Node_product()
+            node = getNode(Flag.ALBUM)
             node.data = product
             self.add_child(node)
         return True

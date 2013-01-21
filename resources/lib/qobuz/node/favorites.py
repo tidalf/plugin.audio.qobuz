@@ -16,17 +16,14 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-from flag import NodeFlag as Flag
 from inode import INode
-from product import Node_product
 from debug import warn
 from gui.util import lang, getSetting
 from gui.util import getImage, notifyH, executeBuiltin, containerUpdate 
-from util import getNode
+from node import getNode, Flag
 from renderer import renderer
 from api import api
 from exception import QobuzXbmcError as Qerror
-from track import Node_track
 from cache import cache
 import qobuz
 
@@ -66,13 +63,13 @@ class Node_favorites(INode):
 
     def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = Node_track()
+            node = getNode(Flag.TRACK)
             node.data = track
             self.add_child(node)
 
     def __populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
-            node = Node_product()
+            node = getNode(Flag.ALBUM)
             node.data = album
             self.add_child(node)
 
@@ -101,8 +98,8 @@ class Node_favorites(INode):
     def list_albums(self, qnt, qid):
         album_ids = {}
         nodes = []
-        if qnt & Flag.PRODUCT == Flag.PRODUCT:
-            node = Node_product(None, {'nid': qid})
+        if qnt & Flag.ALBUM == Flag.ALBUM:
+            node = getNode(Flag.ALBUM, {'nid': qid})
             node.fetch(None, None, None, None)
             album_ids[str(node.id)] = 1
             nodes.append(node)
@@ -114,19 +111,19 @@ class Node_favorites(INode):
             render.asList = True
             render.run()
             if len(render.nodes) > 0:
-                node = Node_product(None)
+                node = getNode(Flag.ALBUM)
                 node.data = render.nodes[0].data['album']
                 album_ids[str(node.id)] = 1
                 nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
             render.depth = -1
-            render.whiteFlag = Flag.PRODUCT
+            render.whiteFlag = Flag.ALBUM
             render.blackFlag = Flag.STOPBUILD & Flag.TRACK
             render.asList = True
             render.run()
             for node in render.nodes:
-                if node.type & Flag.PRODUCT: 
+                if node.type & Flag.ALBUM: 
                     if not str(node.id) in album_ids:
                         album_ids[str(node.id)] = 1
                         nodes.append(node)
@@ -138,7 +135,7 @@ class Node_favorites(INode):
                     render.asList = True
                     render.run()
                     if len(render.nodes) > 0:
-                        newnode = Node_product(None)
+                        newnode = getNode(Flag.ALBUM)
                         newnode.data = render.nodes[0].data['album']
                         if not str(newnode.id) in album_ids:
                             nodes.append(newnode)
@@ -174,7 +171,7 @@ class Node_favorites(INode):
         track_ids = {}
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
-            node = Node_track(None, {'nid': qid})
+            node = getNode(Flag.TRACK, {'nid': qid})
             node.fetch(None, None, None, Flag.NONE)
             track_ids[str(node.id)] = 1
             nodes.append(node)
@@ -223,7 +220,7 @@ class Node_favorites(INode):
         ret = None
         if qnt & Flag.TRACK == Flag.TRACK:
             ret = self.del_track(node.id)
-        elif qnt & Flag.PRODUCT == Flag.PRODUCT:
+        elif qnt & Flag.ALBUM == Flag.ALBUM:
             ret = self.del_album(node.id)
         else:
             raise Qerror(who=self, what='invalid_node_type', 

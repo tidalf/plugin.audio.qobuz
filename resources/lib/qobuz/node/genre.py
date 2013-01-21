@@ -18,11 +18,11 @@ import xbmcgui
 import xbmc
 
 import qobuz
-from flag import NodeFlag as Flag
 from inode import INode
-from recommendation import Node_recommendation, RECOS_TYPE_IDS
 from gui.util import getImage, getSetting, lang
 from api import api
+from node import Flag, getNode
+from node.recommendation import RECOS_TYPE_IDS
 
 class Node_genre(INode):
     '''
@@ -50,9 +50,9 @@ class Node_genre(INode):
 
     def populate_reco(self, Dir, lvl, whiteFlag, blackFlag, ID):
         for gtype in RECOS_TYPE_IDS:
-            node = Node_recommendation(
-                self, {'genre-id': ID, 'genre-type': gtype})
-            node.populating(Dir, 1, Flag.PRODUCT, blackFlag)
+            node = getNode(
+                Flag.RECOMMENDATION, {'parent': self, 'genre-id': ID, 'genre-type': gtype})
+            node.populating(Dir, 1, Flag.ALBUM, blackFlag)
         return True
 
     def fetch(self, Dir, lvl , whiteFlag, blackFlag):

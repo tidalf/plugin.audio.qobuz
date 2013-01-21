@@ -16,24 +16,22 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-from flag import NodeFlag
 from inode import INode
-from product import Node_product
 from debug import warn
 import weakref
 from api import api
 from gui.contextmenu import contextMenu
 from gui.util import getSetting
-
+from node import getNode, Flag
 '''
     @class Node_product_by_artist:
 '''
 
-class Node_product_by_artist(INode):
+class Node_album_by_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
-        super(Node_product_by_artist, self).__init__(parent, parameters)
-        self.type = NodeFlag.ARTIST
+        super(Node_album_by_artist, self).__init__(parent, parameters)
+        self.type = Flag.ALBUM_BY_ARTIST
         self.content_type = 'albums'
         self.offset = self.get_parameter('offset') or 0
     '''

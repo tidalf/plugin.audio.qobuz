@@ -325,25 +325,26 @@ class QobuzHttpResolver(HTTPServer):
         if host == '127.0.0.1': 
             return True
         return False
-    
+
 import threading
 
 class MonitorThread(threading.Thread, xbmc.Monitor):
-    
+
     def __init__(self, httpd):        
         self._stopevent = threading.Event()
         threading.Thread.__init__(self)
         xbmc.Monitor.__init__(self)
         self.httpd = httpd
-        
+        self.alive = True
+
     def run(self):
-        while 1:
+        while self.alive:
             self._stopevent.wait(2)
+        self.httpd.shutdown()
 
     def onAbortRequested(self):
-        self.httpd.shutdown()
-        raise KeyboardInterrupt()
- 
+        self.alive = True
+
 class QobuzXbmcHttpResolver(QobuzHttpResolver):
 
     def __init__(self):
