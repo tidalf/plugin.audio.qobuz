@@ -48,9 +48,17 @@ class Node_user_playlists(INode):
     def get_display_by(self):
         return self.display_by
 
-    def set_current_playlist_id(self, id):
-        store = storage.get('current_playlist_id')
-    
+    def set_current_playlist_id(self, playlist_id):
+        userdata = self.get_user_storage()
+        userdata['current_playlist'] = int(playlist_id)
+        userdata.sync()
+
+    def get_current_playlist_id(self):
+        userdata = self.get_user_storage()
+        if not 'current_playlist' in userdata:
+            return None
+        return int(userdata['current_playlist'])
+        
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/playlist/getUserPlaylists', limit=limit, 
@@ -63,11 +71,7 @@ class Node_user_playlists(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         login = getSetting('username')
-        cid = None
-#        cid = qobuz.registry.get(
-#            name='user-current-playlist-id', noRemote=True)
-#        if cid:
-#            cid = int(cid['data'])
+        cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
             node = Node_playlist(self, {'offset': 0})
             node.data = data

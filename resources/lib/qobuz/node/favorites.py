@@ -27,8 +27,9 @@ from renderer import renderer
 from api import api
 from exception import QobuzXbmcError as Qerror
 from track import Node_track
+from cache import cache
+import qobuz
 
-registryKey = 'user-favorites'
 dialogHeading = lang(30081)
 
 class Node_favorites(INode):
@@ -197,8 +198,12 @@ class Node_favorites(INode):
         return True
 
     def _delete_cache(self):
-        qobuz.registry.delete(name=registryKey)
-        return True
+        limit = getSetting('pagination_limit')
+        key = cache.make_key('/favorite/getUserFavorites', 
+                           user_id=api.user_id, 
+                           limit=limit, 
+                           offset=self.offset)
+        return cache.delete(key)
 
     def del_track(self, track_id):
         if api.favorite_delete(track_ids=track_id):

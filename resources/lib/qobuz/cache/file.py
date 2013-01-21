@@ -63,5 +63,8 @@ class CacheFile(CacheBase):
         return 3600
 
     def delete(self, key, *a, **ka):
-        cache = self._make_path(key)
-        return unlink(cache)
+        filename = self._make_path(key)
+        if not os.path.exists(filename):
+            print "Cache file doesn't exist %s" % (filename)
+            return False
+        return unlink(filename)

@@ -68,3 +68,6 @@ class IRenderer(object):
             if getattr(self.root, methodName)():
                 return True
             return False
+
+    def run (self):
+        raise NotImplemented()

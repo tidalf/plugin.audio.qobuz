@@ -22,13 +22,12 @@ from flag import NodeFlag as Flag
 from inode import INode
 from recommendation import Node_recommendation, RECOS_TYPE_IDS
 from gui.util import getImage, getSetting, lang
-
-'''
-    @class Node_genre:
-'''
+from api import api
 
 class Node_genre(INode):
-
+    '''
+    @class Node_genre:
+    '''
     def __init__(self, parent=None, parameters=None):
         super(Node_genre, self).__init__(parent, parameters)
         self.type = Flag.GENRE
@@ -58,12 +57,12 @@ class Node_genre(INode):
 
     def fetch(self, Dir, lvl , whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(
-            name='genre-list', id=self.id, offset=self.offset, limit=limit)
+        data = api.get('/genre/list', parent_id=self.id, offset=self.offset, 
+                       limit=limit)
         if not data: 
             self.data = None
             return True # Nothing return trigger reco build in build_down
-        self.data = data['data']
+        self.data = data
         g = self.data['genres']
         if 'parent' in g and int(g['parent']['level']) > 1:
             self.populate_reco(Dir, lvl, whiteFlag, blackFlag, 

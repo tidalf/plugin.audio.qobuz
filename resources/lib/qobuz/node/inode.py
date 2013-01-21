@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+import sys, os
 import weakref
 
 import qobuz
@@ -30,7 +30,9 @@ from util import getNode
 from renderer import renderer
 import urllib
 from time import time
-
+from cache import cache
+from storage import _Storage
+from api import api
 
 class INode(object):
     '''Our base node, every node must inherit or mimic is behaviour
@@ -62,6 +64,7 @@ class INode(object):
         self.pagination_prev = None
         self.offset = None
         self.hasWidget = False
+        self.user_storage = None
 
     ''' Id '''
     @property
@@ -575,3 +578,11 @@ class INode(object):
             menu.add(path='qobuz/erase_cache', 
                           label=lang(31009), cmd=cmd, 
                           color=colorCaution, pos=10)
+            
+    def get_user_storage(self):
+        if self.user_storage:
+            return self.user_storage
+        filename = os.path.join(cache.base_path, 'localuserdata-%s.local' %
+                            str(api.user_id))
+        self.user_storage = _Storage(filename)
+        return self.user_storage

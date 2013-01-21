@@ -22,7 +22,7 @@ from search import Node_search
 from favorites import Node_favorites
 from purchases import Node_purchases
 from friend_list import Node_friend_list
-#from genre import Node_genre
+from genre import Node_genre
 from gui.util import getSetting, executeBuiltin, lang
 from cache import cache
 from cache.cacheutil import clean_all
@@ -53,7 +53,7 @@ class Node_root(INode):
             search.search_type = 'artists'
             self.add_child(search)
         self.add_child(Node_friend_list())
-#        self.add_child(Node_genre())
+        self.add_child(Node_genre())
         return True
 
     def cache_remove(self):

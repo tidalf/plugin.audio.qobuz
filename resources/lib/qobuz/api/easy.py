@@ -2,8 +2,9 @@
     qobuz.api.easy
     ~~~~~~~~~~~~~~~~~~
 
-    Add get to qobuz.api.raw, All requests made trough this method are cached (
-    see qobuz.cache.qobuz)
+    Add 'get' to qobuz.api.raw, All requests made trough this method are 
+    cached (see qobuz.cache.qobuz)
+    
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''

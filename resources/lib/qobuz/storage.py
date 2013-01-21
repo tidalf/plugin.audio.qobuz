@@ -18,8 +18,11 @@ except ImportError:
 import shutil
 import collections
 from datetime import datetime
-from xbmcswift2.logger import log
-
+#from xbmcswift2.logger import log
+class MyLog():
+    def debug(self, *a):
+        print a[0] % (a[1:])
+log = MyLog()
 
 class _PersistentDictMixin(object):
     ''' Persistent dictionary with an API compatible with shelve and anydbm.
