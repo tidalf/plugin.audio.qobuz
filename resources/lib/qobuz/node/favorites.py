@@ -59,6 +59,8 @@ class Node_favorites(INode):
             self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
         if 'tracks' in self.data:
             self.__populate_tracks(Dir, lvl, whiteFlag, blackFlag)
+        if 'artists' in self.data:
+            self.__populate_artists(Dir, lvl, whiteFlag, blackFlag)    
         return True
 
     def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
@@ -72,7 +74,12 @@ class Node_favorites(INode):
             node = getNode(Flag.ALBUM)
             node.data = album
             self.add_child(node)
-
+            
+    def __populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
+        for album in self.data['artists']['items']:
+            node = getNode(Flag.ARTIST)
+            node.data = artist
+            self.add_child(node)
 
     def get_description(self):
         return self.get_property('description')
@@ -94,6 +101,25 @@ class Node_favorites(INode):
             return False
         notifyH(dialogHeading, 'Album(s) added to favorite')
         return True
+
+    def gui_add_artists(self):
+        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
+        nodes = self.list_arists(qnt, qid)
+        if len(nodes) == 0:
+            notifyH(dialogHeading, lang(36004))
+            return False
+        ret = xbmcgui.Dialog().select(lang(36004), [
+           node.get_label() for node in nodes                              
+        ])
+        if ret == -1:
+            return False
+        artist_ids = ','.join([node.nid for node in nodes])
+        if not self.add_artists(artist_ids):
+            notifyH(dialogHeading, 'Cannot add artist(s) to favorite')
+            return False
+        notifyH(dialogHeading, 'Album(s) added to favorite')
+        return True
+    
 
     def list_albums(self, qnt, qid):
         album_ids = {}
@@ -148,6 +174,13 @@ class Node_favorites(INode):
             return False
         self._delete_cache()
         return True
+    
+    def add_artists(self, artist_ids):
+        ret = api.favorite_create(artist_ids=artist_ids)
+        if not ret:
+            return False
+        self._delete_cache()
+        return True
 
     def gui_add_tracks(self):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
@@ -168,6 +201,26 @@ class Node_favorites(INode):
         return True
 
     def list_tracks(self, qnt, qid):
+        track_ids = {}
+        nodes = []
+        if qnt & Flag.TRACK == Flag.TRACK:
+            node = getNode(Flag.TRACK, {'nid': qid})
+            node.fetch(None, None, None, Flag.NONE)
+            track_ids[str(node.nid)] = 1
+            nodes.append(node)
+        else:
+            render = renderer(qnt, self.parameters)
+            render.depth = -1
+            render.whiteFlag = Flag.TRACK
+            render.asList = True
+            render.run()
+            for node in render.nodes:
+                if not str(node.nid) in track_ids:
+                    nodes.append(node)
+                    track_ids[str(node.nid)] = 1
+        return nodes
+
+    def list_artists(self, qnt, qid):
         track_ids = {}
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
