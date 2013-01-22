@@ -241,7 +241,7 @@ class Node_track(INode):
     def get_album_id(self):
         albumid = self.get_property('album/id')
         if not albumid and self.parent:
-            return self.parent.id
+            return self.parent.nid
         if albumid:
                 return albumid
         else: 
