@@ -23,7 +23,7 @@ class Node_artist(INode):
         self.set_label(self.get_name())
         self.is_folder = True
         self.slug = ''
-        self.content_type = 'albums'
+        self.content_type = 'artists'
         self.offset = self.get_parameter('offset') or 0
         
     def hook_post_data(self):
@@ -103,11 +103,10 @@ class Node_artist(INode):
         item.setInfo('music' , infoLabels={
 #            'genre': 'reggae', # self.get_genre(),
 #            'year': '2000', # self.get_year(),
-            'artist': self.get_artist(),
+            'artist': self.get_artist(),           
 #            'album': self.get_title(),
-#            'biography': 'coucou', # self.get_description()
-#            'description': 'coucou',
-#            'comment': 'coucou'
+            'comment': self.get_description()
+#           'Artist_Description': 'coucou'
         })
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
