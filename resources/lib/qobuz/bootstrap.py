@@ -71,7 +71,6 @@ class QobuzBootstrap(object):
 
     def bootstrap_registry(self):
         from api import api
-        print "Base Path: %s" % (qobuz.path.cache)
         cache.base_path = qobuz.path.cache
         api.stream_format = 6 if getSetting('streamtype') == 'flac' else 5
         if not api.login(getSetting('username'), getSetting('password')):

@@ -99,8 +99,6 @@ class Node_recommendation(INode):
     def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
         ''' Populate type, we don't have genre_type nor genre_id
         '''
-        import pprint
-        pprint.pprint(self.parameters)
         for gid in RECOS_TYPE_IDS:
             node = getNode(Flag.RECOMMENDATION, {'genre-type': gid})
 #            node.genre_type = gid

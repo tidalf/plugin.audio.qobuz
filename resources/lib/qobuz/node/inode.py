@@ -229,8 +229,7 @@ class INode(object):
 
     def get_parameter(self, name, **ka):
         if not self.parameters:
-            print str(self)
-            
+            return None
         if not name in self.parameters:
             return None
         if 'unQuote' in ka and ka['unQuote'] == True:
