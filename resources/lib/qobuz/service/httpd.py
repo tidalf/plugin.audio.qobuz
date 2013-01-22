@@ -1,9 +1,10 @@
 #import string,cgi,time
 #from os import curdir, sep
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-#import pri
+import socket
 import re
 import sys
+import urllib2
 
 VERSION = '0.0.1'
 
@@ -12,73 +13,59 @@ cache_duration_long = 60*60*24*365
 cache_duration_middle = 60*60*24*365
 stream_format = 5
 __image__ = ''
-def __xbmc_abort_requested ():
-    return False
 
-def try_get_settings():
-    try:
-        boot.bootstrap_registry()
-        username = __addon__.getSetting('username')
-        password = __addon__.getSetting('password')
-        if (username or password):
-          return True
-        else:
-          return False
-    except: pass
-
-
-xbmc_abort_requested = __xbmc_abort_requested()
 
 import xbmcaddon, xbmcplugin, xbmc
+
 import os
 pluginId = 'plugin.audio.qobuz'
 __addon__ = xbmcaddon.Addon(id=pluginId)
 __addonversion__ = __addon__.getAddonInfo('version')
 __addonid__ = __addon__.getAddonInfo('id')
 __cwd__ = __addon__.getAddonInfo('path')
-dbg = True
-addonDir = __addon__.getAddonInfo('path')
-libDir = xbmc.translatePath(os.path.join(addonDir, 'resources', 'lib'))
-qobuzDir = xbmc.translatePath(os.path.join(libDir, 'qobuz'))
-sys.path.append(libDir)
-sys.path.append(qobuzDir)
+__addondir__ = __addon__.getAddonInfo('path')
+__libdir__ = xbmc.translatePath(os.path.join(__addondir__, 'resources', 'lib'))
+__qobuzdir__ = xbmc.translatePath(os.path.join(__libdir__, 'qobuz'))
+sys.path.append(__libdir__)
+sys.path.append(__qobuzdir__)
+
 from bootstrap import QobuzBootstrap
 __handle__ = -1
 boot = QobuzBootstrap(__addon__, __handle__)
 boot.bootstrap_directories()
+
+def try_get_settings():
+    global username, password
+    username = __addon__.getSetting('username')
+    password = __addon__.getSetting('password')
+    if username and password:
+        return True
+    return False
+
 while not (try_get_settings()):
     xbmc.sleep(5000)
         # raise Exception("Missing Mandatory Parameter")
+
+print "USERNAME %s " % (username)
 import qobuz
-base_path = qobuz.path.cache
-def __abort_requested():
-    return xbmc.abortRequested
-xbmc_abort_requested = __abort_requested()
+from api import api
+from cache import cache
+cache.base_path = qobuz.path.cache
+api.login(username, password)
+
+
 stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
 cache_durationm_middle = int(__addon__.getSetting('cache_duration_middle')) * 60
 cache_duration_long = int(__addon__.getSetting('cache_duration_long')) * 60
-  
+
 if stream_format == 6:
     stream_mime = 'audio/flac'
 else:
     stream_mime = 'audio/mpeg'
     
-from registry import QobuzRegistry
 from debug import log
-from node.flag import NodeFlag as Flag
-from node.track import Node_track
-from node.product import Node_product
+from node import getNode, Flag
 
-qobuz.registry = QobuzRegistry(
-                cacheType='default',
-                username=username,
-                password=password,
-                basePath=base_path,
-                streamFormat=stream_format, 
-                hashKey=True,
-                cacheMiddle=cache_duration_middle,
-                cacheLong=cache_duration_long
-            )
 
 class XbmcAbort(Exception):
     def __init__(self, *a, **ka):
@@ -141,7 +128,7 @@ class QobuzResponse:
         if not m:
             return False
         self.artist_id = m.group(1)
-#        print "ArtistID: %s" % (str(self.artist_id))
+        print "ArtistID: %s" % (str(self.artist_id))
         if m.group(2) == 'artist.nfo':
             self.fileWanted = 'artist.nfo'
             return True
@@ -149,7 +136,7 @@ class QobuzResponse:
         if not m:
             return False
         self.album_id = m.group(1)
-#        print "AlbumID: %s" % (str(self.album_id))
+        print "AlbumID: %s" % (str(self.album_id))
         if m.group(2) == 'album.nfo':
             self.fileWanted = 'album.nfo'
             print "Serve album.nfo"
@@ -157,9 +144,14 @@ class QobuzResponse:
         if not m.group(2):
             self.fileWanted = 'dir'
             return True
-        m = re.search('^(\d+)\.(mp3|mpc|flac)', m.group(2))
+        m = re.search('^(\d+|cdart)\.(mp3|mpc|flac|png)', m.group(2))
         if not m:
             return False
+        if m.group(1) == 'cdart':
+            print "GOT COVER ???"
+            self.fileWanted = 'cover'
+            self.fileExt = 'png'
+            return True
         self.track_id = m.group(1)
         self.fileExt = m.group(2)
         self.fileWanted = 'music'
@@ -175,8 +167,8 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def __write_album_nfo(self, node):
         w = self.wfile
         w.write("<album>")
-        w.write("<title>"+node.get_label()+"</title>")
-        w.write("<artist>"+node.get_artist()+"</artist>")
+        w.write(u"<title>"+node.get_label()+u"</title>")
+        w.write(u"<artist>"+node.get_artist()+u"</artist>")
         w.write("<genre>"+node.get_genre()+"</genre>")
         w.write("<year>"+node.get_year()+"</year>")
         w.write("<thumb>"+node.get_image()+"</thumb>")
@@ -186,13 +178,14 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def __write_dir(self, node):
         w = self.wfile
         for track in node.data['tracks']['items']:
-            ntrack = Node_track(node)
+            ntrack = getNode(Flag.TRACK, {'parent': node})
             ntrack.data = track
             w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.flac<br>\n')
         w.close()
     
     def __GET_track(self, request):
-        node = Node_track(None, {'nid': request.track_id})
+        api.login(api.username, api.password)
+        node = getNode(Flag.TRACK, {'nid': request.track_id})
         streaming_url = node.get_streaming_url()
         if not streaming_url:
             raise RequestFailed()
@@ -200,10 +193,20 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         self.send_header('content-type', stream_mime)
         self.send_header('location', streaming_url)
         self.end_headers()
-
+        
+    def __GET_cover(self, request):
+        node = getNode(Flag.ALBUM, {'nid': request.album_id})
+        node.fetch(None, None, None, None)
+        self.send_response(200, "Ok")
+        self.send_header('content-type', 'image/png')
+        self.end_headers()
+        self.wfile.write(urllib2.urlopen(node.get_image()).read())
+        self.wfile.close()
+        return True
+        
     def __GET_album_nfo(self, request):
         print "Serving album.nfo for %s" % (request.album_id)
-        node = Node_product(None, {'nid': request.album_id})
+        node = getNode(Flag.ALBUM, {'nid': request.album_id})
         if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
@@ -214,7 +217,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     
     def __GET_dir(self, request):
         print "Serving dir for %s" % (request.album_id)
-        node = Node_product(None, {'nid': request.album_id})
+        node = getNode(Flag.ALBUM, {'nid': request.album_id})
         if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
         self.send_response(200, "Ok")
@@ -230,6 +233,8 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
                 return self.__GET_dir(request)
             elif request.fileWanted == 'album.nfo':
                 return self.__GET_album_nfo(request)
+            elif request.fileWanted == 'cover':
+                return self.__GET_cover(request)
             elif request.fileWanted == 'music':
                 return self.__GET_track(request)
             else:
@@ -255,15 +260,22 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
                 self.send_header('content-type', 'x-directory/normal')
                 self.end_headers()
                 return True
-            if request.fileWanted == 'album.nfo':
+            elif request.fileWanted == 'album.nfo':
                     self.send_response(200, "Ok ;)")
                     self.send_header('content-type', 'text/html')
                     self.end_headers()
                     return True
-            if request.fileWanted == 'music':
+            elif request.fileWanted == 'cover':
+                    self.send_response(200, "Ok ;)")
+                    self.send_header('content-type', 'image/png')
+                    self.send_header('content-length', 1024)
+                    self.end_headers()
+                    return True
+            elif request.fileWanted == 'music':
                 self.send_response(200, "Ok ;)")
                 self.send_header('content-type', stream_mime)
                 self.end_headers()
+                return True
             else:
                 raise BadRequest()
         except BadRequest as e:
@@ -272,6 +284,8 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.send_error(e.code, e.message)
         except RequestFailed as e:
             self.send_error(e.code, e.message)
+        except socket.error:
+            print "Socket error..."
         except Exception as e:
             msg = 'Server errors (%s / %s)\n%s' % (
                                                   sys.exc_type, sys.exc_value,
@@ -280,14 +294,30 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.send_error(500, msg)
 
 class QobuzHttpResolver(HTTPServer):
+
+    def __init__(self, server_address, RequestHandlerClass):
+        self.alive = True
+        HTTPServer.__init__(self, server_address, RequestHandlerClass)
     
-    def abort_requested(self):
-        try:
-            return xbmc_abort_requested()
-        except Exception as e:
-            print "Error: %s" % (repr(e))
-            return True
-        
+    def get_request(self):
+        """Get the request and client address from the socket."""
+        # 10 second timeout
+
+        self.socket.settimeout(2.0)
+        result = None
+        while result is None:
+            print "Waiting for request"
+            if not self.alive:
+                self.shutdown()
+                raise KeyboardInterrupt()
+            try:
+                result = self.socket.accept()
+            except socket.timeout:
+                pass
+        # Reset timeout on the new socket
+        result[0].settimeout(None)
+        return result
+
     def verify_request(self, path, client_address): 
         host, port = client_address
         if host == '127.0.0.1': 
@@ -324,7 +354,7 @@ class QobuzXbmcHttpResolver(QobuzHttpResolver):
 def main():
     server = None
     try:
-        server = QobuzHttpResolver(('127.0.0.1', 33574), QobuzHttpResolver_Handler)
+        server = QobuzXbmcHttpResolver()
         log(server, 'Qobuz http resolver Starting...')
         server.serve_forever()
     except KeyboardInterrupt:
@@ -335,5 +365,6 @@ def main():
         if server:
             server.socket.close()
             server = None
+
 if __name__ == '__main__':
     main()

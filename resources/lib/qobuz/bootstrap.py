@@ -17,16 +17,14 @@
 import sys
 import os
 
-import pprint
-
 from constants import Mode
 from debug import info, debug, warn
 from dog import dog
-import qobuz
-from node.flag import NodeFlag as Flag
+from node import Flag
 from exception import QobuzXbmcError
 from gui.util import dialogLoginFailure, getSetting, containerRefresh
-
+import qobuz
+from cache import cache
 def get_checked_parameters():
     """Parse parameters passed to xbmc plugin as sys.argv
     """
@@ -140,11 +138,6 @@ class QobuzBootstrap(object):
         for p in self.params:
             info(self, "Param: " + p + ' = ' + str(self.params[p]))
 
-    def erase_cache(self):
-        """Erasing all cached data
-        """
-        qobuz.registry.delete_by_name('^.*\.dat$')
-
     def dispatch(self):
         """Routing based on parameters
         """
@@ -167,7 +160,7 @@ class QobuzBootstrap(object):
             return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
             r = renderer(self.nodeType, self.params)
-            r.whiteFlag = Flag.TRACK | Flag.PRODUCT
+            r.whiteFlag = Flag.TRACK | Flag.ALBUM
             r.depth = -1
             return r.run()
         elif self.MODE == Mode.SCAN:
