@@ -346,9 +346,9 @@ class MonitorThread(threading.Thread, xbmc.Monitor):
 class QobuzXbmcHttpResolver(QobuzHttpResolver):
 
     def __init__(self):
-        self.monitor = MonitorThread(self)
-        self.monitor.setDaemon(True)
-        self.monitor.start()
+#        self.monitor = MonitorThread(self)
+#        self.monitor.setDaemon(True)
+#        self.monitor.start()
         QobuzHttpResolver.__init__(self, ('127.0.0.1', 33574), 
                                                     QobuzHttpResolver_Handler)
 
