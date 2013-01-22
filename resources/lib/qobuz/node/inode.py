@@ -237,6 +237,8 @@ class INode(object):
         self.parameters[name] = value
 
     def get_parameter(self, name, **ka):
+        if not self.parameters:
+            return None
         if not name in self.parameters:
             return None
         if 'unQuote' in ka and ka['unQuote'] == True:
@@ -493,6 +495,18 @@ class INode(object):
                                           mode=Mode.VIEW)
             menu.add(path='favorites/add_albums', 
                           label=lang(39011) + ' albums', cmd=runPlugin(url))
+            ''' ADD TO FAVORITES / Artists'''
+            url = self.make_url(nt=Flag.FAVORITES, 
+                                          nm='gui_add_artists', 
+                                          qid=self.nid, 
+                                          qnt=self.nt, 
+                                          mode=Mode.VIEW)
+            menu.add(path='favorites/add_artists', 
+                          label=lang(39011) + ' artists', cmd=runPlugin(url))
+
+            
+            
+            
         
         if self.parent and (self.parent.type & Flag.FAVORITES):
             url = self.make_url(type=Flag.FAVORITES,

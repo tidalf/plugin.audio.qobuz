@@ -36,7 +36,7 @@ class Node_artist(INode):
         self.set_label(self.get_name())
         self.is_folder = True
         self.slug = ''
-        self.content_type = 'albums'
+        self.content_type = 'artists'
         self.offset = self.get_parameter('offset') or 0
         
     def hook_post_data(self):
@@ -73,8 +73,11 @@ class Node_artist(INode):
         return self.id
 
     def get_image(self):
-        image = self.get_property(['image/extralarge', 
-                                   'image/mega', 
+        image = self.get_property(['image/extralarge',
+                                   'image/mega',
+                                   'image/large',
+                                   'image/medium',
+                                   'image/small',
                                    'picture'])
         if image: 
             image = image.replace('126s', '_')
@@ -111,6 +114,14 @@ class Node_artist(INode):
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
+        item.setInfo('music' , infoLabels={
+#            'genre': 'reggae', # self.get_genre(),
+#            'year': '2000', # self.get_year(),
+            'artist': self.get_artist(),           
+#            'album': self.get_title(),
+            'comment': self.get_description()
+#           'Artist_Description': 'coucou'
+        })
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)

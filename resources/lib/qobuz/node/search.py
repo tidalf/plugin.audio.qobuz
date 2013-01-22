@@ -88,8 +88,8 @@ class Node_search(INode):
                 return False
             query = k.getText()
         query.strip()
-        data = api.search_getResults(
-            query=query, type=stype, limit=limit, offset=self.offset)
+        data = api.get('/search/getResults', query=query, type=stype, 
+                           limit=limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")
             return False

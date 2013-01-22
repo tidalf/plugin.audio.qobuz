@@ -256,7 +256,6 @@ class Node_playlist(INode):
         if qnt & Flag.SEARCH:
             self.del_parameter('query')
         if qnt & Flag.TRACK == Flag.TRACK:
-            # print "Adding one track"
             node = getNode(qnt, {'nid': qid})
             node.fetch(None,None,None, Flag.NONE)
             nodes.append(node)

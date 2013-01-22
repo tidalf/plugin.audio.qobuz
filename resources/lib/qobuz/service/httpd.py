@@ -293,12 +293,34 @@ class QobuzHttpResolver(HTTPServer):
         if host == '127.0.0.1': 
             return True
         return False
-    
-    def server_forever(self):
-        if self.abort_requested():
-            raise XbmcAbort()
-        super(QobuzHttpResolver, self).serve_forever()
 
+import threading
+
+class MonitorThread(threading.Thread, xbmc.Monitor):
+
+    def __init__(self, httpd):        
+        self._stopevent = threading.Event()
+        threading.Thread.__init__(self)
+        xbmc.Monitor.__init__(self)
+        self.httpd = httpd
+        self.alive = True
+
+    def run(self):
+        while self.alive:
+            self._stopevent.wait(2)
+        self.httpd.shutdown()
+
+    def onAbortRequested(self):
+        self.alive = True
+
+class QobuzXbmcHttpResolver(QobuzHttpResolver):
+
+    def __init__(self):
+#        self.monitor = MonitorThread(self)
+#        self.monitor.setDaemon(True)
+#        self.monitor.start()
+        QobuzHttpResolver.__init__(self, ('127.0.0.1', 33574), 
+                                                    QobuzHttpResolver_Handler)
 def main():
     server = None
     try:
