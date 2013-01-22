@@ -35,12 +35,6 @@ class IRenderer(object):
         self.nodes = []
         self.enable_progress = True
 
-    def to_s(self):
-        import pprint
-        """Return this object as a string
-        """
-        return pprint.pformat(self)
-
     def set_root_node(self):
         """Import correct node object based on node_type parameter, setting
         self.root

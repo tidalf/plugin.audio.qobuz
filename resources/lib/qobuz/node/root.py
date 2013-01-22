@@ -14,12 +14,11 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from node import Flag
 from inode import INode
 from gui.util import getSetting, executeBuiltin, lang
 from cache import cache
 from cache.cacheutil import clean_all
-from node import getNode
+from node import getNode, Flag
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here

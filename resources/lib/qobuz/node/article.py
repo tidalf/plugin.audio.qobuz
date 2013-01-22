@@ -8,12 +8,10 @@
 import xbmcgui
 import xbmc
 
-import qobuz
-from flag import NodeFlag as Flag
 from inode import INode
-from gui.util import getImage
 from gui.contextmenu import contextMenu
-import pprint
+from node import Flag
+from api import api
 '''
     @class Node_articles
 '''
@@ -23,22 +21,17 @@ class WidgetArticle(xbmcgui.WindowDialog):
         super(WidgetArticle, self).__init__()
     
     def onInit(self):
-        print "onInit"
         self.image = xbmcgui.ControlImage(100, 250, 125, 75, aspectRatio=2)
         pass
         
     def onClick(self, action):
-        print "onClick: %s" % (action)
         super(WidgetArticle, self).onClick(action)
         
     def onAction(self, action):
-        print "onAction: %s" % (pprint.pformat(action))
         super(WidgetArticle, self).onAction(action)
     
     def onFocus(self, action):
-        print "onFocus"
         super(WidgetArticle, self).onFocus(action)
-import os
 
 class Node_article(INode):
 
@@ -80,13 +73,10 @@ class Node_article(INode):
         return image
 
     def fetch(self, Dir, lvl , whiteFlag, blackFlag):
-        print "Build donw article ..."
-        data = qobuz.registry.get(
-            name='article', article_id=self.nid)
+        data = api.get('/article/get', article_id=self.nid)
         if not data: 
             return False
         self.data = data['data']
-        print pprint.pformat(self.data)
         return True
 
     def populate(self, Dir, lvl , whiteFlag, blackFlag):

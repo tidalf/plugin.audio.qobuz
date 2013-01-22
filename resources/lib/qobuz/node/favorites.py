@@ -237,7 +237,6 @@ class Node_favorites(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                print "Artist %s" % (node.get_artist_id())
                 artist = getNode(Flag.ARTIST, {'nid': node.get_artist_id()})
                 if not artist.fetch(None, None, None, Flag.NONE):
                     continue

@@ -38,10 +38,8 @@ from bootstrap import QobuzBootstrap
 from debug import warn, log
 from api import api
 import threading
-import qobuz
 from cache import cache
 from cache.cacheutil import clean_old
-from node import getNode, Flag
 keyTrackId = 'QobuzPlayerTrackId'
 keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
@@ -132,7 +130,6 @@ class Monitor(xbmc.Monitor):
         self.abortRequested = True
 
     def onDatabaseUpdated( self, database ):
-        print "DB UPDATE"
         import sqlite3 as lite
         if database != 'music':
             return 0
@@ -144,13 +141,11 @@ class Monitor(xbmc.Monitor):
             cur.execute('SELECT DISTINCT(IdAlbum), comment from song')
             data = cur.fetchall()
             for line in data:
-                print line[0]
                 musicdb_idAlbum = line[0]
                 import re
                 try:
                     qobuz_idAlbum = re.search(u'aid=(\d+)', line[1]).group(1)
                 except: 
-                    print "no aid"
                     continue
                 sqlcmd = "SELECT rowid from art WHERE media_id=?" 
                 data2=None
@@ -159,23 +154,18 @@ class Monitor(xbmc.Monitor):
                     data2 = cur.fetchone()
                 except: pass
                 if  data2 is None : 
-                    print "no data try to insert"
                     sqlcmd2 = "INSERT INTO art VALUES ( NULL, (?) , 'album', 'thumb', (?) )"
                     subdir = qobuz_idAlbum[:4]
                     url = "http://static.qobuz.com/images/jaquettes/" + subdir + "/" + qobuz_idAlbum + "_600.jpg"
-                    # print "Url: %s" % (url)
                     try:
                         cur.execute (sqlcmd2,(str(musicdb_idAlbum), url))
                     except: pass
-                else: 
-                    print "already filled"
             con.commit()
         except lite.Error, e:
             print "Error %s:" % e.args[0]
             return -1;
         finally:
             if con:
-                print "Closing handle"
                 con.commit()
                 con.close()
         return True       

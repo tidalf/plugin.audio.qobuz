@@ -357,13 +357,11 @@ class INode(object):
 
     def populating(self, Dir, lvl=1, whiteFlag=None, blackFlag=None, gData=None):
         if Dir.Progress.iscanceled():
-            print "Canceled..."
             return False
         if not gData:
             gData = {'count': 0,
                      'total': 100,
                      'startedOn': time()}
-        #Dir.update(gData, 'Working', '', '')
         if lvl != -1 and lvl < 1:
             return False
         Dir.update(gData, 'Fetching', '', '')
@@ -396,7 +394,6 @@ class INode(object):
                 log(self, "Skipping node: %s" % ( Flag.to_s(child.nt)) )
             """ Calling builiding down on child """
             child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
-#        self.childs = [] # UGLY
         return gData['count']
 
     def populate(self, xbmc_directory, lvl, Flag):

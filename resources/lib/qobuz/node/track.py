@@ -225,7 +225,7 @@ class Node_track(INode):
             warn(self, "Unknow format " + str(formatId))
             mime = 'audio/mpeg'
         return mime
-    
+
     """ We add this information only when playing item because it require
         use to fetch data from Qobuz
     """
@@ -237,7 +237,7 @@ class Node_track(INode):
         item.setProperty('mimetype', mime)
         item.setPath(self.get_streaming_url())
         return True
-    
+
     def makeListItem(self, replaceItems=False):
         import xbmcgui
         media_number = self.get_media_number()
@@ -258,7 +258,6 @@ class Node_track(INode):
         #    duration = 60
         # label = '[COLOR=FF555555]' + label + '[/COLOR]
         # [[COLOR=55FF0000]Sample[/COLOR]]'
-#        print "MakeItem %s" % (self.get_image())
         mode = Mode.PLAY
         url = self.make_url(mode=mode)
         image = self.get_image()
@@ -283,11 +282,8 @@ class Node_track(INode):
         comment = ''
         if mlabel:
             comment = mlabel
-        import pprint
-#        print pprint.pformat(self.parent.data)
         if description:
             comment += ' - ' + description
-#        print "Description: %s" % (repr(description))
         '''Xbmc Library fix: Compilation showing one entry by track
             We are setting artist like 'VA / Artist'
             Data snippet:
@@ -331,7 +327,6 @@ class Node_track(INode):
                 qid=self.get_playlist_track_id(),
                 nm='gui_remove_track',
                 mode=Mode.VIEW)
-            # print "URL %s" % (url)
             menu.add(path='playlist/remove', 
                      label=lang(30073),
                      cmd=runPlugin(url), color=colorCaution)

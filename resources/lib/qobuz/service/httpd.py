@@ -44,9 +44,7 @@ def try_get_settings():
 
 while not (try_get_settings()):
     xbmc.sleep(5000)
-        # raise Exception("Missing Mandatory Parameter")
 
-print "USERNAME %s " % (username)
 import qobuz
 from api import api
 from cache import cache
@@ -128,7 +126,6 @@ class QobuzResponse:
         if not m:
             return False
         self.artist_id = m.group(1)
-        print "ArtistID: %s" % (str(self.artist_id))
         if m.group(2) == 'artist.nfo':
             self.fileWanted = 'artist.nfo'
             return True
@@ -136,10 +133,8 @@ class QobuzResponse:
         if not m:
             return False
         self.album_id = m.group(1)
-        print "AlbumID: %s" % (str(self.album_id))
         if m.group(2) == 'album.nfo':
             self.fileWanted = 'album.nfo'
-            print "Serve album.nfo"
             return True
         if not m.group(2):
             self.fileWanted = 'dir'
@@ -148,14 +143,12 @@ class QobuzResponse:
         if not m:
             return False
         if m.group(1) == 'cdart':
-            print "GOT COVER ???"
             self.fileWanted = 'cover'
             self.fileExt = 'png'
             return True
         self.track_id = m.group(1)
         self.fileExt = m.group(2)
         self.fileWanted = 'music'
-#        print "TrackID: %s" % (self.track_id)
         return True
     
 class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
@@ -205,7 +198,6 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         return True
         
     def __GET_album_nfo(self, request):
-        print "Serving album.nfo for %s" % (request.album_id)
         node = getNode(Flag.ALBUM, {'nid': request.album_id})
         if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
@@ -216,7 +208,6 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         return True
     
     def __GET_dir(self, request):
-        print "Serving dir for %s" % (request.album_id)
         node = getNode(Flag.ALBUM, {'nid': request.album_id})
         if not node.fetch(None, None, None, Flag.NONE):
             raise RequestFailed()
@@ -284,8 +275,6 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.send_error(e.code, e.message)
         except RequestFailed as e:
             self.send_error(e.code, e.message)
-        except socket.error:
-            print "Socket error..."
         except Exception as e:
             msg = 'Server errors (%s / %s)\n%s' % (
                                                   sys.exc_type, sys.exc_value,
@@ -301,12 +290,9 @@ class QobuzHttpResolver(HTTPServer):
     
     def get_request(self):
         """Get the request and client address from the socket."""
-        # 10 second timeout
-
-        self.socket.settimeout(2.0)
+        self.socket.settimeout(5.0)
         result = None
         while result is None:
-            print "Waiting for request"
             if not self.alive:
                 self.shutdown()
                 raise KeyboardInterrupt()
@@ -314,7 +300,7 @@ class QobuzHttpResolver(HTTPServer):
                 result = self.socket.accept()
             except socket.timeout:
                 pass
-        # Reset timeout on the new socket
+        ''' Reset timeout on the new socket '''
         result[0].settimeout(None)
         return result
 
@@ -346,9 +332,6 @@ class MonitorThread(threading.Thread, xbmc.Monitor):
 class QobuzXbmcHttpResolver(QobuzHttpResolver):
 
     def __init__(self):
-#        self.monitor = MonitorThread(self)
-#        self.monitor.setDaemon(True)
-#        self.monitor.start()
         QobuzHttpResolver.__init__(self, ('127.0.0.1', 33574), 
                                                     QobuzHttpResolver_Handler)
 

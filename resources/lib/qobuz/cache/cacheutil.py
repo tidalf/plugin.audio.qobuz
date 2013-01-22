@@ -20,7 +20,6 @@ def clean_old(cache):
             ttl = cache.is_fresh( data['key'], data)
             if ttl:
                 return True
-            print "TTL: %s / Delete: %s" % (str(ttl), filename)
             cache.delete(data['key'])
             return True
         find(cache.base_path, '^.*\.dat$', delete_one)
@@ -32,7 +31,6 @@ def clean_all(cache):
         def delete_one(filename, info):
             '''::callback that delete one file
             '''
-            print "Deleting filename: %s" % (filename)
             data = cache.load_from_store(filename)
             if not cache.check_magic(data):
                 print "Error: bad magic, skipping file %s" % (filename)
