@@ -100,6 +100,15 @@ class Node_artist(INode):
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
+        item.setInfo('music' , infoLabels={
+#            'genre': 'reggae', # self.get_genre(),
+#            'year': '2000', # self.get_year(),
+            'artist': self.get_artist(),
+#            'album': self.get_title(),
+#            'biography': 'coucou', # self.get_description()
+#            'description': 'coucou',
+#            'comment': 'coucou'
+        })
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
