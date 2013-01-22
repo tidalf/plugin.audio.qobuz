@@ -257,7 +257,7 @@ class QobuzApiRaw(object):
         # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {'user_id': self.user_id, 'track_id': track_id}
         return self._api_request(params, '/track/reportStreamingStart')
-
+    
     def track_resportStreamingEnd(self, track_id, duration):
         duration = math.floor(int(duration))
         if duration < 5:
@@ -392,7 +392,11 @@ class QobuzApiRaw(object):
                        'is_public', 'is_collaborative', 'tracks_id'])
         res = self._api_request(ka, '/playlist/update')
         return res
-
+    
+    def playlist_getPublicPlaylists(self, **ka):
+        self._check_ka(ka, '', ['type','limit','offset'])
+        res = self._api_request(ka, '/playlist/getPublicPlaylists')
+        return res
     """
         Artist
     """

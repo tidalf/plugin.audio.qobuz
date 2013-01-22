@@ -41,11 +41,12 @@ class __Flag__():
         self.ARTICLE = 1 << 19
         self.ARTICLE_RUBRICS = 1 << 20
         self.ALBUMS_BY_ARTIST = 1 << 21
+        self.PUB = 1 << 22
         self.STOPBUILD = 1 <<  100
         self.NONE = 1 << 101
         
         
-        self.totalFlag = 20
+        self.totalFlag = 22
         self.ALL = 0
         for i in range(1, self.totalFlag+1):
             self.ALL |= (1 << i)
@@ -87,14 +88,16 @@ class __Flag__():
             return "label"
         elif flag & self.NODE == self.NODE:
             return "inode"
-        elif flag & self.PRODUCTS == self.PRODUCTS:
-            return "products"
+#        elif flag & self.PRODUCTS == self.PRODUCTS:
+#            return "products"
         elif flag & self.STOPBUILD == self.STOPBUILD:
             return "stop_build_down"
         elif flag & self.ARTICLES == self.ARTICLES:
             return "articles"
         elif flag & self.ARTICLE == self.ARTICLE:
             return "article"
+        elif flag & self.PUB == self.PUB:
+            return "public_playlists"
         elif flag & self.ARTICLE_RUBRICS == self.ARTICLE_RUBRICS:
             return "article_rubrics"
         elif flag & self.ALBUMS_BY_ARTIST == self.ALBUMS_BY_ARTIST:
