@@ -16,28 +16,25 @@
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import xbmcgui
 
-import qobuz
-from flag import NodeFlag as Flag
 from inode import INode
-from product import Node_product
 from debug import warn
 from gui.util import lang, getSetting
 from gui.util import getImage, notifyH, executeBuiltin, containerUpdate 
-from util import getNode
+from node import getNode, Flag
 from renderer import renderer
 from api import api
 from exception import QobuzXbmcError as Qerror
-from track import Node_track
+from cache import cache
+import qobuz
 
-registryKey = 'user-favorites'
 dialogHeading = lang(30081)
 
 class Node_favorites(INode):
     '''Displaying user favorites (track and album)
     '''
-    def __init__(self, parent=None, parameters=None, progress=None):
+    def __init__(self, parent=None, parameters=None):
         super(Node_favorites, self).__init__(parent, parameters)
-        self.type = Flag.FAVORITES
+        self.nt = Flag.FAVORITES
         self.set_label(lang(30079))
         self.name = lang(30079)
         self.label = lang(30079)
@@ -47,12 +44,14 @@ class Node_favorites(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(
-            name=registryKey, limit=limit, offset=self.offset)
+        data = api.get('/favorite/getUserFavorites', 
+                           user_id=api.user_id, 
+                           limit=limit, 
+                           offset=self.offset)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
-        self.data = data['data']
+        self.data = data
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
@@ -64,13 +63,13 @@ class Node_favorites(INode):
 
     def __populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = Node_track()
+            node = getNode(Flag.TRACK)
             node.data = track
             self.add_child(node)
 
     def __populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
-            node = Node_product()
+            node = getNode(Flag.ALBUM)
             node.data = album
             self.add_child(node)
 
@@ -89,7 +88,7 @@ class Node_favorites(INode):
         ])
         if ret == -1:
             return False
-        album_ids = ','.join([node.id for node in nodes])
+        album_ids = ','.join([node.nid for node in nodes])
         if not self.add_albums(album_ids):
             notifyH(dialogHeading, 'Cannot add album(s) to favorite')
             return False
@@ -99,10 +98,10 @@ class Node_favorites(INode):
     def list_albums(self, qnt, qid):
         album_ids = {}
         nodes = []
-        if qnt & Flag.PRODUCT == Flag.PRODUCT:
-            node = Node_product(None, {'nid': qid})
+        if qnt & Flag.ALBUM == Flag.ALBUM:
+            node = getNode(Flag.ALBUM, {'nid': qid})
             node.fetch(None, None, None, None)
-            album_ids[str(node.id)] = 1
+            album_ids[str(node.nid)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
             render = renderer(qnt, self.parameters)
@@ -112,23 +111,23 @@ class Node_favorites(INode):
             render.asList = True
             render.run()
             if len(render.nodes) > 0:
-                node = Node_product(None)
+                node = getNode(Flag.ALBUM)
                 node.data = render.nodes[0].data['album']
-                album_ids[str(node.id)] = 1
+                album_ids[str(node.nid)] = 1
                 nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
             render.depth = -1
-            render.whiteFlag = Flag.PRODUCT
+            render.whiteFlag = Flag.ALBUM
             render.blackFlag = Flag.STOPBUILD & Flag.TRACK
             render.asList = True
             render.run()
             for node in render.nodes:
-                if node.type & Flag.PRODUCT: 
-                    if not str(node.id) in album_ids:
-                        album_ids[str(node.id)] = 1
+                if node.nt & Flag.ALBUM: 
+                    if not str(node.nid) in album_ids:
+                        album_ids[str(node.nid)] = 1
                         nodes.append(node)
-                if node.type & Flag.TRACK:
+                if node.nt & Flag.TRACK:
                     render = renderer(qnt, self.parameters)
                     render.depth = 1
                     render.whiteFlag = Flag.TRACK
@@ -136,11 +135,11 @@ class Node_favorites(INode):
                     render.asList = True
                     render.run()
                     if len(render.nodes) > 0:
-                        newnode = Node_product(None)
+                        newnode = getNode(Flag.ALBUM)
                         newnode.data = render.nodes[0].data['album']
-                        if not str(newnode.id) in album_ids:
+                        if not str(newnode.nid) in album_ids:
                             nodes.append(newnode)
-                            album_ids[str(newnode.id)] = 1
+                            album_ids[str(newnode.nid)] = 1
         return nodes
 
     def add_albums(self, album_ids):
@@ -161,7 +160,7 @@ class Node_favorites(INode):
         ])
         if ret == -1:
             return False
-        track_ids = ','.join([str(node.id) for node in nodes])
+        track_ids = ','.join([str(node.nid) for node in nodes])
         if not self.add_tracks(track_ids):
             notifyH(dialogHeading, 'Cannot add track(s) to favorite')
             return False
@@ -172,9 +171,9 @@ class Node_favorites(INode):
         track_ids = {}
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
-            node = Node_track(None, {'nid': qid})
+            node = getNode(Flag.TRACK, {'nid': qid})
             node.fetch(None, None, None, Flag.NONE)
-            track_ids[str(node.id)] = 1
+            track_ids[str(node.nid)] = 1
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
@@ -183,9 +182,9 @@ class Node_favorites(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if not str(node.id) in track_ids:
+                if not str(node.nid) in track_ids:
                     nodes.append(node)
-                    track_ids[str(node.id)] = 1
+                    track_ids[str(node.nid)] = 1
         return nodes
 
     def add_tracks(self, track_ids):
@@ -196,8 +195,12 @@ class Node_favorites(INode):
         return True
 
     def _delete_cache(self):
-        qobuz.registry.delete(name=registryKey)
-        return True
+        limit = getSetting('pagination_limit')
+        key = cache.make_key('/favorite/getUserFavorites', 
+                           user_id=api.user_id, 
+                           limit=limit, 
+                           offset=self.offset)
+        return cache.delete(key)
 
     def del_track(self, track_id):
         if api.favorite_delete(track_ids=track_id):
@@ -216,18 +219,18 @@ class Node_favorites(INode):
         node = getNode(qnt, {'nid': qid})
         ret = None
         if qnt & Flag.TRACK == Flag.TRACK:
-            ret = self.del_track(node.id)
-        elif qnt & Flag.PRODUCT == Flag.PRODUCT:
-            ret = self.del_album(node.id)
+            ret = self.del_track(node.nid)
+        elif qnt & Flag.ALBUM == Flag.ALBUM:
+            ret = self.del_album(node.nid)
         else:
             raise Qerror(who=self, what='invalid_node_type', 
-                         additional=self.type)
+                         additional=self.nt)
         if not ret:
             notifyH(dialogHeading, 
                     'Cannot remove item: %s' % (node.get_label()))
             return False
         notifyH(dialogHeading, 
                     'Item successfully removed: %s' % (node.get_label()))
-        url = self.make_url(nt=self.type, nid='', nm='')
+        url = self.make_url(nt=self.nt, nid='', nm='')
         executeBuiltin(containerUpdate(url, True))
         return True
