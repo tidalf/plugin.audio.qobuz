@@ -15,8 +15,8 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from debug import log
-from node import Flag
-from node import getNode
+from node.flag import NodeFlag as Flag
+from util import getNode
 
 class IRenderer(object):
     """Base class for our renderer
@@ -24,7 +24,7 @@ class IRenderer(object):
         node_type: int, type of node (see node.NodeFlag)
         parameters: dictionary, parameters passed to our plugin
     """
-    def __init__(self, node_type, parameters = {}):
+    def __init__(self, node_type, parameters=None):
         self.node_type = node_type
         self.parameters = parameters
         self.root = None
@@ -68,6 +68,3 @@ class IRenderer(object):
             if getattr(self.root, methodName)():
                 return True
             return False
-
-    def run (self):
-        raise NotImplemented()

@@ -17,19 +17,21 @@
 import qobuz
 
 from debug import warn
-
+from flag import NodeFlag
 from inode import INode
+from product import Node_product
+from track import Node_track
+from product_by_artist import Node_product_by_artist
 from exception import QobuzXbmcError
 from gui.util import notifyH, lang, getImage, getSetting
 import urllib
 from api import api
-from node import getNode, Flag
 
 class Node_search(INode):
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_search, self).__init__(parent, parameters)
-        self.nt = Flag.SEARCH
+    def __init__(self, parent=None, params=None):
+        super(Node_search, self).__init__(parent, params)
+        self.type = NodeFlag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
         self.offset = self.get_parameter('offset') or 0
@@ -69,7 +71,7 @@ class Node_search(INode):
 
     def make_url(self, **ka):
         url = super(Node_search, self).make_url(**ka)
-        url += '&search-nt=' + self.search_type
+        url += '&search-type=' + self.search_type
         if self.query:
             url += '&query=' + self.query
         return url
@@ -86,8 +88,8 @@ class Node_search(INode):
                 return False
             query = k.getText()
         query.strip()
-        data = api.get('/search/getResults', query=query, nt=stype, 
-                           limit=limit, offset=self.offset)
+        data = api.search_getResults(
+            query=query, type=stype, limit=limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")
             return False
@@ -102,17 +104,17 @@ class Node_search(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type == 'albums':
             for album in self.data['albums']['items']:
-                node = getNode(Flag.ALBUM)
+                node= Node_product()
                 node.data = album
                 self.add_child(node)
         elif self.search_type == 'tracks':
             for track in self.data['tracks']['items']:
-                node = getNode(Flag.TRACK)
+                node = Node_track()
                 node.data = track
                 self.add_child(node)
         elif self.search_type == 'artists':
             for artist in self.data['artists']['items']:
-                node = getNode(Flag.ARTIST)
+                node = Node_product_by_artist()
                 node.data = artist
                 self.add_child(node)
         return True

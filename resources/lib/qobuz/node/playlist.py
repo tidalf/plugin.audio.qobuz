@@ -14,30 +14,37 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
-import qobuz
 
+import xbmcgui
+
+import qobuz
+from constants import Mode
+from flag import NodeFlag as Flag
 from inode import INode
-from node import getNode, Flag
-from api import api
-from cache import cache
-from track import Node_track
-from debug import warn, info
-from renderer import renderer
+from debug import info, warn
+from exception import QobuzXbmcError
 from gui.util import notifyH, color, lang, getImage, runPlugin, \
     containerRefresh, containerUpdate, executeBuiltin, getSetting
+from util import  getNode
+from renderer import renderer
 from gui.contextmenu import contextMenu
-from constants import Mode
+from api import api
+
+'''
+    @class Node_playlist:
+'''
+from track import Node_track
+
+registryKey = 'user-playlist'
+registryCplID = 'user-current-playlist-id'
 
 dialogHeading = 'Qobuz playlist'
 
 class Node_playlist(INode):
-    '''
-    @class Node_playlist:
-    '''
-    def __init__(self, parent=None, parameters=None):
+
+    def __init__(self, parent=None, parameters=None, progress=None):
         super(Node_playlist, self).__init__(parent, parameters)
-        self.nt = Flag.PLAYLIST
+        self.type = Flag.PLAYLIST
         self.label = None
         self.current_playlist_id = None
         self.b_is_current = False
@@ -64,19 +71,26 @@ class Node_playlist(INode):
     def is_current(self):
         return self.b_is_current
 
+#    def hook_post_data(self):
+#        if not self.data:
+#            return
+#        self.id = self.get_property('id')
+#        self.label = self.get_name() or 'No name...'
+        
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit', isInt=True)
-        data = api.get('/playlist/get',playlist_id=self.nid, 
+        limit = getSetting('pagination_limit')
+        data = qobuz.registry.get(
+            name=registryKey, id=self.id, playlist_id=self.id, 
             offset=self.offset, limit=limit, extra='tracks')
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
-        self.data = data
+        self.data = data['data']
         return True
     
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK)
+            node = Node_track()
             node.data = track
             self.add_child(node)
         return True
@@ -85,10 +99,12 @@ class Node_playlist(INode):
         return self.get_property(['name', 'title']) 
     
     def get_image(self):
-        userdata = self.get_user_data()
-        if userdata:
-            if self.get_owner() == userdata['login']:
-                return userdata['avatar']
+        user = qobuz.registry.get(name='user')
+        if not user:
+            return True
+        user = user['data']
+        if self.get_owner() == user['user']['login']:
+            return user['user']['avatar']
         return getImage('song')
     
     def get_owner(self):
@@ -131,29 +147,30 @@ class Node_playlist(INode):
         colorCaution = getSetting('item_caution_color')
         login = getSetting('username')
         isOwner = True
-        cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS, 
+        cmd = containerUpdate(self.make_url(type=Flag.USERPLAYLISTS, 
                                     id='', mode=Mode.VIEW))
         menu.add(path='playlist', pos = 1,
                           label="Playlist", cmd=cmd, mode=Mode.VIEW)
         if login != self.get_property('owner/name'):
             isOwner = False
+        label = self.get_label()
         
         if isOwner:
-            url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
+            url = self.make_url(type=Flag.PLAYLIST, mode=Mode.VIEW,
                                 nm='set_as_current')
             menu.add(path='playlist/set_as_current', label=lang(39007), 
                     cmd=containerUpdate(url))
 
-            url = self.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
+            url = self.make_url(type=Flag.PLAYLIST, nm='gui_rename')
             menu.add(path='playlist/rename', label=lang(39009), 
                         cmd=runPlugin(url))
 
         else:
-            url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
+            url = self.make_url(type=Flag.PLAYLIST, nm='subscribe')
             menu.add(path='playlist/subscribe', label=lang(39012), 
                     cmd=runPlugin(url))
 
-        url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
+        url = self.make_url(type=Flag.PLAYLIST, nm='gui_remove')
         menu.add(path='playlist/remove', label=lang(39010), 
                  cmd=runPlugin(url), color=colorCaution)
 
@@ -161,25 +178,33 @@ class Node_playlist(INode):
         super(Node_playlist, self).attach_context_menu(item, menu)
 
     def remove_tracks(self, tracks_id):
-        if not api.playlist_deleteTracks(playlist_id=self.nid, 
-                                         playlist_track_ids=tracks_id):
+        info(self, "Removing tracks: " + tracks_id)
+        qobuz.registry.get(name='user')
+        result = api.playlist_deleteTracks(
+            playlist_id=self.id, playlist_track_ids=tracks_id)
+        if not result:
             return False
         return True
 
     def gui_remove_track(self):
         qid = self.get_parameter('qid')
-        print "Removing track %s from playlist %s" % (qid, self.nid)
+        print "Removing track %s from playlist %s" % (qid, self.id)
         if not self.remove_tracks(qid):
             notifyH(dialogHeading, 'Cannot remove track!', 'icon-error-256')
             return False
-        self.delete_cache(self.nid)
+        self.delete_cache(self.id)
         print "Error API: %s (%s)" % (api.error, api.status_code)
         notifyH(dialogHeading, 'Track removed from playlist')
         executeBuiltin(containerRefresh())
         return True
     
     def gui_add_to_current(self):
-        cid = self.get_current_playlist()
+        cpl = qobuz.registry.get(name=registryCplID)
+        if not cpl or not cpl['data']:
+            notifyH('Qobuz', "No current playlist")
+            warn(self, "No current playlist")
+            return False
+        cid = cpl['data']
         qnt = int(self.get_parameter('qnt'))
         qid = self.get_parameter('qid')
         nodes = []
@@ -217,10 +242,10 @@ class Node_playlist(INode):
             return False
         strtracks=''
         for node in nodes:
-            if node.nt != Flag.TRACK:
+            if node.type != Flag.TRACK:
                 warn(self, "Not a Node_track node")
                 continue
-            strtracks+='%s,' % (str(node.nid))
+            strtracks+='%s,' % (str(node.id))
         return api.playlist_addTracks(
             playlist_id=playlist_id, track_ids=strtracks)
 
@@ -265,38 +290,34 @@ class Node_playlist(INode):
         notifyH('Qobuz / Playlist added', 
                 '[%s] %s' % (len(nodes), name)) 
         return True
-
-    def set_as_current(self, playlist_id = None):
-        if not playlist_id:
-            playlist_id = self.nid
-        if not playlist_id:
-            warn(self, 'Cannot set current playlist without id')
-            return False
-        userdata = self.get_user_storage()
-        userdata['current_playlist'] = int(self.nid)
-        return userdata.sync()
     
-    def get_current_playlist(self):
-        userdata = self.get_user_storage()
-        if not 'current_playlist' in userdata:
-            return None
-        return int(userdata['current_playlist'])
+    def set_as_current(self, nid = None):
+        if not nid: nid = self.id
+        if not nid:
+            raise QobuzXbmcError(who=self, what='node_without_id')
+        qobuz.registry.set(
+            name=registryCplID, id=0, value=nid)
+        return True
 
     '''
         Rename playlist
     '''
-    def gui_rename(self, playlist_id = None):
-        if not playlist_id:
-            playlist_id = self.nid
-        if not playlist_id:
+    def gui_rename(self, ID = None):
+        if not ID:
+            ID = self.id
+        if not ID:
             warn(self, "Can't rename playlist without id")
             return False
         from gui.util import Keyboard
-        data = api.get('/playlist/get', playlist_id=playlist_id)
-        if not data:
+        offset = self.get_parameter('offset') or 0
+        limit = getSetting('pagination_limit')
+        info(self, "renaming playlist: " + str(ID))
+        playlist = qobuz.registry.get(
+            name=registryKey, id=ID, playlist_id=ID, offset=offset, limit=limit)
+        self.data = playlist['data']
+        if not playlist:
             warn(self, "Something went wrong while renaming playlist")
             return False
-        self.data = data
         currentname = self.get_name()
         k = Keyboard(currentname, lang(30078))
         k.doModal()
@@ -310,22 +331,24 @@ class Node_playlist(INode):
             return False
         if newname == currentname:
             return True
-        res = api.playlist_update(playlist_id=playlist_id, name=newname)
+        res = api.playlist_update(playlist_id=ID, name=newname)
         if not res:
             warn(self, "Cannot rename playlist with name %s" % (newname) )
             return False
-        self.delete_cache(playlist_id)
+        self.delete_cache(ID)
         notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
         executeBuiltin(containerRefresh())
         return True
-
+    
     def create(self, name, isPublic=True, isCollaborative=False):
         return api.playlist_create(name=name, 
                                         is_public=isPublic, 
                                         is_collaborative=isCollaborative)
-
+    
     def gui_create(self):
         query = self.get_parameter('query', unQuote=True)
+        #!TODO: Why we are no more logged ...
+        qobuz.registry.get(name='user')
         if not query:
             from gui.util import Keyboard
             k = Keyboard('', lang(42000))
@@ -339,28 +362,26 @@ class Node_playlist(INode):
             warn(self, "Cannot create playlist named '" + query + "'")
             return None
         self.set_as_current(ret['id'])
-        self.delete_cache(ret['id'])
-        url = self.make_url(nt=Flag.USERPLAYLISTS)
+        qobuz.registry.delete(name='user-playlists')
+        qobuz.registry.delete(name='user-playlist', id=ret['id'])
+        url = self.make_url(type=Flag.USERPLAYLISTS, nt='')
         executeBuiltin(containerUpdate(url))
         return ret['id']
 
     '''
         Remove playlist
     '''
-    def gui_remove(self, playlist_id=None):
-        if not playlist_id:
-            playlist_id = self.nid
-        if not playlist_id:
-            notifyH(dialogHeading, 'Invalid playlist %s' % (str(playlist_id)))
-            return False
+    def gui_remove(self):
         import xbmcgui
         import xbmc
-        cid = self.get_current_playlist()
+        cpl = qobuz.registry.get(name=registryCplID)
+        ID = int(self.get_parameter('nid'))
         login = getSetting('username')
-        offset = 0
+        offset = self.get_parameter('offset') or 0
         limit = getSetting('pagination_limit')
-        data = api.get('/playlist/get', playlist_id=playlist_id, limit=limit,
-                       offset=offset)
+        data = qobuz.registry.get(
+            name=registryKey, id=ID, playlist_id=ID, offset=offset, 
+            limit=limit)['data']
         name = ''
         if 'name' in data:
             name = data['name']
@@ -372,25 +393,28 @@ class Node_playlist(INode):
             return False
         res = False
         if data['owner']['name'] == login:
-            info(self, "Deleting playlist: " + str(playlist_id))
-            res = api.playlist_delete(playlist_id=playlist_id)
+            info(self, "Deleting playlist: " + str(ID))
+            res = api.playlist_delete(playlist_id=ID)
         else:
-            info(self, 'Unsuscribe playlist' + str(playlist_id))
-            res = api.playlist_unsubscribe(playlist_id=playlist_id)
+            info(self, 'Unsuscribe playlist' + str(ID))
+            res = api.playlist_unsubscribe(playlist_id=ID)
         if not res:
-            warn(self, "Cannot delete playlist with id " + str(playlist_id))
+            warn(self, "Cannot delete playlist with id " + str(ID))
             notifyH(lang(42001), lang(42004) +
                     name, getImage('icon-error-256'))
             return False
-        self.delete_cache(playlist_id)
+        self.delete_cache(ID)
+        if cpl and cpl['data'] == ID:
+            qobuz.registry.delete(name=registryCplID)
         notifyH(lang(42001), (lang(42002) + "%s" + lang(42003)) % (name))
-        url = self.make_url(nt=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
-                            nid='')
+        url = self.make_url(type=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
+                            nid='', nt='')
         executeBuiltin(containerUpdate(url, True))
         return False
-
+    
     def subscribe(self):
-        if api.playlist_subscribe(playlist_id=self.nid):
+        ID = self.id
+        if api.playlist_subscribe(playlist_id=ID):
             from gui.util import notifyH, isFreeAccount, lang
             notifyH(lang(42001), lang(42005))
             qobuz.registry.delete(name='user-playlists')
@@ -398,11 +422,7 @@ class Node_playlist(INode):
         else:
             return False
 
-    def delete_cache(self, playlist_id):
-        limit = getSetting('pagination_limit')
-        upkey = cache.make_key('/playlist/getUserPlaylists', limit=limit, 
-                                offset=self.offset, user_id=api.user_id)
-        pkey = cache.make_key('/playlist/get',playlist_id=playlist_id, 
-            offset=self.offset, limit=limit, extra='tracks')
-        cache.delete(upkey)
-        cache.delete(pkey)
+    def delete_cache(self, ID):
+        qobuz.registry.delete(name=registryKey, id=ID)
+        qobuz.registry.delete(name='user-playlists')
+        

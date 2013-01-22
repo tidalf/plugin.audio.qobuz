@@ -18,7 +18,7 @@
 from exception import QobuzXbmcError
 from debug import warn
 
-class __Flag__():
+class __NodeFlag():
     def __init__(self):
         self.NODE = 1 << 1
         self.TRACK = 1 << 2
@@ -26,7 +26,7 @@ class __Flag__():
         self.USERPLAYLISTS = 1 << 4
         self.RECOMMENDATION = 1 << 5
         self.ROOT = 1 << 6
-        self.ALBUM = 1 << 7
+        self.PRODUCT = 1 << 7
         self.PURCHASES = 1 << 8
         self.SEARCH = 1 << 9
         self.ARTIST = 1 << 10
@@ -36,11 +36,11 @@ class __Flag__():
         self.FRIEND_LIST = 1 << 14
         self.GENRE = 1 << 15
         self.LABEL = 1 << 16
-        self.ALBUMS = 1 << 17
+        self.PRODUCTS = 1 << 17
         self.ARTICLES = 1 << 18
         self.ARTICLE = 1 << 19
         self.ARTICLE_RUBRICS = 1 << 20
-        self.ALBUMS_BY_ARTIST = 1 << 21
+        
         self.STOPBUILD = 1 <<  100
         self.NONE = 1 << 101
         
@@ -65,8 +65,8 @@ class __Flag__():
             return "recommendation"
         elif flag & self.ROOT == self.ROOT:
             return "root"
-        elif flag & self.ALBUM == self.ALBUM:
-            return "album"
+        elif flag & self.PRODUCT == self.PRODUCT:
+            return "product"
         elif flag & self.PURCHASES == self.PURCHASES:
             return "purchases"
         elif flag & self.FAVORITES == self.FAVORITES:
@@ -97,10 +97,8 @@ class __Flag__():
             return "article"
         elif flag & self.ARTICLE_RUBRICS == self.ARTICLE_RUBRICS:
             return "article_rubrics"
-        elif flag & self.ALBUMS_BY_ARTIST == self.ALBUMS_BY_ARTIST:
-            return "albums_by_artist"
         else:
             raise QobuzXbmcError(
                 who=self, what='invalid_flag', additional=repr(flag))
-
-Flag = __Flag__()
+            
+NodeFlag = __NodeFlag()

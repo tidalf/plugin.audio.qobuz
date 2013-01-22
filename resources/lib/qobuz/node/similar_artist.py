@@ -14,10 +14,14 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+#import xbmcgui
+
+import qobuz
+
+from flag import NodeFlag as Flag
 from inode import INode
-from node import getNode, Flag
+from artist import Node_artist
 from gui.util import lang, getSetting
-from api import api
 
 '''
     NODE ARTIST
@@ -27,7 +31,7 @@ class Node_similar_artist(INode):
 
     def __init__(self, parent=None, parameters=None):
         super(Node_similar_artist, self).__init__(parent, parameters)
-        self.nt = Flag.SIMILAR_ARTIST
+        self.type = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
         self.offset = self.get_parameter('offset') or 0
 
@@ -36,17 +40,16 @@ class Node_similar_artist(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/artist/getSimilarArtists', artist_id=self.nid, 
-                           offset=self.offset, limit=limit)
+        data = qobuz.registry.get(name='artist-similar', id=self.id,
+            artist_id=self.id, offset=self.offset, limit=limit)
         if not data:
             return False
-        self.data = data
-        return len(data['artists']['items'])
+        self.data = data['data']
+        return len(data['data']['artists']['items'])
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
-            artist = getNode(Flag.ARTIST, {'parent': self, 
-                                           'offset': 0, 'nid': aData['id']})
+            artist = Node_artist(self, {'offset': 0, 'nid': aData['id']})
             artist.data = aData
             self.add_child(artist)
         return True

@@ -21,7 +21,8 @@ import qobuz
 from debug import warn
 from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, getImage, \
     getSetting
-from node import Flag, getNode
+from node.flag import NodeFlag as Flag
+from node.track import Node_track
 
 """
     @class: QobuzPlayer
@@ -41,7 +42,7 @@ class QobuzPlayer(xbmc.Player):
         Playing track given a track id
     """
     def play(self, track_id):
-        track = getNode(Flag.TRACK, {'nid': track_id})
+        track = Node_track(None, {'nid': track_id})
         ''' We are just fetching our data '''
         track.fetch(None, 1, Flag.TRACK, Flag.NONE)
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id) 
