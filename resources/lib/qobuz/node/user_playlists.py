@@ -72,7 +72,7 @@ class Node_user_playlists(INode):
         login = getSetting('username')
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST, {'parent': self, 'offset': 0})
+            node = getNode(Flag.PLAYLIST, {'offset': 0})
             node.data = data
             if self.display_product_cover:
                 pass

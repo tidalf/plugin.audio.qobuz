@@ -208,8 +208,6 @@ class Node_track(INode):
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return None
-        import pprint
-        print pprint.pformat(data)
         return data
 
     def get_restrictions(self):
@@ -218,7 +216,7 @@ class Node_track(INode):
             raise ErrorNoData('Cannot get track restrictions')
         restrictions = []
         if not 'restrictions' in data:
-            return False
+            return None
         for restriction in data['restrictions']:
             restrictions.append(restriction['code'])
         return restrictions

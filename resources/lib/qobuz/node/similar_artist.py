@@ -45,8 +45,7 @@ class Node_similar_artist(INode):
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
-            artist = getNode(Flag.ARTIST, {'parent': self, 
-                                           'offset': 0, 'nid': aData['id']})
+            artist = getNode(Flag.ARTIST, {'offset': 0, 'nid': aData['id']})
             artist.data = aData
             self.add_child(artist)
         return True

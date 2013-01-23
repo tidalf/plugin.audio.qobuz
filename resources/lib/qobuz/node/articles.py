@@ -44,6 +44,6 @@ class Node_articles(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for article in self.data['articles']['items']:
-            node = getNode(Flag.ARTICLE, {'parent': self, 'nid': article['id']})
+            node = getNode(Flag.ARTICLE, {'nid': article['id']})
             node.data = article
             self.add_child(node)

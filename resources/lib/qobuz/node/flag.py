@@ -44,13 +44,12 @@ class __Flag__():
         self.PUBLIC_PLAYLISTS = 1 << 22
         self.STOPBUILD = 1 <<  100
         self.NONE = 1 << 101
-        
-        
+
         self.totalFlag = 22
         self.ALL = 0
         for i in range(1, self.totalFlag+1):
             self.ALL |= (1 << i)
-        
+
     def to_s(self, flag):
         if not flag:
             warn(self, "Missing flag parameter")
@@ -88,8 +87,6 @@ class __Flag__():
             return "label"
         elif flag & self.NODE == self.NODE:
             return "inode"
-#        elif flag & self.PRODUCTS == self.PRODUCTS:
-#            return "products"
         elif flag & self.STOPBUILD == self.STOPBUILD:
             return "stop_build_down"
         elif flag & self.ARTICLES == self.ARTICLES:

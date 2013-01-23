@@ -33,7 +33,7 @@ class Node_album(INode):
             self.imageDefaultSize = getSetting('image_default_size')
         except:
             pass
-        
+
         @property
         def nid(self):
             return self._nid

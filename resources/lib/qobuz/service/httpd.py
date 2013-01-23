@@ -171,7 +171,7 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def __write_dir(self, node):
         w = self.wfile
         for track in node.data['tracks']['items']:
-            ntrack = getNode(Flag.TRACK, {'parent': node})
+            ntrack = getNode(Flag.TRACK, parent=node)
             ntrack.data = track
             w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.flac<br>\n')
         w.close()
