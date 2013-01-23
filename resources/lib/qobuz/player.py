@@ -42,34 +42,31 @@ class QobuzPlayer(xbmc.Player):
     """
     def play(self, track_id):
         track = getNode(Flag.TRACK, {'nid': track_id})
-        ''' We are just fetching our data '''
-        track.fetch(None, 1, Flag.TRACK, Flag.NONE)
-        xbmcgui.Window(10000).setProperty(keyTrackId, track_id) 
-        item = None
-        if not track.data:
+        if not track.fetch(None, 1, Flag.TRACK, Flag.NONE):
             warn(self, "Cannot get track data")
-            label = "Maybe an invalid track id"
-            item = xbmcgui.ListItem("No track information",
-                                    label,
-                                    '',
-                                    getImage('icon-error-256'),
-                                    '')
-        else:
-            item = track.makeListItem()
-            if not track.item_add_playing_property(item):
-                warn(self, "Cannot get streaming URL")
-                return False
-        # some tracks are not authorized for stream and a 60s sample is
-        # returned, in that case we overwrite the song duration
+#            label = "Maybe an invalid track id"
+#            item = xbmcgui.ListItem("No track information", label, '', 
+#                                    getImage('icon-error-256'), '')
+            return False
+        if not track.is_playable():
+            warn(self, "Cannot get streaming URL")
+            return False
+        item = track.makeListItem()
+        track.item_add_playing_property(item)
+        '''Some tracks are not authorized for stream and a 60s sample is
+        returned, in that case we overwrite the song duration
+        '''
         if track.is_sample():
             item.setInfo(
                 'music', infoLabels={
                 'duration': 60,
             })
-            # don't warn for free account (all songs except purchases are 60s
-            # limited)
+            '''Don't warn for free account (all songs except purchases are 60s
+            limited)
+            '''
             if not isFreeAccount():
                 notifyH("Qobuz", "Sample returned")
+        xbmcgui.Window(10000).setProperty(keyTrackId, track_id) 
         """
             Notify
         """

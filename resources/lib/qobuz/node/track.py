@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 from constants import Mode
-from node import Flag
+from node import Flag, ErrorNoData
 from inode import INode
 from debug import warn
 from gui.util import lang, getImage, runPlugin, getSetting
@@ -128,16 +128,16 @@ class Node_track(INode):
         return ''
 
     def get_streaming_url(self):
-        format_id = 6 if getSetting('streamtype') == 'flac' else 5
-        data = api.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.nid, user_id=api.user_id)
+        data = self.__getFileUrl()
         if not data:
-            return ''
+            return False
+        restrictions = self.get_restrictions()
+        for restriction in restrictions:
+            print "Restriction: %s" % (restriction)
         if not 'url' in data:
-            warn(self, 
-                 "streaming_url, no url returned\n" +  
-                 "API Error: %s" % (api.error)) 
-            return ''
+            warn(self, "streaming_url, no url returned\n"  
+                "API Error: %s" % (api.error)) 
+            return None
         return data['url']
 
     def get_artist(self):
@@ -183,39 +183,62 @@ class Node_track(INode):
             year = time.strftime("%Y", time.localtime(date))
         except:
             pass
-
         return year
-
+    
+    def is_playable(self):
+        url = self.get_streaming_url()
+        if not url:
+            return False
+        restrictions = self.get_restrictions()
+        if 'TrackUnavailable' in restrictions:
+            return False
+        if 'AlbumUnavailable' in restrictions:
+            return False
+        return True
+    
     def get_description(self):
         if self.parent:
             return self.parent.get_description()
         return ''
 
-    def is_sample(self):
+    def __getFileUrl(self):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         data = api.get('/track/getFileUrl', format_id=format_id,
                            track_id=self.nid, user_id=api.user_id)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
-            return ''
-        try:
-            return data['sample']
-        except:
-            return ''
+            return None
+        import pprint
+        print pprint.pformat(data)
+        return data
 
-    def get_mimetype(self):
-        format_id = 6 if getSetting('streamtype') == 'flac' else 5
-        data = api.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.nid, user_id=api.user_id)
-        formatId = None
+    def get_restrictions(self):
+        data = self.__getFileUrl()
+        if not data: 
+            raise ErrorNoData('Cannot get track restrictions')
+        restrictions = []
+        if not 'restrictions' in data:
+            return False
+        for restriction in data['restrictions']:
+            restrictions.append(restriction['code'])
+        return restrictions
+
+    def is_sample(self):
+        data = self.__getFileUrl()
         if not data:
-            warn(self, "Cannot get mime/type for track (network problem?)")
-            return ''
-        try:
-            formatId = int(data['format_id'])
-        except:
+            return False
+        if 'sample' in data:
+            return data['sample']
+        return False
+    
+    def get_mimetype(self):
+        data = self.__getFileUrl()
+        if not data:
+            return False
+        if not 'format_id' in data:
             warn(self, "Cannot get mime/type for track (restricted track?)")
-            return ''
+            return False
+        formatId = int(data['format_id'])
         mime = ''
         if formatId == 6:
             mime = 'audio/flac'
@@ -227,7 +250,7 @@ class Node_track(INode):
         return mime
 
     """ We add this information only when playing item because it require
-        use to fetch data from Qobuz
+        us to fetch data from Qobuz
     """
     def item_add_playing_property(self, item):
         mime = self.get_mimetype()

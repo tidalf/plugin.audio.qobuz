@@ -32,3 +32,6 @@ def getNode(qnt, params = {}):
             del params['parent']
         node = nodeModule(parent, params)
         return node
+
+class ErrorNoData(Exception):
+    pass
