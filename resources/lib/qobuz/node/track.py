@@ -216,7 +216,7 @@ class Node_track(INode):
             raise ErrorNoData('Cannot get track restrictions')
         restrictions = []
         if not 'restrictions' in data:
-            return None
+            return restrictions
         for restriction in data['restrictions']:
             restrictions.append(restriction['code'])
         return restrictions
