@@ -41,7 +41,7 @@ class __Flag__():
         self.ARTICLE = 1 << 19
         self.ARTICLE_RUBRICS = 1 << 20
         self.ALBUMS_BY_ARTIST = 1 << 21
-        self.PUB = 1 << 22
+        self.PUBLIC_PLAYLISTS = 1 << 22
         self.STOPBUILD = 1 <<  100
         self.NONE = 1 << 101
         
@@ -96,7 +96,7 @@ class __Flag__():
             return "articles"
         elif flag & self.ARTICLE == self.ARTICLE:
             return "article"
-        elif flag & self.PUB == self.PUB:
+        elif flag & self.PUBLIC_PLAYLISTS == self.PUBLIC_PLAYLISTS:
             return "public_playlists"
         elif flag & self.ARTICLE_RUBRICS == self.ARTICLE_RUBRICS:
             return "article_rubrics"

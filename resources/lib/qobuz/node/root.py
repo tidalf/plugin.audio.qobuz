@@ -47,7 +47,7 @@ class Node_root(INode):
             self.add_child(search)
         self.add_child(getNode(Flag.FRIEND_LIST))
         self.add_child(getNode(Flag.GENRE))
-        self.add_child(getNode(Flag.PUB))
+        self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
         return True
 
     def cache_remove(self):
