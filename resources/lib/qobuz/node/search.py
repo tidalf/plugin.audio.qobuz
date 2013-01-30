@@ -77,7 +77,6 @@ class Node_search(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         stype = self.search_type
-        print "SEARCH %s" % (stype)
         query = self.get_parameter('query', unQuote=True)
         if not query:
             from gui.util import Keyboard
