@@ -490,10 +490,6 @@ class INode(object):
             menu.add(path='favorites/add_artists', 
                           label=lang(39011) + ' artists', cmd=runPlugin(url))
 
-            
-            
-            
-        
         if self.parent and (self.parent.nt & Flag.FAVORITES):
             url = self.make_url(nt=Flag.FAVORITES,
                                 nm='', mode=Mode.VIEW)
@@ -573,7 +569,7 @@ class INode(object):
             menu.add(path='qobuz/erase_cache', 
                           label=lang(31009), cmd=cmd, 
                           color=colorCaution, pos=10)
-            
+
     def get_user_storage(self):
         if self.user_storage:
             return self.user_storage
@@ -581,7 +577,7 @@ class INode(object):
                             str(api.user_id))
         self.user_storage = _Storage(filename)
         return self.user_storage
-    
+
     def get_user_data(self):
         data = api.get('/user/login', username=api.username, 
                        password=api.password)

@@ -137,7 +137,7 @@ class Node_playlist(INode):
                           label="Playlist", cmd=cmd, mode=Mode.VIEW)
         if login != self.get_property('owner/name'):
             isOwner = False
-        
+
         if isOwner:
             url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
                                 nm='set_as_current')
@@ -390,9 +390,8 @@ class Node_playlist(INode):
 
     def subscribe(self):
         if api.playlist_subscribe(playlist_id=self.nid):
-            from gui.util import notifyH, isFreeAccount, lang
             notifyH(lang(42001), lang(42005))
-            qobuz.registry.delete(name='user-playlists')
+            self.delete_cache(self.nid)
             return True
         else:
             return False

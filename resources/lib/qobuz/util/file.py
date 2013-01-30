@@ -15,9 +15,6 @@
 #     You should have received a copy of the GNU General Public License
 #     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
 import os
-import time
-import random
-import string
 import re
 import tempfile
 
@@ -29,7 +26,7 @@ def unlink(filename):
     tmpfile = tempfile.mktemp('.dat', 'invalid-', os.path.dirname(filename))
     os.rename(filename, tmpfile)
     return os.unlink(tmpfile)
-    
+
 # From http://stackoverflow.com/questions/12003805/threadsafe-and-fault-tolerant-file-writes
 class RenamedTemporaryFile(object):
     """
@@ -69,7 +66,6 @@ class RenamedTemporaryFile(object):
             result = self.tmpfile.__exit__(exc_type, exc_val, exc_tb)
             os.unlink(self.tmpfile.name)
         return result
-
 
 ''' Find '''
 def find(directory, pattern, callback=None, gData=None):

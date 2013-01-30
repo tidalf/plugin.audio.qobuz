@@ -120,8 +120,10 @@ def color(colorItem, msg):
     return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
 
 def lang(langId):
-    return qobuz.addon.getLocalizedString(langId)
-
+    s = qobuz.addon.getLocalizedString(langId)
+    if not s:
+        raise KeyError(langId)
+    return s
 
 def runPlugin(url):
     return 'XBMC.RunPlugin("%s")' % (url)
