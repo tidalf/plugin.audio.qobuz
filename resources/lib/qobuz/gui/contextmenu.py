@@ -104,7 +104,7 @@ class contextMenu():
             if 'color' in data and data['color']: 
                 colorItem = data['color']
             label = self.format_section % (color(colorItem, data['label']))
-            menuItems.append((label, data['cmd']))
+            #menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
                 colorItem = self.color_default
                 if 'color' in item and item['color']:

@@ -338,7 +338,6 @@ class INode(object):
     def get_label2(self):
         return self.label2
 
-
     def render_nodes(self, nt, parameters, lvl = 1, whiteFlag = Flag.ALL, 
                      blackFlag = Flag.TRACK & Flag.STOPBUILD):
         render = renderer(nt, parameters)
@@ -348,14 +347,15 @@ class INode(object):
         render.asList = True
         render.run()
         return render
-    
+
     # When returning False we are not displaying directory content
     def fetch(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
         '''This method fetch data from cache
         '''
         return True
 
-    def populating(self, Dir, lvl=1, whiteFlag=None, blackFlag=None, gData=None):
+    def populating(self, Dir, lvl=1, whiteFlag=None, blackFlag=None, 
+                   gData=None):
         if Dir.Progress.iscanceled():
             return False
         if not gData:
@@ -427,7 +427,6 @@ class INode(object):
             node.label2 = label
             self.add_child(node)
 
-
     def attach_context_menu(self, item, menu):
         """
             Note: Url made with make_url must set mode (like mode=Mode.VIEW)
@@ -448,8 +447,9 @@ class INode(object):
             artist_name = self.get_artist()
             urlArtist = self.make_url(nt=Flag.ARTIST, nid=artist_id, 
                                       mode=Mode.VIEW)
-            menu.add(path='artist', 
-                          label=artist_name, cmd=containerUpdate(urlArtist), pos=-10)
+            menu.add(path='artist/all_album', 
+                          label="%s %s" % (lang(39001), artist_name), 
+                          cmd=containerUpdate(urlArtist), pos=-10)
 
             ''' Similar artist '''
             url = self.make_url(nt=Flag.SIMILAR_ARTIST, 
@@ -465,7 +465,8 @@ class INode(object):
             ''' ADD TO FAVORITES / TRACKS'''
             url = self.make_url(nt=Flag.FAVORITES,
                                 nm='', mode=Mode.VIEW)
-            menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True),pos=-9)   
+            menu.add(path='favorites', label="Favorites", 
+                     cmd=containerUpdate(url, True),pos=-9)   
             url = self.make_url(nt=Flag.FAVORITES, 
                                           nm='gui_add_tracks', 
                                           qid=self.nid, 
@@ -493,14 +494,15 @@ class INode(object):
         if self.parent and (self.parent.nt & Flag.FAVORITES):
             url = self.make_url(nt=Flag.FAVORITES,
                                 nm='', mode=Mode.VIEW)
-            menu.add(path='favorites', label="Favorites", cmd=containerUpdate(url, True),pos=-9)  
+            menu.add(path='favorites', label="Favorites", 
+                     cmd=containerUpdate(url, True),pos=-9)  
             url = self.make_url(nt=Flag.FAVORITES, nm='gui_remove',
                                 qid=self.nid, qnt=self.nt,
                                 mode=Mode.VIEW)
             menu.add(path='favorites/remove', 
                      label='Remove %s' % (self.get_label()), 
                      cmd=runPlugin(url), color=colorCaution)
-        wf = 0 & ~Flag.USERPLAYLISTS
+        wf = ~Flag.USERPLAYLISTS
 #        if self.parent:
 #            wf = wf and self.parent.nt & (~Flag.USERPLAYLISTS)
         if wf: 
