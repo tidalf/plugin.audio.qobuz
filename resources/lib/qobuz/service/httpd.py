@@ -126,26 +126,13 @@ class QobuzResponse:
         if not m:
             return False
         self.artist_id = m.group(1)
-        if m.group(2) == 'artist.nfo':
-            self.fileWanted = 'artist.nfo'
-            return True
         m = re.search('^(\d+)/(.*)$', m.group(2))
         if not m:
             return False
         self.album_id = m.group(1)
-        if m.group(2) == 'album.nfo':
-            self.fileWanted = 'album.nfo'
-            return True
-        if not m.group(2):
-            self.fileWanted = 'dir'
-            return True
         m = re.search('^(\d+|cdart)\.(mp3|mpc|flac|png)', m.group(2))
         if not m:
             return False
-        if m.group(1) == 'cdart':
-            self.fileWanted = 'cover'
-            self.fileExt = 'png'
-            return True
         self.track_id = m.group(1)
         self.fileExt = m.group(2)
         self.fileWanted = 'music'
@@ -154,27 +141,13 @@ class QobuzResponse:
 class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
 
     def __init__(self, request, client_address, server):
-        BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+        # FIXME workaround for exceptions in logs when the client broke connexion
+        try: 
+            BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+        except:
+            pass
         self.server_version = 'QobuzXbmcHTTP/0.0.1'
 
-    def __write_album_nfo(self, node):
-        w = self.wfile
-        w.write("<album>")
-        w.write(u"<title>"+node.get_label()+u"</title>")
-        w.write(u"<artist>"+node.get_artist()+u"</artist>")
-        w.write("<genre>"+node.get_genre()+"</genre>")
-        w.write("<year>"+node.get_year()+"</year>")
-        w.write("<thumb>"+node.get_image()+"</thumb>")
-        w.write("</album>")
-        w.close()
-
-    def __write_dir(self, node):
-        w = self.wfile
-        for track in node.data['tracks']['items']:
-            ntrack = getNode(Flag.TRACK, parent=node)
-            ntrack.data = track
-            w.write(str(ntrack.get_track_number()) + ' - ' + ntrack.get_artist() + '- ' + ntrack.get_label() + '.flac<br>\n')
-        w.close()
     
     def __GET_track(self, request):
         api.login(api.username, api.password)
@@ -185,53 +158,16 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
         self.send_response(303, "Resolved")
         self.send_header('content-type', stream_mime)
         self.send_header('location', streaming_url)
-        self.end_headers()
-        
-    def __GET_cover(self, request):
-        node = getNode(Flag.ALBUM, {'nid': request.album_id})
-        node.fetch(None, None, None, None)
-        self.send_response(200, "Ok")
-        self.send_header('content-type', 'image/png')
-        self.end_headers()
-        self.wfile.write(urllib2.urlopen(node.get_image()).read())
-        self.wfile.close()
-        return True
-        
-    def __GET_album_nfo(self, request):
-        node = getNode(Flag.ALBUM, {'nid': request.album_id})
-        if not node.fetch(None, None, None, Flag.NONE):
-            raise RequestFailed()
-        self.send_response(200, "Ok")
-        self.send_header('content-type', 'text/html')
-        self.end_headers()
-        self.__write_album_nfo(node)
-        return True
-    
-    def __GET_dir(self, request):
-        node = getNode(Flag.ALBUM, {'nid': request.album_id})
-        if not node.fetch(None, None, None, Flag.NONE):
-            raise RequestFailed()
-        self.send_response(200, "Ok")
-        self.send_header('content-type', 'x-directory/normal')
-        self.end_headers()
-        self.__write_dir(node)
-        return True        
+        self.end_headers()  
     
     def do_GET(self):
         try:
             request = QobuzResponse(self)
-            if request.fileWanted == 'dir':
-                return self.__GET_dir(request)
-            elif request.fileWanted == 'album.nfo':
-                return self.__GET_album_nfo(request)
-            elif request.fileWanted == 'cover':
-                return self.__GET_cover(request)
-            elif request.fileWanted == 'music':
+            if request.fileWanted == 'music':
                 return self.__GET_track(request)
             else:
                 raise BadRequest()
-        except BadRequest as e:
-            self.send_error(e.code, e.message)
+        except BadRequest as e: pass
         except Unauthorized as e:
             self.send_error(e.code, e.message)
         except RequestFailed as e:
@@ -246,31 +182,16 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         try:
             request = QobuzResponse(self)
-            if request.fileWanted == 'dir':
-                self.send_response(200, "Ok ;)")
-                self.send_header('content-type', 'x-directory/normal')
-                self.end_headers()
-                return True
-            elif request.fileWanted == 'album.nfo':
-                    self.send_response(200, "Ok ;)")
-                    self.send_header('content-type', 'text/html')
-                    self.end_headers()
-                    return True
-            elif request.fileWanted == 'cover':
-                    self.send_response(200, "Ok ;)")
-                    self.send_header('content-type', 'image/png')
-                    self.send_header('content-length', 1024)
-                    self.end_headers()
-                    return True
-            elif request.fileWanted == 'music':
+            if request.fileWanted == 'music':
                 self.send_response(200, "Ok ;)")
                 self.send_header('content-type', stream_mime)
                 self.end_headers()
                 return True
             else:
-                raise BadRequest()
-        except BadRequest as e:
-            self.send_error(e.code, e.message)
+                self.send_response(404, "Nops")
+                self.send_header('Content-Type', 'text/html; charset=iso-8859-1')
+                self.end_headers()
+                return True
         except Unauthorized as e:
             self.send_error(e.code, e.message)
         except RequestFailed as e:
