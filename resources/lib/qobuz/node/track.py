@@ -319,8 +319,8 @@ class Node_track(INode):
         artist = self.get_artist()
         if self.parent and hasattr(self.parent, 'get_artist_id'):
             artist_id = str(self.parent.get_artist_id())
-            if artist_id in ['26887', '145383', '255948']:
-                artist = '%s / %s' % (self.parent.get_artist(), artist)
+            #if artist_id in ['26887', '145383', '255948']:
+            artist = '%s / %s' % (self.parent.get_artist(), artist)
         desc = description or 'Qobuz Music Streaming'
         item.setInfo(type='music', infoLabels={
                      'count': self.nid,
@@ -331,8 +331,8 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': desc + ' (aid=' + self.get_album_id() + ')',
-                     'lyrics': "Chant down babylon lalalala" 
+                     'comment': desc + ' (aid=' + self.get_album_id() + ')'
+                     # 'lyrics': "Chant down babylon lalalala" 
                      })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
