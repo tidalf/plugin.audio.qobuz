@@ -244,7 +244,7 @@ class MonitorThread(threading.Thread, xbmc.Monitor):
 
     def run(self):
         while self.alive:
-            self._stopevent.wait(2)
+            self._stopevent.wait(10)
         self.httpd.shutdown()
 
     def onAbortRequested(self):
