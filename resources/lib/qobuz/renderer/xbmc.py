@@ -95,6 +95,7 @@ class QobuzXbmcRenderer(IRenderer):
 
     def scan(self):
         import sys
+        from node.flag import Flag
         """Building tree when using Xbmc library scanning 
         feature
         """
@@ -108,7 +109,11 @@ class QobuzXbmcRenderer(IRenderer):
         Dir.handle = int(sys.argv[1])
         Dir.asList = False
         Dir.asLocalURL = True
-        ret = self.root.populating(Dir, self.depth, 
+        if self.root.nt & Flag.TRACK:
+            self.root.fetch(None, None, Flag.TRACK, Flag.NONE)
+            Dir.add_node(self.root)
+        else:
+            self.root.populating(Dir, self.depth, 
                                        self.whiteFlag, self.blackFlag)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()

@@ -203,52 +203,42 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.log_message(msg)
             self.send_error(500, msg)
 
-class QobuzHttpResolver(HTTPServer):
+import select
+from SocketServer import ThreadingMixIn
+import threading
 
-    def __init__(self, server_address, RequestHandlerClass):
-        self.alive = True
-        HTTPServer.__init__(self, server_address, RequestHandlerClass)
-    
-    def get_request(self):
-        """Get the request and client address from the socket."""
-        self.socket.settimeout(5.0)
-        result = None
-        while result is None:
-            if not self.alive:
-                self.shutdown()
-                raise KeyboardInterrupt()
-            try:
-                result = self.socket.accept()
-            except socket.timeout:
-                pass
-        ''' Reset timeout on the new socket '''
-        result[0].settimeout(None)
-        return result
+class QobuzHttpResolver(ThreadingMixIn, HTTPServer):
+
+    def abortRequested(self):
+        try: 
+            return xbmc.abortRequested
+        except:
+            False
+        return False
+
+#    def get_request(self):
+#        """Get the request and client address from the socket."""
+#        self.socket.settimeout(0.1)
+#        result = None
+#        while not result:
+#            print "TIMEOUT"
+#            if self.abortRequested():
+#                self.__shutdown_request = True
+#                raise KeyboardInterrupt()
+#            try:
+#                result = self.socket.accept()
+#            except socket.timeout:
+#                print 'Socket timeout'
+#                pass
+#        ''' Reset timeout on the new socket '''
+#        result[0].settimeout(None)
+#        return result
 
     def verify_request(self, path, client_address): 
         host, port = client_address
         if host == '127.0.0.1': 
             return True
         return False
-
-import threading
-
-class MonitorThread(threading.Thread, xbmc.Monitor):
-
-    def __init__(self, httpd):        
-        self._stopevent = threading.Event()
-        threading.Thread.__init__(self)
-        xbmc.Monitor.__init__(self)
-        self.httpd = httpd
-        self.alive = True
-
-    def run(self):
-        while self.alive:
-            self._stopevent.wait(10)
-        self.httpd.shutdown()
-
-    def onAbortRequested(self):
-        self.alive = True
 
 class QobuzXbmcHttpResolver(QobuzHttpResolver):
 
@@ -260,7 +250,7 @@ def main():
     server = None
     try:
         server = QobuzXbmcHttpResolver()
-        log(server, 'Qobuz http resolver Starting...')
+        log(server, 'Starting Qobuz Resolver')
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'

@@ -50,10 +50,14 @@ class Node_track(INode):
 
     def make_url(self, **ka):
         if 'asLocalURL' in ka and ka['asLocalURL']:
-            return 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
+            album_id = self.get_property('album/id')
+            if not album_id:
+                album_id = self.parent.nid
+            url = 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
                     str(self.get_artist_id()),
-                    str(self.parent.nid),
+                    album_id,
                     str(self.nid))
+            return url
         if not 'mode' in ka: 
             ka['mode'] = Mode.PLAY 
         return super(Node_track, self).make_url(**ka)
