@@ -320,7 +320,8 @@ class Node_track(INode):
         if self.parent and hasattr(self.parent, 'get_artist_id'):
             artist_id = str(self.parent.get_artist_id())
             #if artist_id in ['26887', '145383', '255948']:
-            artist = '%s / %s' % (self.parent.get_artist(), artist)
+            if self.parent.get_artist() != artist:
+                artist = '%s / %s' % (self.parent.get_artist(), artist)
         desc = description or 'Qobuz Music Streaming'
         item.setInfo(type='music', infoLabels={
                      'count': self.nid,
