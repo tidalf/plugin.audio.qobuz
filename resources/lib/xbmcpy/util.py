@@ -39,7 +39,7 @@ except:
 from qobuz.debug import log, debug
 import qobuz
 
-from qobuz.xbmcrpc import showNotification, getInfoLabels
+#from qobuz.xbmcrpc import showNotification, getInfoLabels
 
 def htm2xbmc(htm):
     def replace(m):

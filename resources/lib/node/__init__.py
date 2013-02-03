@@ -1,4 +1,4 @@
-__all__ = ['BaseFlag', 'BaseNode', 'dict_to_url', 'BaseMode']
+__all__ = ['BaseFlag', 'BaseNode', 'dict2url', 'url2dict' 'BaseMode']
 
 import pprint
 import collections
