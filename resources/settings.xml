@@ -54,7 +54,7 @@
 	<category label="38003">
 		<!-- <setting id="show_recommendations" label="38004" type="bool" default="true" 
 			/> -->
-		<setting id="enable_scan_feature" label="38005" type="bool" default="false" />
+		<setting id="enable_scan_feature" label="38005" type="bool" default="true" />
 		<!-- <setting id="resolver_enabled" label="33000" type="bool" default="true" 
 			/> -->
 		<setting id="debug" label="Debug" type="bool" default="false" />
