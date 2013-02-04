@@ -20,17 +20,9 @@ class Node_artist(INode):
     def __init__(self, parameters={}):
         super(Node_artist, self).__init__(parameters)
         self.kind = Flag.ARTIST
-        self.label = self.get_name()
         self.content_type = 'artists'
         self.offset = self.get_parameter('offset') or 0
-        
-    def hook_post_data(self):
-        self.nid = self.get_property('id')
-        self.name = self.get_property('name')
-        self.image = self.get_image()
-        self.slug = self.get_property('slug')
-        self.label = self.name
-        
+
     def fetch(self, renderer=None):
         data = api.get('/artist/get', artist_id=self.nid, 
                        limit=api.pagination_limit, 
@@ -40,7 +32,10 @@ class Node_artist(INode):
             return False
         self.data = data
         return True
-    
+
+    def get_label(self):
+        return self.get_property('name')
+
     def populate(self, renderer=None):
         node_artist = getNode(Flag.ARTIST, self.parameters)
         node_artist.data = self.data
@@ -66,13 +61,13 @@ class Node_artist(INode):
         if image: 
             image = image.replace('126s', '_')
         return image
-    
+
     def get_title(self):
         return self.get_name()
-    
+
     def get_artist(self):
         return self.get_name()
-    
+
     def get_name(self):
         return self.get_property('name')
 
