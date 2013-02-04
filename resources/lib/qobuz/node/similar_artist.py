@@ -25,9 +25,9 @@ class Node_similar_artist(INode):
         self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
-        return lang(39000)
+        return lang(30010)
 
-    def fetch(self):
+    def fetch(self, renderer=None):
         data = api.get('/artist/getSimilarArtists', artist_id=self.nid, 
                            offset=self.offset, limit=api.pagination_limit)
         if not data:
@@ -35,7 +35,7 @@ class Node_similar_artist(INode):
         self.data = data
         return True
 
-    def populate(self, directory=None, depth=None):
+    def populate(self, renderer=None):
         for aData in self.data['artists']['items']:
             artist = getNode(Flag.ARTIST, {'offset': 0, 'nid': aData['id']})
             artist.data = aData

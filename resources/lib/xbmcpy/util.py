@@ -103,10 +103,12 @@ def runPlugin(url):
     return 'XBMC.RunPlugin("%s")' % (url)
 
 def containerUpdate(url, replace = False):
+    print "Replace %s" % (url)
     if replace: 
         replace = ', "replace"' 
-    else: replace = ''
-    s = 'Container.Update("%s"%s)' % ( url, replace)
+    else: 
+        replace = ''
+    s = 'Container.Update("%s"%s)' % (url, replace)
     return s
 
 def yesno(heading, line1, line2='', line3=''):

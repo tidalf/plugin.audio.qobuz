@@ -2,6 +2,7 @@ from xbmcpy.mock.xbmcplugin import xbmcplugin
 import xbmcpy.mock.xbmcaddon as xbmcaddon
 from xbmcpy.mock.xbmcgui import xbmcgui
 from node import Mode
+
 class ItemFactory(object):
 
     def make_item(self, node):
@@ -40,6 +41,7 @@ class XbmcRenderer(deque):
         return super(XbmcRenderer, self).append(node)
 
     def render(self, node, plugin):
+        print "[Qobuz] Renderer starting\nnode %s" % (node)
         if plugin.parameter('mode') == str(Mode.PLAY):
             if self.player and node.is_playable:
                 print "Playing track %s" % (node.get_label())

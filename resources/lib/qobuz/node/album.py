@@ -52,11 +52,11 @@ class Node_album(INode):
             self.append(node)
         return len(self.data['tracks']['items'])
 
-    def url(self):
+    def url(self, **ka):
 #        if 'asLocalURL' in ka and ka['asLocalURL']:
 #            from constants import Mode
 #            ka['mode'] = Mode.SCAN
-        return super(Node_album, self).url()
+        return super(Node_album, self).url(**ka)
 
 #    def makeListItem(self, replaceItems=False):
 #        import xbmc, xbmcgui

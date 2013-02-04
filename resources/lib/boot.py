@@ -25,7 +25,8 @@ api.login(settings.get('username'),
           settings.get('password'))    
 
 renderer = None
-try:
+#try:
+if 1:
     import xbmc
     from node.renderer.xbmc import XbmcRenderer
     renderer = XbmcRenderer()
@@ -34,12 +35,12 @@ try:
     renderer.plugin_id = plugin.plugin_id
     renderer.whiteFlag = Flag.ALL
     renderer.player = Player(plugin=plugin)
-except Exception as e:
-    print "Outside of Xbmc: %s" % (e)
-    from node.renderer.console import ConsoleRenderer, ItemFactory
-    renderer = ConsoleRenderer()
-    renderer.itemFactory = ItemFactory()
-    renderer.whiteFlag = Flag.ALL
+#except Exception as e:
+#    print "Outside of Xbmc: %s" % (e)
+#    from node.renderer.console import ConsoleRenderer, ItemFactory
+#    renderer = ConsoleRenderer()
+#    renderer.itemFactory = ItemFactory()
+#    renderer.whiteFlag = Flag.ALL
 
 while renderer.alive:
         renderer.render(plugin.route(Flag, getNode), plugin)

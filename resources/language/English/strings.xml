@@ -14,10 +14,12 @@
     <string id="30006">Search song</string>
     <string id="30007">Genre</string>
     <string id="30008">Public playlist</string>
+    <string id="30009">Playlist</string>
+    <string id="30010">Similar artist(s)</string>
     
     <!-- Context -->
     <string id="32000">Artist</string>
-    
+
     <!-- Recommendations -->
     <string id="31083">Press awards</string>
     <string id="31084">News</string>

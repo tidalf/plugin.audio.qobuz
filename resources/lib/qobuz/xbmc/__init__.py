@@ -23,7 +23,13 @@ class Setting():
     def get(self, key):
         return xbmcaddon.Addon().getSetting(key)
 
+        
 settings = Setting()
+
+base_url = 'plugin://%s/' % (xbmcaddon.Addon().getAddonInfo('id'))
+
+def furl(frag):
+    return base_url + frag
 
 class ItemFactory(object):
 
@@ -32,7 +38,7 @@ class ItemFactory(object):
         
     def make_item(self, node):
         sflag = Flag.to_s(node.kind)
-        if sflag in 'track':
+        if sflag in ['track', 'artist']:
             item = getattr(self, 'make_item_%s' % sflag)(node)
         else:
             item = self.make_item_default(node)
@@ -54,37 +60,34 @@ class ItemFactory(object):
             return None
         label = node.get_label()
         image = node.get_image()
-        plugin_id = xbmcaddon.Addon().getAddonInfo('id')
-        url = '%s%s' % (plugin_id, node.url())
+#        plugin_id = xbmcaddon.Addon().getAddonInfo('id')
+        url = furl(node.url())
         item = xbmcgui.ListItem(label, label, image, image, url)
         return item
 
-    def attach_context_album(self, menu, node):
-        print "Attach track context"
-
     def attach_context_default(self, menu, node):
-        print "Attach default @#!"
         """
             Note: Url made with make_url must set mode (like mode=Mode.VIEW)
             else we are copying current mode (for track it's Mode.PLAY ...)
         """
-        colorCaution = getSetting('item_caution_color')
-        url = node.url(kind=Flag.ROOT, mode=Mode.VIEW)
-        menu.append( ('Qobuz', containerUpdate(url, False)) )     
+#        colorCaution = getSetting('item_caution_color')
+#        url = node.url(kind=Flag.ROOT, mode=Mode.VIEW)
+#        menu.append( ('Qobuz', containerUpdate(url, False)) )     
 #
 #        ''' ARTIST '''
         if node.kind & (Flag.ALBUM | Flag.TRACK | Flag.ARTIST):
             artist_id = node.get_artist_id()
             artist_name = node.get_artist()
-            urlArtist = node.url(kind=Flag.ARTIST, nid=artist_id, 
-                                      mode=Mode.VIEW)
+            url = furl(node.url(kind=Flag.ARTIST, nid=artist_id, mode=Mode.VIEW) )
+            print "URL artist %s" % (url)
             menu.append( ("%s %s" % (lang(32000), artist_name), 
-                          containerUpdate(urlArtist)) )  
-#
-#            ''' Similar artist '''
-#            url = node.url(kind=Flag.SIMILAR_ARTIST, 
-#                                nid=artist_id, mode=Mode.VIEW)
-#            menu.append((label=lang(39004), containerUpdate(url)) 
+                          containerUpdate(url)) )  
+
+            ''' Similar artist '''
+            url = furl(node.url(kind=Flag.SIMILAR_ARTIST, nid=artist_id, 
+                                     mode=Mode.VIEW))
+            menu.append(( '%s: %s' % (lang(30010), artist_name), containerUpdate(url))) 
+
 #        ''' FAVORITES '''
 #        wf = self.nt & (~Flag.FAVORITES)
 #        if self.parent:
@@ -199,6 +202,24 @@ class ItemFactory(object):
 #            menu.add(path='qobuz/erase_cache', 
 #                          label=lang(31009), cmd=cmd, 
 #                          color=colorCaution, pos=10)
+    def make_item_artist(self, node):
+        image = node.get_image()
+        url = node.url(mode=Mode.VIEW)
+        name = node.get_label()
+        item = xbmcgui.ListItem(name,
+                                name,
+                                image,
+                                image,
+                                url)
+        if not item:
+            warn(self, "Error: Cannot make xbmc list item")
+            return None
+        item.setPath(url)
+        item.setInfo('music' , infoLabels={
+            'artist': node.get_artist(),           
+            'comment': node.get_description()
+        })
+        return item
 
     def make_item_track(self, node):
         media_number = node.get_media_number()

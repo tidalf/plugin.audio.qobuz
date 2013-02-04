@@ -33,9 +33,6 @@ class Node_artist(INode):
         self.data = data
         return True
 
-    def get_label(self):
-        return self.get_property('name')
-
     def populate(self, renderer=None):
         node_artist = getNode(Flag.ARTIST, self.parameters)
         node_artist.data = self.data
@@ -47,6 +44,9 @@ class Node_artist(INode):
             node.data = pData
             self.append(node)
         return True
+
+    def get_label(self):
+        return self.get_property('name')
 
     def get_artist_id(self):
         return self.nid
@@ -76,30 +76,3 @@ class Node_artist(INode):
 
     def get_description(self):
         return self.get_property('description')
-
-#    def makeListItem(self, replaceItems=False):
-#        import xbmcgui
-#        image = self.get_image()
-#        url = self.make_url()
-#        name = self.get_label()
-#        item = xbmcgui.ListItem(name,
-#                                name,
-#                                image,
-#                                image,
-#                                url)
-#        if not item:
-#            warn(self, "Error: Cannot make xbmc list item")
-#            return None
-#        item.setPath(url)
-#        item.setInfo('music' , infoLabels={
-##            'genre': 'reggae', # self.get_genre(),
-##            'year': '2000', # self.get_year(),
-#            'artist': self.get_artist(),           
-##            'album': self.get_title(),
-#            'comment': self.get_description()
-##           'Artist_Description': 'coucou'
-#        })
-#        ctxMenu = contextMenu()
-#        self.attach_context_menu(item, ctxMenu)
-#        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
-#        return item

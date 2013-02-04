@@ -12,6 +12,7 @@ from inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.api import api
 from qobuz.debug import warn
+from xbmcpy.util import lang
 
 class Node_playlist(INode):
     '''
@@ -20,7 +21,7 @@ class Node_playlist(INode):
     def __init__(self, properties = {}):
         super(Node_playlist, self).__init__(properties)
         self.kind = Flag.PLAYLIST
-        self.label = None
+        self.label = lang(30009)
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
@@ -32,7 +33,7 @@ class Node_playlist(INode):
         self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
-        return self.label or self.get_property('name')
+        return self.get_property('name') or self.label
 
     def get_description(self):
         return self.get_property('description')

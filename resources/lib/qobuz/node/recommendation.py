@@ -60,7 +60,7 @@ class Node_recommendation(INode):
         self.offset = self.get_parameter('offset') or 0
 
     def url(self, **ka):
-        url = super(Node_recommendation, self).url()
+        url = super(Node_recommendation, self).url(**ka)
         if self.genre_type:
             url += '&genre-type=' + str(self.genre_type)
         if self.genre_id:

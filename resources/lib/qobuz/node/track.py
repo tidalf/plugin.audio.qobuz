@@ -40,7 +40,8 @@ class Node_track(INode):
         return True
 
     def url(self, **ka):
-        mode = Mode.PLAY
+        if not 'mode' in ka:
+            ka['mode'] = Mode.PLAY
 #        if 'asLocalURL' in ka and ka['asLocalURL']:
 #            return 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
 #                    str(self.get_artist_id()),
@@ -48,7 +49,7 @@ class Node_track(INode):
 #                    str(self.nid))
 #        if not 'mode' in ka: 
 #            ka['mode'] = Mode.PLAY
-        return super(Node_track, self).url(mode=mode)
+        return super(Node_track, self).url(**ka)
 
     def get_label(self, sFormat="%a - %t"):
         sFormat = sFormat.replace("%a", self.get_artist())
