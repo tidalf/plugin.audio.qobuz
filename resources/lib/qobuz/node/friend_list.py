@@ -1,59 +1,49 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.node.friend_list
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from inode import INode
 from qobuz.debug import info, warn
-from qobuz.gui.util import getImage, runPlugin, containerUpdate, lang
+from xbmcpy.util import getImage, lang
 from qobuz.api import api
 from qobuz.node import getNode, Flag
+from qobuz.constants import Mode
 
 class Node_friend_list(INode):
     '''
     @class Node_friend_list:
     '''
-    def __init__(self, parent=None, parameters=None):
-        super(Node_friend_list, self).__init__(parent, parameters)
-        self.nt = Flag.FRIEND_LIST
+    def __init__(self, parameters={}):
+        super(Node_friend_list, self).__init__(parameters)
+        self.kind = Flag.FRIEND_LIST
         self.name = self.get_parameter('query')
         self.image = getImage('artist')
         self.label = str(self.name) + lang(41100) if (
             self.name) else lang(41101)
-        self.url = None
-        self.is_folder = True
+
         self.content_type = 'artists'
 
-    def make_url(self, **ka):
-        url = super(Node_friend_list, self).make_url(**ka)
+    def url(self, **ka):
+        u = super(Node_friend_list, self).url(**ka)
         if self.name:
-            url += "&query=" + self.name
-        return url
+            u += "&query=" + self.name
+        return u
 
     def get_image(self):
         return ''
-#        data = easyapi.get('user/login', user)
-#        if not data:
-#            return ''
-#        return data['data']['user']['avatar']
-        
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        node = getNode(Flag.FRIEND)
+
+    def fetch(self):
+        node = getNode(Flag.FRIEND, self.parameters)
         node.create('qobuz.com')
         return True
-    
-    def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
+
+    def populate(self, directory=None, depth=None):
+        print "Populate"
         username = api.username
         password = api.password
         user_id = api.user_id
@@ -87,19 +77,19 @@ class Node_friend_list(INode):
         friend_list = keys.keys()
         # and add them to the directory
         for name in friend_list:
-            node = getNode(Flag.FRIEND, {'query': str(name)})
+            node = getNode(Flag.FRIEND, self.parameters)
             if name == self.name:
                 continue
             if name in friend_data:
                 node.label = 'Friend / %s' % (node.label)
-            self.add_child(node)
+            self.append(node)
 
-    def attach_context_menu(self, item, menu):
-        label = self.get_label()
-        url = self.make_url()
-        menu.add(path='friend', label=label, cmd=containerUpdate(url))
-        url = self.make_url(nt=Flag.FRIEND, nm='gui_create', nid=self.nid)
-        menu.add(path='friend/add', label='Add', cmd=runPlugin(url))
-
-        ''' Calling base class '''
-        super(Node_friend_list, self).attach_context_menu(item, menu)
+#    def attach_context_menu(self, item, menu):
+#        label = self.get_label()
+#        url = self.make_url()
+#        menu.add(path='friend', label=label, cmd=containerUpdate(url))
+#        url = self.make_url(nt=Flag.FRIEND, nm='gui_create', nid=self.nid)
+#        menu.add(path='friend/add', label='Add', cmd=runPlugin(url))
+#
+#        ''' Calling base class '''
+#        super(Node_friend_list, self).attach_context_menu(item, menu)

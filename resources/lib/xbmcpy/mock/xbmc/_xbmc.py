@@ -1,5 +1,13 @@
+'''
+    xbmcpy.mock.xbmc._xbmc
+    ~~~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 import os, getpass, sys, platform
-#from xbmcpy.mock import xbmcaddon
 
 '''Our platform
 '''
@@ -15,9 +23,14 @@ if _platform_.startswith('windows-7'):
 else:
     raise NotImplementedError('fake_profile for os: %s' % (_platform_))
 
-'''xbmc mock
-'''
+class _Player_():
+    pass
+    
 class Mock(object):
+    ''' <xbmc> mock
+    '''
+    def __init__(self):
+        self.Player = _Player_
 
     def translatePath(self, path):
         if path.startswith('special://profile'):
@@ -26,4 +39,4 @@ class Mock(object):
 
 '''singleton
 '''
-xbmc = Mock()
+mock = Mock()

@@ -1,6 +1,8 @@
 '''
     qobuz.node.album
-    ~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
 
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
@@ -8,13 +10,11 @@
 from inode import INode
 from qobuz.debug import warn
 from xbmcpy.util import getImage, getSetting, htm2xbmc
-#from gui.contextmenu import contextMenu
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 
 SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']
-
 
 class Node_album(INode):
     '''
@@ -34,7 +34,7 @@ class Node_album(INode):
         except:
             pass
 
-    def fetch(self):# Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, renderer=None):
         data = api.get('/album/get', album_id=self.nid)
         if not data:
             warn(self, "Cannot fetch product data")
@@ -42,7 +42,7 @@ class Node_album(INode):
         self.data = data
         return True
 
-    def populate(self):
+    def populate(self, renderer=None):
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, self.parameters)
             if not 'image' in track:
@@ -57,30 +57,30 @@ class Node_album(INode):
 #            from constants import Mode
 #            ka['mode'] = Mode.SCAN
         return super(Node_album, self).url()
-    
-    def makeListItem(self, replaceItems=False):
-        import xbmc, xbmcgui
-        image = self.get_image()
-        thumb = xbmc.getCacheThumbName(image)
-        item = xbmcgui.ListItem(
-            label=self.get_label(),
-            label2=self.get_label(),
-            iconImage=image,
-            thumbnailImage=image,
-            path=self.make_url(),
-        )
-        item.setInfo('music', infoLabels={
-            'genre': self.get_genre(),
-            'year': self.get_year(),
-            'artist': self.get_artist(),
-            'title': self.get_title(),
-            'album': self.get_title(),
-            'comment': self.get_description()
-        })
-        ctxMenu = contextMenu()
-        self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
-        return item
+
+#    def makeListItem(self, replaceItems=False):
+#        import xbmc, xbmcgui
+#        image = self.get_image()
+#        thumb = xbmc.getCacheThumbName(image)
+#        item = xbmcgui.ListItem(
+#            label=self.get_label(),
+#            label2=self.get_label(),
+#            iconImage=image,
+#            thumbnailImage=image,
+#            path=self.make_url(),
+#        )
+#        item.setInfo('music', infoLabels={
+#            'genre': self.get_genre(),
+#            'year': self.get_year(),
+#            'artist': self.get_artist(),
+#            'title': self.get_title(),
+#            'album': self.get_title(),
+#            'comment': self.get_description()
+#        })
+#        ctxMenu = contextMenu()
+#        self.attach_context_menu(item, ctxMenu)
+#        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
+#        return item
 
     '''
     PROPERTIES

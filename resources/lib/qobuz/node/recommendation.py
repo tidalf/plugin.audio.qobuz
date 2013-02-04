@@ -1,21 +1,12 @@
-# -*- coding: UTF-8 -*-
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-#import xbmcgui
+'''
+    qobuz.node.recommendation
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 
 from qobuz.api import api
 from inode import INode
@@ -33,26 +24,26 @@ RECOS_TYPE_IDS = {
 }
 
 RECOS_TYPES = {
-    1: lang(30084),
-    2: lang(30083),
-    3: lang(30085),
-    4: lang(30086),
-    5: lang(30102),
+    1: lang(31084),
+    2: lang(31083),
+    3: lang(31085),
+    4: lang(31086),
+    5: lang(31102),
 }
 
 RECOS_GENRES = {
-    2: lang(30093),
-    10: lang(30095),
-    6: lang(30090),
-    59: lang(30098),
-    73: lang(30201),
-    80: lang(30089),
-    64: lang(30202),
-    91: lang(30094),
-    94: lang(30092),
-    112: lang(30087),
-    127: lang(30200),
-    123: lang(30203),
+    2: lang(31093),
+    10: lang(31095),
+    6: lang(31090),
+    59: lang(31098),
+    73: lang(31201),
+    80: lang(31089),
+    64: lang(31202),
+    91: lang(31094),
+    94: lang(31092),
+    112: lang(31087),
+    127: lang(31200),
+    123: lang(31203),
     'null': 'All',
 }
 
@@ -62,7 +53,7 @@ class Node_recommendation(INode):
     def __init__(self, parameters = {}):
         super(Node_recommendation, self).__init__(parameters)
         self.kind = Flag.RECOMMENDATION
-        self.label = 'Recommendation'
+        self.label = lang(30001)
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
         self.image = getImage('album')
@@ -81,7 +72,7 @@ class Node_recommendation(INode):
             return None
         return str(self.genre_type) + '-' + str(self.genre_id)
 
-    def fetch(self):
+    def fetch(self, renderer=None):
         if not (self.genre_type and self.genre_id):
             return True
         offset = self.offset or 0
@@ -97,7 +88,7 @@ class Node_recommendation(INode):
         self.data = data
         return True
     
-    def __populate_type(self):#, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_type(self):
         ''' Populate type, we don't have genre_type nor genre_id
         '''
         for gtype in RECOS_TYPE_IDS:
@@ -108,7 +99,7 @@ class Node_recommendation(INode):
             self.append(node)
         return True
 
-    def __populate_genre(self):#, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_genre(self):
         '''Populate genre, we have genre_type but no genre_id
         '''
         for genre_id in RECOS_GENRES:
@@ -123,7 +114,7 @@ class Node_recommendation(INode):
             self.append(node)
         return True
 
-    def __populate_type_genre(self):#, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_type_genre(self):
         '''Populate album selected by genre_type and genre_id
         '''
         if not self.data:
@@ -134,7 +125,7 @@ class Node_recommendation(INode):
             self.append(node)
         return True
 
-    def populate(self):#, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, renderer=None):
         '''We are populating our node based on genre_type and genre_id
         '''
         if not self.genre_type:

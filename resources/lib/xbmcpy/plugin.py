@@ -1,3 +1,12 @@
+'''
+    xbmcpy.plugin
+    ~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from mock import xbmcaddon
 from mock.xbmc import xbmc
 
@@ -33,8 +42,10 @@ class Plugin(object):
         self.addon = xbmcaddon.Addon
         xbmcaddon._addon_id_ = self.plugin_id
         self._parameters = parse_parameters()
+        self.base_url = 'plugin://%s/' % (self.plugin_id)
 
     def handle(self):
+        print "Sys %s" % (pprint.pformat(sys.argv))
         if len(sys.argv) < 2:
             return -1
         return int(sys.argv[1])

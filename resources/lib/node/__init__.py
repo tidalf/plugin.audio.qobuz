@@ -1,10 +1,10 @@
-__all__ = ['BaseFlag', 'BaseNode', 'dict2url', 'url2dict' 'BaseMode']
+__all__ = ['Mode', 'Flag', 'url2dict', 'dict2url']
 
 import pprint
 import collections
 import copy
 
-import urllib
+from urllib import quote, unquote
 
 class BaseFlag(object):
     Base = 1 << 0
@@ -16,13 +16,27 @@ __base_properties__ = {
     'kind': Flag.Base
 }
 
-class BaseMode(object):
-    VIEW = 1 << 1
-    RVIEW = 1 << 2
-    PLAY = 1 << 3
-    SCAN = 1 << 4
+class _Mode_():
 
-Mode = BaseMode()
+    def __init__(self):
+        self.VIEW = 1 << 1
+        self.PLAY = 1 << 2
+        self.SCAN = 1 << 3
+        self.VIEW_BIG_DIR = 1 << 4
+
+    def to_s(self, mode):
+        if mode == self.VIEW:
+            return "view"
+        elif mode == self.PLAY:
+            return "play"
+        elif mode == self.SCAN:
+            return "scan"
+        elif mode == self.VIEW_BIG_DIR:
+            return "view big dir"
+        else:
+            raise Exception("Unknow mode: %s" % (str(mode)))
+
+Mode = _Mode_()
 
 def url2dict(url):
     '''Convert url query parameter (?foo=bar&fi=fu) to python dictionary
@@ -50,54 +64,65 @@ class BaseNode(collections.deque):
     def __init__(self, parameters={}):
         self.parameters = parameters.copy()
         self.nid = self.get_property('id') or self.get_parameter('nid')
+        self.parent = None
         self.is_folder = True
         self.is_playable = False
         self.label = None
         self.label2 = None
         self.image = None
         self.data = None
+        self.mode = Mode.VIEW
         super(BaseNode, self).__init__(self)
 
     def append(self, node):
         node.parent = self
         return super(BaseNode, self).append(node)
 
-    def set_parameter(self, path, value):
+    def set_parameter(self, path, value, **ka):
+        if 'urlEncode' in ka and ka['urlEncode']:
+            value = quote(value)
+        elif 'isBool' in ka and ka['isBool']:
+            value = True if value else False
         self.parameters[path] = value
 
-    def get_parameter(self, path):
+    def get_parameter(self, path, **ka):
         if not path in self.parameters:
             return None
-        return self.parameters[path]
+        value = self.parameters[path]
+        if 'urlDecode' in ka and ka['urlDecode']:
+            value = unquote(value)
+        return value
 
-    def url(self, mode=Mode.VIEW):
-        d = {'kind': self.kind, 'mode': mode}
-        if self.nid:
-            d['nid'] = self.nid
-        return '?%s' % (dict2url(d))
+    def url(self, **ka):
+        for label in ['kind', 'mode', 'nid']:
+            if not label in ka:
+                v = getattr(self, label)
+                if v is not None:
+                    ka[label] = v
+        return '?%s' % (dict2url(ka))
     
-    def fetch(self):
+    def fetch(self, renderer):
         return True
 
-    def populate(self):
+    def populate(self, renderer):
         return True
 
-    def populating(self, directory, depth=1, whiteFlag=None, blackFlag=None):
+    def populating(self, renderer, depth=1, whiteFlag=None, blackFlag=None):
         if depth != -1:
             if depth <= 0:
                 depth = 0
                 return False
-        if not self.fetch():
+        if not self.fetch(renderer):
             return False
-        self.populate()
+        self.populate(renderer)
         if depth != -1:
             depth -= 1
         for child in iter(self):
             if child.kind & whiteFlag:
-                directory.append(child)
+                renderer.append(child)
             else:
                 print "Rejecting node: %s" % (child)
-            child.populating(directory, depth, whiteFlag, blackFlag)
+            child.populating(renderer, depth, whiteFlag, blackFlag)
         return True
     
     '''Getters
@@ -161,3 +186,7 @@ class BaseNode(collections.deque):
         if self.data and 'id' in self.data:
             return self.data['id']
         return self._nid
+
+    def __str__(self):
+        s = '%8s % 20s (%s)' % (self.kind, self.get_label(), self.url())
+        return s

@@ -2,16 +2,15 @@
     qobuz.node.article
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    This file is part of qobuz-xbmc
+
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui
-import xbmc
 
 from inode import INode
-from gui.contextmenu import contextMenu
-from node import Flag
-from api import api
+from qobuz.node import Flag
+from qobuz.api import api
 '''
     @class Node_articles
 '''

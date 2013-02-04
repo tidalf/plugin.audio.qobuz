@@ -10,7 +10,7 @@
 #from gui.util import getImage, getSetting, htm2xbmc
 #from gui.contextmenu import contextMenu
 #from api import api
-from node import getNode, Flag 
+from qobuz.node import Flag 
 
 SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']

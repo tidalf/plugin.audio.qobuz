@@ -2,30 +2,28 @@
     qobuz.node.public_playlists
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    This file is part of qobuz-xbmc
+
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node import Flag, getNode
 from inode import INode
-from qobuz.gui.util import lang, getImage, getSetting
+from xbmcpy.util import lang, getImage
 from qobuz.api import api
 
 class Node_public_playlists(INode):
-    '''
-    @class Node_public_playlists
-    '''
-    def __init__(self, parent=None, parameters=None):
-        super(Node_public_playlists, self).__init__(parent, parameters)
-        self.nt = Flag.PUBLIC_PLAYLISTS
-        self.set_label(lang(42102))
-        self.is_folder = True
+
+    def __init__(self, parameters={}):
+        super(Node_public_playlists, self).__init__(parameters)
+        self.kind = Flag.PUBLIC_PLAYLISTS
+        self.label = lang(30008)
         self.image = getImage('userplaylists')
         self.offset = self.get_parameter('offset') or 0
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
+    def fetch(self):
         data = api.get('/playlist/getPublicPlaylists', offset=self.offset, 
-                       limit=limit, type='last-created')
+                       limit=api.pagination_limit, type='last-created')
         if not data:
             return False
         # @bug: we use pagination_limit as limit for the search so we don't 
@@ -35,9 +33,9 @@ class Node_public_playlists(INode):
         self.data = data
         return True
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, directory=None, depth=None):
         for item in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST)
+            node = getNode(Flag.PLAYLIST, self.parameters)
             node.data = item
-            self.add_child(node)
+            self.append(node)
         return True

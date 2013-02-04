@@ -1,45 +1,18 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    xbmcpy.util
+    ~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 import os, sys
 import re
-  
-try:
-    """
-    Dirty trick that permit to import this module outside of xbmc
-    All function using xbmc module will fail ...
-    """
-    import xbmc
-    import xbmcgui
-    import xbmcplugin
-    '''
-    Keyboard
-    '''
-    class Keyboard(xbmc.Keyboard):
-
-        def __init__(self, default, heading, hidden=True):
-            self.setHeading('Qobuz / ' + heading)
-        
-except:
-    pass #print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"
-    
-from qobuz.debug import log, debug
-import qobuz
-
-#from qobuz.xbmcrpc import showNotification, getInfoLabels
+import mock.xbmcaddon as xbmcaddon
+from mock.xbmc import xbmc
+import mock.xbmcgui as xbmcgui
+from mock.xbmcplugin import xbmcplugin
 
 def htm2xbmc(htm):
     def replace(m):
@@ -90,7 +63,7 @@ def dialogLoginFailure():
 def isFreeAccount():
     """Check if account if it's a Qobuz paid account
     """
-    from api import api
+    from qobuz.api import api
     data = api.get('/user/login', username=api.username, 
                    password=api.password)
     if not data:
@@ -121,8 +94,7 @@ def color(colorItem, msg):
     return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
 
 def lang(langId):
-    return str(langId)
-    s = qobuz.addon.getLocalizedString(langId)
+    s = xbmcaddon.Addon().getLocalizedString(langId)
     if not s:
         raise KeyError(langId)
     return s
@@ -134,8 +106,8 @@ def containerUpdate(url, replace = False):
     if replace: 
         replace = ', "replace"' 
     else: replace = ''
-    str = 'Container.Update("%s"%s)' % ( url, replace)
-    return str
+    s = 'Container.Update("%s"%s)' % ( url, replace)
+    return s
 
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()

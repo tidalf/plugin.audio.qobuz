@@ -1,35 +1,25 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import qobuz
+'''
+    qobuz.node.search
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-from debug import warn
+    This file is part of qobuz-xbmc
 
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+
+from qobuz.debug import warn
+from qobuz.exception import QobuzXbmcError
 from inode import INode
-from exception import QobuzXbmcError
-from gui.util import notifyH, lang, getImage, getSetting
-import urllib
-from api import api
-from node import getNode, Flag
+from qobuz.api import api
+from qobuz.node import getNode, Flag
+from xbmcpy.util import lang, getImage
 
 class Node_search(INode):
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_search, self).__init__(parent, parameters)
-        self.nt = Flag.SEARCH
+    def __init__(self, parameters=None):
+        super(Node_search, self).__init__(parameters)
+        self.kind = Flag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
         self.offset = self.get_parameter('offset') or 0
@@ -48,15 +38,15 @@ class Node_search(INode):
     @search_type.setter
     def search_type(self, st):
         if st == 'artists':
-            self.label = lang(30015)
+            self.label = lang(30004)
             self.content_type = 'files'
             self.image = getImage('artist')
         elif st == 'albums':
-            self.label = lang(30014)
+            self.label = lang(30005)
             self.content_type = 'albums'
             self.image = getImage('album')
         elif st == 'tracks':
-            self.label = lang(30013)
+            self.label = lang(30006)
             self.content_type = 'songs'
             self.image = getImage('song')
         else:
@@ -67,19 +57,18 @@ class Node_search(INode):
     def search_type(self):
         return self._search_type
 
-    def make_url(self, **ka):
-        url = super(Node_search, self).make_url(**ka)
+    def url(self, **ka):
+        url = super(Node_search, self).url()
         url += '&search-type=' + self.search_type
         if self.query:
             url += '&query=' + self.query
         return url
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
+    def fetch(self, renderer=None):
         stype = self.search_type
         query = self.get_parameter('query', unQuote=True)
         if not query:
-            from gui.util import Keyboard
+            from xbmcpy.keyboard import Keyboard
             k = Keyboard('', stype)
             k.doModal()
             if not k.isConfirmed():
@@ -87,7 +76,7 @@ class Node_search(INode):
             query = k.getText()
         query.strip()
         data = api.get('/search/getResults', query=query, type=stype, 
-                           limit=limit, offset=self.offset)
+                           limit=api.pagination_limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")
             return False
@@ -98,21 +87,21 @@ class Node_search(INode):
         self.set_parameter('query', query, quote=True)
         self.data = data
         return True
-    
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+
+    def populate(self, renderer=None):
         if self.search_type == 'albums':
             for album in self.data['albums']['items']:
-                node = getNode(Flag.ALBUM)
+                node = getNode(Flag.ALBUM, self.parameters)
                 node.data = album
-                self.add_child(node)
+                self.append(node)
         elif self.search_type == 'tracks':
             for track in self.data['tracks']['items']:
-                node = getNode(Flag.TRACK)
+                node = getNode(Flag.TRACK, self.parameters)
                 node.data = track
-                self.add_child(node)
+                self.append(node)
         elif self.search_type == 'artists':
             for artist in self.data['artists']['items']:
-                node = getNode(Flag.ARTIST)
+                node = getNode(Flag.ARTIST, self.parameters)
                 node.data = artist
-                self.add_child(node)
+                self.append(node)
         return True

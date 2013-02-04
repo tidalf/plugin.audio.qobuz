@@ -25,7 +25,7 @@ class QobuzApiEasy(QobuzApiRaw):
         self.is_logged = False
         ''' Setting default stream format to mp3 '''
         self.stream_format = 5
-        self.pagination_limit = None
+        self.pagination_limit = 100
 
     @cache.cached
 #    @sql.cached

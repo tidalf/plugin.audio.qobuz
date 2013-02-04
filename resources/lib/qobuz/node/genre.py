@@ -1,25 +1,14 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-#import xbmcgui
-#import xbmc
+'''
+    qobuz.node.genre
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#import qobuz
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from inode import INode
-from qobuz.gui.util import getImage, getSetting, lang
+from xbmcpy.util import getImage, getSetting, lang
 from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.node.recommendation import RECOS_TYPE_IDS
@@ -28,16 +17,15 @@ class Node_genre(INode):
     '''
     @class Node_genre:
     '''
-    def __init__(self, parent=None, parameters=None):
-        super(Node_genre, self).__init__(parent, parameters)
-        self.nt = Flag.GENRE
-        self.set_label(lang(42101))
-        self.is_folder = True
+    def __init__(self, parameters={}):
+        super(Node_genre, self).__init__(parameters)
+        self.kind = Flag.GENRE
+        self.label = lang(30007)
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
-        
-    def make_url(self, **ka):
-        url = super(Node_genre, self).make_url(**ka)
+
+    def url(self, **ka):
+        url = super(Node_genre, self).url(**ka)
         if self.parent and self.parent.nid:
             url += "&parent-id=" + self.parent.nid
         return url
@@ -48,14 +36,14 @@ class Node_genre(INode):
     def get_name(self):
         return self.get_property('name')
 
-    def populate_reco(self, Dir, lvl, whiteFlag, blackFlag, ID):
+    def populate_reco(self, directory, ID):
         for gtype in RECOS_TYPE_IDS:
             node = getNode(
                 Flag.RECOMMENDATION, {'parent': self, 'genre-id': ID, 'genre-type': gtype})
-            node.populating(Dir, 1, Flag.ALBUM, blackFlag)
+            node.populating(directory, 1, Flag.ALBUM, Flag.NONE)
         return True
 
-    def fetch(self, Dir, lvl , whiteFlag, blackFlag):
+    def fetch(self, directory=None):
         limit = getSetting('pagination_limit')
         data = api.get('/genre/list', parent_id=self.nid, offset=self.offset, 
                        limit=limit)
@@ -65,16 +53,14 @@ class Node_genre(INode):
         self.data = data
         g = self.data['genres']
         if 'parent' in g and int(g['parent']['level']) > 1:
-            self.populate_reco(Dir, lvl, whiteFlag, blackFlag, 
-                                  g['parent']['id'])
+            self.populate_reco(directory, g['parent']['id'])
         return True
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, directory=None, depth=None):
         if not self.data or len(self.data['genres']['items']) == 0:
-            return self.populate_reco(Dir, lvl, 
-                                         whiteFlag, blackFlag, self.nid)
+            return self.populate_reco(directory, self.nid)
         for genre in self.data['genres']['items']:
-            node = Node_genre(self, {'nid': genre['id']})
+            node = getNode(Flag.GENRE, self.parameters)
             node.data = genre
-            self.add_child(node)
+            self.append(node)
         return True
