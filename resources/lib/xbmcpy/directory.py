@@ -1,3 +1,12 @@
+'''
+    xbmcpy.directory
+    ~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from collections import deque
 from mock.xbmcplugin import xbmcplugin
 
@@ -20,6 +29,9 @@ class Directory(deque):
         super(Directory, self).__init__()
 
     def append(self, node):
+        if node is None:
+            print "Appending nothing ..."
+            return
         if self.makeItem:
             item = self.makeItem(node)
             if __in_xbmc__:

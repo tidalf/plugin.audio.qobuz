@@ -1,25 +1,17 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-from qobuz.constants import Mode
+'''
+    qobuz.node.track
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+from node import Mode
 from qobuz.node import Flag, ErrorNoData
 from inode import INode
 from qobuz.debug import warn
 from xbmcpy.util import lang, getImage, runPlugin, getSetting
-#from gui.contextmenu import contextMenu
 from qobuz.api import api
 
 class Node_track(INode):
@@ -28,29 +20,26 @@ class Node_track(INode):
     '''
     def __init__(self, parameters={}):
         super(Node_track, self).__init__(parameters)
-        print "Mode: %s" % (self.get_parameter('mode'))
         self.kind = Flag.TRACK
         self.is_folder = False
-        self.is_playable = True
+#        self.is_playable = True
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.status = None
         self.image = getImage('song')
 
-    def fetch(self):#, Dir, lvl, whiteFlag, blackFlag):
-#        if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
-#            return False
+    def fetch(self, renderer=None):
         data = api.get('/track/get', track_id=self.nid)
         if not data:
             return False
         self.data = data
         return True
     
-    def populate(self):#, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, renderer=None):
         self.append(self)
         return True
 
-    def url(self, mode=Mode.PLAY):
+    def url(self, **ka):
         mode = Mode.PLAY
 #        if 'asLocalURL' in ka and ka['asLocalURL']:
 #            return 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
@@ -58,7 +47,7 @@ class Node_track(INode):
 #                    str(self.parent.nid),
 #                    str(self.nid))
 #        if not 'mode' in ka: 
-#            ka['mode'] = Mode.PLAY 
+#            ka['mode'] = Mode.PLAY
         return super(Node_track, self).url(mode=mode)
 
     def get_label(self, sFormat="%a - %t"):
@@ -187,7 +176,8 @@ class Node_track(INode):
         except:
             pass
         return year
-    
+
+    @property
     def is_playable(self):
         url = self.get_streaming_url()
         if not url:
@@ -198,8 +188,12 @@ class Node_track(INode):
         if 'AlbumUnavailable' in restrictions:
             return False
         return True
-    
+    @is_playable.setter
+    def is_playable(self, v):
+        pass
+
     def get_description(self):
+        return '' # Recursion bug ...
         if self.parent:
             return self.parent.get_description()
         return ''
@@ -262,86 +256,7 @@ class Node_track(INode):
         item.setPath(self.get_streaming_url())
         return True
 
-    def makeListItem(self, replaceItems=False):
-        import xbmcgui
-        media_number = self.get_media_number()
-        if not media_number:
-            media_number = 1
-        else:
-            media_number = int(media_number)
-        duration = self.get_duration()
-        if duration == -1:
-            import pprint
-            print "Error: no duration\n%s" % (pprint.pformat(self.data))
-        label = self.get_label()
-        isplayable = 'true'
 
-        # Disable free account checking here, purchased track are
-        # still playable even with free account, but we don't know yet.
-        # if qobuz.gui.is_free_account():
-        #    duration = 60
-        # label = '[COLOR=FF555555]' + label + '[/COLOR]
-        # [[COLOR=55FF0000]Sample[/COLOR]]'
-        mode = Mode.PLAY
-        url = self.make_url(mode=mode)
-        image = self.get_image()
-        item = xbmcgui.ListItem(label,
-                                label,
-                                image,
-                                image,
-                                url)
-        item.setIconImage(image)
-        item.setThumbnailImage(image)
-        if not item:
-            warn(self, "Cannot create xbmc list item")
-            return None
-        item.setPath(url)
-        track_number = self.get_track_number()
-        if not track_number:
-            track_number = 0
-        else:
-            track_number = int(track_number)
-        mlabel = self.get_property('label/name')
-        description = self.get_description()
-        comment = ''
-        if mlabel:
-            comment = mlabel
-        if description:
-            comment += ' - ' + description
-        '''Xbmc Library fix: Compilation showing one entry by track
-            We are setting artist like 'VA / Artist'
-            Data snippet:
-                {u'id': 26887, u'name': u'Interpr\xe8tes Divers'}
-                {u'id': 145383, u'name': u'Various Artists'}
-                {u'id': 255948, u'name': u'Multi Interpretes'}
-        '''
-        artist = self.get_artist()
-        if self.parent and hasattr(self.parent, 'get_artist_id'):
-            artist_id = str(self.parent.get_artist_id())
-            if artist_id in ['26887', '145383', '255948']:
-                artist = '%s / %s' % (self.parent.get_artist(), artist)
-        desc = description or 'Qobuz Music Streaming'
-        item.setInfo(type='music', infoLabels={
-                     'count': self.nid,
-                     'title': self.get_title(),
-                     'album': self.get_album(),
-                     'genre': self.get_genre(),
-                     'artist': artist,
-                     'tracknumber': track_number,
-                     'duration': duration,
-                     'year': self.get_year(),
-                     'comment': desc + ' (aid=' + self.get_album_id() + ')',
-                     'lyrics': "Chant down babylon lalalala" 
-                     })
-        item.setProperty('DiscNumber', str(media_number))
-        item.setProperty('IsPlayable', isplayable)
-        item.setProperty('IsInternetStream', isplayable)
-        item.setProperty('Music', isplayable)
-#        item.setProperty('mimetype', 'audio/mpeg')
-        ctxMenu = contextMenu()
-        self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
-        return item
 
     def attach_context_menu(self, item, menu):
         if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):

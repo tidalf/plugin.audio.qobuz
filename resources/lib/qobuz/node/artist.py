@@ -2,27 +2,25 @@
     qobuz.node.artist
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    This file is part of qobuz-xbmc
+
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from inode import INode
-from debug import warn
-from gui.util import getSetting
-from gui.contextmenu import contextMenu
-from api import api
-from node import getNode, Flag
+from qobuz.api import api
+from qobuz.node import getNode, Flag
+from qobuz.debug import warn
 '''
     @class Node_artist(Inode): Artist
 '''
 
 class Node_artist(INode):
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_artist, self).__init__(parent, parameters)
-        self.nt = Flag.ARTIST
-        self.set_label(self.get_name())
-        self.is_folder = True
-        self.slug = ''
+    def __init__(self, parameters={}):
+        super(Node_artist, self).__init__(parameters)
+        self.kind = Flag.ARTIST
+        self.label = self.get_name()
         self.content_type = 'artists'
         self.offset = self.get_parameter('offset') or 0
         
@@ -33,29 +31,27 @@ class Node_artist(INode):
         self.slug = self.get_property('slug')
         self.label = self.name
         
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/artist/get', artist_id=self.nid, limit=limit, 
-                           offset=self.offset, extra='albums')
+    def fetch(self, renderer=None):
+        data = api.get('/artist/get', artist_id=self.nid, 
+                       limit=api.pagination_limit, 
+                        offset=self.offset, extra='albums')
         if not data:
             warn(self, "Build-down: Cannot fetch artist data")
             return False
         self.data = data
         return True
     
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        node_artist = getNode(Flag.ARTIST)
+    def populate(self, renderer=None):
+        node_artist = getNode(Flag.ARTIST, self.parameters)
         node_artist.data = self.data
         node_artist.label = '[ %s ]' % (node_artist.label)
         if not 'albums' in self.data: 
             return True
         for pData in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM)
+            node = getNode(Flag.ALBUM, self.parameters)
             node.data = pData
-            self.add_child(node)
+            self.append(node)
         return True
-
-        del self._data['tracks']
 
     def get_artist_id(self):
         return self.nid
@@ -86,29 +82,29 @@ class Node_artist(INode):
     def get_description(self):
         return self.get_property('description')
 
-    def makeListItem(self, replaceItems=False):
-        import xbmcgui
-        image = self.get_image()
-        url = self.make_url()
-        name = self.get_label()
-        item = xbmcgui.ListItem(name,
-                                name,
-                                image,
-                                image,
-                                url)
-        if not item:
-            warn(self, "Error: Cannot make xbmc list item")
-            return None
-        item.setPath(url)
-        item.setInfo('music' , infoLabels={
-#            'genre': 'reggae', # self.get_genre(),
-#            'year': '2000', # self.get_year(),
-            'artist': self.get_artist(),           
-#            'album': self.get_title(),
-            'comment': self.get_description()
-#           'Artist_Description': 'coucou'
-        })
-        ctxMenu = contextMenu()
-        self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
-        return item
+#    def makeListItem(self, replaceItems=False):
+#        import xbmcgui
+#        image = self.get_image()
+#        url = self.make_url()
+#        name = self.get_label()
+#        item = xbmcgui.ListItem(name,
+#                                name,
+#                                image,
+#                                image,
+#                                url)
+#        if not item:
+#            warn(self, "Error: Cannot make xbmc list item")
+#            return None
+#        item.setPath(url)
+#        item.setInfo('music' , infoLabels={
+##            'genre': 'reggae', # self.get_genre(),
+##            'year': '2000', # self.get_year(),
+#            'artist': self.get_artist(),           
+##            'album': self.get_title(),
+#            'comment': self.get_description()
+##           'Artist_Description': 'coucou'
+#        })
+#        ctxMenu = contextMenu()
+#        self.attach_context_menu(item, ctxMenu)
+#        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
+#        return item

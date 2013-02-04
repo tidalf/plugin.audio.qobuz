@@ -1,20 +1,18 @@
+'''
+    boot
+    ~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from xbmcpy.plugin import Plugin
-from node import url2dict
 from qobuz.node import getNode, Flag
 from qobuz.cache import cache
 from qobuz.api import api
-from qobuz.xbmc import makeItem, settings
-from xbmcpy.directory import Directory
-
-directory = None
-def route_one(plugin, makeItem):
-    global directory
-    directory = Directory(handle=plugin.handle(), makeItem=makeItem, 
-                      pluginId=plugin.plugin_id)
-    root = plugin.route(Flag, getNode)
-    root.populating(directory, depth=1, whiteFlag=Flag.ALL)
-    directory.end()
-
+from qobuz.xbmc import settings, ItemFactory
+from qobuz.xbmc.player import Player
 """Main
 """
 import os
@@ -22,22 +20,29 @@ plugin = Plugin('plugin.audio.qobuztest')
 profile = plugin.profile()
 cache.base_path = os.path.join(profile, 
                                plugin.plugin_id, 'cache')
+api.pagination_limit = int(settings.get('pagination_limit'))
 api.login(settings.get('username'), 
           settings.get('password'))    
-directory = Directory(handle=plugin.handle(), makeItem=makeItem, 
-                      pluginId=plugin.plugin_id)
-alive = True
-if directory.console:
-    console = directory.console
-    while alive:
-        route_one(plugin, makeItem)
-        command, arg1 = console.get_command()
-        if command == 'view' and arg1 < len(directory):
-            try:
-                plugin._parameters = url2dict(directory[arg1].url())
-            except:
-                console.write('Invalid view command\n')
-      
-else:
-    route_one(plugin, makeItem)
+
+renderer = None
+try:
+    import xbmc
+    from node.renderer.xbmc import XbmcRenderer
+    renderer = XbmcRenderer()
+    renderer.itemFactory = ItemFactory()
+    renderer.handle = plugin.handle()
+    renderer.plugin_id = plugin.plugin_id
+    renderer.whiteFlag = Flag.ALL
+    renderer.player = Player(plugin=plugin)
+except Exception as e:
+    print "Outside of Xbmc: %s" % (e)
+    from node.renderer.console import ConsoleRenderer, ItemFactory
+    renderer = ConsoleRenderer()
+    renderer.itemFactory = ItemFactory()
+    renderer.whiteFlag = Flag.ALL
+
+while renderer.alive:
+        renderer.render(plugin.route(Flag, getNode), plugin)
+        renderer.ask()
+
 

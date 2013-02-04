@@ -1,94 +1,42 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.node.user_playlists
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from qobuz.node import Flag, getNode
 from inode import INode
-from qobuz.debug import warn, error
+from qobuz.debug import warn
 from qobuz.api import api
-from qobuz.xbmc import settings
-
-import xbmcpy.mock.xbmcaddon as xbmcaddon
+from xbmcpy.util import lang
 
 class Node_user_playlists(INode):
     """User playlists node
         This node list playlist made by user and saved on Qobuz server
     """
     def __init__(self, parameters = {}):
-
-#        parameters['label'] = 'UserPlaylists' #lang(30019)
         super(Node_user_playlists, self).__init__(parameters)
         self.kind = Flag.USERPLAYLISTS
-        self.label = "UserPlaylists"
-#         print "Kind: %s" % (self.get_property('kind'))
-#        self.image = getImage('userplaylists')
-#        self.nt = Flag.USERPLAYLISTS
+        self.label = lang(30000)
         self.content_type = 'files'
-#        display_by = self.get_parameter('display-by')
-#        if not display_by:
-#            display_by = 'songs'
-        self.set_display_by('songs')
-        display_cover = xbmcaddon.Addon().getSetting(
-                                    'userplaylists_display_cover') == 'true'
-        self.display_product_cover = display_cover
-        self.offset = self.get_parameter('offset') or 0
+        self.offset = self.get_parameter('offset')
 
-    def set_display_by(self, dtype):
-        vtype = ('product', 'songs')
-        if not dtype in vtype:
-            error(self, "Invalid display by: " + dtype)
-        self.display_by = dtype
-
-    def get_display_by(self):
-        return self.display_by
-
-    def set_current_playlist_id(self, playlist_id):
-        userdata = self.get_user_storage()
-        userdata['current_playlist'] = int(playlist_id)
-        userdata.sync()
-
-    def get_current_playlist_id(self):
-        userdata = self.get_user_storage()
-        if not 'current_playlist' in userdata:
-            return None
-        return int(userdata['current_playlist'])
-
-    def fetch(self):
-        limit = settings.get('pagination_limit') or 100
-        data = api.get('/playlist/getUserPlaylists', limit=limit, 
-                                offset=self.offset, user_id=api.user_id)
-        import pprint
-        print "DATA: %s" % (pprint.pformat(data))
+    def fetch(self, renderer=None):
+        data = api.get('/playlist/getUserPlaylists', 
+                       limit=api.pagination_limit, offset=self.offset, 
+                       user_id=api.user_id)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
         self.data = data
         return True
 
-    def populate(self):# Dir, lvl, whiteFlag, blackFlag):
-        print "POPULATE USERPLAYLISTS"
-        import pprint
-#        login = setting.get('username') or ''
-#        cid = self.get_current_playlist_id()
-        for data in self.data['playlists']['items']:
+    def populate(self, renderer=None):
+        for playlist in self.data['playlists']['items']:
             node = getNode(Flag.PLAYLIST, self.parameters)
-            print "Node %s" % (pprint.pformat(node))
-            node.data = data
-#            if (cid and cid == node.nid):
-#                node.set_is_current(True)
-#            if node.get_owner() == login:
-#                node.set_is_my_playlist(True)
+            node.data = playlist
             self.append(node)
         return True
