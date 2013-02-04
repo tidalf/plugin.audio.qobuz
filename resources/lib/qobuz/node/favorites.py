@@ -60,7 +60,6 @@ class Node_favorites(INode):
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, self.parameters)
             node.data = artist
-            node.fetch()
             self.append(node)
 
     def get_description(self):

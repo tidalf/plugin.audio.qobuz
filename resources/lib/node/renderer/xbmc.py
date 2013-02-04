@@ -58,7 +58,7 @@ class XbmcRenderer(deque):
         self.alive = False
         handle = self.plugin.handle()
         succeeded = True if len(self) > 0 else False
-        updateListing=succeeded
+        updateListing=not succeeded
         cacheToDisc=succeeded
         xbmcplugin.endOfDirectory(handle, succeeded, updateListing, 
                                   cacheToDisc)
