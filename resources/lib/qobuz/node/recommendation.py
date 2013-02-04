@@ -11,7 +11,7 @@
 from qobuz.api import api
 from inode import INode
 from qobuz.node import getNode, Flag
-#from qobuz.gui.util import getSetting, lang, getImage
+#@todo: qobuz i8n...
 from xbmcpy.util import lang, getImage
 from qobuz.debug import warn
 
@@ -87,7 +87,7 @@ class Node_recommendation(INode):
             return False
         self.data = data
         return True
-    
+
     def __populate_type(self):
         ''' Populate type, we don't have genre_type nor genre_id
         '''
@@ -95,7 +95,8 @@ class Node_recommendation(INode):
             parameters = self.parameters.copy()
             parameters['genre-type'] = gtype
             node = getNode(Flag.RECOMMENDATION, parameters)
-            self.label = '%s / %s' % (self.label, RECOS_TYPES[gtype])
+            label = '%s / %s' % (self.label, RECOS_TYPES[gtype])
+            node.label = label
             self.append(node)
         return True
 

@@ -1,4 +1,4 @@
-from xbmcpy.console import console
+from xbmcpy.console import console as con
 from node import url2dict
 
 class ItemFactory(object):
@@ -33,11 +33,11 @@ class ConsoleRenderer(deque):
         try:
             return getattr(self, 'command_%s' % (cmd))(args)
         except Exception as e:
-            console.write('Invalid command: %s\n' % (e))
+            con.write('Invalid command: %s\n' % (e))
         return False
 
     def get_command(self):
-        inp = console.raw_input('#>')
+        inp = con.raw_input('#>')
         inpx = inp.split(' ')
         if inpx[0] not in self.valid_commands:
             return ('invalid', (inpx[0]))
@@ -46,13 +46,13 @@ class ConsoleRenderer(deque):
     def end(self):
         count = 0
         for node in iter(self):
-            console.write('[%s] %s\n' % (count, str(node)))
+            con.write('[%s] %s\n' % (count, str(node)))
             count+=1
         return True
 
     def command_view(self, args):
         if len(args) == 0:
-            console.write('You must supply id: view <id>\n')
+            con.write('You must supply id: view <id>\n')
             return False
         idx = int(args[0])
         if idx is None:
@@ -67,4 +67,4 @@ class ConsoleRenderer(deque):
         return True
 
     def command_invalid(self, args):
-        console.write('Invalid command: %s\n' % args[0])
+        con.write('Invalid command: %s\n' % args[0])
