@@ -108,20 +108,25 @@ class BaseNode(collections.deque):
         return True
 
     def populating(self, renderer, depth=1, whiteFlag=None, blackFlag=None):
+#        print "POPULATING .... %s %s" % (str(depth), str(self))
+        if depth == 0: return False
         if depth != -1:
             if depth <= 0:
                 depth = 0
                 return False
         if not self.fetch(renderer):
             return False
-        self.populate(renderer)
+        if not self.populate(renderer):
+            return True
         if depth != -1:
             depth -= 1
-        for child in iter(self):
+        if len(self) == 0:
+            return True
+        for child in self:
             if child.kind & whiteFlag:
                 renderer.append(child)
             else:
-                print "Rejecting node: %s" % (child)
+                print u"Rejecting node: " + str(child)
             child.populating(renderer, depth, whiteFlag, blackFlag)
         return True
     
@@ -188,5 +193,5 @@ class BaseNode(collections.deque):
         return self._nid
 
     def __str__(self):
-        s = '%8s % 20s (%s)' % (self.kind, self.get_label(), self.url())
+        s = u'%8s % 20s (%s)' % (self.kind, repr(self.get_label()), self.url())
         return s

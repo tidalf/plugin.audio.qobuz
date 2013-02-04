@@ -19,7 +19,8 @@
     
     <!-- Context -->
     <string id="32000">Artist</string>
-
+    <string id="32001">Add track(s) to favorite</string>
+    
     <!-- Recommendations -->
     <string id="31083">Press awards</string>
     <string id="31084">News</string>

@@ -162,43 +162,27 @@ class Node_favorites(INode):
 #        self._delete_cache()
 #        return True
 #
-#    def gui_add_tracks(self):
-#        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
-#        nodes = self.list_tracks(qnt, qid)
-#        if len(nodes) == 0:
-#            notifyH(dialogHeading, lang(3600))
-#            return False
-#        ret = xbmcgui.Dialog().select(lang(36006), [
-#           node.get_label() for node in nodes                              
-#        ])
-#        if ret == -1:
-#            return False
-#        track_ids = ','.join([str(node.nid) for node in nodes])
-#        if not self.add_tracks(track_ids):
-#            notifyH(dialogHeading, 'Cannot add track(s) to favorite')
-#            return False
-#        notifyH(dialogHeading, 'Track(s) added to favorite')
-#        return True
+
 #
-#    def list_tracks(self, qnt, qid):
-#        track_ids = {}
-#        nodes = []
-#        if qnt & Flag.TRACK == Flag.TRACK:
-#            node = getNode(Flag.TRACK, {'nid': qid})
-#            node.fetch(None, None, None, Flag.NONE)
-#            track_ids[str(node.nid)] = 1
-#            nodes.append(node)
-#        else:
-#            render = renderer(qnt, self.parameters)
-#            render.depth = -1
-#            render.whiteFlag = Flag.TRACK
-#            render.asList = True
-#            render.run()
-#            for node in render.nodes:
-#                if not str(node.nid) in track_ids:
-#                    nodes.append(node)
-#                    track_ids[str(node.nid)] = 1
-#        return nodes
+    def list_tracks(self, plugin, node):
+        from node.renderer.list import ListRenderer
+        track_ids = {}
+        nodes = []
+        if node.kind & Flag.TRACK == Flag.TRACK:
+            node.fetch()
+            track_ids[str(node.nid)] = 1
+            nodes.append(node)
+        else:
+            render = ListRenderer()
+            render.alive = False
+            render.depth = -1
+            render.whiteFlag = Flag.TRACK
+            render.render(plugin, node)
+            for node in iter(render):
+                if not str(node.nid) in track_ids:
+                    nodes.append(node)
+                    track_ids[str(node.nid)] = 1
+        return nodes
 #
 #    def list_artists(self, qnt, qid):
 #        artist_ids = {}

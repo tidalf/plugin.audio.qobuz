@@ -12,7 +12,6 @@ from qobuz.node import getNode, Flag
 from qobuz.cache import cache
 from qobuz.api import api
 from qobuz.xbmc import settings, ItemFactory
-from qobuz.xbmc.player import Player
 """Main
 """
 import os
@@ -25,25 +24,27 @@ api.login(settings.get('username'),
           settings.get('password'))    
 
 renderer = None
-#try:
-if 1:
+try:
     import xbmc
     from node.renderer.xbmc import XbmcRenderer
+    from qobuz.xbmc.commander import QobuzXbmcCommander
+    from qobuz.xbmc.player import Player
     renderer = XbmcRenderer()
+    renderer.commander = QobuzXbmcCommander(Flag)
     renderer.itemFactory = ItemFactory()
     renderer.handle = plugin.handle()
     renderer.plugin_id = plugin.plugin_id
     renderer.whiteFlag = Flag.ALL
     renderer.player = Player(plugin=plugin)
-#except Exception as e:
-#    print "Outside of Xbmc: %s" % (e)
-#    from node.renderer.console import ConsoleRenderer, ItemFactory
-#    renderer = ConsoleRenderer()
-#    renderer.itemFactory = ItemFactory()
-#    renderer.whiteFlag = Flag.ALL
+except Exception as e:
+    print "Outside of Xbmc: %s" % (e)
+    from node.renderer.console import ConsoleRenderer, ItemFactory
+    renderer = ConsoleRenderer()
+    renderer.itemFactory = ItemFactory()
+    renderer.whiteFlag = Flag.ALL & ~Flag.TRACK
 
 while renderer.alive:
-        renderer.render(plugin.route(Flag, getNode), plugin)
+        renderer.render(plugin, plugin.route(Flag, getNode))
         renderer.ask()
 
 

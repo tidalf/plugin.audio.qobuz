@@ -16,6 +16,26 @@ class ItemFactory(object):
         return item
         return None
 
+class Commander(object):
+
+    def __init__(self, flag):
+        self.flag = flag
+
+    def has_action(self, plugin, node):
+        if plugin.parameter('action'):
+            return True
+        return False
+
+    def execute(self, plugin, node):
+        action = plugin.parameter('action')
+        if not action:
+            return True
+        del node.parameters['action']
+        print "Executing action %s on %s" % (action, node)
+        nodename = self.flag.to_s(node.kind)
+        return getattr(self, 'action_%s_%s' % (nodename, action))(plugin, node)
+
+
 from collections import deque
 
 class XbmcRenderer(deque):
@@ -29,6 +49,7 @@ class XbmcRenderer(deque):
         self.depth = 1
         self.whiteFlag = None
         self.handle = None
+        self.commander = None
 
     def append(self, node):
         item = self.itemFactory.make_item(node)
@@ -40,7 +61,13 @@ class XbmcRenderer(deque):
             print "No item... @#!"
         return super(XbmcRenderer, self).append(node)
 
-    def render(self, node, plugin):
+    def render(self, plugin, node):
+        self.alive = False
+        if self.commander:
+            if self.commander.has_action(plugin, node):
+                ret = self.commander.execute(plugin, node)
+                self.end()
+                return ret
         print "[Qobuz] Renderer starting\nnode %s" % (node)
         if plugin.parameter('mode') == str(Mode.PLAY):
             if self.player and node.is_playable:
@@ -51,17 +78,16 @@ class XbmcRenderer(deque):
         self.plugin = plugin
         self.handle = plugin.handle()
         node.populating(self, self.depth, self.whiteFlag)
-        self.end()
+        return self.end()
 
     def ask(self):
         pass
 
     def end(self):
-        self.alive = False
-        handle = self.plugin.handle()
+        handle = self.handle
         succeeded = True if len(self) > 0 else False
         updateListing=not succeeded
         cacheToDisc=succeeded
         xbmcplugin.endOfDirectory(handle, succeeded, updateListing, 
                                   cacheToDisc)
-
+        return True

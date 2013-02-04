@@ -18,11 +18,11 @@ class ConsoleRenderer(deque):
         self.plugin = None
         self.depth = 1
         self.whiteFlag = None
-        
+
     def append(self, node):
         return super(ConsoleRenderer, self).append(node)
 
-    def render(self, node, plugin):
+    def render(self, plugin, node):
         self.clear()
         self.plugin = plugin
         node.populating(self, self.depth, self.whiteFlag)

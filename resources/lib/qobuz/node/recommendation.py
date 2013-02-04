@@ -15,6 +15,11 @@ from qobuz.node import getNode, Flag
 from xbmcpy.util import lang, getImage
 from qobuz.debug import warn
 
+def gettext(msg):
+    pass
+
+gettext('plop')
+
 RECOS_TYPE_IDS = {
     1: 'new-releases',
     2: 'press-awards',

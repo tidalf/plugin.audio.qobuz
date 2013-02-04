@@ -36,7 +36,7 @@ class Node_track(INode):
         return True
     
     def populate(self, renderer=None):
-        self.append(self)
+#        self.append(self)
         return True
 
     def url(self, **ka):

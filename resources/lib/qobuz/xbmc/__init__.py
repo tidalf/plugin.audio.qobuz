@@ -17,7 +17,7 @@ from xbmcpy.mock.xbmcgui import xbmcgui
 from qobuz.node.flag import Flag
 from node import Mode
 from qobuz.debug import warn
-from xbmcpy.util import getSetting, containerUpdate, lang
+from xbmcpy.util import getSetting, containerUpdate, lang, runPlugin
 
 class Setting():
     def get(self, key):
@@ -35,7 +35,7 @@ class ItemFactory(object):
 
     def __init__(self):
         self.append_context = True
-        
+
     def make_item(self, node):
         sflag = Flag.to_s(node.kind)
         if sflag in ['track', 'artist']:
@@ -60,7 +60,6 @@ class ItemFactory(object):
             return None
         label = node.get_label()
         image = node.get_image()
-#        plugin_id = xbmcaddon.Addon().getAddonInfo('id')
         url = furl(node.url())
         item = xbmcgui.ListItem(label, label, image, image, url)
         return item
@@ -88,23 +87,18 @@ class ItemFactory(object):
                                      mode=Mode.VIEW))
             menu.append(( '%s: %s' % (lang(30010), artist_name), containerUpdate(url))) 
 
-#        ''' FAVORITES '''
-#        wf = self.nt & (~Flag.FAVORITES)
-#        if self.parent:
-#            wf = wf and self.parent.nt & ~Flag.FAVORITES
-#        if wf:
-#            ''' ADD TO FAVORITES / TRACKS'''
-#            url = self.make_url(nt=Flag.FAVORITES,
-#                                nm='', mode=Mode.VIEW)
-#            menu.add(path='favorites', label="Favorites", 
-#                     cmd=containerUpdate(url, True),pos=-9)   
-#            url = self.make_url(nt=Flag.FAVORITES, 
-#                                          nm='gui_add_tracks', 
-#                                          qid=self.nid, 
-#                                          qnt=self.nt, 
-#                                          mode=Mode.VIEW)
-#            menu.add(path='favorites/add_tracks', 
-#                          label=lang(39011) + ' tracks', cmd=runPlugin(url))
+        ''' FAVORITES '''
+        wf = node.kind & (~Flag.FAVORITES)
+        if node.parent:
+            wf = wf and node.parent.kind & ~Flag.FAVORITES
+        if wf:
+            ''' ADD TO FAVORITES / TRACKS'''
+            url = furl(node.url(kind=Flag.FAVORITES, 
+                                          action='add_tracks', 
+                                          qnid=node.nid, 
+                                          qkind=node.kind, 
+                                          mode=Mode.VIEW))
+            menu.append( (lang(32001), runPlugin(url) ))
 #            ''' ADD TO FAVORITES / Albums'''
 #            url = self.make_url(nt=Flag.FAVORITES, 
 #                                          nm='gui_add_albums', 
