@@ -20,6 +20,8 @@ _fake_profile = None
 if _platform_.startswith('windows-7'):
     _fake_profile = os.path.join('c:\\', 'Users', getpass.getuser(), 
                                  'AppData', 'Roaming', 'XBMC', 'userdata')
+elif _platform_.startswith('linux'):
+    _fake_profile = os.path.join('/', 'home', getpass.getuser(), '.xbmc', 'userdata')
 else:
     raise NotImplementedError('fake_profile for os: %s' % (_platform_))
 

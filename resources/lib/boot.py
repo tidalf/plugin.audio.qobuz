@@ -15,7 +15,7 @@ from qobuz.xbmc import settings, ItemFactory
 """Main
 """
 import os
-plugin = Plugin('plugin.audio.qobuztest')
+plugin = Plugin('plugin.audio.qobuz')
 profile = plugin.profile()
 cache.base_path = os.path.join(profile, 
                                plugin.plugin_id, 'cache')
