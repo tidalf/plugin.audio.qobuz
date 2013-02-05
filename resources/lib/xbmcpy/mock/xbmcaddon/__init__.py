@@ -30,7 +30,7 @@ class __Addon__(object):
             return os.path.abspath(os.path.join(os.path.curdir, '..'))
         if key == 'version':
             return '0.0.1'
-        return 'key: NotImplemented'
+        return 'key %s: NotImplemented' % (key)
 
     def __get_config_xml_root(self):
         import xml.etree.ElementTree as ET
@@ -46,7 +46,8 @@ class __Addon__(object):
     def getSetting(self, sid):
         if not self.xmlroot_config:
             self.xmlroot_config = self.__get_config_xml_root()
-        elm = self.xmlroot_config.find('.//setting[@id="%s"]' % (sid))
+        #@bug: error on linux (debian/squeeze) with python 2.6
+        elm = self.xmlroot_config.find('.//setting[@id="%s"]' % (sid)) 
         if elm is not None:
             elm = elm.get('value')
         return elm
