@@ -46,5 +46,3 @@ except Exception as e:
 while renderer.alive:
         renderer.render(plugin, plugin.route(Flag, getNode))
         renderer.ask()
-
-
