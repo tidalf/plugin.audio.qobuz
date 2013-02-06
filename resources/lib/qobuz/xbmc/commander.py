@@ -1,3 +1,12 @@
+'''
+    qobuz.xbmc.commander
+    ~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from node.renderer.xbmc import Commander
 from xbmcpy.util import notifyH, lang
 from xbmcpy.mock.xbmcgui import xbmcgui

@@ -1,6 +1,6 @@
 '''
     qobuz.xbmc.player
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~
 
     This file is part of qobuz-xbmc
 

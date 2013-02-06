@@ -10,20 +10,19 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from file import CacheFile
+from qobuz.settings import settings
 
-class CacheQobuz(CacheFile):
+class CacheFileTTL(CacheFile):
 
     def __init__(self, *a, **ka):
         self.store = {}
         self.black_keys = ['password']
-        self.duration_middle = 0.5
-        self.duration_long = 1
-        super(CacheQobuz, self).__init__()
+        super(CacheFileTTL, self).__init__()
 
     def load(self, key, *a, **ka):
         if key in self.store:
             return self.store[key]
-        data = super(CacheQobuz, self).load(key, *a, **ka)
+        data = super(CacheFileTTL, self).load(key, *a, **ka)
         if not data:
             return None
         self.store[key] = data
@@ -32,7 +31,7 @@ class CacheQobuz(CacheFile):
     def get_ttl(self, key, *a, **ka):
         if len(a) > 0:
             if a[0] == '/track/getFileUrl':
-                return 60*15
+                return settings['cache_duration_short'] * 60
         if 'user_id' in ka:
-            return self.duration_middle * 60
-        return self.duration_long * 60
+            return settings['cache_duration_middle'] * 60
+        return settings['cache_duration_long'] * 60

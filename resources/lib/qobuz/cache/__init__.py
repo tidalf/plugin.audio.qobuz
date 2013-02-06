@@ -9,5 +9,5 @@
 '''
 __all__ = ['cache']
 
-from qobuz import CacheQobuz
-cache = CacheQobuz()
+from ttl import CacheFileTTL
+cache = CacheFileTTL()

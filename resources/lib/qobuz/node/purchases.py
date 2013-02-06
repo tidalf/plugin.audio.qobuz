@@ -11,7 +11,7 @@ from inode import INode
 from qobuz.debug import warn
 from qobuz.api import api
 from qobuz.node import Flag, getNode
-from xbmcpy.util import lang, getImage
+from qobuz.i8n import _
 
 class Node_purchases(INode):
     '''Displaying product purchased by user (track and album)
@@ -19,15 +19,17 @@ class Node_purchases(INode):
     def __init__(self, properties = {}):
         super(Node_purchases, self).__init__(properties)
         self.kind = Flag.PURCHASES
-        self.label = lang(30002)
+        self.label = _('Purchases')
         self.content_type = 'albums'
-        self.image = getImage('album')
-        self.offset = self.get_property('offset') or 0
+        self.image = ''
+        self.offset = self.get_parameter('offset') or 0
 
     def fetch(self, renderer=None):
-        data = api.get('/purchase/getUserPurchases', 
+        data = api.get('/purchase/getUserPurchases',
                        limit=api.pagination_limit, offset=self.offset, 
                        user_id=api.user_id)
+        import pprint
+        pprint.pprint(data)
         if not data:
             warn(self, "Cannot fetch purchases data")
             return False
@@ -35,17 +37,21 @@ class Node_purchases(INode):
         return True
 
     def populate(self, renderer=None):
+        ret = False
         if 'albums' in self.data:
-            self.__populate_albums()
-        elif 'tracks' in self.data:
-            self.__populate_tracks()
+            if self.__populate_albums():
+                ret = True
+        if 'tracks' in self.data:
+            if self.__populate_tracks():
+                ret = True
+        return ret
 
     def __populate_albums(self):
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, self.parameters)
             node.data = album
             self.append(node)
-        return list
+        return True
 
     def __populate_tracks(self):
         for track in self.data['tracks']['items']:

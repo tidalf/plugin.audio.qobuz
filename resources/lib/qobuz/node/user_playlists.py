@@ -8,10 +8,10 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node import Flag, getNode
-from inode import INode
 from qobuz.debug import warn
 from qobuz.api import api
-from xbmcpy.util import lang
+from qobuz.i8n import _
+from inode import INode
 
 class Node_user_playlists(INode):
     """User playlists node
@@ -20,13 +20,13 @@ class Node_user_playlists(INode):
     def __init__(self, parameters = {}):
         super(Node_user_playlists, self).__init__(parameters)
         self.kind = Flag.USERPLAYLISTS
-        self.label = lang(30000)
+        self.label = _('User playlists') #lang(30000)
         self.content_type = 'files'
         self.offset = self.get_parameter('offset')
 
     def fetch(self, renderer=None):
         data = api.get('/playlist/getUserPlaylists', 
-                       limit=api.pagination_limit, offset=self.offset, 
+                       limit=api.pagination_limit, offset=self.offset,
                        user_id=api.user_id)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")

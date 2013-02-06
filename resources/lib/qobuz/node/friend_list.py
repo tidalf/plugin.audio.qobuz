@@ -9,10 +9,10 @@
 '''
 from inode import INode
 from qobuz.debug import info, warn
-from xbmcpy.util import getImage, lang
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.constants import Mode
+from qobuz.i8n import _
 
 class Node_friend_list(INode):
     '''
@@ -22,9 +22,9 @@ class Node_friend_list(INode):
         super(Node_friend_list, self).__init__(parameters)
         self.kind = Flag.FRIEND_LIST
         self.name = self.get_parameter('query')
-        self.image = getImage('artist')
-        self.label = str(self.name) + lang(41100) if (
-            self.name) else lang(41101)
+        self.image = ''
+        self.label = str(self.name) + _("'s friend") if (
+            self.name) else _('Friend')
 
         self.content_type = 'artists'
 
@@ -43,7 +43,6 @@ class Node_friend_list(INode):
         return True
 
     def populate(self, directory=None, depth=None):
-        print "Populate"
         username = api.username
         password = api.password
         user_id = api.user_id

@@ -7,15 +7,12 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui
-
 from inode import INode
-from debug import warn
+from qobuz.debug import warn
 import weakref
-from api import api
-from gui.contextmenu import contextMenu
-from gui.util import getSetting
-from node import getNode, Flag
+from qobuz.api import api
+from qobuz.node import getNode, Flag
+from qobuz.settings import settings
 '''
     @class Node_product_by_artist:
 '''

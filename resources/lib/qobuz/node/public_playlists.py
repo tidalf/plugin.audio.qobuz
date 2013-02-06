@@ -7,21 +7,21 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.node import Flag, getNode
 from inode import INode
-from xbmcpy.util import lang, getImage
+from qobuz.node import Flag, getNode
 from qobuz.api import api
+from qobuz.i8n import _
 
 class Node_public_playlists(INode):
 
     def __init__(self, parameters={}):
         super(Node_public_playlists, self).__init__(parameters)
         self.kind = Flag.PUBLIC_PLAYLISTS
-        self.label = lang(30008)
-        self.image = getImage('userplaylists')
+        self.label = _('Public playlists')
+        self.image = '' #getImage('userplaylists')
         self.offset = self.get_parameter('offset') or 0
 
-    def fetch(self):
+    def fetch(self, renderer=None):
         data = api.get('/playlist/getPublicPlaylists', offset=self.offset, 
                        limit=api.pagination_limit, type='last-created')
         if not data:
@@ -33,7 +33,7 @@ class Node_public_playlists(INode):
         self.data = data
         return True
 
-    def populate(self, directory=None, depth=None):
+    def populate(self, renderer=None):
         for item in self.data['playlists']['items']:
             node = getNode(Flag.PLAYLIST, self.parameters)
             node.data = item

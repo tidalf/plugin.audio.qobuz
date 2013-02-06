@@ -1,6 +1,6 @@
 '''
     qobuz.xbmc
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~
 
     This file is part of qobuz-xbmc
 
@@ -78,7 +78,6 @@ class ItemFactory(object):
             artist_id = node.get_artist_id()
             artist_name = node.get_artist()
             url = furl(node.url(kind=Flag.ARTIST, nid=artist_id, mode=Mode.VIEW) )
-            print "URL artist %s" % (url)
             menu.append( ("%s %s" % (lang(32000), artist_name), 
                           containerUpdate(url)) )  
 

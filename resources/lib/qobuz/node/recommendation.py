@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
     qobuz.node.recommendation
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -11,14 +12,8 @@
 from qobuz.api import api
 from inode import INode
 from qobuz.node import getNode, Flag
-#@todo: qobuz i8n...
-from xbmcpy.util import lang, getImage
 from qobuz.debug import warn
-
-def gettext(msg):
-    pass
-
-gettext('plop')
+from qobuz.i8n import _
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -29,26 +24,26 @@ RECOS_TYPE_IDS = {
 }
 
 RECOS_TYPES = {
-    1: lang(31084),
-    2: lang(31083),
-    3: lang(31085),
-    4: lang(31086),
-    5: lang(31102),
+    1: _('News'),
+    2: _('Press awards'),
+    3: _('Best sellers'),
+    4: _('Editor picks'),
+    5: _('Most featured'),
 }
 
 RECOS_GENRES = {
-    2: lang(31093),
-    10: lang(31095),
-    6: lang(31090),
-    59: lang(31098),
-    73: lang(31201),
-    80: lang(31089),
-    64: lang(31202),
-    91: lang(31094),
-    94: lang(31092),
-    112: lang(31087),
-    127: lang(31200),
-    123: lang(31203),
+    2:   _('Blues / Country / Folk'),
+    10:  _('Classical'),
+    6:   _('Chanson française'),
+    59:  _('Historical documents / Litterature / Humor'),
+    73:  _('Childs / Karakoke / Ambiance'),
+    80:  _('Jazz'),
+    64:  _('Techno'),
+    91:  _('Movie soundtracks'),
+    94:  _('World music'),
+    112: _('Pop / Rock'),
+    127: _('Rap / HipHop / R&B / Soul'),
+    123: _('Reggae'),
     'null': 'All',
 }
 
@@ -58,10 +53,10 @@ class Node_recommendation(INode):
     def __init__(self, parameters = {}):
         super(Node_recommendation, self).__init__(parameters)
         self.kind = Flag.RECOMMENDATION
-        self.label = lang(30001)
+        self.label = _('Recommendation')
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
-        self.image = getImage('album')
+        self.image = ''
         self.offset = self.get_parameter('offset') or 0
 
     def url(self, **ka):
@@ -81,11 +76,10 @@ class Node_recommendation(INode):
         if not (self.genre_type and self.genre_id):
             return True
         offset = self.offset or 0
-        limit = 100
         data = api.get('/album/getFeatured',
                                   type=RECOS_TYPE_IDS[int(self.genre_type)],
                                   genre_id=self.genre_id,
-                                  limit=limit,
+                                  limit=api.pagination_limit,
                                   offset=offset)
         if not data:
             warn(self, "Cannot fetch data for recommendation")

@@ -12,7 +12,7 @@ from inode import INode
 from qobuz.debug import warn
 from qobuz.node import getNode, Flag
 from qobuz.api import api
-from xbmcpy.util import lang
+from qobuz.i8n import _
 
 class Node_favorites(INode):
     '''Displaying user favorites (track and album)
@@ -20,7 +20,7 @@ class Node_favorites(INode):
     def __init__(self, parameters={}):
         super(Node_favorites, self).__init__(parameters)
         self.kind = Flag.FAVORITES
-        self.label = lang(30003)
+        self.label = _('Favorites')
         self.content_type = 'albums'
         self.offset = self.get_parameter('offset') or 0
 

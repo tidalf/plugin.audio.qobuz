@@ -8,10 +8,10 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from inode import INode
-from xbmcpy.util import getImage, getSetting, lang
 from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.node.recommendation import RECOS_TYPE_IDS
+from qobuz.i8n import _
 
 class Node_genre(INode):
     '''
@@ -20,8 +20,8 @@ class Node_genre(INode):
     def __init__(self, parameters={}):
         super(Node_genre, self).__init__(parameters)
         self.kind = Flag.GENRE
-        self.label = lang(30007)
-        self.image = getImage('album')
+        self.label = _('Genre')
+        self.image = ''
         self.offset = self.get_parameter('offset') or 0
 
     def url(self, **ka):
@@ -29,9 +29,6 @@ class Node_genre(INode):
         if self.parent and self.parent.nid:
             url += "&parent-id=" + self.parent.nid
         return url
-
-    def hook_post_data(self):
-        self.label = self.get_property('name')
 
     def get_name(self):
         return self.get_property('name')
@@ -44,9 +41,8 @@ class Node_genre(INode):
         return True
 
     def fetch(self, directory=None):
-        limit = getSetting('pagination_limit')
         data = api.get('/genre/list', parent_id=self.nid, offset=self.offset, 
-                       limit=limit)
+                       limit=api.pagination_limit)
         if not data: 
             self.data = None
             return True # Nothing return trigger reco build in build_down

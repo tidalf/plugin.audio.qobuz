@@ -11,8 +11,9 @@ from node import Mode
 from qobuz.node import Flag, ErrorNoData
 from inode import INode
 from qobuz.debug import warn
-from xbmcpy.util import lang, getImage, runPlugin, getSetting
 from qobuz.api import api
+from qobuz.settings import settings
+from qobuz.i8n import _
 
 class Node_track(INode):
     '''
@@ -26,7 +27,7 @@ class Node_track(INode):
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.status = None
-        self.image = getImage('song')
+        self.image = ''#getImage('song')
 
     def fetch(self, renderer=None):
         data = api.get('/track/get', track_id=self.nid)
@@ -200,7 +201,7 @@ class Node_track(INode):
         return ''
 
     def __getFileUrl(self):
-        format_id = 6 if getSetting('streamtype') == 'flac' else 5
+        format_id = 6 if settings['stream_type'] == 'flac' else 5
         data = api.get('/track/getFileUrl', format_id=format_id,
                            track_id=self.nid, user_id=api.user_id)
         if not data:
@@ -257,19 +258,17 @@ class Node_track(INode):
         item.setPath(self.get_streaming_url())
         return True
 
-
-
-    def attach_context_menu(self, item, menu):
-        if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
-            colorCaution = getSetting('item_caution_color')
-            url = self.parent.make_url(nt=Flag.PLAYLIST,
-                id=self.parent.nid,
-                qid=self.get_playlist_track_id(),
-                nm='gui_remove_track',
-                mode=Mode.VIEW)
-            menu.add(path='playlist/remove', 
-                     label=lang(30073),
-                     cmd=runPlugin(url), color=colorCaution)
-
-        ''' Calling base class '''
-        super(Node_track, self).attach_context_menu(item, menu)
+#    def attach_context_menu(self, item, menu):
+#        if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
+#            colorCaution = getSetting('item_caution_color')
+#            url = self.parent.make_url(nt=Flag.PLAYLIST,
+#                id=self.parent.nid,
+#                qid=self.get_playlist_track_id(),
+#                nm='gui_remove_track',
+#                mode=Mode.VIEW)
+#            menu.add(path='playlist/remove', 
+#                     label=lang(30073),
+#                     cmd=runPlugin(url), color=colorCaution)
+#
+#        ''' Calling base class '''
+#        super(Node_track, self).attach_context_menu(item, menu)

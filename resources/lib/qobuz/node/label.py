@@ -9,9 +9,9 @@
 '''
 from inode import INode
 from qobuz.debug import warn
-from xbmcpy.util import getImage, getSetting, lang
 from qobuz.node import Flag
 from qobuz.api import api
+from qobuz.i8n import _
 
 class Node_label(INode):
     '''
@@ -20,7 +20,7 @@ class Node_label(INode):
     def __init__(self, parameters={}):
         super(Node_label, self).__init__(parameters)
         self.kind = Flag.LABEL
-        self.label = lang(42100)
+        self.label = _('Label')
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
 

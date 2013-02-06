@@ -1,6 +1,6 @@
 '''
     qobuz.node.album
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~
 
     This file is part of qobuz-xbmc
 
@@ -9,9 +9,11 @@
 '''
 from inode import INode
 from qobuz.debug import warn
-from xbmcpy.util import getImage, getSetting, htm2xbmc
+#from xbmcpy.util import getImage, getSetting, htm2xbmc
 from qobuz.api import api
 from qobuz.node import getNode, Flag
+from qobuz.i8n import _
+from qobuz.settings import settings
 
 SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']
@@ -23,16 +25,13 @@ class Node_album(INode):
     def __init__(self, parameters={}):
         super(Node_album, self).__init__(parameters)
         self.kind = Flag.ALBUM
-        self.image = getImage('album')
+        self.image = ''
         self.content_type = 'songs'
         self.is_special_purchase = False
         self.offset = None
         self.imageDefaultSize = 'large'
-        self.label = u'Album'
-        try:
-            self.imageDefaultSize = getSetting('image_default_size')
-        except:
-            pass
+        self.label = _('Album')
+        self.imageDefaultSize = settings.get('image_size_default')
 
     def fetch(self, renderer=None):
         data = api.get('/album/get', album_id=self.nid)
@@ -131,4 +130,4 @@ class Node_album(INode):
         return year
 
     def get_description(self):
-        return htm2xbmc(self.get_property('description'))
+        return self.get_property('description')

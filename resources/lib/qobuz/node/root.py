@@ -10,7 +10,7 @@
 
 from inode import INode
 from qobuz.node import getNode, Flag
-from qobuz.xbmc import settings
+from qobuz.settings import settings
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -20,15 +20,14 @@ class Node_root(INode):
         self.kind = Flag.ROOT
         self.label = 'Qobuz'
         self.content_type = 'files'
-        self.display_recommendation = True
 
     def populate(self, renderer=None):
         self.append(getNode(Flag.USERPLAYLISTS, self.parameters))
-        if self.display_recommendation:
+        if settings['recommendation_enable']:
             self.append(getNode(Flag.RECOMMENDATION, self.parameters))
         self.append(getNode(Flag.PURCHASES, self.parameters))
         self.append(getNode(Flag.FAVORITES, self.parameters))
-        if settings.get('search_enabled') == 'true':
+        if settings['search_enable']:
             search = getNode(Flag.SEARCH, self.parameters)
             search.search_type = 'albums'
             self.append(search)

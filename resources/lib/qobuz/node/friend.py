@@ -15,8 +15,7 @@ from qobuz.debug import warn
 from qobuz.api import api
 from qobuz.cache import cache
 from qobuz.node import Flag, getNode
-from qobuz.xbmc import settings
-from xbmcpy.util import getImage, lang, color
+from qobuz.settings import settings
 
 class Node_friend(INode):
     '''
@@ -26,18 +25,17 @@ class Node_friend(INode):
     def __init__(self, parameters={}):
         super(Node_friend, self).__init__(parameters)
         self.kind = Flag.FRIEND
-        self.image = getImage('artist')
+        self.image = ''
         self.name = ''
         self.set_name(self.get_parameter('query'))
         self.set_label(self.name)
 
     def set_label(self, label):
-        colorItem = settings.get('color_item')
-        self.label = color(colorItem, label)
+        self.label = label
 
     def set_name(self, name):
         self.name = name or ''
-        self.set_label(self.name)
+        self.label = self.name
         return self
 
     def make_url(self, **ka):

@@ -15,12 +15,16 @@ from base import CacheBase
 from fileutil import RenamedTemporaryFile, unlink
 
 class CacheFile(CacheBase):
-
-    def __init__(self):
-        self.base_path = None
+    '''Caching to files (base_path/<md5.dat>)
+        Properties:
+            base_path: string, location of our cache,
+            ** must be set before using cache
+    '''
+    def __init__(self, base_path=None):
+        self.base_path = base_path        
         self.ventile = False
         super(CacheFile, self).__init__()
-
+        
     def load(self, key, *a, **ka):
         filename = self._make_path(key)
         return self.load_from_store(filename)
