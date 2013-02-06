@@ -28,7 +28,6 @@ class Node_friend(INode):
         self.image = ''
         self.name = ''
         self.set_name(self.get_parameter('query'))
-        self.set_label(self.name)
 
     def set_label(self, label):
         self.label = label
@@ -38,9 +37,9 @@ class Node_friend(INode):
         self.label = self.name
         return self
 
-    def make_url(self, **ka):
-        url = super(Node_friend, self).make_url(**ka) + "&query=" + self.name
-        return url
+    def url(self, **ka):
+        ka['query'] = self.name
+        return super(Node_friend, self).url(**ka)
 
 #    def gui_create(self):
 #        name = self.get_parameter('query')
@@ -126,19 +125,19 @@ class Node_friend(INode):
 #        executeBuiltin(containerRefresh())
 #        return True
 
-    def populate(self, directory=None, depth=None):
+    def populate(self, renderer=None):
         data = api.get('/playlist/getUserPlaylists', username=self.name)
         if not data:
             warn(self, "No friend data")
             return False
         if depth != -1:
-            self.add_child(getNode(Flag.FRIEND_LIST, self.parameters))
+            self.append(getNode(Flag.FRIEND_LIST, self.parameters))
         for pl in data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST)
+            node = getNode(Flag.PLAYLIST, self.parameters)
             node.data = pl
             if node.get_owner() == self.label:
                 self.nid = node.get_owner_id()
-            self.add_child(node)
+            self.append(node)
         return True
 
 #    def attach_context_menu(self, item, menu):

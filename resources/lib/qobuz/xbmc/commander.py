@@ -29,7 +29,7 @@ class QobuzXbmcCommander(Commander):
         if len(nodes) == 0:
             return False
         ret = xbmcgui.Dialog().select(lang(32001), [
-           node.get_label() for node in nodes                              
+           node.get_label() for node in nodes
         ])
         if ret == -1:
             return False

@@ -89,6 +89,8 @@ class BaseNode(collections.deque):
         if not path in self.parameters:
             return None
         value = self.parameters[path]
+        if value is None:
+            return None
         if 'urlDecode' in ka and ka['urlDecode']:
             value = unquote(value)
         return value

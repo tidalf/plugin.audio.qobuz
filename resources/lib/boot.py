@@ -19,6 +19,7 @@ plugin = Plugin('plugin.audio.qobuz')
 profile = plugin.profile()
 cache.base_path = os.path.join(profile, 
                                plugin.plugin_id, 'cache')
+print "Cache %s" % (cache.base_path)
 api.pagination_limit = int(settings.get('pagination_limit'))
 api.login(settings.get('username'), 
           settings.get('password'))    
@@ -46,3 +47,5 @@ except Exception as e:
 while renderer.alive:
         renderer.render(plugin, plugin.route(Flag, getNode))
         renderer.ask()
+
+cache.delete_old()

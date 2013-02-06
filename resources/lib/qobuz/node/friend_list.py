@@ -21,28 +21,24 @@ class Node_friend_list(INode):
     def __init__(self, parameters={}):
         super(Node_friend_list, self).__init__(parameters)
         self.kind = Flag.FRIEND_LIST
-        self.name = self.get_parameter('query')
+        self.name = self.get_parameter('name')
         self.image = ''
-        self.label = str(self.name) + _("'s friend") if (
-            self.name) else _('Friend')
+        self.label = _("%s's friend" % self.name) if self.name else _('Friend')
 
         self.content_type = 'artists'
 
     def url(self, **ka):
-        u = super(Node_friend_list, self).url(**ka)
-        if self.name:
-            u += "&query=" + self.name
-        return u
+        ka['name'] = self.name
+        url = super(Node_friend_list, self).url(**ka)
+        print "URL %s" % (url)
+        return url
 
-    def get_image(self):
-        return ''
-
-    def fetch(self):
+    def fetch(self, renderer=None):
         node = getNode(Flag.FRIEND, self.parameters)
         node.create('qobuz.com')
         return True
 
-    def populate(self, directory=None, depth=None):
+    def populate(self, renderer=None):
         username = api.username
         password = api.password
         user_id = api.user_id
@@ -80,9 +76,9 @@ class Node_friend_list(INode):
             if name == self.name:
                 continue
             if name in friend_data:
-                node.label = 'Friend / %s' % (node.label)
+                node.label = _('Friend / %s' % (node.label))
             self.append(node)
-
+        return True
 #    def attach_context_menu(self, item, menu):
 #        label = self.get_label()
 #        url = self.make_url()

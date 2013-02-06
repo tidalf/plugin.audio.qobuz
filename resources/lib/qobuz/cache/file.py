@@ -12,7 +12,7 @@ import pickle
 import os
 
 from base import CacheBase
-from fileutil import RenamedTemporaryFile, unlink
+from fileutil import RenamedTemporaryFile, unlink, find
 
 class CacheFile(CacheBase):
     '''Caching to files (base_path/<md5.dat>)
@@ -72,3 +72,34 @@ class CacheFile(CacheBase):
             print "Cache file doesn't exist %s" % (filename)
             return False
         return unlink(filename)
+    
+    def delete_old(self):
+        """Callback deleting one file
+        """
+        def delete_one(filename, info):
+            data = self.load_from_store(filename)
+            if not self.check_magic(data):
+                raise TypeError('magic mismatch')
+            ttl = self.is_fresh( data['key'], data)
+            if ttl:
+                return True
+            self.delete(data['key'])
+            return True
+        find(self.base_path, '^.*\.dat$', delete_one)
+        return True
+
+    def delete_all(self):
+        '''Clean all data from cache
+        '''
+        def delete_one(filename, info):
+            '''::callback that delete one file
+            '''
+            data = self.load_from_store(filename)
+            if not self.check_magic(data):
+                print "Error: bad magic, skipping file %s" % (filename)
+                return True
+            self.delete(data['key'])
+            return True
+        find(self.base_path, '^.*\.dat$', delete_one)
+        return True
+
