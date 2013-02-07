@@ -11,21 +11,16 @@ from inode import INode
 from qobuz.node import getNode, Flag
 from xbmcpy.util import lang
 from qobuz.api import api
-
-'''
-    NODE ARTIST
-'''
+from qobuz.i8n import _
 
 class Node_similar_artist(INode):
 
     def __init__(self, parameters={}):
         super(Node_similar_artist, self).__init__(parameters)
         self.kind = Flag.SIMILAR_ARTIST
+        self.label = _('Similar artists')
         self.content_type = 'artists'
         self.items_path = 'artists'
-
-    def get_label(self):
-        return lang(30010)
 
     def fetch(self, renderer=None):
         data = api.get('/artist/getSimilarArtists', artist_id=self.nid, 

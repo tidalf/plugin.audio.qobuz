@@ -21,7 +21,7 @@ class Node_friend_list(INode):
     def __init__(self, parameters={}):
         super(Node_friend_list, self).__init__(parameters)
         self.kind = Flag.FRIEND_LIST
-        self.name = self.get_parameter('name')
+        self.name = self.get_parameter('name', delete=True)
         self.image = ''
         self.label = _("%s's friend" % self.name) if self.name else _('Friend')
 

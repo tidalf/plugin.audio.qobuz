@@ -17,14 +17,40 @@ from xbmcpy.mock.xbmcgui import xbmcgui
 from qobuz.node.flag import Flag
 from node import Mode
 from qobuz.debug import warn
-from xbmcpy.util import getSetting, containerUpdate, lang, runPlugin
+from xbmcpy.util import containerUpdate, lang, runPlugin
+from collections import defaultdict
+from qobuz.settings import settings as qobuz_settings
 
-class Setting():
-    def get(self, key):
-        return xbmcaddon.Addon().getSetting(key)
+class Settings(object):
 
+    def __init__(self, qobuz):
+        self.qobuz = qobuz
+
+    def get(self, key, **ka):
+        return self.qobuz[key]
+
+    def set(self, key, value, **ka):
+        self.qobuz[key] = value
         
-settings = Setting()
+    def __getitem__(self, *a, **ka):
+        v = xbmcaddon.Addon().getSetting(a[0])
+        if v:
+            return v
+        try:
+            return self.qobuz[a[0]]
+        except:
+            return None
+
+    def __setitem__(self, *a, **ka):
+        self.qobuz[a[0]] = a[1]
+
+    def __iter__(self):
+        return self.qobuz.__iter__()
+
+    def __len__(self, *a, **ka):
+        return self.qobuz.__len__()
+
+settings = Settings(qobuz_settings)
 
 base_url = 'plugin://%s/' % (xbmcaddon.Addon().getAddonInfo('id'))
 
@@ -36,6 +62,14 @@ class ItemFactory(object):
     def __init__(self):
         self.append_context = True
 
+    def menu_from_action(self, menu, node):
+        for action in node.actions:
+            ka = {'action': action}
+            if 'target' in node.actions[action]:
+                ka['target'] = node.actions[action]['target']
+            url = furl(node.url(**ka))
+            menu.append((node.actions[action]['label'], containerUpdate(url)))
+
     def make_item(self, node):
         sflag = Flag.to_s(node.kind)
         if sflag in ['track', 'artist']:
@@ -46,6 +80,7 @@ class ItemFactory(object):
             return None
         if self.append_context:
             menu = []
+            self.menu_from_action(menu, node)
             skind = Flag.to_s(node.kind)
             methname = 'attach_context_%s' % skind
             if hasattr(self, methname):
@@ -86,18 +121,18 @@ class ItemFactory(object):
                                      mode=Mode.VIEW))
             menu.append(( '%s: %s' % (lang(30010), artist_name), containerUpdate(url))) 
 
-        ''' FAVORITES '''
-        wf = node.kind & (~Flag.FAVORITES)
-        if node.parent:
-            wf = wf and node.parent.kind & ~Flag.FAVORITES
-        if wf:
-            ''' ADD TO FAVORITES / TRACKS'''
-            url = furl(node.url(kind=Flag.FAVORITES, 
-                                          action='add_tracks', 
-                                          qnid=node.nid, 
-                                          qkind=node.kind, 
-                                          mode=Mode.VIEW))
-            menu.append( (lang(32001), runPlugin(url) ))
+#        ''' FAVORITES '''
+#        wf = node.kind & (~Flag.FAVORITES)
+#        if node.parent:
+#            wf = wf and node.parent.kind & ~Flag.FAVORITES
+#        if wf:
+#            ''' ADD TO FAVORITES / TRACKS'''
+#            url = furl(node.url(kind=Flag.FAVORITES, 
+#                                          action='add_tracks', 
+#                                          qnid=node.nid, 
+#                                          qkind=node.kind, 
+#                                          mode=Mode.VIEW))
+#            menu.append( (lang(32001), runPlugin(url) ))
 #            ''' ADD TO FAVORITES / Albums'''
 #            url = self.make_url(nt=Flag.FAVORITES, 
 #                                          nm='gui_add_albums', 

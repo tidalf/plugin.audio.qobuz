@@ -26,16 +26,21 @@ class Node_friend(INode):
         super(Node_friend, self).__init__(parameters)
         self.kind = Flag.FRIEND
         self.image = ''
-        self.name = ''
-        self.set_name(self.get_parameter('query'))
+        self.name = self.get_parameter('query', delete=True)
 
     def set_label(self, label):
         self.label = label
 
-    def set_name(self, name):
-        self.name = name or ''
+    @property
+    def name(self):
+        return self._name
+    @name.getter
+    def name(self):
+        return self._name
+    @name.setter
+    def name(self, name):
+        self._name = name or ''
         self.label = self.name
-        return self
 
     def url(self, **ka):
         ka['query'] = self.name

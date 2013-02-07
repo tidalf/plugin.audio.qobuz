@@ -9,7 +9,6 @@
 '''
 from inode import INode
 from qobuz.debug import warn
-#from xbmcpy.util import getImage, getSetting, htm2xbmc
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.i8n import _
@@ -25,11 +24,8 @@ class Node_album(INode):
     def __init__(self, parameters={}):
         super(Node_album, self).__init__(parameters)
         self.kind = Flag.ALBUM
-        self.image = ''
         self.content_type = 'songs'
         self.is_special_purchase = False
-        self.offset = None
-        self.imageDefaultSize = 'large'
         self.label = _('Album')
         self.imageDefaultSize = settings.get('image_size_default')
 
@@ -52,34 +48,7 @@ class Node_album(INode):
         return len(self.data['tracks']['items'])
 
     def url(self, **ka):
-#        if 'asLocalURL' in ka and ka['asLocalURL']:
-#            from constants import Mode
-#            ka['mode'] = Mode.SCAN
         return super(Node_album, self).url(**ka)
-
-#    def makeListItem(self, replaceItems=False):
-#        import xbmc, xbmcgui
-#        image = self.get_image()
-#        thumb = xbmc.getCacheThumbName(image)
-#        item = xbmcgui.ListItem(
-#            label=self.get_label(),
-#            label2=self.get_label(),
-#            iconImage=image,
-#            thumbnailImage=image,
-#            path=self.make_url(),
-#        )
-#        item.setInfo('music', infoLabels={
-#            'genre': self.get_genre(),
-#            'year': self.get_year(),
-#            'artist': self.get_artist(),
-#            'title': self.get_title(),
-#            'album': self.get_title(),
-#            'comment': self.get_description()
-#        })
-#        ctxMenu = contextMenu()
-#        self.attach_context_menu(item, ctxMenu)
-#        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
-#        return item
 
     '''
     PROPERTIES

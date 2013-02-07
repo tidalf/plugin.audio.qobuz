@@ -2,6 +2,7 @@ from xbmcpy.mock.xbmcplugin import xbmcplugin
 import xbmcpy.mock.xbmcaddon as xbmcaddon
 from xbmcpy.mock.xbmcgui import xbmcgui
 from node import Mode
+from qobuz.node import Flag, getNode
 
 class ItemFactory(object):
 
@@ -22,18 +23,23 @@ class Commander(object):
         self.flag = flag
 
     def has_action(self, plugin, node):
-        if plugin.parameter('action'):
+        if node.get_parameter('action'):
             return True
         return False
 
     def execute(self, plugin, node):
-        action = plugin.parameter('action')
+        action = node.get_parameter('action', delete=True)
         if not action:
             return True
-        del node.parameters['action']
         print "Executing action %s on %s" % (action, node)
-        nodename = self.flag.to_s(node.kind)
-        return getattr(self, 'action_%s_%s' % (nodename, action))(plugin, node)
+        target = node.get_parameter('target', number=True, delete=True)
+        kind = node.kind
+        tnode=None
+        if target:
+            kind = target
+            tnode = getNode(kind, node.parameters) 
+        nodename = self.flag.to_s(kind)
+        return getattr(self, 'action_%s_%s' % (nodename, action))(plugin, node, tnode)
 
 from base import BaseRenderer
 
@@ -47,6 +53,7 @@ class XbmcRenderer(BaseRenderer):
         self.player = None
         self.depth = 1
         self.whiteFlag = None
+        self.blackFlag = Flag.TRACK
         self.handle = None
         self.commander = None
 

@@ -72,14 +72,29 @@ class BaseNode(collections.deque):
         self.image = None
         self.data = None
         self.mode = Mode.VIEW
+        self.actions = {}
         super(BaseNode, self).__init__(self)
+
+    def add_action(self, path, **ka):
+        self.actions[path] = ka
+
+    def exec_action(self, *a, **ka):
+        action = self.get_parameter('action', delete=True)
+        if not action:
+            return True
+        path = path.replace('/', '_')
+        methodname = 'action_%s' % (path)
+        return getattr(self, methodname)(*a, **ka)
+
+    def has_action(self):
+        return self.get_parameter('action')
 
     def append(self, node):
         node.parent = self
         return super(BaseNode, self).append(node)
 
     def set_parameter(self, path, value, **ka):
-        if 'urlEncode' in ka and ka['urlEncode']:
+        if 'encode' in ka and ka['encode']:
             value = quote(value)
         elif 'isBool' in ka and ka['isBool']:
             value = True if value else False
@@ -89,10 +104,14 @@ class BaseNode(collections.deque):
         if not path in self.parameters:
             return None
         value = self.parameters[path]
+        if 'delete' in ka and ka['delete']:
+            del self.parameters[path]
         if value is None:
             return None
-        if 'urlDecode' in ka and ka['urlDecode']:
+        if 'decode' in ka and ka['decode']:
             value = unquote(value)
+        if 'number' in ka and ka['number']:
+            value = int(value)
         return value
 
     def url(self, **ka):
@@ -116,10 +135,11 @@ class BaseNode(collections.deque):
             if renderer.depth <= 0:
                 renderer.depth = 0
                 return False
-        if not self.fetch(renderer):
-            return False
-        if not self.populate(renderer):
-            return True
+        if self.kind & renderer.blackFlag != self.kind:
+            if not self.fetch(renderer):
+                return False
+            if not self.populate(renderer):
+                return True
         if renderer.depth != -1:
             renderer.depth -= 1
         if len(self) == 0:

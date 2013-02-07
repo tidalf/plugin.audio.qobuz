@@ -21,8 +21,6 @@ class Node_genre(INode):
         super(Node_genre, self).__init__(parameters)
         self.kind = Flag.GENRE
         self.label = _('Genre')
-        self.image = ''
-        self.offset = self.get_parameter('offset') or 0
 
     def url(self, **ka):
         url = super(Node_genre, self).url(**ka)

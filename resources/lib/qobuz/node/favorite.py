@@ -14,6 +14,10 @@ from qobuz.node import getNode, Flag
 from qobuz.api import api
 from qobuz.i8n import _
 
+_('albums')
+_('tracks')
+_('artists')
+
 class Node_favorite(INode):
     '''Displaying user favorites (track and album)
     '''
@@ -22,12 +26,12 @@ class Node_favorite(INode):
         self.kind = Flag.FAVORITE
         self.label = _('Favorites')
         self.content_type = 'albums'
-        self.items_path = self.get_parameter('items_path')
-        if 'item_path' in self.parameters:
-            del self.parameters['items_path']
+        self.items_path = self.get_parameter('items_path', delete=True)
+        if not self.items_path:
+            self.items_path = 'albums'
 
     def get_label(self):
-        return '%s / %s ' % (self.label, self.items_path)
+        return '%s / %s ' % (self.label, _(self.items_path))
 
     def url(self, **ka):
         if not 'items_path' in ka:
@@ -184,8 +188,9 @@ class Node_favorite(INode):
             render.alive = False
             render.depth = -1
             render.whiteFlag = Flag.TRACK
-            render.render(plugin, node)
-            for node in iter(render):
+            render.blackFlag = Flag.TRACK
+            render.render(node)
+            for node in render:
                 if not str(node.nid) in track_ids:
                     nodes.append(node)
                     track_ids[str(node.nid)] = 1

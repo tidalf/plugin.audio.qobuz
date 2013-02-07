@@ -11,6 +11,7 @@
 from inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.settings import settings
+from qobuz.i8n import _
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -20,6 +21,8 @@ class Node_root(INode):
         self.kind = Flag.ROOT
         self.label = 'Qobuz'
         self.content_type = 'files'
+        self.add_action('cache/erase_all', 
+                        label=_('Erase cache'))
 
     def populate(self, renderer=None):
         self.append(getNode(Flag.USERPLAYLISTS, self.parameters))

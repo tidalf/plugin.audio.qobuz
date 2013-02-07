@@ -21,7 +21,6 @@ class Node_artist(INode):
         super(Node_artist, self).__init__(parameters)
         self.kind = Flag.ARTIST
         self.content_type = 'artists'
-        self.offset = self.get_parameter('offset') or 0
 
     def fetch(self, renderer=None):
         data = api.get('/artist/get', artist_id=self.nid, 

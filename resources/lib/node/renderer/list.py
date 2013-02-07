@@ -8,9 +8,9 @@ class ListRenderer(BaseRenderer):
         self.whiteFlag = None
         self.blackFlag = None
 
-    def render(self, plugin, node):
+    def render(self, node):
         self.clear()
-        node.populating(self, self.depth, self.whiteFlag)
+        node.populating(self)
         self.end()
 
     def ask(self):

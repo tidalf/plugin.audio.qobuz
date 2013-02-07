@@ -8,24 +8,20 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from node.renderer.xbmc import Commander
-from xbmcpy.util import notifyH, lang
+from xbmcpy.util import notifyH, lang, executeBuiltin, containerUpdate
 from xbmcpy.mock.xbmcgui import xbmcgui
 from qobuz.node import getNode, Flag
+from xbmcpy.mock import xbmcaddon
+
+base_url = 'plugin://%s/' % (xbmcaddon.Addon().getAddonInfo('id'))
 
 class QobuzXbmcCommander(Commander):
 
-    def action_favorites_add_tracks(self, plugin, node):
-        print "Adding tracks to favorite"
-        dialogHeading = lang(32001)
-        parameters = node.parameters.copy()
-        qnid = node.get_parameter('qnid')
-        if qnid:
-            parameters['nid'] = qnid
-        else:
-            if 'nid' in parameters:
-                del parameters['nid']
-        target = getNode(node.get_parameter('qkind'), parameters)
-        nodes = node.list_tracks(plugin, target)
+    def action_favorite_add_tracks(self, plugin, node, tnode):
+        target = node
+        if tnode:
+            target = tnode
+        nodes = target.list_tracks(plugin, node)
         if len(nodes) == 0:
             return False
         ret = xbmcgui.Dialog().select(lang(32001), [
@@ -38,4 +34,13 @@ class QobuzXbmcCommander(Commander):
             notifyH(dialogHeading, 'Cannot add track(s) to favorite')
             return False
         notifyH(dialogHeading, 'Track(s) added to favorite')
+        return True
+
+    def action_similar_artist_get(self, plugin, node, tnode):
+        if not hasattr(node, 'get_artist_id'):
+            return False
+#        node.fetch(None)
+        tnode.nid = node.get_artist_id()
+        url = '%s%s' % (base_url, tnode.url())
+        executeBuiltin(containerUpdate(url))
         return True

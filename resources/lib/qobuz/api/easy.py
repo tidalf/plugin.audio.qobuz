@@ -8,6 +8,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+from qobuz.debug import warn
 from qobuz.cache import cache
 #from cache.sql import CacheSQL
 from raw  import QobuzApiRaw
@@ -89,7 +90,10 @@ class QobuzApiEasy(QobuzApiRaw):
         '''
         for label in self.__clean_ka(xpath[0], xpath[1], **ka):
             del ka[label]
-        return getattr(self, methname)(**ka)
+        data = getattr(self, methname)(**ka)
+        if data is None and self.error:
+            warn(self, self.error)
+        return data
 
     def __clean_ka(self, endpoint, method, **ka):
         ''' We are removing some key that are not needed by our raw api but 

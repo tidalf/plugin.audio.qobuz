@@ -54,17 +54,18 @@ class Node_recommendation(INode):
         super(Node_recommendation, self).__init__(parameters)
         self.kind = Flag.RECOMMENDATION
         self.label = _('Recommendation')
-        self.genre_id = self.get_parameter('genre-id')
-        self.genre_type = self.get_parameter('genre-type')
+        self.genre_id = self.get_parameter('genre-id', delete=True)
+        self.genre_type = self.get_parameter('genre-type', delete=True)
         self.image = ''
         self.items_path = 'albums'
 
     def url(self, **ka):
-        url = super(Node_recommendation, self).url(**ka)
         if self.genre_type:
-            url += '&genre-type=' + str(self.genre_type)
+            ka['genre-type'] = str(self.genre_type)
         if self.genre_id:
-            url += '&genre-id=' + str(self.genre_id)
+            ka['genre-id'] = str(self.genre_id)
+        return super(Node_recommendation, self).url(**ka)
+
         return url
 
     def myid(self):

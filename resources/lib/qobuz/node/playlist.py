@@ -22,15 +22,12 @@ class Node_playlist(INode):
         super(Node_playlist, self).__init__(properties)
         self.kind = Flag.PLAYLIST
         self.label = _('Playlist')
-        self.current_playlist_id = None
-        self.b_is_current = False
         self.is_my_playlist = False
-        self.packby = ''
-        if self.packby == 'album':
-            self.content_type = 'albums'
-        else:
-            self.content_type = 'songs'
-        self.offset = self.get_parameter('offset') or 0
+        self.content_type = 'songs'
+        self.items_path = 'tracks'
+        self.add_action('delete', label=_('Delete playlist'))
+        self.add_action('rename', label=_('Rename playlist'))
+        self.add_action('add_as_current', label=_('Set as current playlist'))
 
     def get_label(self):
         return self.get_property('name') or self.label
@@ -57,7 +54,7 @@ class Node_playlist(INode):
         return True
 
     def populate(self, renderer=None):
-        for track in self.data['tracks']['items']:
+        for track in self.data[self.items_path]['items']:
             node = getNode(Flag.TRACK, self.parameters)
             node.data = track
             self.append(node)

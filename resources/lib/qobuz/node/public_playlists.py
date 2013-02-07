@@ -38,3 +38,4 @@ class Node_public_playlists(INode):
             node.data = item
             self.append(node)
         return True
+

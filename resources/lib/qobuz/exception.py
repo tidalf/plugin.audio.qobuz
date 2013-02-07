@@ -10,6 +10,14 @@
 import pprint
 import traceback
 
+class QobuzException(Exception):
+    pass
+
+class InvalidParameter(QobuzException):
+    pass
+
+class MissingParameter(QobuzException):
+    pass
 
 class QobuzXbmcError(Exception):
 

@@ -69,7 +69,7 @@ class RenamedTemporaryFile(object):
         return result
 
 ''' Find '''
-def find(directory, pattern, callback=None, gData=None):
+def find(directory, pattern, callback=None, data=None):
         flist = []
         fok = re.compile(pattern)
         for dirname, dirnames, filenames in os.walk(directory):
@@ -78,7 +78,7 @@ def find(directory, pattern, callback=None, gData=None):
                     path = os.path.join(dirname, filename)
                     if callback:
                         try:
-                            if not callback(path, gData):
+                            if not callback(path, data):
                                 return None
                         except Exception as e:
                             warn('[find]', "Callback raise exception: " + repr(e))

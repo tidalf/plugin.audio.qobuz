@@ -17,15 +17,10 @@ import socket
 
 import requests
 
-from qobuz.exception import QobuzXbmcError
+from qobuz.exception import InvalidParameter, MissingParameter
 from qobuz.debug import warn, info
 
 socket.timeout = 5
-
-def _api_error_string(self, url="", params={}, json=""): 
-        return 'Something went wrong with request: %s\n%s\n%s' % (
-                url, pprint.pformat(params),
-                pprint.pformat(json))
 
 class QobuzApiRaw(object):
 
@@ -45,6 +40,21 @@ class QobuzApiRaw(object):
         self.statTotalRequest = 0
         self.error = None
         self.__set_s4()
+    
+    def _serror(self, msg="", url="", params={}, json=""): 
+        import copy
+        _copy_params = copy.deepcopy(params)
+        if 'password' in _copy_params:
+            _copy_params['password'] = '***'
+        label = 'Something went wrong with request:'
+        s = 'Something went wrong with request\n' + \
+            '\t::message: %s\n' + \
+            '\t::url    : %s\n' + \
+            '\t::params : %s\n' + \
+            '\t::json   : %s\n' + \
+            "\t::error  : %s\n"
+        s = s % (msg, url, _copy_params, json, self.error)
+        return s
 
     def _check_ka(self, ka, mandatory, allowed=[]):
         """
@@ -56,14 +66,10 @@ class QobuzApiRaw(object):
         """
         for label in mandatory:
             if not label in ka:
-                raise QobuzXbmcError(who=self,
-                                     what='missing_parameter',
-                                     additional=label)
+                raise MissingParameter(label)
         for label in ka:
             if label not in mandatory and label not in allowed:
-                raise QobuzXbmcError(who=self,
-                                     what='invalid_parameter',
-                                     additional=label)
+                raise InvalidParameter(label)
 
     def __set_s4(self):
         """appid and associated secret is for this app usage only
@@ -112,18 +118,11 @@ class QobuzApiRaw(object):
         if useToken and self.user_auth_token:
             headers["x-user-auth-token"] = self.user_auth_token
         headers["x-app-id"] = self.appid
-        """ DEBUG """
-        import copy
-        _copy_params = copy.deepcopy(params)
-        if 'password' in _copy_params:
-            _copy_params['password'] = '***'
-        """ END / DEBUG """
         r = None
         try:
             r = self.session.post(url, data=params, headers=headers)
         except:
-            self.error = "Post request fail"
-            warn(self, self.error)
+            self.error = self._serror('Post error', url, params, None)
             return None
         self.status_code = r.status_code
         if int(r.status_code) != 200:
@@ -137,12 +136,10 @@ class QobuzApiRaw(object):
                 self.error = "Not Found"
             else:
                 self.error = "Server error"
-            self.error = _api_error_string(url, _copy_params)
-            warn(self, self.error)
+            self.error = self._serror(self.error, url, params)
             return None
         if not r.content:
-            self.error = "Request return no content"
-            warn(self, self.error)
+            self.error = self._serror("Request return no content", url, params)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
         """ Retry get if connexion fail """
@@ -162,8 +159,7 @@ class QobuzApiRaw(object):
         except:
             pass
         if status == 'error':
-            self.error = _api_error_string(url, _copy_params, response_json)
-            warn(self, self.error)
+            self.error = self._serror(self.error, url, params, response_json)
             return None
         return response_json
 

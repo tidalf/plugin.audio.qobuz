@@ -20,9 +20,10 @@ class Node_user_playlists(INode):
     def __init__(self, parameters = {}):
         super(Node_user_playlists, self).__init__(parameters)
         self.kind = Flag.USERPLAYLISTS
-        self.label = _('User playlists') #lang(30000)
+        self.label = _('User playlists')
         self.content_type = 'files'
         self.items_path = 'playlists'
+        self.add_action('new', label=_('New playlist'))
 
     def fetch(self, renderer=None):
         data = api.get('/playlist/getUserPlaylists', 

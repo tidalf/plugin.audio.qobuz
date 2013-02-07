@@ -19,13 +19,12 @@ plugin = Plugin('plugin.audio.qobuz')
 profile = plugin.profile()
 cache.base_path = os.path.join(profile, 
                                plugin.plugin_id, 'cache')
-print "Cache %s" % (cache.base_path)
-api.pagination_limit = int(settings.get('pagination_limit'))
-api.login(settings.get('username'), 
-          settings.get('password'))    
+api.pagination_limit = int(settings['pagination_limit'])
+api.login(settings['username'],
+          settings['password'])
 
 renderer = None
-try:
+if 1:
     import xbmc
     from node.renderer.xbmc import XbmcRenderer
     from qobuz.xbmc.commander import QobuzXbmcCommander
@@ -37,12 +36,11 @@ try:
     renderer.plugin_id = plugin.plugin_id
     renderer.whiteFlag = Flag.ALL
     renderer.player = Player(plugin=plugin)
-except Exception as e:
-    print "Outside of Xbmc: %s" % (e)
-    from node.renderer.console import ConsoleRenderer, ItemFactory
-    renderer = ConsoleRenderer()
-    renderer.itemFactory = ItemFactory()
-    renderer.whiteFlag = Flag.ALL & ~Flag.TRACK
+#except Exception as e:
+#    from node.renderer.console import ConsoleRenderer, ItemFactory
+#    renderer = ConsoleRenderer()
+#    renderer.itemFactory = ItemFactory()
+#    renderer.whiteFlag = Flag.ALL & ~Flag.TRACK
 
 while renderer.alive:
         renderer.render(plugin, plugin.route(Flag, getNode))

@@ -7,9 +7,10 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from node import BaseNode
+from node import BaseNode, url2dict
 from qobuz.node import Flag, getNode
 from qobuz.settings import settings
+from qobuz.i8n import _
 
 class INode(BaseNode):
 
@@ -18,10 +19,16 @@ class INode(BaseNode):
         super(INode, self).__init__(parameters)
         self.content_type = "files"
         self.items_path = None
-        self.offset = self.get_parameter('offset') or 0
-        if 'offset' in self.parameters:
-            del self.parameters['offset']
-
+        self.offset = self.get_parameter('offset', delete=True) or 0
+        self.add_action('add_tracks', 
+                        label=_('Add to favorite tracks'),
+                        target=Flag.FAVORITE)
+        self.add_action('add_albums', 
+                        label=_('Add to favorite albums'),
+                        target=Flag.FAVORITE)
+        self.add_action('get',
+                        label=_('Similar artists'),
+                        target=Flag.SIMILAR_ARTIST)
     @property
     def offset(self):
         return self._offset
@@ -58,8 +65,7 @@ class INode(BaseNode):
         next_offset = data['offset'] + data['limit']
         if next_offset > data['total']:
             return False
-        parameters = self.parameters.copy()
-        parameters['offset'] = next_offset
+        parameters = url2dict(self.url(offset=next_offset))
         node = getNode(self.kind, parameters)
         node.label = '[%s/%s] %s' % (parameters['offset'], 
                                      data['total'],

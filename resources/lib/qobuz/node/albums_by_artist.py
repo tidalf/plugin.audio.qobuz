@@ -19,11 +19,10 @@ from qobuz.settings import settings
 
 class Node_albums_by_artist(INode):
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_albums_by_artist, self).__init__(parent, parameters)
-        self.nt = Flag.ALBUMS_BY_ARTIST
+    def __init__(self, parameters={}):
+        super(Node_albums_by_artist, self).__init__(parameters)
+        self.kind = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
-        self.offset = self.get_parameter('offset') or 0
     '''
         Getter
     '''
@@ -49,7 +48,7 @@ class Node_albums_by_artist(INode):
     '''
         Build Down
     '''
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, renderer=None):
         limit = getSetting('pagination_limit')
         data = api.get('/artist/getSimilarArtist', artist_id=self.nid, 
                        limit=limit, offset=self.offset, extra='albums')
@@ -59,7 +58,7 @@ class Node_albums_by_artist(INode):
         self.data = data
         return True
     
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populating(self, renderer=None):
         count = 0
         total = len(self.data['albums']['items'])
         for album in self.data['albums']['items']:
@@ -78,17 +77,17 @@ class Node_albums_by_artist(INode):
             self.add_child(node)
         return True
 
-    '''
-        Make XbmcListItem
-    '''
-    def makeListItem(self, replaceItems=False):
-        item = xbmcgui.ListItem(self.get_label(),
-                                self.get_label(),
-                                self.get_image(),
-                                self.get_image(),
-                                self.make_url(),
-                                )
-        ctxMenu = contextMenu()
-        self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
-        return item
+#    '''
+#        Make XbmcListItem
+#    '''
+#    def makeListItem(self, replaceItems=False):
+#        item = xbmcgui.ListItem(self.get_label(),
+#                                self.get_label(),
+#                                self.get_image(),
+#                                self.get_image(),
+#                                self.make_url(),
+#                                )
+#        ctxMenu = contextMenu()
+#        self.attach_context_menu(item, ctxMenu)
+#        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
+#        return item

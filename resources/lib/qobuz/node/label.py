@@ -21,8 +21,6 @@ class Node_label(INode):
         super(Node_label, self).__init__(parameters)
         self.kind = Flag.LABEL
         self.label = _('Label')
-        self.image = getImage('album')
-        self.offset = self.get_parameter('offset') or 0
 
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         #@bug: Qobuz service seam do don't return total so pagination is broken

@@ -85,7 +85,7 @@ class QobuzConsole(code.InteractiveConsole):
                 self.command_quit(None)
             except Exception as e:
                 import traceback
-                print "Error %s" % (e)
+                print " >>> Error %s" % (e)
                 traceback.print_stack()
                 raise e
 
@@ -98,10 +98,8 @@ class QobuzConsole(code.InteractiveConsole):
         self.display(self.renderer)
         if len(self._cmd_stack) > 0:
             cmd = self._cmd_stack.pop(0)
-            if self.exec_command(cmd):
-                self.write('\n>> command: %s, Ok <<\n' % (cmd[0]))
-            else:
-                self.write('\n>> command %s, error <<\n' % (cmd[0]))
+            if not self.exec_command(cmd):
+                self.write('\n > command %s Error\n' % (cmd[0]))
         else:
             #self._cmd_stack.append(('fuzz', []))
             self._cmd_stack.append(self.get_command())
@@ -111,7 +109,7 @@ class QobuzConsole(code.InteractiveConsole):
         prompt = label or self.last_prompt
         if prompt and len(prompt) > 40:
             prompt = '%s...' % (prompt[0:40]) 
-        return '>>> %s: ' % (prompt.encode('ascii', 'ignore') or 'Qobuz')
+        return '#> %s: ' % (prompt.encode('ascii', 'ignore') or 'Qobuz')
 
     def get_command(self):
         inp = self.raw_input(self.get_prompt())
@@ -131,7 +129,7 @@ class QobuzConsole(code.InteractiveConsole):
         try:
             return getattr(self, 'command_%s' % (name))(args)
         except Exception as e:
-            self.write('>>> Invalid command %s (%s)\n\t%s\n' % (name, 
+            self.write(' >>> Invalid command %s (%s)\n\t%s\n' % (name, 
                                                                 args, e))
         return False
 
@@ -140,7 +138,7 @@ class QobuzConsole(code.InteractiveConsole):
             self.no_display = False
             return
         count = 0
-        msg = '\n'
+        msg = '-'*79 + '\n'
         for node in nlist:
             method = 'display_%s' % (Flag.to_s(node.kind))
             imsg = ''
@@ -150,6 +148,7 @@ class QobuzConsole(code.InteractiveConsole):
                 imsg = '[%s] %s\n' % (count, node.get_label())
             msg+=imsg
             count += 1
+        msg+= '\n'
         self.write(msg)
 
     def display_track(self, node):
@@ -170,7 +169,7 @@ class QobuzConsole(code.InteractiveConsole):
             idx = int(args[0])
             node = self.renderer[idx]
         except Exception as e:
-            self.write('>>>> Invalid index: %s\n' % (e))
+            self.write(' >>> Invalid index: %s\n' % (e))
             return False
         if self.env:
             self.env_stack.append(self.env.copy())
@@ -198,7 +197,7 @@ class QobuzConsole(code.InteractiveConsole):
 
     def command_quit(self, args):
         self.alive = False
-        self.write('\n>> quit...\n')
+        self.write('\n:: quit\n')
         return True
 
     def command_back(self, args):
@@ -211,7 +210,7 @@ class QobuzConsole(code.InteractiveConsole):
             self.renderer.depth = 1
             return True
         except Exception as e:
-            self.write('Cannot go back: %s\n' % (e))
+            self.write(' >>> Cannot go back: %s\n' % (e))
         return False
 
     def command_set(self, args):
@@ -219,7 +218,7 @@ class QobuzConsole(code.InteractiveConsole):
         try:
             key, value = args
             settings[key] = value
-            self.write('Set << %s >> to << %s >>' % (key, value))
+            self.write(' > set %s = %s' % (key, value))
             return True
         except Exception as e:
             self.write('Cannot set << %s >> with value << %s >>\n\t%s\n' % (key, value, e))
@@ -246,11 +245,6 @@ class QobuzConsole(code.InteractiveConsole):
 
 '''Main
 '''
-#api.login('', '')
-if not DEBUG and api.password:
-    raise Exception('Password disclosure!')
-#settings['search_enable'] = False
-#settings['recommendation_enabel'] = False
 
 import tempfile
 __tempdir__ = tempfile.gettempdir()
@@ -263,22 +257,26 @@ if not os.path.exists(__tempdir__):
             __tempdir__ = None
 if __tempdir__:
     cache.base_path = __tempdir__
+#api.login('', '')
+if not DEBUG and api.password:
+    raise Exception('Password disclosure!')
+#settings['search_enable'] = False
+#settings['recommendation_enabel'] = False
+
 c = QobuzConsole()
-c.write('>> Qobuz console(%s)\n' % (VERSION))
+c.write(':: qobuz console (%s)\n' % (VERSION))
 try:
     while not api.is_logged:
         username = c.raw_input(c.get_prompt('Login'))
         password = c.raw_input(c.get_prompt('Password'))
-        api.login(username, password)
-    c.write('Logged as %s\n' % (api.username))
+        if not api.login(username, password):
+            c.write(api.error)
+    c.write(' > Logged as %s\n' % (api.username))
     c.start()
 except KeyboardInterrupt as e:
     pass
 finally:
-    print ">> cleaning"
-    if not DEBUG:
-        api.logout()
-        cache.delete_all()
-        if os.path.exists(__tempdir__):
-            os.rmdir(__tempdir__)
-    print "Bye :)"
+    c.write(":: cleaning\n")
+    count = cache.delete_old()
+    c.write(" > cache cleaned: %s file(s)\n" % (count))
+    c.write(":: bye :)\n")

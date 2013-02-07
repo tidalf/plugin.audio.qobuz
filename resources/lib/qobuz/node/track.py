@@ -27,7 +27,6 @@ class Node_track(INode):
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.status = None
-        self.image = ''#getImage('song')
 
     def fetch(self, renderer=None):
         data = api.get('/track/get', track_id=self.nid)

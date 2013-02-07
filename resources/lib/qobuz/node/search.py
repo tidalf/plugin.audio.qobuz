@@ -13,16 +13,19 @@ from qobuz.exception import QobuzXbmcError
 from inode import INode
 from qobuz.api import api
 from qobuz.node import getNode, Flag
-from xbmcpy.util import lang, getImage
+from qobuz.i8n import _
 
 class Node_search(INode):
 
     def __init__(self, parameters=None):
         super(Node_search, self).__init__(parameters)
         self.kind = Flag.SEARCH
-        self.search_type = self.get_parameter('search-type') or 'albums'
-        self.query = self.get_parameter('query', unQuote=True)
-        self.offset = self.get_parameter('offset') or 0
+        self.search_type = self.get_parameter('search-type', 
+                                              delete=True) or 'albums'
+        self.query = self.get_parameter('query', 
+                                        decode=True, 
+                                        delete=True)
+        self.label = _('Search')
 
     def get_label(self):
         return self.label
@@ -34,39 +37,33 @@ class Node_search(INode):
     @property
     def search_type(self):
         return self._search_type
-
     @search_type.setter
     def search_type(self, st):
         if st == 'artists':
-            self.label = lang(30004)
+            self.label = _('Search artist')
             self.content_type = 'files'
-            self.image = getImage('artist')
         elif st == 'albums':
-            self.label = lang(30005)
+            self.label = _('Search album')
             self.content_type = 'albums'
-            self.image = getImage('album')
         elif st == 'tracks':
-            self.label = lang(30006)
+            self.label = _('Search song')
             self.content_type = 'songs'
-            self.image = getImage('song')
         else:
             raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
         self._search_type = st
-
     @search_type.getter
     def search_type(self):
         return self._search_type
 
     def url(self, **ka):
-        url = super(Node_search, self).url()
-        url += '&search-type=' + self.search_type
-        if self.query:
-            url += '&query=' + self.query
-        return url
+        ka['search_type'] = self.search_type
+        if self.query and not 'query' in ka:
+            ka['query'] = self.query
+        return super(Node_search, self).url()
 
     def fetch(self, renderer=None):
         stype = self.search_type
-        query = self.get_parameter('query', unQuote=True)
+        query = self.query
         if not query:
             from xbmcpy.keyboard import Keyboard
             k = Keyboard('', stype)
@@ -84,7 +81,7 @@ class Node_search(INode):
             return False
         if not 'items' in data[stype]:
             return False
-        self.set_parameter('query', query, quote=True)
+        self.set_parameter('query', query, encode=True)
         self.data = data
         return True
 
@@ -105,3 +102,4 @@ class Node_search(INode):
                 node.data = artist
                 self.append(node)
         return True
+

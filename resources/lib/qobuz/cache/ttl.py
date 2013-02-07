@@ -15,9 +15,10 @@ from qobuz.settings import settings
 class CacheFileTTL(CacheFile):
 
     def __init__(self, *a, **ka):
+        super(CacheFileTTL, self).__init__()
         self.store = {}
         self.black_keys = ['password']
-        super(CacheFileTTL, self).__init__()
+
 
     def load(self, key, *a, **ka):
         if key in self.store:

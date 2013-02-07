@@ -91,8 +91,10 @@ class CacheFile(CacheBase):
         if not os.path.exists(filename):
             print "Cache file doesn't exist %s" % (filename)
             return False
-        return unlink(filename)
-    
+        #@bug: We are not checking that filename is really unlinked
+        unlink(filename)
+        return True
+
     def delete_old(self):
         """Callback deleting one file
         """
@@ -103,10 +105,12 @@ class CacheFile(CacheBase):
             ttl = self.is_fresh( data['key'], data)
             if ttl:
                 return True
-            self.delete(data['key'])
+            if self.delete(data['key']):
+                info['count'] += 1
             return True
-        find(self.base_path, '^.*\.dat$', delete_one)
-        return True
+        info = { 'count': 0 }
+        find(self.base_path, '^.*\.dat$', delete_one, info)
+        return info['count']
 
     def delete_all(self):
         '''Clean all data from cache
@@ -118,8 +122,10 @@ class CacheFile(CacheBase):
             if not self.check_magic(data):
                 print "Error: bad magic, skipping file %s" % (filename)
                 return True
-            self.delete(data['key'])
+            if self.delete(data['key']):
+                info['count'] += 1
             return True
-        find(self.base_path, '^.*\.dat$', delete_one)
-        return True
+        info = { 'count': 0 }
+        find(self.base_path, '^.*\.dat$', delete_one, info)
+        return info['count']
 

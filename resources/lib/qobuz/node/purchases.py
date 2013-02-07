@@ -21,8 +21,6 @@ class Node_purchases(INode):
         self.kind = Flag.PURCHASES
         self.label = _('Purchases')
         self.content_type = 'albums'
-        self.image = ''
-        self.offset = self.get_parameter('offset') or 0
 
     def fetch(self, renderer=None):
         data = api.get('/purchase/getUserPurchases',
