@@ -201,7 +201,7 @@ class Node_track(INode):
         return ''
 
     def __getFileUrl(self):
-        format_id = 6 if settings['stream_type'] == 'flac' else 5
+        format_id = settings['stream_format']
         data = api.get('/track/getFileUrl', format_id=format_id,
                            track_id=self.nid, user_id=api.user_id)
         if not data:

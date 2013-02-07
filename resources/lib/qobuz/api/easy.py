@@ -11,6 +11,7 @@
 from qobuz.cache import cache
 #from cache.sql import CacheSQL
 from raw  import QobuzApiRaw
+from qobuz.settings import settings
 
 class InvalidQuery(Exception):
     pass
@@ -23,9 +24,28 @@ class QobuzApiEasy(QobuzApiRaw):
         self.cache_base_path = None
         super(QobuzApiEasy, self).__init__()
         self.is_logged = False
-        ''' Setting default stream format to mp3 '''
-        self.stream_format = 5
-        self.pagination_limit = 100
+        self.username = None
+        self.password = None
+
+    @property
+    def pagination_limit(self):
+        return settings['pagination_limit']
+    @pagination_limit.setter
+    def pagination_limit(self, value):
+        settings['pagination_limit'] = value
+    @pagination_limit.getter
+    def pagination_limit(self):
+        return settings['pagination_limit']
+
+    @property
+    def stream_format(self):
+        return settings['stream_format']
+    @stream_format.setter
+    def stream_format(self, value):
+        settings['stream_format'] = value
+    @stream_format.getter
+    def stream_format(self):
+        return settings['stream_format']
 
     @cache.cached
 #    @sql.cached
@@ -99,3 +119,13 @@ class QobuzApiEasy(QobuzApiRaw):
         self.set_user_data(user['id'], data['user_auth_token'])
         self.is_logged = True
         return True
+    
+    def logout(self):
+        if self.username and cache.base_path:
+            cache.delete(cache.make_key('/user/login', 
+                                        username=self.username, 
+                                        password=self.password))
+        self.username = None
+        self.password = None
+        self.is_logged = False
+        return super(QobuzApiEasy, self).logout()

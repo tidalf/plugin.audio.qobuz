@@ -35,10 +35,9 @@ class Commander(object):
         nodename = self.flag.to_s(node.kind)
         return getattr(self, 'action_%s_%s' % (nodename, action))(plugin, node)
 
+from base import BaseRenderer
 
-from collections import deque
-
-class XbmcRenderer(deque):
+class XbmcRenderer(BaseRenderer):
 
     def __init__(self):
         self.itemFactory = ItemFactory()
@@ -77,7 +76,7 @@ class XbmcRenderer(deque):
         self.clear()
         self.plugin = plugin
         self.handle = plugin.handle()
-        node.populating(self, self.depth, self.whiteFlag)
+        node.populating(self)
         return self.end()
 
     def ask(self):

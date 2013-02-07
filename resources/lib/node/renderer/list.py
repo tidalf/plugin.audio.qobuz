@@ -1,14 +1,12 @@
-from collections import deque
+from base import BaseRenderer
 
-class ListRenderer(deque):
+class ListRenderer(BaseRenderer):
 
     def __init__(self):
         self.alive = False
-        self.depth = -1
+        self.depth = 1
         self.whiteFlag = None
-#        
-#    def append(self, node):
-#        return super(ListRenderer, self).append(node)
+        self.blackFlag = None
 
     def render(self, plugin, node):
         self.clear()

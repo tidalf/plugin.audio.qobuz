@@ -16,15 +16,36 @@ from fileutil import RenamedTemporaryFile, unlink, find
 
 class CacheFile(CacheBase):
     '''Caching to files (base_path/<md5.dat>)
-        Properties:
+        
+        ::Properties:
             base_path: string, location of our cache,
-            ** must be set before using cache
+        
+        ::Note: 
+            if base_path is not set caching is disable
     '''
     def __init__(self, base_path=None):
         self.base_path = base_path        
         self.ventile = False
         super(CacheFile, self).__init__()
-        
+
+    @property
+    def base_path(self):
+        return self._base_path
+    @base_path.setter
+    def base_path(self, path):
+        '''This setter enable cache when feed with valid path
+        '''
+        if path is None:
+            return
+        print "Setting path: %s" % (path)
+        if not os.path.exists(path):
+            raise Exception('Bad file path: %s' % (path))
+        self._base_path = path
+        self.enable = True
+    @base_path.getter
+    def base_path(self):
+            return self._base_path
+
     def load(self, key, *a, **ka):
         filename = self._make_path(key)
         return self.load_from_store(filename)

@@ -33,14 +33,14 @@ class Node_genre(INode):
     def get_name(self):
         return self.get_property('name')
 
-    def populate_reco(self, directory, ID):
+    def populate_reco(self, renderer, ID):
         for gtype in RECOS_TYPE_IDS:
             node = getNode(
                 Flag.RECOMMENDATION, {'parent': self, 'genre-id': ID, 'genre-type': gtype})
-            node.populating(directory, 1, Flag.ALBUM, Flag.NONE)
+            node.populating(renderer)
         return True
 
-    def fetch(self, directory=None):
+    def fetch(self, renderer=None):
         data = api.get('/genre/list', parent_id=self.nid, offset=self.offset, 
                        limit=api.pagination_limit)
         if not data: 
@@ -49,12 +49,12 @@ class Node_genre(INode):
         self.data = data
         g = self.data['genres']
         if 'parent' in g and int(g['parent']['level']) > 1:
-            self.populate_reco(directory, g['parent']['id'])
+            self.populate_reco(renderer, g['parent']['id'])
         return True
 
-    def populate(self, directory=None, depth=None):
+    def populate(self, renderer):
         if not self.data or len(self.data['genres']['items']) == 0:
-            return self.populate_reco(directory, self.nid)
+            return self.populate_reco(renderer, self.nid)
         for genre in self.data['genres']['items']:
             node = getNode(Flag.GENRE, self.parameters)
             node.data = genre

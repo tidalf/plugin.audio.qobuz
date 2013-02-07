@@ -25,6 +25,7 @@ class HistoryConsole(code.InteractiveConsole):
         code.InteractiveConsole.__init__(self, locals, filename)
         self.init_history(histfile)
         self.env_stack = []
+        self.prompt = '# '
         
     def init_history(self, histfile):
         readline.parse_and_bind("tab: complete")
@@ -36,10 +37,11 @@ class HistoryConsole(code.InteractiveConsole):
             atexit.register(self.save_history, histfile)
 
     def save_history(self, histfile):
-        readline.write_history_file(histfile)
+        pass
+#        readline.write_history_file(histfile)
     
     def get_command(self):
-        inp = self.raw_input("\n#> ")
+        inp = self.raw_input(self.prompt)
         inpx = inp.split(' ')
         if inpx[0].startswith('help'):
             return ('help', None)

@@ -24,7 +24,6 @@ class SettingsProxy(object):
         self.proxy = proxy
 
     def lock(self):
-
         self._lock = True
 
     def unlock(self):
@@ -54,12 +53,14 @@ class Settings(defaultdict):
     pass
 
 settings = SettingsProxy(Settings())
+settings['pagination_limit'] = 12
 settings['image_size_default'] = 'large'
 settings['search_enable'] = True
-settings['recommendation_enable'] = False
+settings['recommendation_enable'] = True
 settings['cache_duration_short'] = 5
 settings['cache_duration_long'] = 60 * 24
 settings['cache_duration_middle'] = 60 * 12
+settings['stream_format'] = 5
 settings['stream_type'] = 'flac'
 settings.lock()
 

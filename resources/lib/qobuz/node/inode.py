@@ -17,6 +17,11 @@ class INode(BaseNode):
         self.pagination_next = None
         self.pagination_prev = None
         self.user_storage = None
+        
+    def populating(self, renderer=None):
+        if self.get_property('total'):
+            print "Has pagination..."
+        return super(INode, self).populating(renderer)
 
 #    def __add_pagination(self, data):
 #        """build_down helper: Add pagination data when needed

@@ -109,27 +109,27 @@ class BaseNode(collections.deque):
     def populate(self, renderer):
         return True
 
-    def populating(self, renderer, depth=1, whiteFlag=None, blackFlag=None):
+    def populating(self, renderer):
 #        print "POPULATING .... %s %s" % (str(depth), str(self))
-        if depth == 0: return False
-        if depth != -1:
-            if depth <= 0:
-                depth = 0
+        if renderer.depth == 0: return False
+        if renderer.depth != -1:
+            if renderer.depth <= 0:
+                renderer.depth = 0
                 return False
         if not self.fetch(renderer):
             return False
         if not self.populate(renderer):
             return True
-        if depth != -1:
-            depth -= 1
+        if renderer.depth != -1:
+            renderer.depth -= 1
         if len(self) == 0:
             return True
         for child in self:
-            if child.kind & whiteFlag:
+            if child.kind & renderer.whiteFlag:
                 renderer.append(child)
             else:
                 print u"Rejecting node: " + str(child)
-            child.populating(renderer, depth, whiteFlag, blackFlag)
+            child.populating(renderer)
         return True
     
     '''Getters

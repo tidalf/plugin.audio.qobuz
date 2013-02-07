@@ -27,6 +27,7 @@ class CacheBase(object):
     ''' A base class for caching
     '''
     def __init__(self, *a, **ka):
+        self.enable = False
         self.cached_function_name = __name__
 
     def cached(self, f, *a, **ka):
@@ -36,6 +37,8 @@ class CacheBase(object):
         that = self
         self.cached_function_name = f.__name__
         def wrapped_function(self, *a, **ka):
+            if not that.enable:
+                return f(self, *a, **ka)
             that.error = 0
             key = that.make_key(*a, **ka)
             data = that.load(key, *a, **ka)
