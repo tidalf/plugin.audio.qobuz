@@ -124,14 +124,18 @@ class BaseNode(collections.deque):
             renderer.depth -= 1
         if len(self) == 0:
             return True
+        if hasattr(self, 'populating_hook_before_traversal'):
+            self.populating_hook_before_traversal(renderer)
         for child in self:
             if child.kind & renderer.whiteFlag:
                 renderer.append(child)
             else:
                 print u"Rejecting node: " + str(child)
             child.populating(renderer)
+        if hasattr(self, 'populating_hook_after_traversal'):
+            self.populating_hook_after_traversal(renderer)
         return True
-    
+
     '''Getters
     '''
     def get_label(self):

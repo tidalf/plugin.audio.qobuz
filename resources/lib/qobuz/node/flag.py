@@ -9,36 +9,44 @@
 '''
 
 class __Flag__():
+    
     def __init__(self):
-        self.NODE = 1 << 1
-        self.TRACK = 1 << 2
-        self.PLAYLIST = 1 << 3
-        self.USERPLAYLISTS = 1 << 4
-        self.RECOMMENDATION = 1 << 5
-        self.ROOT = 1 << 6
-        self.ALBUM = 1 << 7
-        self.PURCHASES = 1 << 8
-        self.SEARCH = 1 << 9
-        self.ARTIST = 1 << 10
-        self.SIMILAR_ARTIST = 1 << 11
-        self.FAVORITES = 1 << 12
-        self.FRIEND = 1 << 13
-        self.FRIEND_LIST = 1 << 14
-        self.GENRE = 1 << 15
-        self.LABEL = 1 << 16
-        self.ALBUMS = 1 << 17
-        self.ARTICLES = 1 << 18
-        self.ARTICLE = 1 << 19
-        self.ARTICLE_RUBRICS = 1 << 20
-        self.ALBUMS_BY_ARTIST = 1 << 21
-        self.PUBLIC_PLAYLISTS = 1 << 22
+        self.count = 0
+
+        self.NODE = self._gv()
+        self.TRACK = self._gv()
+        self.PLAYLIST = self._gv()
+        self.USERPLAYLISTS = self._gv()
+        self.RECOMMENDATION = self._gv()
+        self.ROOT = self._gv()
+        self.ALBUM = self._gv()
+        self.PURCHASES = self._gv()
+        self.SEARCH = self._gv()
+        self.ARTIST = self._gv()
+        self.SIMILAR_ARTIST = self._gv()
+        self.FAVORITES = self._gv()
+        self.FRIEND = self._gv()
+        self.FRIEND_LIST = self._gv()
+        self.GENRE = self._gv()
+        self.LABEL = self._gv()
+        self.ALBUMS = self._gv()
+        self.ARTICLES = self._gv()
+        self.ARTICLE = self._gv()
+        self.ARTICLE_RUBRICS = self._gv()
+        self.ALBUMS_BY_ARTIST = self._gv()
+        self.PUBLIC_PLAYLISTS = self._gv()
+        self.FAVORITE = self._gv()
+        
         self.STOPBUILD = 1 <<  100
         self.NONE = 1 << 101
 
-        self.totalFlag = 22
         self.ALL = 0
-        for i in range(1, self.totalFlag+1):
+        for i in range(1, self.count+1):
             self.ALL |= (1 << i)
+    
+    def _gv(self):
+        self.count+=1
+        return 1 << self.count
 
     def to_s(self, flag):
         if not flag:
@@ -60,6 +68,8 @@ class __Flag__():
             return "purchases"
         elif flag & self.FAVORITES == self.FAVORITES:
             return "favorites"
+        elif flag & self.FAVORITE == self.FAVORITE:
+            return "favorite"
         elif flag & self.SEARCH == self.SEARCH:
             return "search"
         elif flag & self.ARTIST == self.ARTIST:

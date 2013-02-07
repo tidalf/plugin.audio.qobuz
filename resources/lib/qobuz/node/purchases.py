@@ -28,8 +28,6 @@ class Node_purchases(INode):
         data = api.get('/purchase/getUserPurchases',
                        limit=api.pagination_limit, offset=self.offset, 
                        user_id=api.user_id)
-        import pprint
-        pprint.pprint(data)
         if not data:
             warn(self, "Cannot fetch purchases data")
             return False

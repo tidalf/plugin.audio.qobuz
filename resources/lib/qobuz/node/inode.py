@@ -64,13 +64,10 @@ class INode(BaseNode):
         node.label = '[%s/%s] %s' % (parameters['offset'], 
                                      data['total'],
                                      self.get_label())
-        renderer.append(node)
+        self.append(node)
+        return True
 
-    def populating(self, renderer=None):
-        '''Overloading populating method so we can add pagination node when
-        needed
-        '''
-        ret = super(INode, self).populating(renderer)
+    def populating_hook_before_traversal(self, renderer=None):
         if self.data and settings['auto_pagination']:
-            self.add_pagination_node(renderer)
-        return ret
+            return self.add_pagination_node(renderer)
+        return True

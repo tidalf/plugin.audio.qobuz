@@ -28,6 +28,7 @@ from qobuz.settings import settings
 import random
 
 VERSION='0.0.1'
+DEBUG = False
 
 class _c:
     HEADER = '\033[95m'
@@ -60,7 +61,7 @@ class QobuzConsole(code.InteractiveConsole):
         self.alive = True
         self.available_commands = ['view', 'back', 'help', 'quit', 'fuzz', 
                                    'set', 'home']
-        self._cmd_stack = [] #[('view', [0])] 
+        self._cmd_stack = [] #[('view', [3])] 
 
     def init_history(self, histfile):
         readline.parse_and_bind("tab: complete")
@@ -245,7 +246,9 @@ class QobuzConsole(code.InteractiveConsole):
 
 '''Main
 '''
-#api.login('MY_USERNAME', 'MY_PASSWORD')
+#api.login('', '')
+if not DEBUG and api.password:
+    raise Exception('Password disclosure!')
 #settings['search_enable'] = False
 #settings['recommendation_enabel'] = False
 
@@ -273,8 +276,9 @@ except KeyboardInterrupt as e:
     pass
 finally:
     print ">> cleaning"
-    api.logout()
-    cache.delete_all()
-    if os.path.exists(__tempdir__):
-        os.rmdir(__tempdir__)
+    if not DEBUG:
+        api.logout()
+        cache.delete_all()
+        if os.path.exists(__tempdir__):
+            os.rmdir(__tempdir__)
     print "Bye :)"
