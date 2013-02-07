@@ -18,9 +18,8 @@ class Node_public_playlists(INode):
         super(Node_public_playlists, self).__init__(parameters)
         self.kind = Flag.PUBLIC_PLAYLISTS
         self.label = _('Public playlists')
-        self.image = '' #getImage('userplaylists')
-        self.offset = self.get_parameter('offset') or 0
-
+        self.items_path = 'playlists'
+        
     def fetch(self, renderer=None):
         data = api.get('/playlist/getPublicPlaylists', offset=self.offset, 
                        limit=api.pagination_limit, type='last-created')
@@ -28,13 +27,13 @@ class Node_public_playlists(INode):
             return False
         # @bug: we use pagination_limit as limit for the search so we don't 
         # need offset... (Fixed if qobuz fix it :p)
-        if not 'total' in data['playlists']:
-            data['playlists']['total'] = data['playlists']['limit']
+        if not 'total' in data[self.items_path]:
+            data[self.items_path]['total'] = data[self.items_path]['limit']
         self.data = data
         return True
 
     def populate(self, renderer=None):
-        for item in self.data['playlists']['items']:
+        for item in self.data[self.items_path]['items']:
             node = getNode(Flag.PLAYLIST, self.parameters)
             node.data = item
             self.append(node)

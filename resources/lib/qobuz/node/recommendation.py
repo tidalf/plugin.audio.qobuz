@@ -57,7 +57,7 @@ class Node_recommendation(INode):
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
         self.image = ''
-        self.offset = self.get_parameter('offset') or 0
+        self.items_path = 'albums'
 
     def url(self, **ka):
         url = super(Node_recommendation, self).url(**ka)
@@ -75,18 +75,24 @@ class Node_recommendation(INode):
     def fetch(self, renderer=None):
         if not (self.genre_type and self.genre_id):
             return True
-        offset = self.offset or 0
         data = api.get('/album/getFeatured',
                                   type=RECOS_TYPE_IDS[int(self.genre_type)],
                                   genre_id=self.genre_id,
                                   limit=api.pagination_limit,
-                                  offset=offset)
+                                  offset=self.offset)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
         self.data = data
         return True
 
+    def _get_label(self, label, type='', genre=''):
+        if type:
+            type = ' / %s' % type
+        if genre:
+            genre = ' / %s' % genre
+        return '%s%s%s' % (label, type, genre)
+    
     def __populate_type(self):
         ''' Populate type, we don't have genre_type nor genre_id
         '''
@@ -94,8 +100,7 @@ class Node_recommendation(INode):
             parameters = self.parameters.copy()
             parameters['genre-type'] = gtype
             node = getNode(Flag.RECOMMENDATION, parameters)
-            label = '%s / %s' % (self.label, RECOS_TYPES[gtype])
-            node.label = label
+            node.label = self._get_label(self.get_label(), RECOS_TYPES[gtype])
             self.append(node)
         return True
 
@@ -106,11 +111,10 @@ class Node_recommendation(INode):
             parameters = self.parameters.copy()
             parameters['genre-type'] = self.genre_type
             parameters['genre-id'] = genre_id
-            node = getNode(Flag.RECOMMENDATION, parameters)
-            label = '%s / %s / %s' % (self.label, 
-                                      RECOS_TYPES[int(self.genre_type)],
-                                     RECOS_GENRES[genre_id])  
-            node.label = label 
+            node = getNode(Flag.RECOMMENDATION, parameters)  
+            node.label = self._get_label(self.get_label(), 
+                                         RECOS_TYPES[int(self.genre_type)], 
+                                         RECOS_GENRES[genre_id]) 
             self.append(node)
         return True
 
@@ -119,7 +123,7 @@ class Node_recommendation(INode):
         '''
         if not self.data:
             return False
-        for album in self.data['albums']['items']:
+        for album in self.data[self.items_path]['items']:
             node = getNode(Flag.ALBUM, self.parameters)
             node.data = album
             self.append(node)

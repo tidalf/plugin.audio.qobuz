@@ -58,7 +58,8 @@ class QobuzConsole(code.InteractiveConsole):
         rlist.blackFlag = Flag.NONE
         self.renderer = rlist
         self.alive = True
-        self.available_commands = ['view', 'back', 'help', 'quit', 'fuzz']
+        self.available_commands = ['view', 'back', 'help', 'quit', 'fuzz', 
+                                   'set', 'home']
         self._cmd_stack = [] #[('view', [0])] 
 
     def init_history(self, histfile):
@@ -83,7 +84,7 @@ class QobuzConsole(code.InteractiveConsole):
                 self.command_quit(None)
             except Exception as e:
                 import traceback
-                print "Error %e" % (e)
+                print "Error %s" % (e)
                 traceback.print_stack()
                 raise e
 
@@ -98,7 +99,6 @@ class QobuzConsole(code.InteractiveConsole):
             cmd = self._cmd_stack.pop(0)
             if self.exec_command(cmd):
                 self.write('\n>> command: %s, Ok <<\n' % (cmd[0]))
-                self.write('\tPrevious: %s\n' % (node.get_label()))
             else:
                 self.write('\n>> command %s, error <<\n' % (cmd[0]))
         else:
@@ -114,20 +114,24 @@ class QobuzConsole(code.InteractiveConsole):
 
     def get_command(self):
         inp = self.raw_input(self.get_prompt())
+        if not inp:
+            return (None, None)
         inpx = inp.split(' ')
         if inpx[0] in self.available_commands:
             return (inpx[0], inpx[1:])
-        return None
+        return (None, None)
 
     def exec_command(self, tuple):
         if tuple is None:
             return True
         name, args = tuple
-#        try:
-        return getattr(self, 'command_%s' % (name))(args)
-#        except Exception as e:
-#            self.write('>>> Invalid command %s (%s)\n\t%s\n' % (name, 
-#                                                                args, e))
+        if name is None:
+            return True
+        try:
+            return getattr(self, 'command_%s' % (name))(args)
+        except Exception as e:
+            self.write('>>> Invalid command %s (%s)\n\t%s\n' % (name, 
+                                                                args, e))
         return False
 
     def display(self, nlist):
@@ -194,6 +198,7 @@ class QobuzConsole(code.InteractiveConsole):
     def command_quit(self, args):
         self.alive = False
         self.write('\n>> quit...\n')
+        return True
 
     def command_back(self, args):
         try:
@@ -208,18 +213,42 @@ class QobuzConsole(code.InteractiveConsole):
             self.write('Cannot go back: %s\n' % (e))
         return False
 
+    def command_set(self, args):
+        self.no_display = True
+        try:
+            key, value = args
+            settings[key] = value
+            self.write('Set << %s >> to << %s >>' % (key, value))
+            return True
+        except Exception as e:
+            self.write('Cannot set << %s >> with value << %s >>\n\t%s\n' % (key, value, e))
+        return False
+
     def command_help(self, args):
         msg = '::Qobuz console (%s)\n' % (VERSION)
         msg+= '\t:: view <idx>\n\t\tenter directory with index idx\n'
         msg+= '\t:: back\n\t\tback to parent\n'
         msg+= '\t:: quit\n\t\tquit interactive console\n'
+        msg+= '\t:: set <key> <value>\n\t\t setting key to value\n'
+        msg+= '\t:: home\n\t\tgo root\n'
         msg+= '\t:: help\n\t\tthis help\n'
         self.no_display = True
         self.write(msg)
         return True
+    
+    def command_home(self, args):
+        self.env = None
+        self.env_stack = []
+        self.renderer.clear()
+        self.renderer.depth = 1
+        return True
 
 '''Main
 '''
+#api.login('MY_USERNAME', 'MY_PASSWORD')
+#settings['search_enable'] = False
+#settings['recommendation_enabel'] = False
+
 import tempfile
 __tempdir__ = tempfile.gettempdir()
 __tempdir__ = os.path.join(__tempdir__, 'qobuzcache')
@@ -233,7 +262,6 @@ if __tempdir__:
     cache.base_path = __tempdir__
 c = QobuzConsole()
 c.write('>> Qobuz console(%s)\n' % (VERSION))
-#settings['search_enable'] = False
 try:
     while not api.is_logged:
         username = c.raw_input(c.get_prompt('Login'))

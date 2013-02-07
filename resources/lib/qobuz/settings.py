@@ -54,6 +54,7 @@ class Settings(defaultdict):
 
 settings = SettingsProxy(Settings())
 settings['pagination_limit'] = 12
+settings['auto_pagination'] = True
 settings['image_size_default'] = 'large'
 settings['search_enable'] = True
 settings['recommendation_enable'] = True
@@ -67,4 +68,4 @@ settings.lock()
 if __name__ == '__main__':
     print "Length %s" % (len(settings))
     for key in settings:
-        print "Cache duration <%s> => %s" % (key, settings[key])
+        print "<%s> => %s" % (key, settings[key])

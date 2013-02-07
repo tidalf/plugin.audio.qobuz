@@ -13,7 +13,6 @@ import os
 
 from base import CacheBase
 from fileutil import RenamedTemporaryFile, unlink, find
-
 class CacheFile(CacheBase):
     '''Caching to files (base_path/<md5.dat>)
         
@@ -37,7 +36,7 @@ class CacheFile(CacheBase):
         '''
         if path is None:
             return
-        print "Setting path: %s" % (path)
+        print "Cache path: %s" % (path)
         if not os.path.exists(path):
             raise Exception('Bad file path: %s' % (path))
         self._base_path = path

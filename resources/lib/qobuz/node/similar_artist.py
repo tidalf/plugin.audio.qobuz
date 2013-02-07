@@ -22,7 +22,7 @@ class Node_similar_artist(INode):
         super(Node_similar_artist, self).__init__(parameters)
         self.kind = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
-        self.offset = self.get_parameter('offset') or 0
+        self.items_path = 'artists'
 
     def get_label(self):
         return lang(30010)
@@ -36,8 +36,8 @@ class Node_similar_artist(INode):
         return True
 
     def populate(self, renderer=None):
-        for aData in self.data['artists']['items']:
-            artist = getNode(Flag.ARTIST, {'offset': 0, 'nid': aData['id']})
-            artist.data = aData
+        for data in self.data[self.items_path]['items']:
+            artist = getNode(Flag.ARTIST, {'nid': data['id']})
+            artist.data = data
             self.append(artist)
         return True

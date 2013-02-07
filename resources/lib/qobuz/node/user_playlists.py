@@ -22,7 +22,7 @@ class Node_user_playlists(INode):
         self.kind = Flag.USERPLAYLISTS
         self.label = _('User playlists') #lang(30000)
         self.content_type = 'files'
-        self.offset = self.get_parameter('offset')
+        self.items_path = 'playlists'
 
     def fetch(self, renderer=None):
         data = api.get('/playlist/getUserPlaylists', 
@@ -35,7 +35,7 @@ class Node_user_playlists(INode):
         return True
 
     def populate(self, renderer=None):
-        for playlist in self.data['playlists']['items']:
+        for playlist in self.data[self.items_path]['items']:
             node = getNode(Flag.PLAYLIST, self.parameters)
             node.data = playlist
             self.append(node)
