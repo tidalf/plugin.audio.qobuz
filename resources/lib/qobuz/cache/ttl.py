@@ -32,7 +32,7 @@ class CacheFileTTL(CacheFile):
     def get_ttl(self, key, *a, **ka):
         if len(a) > 0:
             if a[0] == '/track/getFileUrl':
-                return settings['cache_duration_short'] * 60
+                return int(settings['cache_duration_short']) * 60
         if 'user_id' in ka:
-            return settings['cache_duration_middle'] * 60
-        return settings['cache_duration_long'] * 60
+            return int(settings['cache_duration_middle']) * 60
+        return int(settings['cache_duration_long']) * 60

@@ -58,6 +58,30 @@ def dict2url(d):
         url += '%s=%s&' % (k, d[k])#urllib.quote_plus(d[k]))
     return url[:-1]
 
+class Commander(object):
+
+    def __init__(self, flag, getNode):
+        self.flag = flag
+        self.getNode = getNode
+
+    def has_action(self, node):
+        if node.get_parameter('action'):
+            return True
+        return False
+
+    def execute(self, node):
+        action = node.get_parameter('action', delete=True)
+        if not action:
+            return True
+        tkind = node.get_parameter('target', number=True, delete=True)
+        target = None
+        if tkind:
+            tmp = node
+            node = self.getNode(tkind, node.parameters)
+            target = tmp
+        nodename = self.flag.to_s(node.kind)
+        return getattr(self, 'action_%s_%s' % (nodename, action))(node, target)
+    
 class BaseNode(collections.deque):
     '''Our base node that act like a list for his childs
     '''
@@ -74,7 +98,23 @@ class BaseNode(collections.deque):
         self.mode = Mode.VIEW
         self.actions = {}
         super(BaseNode, self).__init__(self)
-
+    
+    def pretty(self, Flag):
+        s = '[ %s ]\n' % (Flag.to_s(self.kind))
+        s+= ' ::nid:\t%s\n' % self.nid
+        for p in ['kind', 'mode', 'parent', 'label', 'is_folder', 
+                  'image']:
+                s+= ' ::%s\t%s\n' % (p, self.__dict__[p])
+        s+= ' ::IsPlayable: %s\n' % (self.is_playable)
+        s+= ' ::Parameters\n\t%s\n' % self.parameters
+        s+= ' ::Actions\n'
+        for a in self.actions:
+            kind = self.kind
+            if 'target' in self.actions[a]:
+                kind = self.actions[a]['target']
+            s+= ' [ %s ]\t%s (%s)\n' % (Flag.to_s(kind), a, self.actions[a]['label']) 
+        return s
+ 
     def add_action(self, path, **ka):
         self.actions[path] = ka
 
@@ -82,8 +122,8 @@ class BaseNode(collections.deque):
         action = self.get_parameter('action', delete=True)
         if not action:
             return True
-        path = path.replace('/', '_')
-        methodname = 'action_%s' % (path)
+        action = action.replace('/', '_')
+        methodname = 'action_%s' % (action)
         return getattr(self, methodname)(*a, **ka)
 
     def has_action(self):
@@ -147,10 +187,10 @@ class BaseNode(collections.deque):
         if hasattr(self, 'populating_hook_before_traversal'):
             self.populating_hook_before_traversal(renderer)
         for child in self:
-            if child.kind & renderer.whiteFlag:
+            if child.kind & renderer.whiteFlag == child.kind:
                 renderer.append(child)
             else:
-                print u"Rejecting node: " + str(child)
+                print u"Rejecting node: %s" % child.get_label().encode('ascii', 'replace')
             child.populating(renderer)
         if hasattr(self, 'populating_hook_after_traversal'):
             self.populating_hook_after_traversal(renderer)

@@ -4,7 +4,10 @@
 
     Qobuz console
     
-    ::Note: Under windows you need to install pyreadline...
+    ::dependencies::
+        requests
+        pyreadline (win)
+        colorama (win)
     
     This file is part of qobuz-xbmc
 
@@ -13,12 +16,11 @@
 '''
 import code
 try:
-    import readline
+    import readline # @UnusedImport
 except:
-    import pyreadline as readline
-
+    import pyreadline as readline #@UnresolvedImport @Reimport
 import atexit
-import os
+import os, sys
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.cache import cache
@@ -30,21 +32,32 @@ import random
 VERSION='0.0.1'
 DEBUG = False
 
-class _c:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    GREEN = '\033[92m'
+HEADER = '\033[95m'
+OKBLUE = '\033[94m'
+OKGREEN = '\033[92m'
+WARNING = '\033[93m'
+FAIL = '\033[91m'
+WHITE   = '\033[47;30m'
+RED   = '\033[41;30m'
+IRED   = '\033[41;30m'
+GREEN = '\033[42m'
+ENDC  = '\033[0m'
 
-def color(type, msg):
-    return '%s%s%s' % (type, msg, _c.ENDC)
+def _c(kind, msg):
+    return msg
+#    return '%s%s%s' % (kind, msg, ENDC)
+
+sep_info = _c(GREEN,'::')
+sep_cmd = _c(RED,   '>>>')
+sep_res = _c(GREEN, '>>>')
+sep_error = _c(RED, '   @#! >>>')
+
+def sep_count(idx):
+    return '%s%s%s' % ( _c(RED, '['), idx, _c(RED, ']') )
 
 class QobuzConsole(code.InteractiveConsole):
 
-    def __init__(self, locals=None, filename="<console>",
+    def __init__(self, locals=None, filename="<console>", # @ReservedAssignment
                  histfile=os.path.expanduser("~/.console-history")):
 
         code.InteractiveConsole.__init__(self, locals, filename)
@@ -60,8 +73,10 @@ class QobuzConsole(code.InteractiveConsole):
         self.renderer = rlist
         self.alive = True
         self.available_commands = ['view', 'back', 'help', 'quit', 'fuzz', 
-                                   'set', 'home']
-        self._cmd_stack = [] #[('view', [3])] 
+                                   'set', 'home', 'action']
+        self._cmd_stack = [#('view', [2]), 
+                           #('view', [0]), 
+                           ('action', ['cache_delete_old'])] 
 
     def init_history(self, histfile):
         readline.parse_and_bind("tab: complete")
@@ -77,29 +92,42 @@ class QobuzConsole(code.InteractiveConsole):
             return
         readline.write_history_file(histfile)
 
+    def yesno(self, question):
+        res = ''
+        import re
+        m = None
+        pat = re.compile('^(y(es)?|n(o)?)$', )
+        while not m:
+            res = self.raw_input('%s (yes/no): ' % question)
+            m = pat.search(res)
+        if m.group(0).startswith('y'):
+            return True
+        return False
+
     def start(self):
         while self.alive:
-            try:
+#            try:
                 self.process()
-            except KeyboardInterrupt:
-                self.command_quit(None)
-            except Exception as e:
-                import traceback
-                print " >>> Error %s" % (e)
-                traceback.print_stack()
-                raise e
+#            except KeyboardInterrupt:
+#                self.command_quit(None)
+#            except Exception as e:
+#                import traceback
+#                print " >>> Error %s" % (e)
+#                traceback.print_stack()
+#                raise e
 
     def process(self):
         kind = self.env['kind'] if (self.env and 'kind' in self.env) else None
         flag = kind or Flag.ROOT
         node = getNode(flag, self.env or {})
+        self.node = node
         node.populating(self.renderer)
         self.last_prompt = node.get_label()
         self.display(self.renderer)
         if len(self._cmd_stack) > 0:
             cmd = self._cmd_stack.pop(0)
             if not self.exec_command(cmd):
-                self.write('\n > command %s Error\n' % (cmd[0]))
+                self.write('\n%s command %s Error\n' % (sep_error, cmd[0]))
         else:
             #self._cmd_stack.append(('fuzz', []))
             self._cmd_stack.append(self.get_command())
@@ -120,17 +148,17 @@ class QobuzConsole(code.InteractiveConsole):
             return (inpx[0], inpx[1:])
         return (None, None)
 
-    def exec_command(self, tuple):
-        if tuple is None:
+    def exec_command(self, t):
+        if t is None:
             return True
-        name, args = tuple
+        name, args = t
         if name is None:
             return True
-        try:
-            return getattr(self, 'command_%s' % (name))(args)
-        except Exception as e:
-            self.write(' >>> Invalid command %s (%s)\n\t%s\n' % (name, 
-                                                                args, e))
+#        try:
+        return getattr(self, 'command_%s' % (name))(args)
+#        except Exception as e:
+#            self.write('%s Invalid command %s (%s)\n\t%s\n' % (sep_error, name, 
+#                                                                args, e))
         return False
 
     def display(self, nlist):
@@ -138,30 +166,34 @@ class QobuzConsole(code.InteractiveConsole):
             self.no_display = False
             return
         count = 0
-        msg = '-'*79 + '\n'
+        msg = '::[ %s ]\n' % (Flag.to_s(self.node.kind))
+        ma = ''
+        if self.node:
+            for action in self.node.actions:
+                target = ''
+                if 'target' in self.node.actions[action]:
+                    target = Flag.to_s(self.node.actions[action]['target'])
+                ma += '%s/%s ' % (target, action)
+        if ma:
+            ma = '::[ %s ]' % ma
+        msg+= ma + '\n' + '-'*79 + '\n'
         for node in nlist:
             method = 'display_%s' % (Flag.to_s(node.kind))
             imsg = ''
             if hasattr(self, method):
-                imsg = '[%s] %s' % (count, getattr(self, method)(node))
+                imsg = '%s %s' % (sep_count(count), getattr(self, method)(node))
             else:
-                imsg = '[%s] %s\n' % (count, node.get_label())
+                imsg = '%s %s\n' % (sep_count(count), node.get_label())
             msg+=imsg
             count += 1
         msg+= '\n'
         self.write(msg)
 
     def display_track(self, node):
-        msg = '%s (%2.2f mn)\n' % (node.get_title(), node.get_duration()/60.0)
-        info=''
-        pkind = node.parent.kind if node.parent else None
-        if pkind and not (pkind & Flag.PLAYLIST == Flag.PLAYLIST):
-            info = '\t%s - %s\n' % (node.get_artist(), 
-                                             node.get_album())
-            if len(info) >= 80:
-                info = info[0:79] + '\n'
-            msg = color(_c.GREEN, msg)
-        return '%s%s' % (msg, info) 
+        msg = '%s - %s (%2.2f mn)\n' % (node.get_artist(), 
+                                        node.get_title(), 
+                                        node.get_duration() / 60.0)
+        return msg
 
     def command_view(self, args):
         node = None
@@ -215,6 +247,11 @@ class QobuzConsole(code.InteractiveConsole):
 
     def command_set(self, args):
         self.no_display = True
+        if not args:
+            self.write(':: Settings:\n')
+            for k in settings:
+                self.write(' - %s: %s\n' % (k, settings[k]))
+            return True
         try:
             key, value = args
             settings[key] = value
@@ -224,10 +261,62 @@ class QobuzConsole(code.InteractiveConsole):
             self.write('Cannot set << %s >> with value << %s >>\n\t%s\n' % (key, value, e))
         return False
 
+    def exec_action(self, node, action):
+        a = node.actions[action]
+        self.no_display = True
+        target = node
+        if 'target' in a and a['target'] is not None:
+            tmp = target
+            target = getNode(a['target'], node.parameters)
+            node = tmp
+        meth = 'action_%s_%s' % (Flag.to_s(target.kind), action)
+        if not hasattr(self, meth):
+            print "error ... %s" % meth
+            raise NotImplementedError(meth) 
+        getattr(self, meth)(node, target)
+
+    def command_action(self, args):
+        if self.node is None:
+            print "No current node, cannot execute action"
+            return False
+        request = args[0]
+        for action in self.node.actions:
+            if action == request:
+                self.exec_action(self.node, action)
+                return True
+        return False
+
+    def action_favorite_add_tracks(self, source, target):
+        tracks = target.list_tracks(source)
+        print "[ Favorite / Add tracks ]"
+        for track in tracks:
+            print ' - %s' % track.get_label()
+        if not self.yesno('Add %s tracks to favorite ?' % len(tracks)):
+            return False
+        track_ids = ','.join([str(track.nid) for track in tracks])
+        if target.add_tracks(track_ids):
+            print "%s track(s) added to favorite" % (len(tracks))
+            return True
+        print "Cannot add tracks to favorite"
+        return True
+    
+    def action_root_cache_delete_old(self, source, target):
+        res = source.cache_delete_old()
+        if res > 0:
+            print "%s file(s) deleted from cache" % res
+        return True
+
+    def action_root_cache_delete_all(self, source, target):
+        res = source.cache_delete_all()
+        if res > 0:
+            print "%s file(s) deleted from cache" % res
+        return True
+    
     def command_help(self, args):
         msg = '::Qobuz console (%s)\n' % (VERSION)
         msg+= '\t:: view <idx>\n\t\tenter directory with index idx\n'
         msg+= '\t:: back\n\t\tback to parent\n'
+        msg+= '\t:: action <name>\n\t\tExecute action on current node\n'
         msg+= '\t:: quit\n\t\tquit interactive console\n'
         msg+= '\t:: set <key> <value>\n\t\t setting key to value\n'
         msg+= '\t:: home\n\t\tgo root\n'
@@ -243,6 +332,12 @@ class QobuzConsole(code.InteractiveConsole):
         self.renderer.depth = 1
         return True
 
+def hasargv(name):
+    for arg in sys.argv[1:]:
+        print "ARG %s %s" % (name, arg)
+        if name == arg:
+            return True
+    return False
 '''Main
 '''
 
@@ -264,14 +359,15 @@ if not DEBUG and api.password:
 #settings['recommendation_enabel'] = False
 
 c = QobuzConsole()
-c.write(':: qobuz console (%s)\n' % (VERSION))
+c.write_history = True
+c.write('%s qobuz console (%s)\n' % (sep_info , VERSION))
 try:
     while not api.is_logged:
         username = c.raw_input(c.get_prompt('Login'))
         password = c.raw_input(c.get_prompt('Password'))
         if not api.login(username, password):
             c.write(api.error)
-    c.write(' > Logged as %s\n' % (api.username))
+    c.write('%s Logged as %s\n' % (sep_res, api.username))
     c.start()
 except KeyboardInterrupt as e:
     pass

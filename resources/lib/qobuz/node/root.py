@@ -12,6 +12,7 @@ from inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.settings import settings
 from qobuz.i8n import _
+from qobuz.cache import cache
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -21,8 +22,10 @@ class Node_root(INode):
         self.kind = Flag.ROOT
         self.label = 'Qobuz'
         self.content_type = 'files'
-        self.add_action('cache/erase_all', 
-                        label=_('Erase cache'))
+        self.add_action('cache_delete_all', 
+                        label=_('Erase all data from cache'))
+        self.add_action('cache_delete_old', 
+                        label=_('Erase old data from cache'))
 
     def populate(self, renderer=None):
         self.append(getNode(Flag.USERPLAYLISTS, self.parameters))
@@ -45,21 +48,13 @@ class Node_root(INode):
         self.append(getNode(Flag.PUBLIC_PLAYLISTS, self.parameters))
         return True
 
-#    def cache_remove(self):
-#        '''GUI/Removing all cached data
-#        '''
-#        from gui.util import yesno, notifyH, getImage
-#        from debug import log
-#        if not yesno(lang(31102), lang(31103)):
-#            log(self, "Deleting cached data aborted")
-#            return False
-#        if clean_all(cache):
-#            notifyH(lang(31100), lang(31104))
-#        else:
-#            notifyH(lang(31100), lang(31101),
-#                    getImage('icon-error-256'))
-#        return True
-#
+    def cache_delete_all(self):
+        return cache.delete_all()
+
+    def cache_delete_old(self):
+        return cache.delete_old()
+
+        
 #    def gui_scan(self):
 #        '''Scanning directory specified in query parameter
 #        '''

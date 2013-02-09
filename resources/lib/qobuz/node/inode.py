@@ -21,14 +21,14 @@ class INode(BaseNode):
         self.items_path = None
         self.offset = self.get_parameter('offset', delete=True) or 0
         self.add_action('add_tracks', 
-                        label=_('Add to favorite tracks'),
+                        label=_('Add track(s) to favorite'),
                         target=Flag.FAVORITE)
         self.add_action('add_albums', 
-                        label=_('Add to favorite albums'),
+                        label=_('Add album(s) to favorite'),
                         target=Flag.FAVORITE)
-        self.add_action('get',
-                        label=_('Similar artists'),
-                        target=Flag.SIMILAR_ARTIST)
+        self.add_action('add_artists', 
+                        label=_('Add artist(s) to favorite'),
+                        target=Flag.FAVORITE)
     @property
     def offset(self):
         return self._offset

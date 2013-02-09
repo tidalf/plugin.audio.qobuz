@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
     qobuz.xbmc
     ~~~~~~~~~~
@@ -63,7 +64,7 @@ class ItemFactory(object):
         self.append_context = True
 
     def menu_from_action(self, menu, node):
-        for action in node.actions:
+        for action in sorted(node.actions):
             ka = {'action': action}
             if 'target' in node.actions[action]:
                 ka['target'] = node.actions[action]['target']
@@ -81,12 +82,12 @@ class ItemFactory(object):
         if self.append_context:
             menu = []
             self.menu_from_action(menu, node)
-            skind = Flag.to_s(node.kind)
-            methname = 'attach_context_%s' % skind
-            if hasattr(self, methname):
-                getattr(self, methname)(menu, node)
-            else:
-                self.attach_context_default(menu, node)
+#            skind = Flag.to_s(node.kind)
+#            methname = 'attach_context_%s' % skind
+#            if hasattr(self, methname):
+#                getattr(self, methname)(menu, node)
+#            else:
+#                self.attach_context_default(menu, node)
             item.addContextMenuItems(menu, False)
         return item
 
@@ -297,7 +298,7 @@ class ItemFactory(object):
         '''Xbmc Library fix: Compilation showing one entry by track
             We are setting artist like 'VA / Artist'
             Data snippet:
-                {u'id': 26887, u'name': u'Interpr\xe8tes Divers'}
+                {u'id': 26887, u'name': u'Interprètes Divers'}
                 {u'id': 145383, u'name': u'Various Artists'}
                 {u'id': 255948, u'name': u'Multi Interpretes'}
         '''

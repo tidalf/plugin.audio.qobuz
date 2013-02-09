@@ -7,8 +7,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-__all__ = ['xbmc']
 try:
-    import xbmc
+    import xbmc # @UnresolvedImport
 except:
-    from _xbmc import mock as xbmc
+    from _xbmc import mock as xbmc #@Reimport

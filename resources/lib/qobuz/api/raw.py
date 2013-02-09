@@ -169,8 +169,7 @@ class QobuzApiRaw(object):
     """
     def set_user_data(self, user_id, user_auth_token):
         if not (user_id or user_auth_token):
-            raise QobuzXbmcError(who=self, what='missing_argument', 
-                                 additional='uid|token')
+            raise MissingParameter('uid|token')
         self.user_auth_token = user_auth_token
         self.user_id = user_id 
         self.logged_on = time()
@@ -296,9 +295,7 @@ class QobuzApiRaw(object):
         mandatory = ['query', 'type']
         for label in mandatory:
             if not label in ka:
-                raise QobuzXbmcError(who=self,
-                                     what='missing_parameter',
-                                     additional=label)
+                raise MissingParameter(label)
         return self._api_request(ka, '/search/getResults')
 
     """
@@ -315,8 +312,7 @@ class QobuzApiRaw(object):
             if label in ka:
                 found = label
         if not found:
-            raise QobuzXbmcError(who=self, what='missing_parameter',
-                                 additional='artist_ids|albums_ids|track_ids')
+            raise MissingParameter('artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/create')
 
     def favorite_delete(self, **ka):
@@ -326,8 +322,7 @@ class QobuzApiRaw(object):
             if label in ka:
                 found = label
         if not found:
-            raise QobuzXbmcError(who=self, what='missing_parameter',
-                                 additional='artist_ids|albums_ids|track_ids')
+            raise MissingParameter('artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/delete')
 
     """
@@ -359,8 +354,7 @@ class QobuzApiRaw(object):
             if label in ka:
                 found = label
         if not found:
-            raise QobuzXbmcError(
-                who=self, what='missing_parameter', additional='playlist_id')
+            raise MissingParameter('playlist_id')
         return self._api_request(ka, '/playlist/subscribe')
 
     def playlist_unsubscribe(self, **ka):
@@ -379,8 +373,7 @@ class QobuzApiRaw(object):
     def playlist_delete(self, **ka):
         self._check_ka(ka, ['playlist_id'])
         if not 'playlist_id' in ka:
-            raise QobuzXbmcError(
-                who=self, what='missing_parameter', additional='playlist_id')
+            raise MissingParameter('playlist_id')
         return self._api_request(ka, '/playlist/delete')
 
     def playlist_update(self, **ka):

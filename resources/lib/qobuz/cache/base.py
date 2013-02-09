@@ -23,6 +23,10 @@ NoData = 1 << 3
 StoreError = 1 << 4
 DeleteError = 1 << 5
 
+from qobuz.exception import QobuzException
+
+class BadMagic(QobuzException): pass
+
 class CacheBase(object):
     ''' A base class for caching
     '''
@@ -61,7 +65,7 @@ class CacheBase(object):
             entry = {
                  'updated_on': time(),
                  'data': data,
-                 'ttl': that.get_ttl(key, *a, **ka),
+                 'ttl': int(that.get_ttl(key, *a, **ka)),
                  'pa': a,
                  'ka': ka,
                  'magic': __magic__,
@@ -85,6 +89,8 @@ class CacheBase(object):
         return diff
 
     def check_magic(self, data, *a, **ka):
+        if not data:
+            return False
         if not 'magic' in data:
             return False
         if data['magic'] != __magic__:

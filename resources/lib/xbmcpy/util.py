@@ -14,6 +14,8 @@ from mock.xbmc import xbmc
 import mock.xbmcgui as xbmcgui
 from mock.xbmcplugin import xbmcplugin
 
+from rpc import showNotification
+
 def htm2xbmc(htm):
     def replace(m):
         return '[' + m.group(1) + m.group(2).upper() + ']'
@@ -92,6 +94,10 @@ def color(colorItem, msg):
     if not msg: return ''
     if not colorItem: return msg
     return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
+
+def nolang(msg):
+    print "[Warn] untranslated string %s" % msg
+    return msg
 
 def lang(langId):
     s = xbmcaddon.Addon().getLocalizedString(langId)

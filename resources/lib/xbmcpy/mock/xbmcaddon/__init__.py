@@ -62,7 +62,7 @@ class __Addon__(object):
 
 Addon = None
 try:
-    import xbmcaddon
+    import xbmcaddon # @UnresolvedImport
     Addon = xbmcaddon.Addon
 except:
     Addon = __Addon__

@@ -9,7 +9,7 @@
 '''
 
 from qobuz.debug import warn
-from qobuz.exception import QobuzXbmcError
+from qobuz.exception import InvalidType
 from inode import INode
 from qobuz.api import api
 from qobuz.node import getNode, Flag
@@ -49,7 +49,7 @@ class Node_search(INode):
             self.label = _('Search song')
             self.content_type = 'songs'
         else:
-            raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
+            raise InvalidType(st)
         self._search_type = st
     @search_type.getter
     def search_type(self):

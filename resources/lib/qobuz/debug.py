@@ -16,12 +16,12 @@ LOGSEVERE = None
 
 try:
     import xbmc
-    import xbmcaddon
-    ourlog = xbmc.log
-    LOGDEBUG = xbmc.LOGDEBUG
-    LOGNOTICE = xbmc.LOGNOTICE
-    LOGERROR = xbmc.LOGERROR
-    LOGSEVERE = xbmc.LOGSEVERE
+    import xbmcaddon           # @UnresolvedImport
+    ourlog = xbmc.log          # @UndefinedVariable
+    LOGDEBUG = xbmc.LOGDEBUG   # @UndefinedVariable
+    LOGNOTICE = xbmc.LOGNOTICE # @UndefinedVariable
+    LOGERROR = xbmc.LOGERROR   # @UndefinedVariable
+    LOGSEVERE = xbmc.LOGSEVERE # @UndefinedVariable
     __debugging__ = False
     if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         __debugging__ = True

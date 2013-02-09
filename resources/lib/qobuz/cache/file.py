@@ -11,8 +11,9 @@ import hashlib
 import pickle
 import os
 
-from base import CacheBase
+from base import CacheBase, BadMagic
 from fileutil import RenamedTemporaryFile, unlink, find
+
 class CacheFile(CacheBase):
     '''Caching to files (base_path/<md5.dat>)
         
@@ -100,8 +101,11 @@ class CacheFile(CacheBase):
         """
         def delete_one(filename, info):
             data = self.load_from_store(filename)
+            if not data:
+                return True
             if not self.check_magic(data):
-                raise TypeError('magic mismatch')
+                print "Error: bad magic, skipping file %s" % (filename)
+                return True
             ttl = self.is_fresh( data['key'], data)
             if ttl:
                 return True
@@ -119,6 +123,8 @@ class CacheFile(CacheBase):
             '''::callback that delete one file
             '''
             data = self.load_from_store(filename)
+            if not data:
+                return True
             if not self.check_magic(data):
                 print "Error: bad magic, skipping file %s" % (filename)
                 return True

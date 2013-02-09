@@ -28,6 +28,13 @@ class Node_album(INode):
         self.is_special_purchase = False
         self.label = _('Album')
         self.imageDefaultSize = settings.get('image_size_default')
+        self.add_action('similar',
+                        label=_('Similar artists'),
+                        target=Flag.SIMILAR_ARTIST)
+        self.add_action('featured',
+                        label=_('Featured album'),
+                        target=Flag.ALBUMS_BY_ARTIST)
+
 
     def fetch(self, renderer=None):
         data = api.get('/album/get', album_id=self.nid)

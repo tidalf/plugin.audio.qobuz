@@ -77,11 +77,12 @@ def find(directory, pattern, callback=None, data=None):
                 if fok.match(filename):
                     path = os.path.join(dirname, filename)
                     if callback:
-                        try:
+#                        try:
                             if not callback(path, data):
                                 return None
-                        except Exception as e:
-                            warn('[find]', "Callback raise exception: " + repr(e))
-                            return None
+#                        except Exception as e:
+#                            #warn('[find]', "Callback raise exception: " + e)
+#                            raise e
+#                            return None
                     flist.append(path)
         return flist

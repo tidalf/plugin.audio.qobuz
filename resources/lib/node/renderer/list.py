@@ -17,4 +17,4 @@ class ListRenderer(BaseRenderer):
         pass
 
     def end(self):
-        print "Count %s" % (len(self))
+        pass

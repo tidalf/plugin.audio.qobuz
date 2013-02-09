@@ -7,7 +7,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os, getpass, sys, platform
+import os, getpass, platform
 
 '''Our platform
 '''

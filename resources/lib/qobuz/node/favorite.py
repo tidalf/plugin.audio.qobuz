@@ -13,7 +13,11 @@ from qobuz.debug import warn
 from qobuz.node import getNode, Flag
 from qobuz.api import api
 from qobuz.i8n import _
+from qobuz.cache import cache
+from node.renderer.list import ListRenderer
 
+'''Used to trigger po parser
+'''
 _('albums')
 _('tracks')
 _('artists')
@@ -56,6 +60,9 @@ class Node_favorite(INode):
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, self.parameters)
             node.data = track
+            node.add_action('delete_track',
+                            label=_('Remove track from favorite'),
+                            target=self.kind)
             self.append(node)
         return True
 
@@ -63,6 +70,9 @@ class Node_favorite(INode):
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, self.parameters)
             node.data = album
+            node.add_action('delete_album',
+                            label=_('Remove album from favorite'),
+                            target=self.kind)
             self.append(node)
         return True
 
@@ -70,170 +80,136 @@ class Node_favorite(INode):
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, self.parameters)
             node.data = artist
+            node.add_action('delete_artist',
+                            label=_('Remove artist from favorite'),
+                            target=self.kind)
             self.append(node)
         return True
 
     def get_description(self):
         return self.get_property('description')
 
-#    def gui_add_albums(self):
-#        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
-#        nodes = self.list_albums(qnt, qid)
-#        if len(nodes) == 0:
-#            notifyH(dialogHeading, lang(36004))
-#            return False
-#        ret = xbmcgui.Dialog().select(lang(36005), [
-#           node.get_label() for node in nodes                              
-#        ])
-#        if ret == -1:
-#            return False
-#        album_ids = ','.join([node.nid for node in nodes])
-#        if not self.add_albums(album_ids):
-#            notifyH(dialogHeading, 'Cannot add album(s) to favorite')
-#            return False
-#        notifyH(dialogHeading, 'Album(s) added to favorite')
-#        return True
-#
-#    def gui_add_artists(self):
-#        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
-#        nodes = self.list_artists(qnt, qid)
-#        if len(nodes) == 0:
-#            notifyH(dialogHeading, lang(36004))
-#            return False
-#        ret = xbmcgui.Dialog().select(lang(36007), [
-#           node.get_label() for node in nodes                              
-#        ])
-#        if ret == -1:
-#            return False
-#        artist_ids = ','.join([str(node.nid) for node in nodes])
-#        if not self.add_artists(artist_ids):
-#            notifyH(dialogHeading, 'Cannot add artist(s) to favorite')
-#            return False
-#        notifyH(dialogHeading, 'Artist(s) added to favorite')
-#        return True
+    def add_albums(self, album_ids):
+        ret = api.favorite_create(album_ids=album_ids)
+        if not ret:
+            return False
+        self._delete_cache('albums')
+        return True
 
-#    def list_albums(self, qnt, qid):
-#        album_ids = {}
-#        nodes = []
-#        if qnt & Flag.ALBUM == Flag.ALBUM:
-#            node = getNode(Flag.ALBUM, {'nid': qid})
-#            node.fetch(None, None, None, None)
-#            album_ids[str(node.nid)] = 1
-#            nodes.append(node)
-#        elif qnt & Flag.TRACK == Flag.TRACK:
-#            render = renderer(qnt, self.parameters)
-#            render.depth = 1
-#            render.whiteFlag = Flag.TRACK
-#            render.blackFlag = Flag.NONE
-#            render.asList = True
-#            render.run()
-#            if len(render.nodes) > 0:
-#                node = getNode(Flag.ALBUM)
-#                node.data = render.nodes[0].data['album']
-#                album_ids[str(node.nid)] = 1
-#                nodes.append(node)
-#        else:
-#            render = renderer(qnt, self.parameters)
-#            render.depth = -1
-#            render.whiteFlag = Flag.ALBUM
-#            render.blackFlag = Flag.STOPBUILD & Flag.TRACK
-#            render.asList = True
-#            render.run()
-#            for node in render.nodes:
-#                if node.nt & Flag.ALBUM: 
-#                    if not str(node.nid) in album_ids:
-#                        album_ids[str(node.nid)] = 1
-#                        nodes.append(node)
-#                if node.nt & Flag.TRACK:
-#                    render = renderer(qnt, self.parameters)
-#                    render.depth = 1
-#                    render.whiteFlag = Flag.TRACK
-#                    render.blackFlag = Flag.NONE
-#                    render.asList = True
-#                    render.run()
-#                    if len(render.nodes) > 0:
-#                        newnode = getNode(Flag.ALBUM)
-#                        newnode.data = render.nodes[0].data['album']
-#                        if not str(newnode.nid) in album_ids:
-#                            nodes.append(newnode)
-#                            album_ids[str(newnode.nid)] = 1
-#        return nodes
+    def list_albums(self, target):
+        album_ids = {}
+        albums = []
+        if target.kind & Flag.ALBUM == Flag.ALBUM:
+            target.fetch()
+            album_ids[str(target.nid)] = 1
+            albums.append(target)
+        elif target.kind & Flag.TRACK == Flag.TRACK:
+            render = ListRenderer()
+            render.depth = 1
+            render.whiteFlag = Flag.TRACK
+            render.blackFlag = Flag.TRACK
+            render.render(target)
+            if len(render) > 0:
+                album = getNode(Flag.ALBUM, {})
+                album.data = render[0].data['album']
+                album_ids[str(album.nid)] = 1
+                albums.append(album)
+        else:
+            render = ListRenderer()
+            render.depth = -1
+            render.whiteFlag = Flag.ALBUM | Flag.TRACK
+            render.blackFlag = Flag.TRACK
+            render.render(target)
+            for node in render:
+                if node.kind & Flag.ALBUM == Flag.ALBUM:
+                    if not str(node.nid) in album_ids:
+                        album_ids[str(node.nid)] = 1
+                        albums.append(node)
+                if node.kind & Flag.TRACK == Flag.TRACK:
+                    album = getNode(Flag.ALBUM, 
+                                    {'nid': node.get_property('album/id')})
+                    if 'album' in node.data:
+                        album.data = node.data['album']
+                    else:
+                        print "BUH"
+                        import pprint
+                        print pprint.pformat(node.data)
+                    if not str(album.nid) in album_ids:
+                            albums.append(album)
+                            album_ids[str(album.nid)] = 1
+        return albums
 
-#    def add_albums(self, album_ids):
-#        ret = api.favorite_create(album_ids=album_ids)
-#        if not ret:
-#            return False
-#        self._delete_cache()
-#        return True
-#    
-#    def add_artists(self, artist_ids):
-#        ret = api.favorite_create(artist_ids=artist_ids)
-#        if not ret:
-#            return False
-#        self._delete_cache()
-#        return True
-#
+    def add_artists(self, artist_ids):
+        ret = api.favorite_create(artist_ids=artist_ids)
+        if not ret:
+            return False
+        self._delete_cache('artists')
+        return True
 
-#
-    def list_tracks(self, plugin, node):
-        from node.renderer.list import ListRenderer
+    def list_artists(self, target):
+        artist_ids = {}
+        artists = []
+        if target.kind & Flag.ARTIST == Flag.ARTIST:
+            artist_ids[str(target.nid)] = 1
+            artists.append(target)
+        else:
+            render = ListRenderer()
+            render.depth = -1
+            render.whiteFlag = Flag.ALBUM | Flag.TRACK | Flag.ARTIST
+            render.blackFlag = Flag.TRACK
+            render.render(target)
+            for node in render:
+                aid = node.get_artist_id()
+                if aid is None:
+                    continue
+                artist = getNode(Flag.ARTIST, {'nid': aid})
+                if node.kind & Flag.ARTIST:
+                    artist.data = node.data
+                elif node.kind & Flag.ALBUM:
+                    artist.data = node.data['artist']
+                elif node.kind & Flag.TRACK:
+                    artist.data = { 'nid': aid, 'name': node.get_artist()}
+                else:
+                    artist.fetch()
+                if not str(artist.nid) in artist_ids:
+                    artists.append(artist)
+                    artist_ids[str(artist.nid)] = 1
+        return artists
+
+    def add_tracks(self, track_ids):
+        ret = api.favorite_create(track_ids=track_ids)
+        if not ret:
+            return False
+        self._delete_cache('tracks')
+        return True
+
+    def list_tracks(self, root):
         track_ids = {}
         nodes = []
-        if node.kind & Flag.TRACK == Flag.TRACK:
-            node.fetch()
-            track_ids[str(node.nid)] = 1
-            nodes.append(node)
+        if root.kind & Flag.TRACK == Flag.TRACK:
+            root.fetch()
+            track_ids[str(root.nid)] = 1
+            nodes.append(root)
         else:
             render = ListRenderer()
             render.alive = False
             render.depth = -1
             render.whiteFlag = Flag.TRACK
             render.blackFlag = Flag.TRACK
-            render.render(node)
+            render.render(root)
             for node in render:
                 if not str(node.nid) in track_ids:
                     nodes.append(node)
                     track_ids[str(node.nid)] = 1
         return nodes
-#
-#    def list_artists(self, qnt, qid):
-#        artist_ids = {}
-#        nodes = []
-#        if qnt & Flag.ARTIST == Flag.ARTIST:
-#            node = getNode(Flag.ARTIST, {'nid': qid})
-#            node.fetch(None, None, None, Flag.NONE)
-#            artist_ids[str(node.nid)] = 1
-#            nodes.append(node)
-#        else:
-#            render = renderer(qnt, self.parameters)
-#            render.depth = -1
-#            render.whiteFlag = Flag.ALBUM & Flag.TRACK
-#            render.blackFlag = Flag.TRACK & Flag.STOPBUILD
-#            render.asList = True
-#            render.run()
-#            for node in render.nodes:
-#                artist = getNode(Flag.ARTIST, {'nid': node.get_artist_id()})
-#                if not artist.fetch(None, None, None, Flag.NONE):
-#                    continue
-#                if not str(artist.nid) in artist_ids:
-#                    nodes.append(artist)
-#                    artist_ids[str(artist.nid)] = 1
-#        return nodes
-#
-#    def add_tracks(self, track_ids):
-#        ret = api.favorite_create(track_ids=track_ids)
-#        if not ret:
-#            return False
-#        self._delete_cache()
-#        return True
-#
-#    def _delete_cache(self):
-#        limit = getSetting('pagination_limit')
-#        key = cache.make_key('/favorite/getUserFavorites', 
-#                           user_id=api.user_id, 
-#                           limit=limit, 
-#                           offset=self.offset)
-#        return cache.delete(key)
+
+    def _delete_cache(self, type):
+        key = cache.make_key('/favorite/getUserFavorites', 
+                           user_id=api.user_id, 
+                           limit=api.pagination_limit,
+                           type=type,
+                           offset=self.offset)
+        return cache.delete(key)
 #
 #    def del_track(self, track_id):
 #        if api.favorite_delete(track_ids=track_id):
@@ -253,25 +229,3 @@ class Node_favorite(INode):
 #            return True
 #        return False
 #
-#    def gui_remove(self):
-#        qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
-#        node = getNode(qnt, {'nid': qid})
-#        ret = None
-#        if qnt & Flag.TRACK == Flag.TRACK:
-#            ret = self.del_track(node.nid)
-#        elif qnt & Flag.ALBUM == Flag.ALBUM:
-#            ret = self.del_album(node.nid)
-#        elif qnt & Flag.ARTIST == Flag.ARTIST:
-#            ret = self.del_artist(node.nid)
-#        else:
-#            raise Qerror(who=self, what='invalid_node_type', 
-#                         additional=self.nt)
-#        if not ret:
-#            notifyH(dialogHeading, 
-#                    'Cannot remove item: %s' % (node.get_label()))
-#            return False
-#        notifyH(dialogHeading, 
-#                    'Item successfully removed: %s' % (node.get_label()))
-#        url = self.make_url(nt=self.nt, nid='', nm='')
-#        executeBuiltin(containerUpdate(url, True))
-#        return True

@@ -18,7 +18,7 @@ class Mock(object):
     def Dialog(self):
         raise NotImplemented()
 try:
-    import xbmcgui
+    import xbmcgui # @UnresolvedImport
 except:
     xbmcgui = Mock()
 

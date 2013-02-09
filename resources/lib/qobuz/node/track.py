@@ -27,6 +27,12 @@ class Node_track(INode):
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.status = None
+        self.add_action('similar',
+                        label=_('Similar artists'),
+                        target=Flag.SIMILAR_ARTIST)
+        self.add_action('featured',
+                        label=_('Featured album'),
+                        target=Flag.ALBUMS_BY_ARTIST)
 
     def fetch(self, renderer=None):
         data = api.get('/track/get', track_id=self.nid)
@@ -179,6 +185,9 @@ class Node_track(INode):
         return year
 
     @property
+    def is_playable(self):
+        return True
+    @is_playable.getter
     def is_playable(self):
         url = self.get_streaming_url()
         if not url:

@@ -44,8 +44,12 @@ class Plugin(object):
         self._parameters = parse_parameters()
         self.base_url = 'plugin://%s/' % (self.plugin_id)
 
+    
+    @property
     def handle(self):
-        print "Sys %s" % (pprint.pformat(sys.argv))
+        pass
+    @handle.getter
+    def handle(self):
         if len(sys.argv) < 2:
             return -1
         return int(sys.argv[1])

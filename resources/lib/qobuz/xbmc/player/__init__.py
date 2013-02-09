@@ -15,6 +15,7 @@ from qobuz.debug import warn
 from xbmcpy.util import notifyH, isFreeAccount, lang, setResolvedUrl, \
     getSetting
 from qobuz.node import Flag, getNode
+from qobuz.exception import MissingParameter
 
 """
     @class: QobuzPlayer
@@ -25,7 +26,9 @@ class Player(xbmc.Player):
 
     def __init__(self, **ka):
         super(Player, self).__init__()
-        self.plugin = ka['plugin'] if 'plugin' in ka else None
+        if not 'plugin' in ka:
+            raise MissingParameter('plugin')
+        self.plugin = ka['plugin']
         self.track_id = None
         self.total = None
         self.elapsed = None
@@ -33,19 +36,11 @@ class Player(xbmc.Player):
     """
         Playing track given a track id
     """
-    def play(self, renderer, node):
-        track = node#getNode(Flag.TRACK, {'nid': track_id})
-        
-        if not track.fetch():
-            warn(self, "Cannot get track data")
-#            label = "Maybe an invalid track id"
-#            item = xbmcgui.ListItem("No track information", label, '', 
-#                                    getImage('icon-error-256'), '')
-            return False
+    def play(self, renderer, track):
         if not track.is_playable:
             warn(self, "Cannot get streaming URL")
             return False
-        item = renderer.itemFactory.make_item(node)
+        item = renderer.itemFactory.make_item(track)
         track.item_add_playing_property(item)
         '''Some tracks are not authorized for stream and a 60s sample is
         returned, in that case we overwrite the song duration
@@ -69,11 +64,11 @@ class Player(xbmc.Player):
         """
             We are called from playlist...
         """
-        if self.plugin.handle() == -1:
+        if self.plugin.handle == -1:
             super(Player, self).play(track.get_streaming_url(), 
                                           item, False)
         else:
-            setResolvedUrl(handle=self.plugin.handle(),
+            setResolvedUrl(handle=self.plugin.handle,
                 succeeded=True,
                 listitem=item)
         return True
