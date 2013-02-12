@@ -9,13 +9,11 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from cache import cache
-#from cache.sql import CacheSQL
 from api.raw  import QobuzApiRaw
 
 class InvalidQuery(Exception):
     pass
 
-#sql = CacheSQL()
 
 class QobuzApiEasy(QobuzApiRaw):
 
@@ -27,7 +25,6 @@ class QobuzApiEasy(QobuzApiRaw):
         self.stream_format = 5
 
     @cache.cached
-#    @sql.cached
     def get(self, *a, **ka):
         '''Wrapper that cache query to our raw api. We are enforcing format
         because cache entry key are made based on *a and **ka parameters. 
