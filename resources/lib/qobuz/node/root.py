@@ -22,10 +22,6 @@ class Node_root(INode):
         self.kind = Flag.ROOT
         self.label = 'Qobuz'
         self.content_type = 'files'
-        self.add_action('cache_delete_all', 
-                        label=_('Erase all data from cache'))
-        self.add_action('cache_delete_old', 
-                        label=_('Erase old data from cache'))
 
     def populate(self, renderer=None):
         self.append(getNode(Flag.USERPLAYLISTS, self.parameters))
@@ -47,6 +43,13 @@ class Node_root(INode):
         self.append(getNode(Flag.GENRE, self.parameters))
         self.append(getNode(Flag.PUBLIC_PLAYLISTS, self.parameters))
         return True
+
+    def append(self, item):
+        item.add_action('cache_delete_all', 
+                        label=_('Erase all data from cache'), target=Flag.ROOT)
+        item.add_action('cache_delete_old', 
+                        label=_('Erase old data from cache'), target=Flag.ROOT)
+        super(Node_root, self).append(item)
 
     def cache_delete_all(self):
         return cache.delete_all()

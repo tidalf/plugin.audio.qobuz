@@ -48,7 +48,6 @@ class CacheBase(object):
             data = that.load(key, *a, **ka)
             if data:
                 if not that.check_magic(data, *a, **ka):
-                    print BadMagic
                     that.error &= BadMagic
                 elif not that.check_key(data, key, *a, **ka):
                     that.error &= BadKey

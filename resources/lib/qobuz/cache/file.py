@@ -11,7 +11,7 @@ import hashlib
 import pickle
 import os
 
-from base import CacheBase, BadMagic
+from base import CacheBase
 from fileutil import RenamedTemporaryFile, unlink, find
 
 class CacheFile(CacheBase):
