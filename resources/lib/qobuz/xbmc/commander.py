@@ -19,11 +19,12 @@ base_url = 'plugin://%s/' % (xbmcaddon.Addon().getAddonInfo('id'))
 
 def refresh():
     executeBuiltin(containerRefresh())
+
 class QobuzXbmcCommander(Commander):
 
     def action_root_cache_delete_all(self, root, node):
         dialogHeading = _('Delete all data from cache')
-        if not root.cache_delete_all():
+        if not root.cache_delete_all(checkMagic=False):
             notifyH(dialogHeading, 'Fail')
             return False
         notifyH(dialogHeading, 'Success')

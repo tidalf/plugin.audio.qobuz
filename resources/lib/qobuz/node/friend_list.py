@@ -29,7 +29,6 @@ class Node_friend_list(INode):
     def url(self, **ka):
         ka['name'] = self.name
         url = super(Node_friend_list, self).url(**ka)
-        print "URL %s" % (url)
         return url
 
     def fetch(self, renderer=None):

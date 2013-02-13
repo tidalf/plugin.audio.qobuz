@@ -116,19 +116,23 @@ class CacheFile(CacheBase):
         find(self.base_path, '^.*\.dat$', delete_one, info)
         return info['count']
 
-    def delete_all(self):
+    def delete_all(self, **ka):
         '''Clean all data from cache
         '''
+        checkMagic = True
+        if 'checkMagic' in ka:
+            checkMagic = ka['checkMagic']
         def delete_one(filename, info):
             '''::callback that delete one file
             '''
             data = self.load_from_store(filename)
             if not data:
                 return True
-            if not self.check_magic(data):
+            if checkMagic and not self.check_magic(data):
                 print "Error: bad magic, skipping file %s" % (filename)
                 return True
             if self.delete(data['key']):
+                print "File deleted: %s" % filename
                 info['count'] += 1
             return True
         info = { 'count': 0 }

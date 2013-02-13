@@ -51,8 +51,8 @@ class Node_root(INode):
                         label=_('Erase old data from cache'), target=Flag.ROOT)
         super(Node_root, self).append(item)
 
-    def cache_delete_all(self):
-        return cache.delete_all()
+    def cache_delete_all(self, **ka):
+        return cache.delete_all(**ka)
 
     def cache_delete_old(self):
         return cache.delete_old()
