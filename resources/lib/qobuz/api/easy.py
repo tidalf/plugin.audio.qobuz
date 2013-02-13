@@ -13,6 +13,7 @@ from qobuz.cache import cache
 #from cache.sql import CacheSQL
 from raw  import QobuzApiRaw
 from qobuz.settings import settings
+from qobuz import DEBUG
 
 class InvalidQuery(Exception):
     pass
@@ -80,6 +81,8 @@ class QobuzApiEasy(QobuzApiRaw):
         path = path[1:]
         if path.endswith('/'):
             raise InvalidQuery('Invalid trailing << / >>')
+        if DEBUG:
+            print "Qobuz/Api %s %s" % (path, ka)
         xpath = path.split('/')
         if len(xpath) < 1:
             raise InvalidQuery(path)

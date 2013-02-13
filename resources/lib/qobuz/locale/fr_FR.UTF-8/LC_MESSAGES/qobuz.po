@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: qobuz\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-09 15:51+0100\n"
-"PO-Revision-Date: 2013-02-09 15:53+0100\n"
+"POT-Creation-Date: 2013-02-10 11:22+0100\n"
+"PO-Revision-Date: 2013-02-10 11:30+0100\n"
 "Last-Translator: Joachim Basmaison <joachim.basmaison@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -94,7 +94,7 @@ msgstr "Choix de l'editeur"
 
 #: /home/sho/Code/plugin.audio.qobuz/resources/lib/qobuz/node/recommendation.py:31
 msgid "Most featured"
-msgstr ""
+msgstr "Les plus écoutés"
 
 #: /home/sho/Code/plugin.audio.qobuz/resources/lib/qobuz/node/recommendation.py:35
 msgid "Blues / Country / Folk"
@@ -144,9 +144,13 @@ msgstr "Rap / HipHop / R&B / Soul"
 msgid "Reggae"
 msgstr "Reggae"
 
+#: /home/sho/Code/plugin.audio.qobuz/resources/lib/qobuz/node/recommendation.py:47
+msgid "All"
+msgstr "Tous"
+
 #: /home/sho/Code/plugin.audio.qobuz/resources/lib/qobuz/node/recommendation.py:56
 msgid "Recommendation"
-msgstr "Recommendation"
+msgstr "Recommandation"
 
 #: /home/sho/Code/plugin.audio.qobuz/resources/lib/qobuz/node/genre.py:23
 msgid "Genre"

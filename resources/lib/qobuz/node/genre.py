@@ -12,6 +12,8 @@ from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.node.recommendation import RECOS_TYPE_IDS
 from qobuz.i8n import _
+from node.renderer.list import ListRenderer
+from qobuz.debug import log
 
 class Node_genre(INode):
     '''
@@ -22,6 +24,17 @@ class Node_genre(INode):
         self.kind = Flag.GENRE
         self.label = _('Genre')
 
+    @property
+    def label(self):
+        return self._label
+    @label.getter
+    def label(self):
+        name = self.get_name()
+        return name or self._label
+    @label.setter
+    def label(self, label):
+        self._label = label
+
     def url(self, **ka):
         url = super(Node_genre, self).url(**ka)
         if self.parent and self.parent.nid:
@@ -31,23 +44,38 @@ class Node_genre(INode):
     def get_name(self):
         return self.get_property('name')
 
-    def populate_reco(self, renderer, ID):
+    def populate_reco(self, renderer, gid):
+        album_ids = {}
+        log(self, "Populate reco %s" % gid)
         for gtype in RECOS_TYPE_IDS:
+            lr = ListRenderer()
+            lr.depth = -1
+            lr.whiteFlag =  Flag.ALBUM
+            lr.blackFlag = Flag.TRACK | Flag.ALBUM
             node = getNode(
-                Flag.RECOMMENDATION, {'parent': self, 'genre-id': ID, 'genre-type': gtype})
-            node.populating(renderer)
+                Flag.RECOMMENDATION, {'genre-id': gid, 'genre-type': gtype})
+            node.populating(lr)
+            for album in lr:
+                aid = album.nid
+                if aid in album_ids:
+                    continue
+                album_ids[aid] = 1
+                renderer.append(album)
+            #renderer.extend([track for track in lr])
         return True
 
     def fetch(self, renderer=None):
-        data = api.get('/genre/list', parent_id=self.nid, offset=self.offset, 
+        data = api.get('/genre/list', parent_id=self.nid, offset=self.offset,
                        limit=api.pagination_limit)
         if not data: 
             self.data = None
             return True # Nothing return trigger reco build in build_down
         self.data = data
         g = self.data['genres']
-        if 'parent' in g and int(g['parent']['level']) > 1:
-            self.populate_reco(renderer, g['parent']['id'])
+        lvl = int(g['parent']['level'])
+        print "Level: %s" % lvl
+        if 'parent' in g and lvl > 2:
+            self.populate_reco(renderer, int(g['parent']['id']))
         return True
 
     def populate(self, renderer):

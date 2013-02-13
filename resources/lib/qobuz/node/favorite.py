@@ -33,7 +33,7 @@ class Node_favorite(INode):
         self.items_path = self.get_parameter('items_path', delete=True)
         if not self.items_path:
             self.items_path = 'albums'
-
+            
     def get_label(self):
         return '%s / %s ' % (self.label, _(self.items_path))
 
@@ -43,10 +43,13 @@ class Node_favorite(INode):
         return super(Node_favorite, self).url(**ka)
 
     def fetch(self, renderer=None):
+        print "FETCH FAVORITE %s" % self.items_path
         data = api.get('/favorite/getUserFavorites', 
                            user_id=api.user_id, 
                            limit=api.pagination_limit, 
                            offset=self.offset, type=self.items_path)
+        import pprint
+        print pprint.pformat(data)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
@@ -62,6 +65,9 @@ class Node_favorite(INode):
             node.data = track
             node.add_action('delete_track',
                             label=_('Remove track from favorite'),
+                            target=self.kind)
+            node.add_action('delete_tracks_from_album',
+                            label=_('Remove all album tracks'),
                             target=self.kind)
             self.append(node)
         return True
@@ -93,7 +99,7 @@ class Node_favorite(INode):
         ret = api.favorite_create(album_ids=album_ids)
         if not ret:
             return False
-        self._delete_cache('albums')
+        self.delete_cache('albums')
         return True
 
     def list_albums(self, target):
@@ -104,16 +110,20 @@ class Node_favorite(INode):
             album_ids[str(target.nid)] = 1
             albums.append(target)
         elif target.kind & Flag.TRACK == Flag.TRACK:
-            render = ListRenderer()
-            render.depth = 1
-            render.whiteFlag = Flag.TRACK
-            render.blackFlag = Flag.TRACK
-            render.render(target)
-            if len(render) > 0:
-                album = getNode(Flag.ALBUM, {})
-                album.data = render[0].data['album']
-                album_ids[str(album.nid)] = 1
-                albums.append(album)
+            target.fetch()
+            album = getNode(Flag.ALBUM, {})
+            album.data = target.get_property('album')
+            albums.append(album)
+#            render = ListRenderer()
+#            render.depth = 1
+#            render.whiteFlag = Flag.TRACK
+#            render.blackFlag = Flag.TRACK
+#            render.render(target)
+#            if len(render) > 0:
+#                album = getNode(Flag.ALBUM, {})
+#                album.data = render[0].data['album']
+#                album_ids[str(album.nid)] = 1
+#                albums.append(album)
         else:
             render = ListRenderer()
             render.depth = -1
@@ -143,15 +153,25 @@ class Node_favorite(INode):
         ret = api.favorite_create(artist_ids=artist_ids)
         if not ret:
             return False
-        self._delete_cache('artists')
+        self.delete_cache('artists')
         return True
 
     def list_artists(self, target):
         artist_ids = {}
         artists = []
-        if target.kind & Flag.ARTIST == Flag.ARTIST:
-            artist_ids[str(target.nid)] = 1
-            artists.append(target)
+#        if target.kind & Flag.ARTIST == Flag.ARTIST:
+#            target.fetch()
+#            artist_ids[str(target.nid)] = 1
+#            artists.append(target)
+        if target.kind & Flag.TRACK == Flag.TRACK:
+            if target.data is None:
+                target.fetch()
+            aid = target.get_artist_id()
+            if aid is None:
+                return artists
+            artist = getNode(Flag.ARTIST, {'nid': aid})
+            artist.data = { 'nid': aid, 'name': target.get_artist()}
+            artists.append(artist)
         else:
             render = ListRenderer()
             render.depth = -1
@@ -180,7 +200,7 @@ class Node_favorite(INode):
         ret = api.favorite_create(track_ids=track_ids)
         if not ret:
             return False
-        self._delete_cache('tracks')
+        self.delete_cache('tracks')
         return True
 
     def list_tracks(self, root):
@@ -203,29 +223,40 @@ class Node_favorite(INode):
                     track_ids[str(node.nid)] = 1
         return nodes
 
-    def _delete_cache(self, type):
+    def delete_track(self, track_id):
+        if api.favorite_delete(track_ids=track_id):
+            self.delete_cache('tracks')
+            return True
+        return False
+
+    def list_tracks_from_album(self, album_id):
+        lr = ListRenderer()
+        lr.whiteFlag = Flag.TRACK
+        lr.blackFlag = Flag.TRACK
+        lr.depth = 1
+        self.populating(lr)
+        tracks = []
+        for track in lr:
+            if track.get_album_id() == album_id:
+                tracks.append(track)
+        return tracks
+
+    def delete_album(self, album_id):
+        if api.favorite_delete(album_ids=album_id):
+            self.delete_cache('albums')
+            return True
+        return False
+
+    def delete_artist(self, artist_id):
+        if api.favorite_delete(artist_ids=artist_id):
+            self.delete_cache('artists')
+            return True
+        return False
+
+    def delete_cache(self, ftype):
         key = cache.make_key('/favorite/getUserFavorites', 
                            user_id=api.user_id, 
                            limit=api.pagination_limit,
-                           type=type,
+                           type=ftype,
                            offset=self.offset)
         return cache.delete(key)
-#
-#    def del_track(self, track_id):
-#        if api.favorite_delete(track_ids=track_id):
-#            self._delete_cache()
-#            return True
-#        return False
-#
-#    def del_album(self, album_id):
-#        if api.favorite_delete(album_ids=album_id):
-#            self._delete_cache()
-#            return True
-#        return False
-#
-#    def del_artist(self, artist_id):
-#        if api.favorite_delete(artist_ids=artist_id):
-#            self._delete_cache()
-#            return True
-#        return False
-#

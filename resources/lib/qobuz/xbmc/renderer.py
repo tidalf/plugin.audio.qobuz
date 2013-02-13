@@ -2,9 +2,8 @@ from xbmcpy.mock.xbmcplugin import xbmcplugin
 import xbmcpy.mock.xbmcaddon as xbmcaddon
 from xbmcpy.mock.xbmcgui import xbmcgui
 from node import Mode
-from qobuz.node import Flag, getNode
+from qobuz.node import Flag
 from node.renderer.base import BaseRenderer
-from qobuz.debug import log
 
 class ItemFactory(object):
 
@@ -18,8 +17,6 @@ class ItemFactory(object):
         item = xbmcgui.ListItem(label, label, image, image, url)
         return item
         return None
-
-
 
 from qobuz.exception import QobuzException
 
@@ -56,7 +53,7 @@ class XbmcRenderer(BaseRenderer):
         self.alive = False
         if self.commander.has_action(node):
             ret = self.commander.execute(node)
-            self.end()
+            self.end(ret)
             return ret
         if node.get_parameter('mode', number=True) == Mode.PLAY:
             if not node.fetch():
@@ -78,10 +75,11 @@ class XbmcRenderer(BaseRenderer):
     def ask(self):
         pass
 
-    def end(self):
+    def end(self, succeeded=None):
         handle = self.plugin.handle
-        succeeded = True if len(self) > 0 else False
-        updateListing=not succeeded
+        if succeeded is None:
+            succeeded = True if len(self) > 0 else False
+        updateListing= not succeeded
         cacheToDisc=succeeded
         xbmcplugin.endOfDirectory(handle, succeeded, updateListing, 
                                   cacheToDisc)

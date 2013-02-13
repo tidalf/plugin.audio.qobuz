@@ -12,7 +12,7 @@ from qobuz.debug import warn
 import weakref
 from qobuz.api import api
 from qobuz.node import getNode, Flag
-from qobuz.settings import settings
+
 '''
     @class Node_product_by_artist:
 '''
@@ -23,6 +23,7 @@ class Node_albums_by_artist(INode):
         super(Node_albums_by_artist, self).__init__(parameters)
         self.kind = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
+        self.items_path = 'albums'
     '''
         Getter
     '''
@@ -49,9 +50,9 @@ class Node_albums_by_artist(INode):
         Build Down
     '''
     def fetch(self, renderer=None):
-        limit = getSetting('pagination_limit')
         data = api.get('/artist/getSimilarArtist', artist_id=self.nid, 
-                       limit=limit, offset=self.offset, extra='albums')
+                       limit=api.pagination_limit, offset=self.offset, 
+                       extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
@@ -60,8 +61,8 @@ class Node_albums_by_artist(INode):
     
     def populating(self, renderer=None):
         count = 0
-        total = len(self.data['albums']['items'])
-        for album in self.data['albums']['items']:
+        items = self.data[self.items_path]['items']
+        for album in items:
             keys = ['artist', 'interpreter', 'composer', 'performer']
             for k in keys:
                 try:
@@ -70,10 +71,9 @@ class Node_albums_by_artist(INode):
                 except:
                     warn(self, "Strange thing happen")
                     pass
-            node = getNode(Flag.ALBUM)
+            node = getNode(Flag.ALBUM, {})
             node.data = album
             count += 1
-            Dir.update(count, total, "Add album:" + node.get_label(), '')
             self.add_child(node)
         return True
 

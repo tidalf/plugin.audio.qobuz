@@ -9,7 +9,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
-import pprint
 from time import time
 import math
 import hashlib
@@ -18,7 +17,7 @@ import socket
 import requests
 
 from qobuz.exception import InvalidParameter, MissingParameter
-from qobuz.debug import warn, info
+from qobuz.debug import warn, log
 
 socket.timeout = 5
 
@@ -256,7 +255,7 @@ class QobuzApiRaw(object):
     def track_resportStreamingEnd(self, track_id, duration):
         duration = math.floor(int(duration))
         if duration < 5:
-            info(self, 'Duration lesser than 5s, abort reporting')
+            log(self, 'Duration lesser than 5s, abort reporting')
             return None
         #@todo ???
         user_auth_token = ''

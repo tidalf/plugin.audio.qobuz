@@ -10,7 +10,6 @@
 
 from inode import INode
 from qobuz.node import getNode, Flag
-from qobuz.settings import settings
 from qobuz.i8n import _
 
 class Node_favorites(INode):
@@ -22,9 +21,8 @@ class Node_favorites(INode):
         self.content_type = 'files'
 
     def populate(self, renderer=None):
-        for favorite in ['albums', 'tracks', 'artists']:
-            parameters = self.parameters.copy()
-            parameters['items_path'] = favorite
-            node = getNode(Flag.FAVORITE, parameters)
+        for ftype in ['albums', 'tracks', 'artists']:
+            node = getNode(Flag.FAVORITE, self.parameters)
+            node.items_path = ftype
             self.append(node)
         return True

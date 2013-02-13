@@ -1,3 +1,12 @@
+'''
+    node
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This file is part of qobuz-xbmc
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 __all__ = ['Mode', 'Flag', 'url2dict', 'dict2url']
 
 import pprint
@@ -102,7 +111,8 @@ class BaseNode(collections.deque):
     def pretty(self, Flag):
         s = '[ %s ]\n' % (Flag.to_s(self.kind))
         s+= ' ::nid:\t%s\n' % self.nid
-        for p in ['kind', 'mode', 'parent', 'label', 'is_folder', 
+        s+= ' ::label:\t%s\n' % self.label
+        for p in ['kind', 'mode', 'parent', 'is_folder', 
                   'image']:
                 s+= ' ::%s\t%s\n' % (p, self.__dict__[p])
         s+= ' ::IsPlayable: %s\n' % (self.is_playable)

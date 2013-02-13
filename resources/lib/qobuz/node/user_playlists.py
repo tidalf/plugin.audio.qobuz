@@ -10,6 +10,7 @@
 from qobuz.node import Flag, getNode
 from qobuz.debug import warn
 from qobuz.api import api
+from qobuz.cache import cache
 from qobuz.i8n import _
 from inode import INode
 
@@ -23,7 +24,7 @@ class Node_user_playlists(INode):
         self.label = _('User playlists')
         self.content_type = 'files'
         self.items_path = 'playlists'
-        self.add_action('new', label=_('New playlist'))
+        self.add_action('new', label=_('New playlist'), target=Flag.PLAYLIST)
 
     def fetch(self, renderer=None):
         data = api.get('/playlist/getUserPlaylists', 
@@ -41,3 +42,9 @@ class Node_user_playlists(INode):
             node.data = playlist
             self.append(node)
         return True
+    
+    def delete_cache(self):
+        key = cache.make_key('/playlist/getUserPlaylists', 
+                       limit=api.pagination_limit, offset=self.offset,
+                       user_id=api.user_id)
+        return cache.delete(key)

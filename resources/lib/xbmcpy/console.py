@@ -9,10 +9,10 @@
 '''
 import code
 try:
-    import readline
+    import readline # @UnusedImport
 except:
     try:
-        import pyreadline as readline
+        import pyreadline as readline # @UnresolvedImport @Reimport
     except:
         print "No readline :/"
 import atexit
@@ -20,7 +20,7 @@ import os
 
 class HistoryConsole(code.InteractiveConsole):
 
-    def __init__(self, locals=None, filename="<console>",
+    def __init__(self, locals=None, filename="<console>", # @ReservedAssignment
                  histfile=os.path.expanduser("~/.console-history")):
         code.InteractiveConsole.__init__(self, locals, filename)
         self.init_history(histfile)

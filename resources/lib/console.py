@@ -247,7 +247,7 @@ class QobuzConsole(code.InteractiveConsole):
 
     def command_set(self, args):
         self.no_display = True
-        if not args:
+        if not args or len(args) < 2:
             self.write(':: Settings:\n')
             for k in settings:
                 self.write(' - %s: %s\n' % (k, settings[k]))

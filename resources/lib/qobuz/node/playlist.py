@@ -13,6 +13,7 @@ from qobuz.node import getNode, Flag
 from qobuz.api import api
 from qobuz.debug import warn
 from qobuz.i8n import _
+from qobuz.cache import cache
 
 class Node_playlist(INode):
     '''
@@ -30,7 +31,16 @@ class Node_playlist(INode):
         self.add_action('set_as_current', label=_('Set as current playlist'))
 
     def get_label(self):
-        return self.get_property('name') or self.label
+        owner = self.get_owner()
+        if owner and owner != api.username:
+            owner = '[ %s ]' % owner
+        else:
+            owner = ''
+        name = self.get_name() or self.label
+        return '%s %s' % (owner, name)
+
+    def get_name(self):
+        return self.get_property('name')
 
     def get_description(self):
         return self.get_property('description')
@@ -70,11 +80,11 @@ class Node_playlist(INode):
 #                return userdata['avatar']
 #        return getImage('song')
 #    
-#    def get_owner(self):
-#        return self.get_property('owner/name')
-#
-#    def get_owner_id(self):
-#        return self.get_property('owner/id')
+    def get_owner(self):
+        return self.get_property('owner/name')
+
+    def get_owner_id(self):
+        return self.get_property('owner/id')
 #
 #    def get_description(self):
 #        return self.get_property('description')
@@ -297,10 +307,22 @@ class Node_playlist(INode):
 #        executeBuiltin(containerRefresh())
 #        return True
 #
-#    def create(self, name, isPublic=True, isCollaborative=False):
-#        return api.playlist_create(name=name, 
-#                                        is_public=isPublic, 
-#                                        is_collaborative=isCollaborative)
+    def create(self, name, isPublic=True, isCollaborative=False):
+        if not api.playlist_create(name=name, 
+                                        is_public=isPublic, 
+                                        is_collaborative=isCollaborative):
+            return False
+        userplaylists = getNode(Flag.USERPLAYLISTS, {})
+        userplaylists.delete_cache()
+        return True
+
+    def rename(self, name):
+        if not api.playlist_update(playlist_id=self.nid, name=name):
+            return False
+        self.delete_cache()
+        userplaylists = getNode(Flag.USERPLAYLISTS, {})
+        userplaylists.delete_cache()
+        return True
 #
 #    def gui_create(self):
 #        query = self.get_parameter('query', unQuote=True)
@@ -366,7 +388,16 @@ class Node_playlist(INode):
 #                            nid='')
 #        executeBuiltin(containerUpdate(url, True))
 #        return False
-#
+
+    def delete(self):
+        print "Deleting playlist with id %s" % self.nid
+        res = api.playlist_delete(playlist_id=self.nid)
+        import pprint
+        print pprint.pformat(res)
+        if res:
+            self.delete_cache()
+            return True
+        return False
 #    def subscribe(self):
 #        if api.playlist_subscribe(playlist_id=self.nid):
 #            notifyH(lang(42001), lang(42005))
@@ -375,11 +406,12 @@ class Node_playlist(INode):
 #        else:
 #            return False
 #
-#    def delete_cache(self, playlist_id):
-#        limit = getSetting('pagination_limit')
-#        upkey = cache.make_key('/playlist/getUserPlaylists', limit=limit, 
-#                                offset=self.offset, user_id=api.user_id)
-#        pkey = cache.make_key('/playlist/get',playlist_id=playlist_id, 
-#            offset=self.offset, limit=limit, extra='tracks')
-#        cache.delete(upkey)
-#        cache.delete(pkey)
+    def delete_cache(self):
+        upkey = cache.make_key('/playlist/getUserPlaylists', 
+                               limit=api.pagination_limit, 
+                                offset=self.offset, user_id=api.user_id)
+        pkey = cache.make_key('/playlist/get',playlist_id=self.nid, 
+            offset=self.offset, limit=api.pagination_limit, extra='tracks')
+        cache.delete(upkey)
+        cache.delete(pkey)
+

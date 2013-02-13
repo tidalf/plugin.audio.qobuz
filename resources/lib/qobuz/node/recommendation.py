@@ -44,7 +44,7 @@ RECOS_GENRES = {
     112: _('Pop / Rock'),
     127: _('Rap / HipHop / R&B / Soul'),
     123: _('Reggae'),
-    'null': 'All',
+    'null': _('All'),
 }
 
 class Node_recommendation(INode):
@@ -66,8 +66,6 @@ class Node_recommendation(INode):
             ka['genre-id'] = str(self.genre_id)
         return super(Node_recommendation, self).url(**ka)
 
-        return url
-
     def myid(self):
         if not self.genre_id or not self.genre_type:
             return None
@@ -87,13 +85,13 @@ class Node_recommendation(INode):
         self.data = data
         return True
 
-    def _get_label(self, label, type='', genre=''):
+    def _get_label(self, label, type='', genre=''): # @ReservedAssignment
         if type:
-            type = ' / %s' % type
+            type = ' / %s' % type # @ReservedAssignment
         if genre:
             genre = ' / %s' % genre
         return '%s%s%s' % (label, type, genre)
-    
+
     def __populate_type(self):
         ''' Populate type, we don't have genre_type nor genre_id
         '''
@@ -112,10 +110,10 @@ class Node_recommendation(INode):
             parameters = self.parameters.copy()
             parameters['genre-type'] = self.genre_type
             parameters['genre-id'] = genre_id
-            node = getNode(Flag.RECOMMENDATION, parameters)  
+            node = getNode(Flag.RECOMMENDATION, parameters)
             node.label = self._get_label(self.get_label(), 
-                                         RECOS_TYPES[int(self.genre_type)], 
-                                         RECOS_GENRES[genre_id]) 
+                                         RECOS_TYPES[int(self.genre_type)],
+                                         RECOS_GENRES[genre_id])
             self.append(node)
         return True
 

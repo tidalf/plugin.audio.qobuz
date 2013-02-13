@@ -16,7 +16,10 @@ class Mock(object):
         self.items.append((label, label2, image, thumb, url))
     
     def Dialog(self):
-        raise NotImplemented()
+        raise NotImplementedError('Dialog')
+    
+    def Window(self):
+        raise NotImplementedError('Window')
 try:
     import xbmcgui # @UnresolvedImport
 except:

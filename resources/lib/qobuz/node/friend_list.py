@@ -8,10 +8,9 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from inode import INode
-from qobuz.debug import info, warn
+from qobuz.debug import log, warn
 from qobuz.api import api
 from qobuz.node import getNode, Flag
-from qobuz.constants import Mode
 from qobuz.i8n import _
 
 class Node_friend_list(INode):
@@ -45,7 +44,7 @@ class Node_friend_list(INode):
         user_data = api.get('/user/login', username=username, 
                                 password=password)
         friend_data = user_data['user']['player_settings']['friends']
-        info(self, "Build-down friends list " + repr(self.name))
+        log(self, "Build-down friends list " + repr(self.name))
         if self.name:
             data = api.get('/playlist/getUserPlaylists', 
                                username=self.name, limit=0)

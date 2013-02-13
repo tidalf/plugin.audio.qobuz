@@ -11,6 +11,7 @@ from inode import INode
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.debug import warn
+from qobuz.i8n import _
 '''
     @class Node_artist(Inode): Artist
 '''
@@ -21,6 +22,12 @@ class Node_artist(INode):
         super(Node_artist, self).__init__(parameters)
         self.kind = Flag.ARTIST
         self.content_type = 'artists'
+        self.add_action('similar',
+                        label=_('Similar artists'),
+                        target=Flag.SIMILAR_ARTIST)
+        self.add_action('featured',
+                        label=_('Featured album'),
+                        target=Flag.ALBUMS_BY_ARTIST)
 
     def fetch(self, renderer=None):
         data = api.get('/artist/get', artist_id=self.nid, 
