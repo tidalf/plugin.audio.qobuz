@@ -52,7 +52,7 @@ class XbmcRenderer(BaseRenderer):
         print node.pretty(Flag)
         self.alive = False
         if self.commander.has_action(node):
-            ret = self.commander.execute(node)
+            ret = self.commander.execute(self, node)
             self.end(ret)
             return ret
         if node.get_parameter('mode', number=True) == Mode.PLAY:
@@ -79,8 +79,8 @@ class XbmcRenderer(BaseRenderer):
         handle = self.plugin.handle
         if succeeded is None:
             succeeded = True if len(self) > 0 else False
-        updateListing= not succeeded
-        cacheToDisc=succeeded
+        updateListing = not succeeded
+        cacheToDisc = succeeded
         xbmcplugin.endOfDirectory(handle, succeeded, updateListing, 
                                   cacheToDisc)
         return True

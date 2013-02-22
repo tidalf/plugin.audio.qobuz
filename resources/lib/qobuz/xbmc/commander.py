@@ -22,7 +22,7 @@ def refresh():
 
 class QobuzXbmcCommander(Commander):
 
-    def action_root_cache_delete_all(self, root, node):
+    def root_cache_delete_all(self, renderer, root, node):
         dialogHeading = _('Delete all data from cache')
         if not root.cache_delete_all(checkMagic=False):
             notifyH(dialogHeading, 'Fail')
@@ -30,7 +30,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, 'Success')
         return False
 
-    def action_root_cache_delete_old(self, root, node):
+    def root_cache_delete_old(self, renderer, root, node):
         dialogHeading = _('Delete old data from cache')
         if not root.cache_delete_old():
             notifyH(dialogHeading, 'Fail')
@@ -38,7 +38,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, 'Success')
         return False
 
-    def action_favorite_add_tracks(self, favorite, target):
+    def favorite_add_tracks(self, renderer, favorite, target):
         dialogHeading = _('Add track(s) to favorite')
         tracks = favorite.list_tracks(target)
         if len(tracks) == 0:
@@ -55,7 +55,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, '%s track(s) added to favorite' % len(tracks))
         return False
 
-    def action_favorite_delete_track(self, favorite, track):
+    def favorite_delete_track(self, renderer, favorite, track):
         dialogHeading = _('Delete track from favorite')
         if not favorite.delete_track(track.nid):
             notifyH(dialogHeading, _('Fail'))
@@ -64,7 +64,7 @@ class QobuzXbmcCommander(Commander):
         refresh()
         return False
 
-    def action_favorite_delete_tracks_from_album(self, favorite, track):
+    def favorite_delete_tracks_from_album(self, renderer, favorite, track):
         dialogHeading = _('Delete tracks from album')
         track.fetch()
         aid = track.get_album_id()
@@ -84,7 +84,7 @@ class QobuzXbmcCommander(Commander):
         refresh()
         return False
 
-    def action_favorite_add_albums(self, favorite, target):
+    def favorite_add_albums(self, renderer, favorite, target):
         dialogHeading = _('Add album(s) to favorite')
         albums = favorite.list_albums(target)
         if len(albums) == 0:
@@ -101,7 +101,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, '%s album(s) added to favorite' % len(albums))
         return False
 
-    def action_favorite_delete_album(self, favorite, album):
+    def favorite_delete_album(self, renderer, favorite, album):
         dialogHeading = _('Delete album from favorite')
         if not favorite.delete_album(album.nid):
             notifyH(dialogHeading, _('Fail'))
@@ -109,7 +109,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, _('Success'))
         return True
 
-    def action_favorite_add_artists(self, favorite, target):
+    def favorite_add_artists(self, renderer, favorite, target):
         dialogHeading = _("Add artist(s) to favorite")
         artists = favorite.list_artists(target)
         print "Add artist %s" % len(artists)
@@ -127,7 +127,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, '%s artist(s) added to favorite' % len(artists))
         return True
 
-    def action_favorite_delete_artist(self, favorite, artist):
+    def favorite_delete_artist(self, renderer, favorite, artist):
         dialogHeading = _('Delete artist from favorite')
         if not favorite.delete_artist(artist.nid):
             notifyH(dialogHeading, _('Fail'))
@@ -135,7 +135,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, _('Success'))
         return True
 
-    def action_similar_artist_similar(self, similar_artist, node):
+    def similar_artist_similar(self, renderer, similar_artist, node):
         if not hasattr(node, 'get_artist_id'):
             return False
         similar_artist.nid = node.get_artist_id()
@@ -143,7 +143,7 @@ class QobuzXbmcCommander(Commander):
         executeBuiltin(containerUpdate(url))
         return False
 
-    def action_playlist_new(self, playlist, userplaylists):
+    def playlist_new(self, renderer, playlist, userplaylists):
         dialogHeading = _('Create playlist')
         keyboard = Keyboard('', dialogHeading)
         keyboard.doModal()
@@ -156,7 +156,7 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, 'Success')
         return True
 
-    def action_playlist_rename(self, playlist, userplaylists):
+    def playlist_rename(self, renderer, playlist, userplaylists):
         dialogHeading = _('Rename playlist')
         playlist.fetch()
         keyboard = Keyboard(playlist.get_label(), dialogHeading)
@@ -172,20 +172,32 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, 'Success')
         return True
 
-    def action_playlist_delete(self, playlist, none):
+    def playlist_delete(self, renderer, playlist, none):
         dialogHeading = _('Delete playlist')
         if not playlist.delete():
             notifyH(dialogHeading, 'Fail')
             return False
-#        from xbmcpy.list import XbmcList
-#        l = XbmcList(xbmcgui.getCurrentWindowId())
-#        l.delete(l.getSelectedItem())
         notifyH(dialogHeading, 'Success')
         return True
 
-    def action_albums_by_artist_featured(self, albums_by_artist, node):
+    def albums_by_artist_featured(self, renderer, featured, node):
         node.fetch()
-        albums_by_artist.nid = node.get_artist_id()
-        print "ID ARTIST %s" % albums_by_artist.nid
-        executeBuiltin(containerUpdate(albums_by_artist.url()))
-        return False
+        featured.nid = node.get_artist_id()
+        featured.fetch()
+        featured.populating(renderer)
+        for album in featured:
+            renderer.append(album)
+        return None
+
+    def artist_similar_list(self, renderer, similar, node):
+        node.fetch()
+        aid = node.get_artist_id()
+        if aid is None:
+            return False
+        similar.nid = aid
+        similar.fetch()
+        similar.populating(renderer)
+        for artist in similar:
+            renderer.append(artist)
+        return None
+

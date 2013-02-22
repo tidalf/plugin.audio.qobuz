@@ -9,15 +9,14 @@
 '''
 from inode import INode
 from qobuz.node import getNode, Flag
-from xbmcpy.util import lang
 from qobuz.api import api
 from qobuz.i8n import _
 
-class Node_similar_artist(INode):
+class Node_artist_similar(INode):
 
     def __init__(self, parameters={}):
-        super(Node_similar_artist, self).__init__(parameters)
-        self.kind = Flag.SIMILAR_ARTIST
+        super(Node_artist_similar, self).__init__(parameters)
+        self.kind = Flag.ARTIST_SIMILAR
         self.label = _('Similar artists')
         self.content_type = 'artists'
         self.items_path = 'artists'
@@ -25,6 +24,7 @@ class Node_similar_artist(INode):
     def fetch(self, renderer=None):
         data = api.get('/artist/getSimilarArtists', artist_id=self.nid, 
                            offset=self.offset, limit=api.pagination_limit)
+        print "GOT DATA %s" % data
         if not data:
             return False
         self.data = data

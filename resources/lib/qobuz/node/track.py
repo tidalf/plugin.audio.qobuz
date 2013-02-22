@@ -27,9 +27,9 @@ class Node_track(INode):
         self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.status = None
-        self.add_action('similar',
+        self.add_action('list',
                         label=_('Similar artists'),
-                        target=Flag.SIMILAR_ARTIST)
+                        target=Flag.ARTIST_SIMILAR)
         self.add_action('featured',
                         label=_('Featured album'),
                         target=Flag.ALBUMS_BY_ARTIST)

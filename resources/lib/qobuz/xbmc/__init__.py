@@ -118,7 +118,7 @@ class ItemFactory(object):
                           containerUpdate(url)) )  
 
             ''' Similar artist '''
-            url = furl(node.url(kind=Flag.SIMILAR_ARTIST, nid=artist_id, 
+            url = furl(node.url(kind=Flag.ARTIST_SIMILAR, nid=artist_id, 
                                      mode=Mode.VIEW))
             menu.append(( '%s: %s' % (lang(30010), artist_name), containerUpdate(url))) 
 

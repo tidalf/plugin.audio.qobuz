@@ -24,7 +24,7 @@ class Node_artist(INode):
         self.content_type = 'artists'
         self.add_action('similar',
                         label=_('Similar artists'),
-                        target=Flag.SIMILAR_ARTIST)
+                        target=Flag.ARTIST_SIMILAR)
         self.add_action('featured',
                         label=_('Featured album'),
                         target=Flag.ALBUMS_BY_ARTIST)

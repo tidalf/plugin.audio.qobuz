@@ -23,7 +23,7 @@ class __Flag__():
         self.PURCHASES = self._gv()
         self.SEARCH = self._gv()
         self.ARTIST = self._gv()
-        self.SIMILAR_ARTIST = self._gv()
+        self.ARTIST_SIMILAR = self._gv()
         self.FAVORITES = self._gv()
         self.FRIEND = self._gv()
         self.FRIEND_LIST = self._gv()
@@ -74,8 +74,8 @@ class __Flag__():
             return "search"
         elif flag & self.ARTIST == self.ARTIST:
             return "artist"
-        elif flag & self.SIMILAR_ARTIST == self.SIMILAR_ARTIST:
-            return "similar_artist"
+        elif flag & self.ARTIST_SIMILAR == self.ARTIST_SIMILAR:
+            return "artist_similar"
         elif flag & self.FRIEND == self.FRIEND:
             return "friend"
         elif flag & self.FRIEND_LIST == self.FRIEND_LIST:

@@ -50,9 +50,10 @@ class Node_albums_by_artist(INode):
         Build Down
     '''
     def fetch(self, renderer=None):
-        data = api.get('/artist/getSimilarArtist', artist_id=self.nid, 
-                       limit=api.pagination_limit, offset=self.offset, 
+        data = api.get('/artist/get', artist_id=self.nid,
+                       limit=api.pagination_limit, offset=self.offset,
                        extra='albums')
+        print "DATA %s" % data
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
@@ -63,6 +64,7 @@ class Node_albums_by_artist(INode):
         count = 0
         items = self.data[self.items_path]['items']
         for album in items:
+            print "Album %s" % album
             keys = ['artist', 'interpreter', 'composer', 'performer']
             for k in keys:
                 try:
@@ -74,7 +76,7 @@ class Node_albums_by_artist(INode):
             node = getNode(Flag.ALBUM, {})
             node.data = album
             count += 1
-            self.add_child(node)
+            self.append(node)
         return True
 
 #    '''

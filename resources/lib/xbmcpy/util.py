@@ -108,6 +108,9 @@ def lang(langId):
 def runPlugin(url):
     return 'XBMC.RunPlugin("%s")' % (url)
 
+def executeBuiltin(cmd):
+    xbmc.executebuiltin("%s" % (cmd)) # @UndefinedVariable
+
 def containerUpdate(url, replace = False):
     if replace: 
         replace = ', "replace"' 
@@ -122,9 +125,6 @@ def yesno(heading, line1, line2='', line3=''):
 
 def containerRefresh():
     return ('Container.Refresh')
-
-def executeBuiltin(cmd):
-    xbmc.executebuiltin("%s" % (cmd))
 
 def containerViewMode():
     label = 'Container.Viewmode'

@@ -31,15 +31,21 @@ class Logger(object):
     def log(self, obj, msg):
         name = self.__obj_name__(obj)
         print '[%s] %s %s' % (self.NOTICE, name, msg)
+        
+    def warn(self, obj, msg):
+        name = self.__obj_name__(obj)
+        print '[%s] %s %s' % (self.ERROR, name, msg)
 
 class LogFacility(object):
 
     def __init__(self, logger):
         self.logger = logger
     
-    def __getattribute__(self, *args, **kwargs):
-        return self.logger.__getattribute__(self, *args, **kwargs)
-
+    def log(self, obj, msg):
+        self.logger.log(obj, msg)
+    
+    def warn(self, obj, msg):
+        self.logger.warn(obj, msg)
 
 log_facility = LogFacility(Logger())
 
@@ -49,7 +55,7 @@ def log(obj, msg):
 
 def warn(obj, msg):
     global log_facility
-    log_facility.warn(obj, msg)
+    log_facility.log(obj, msg)
 
 
 #

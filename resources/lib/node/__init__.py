@@ -78,18 +78,18 @@ class Commander(object):
             return True
         return False
 
-    def execute(self, node):
+    def execute(self, renderer, node):
         action = node.get_parameter('action', delete=True)
         if not action:
             return True
-        tkind = node.get_parameter('target', number=True, delete=True)
+        tkind = node.get_parameter('target', delete=True)
         target = None
         if tkind:
             tmp = node
             node = self.getNode(tkind, node.parameters)
             target = tmp
         nodename = self.flag.to_s(node.kind)
-        return getattr(self, 'action_%s_%s' % (nodename, action))(node, target)
+        return getattr(self, '%s_%s' % (nodename, action))(renderer, node, target)
     
 class BaseNode(collections.deque):
     '''Our base node that act like a list for his childs

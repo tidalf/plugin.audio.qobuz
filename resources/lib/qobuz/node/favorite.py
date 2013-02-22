@@ -48,8 +48,6 @@ class Node_favorite(INode):
                            user_id=api.user_id, 
                            limit=api.pagination_limit, 
                            offset=self.offset, type=self.items_path)
-        import pprint
-        print pprint.pformat(data)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
             return False
@@ -141,7 +139,6 @@ class Node_favorite(INode):
                     if 'album' in node.data:
                         album.data = node.data['album']
                     else:
-                        print "BUH"
                         import pprint
                         print pprint.pformat(node.data)
                     if not str(album.nid) in album_ids:
