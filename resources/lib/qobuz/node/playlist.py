@@ -318,7 +318,7 @@ class Node_playlist(INode):
         executeBuiltin(containerRefresh())
         return True
 
-    def create(self, name, isPublic=True, isCollaborative=False):
+    def create(self, name, isPublic="true", isCollaborative="false"):
         return api.playlist_create(name=name, 
                                         is_public=isPublic, 
                                         is_collaborative=isCollaborative)
