@@ -121,6 +121,7 @@ class QobuzApiRaw(object):
             _copy_params['password'] = '***'
         """ END / DEBUG """
         r = None
+        info(self, 'url: %s, data: %s, headers: %s' % (url, params, headers))
         try:
             r = self.session.post(url, data=params, headers=headers)
         except:
@@ -443,13 +444,16 @@ class QobuzApiRaw(object):
         return self._api_request(ka, '/article/get')
 
     def collection_getAlbums(self, **ka):
-        self._check_ka(ka, [], ['source', 'artist_id', 'query'])
-        return self._api_request(ka, '/collections/getAlbums')
+        self._check_ka(ka, [], ['source', 'artist_id', 'query',
+                                'limit', 'offset'])
+        return self._api_request(ka, '/collection/getAlbums')
 
     def collection_getArtists(self, **ka):
-        self._check_ka(ka, [], ['source', 'query'])
-        return self._api_request(ka, '/collections/getArtists')
+        self._check_ka(ka, [], ['source', 'query'
+                                'limit', 'offset'])
+        return self._api_request(ka, '/collection/getArtists')
 
     def collection_getTracks(self, **ka):
-        self._check_ka(ka, [], ['source', 'artist_id', 'album_id', 'query'])
-        return self._api_request(ka, '/collections/getTracks')
+        self._check_ka(ka, [], ['source', 'artist_id', 'album_id', 'query'
+                                'limit', 'offset'])
+        return self._api_request(ka, '/collection/getTracks')
