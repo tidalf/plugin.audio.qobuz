@@ -141,7 +141,7 @@ class Monitor(xbmc.Monitor):
 	    dbver = "MyMusic37.db"
 
         dbfile = os.path.join(xbmc.translatePath('special://profile/')
-                              ,"Database","MyMusic32.db")
+                              ,"Database",dbver)
         try:
             con = lite.connect(dbfile)
             cur = con.cursor()    
