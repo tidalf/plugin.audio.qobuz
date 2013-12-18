@@ -1,7 +1,7 @@
 '''
     qobuz.node
     ~~~~~~~~~~
-    
+
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
@@ -11,7 +11,8 @@ __all__ = ['getNode', 'flag']
 from node.flag import Flag
 from debug import log
 
-def getNode(qnt, params = {}, **ka):
+
+def getNode(qnt, params={}, **ka):
         ''' Caching import ??? '''
         nodeName = Flag.to_s(qnt)
         modulePath = nodeName
@@ -26,10 +27,10 @@ def getNode(qnt, params = {}, **ka):
 #        except Exception as e:
 #            print repr(e)
 #            pass
-        """ 
-            Initializing our new node 
-            - no parent 
-            - parameters 
+        """
+            Initializing our new node
+            - no parent
+            - parameters
             """
         parent = None
         if 'parent' in ka:
@@ -37,16 +38,19 @@ def getNode(qnt, params = {}, **ka):
         node = Module(parent, params)
         return node
 
+
 def mixin_factory(name, base, mixin):
     return type(name, (base, mixin), {})
 
+
 def module_import(path, name, **ka):
         """ from node.foo import Node_foo """
-        modPackage = __import__(path, globals(), 
+        modPackage = __import__(path, globals(),
                                 locals(), [name], -1)
         """ Getting Module from Package """
         Module = getattr(modPackage, name)
         return Module
+
 
 class ErrorNoData(Exception):
     pass
