@@ -2,6 +2,7 @@
     qobuz.node.album
     ~~~~~~~~~~~~~~~~
 
+    :part_of: xbmc-qobuz
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
@@ -37,10 +38,10 @@ class Node_album(INode):
         @property
         def nid(self):
             return self._nid
-        @nid.getter
+        @nid.getter  # @IgnorePep8
         def nid(self):
             return self._nid
-        @nid.setter
+        @nid.setter  # @IgnorePep8
         def nid(self, value):
             self._id = value
             if value in SPECIAL_PURCHASES:
@@ -60,7 +61,7 @@ class Node_album(INode):
             if not 'image' in track:
                 track['image'] = self.get_image()
             node.data = track
-            
+
             self.add_child(node)
         return len(self.data['tracks']['items'])
 
@@ -69,11 +70,10 @@ class Node_album(INode):
             from constants import Mode
             ka['mode'] = Mode.SCAN
         return super(Node_album, self).make_url(**ka)
-    
+
     def makeListItem(self, replaceItems=False):
-        import xbmc, xbmcgui
+        import xbmcgui  # @UnresolvedImport
         image = self.get_image()
-        thumb = xbmc.getCacheThumbName(image)
         item = xbmcgui.ListItem(
             label=self.get_label(),
             label2=self.get_label(),
@@ -99,7 +99,7 @@ class Node_album(INode):
     '''
     def get_artist(self):
         return self.get_property(['artist/name',
-                               'interpreter/name', 
+                               'interpreter/name',
                                'composer/name'])
 
     def get_album(self):
@@ -116,11 +116,11 @@ class Node_album(INode):
     def get_title(self):
         return self.get_property('title')
 
-    def get_image(self, size = None):
+    def get_image(self, size=None):
         if not size:
             size = self.imageDefaultSize
         return self.get_property(['image/%s' % (size),
-                                   'image/large', 
+                                   'image/large',
                                    'image/small',
                                    'image/thumbnail'])
 
