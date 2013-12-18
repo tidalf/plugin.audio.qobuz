@@ -1,20 +1,12 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
+'''
+    qobuz.node.albums_by_artist
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+import xbmcgui  # @UnresolvedImport
 
 from inode import INode
 from debug import warn
@@ -23,11 +15,12 @@ from api import api
 from gui.contextmenu import contextMenu
 from gui.util import getSetting
 from node import getNode, Flag
-'''
-    @class Node_product_by_artist:
-'''
+
 
 class Node_albums_by_artist(INode):
+    '''
+        @class Node_product_by_artist:
+    '''
 
     def __init__(self, parent=None, parameters=None):
         super(Node_albums_by_artist, self).__init__(parent, parameters)
@@ -42,7 +35,8 @@ class Node_albums_by_artist(INode):
 
     def get_image(self):
         image = self.get_property('picture')
-        # get max size image from lastfm, Qobuz default is a crappy 126p large one
+        # get max size image from lastfm
+        # Qobuz default is a crappy 126p large one
         # perhaps we need a setting for low bw users
         image = image.replace('126s', '_')
         return image
@@ -61,14 +55,14 @@ class Node_albums_by_artist(INode):
     '''
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/artist/getSimilarArtist', artist_id=self.nid, 
+        data = api.get('/artist/getSimilarArtist', artist_id=self.nid,
                        limit=limit, offset=self.offset, extra='albums')
         if not data:
             warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
         self.data = data
         return True
-    
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         count = 0
         total = len(self.data['albums']['items'])
