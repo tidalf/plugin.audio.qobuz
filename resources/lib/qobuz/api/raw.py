@@ -5,6 +5,7 @@
     Our base api, all method are mapped like <endpoint>_<method>
     see Qobuz API on GitHub (https://github.com/Qobuz/api-documentation)
 
+    :part_of: xbmc-qobuz
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
@@ -121,7 +122,7 @@ class QobuzApiRaw(object):
             _copy_params['password'] = '***'
         """ END / DEBUG """
         r = None
-        info(self, 'url: %s, data: %s, headers: %s' % (url, params, headers))
+        info(self, 'url: %s, params: %s, headers: %s' % (url, params, headers))
         try:
             r = self.session.post(url, data=params, headers=headers)
         except:
@@ -444,16 +445,20 @@ class QobuzApiRaw(object):
         return self._api_request(ka, '/article/get')
 
     def collection_getAlbums(self, **ka):
+        info(self, 'GETTING ALBUMS')
         self._check_ka(ka, [], ['source', 'artist_id', 'query',
                                 'limit', 'offset'])
+        info(self, 'GETTING ALBUMS')
         return self._api_request(ka, '/collection/getAlbums')
 
     def collection_getArtists(self, **ka):
-        self._check_ka(ka, [], ['source', 'query'
+        info(self, 'GETTING ARTIST %s' % ka)
+        self._check_ka(ka, [], ['source', 'query',
                                 'limit', 'offset'])
+        info(self, 'GETTING ARTIST')
         return self._api_request(ka, '/collection/getArtists')
 
     def collection_getTracks(self, **ka):
-        self._check_ka(ka, [], ['source', 'artist_id', 'album_id', 'query'
+        self._check_ka(ka, [], ['source', 'artist_id', 'album_id', 'query',
                                 'limit', 'offset'])
         return self._api_request(ka, '/collection/getTracks')

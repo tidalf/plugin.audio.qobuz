@@ -5,11 +5,13 @@
     Add 'get' to qobuz.api.raw, All requests made trough this method are
     cached (see qobuz.cache.qobuz)
 
+    :part_of: xbmc-qobuz
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from cache import cache
 from api.raw  import QobuzApiRaw
+from debug import info
 
 
 class InvalidQuery(Exception):
@@ -69,6 +71,7 @@ class QobuzApiEasy(QobuzApiRaw):
         return getattr(self, methname)(**ka)
 
     def __clean_ka(self, endpoint, method, **ka):
+        info(self, 'endpoint: %s, method: %s, ka: %s' % (endpoint, method, ka))
         ''' We are removing some key that are not needed by our raw api but
         generate different cache entry (Data bound to specific user...) '''
         keys = []
