@@ -20,10 +20,10 @@ from debug import warn
 
 from inode import INode
 from exception import QobuzXbmcError
-from gui.util import notifyH, lang, getImage, getSetting
-import urllib
+from gui.util import lang, getImage, getSetting
 from api import api
 from node import getNode, Flag
+
 
 class Node_search(INode):
 
@@ -59,6 +59,10 @@ class Node_search(INode):
             self.label = lang(30013)
             self.content_type = 'songs'
             self.image = getImage('song')
+        elif st == 'collection':
+            self.label = lang(30016)
+            self.content_type = 'files'
+            self.image = getImage('song')
         else:
             raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
         self._search_type = st
@@ -86,7 +90,7 @@ class Node_search(INode):
                 return False
             query = k.getText()
         query.strip()
-        data = api.get('/search/getResults', query=query, type=stype, 
+        data = api.get('/search/getResults', query=query, type=stype,
                            limit=limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")
@@ -98,7 +102,7 @@ class Node_search(INode):
         self.set_parameter('query', query, quote=True)
         self.data = data
         return True
-    
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type == 'albums':
             for album in self.data['albums']['items']:
