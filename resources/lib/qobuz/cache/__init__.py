@@ -1,6 +1,6 @@
 '''
-    qobuz.storage
-    ~~~~~~~~~~~~~~~~~~
+    qobuz.cache
+    ~~~~~~~~~~~
 
     Package that set our default cache
 

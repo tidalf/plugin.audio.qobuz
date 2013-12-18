@@ -1,6 +1,6 @@
 '''
     qobuz.storage.cacheutil
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~
 
     Little utility class for cleaning cache purpose
 
