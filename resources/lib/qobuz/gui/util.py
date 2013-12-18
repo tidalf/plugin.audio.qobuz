@@ -1,30 +1,23 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import os, sys
+'''
+    qobuz.gui.utils
+    ~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+import os
+import sys
 import re
-  
+
 try:
     """
     Dirty trick that permit to import this module outside of xbmc
     All function using xbmc module will fail ...
     """
-    import xbmc
-    import xbmcgui
-    import xbmcplugin
+    import xbmc  # @UnresolvedImport
+    import xbmcgui  # @UnresolvedImport
+    import xbmcplugin  # @UnresolvedImport
     '''
     Keyboard
     '''
@@ -32,47 +25,47 @@ try:
 
         def __init__(self, default, heading, hidden=True):
             self.setHeading('Qobuz / ' + heading)
-        
+
 except:
     print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"
-    
-from debug import log, debug
-import qobuz
+
+# from debug import log, debug
+import qobuz  # @UnresolvedImport
 
 from xbmcrpc import showNotification, getInfoLabels
+
 
 def htm2xbmc(htm):
     def replace(m):
         return '[' + m.group(1) + m.group(2).upper() + ']'
     return re.sub('<(/?)(i|b)>', replace, htm, re.IGNORECASE)
 
+
 def getImage(name):
     if not qobuz.path:
         return ''
     return os.path.join(qobuz.path.image, name + '.png')
 
-'''
-    Notify Human
-'''
+
 def notifyH(title, text, image=None, mstime=2000):
     """Notify for human... not using localized string :p
     """
     if not image:
         image = getImage('icon-default-256')
-    return showNotification(title=title, message=text, image=image, displaytime=mstime)
+    return showNotification(title=title, message=text, image=image,
+                            displaytime=mstime)
 
-'''
-    Notify
-'''
+
 def notify(title, text, image=None, mstime=2000):
     """Notification that wrap title and text parameter into lang()
     """
     if not image:
         image = getImage('icon-default-256')
-    return showNotification(title=lang(title), 
-                     message=lang(text), 
-                     image= getImage, 
+    return showNotification(title=lang(title),
+                     message=lang(text),
+                     image=getImage,
                      displaytime=mstime)
+
 
 def dialogLoginFailure():
     """Dialog to be shown when we can't login into Qobuz
@@ -86,11 +79,12 @@ def dialogLoginFailure():
         xbmc.executebuiltin('ActivateWindow(home)')
         return False
 
+
 def isFreeAccount():
     """Check if account if it's a Qobuz paid account
     """
     from api import api
-    data = api.get('/user/login', username=api.username, 
+    data = api.get('/user/login', username=api.username,
                    password=api.password)
     if not data:
         return True
@@ -115,9 +109,12 @@ def executeJSONRPC(json):
 
 
 def color(colorItem, msg):
-    if not msg: return ''
-    if not colorItem: return msg
+    if not msg:
+        return ''
+    if not colorItem:
+        return msg
     return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
+
 
 def lang(langId):
     s = qobuz.addon.getLocalizedString(langId)
@@ -125,49 +122,59 @@ def lang(langId):
         raise KeyError(langId)
     return s
 
+
 def runPlugin(url):
     return 'XBMC.RunPlugin("%s")' % (url)
 
-def containerUpdate(url, replace = False):
-    if replace: 
-        replace = ', "replace"' 
-    else: replace = ''
-    str = 'Container.Update("%s"%s)' % ( url, replace)
-    return str
+
+def containerUpdate(url, replace=False):
+    if replace:
+        replace = ', "replace"'
+    else:
+        replace = ''
+    s = 'Container.Update("%s"%s)' % (url, replace)
+    return s
+
 
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
     return dialog.yesno(heading, line1, line2, line3)
 
+
 def containerRefresh():
     return ('Container.Refresh')
+
 
 def executeBuiltin(cmd):
     xbmc.executebuiltin("%s" % (cmd))
 
+
 def containerViewMode():
     label = 'Container.Viewmode'
     data = getInfoLabels(labels=[label])
-    if data: 
+    if data:
         return data[label]
     return ''
+
 
 def containerSortMethod():
     label = 'Container.SortMethod'
     data = getInfoLabels(labels=[label])
-    if data: 
+    if data:
         return data[label]
     return ''
 
+
 def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
+
 
 def getSetting(key, **ka):
     """Helper to access xbmcaddon.getSetting
         Parameter:
         key: Key to retrieve from setting
-        * optional: isBool (convert 'true' and 'false to python boolean), 
-            isInt (return data as integer) 
+        * optional: isBool (convert 'true' and 'false to python boolean),
+            isInt (return data as integer)
     """
     data = qobuz.addon.getSetting(key)
     if not data:

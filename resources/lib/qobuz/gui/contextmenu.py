@@ -1,21 +1,14 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.gui.contextmenu
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, getSetting
+
 
 class contextMenu():
     '''Creating context menu:
@@ -34,7 +27,7 @@ class contextMenu():
         except:
             formatStr = '[ %s ]'
         self.format_section = formatStr
-    
+
     def get_section_path(self, **ka):
         path = self.defaultSection
         if 'path' in ka and ka['path']:
@@ -57,15 +50,15 @@ class contextMenu():
         '''
         for key in  ['label', 'cmd']:
             if not key in ka:
-                raise Qerror(who=self, 
+                raise Qerror(who=self,
                              what='missing_parameter', additional=key)
         section, path = self.get_section_path(**ka)
         root = self.data
         pos = 0
-        if 'pos' in ka: 
+        if 'pos' in ka:
             pos = ka['pos']
         cmd = ''
-        if 'cmd' in ka: 
+        if 'cmd' in ka:
             cmd = ka['cmd']
         color = ''
         if 'color' in ka:
@@ -87,21 +80,22 @@ class contextMenu():
             item = {'label': ka['label'],
                     'cmd': cmd,
                     'pos': pos,
-                    'color': color }
+                    'color': color}
             root[section]['childs'].append(item)
         return root
 
     def getTuples(self):
         menuItems = []
+
         def sectionSort(key):
             return self.data[key]['pos']
-               
+
         def itemSort(item):
-                return item['pos']        
+                return item['pos']
         for section in sorted(self.data, key=sectionSort):
             colorItem = self.color_section
             data = self.data[section]
-            if 'color' in data and data['color']: 
+            if 'color' in data and data['color']:
                 colorItem = data['color']
             label = self.format_section % (color(colorItem, data['label']))
             #menuItems.append((label, data['cmd']))
@@ -115,10 +109,10 @@ class contextMenu():
 
 if __name__ == '__main__':
     c = contextMenu()
-    c.add(path='qobuz', label='Qobuz', cmd='playlist', pos = 1)
+    c.add(path='qobuz', label='Qobuz', cmd='playlist', pos=1)
     c.add(path='playlist', label='Global', cmd='playlist', pos=2)
     c.add(path='friends', label='Global', cmd='toto', pos=3)
-    c.add(path='friends/titi', label='Titi', cmd='nop', pos = 1)
-    c.add(path='friends/toto', label='Toto', cmd='nop', pos = 4)
-    c.add(path='friends/plop', label='Plop', cmd='nop', pos = 0)
+    c.add(path='friends/titi', label='Titi', cmd='nop', pos=1)
+    c.add(path='friends/toto', label='Toto', cmd='nop', pos=4)
+    c.add(path='friends/plop', label='Plop', cmd='nop', pos=0)
     c.getTuples()
