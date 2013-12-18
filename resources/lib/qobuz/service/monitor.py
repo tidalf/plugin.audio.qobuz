@@ -133,8 +133,15 @@ class Monitor(xbmc.Monitor):
         import sqlite3 as lite
         if database != 'music':
             return 0
+	
+        log(self, xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') )
+	if (xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') == "12.0.0"): 
+	    dbver = "MyMusic32.db"
+        else:
+	    dbver = "MyMusic37.db"
+
         dbfile = os.path.join(xbmc.translatePath('special://profile/')
-                              ,"Database","MyMusic32.db")
+                              ,"Database",dbver)
         try:
             con = lite.connect(dbfile)
             cur = con.cursor()    
