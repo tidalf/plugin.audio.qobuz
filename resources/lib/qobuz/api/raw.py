@@ -14,7 +14,7 @@ from time import time
 import math
 import hashlib
 import socket
-
+ 
 import requests
 
 from exception import QobuzXbmcError
@@ -437,3 +437,16 @@ class QobuzApiRaw(object):
     def article_get(self, **ka):
         self._check_ka(ka, ['article_id'])
         return self._api_request(ka, '/article/get')
+
+    def collection_getAlbums(self, **ka):
+        self._check_ka(ka, [], ['source', 'artist_id', 'query'])
+        return self._api_request(ka, '/collections/getAlbums')
+
+    def collection_getArtists(self, **ka):
+        self._check_ka(ka, [], ['source', 'query'])
+        return self._api_request(ka, '/collections/getArtists')
+
+    def collection_getTracks(self, **ka):
+        self._check_ka(ka, [], ['source', 'artist_id', 'album_id', 'query'])
+        return self._api_request(ka, '/collections/getTracks')
+
