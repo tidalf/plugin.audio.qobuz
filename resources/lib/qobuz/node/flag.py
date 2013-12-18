@@ -1,53 +1,48 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.node.flag
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 
 from exception import QobuzXbmcError
 from debug import warn
 
-class __Flag__():
-    def __init__(self):
-        self.NODE = 1 << 1
-        self.TRACK = 1 << 2
-        self.PLAYLIST = 1 << 3
-        self.USERPLAYLISTS = 1 << 4
-        self.RECOMMENDATION = 1 << 5
-        self.ROOT = 1 << 6
-        self.ALBUM = 1 << 7
-        self.PURCHASES = 1 << 8
-        self.SEARCH = 1 << 9
-        self.ARTIST = 1 << 10
-        self.SIMILAR_ARTIST = 1 << 11
-        self.FAVORITES = 1 << 12
-        self.FRIEND = 1 << 13
-        self.FRIEND_LIST = 1 << 14
-        self.GENRE = 1 << 15
-        self.LABEL = 1 << 16
-        self.ALBUMS = 1 << 17
-        self.ARTICLES = 1 << 18
-        self.ARTICLE = 1 << 19
-        self.ARTICLE_RUBRICS = 1 << 20
-        self.ALBUMS_BY_ARTIST = 1 << 21
-        self.PUBLIC_PLAYLISTS = 1 << 22
-        self.STOPBUILD = 1 <<  100
-        self.NONE = 1 << 101
 
-        self.totalFlag = 22
+class __Flag__():
+    NODE = 1 << 1
+    TRACK = 1 << 2
+    PLAYLIST = 1 << 3
+    USERPLAYLISTS = 1 << 4
+    RECOMMENDATION = 1 << 5
+    ROOT = 1 << 6
+    ALBUM = 1 << 7
+    PURCHASES = 1 << 8
+    SEARCH = 1 << 9
+    ARTIST = 1 << 10
+    SIMILAR_ARTIST = 1 << 11
+    FAVORITES = 1 << 12
+    FRIEND = 1 << 13
+    FRIEND_LIST = 1 << 14
+    GENRE = 1 << 15
+    LABEL = 1 << 16
+    ALBUMS = 1 << 17
+    ARTICLES = 1 << 18
+    ARTICLE = 1 << 19
+    ARTICLE_RUBRICS = 1 << 20
+    ALBUMS_BY_ARTIST = 1 << 21
+    PUBLIC_PLAYLISTS = 1 << 22
+    COLLECTION = 1 << 23
+
+    STOPBUILD = 1 << 100
+    NONE = 1 << 101
+
+    def __init__(self):
+
+        self.totalFlag = 23
         self.ALL = 0
-        for i in range(1, self.totalFlag+1):
+        for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
 
     def to_s(self, flag):
@@ -99,6 +94,8 @@ class __Flag__():
             return "article_rubrics"
         elif flag & self.ALBUMS_BY_ARTIST == self.ALBUMS_BY_ARTIST:
             return "albums_by_artist"
+        elif flag & self.COLLECTION == self.COLLECTION:
+            return "collection"
         else:
             raise QobuzXbmcError(
                 who=self, what='invalid_flag', additional=repr(flag))
