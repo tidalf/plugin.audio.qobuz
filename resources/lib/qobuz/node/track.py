@@ -1,19 +1,11 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.node.track
+    ~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from constants import Mode
 from node import Flag, ErrorNoData
 from inode import INode
@@ -21,6 +13,7 @@ from debug import warn
 from gui.util import lang, getImage, runPlugin, getSetting
 from gui.contextmenu import contextMenu
 from api import api
+
 
 class Node_track(INode):
     '''
@@ -43,7 +36,7 @@ class Node_track(INode):
             return False
         self.data = data
         return True
-    
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         Dir.add_node(self)
         return True
@@ -58,8 +51,8 @@ class Node_track(INode):
                     album_id,
                     str(self.nid))
             return url
-        if not 'mode' in ka: 
-            ka['mode'] = Mode.PLAY 
+        if not 'mode' in ka:
+            ka['mode'] = Mode.PLAY
         return super(Node_track, self).make_url(**ka)
 
     def get_label(self, sFormat="%a - %t"):
@@ -94,15 +87,15 @@ class Node_track(INode):
         if self.parent.nt & Flag.ALBUM:
             return self.parent.get_title()
         return ''
-    
+
     def get_album_id(self):
         aid = self.get_property('album/id')
         if not aid and self.parent:
             return self.parent.nid
         return aid
-    
+
     def get_image(self):
-        image = self.get_property(['album/image/large', 'image/large', 
+        image = self.get_property(['album/image/large', 'image/large',
                                       'image/small',
                                       'image/thumbnail', 'image'])
         if image:
@@ -139,8 +132,8 @@ class Node_track(INode):
         for restriction in restrictions:
             print "Restriction: %s" % (restriction)
         if not 'url' in data:
-            warn(self, "streaming_url, no url returned\n"  
-                "API Error: %s" % (api.error)) 
+            warn(self, "streaming_url, no url returned\n"
+                "API Error: %s" % (api.error))
             return None
         return data['url']
 
@@ -188,7 +181,7 @@ class Node_track(INode):
         except:
             pass
         return year
-    
+
     def is_playable(self):
         url = self.get_streaming_url()
         if not url:
@@ -199,7 +192,7 @@ class Node_track(INode):
         if 'AlbumUnavailable' in restrictions:
             return False
         return True
-    
+
     def get_description(self):
         if self.parent:
             return self.parent.get_description()
@@ -232,7 +225,7 @@ class Node_track(INode):
         if 'sample' in data:
             return data['sample']
         return False
-    
+
     def get_mimetype(self):
         data = self.__getFileUrl()
         if not data:
@@ -264,7 +257,7 @@ class Node_track(INode):
         return True
 
     def makeListItem(self, replaceItems=False):
-        import xbmcgui
+        import xbmcgui  # @UnresolvedImport
         media_number = self.get_media_number()
         if not media_number:
             media_number = 1
@@ -318,7 +311,7 @@ class Node_track(INode):
         '''
         artist = self.get_artist()
         if self.parent and hasattr(self.parent, 'get_artist_id'):
-            artist_id = str(self.parent.get_artist_id())
+#             artist_id = str(self.parent.get_artist_id())
             #if artist_id in ['26887', '145383', '255948']:
             if self.parent.get_artist() != artist:
                 artist = '%s / %s' % (self.parent.get_artist(), artist)
@@ -332,8 +325,9 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': desc + '(aid=' + self.get_album_id() + ',curl=' + self.get_image() + ')'
-                     # 'lyrics': "Chant down babylon lalalala" 
+                     'comment': desc + '(aid=' + self.get_album_id()
+                        + ',curl=' + self.get_image() + ')'
+                     # 'lyrics': "Chant down babylon lalalala"
                      })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
@@ -353,7 +347,7 @@ class Node_track(INode):
                 qid=self.get_playlist_track_id(),
                 nm='gui_remove_track',
                 mode=Mode.VIEW)
-            menu.add(path='playlist/remove', 
+            menu.add(path='playlist/remove',
                      label=lang(30073),
                      cmd=runPlugin(url), color=colorCaution)
 

@@ -1,21 +1,13 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
-import xbmc
+'''
+    qobuz.node.friend
+    ~~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+# import xbmcgui  # @UnresolvedImport
+# import xbmc  # @UnresolvedImport
 import json
 
 from inode import INode
@@ -26,6 +18,7 @@ from api import api
 from cache import cache
 
 from node import Flag, getNode
+
 
 class Node_friend(INode):
     '''
@@ -59,7 +52,7 @@ class Node_friend(INode):
         name = self.get_parameter('query')
         if not name:
             from gui.util import Keyboard
-            kb = Keyboard('', 
+            kb = Keyboard('',
                           str(lang(41102)))
             kb.doModal()
             name = ''
@@ -73,7 +66,7 @@ class Node_friend(INode):
             return False
         notifyH('Qobuz', 'Friend %s added' % (name))
         return True
-    
+
     def create(self, name=None):
         username = api.username
         password = api.password
@@ -102,10 +95,10 @@ class Node_friend(INode):
         return True
 
     def delete_cache(self):
-        key = cache.make_key('/user/login', username=api.username, 
+        key = cache.make_key('/user/login', username=api.username,
                              password=api.password)
         cache.delete(key)
-        
+
     def remove(self):
         name = self.get_parameter('query')
         if name == 'qobuz.com':
@@ -117,13 +110,13 @@ class Node_friend(INode):
             return False
         friends = user['player_settings']
         if not 'friends' in friends:
-            notifyH('Qobuz', "You don't have friend", 
+            notifyH('Qobuz', "You don't have friend",
                     'icon-error-256')
             warn(self, "No friends in user/player_settings")
             return False
         friends = friends['friends']
         if not name in friends:
-            notifyH('Qobuz', "You're not friend with %s" % (name), 
+            notifyH('Qobuz', "You're not friend with %s" % (name),
                     'icon-error-256')
             warn(self, "Friend " + repr(name) + " not in friends data")
             return False
@@ -131,7 +124,7 @@ class Node_friend(INode):
         newdata = {'friends': friends}
         if not api.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', 'Friend %s added' % (name))
-            notifyH('Qobuz', "Cannot updata friend's list...", 
+            notifyH('Qobuz', "Cannot updata friend's list...",
                     'icon-error-256')
             return False
         notifyH('Qobuz', 'Friend %s removed' % (name))
@@ -156,10 +149,10 @@ class Node_friend(INode):
 
     def attach_context_menu(self, item, menu):
         colorWarn = getSetting('item_caution_color')
-        url=self.make_url()
+        url = self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
         cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm="remove"))
-        menu.add(path='friend/remove', label='Remove', cmd=cmd, 
+        menu.add(path='friend/remove', label='Remove', cmd=cmd,
                  color=colorWarn)
 
         ''' Calling base class '''

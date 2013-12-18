@@ -1,21 +1,13 @@
 # -*- coding: UTF-8 -*-
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
+'''
+    qobuz.node.recommendation
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+# import xbmcgui  # @UnresolvedImport
 
 from api import api
 from inode import INode
@@ -54,6 +46,7 @@ RECOS_GENRES = {
     123: lang(30203),
     'null': 'All',
 }
+
 
 class Node_recommendation(INode):
     '''Recommendation node, displaying music ordered by category and genre
@@ -95,7 +88,7 @@ class Node_recommendation(INode):
             return False
         self.data = data
         return True
-    
+
     def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
         ''' Populate type, we don't have genre_type nor genre_id
         '''
@@ -112,13 +105,13 @@ class Node_recommendation(INode):
         '''
         for genre_id in RECOS_GENRES:
             node = getNode(Flag.RECOMMENDATION, {'genre-type': self.genre_type,
-                                                 'genre-id': genre_id })
+                                                 'genre-id': genre_id})
 #            node.genre_type = self.genre_type
 #            node.genre_id = genre_id
-            label = '%s / %s / %s' % (self.label, 
+            label = '%s / %s / %s' % (self.label,
                                       RECOS_TYPES[int(self.genre_type)],
-                                     RECOS_GENRES[genre_id])  
-            node.set_label(label) 
+                                     RECOS_GENRES[genre_id])
+            node.set_label(label)
             self.add_child(node)
         return True
 
@@ -142,4 +135,3 @@ class Node_recommendation(INode):
             return self.__populate_genre(Dir, lvl, whiteFlag, blackFlag)
         self.content_type = 'albums'
         return self.__populate_type_genre(Dir, lvl, whiteFlag, blackFlag)
-

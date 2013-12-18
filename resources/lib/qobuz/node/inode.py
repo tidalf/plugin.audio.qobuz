@@ -1,25 +1,17 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.node.inode
+    ~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 
 import sys
 import os
 import weakref
 
-import qobuz
+import qobuz  # @UnresolvedImport
 from constants import Mode
 from node import Flag
 from exception import QobuzXbmcError as Qerror
@@ -116,11 +108,11 @@ class INode(object):
         return self._content_type
 
     @content_type.setter
-    def content_type(self, type):
-        if type not in ['songs', 'albums', 'files', 'artists']:
+    def content_type(self, kind):
+        if kind not in ['songs', 'albums', 'files', 'artists']:
             raise Qerror(
-                who=self, what='invalid_type', additional=type)
-        self._content_type = type
+                who=self, what='invalid_type', additional=kind)
+        self._content_type = kind
 
     ''' data '''
     @property

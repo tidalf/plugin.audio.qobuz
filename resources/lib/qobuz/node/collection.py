@@ -35,7 +35,7 @@ class Node_collection(INode):
         self.url = None
         self.is_folder = True
         self.image = getImage('songs')
-        self.search_type = self.get_parameter('search-type') or 'artists'
+        self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
         self.offset = self.get_parameter('offset') or 0
 
@@ -43,7 +43,7 @@ class Node_collection(INode):
         limit = getSetting('pagination_limit', isInt=True)
         data = None
         query = self.get_parameter('query', unQuote=True)
-        query = 'reggae'
+        query = 'e'
         if not query:
             from gui.util import Keyboard
             k = Keyboard('', 'My %s' % self.search_type)
@@ -54,7 +54,7 @@ class Node_collection(INode):
         query.strip()
         info(self, 'search_type: %s, query: %s' % (self.search_type, query))
         if self.search_type == 'albums':
-            data = api.get('/collection/getAlbums', query=query, limit=limit)
+            data = api.get('/collection/getAlbums', limit=limit)
         elif self.search_type == 'artists':
             data = api.get('/collection/getArtists', query=query, limit=limit)
         elif self.search_type == 'tracks':

@@ -1,28 +1,21 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
-import xbmc
+'''
+    qobuz.node.genre
+    ~~~~~~~~~~~~~~~~
 
-import qobuz
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+# import xbmcgui  # @UnresolvedImport
+# import xbmc  # @UnresolvedImport
+
+# import qobuz  # @UnresolvedImport
 from inode import INode
 from gui.util import getImage, getSetting, lang
 from api import api
 from node import Flag, getNode
 from node.recommendation import RECOS_TYPE_IDS
+
 
 class Node_genre(INode):
     '''
@@ -35,7 +28,7 @@ class Node_genre(INode):
         self.is_folder = True
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
-        
+
     def make_url(self, **ka):
         url = super(Node_genre, self).make_url(**ka)
         if self.parent and self.parent.nid:
@@ -51,27 +44,28 @@ class Node_genre(INode):
     def populate_reco(self, Dir, lvl, whiteFlag, blackFlag, ID):
         for gtype in RECOS_TYPE_IDS:
             node = getNode(
-                Flag.RECOMMENDATION, {'parent': self, 'genre-id': ID, 'genre-type': gtype})
+                Flag.RECOMMENDATION, {'parent': self, 'genre-id': ID,
+                                      'genre-type': gtype})
             node.populating(Dir, 1, Flag.ALBUM, blackFlag)
         return True
 
-    def fetch(self, Dir, lvl , whiteFlag, blackFlag):
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/genre/list', parent_id=self.nid, offset=self.offset, 
+        data = api.get('/genre/list', parent_id=self.nid, offset=self.offset,
                        limit=limit)
-        if not data: 
+        if not data:
             self.data = None
-            return True # Nothing return trigger reco build in build_down
+            return True  # Nothing returned trigger reco build in build_down
         self.data = data
         g = self.data['genres']
         if 'parent' in g and int(g['parent']['level']) > 1:
-            self.populate_reco(Dir, lvl, whiteFlag, blackFlag, 
+            self.populate_reco(Dir, lvl, whiteFlag, blackFlag,
                                   g['parent']['id'])
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.data or len(self.data['genres']['items']) == 0:
-            return self.populate_reco(Dir, lvl, 
+            return self.populate_reco(Dir, lvl,
                                          whiteFlag, blackFlag, self.nid)
         for genre in self.data['genres']['items']:
             node = Node_genre(self, {'nid': genre['id']})

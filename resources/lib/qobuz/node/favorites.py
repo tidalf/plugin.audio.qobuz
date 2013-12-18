@@ -1,33 +1,26 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmcgui
+'''
+    qobuz.node.favorites
+    ~~~~~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+import xbmcgui  # @UnresolvedImport
 
 from inode import INode
 from debug import warn
 from gui.util import lang, getSetting
-from gui.util import getImage, notifyH, executeBuiltin, containerUpdate 
+from gui.util import getImage, notifyH, executeBuiltin, containerUpdate
 from node import getNode, Flag
 from renderer import renderer
 from api import api
 from exception import QobuzXbmcError as Qerror
 from cache import cache
-import qobuz
+# import qobuz  # @UnresolvedImport
 
 dialogHeading = lang(30081)
+
 
 class Node_favorites(INode):
     '''Displaying user favorites (track and album)
@@ -44,9 +37,9 @@ class Node_favorites(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/favorite/getUserFavorites', 
-                           user_id=api.user_id, 
-                           limit=limit, 
+        data = api.get('/favorite/getUserFavorites',
+                           user_id=api.user_id,
+                           limit=limit,
                            offset=self.offset)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
@@ -56,7 +49,7 @@ class Node_favorites(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if 'artists' in self.data:
-            self.__populate_artists(Dir, lvl, whiteFlag, blackFlag)    
+            self.__populate_artists(Dir, lvl, whiteFlag, blackFlag)
         if 'albums' in self.data:
             self.__populate_albums(Dir, lvl, whiteFlag, blackFlag)
         if 'tracks' in self.data:
@@ -74,7 +67,7 @@ class Node_favorites(INode):
             node = getNode(Flag.ALBUM)
             node.data = album
             self.add_child(node)
-            
+
     def __populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST)
@@ -92,7 +85,7 @@ class Node_favorites(INode):
             notifyH(dialogHeading, lang(36004))
             return False
         ret = xbmcgui.Dialog().select(lang(36005), [
-           node.get_label() for node in nodes                              
+           node.get_label() for node in nodes
         ])
         if ret == -1:
             return False
@@ -110,7 +103,7 @@ class Node_favorites(INode):
             notifyH(dialogHeading, lang(36004))
             return False
         ret = xbmcgui.Dialog().select(lang(36007), [
-           node.get_label() for node in nodes                              
+           node.get_label() for node in nodes
         ])
         if ret == -1:
             return False
@@ -120,7 +113,6 @@ class Node_favorites(INode):
             return False
         notifyH(dialogHeading, 'Artist(s) added to favorite')
         return True
-    
 
     def list_albums(self, qnt, qid):
         album_ids = {}
@@ -150,7 +142,7 @@ class Node_favorites(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if node.nt & Flag.ALBUM: 
+                if node.nt & Flag.ALBUM:
                     if not str(node.nid) in album_ids:
                         album_ids[str(node.nid)] = 1
                         nodes.append(node)
@@ -175,7 +167,7 @@ class Node_favorites(INode):
             return False
         self._delete_cache()
         return True
-    
+
     def add_artists(self, artist_ids):
         ret = api.favorite_create(artist_ids=artist_ids)
         if not ret:
@@ -190,7 +182,7 @@ class Node_favorites(INode):
             notifyH(dialogHeading, lang(3600))
             return False
         ret = xbmcgui.Dialog().select(lang(36006), [
-           node.get_label() for node in nodes                              
+           node.get_label() for node in nodes
         ])
         if ret == -1:
             return False
@@ -254,9 +246,9 @@ class Node_favorites(INode):
 
     def _delete_cache(self):
         limit = getSetting('pagination_limit')
-        key = cache.make_key('/favorite/getUserFavorites', 
-                           user_id=api.user_id, 
-                           limit=limit, 
+        key = cache.make_key('/favorite/getUserFavorites',
+                           user_id=api.user_id,
+                           limit=limit,
                            offset=self.offset)
         return cache.delete(key)
 
@@ -289,13 +281,13 @@ class Node_favorites(INode):
         elif qnt & Flag.ARTIST == Flag.ARTIST:
             ret = self.del_artist(node.nid)
         else:
-            raise Qerror(who=self, what='invalid_node_type', 
+            raise Qerror(who=self, what='invalid_node_type',
                          additional=self.nt)
         if not ret:
-            notifyH(dialogHeading, 
+            notifyH(dialogHeading,
                     'Cannot remove item: %s' % (node.get_label()))
             return False
-        notifyH(dialogHeading, 
+        notifyH(dialogHeading,
                     'Item successfully removed: %s' % (node.get_label()))
         url = self.make_url(nt=self.nt, nid='', nm='')
         executeBuiltin(containerUpdate(url, True))
