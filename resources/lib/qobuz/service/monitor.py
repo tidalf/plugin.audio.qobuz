@@ -144,7 +144,7 @@ class Monitor(xbmc.Monitor):
                 musicdb_idAlbum = line[0]
                 import re
                 try:
-                    qobuz_idAlbum = re.search(u'aid=(\d+)', line[1]).group(1)
+                    curl = re.search(u'curl=(.*)\)', line[1]).group(1)
                 except: 
                     continue
                 sqlcmd = "SELECT rowid from art WHERE media_id=?" 
@@ -155,10 +155,8 @@ class Monitor(xbmc.Monitor):
                 except: pass
                 if  data2 is None : 
                     sqlcmd2 = "INSERT INTO art VALUES ( NULL, (?) , 'album', 'thumb', (?) )"
-                    subdir = qobuz_idAlbum[:4]
-                    url = "http://static.qobuz.com/images/jaquettes/" + subdir + "/" + qobuz_idAlbum + "_600.jpg"
                     try:
-                        cur.execute (sqlcmd2,(str(musicdb_idAlbum), url))
+                        cur.execute (sqlcmd2,(str(musicdb_idAlbum), curl))
                     except: pass
             con.commit()
         except lite.Error, e:
