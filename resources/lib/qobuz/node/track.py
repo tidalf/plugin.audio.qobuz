@@ -332,7 +332,7 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': desc + ' (aid=' + self.get_album_id() + ')'
+                     'comment': desc + '(aid=' + self.get_album_id() + ',curl=' + self.get_image() + ')'
                      # 'lyrics': "Chant down babylon lalalala" 
                      })
         item.setProperty('DiscNumber', str(media_number))
