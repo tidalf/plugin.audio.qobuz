@@ -20,7 +20,7 @@ class Node_label(INode):
     def __init__(self, parent=None, parameters=None):
         super(Node_label, self).__init__(parent, parameters)
         self.nt = Flag.LABEL
-        self.set_label(lang(42100))
+        self.set_label(lang(30188))
         self.url = None
         self.is_folder = True
         self.image = getImage('album')

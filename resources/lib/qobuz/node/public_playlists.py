@@ -19,7 +19,7 @@ class Node_public_playlists(INode):
     def __init__(self, parent=None, parameters=None):
         super(Node_public_playlists, self).__init__(parent, parameters)
         self.nt = Flag.PUBLIC_PLAYLISTS
-        self.set_label(lang(42102))
+        self.set_label(lang(30190))
         self.is_folder = True
         self.image = getImage('userplaylists')
         self.offset = self.get_parameter('offset') or 0

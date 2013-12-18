@@ -50,13 +50,13 @@ class Node_root(INode):
         '''
         from gui.util import yesno, notifyH, getImage
         from debug import log
-        if not yesno(lang(31102), lang(31103)):
+        if not yesno(lang(30121), lang(30122)):
             log(self, "Deleting cached data aborted")
             return False
         if clean_all(cache):
-            notifyH(lang(31100), lang(31104))
+            notifyH(lang(30119), lang(30123))
         else:
-            notifyH(lang(31100), lang(31101),
+            notifyH(lang(30119), lang(30120),
                     getImage('icon-error-256'))
         return True
 

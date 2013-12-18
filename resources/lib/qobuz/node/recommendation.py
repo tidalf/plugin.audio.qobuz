@@ -24,26 +24,26 @@ RECOS_TYPE_IDS = {
 }
 
 RECOS_TYPES = {
-    1: lang(30084),
-    2: lang(30083),
-    3: lang(30085),
-    4: lang(30086),
-    5: lang(30102),
+    1: lang(30086),
+    2: lang(30085),
+    3: lang(30087),
+    4: lang(30088),
+    5: lang(30103),
 }
 
 RECOS_GENRES = {
-    2: lang(30093),
-    10: lang(30095),
-    6: lang(30090),
-    59: lang(30098),
-    73: lang(30201),
-    80: lang(30089),
-    64: lang(30202),
-    91: lang(30094),
-    94: lang(30092),
-    112: lang(30087),
-    127: lang(30200),
-    123: lang(30203),
+    2: lang(30095),
+    10: lang(30097),
+    6: lang(30092),
+    59: lang(30100),
+    73: lang(30105),
+    80: lang(30091),
+    64: lang(30106),
+    91: lang(30096),
+    94: lang(30094),
+    112: lang(30089),
+    127: lang(30104),
+    123: lang(30107),
     'null': 'All',
 }
 
@@ -56,7 +56,7 @@ class Node_recommendation(INode):
         self.nt = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id')
         self.genre_type = self.get_parameter('genre-type')
-        self.set_label(lang(30082))
+        self.set_label(lang(30084))
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0
 

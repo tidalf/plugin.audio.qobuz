@@ -24,7 +24,7 @@ class Node_genre(INode):
     def __init__(self, parent=None, parameters=None):
         super(Node_genre, self).__init__(parent, parameters)
         self.nt = Flag.GENRE
-        self.set_label(lang(42101))
+        self.set_label(lang(30189))
         self.is_folder = True
         self.image = getImage('album')
         self.offset = self.get_parameter('offset') or 0

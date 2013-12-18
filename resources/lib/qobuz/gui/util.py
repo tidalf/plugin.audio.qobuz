@@ -71,7 +71,7 @@ def dialogLoginFailure():
     """Dialog to be shown when we can't login into Qobuz
     """
     dialog = xbmcgui.Dialog()
-    if dialog.yesno(lang(30008), lang(30034), lang(30040)):
+    if dialog.yesno(lang(30010), lang(30036), lang(30042)):
         qobuz.addon.openSettings()
         xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
                                   updateListing=True, cacheToDisc=False)
@@ -99,7 +99,7 @@ def dialogFreeAccount():
     if qobuz.addon.getSetting('warn_free_account') != 'true':
         return
     dialog = xbmcgui.Dialog()
-    ok = dialog.yesno(lang(41000), lang(41001), lang(41002), lang(41003))
+    ok = dialog.yesno(lang(30175), lang(30176), lang(30177), lang(30178))
     if ok:
         qobuz.addon.setSetting('warn_free_account', 'false')
 

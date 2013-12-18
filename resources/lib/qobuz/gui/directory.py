@@ -49,7 +49,7 @@ class Directory():
         self.total_put = 0
         self.started_on = time.time()
         self.Progress.create(self.label + root.get_label())
-        self.update({'count': 0, 'total': 100}, lang(40000))
+        self.update({'count': 0, 'total': 100}, lang(30169))
         self.line1 = ''
         self.line2 = ''
         self.line3 = ''
@@ -196,8 +196,8 @@ class Directory():
                                   succeeded=success,
                                   updateListing=False,
                                   cacheToDisc=success)
-        self.update({'count': 100, 'total': 100}, lang(40003),
-                    "%s : %s items" % (lang(40002), str(self.total_put)))
+        self.update({'count': 100, 'total': 100}, lang(30172),
+                    "%s : %s items" % (lang(30171), str(self.total_put)))
         self.close()
         return self.total_put
 

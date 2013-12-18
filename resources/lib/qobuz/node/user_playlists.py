@@ -19,7 +19,7 @@ class Node_user_playlists(INode):
     """
     def __init__(self, parent=None, parameters=None):
         super(Node_user_playlists, self).__init__(parent, parameters)
-        self.label = lang(30019)
+        self.label = lang(30021)
         self.image = getImage('userplaylists')
         self.nt = Flag.USERPLAYLISTS
         self.content_type = 'files'

@@ -71,7 +71,7 @@ class QobuzPlayer(xbmc.Player):
             Notify
         """
         if getSetting('notification_playingsong', isBool=True):
-            notifyH(lang(34000), track.get_label(), track.get_image())
+            notifyH(lang(30132), track.get_label(), track.get_image())
         """
             We are called from playlist...
         """

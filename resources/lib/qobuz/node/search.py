@@ -40,19 +40,19 @@ class Node_search(INode):
     @search_type.setter
     def search_type(self, st):
         if st == 'artists':
-            self.label = lang(30015)
+            self.label = lang(30017)
             self.content_type = 'files'
             self.image = getImage('artist')
         elif st == 'albums':
-            self.label = lang(30014)
+            self.label = lang(30016)
             self.content_type = 'albums'
             self.image = getImage('album')
         elif st == 'tracks':
-            self.label = lang(30013)
+            self.label = lang(30015)
             self.content_type = 'songs'
             self.image = getImage('song')
         elif st == 'collection':
-            self.label = lang(30016)
+            self.label = lang(30018)
             self.content_type = 'files'
             self.image = getImage('song')
         else:
