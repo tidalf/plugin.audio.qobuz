@@ -3,10 +3,11 @@
     ~~~~~~~~~~~~~~~~~~
 
     A class to handle caching
-    
+
     ::cached decorator that will cache a function call based on his
     positional and named parameter
 
+    :part_of: xbmc-qobuz
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
@@ -14,14 +15,15 @@ from time import time
 __seed__ = __name__ + '0.0.1'
 __magic__ = 0
 pos = 0
-for i in [ ord(c) for c in __seed__[:]]:
-    __magic__ += i * 2**pos
-    pos+=1
+for i in [ord(c) for c in __seed__[:]]:
+    __magic__ += i * 2 ** pos
+    pos += 1
 BadMagic = 1 << 1
 BadKey = 1 << 2
 NoData = 1 << 3
 StoreError = 1 << 4
 DeleteError = 1 << 5
+
 
 class CacheBase(object):
     ''' A base class for caching
@@ -35,6 +37,7 @@ class CacheBase(object):
         '''
         that = self
         self.cached_function_name = f.__name__
+
         def wrapped_function(self, *a, **ka):
             that.error = 0
             key = that.make_key(*a, **ka)
