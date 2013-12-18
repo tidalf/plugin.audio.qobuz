@@ -1,24 +1,17 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.node.root
+    ~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from inode import INode
 from gui.util import getSetting, executeBuiltin, lang
 from cache import cache
 from cache.cacheutil import clean_all
 from node import getNode, Flag
+
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -44,6 +37,8 @@ class Node_root(INode):
             self.add_child(search)
             search = getNode(Flag.SEARCH)
             search.search_type = 'artists'
+            self.add_child(search)
+            search = getNode(Flag.COLLECTION)
             self.add_child(search)
         self.add_child(getNode(Flag.FRIEND_LIST))
         self.add_child(getNode(Flag.GENRE))
