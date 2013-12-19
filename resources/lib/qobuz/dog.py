@@ -28,6 +28,7 @@ class dog():
             'track-id': "^\d{1,10}$",
             'parent-id': "^\d{1,10}$",
             'offset': "^\d{1,10}$",
+            'source': '^(all|playlists|purchases|favorites)$'
         }
 
     def kv_is_ok(self, key, value):
