@@ -122,7 +122,7 @@
     <string id="30112">Durée du cache recommendation</string>
     <string id="30113">Durée du cache liste de lecture</string>
     <string id="30114">Cache</string>
-    <string id="30115">Paramètres du cache</string>
+    <string id="30115">Paramètres</string>
     <string id="30116">Durée du cache d'authentification</string>
     <string id="30117">Effacer le cache</string>
     <string id="30118">Organisation des listes de lecture</string>
@@ -227,7 +227,7 @@
     <!-- nodes -->
     <string id="30188">Label</string>
     <string id="30189">Genre</string>
-    <string id="30190">Public playlists</string>
+    <string id="30190">Liste de lecture publique</string>
 
     <!-- options -->
     <string id="30191">Afficher les recommandations</string>
