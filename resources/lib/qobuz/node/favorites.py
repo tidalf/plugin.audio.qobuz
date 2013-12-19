@@ -28,9 +28,9 @@ class Node_favorites(INode):
     def __init__(self, parent=None, parameters=None):
         super(Node_favorites, self).__init__(parent, parameters)
         self.nt = Flag.FAVORITES
-        self.set_label(lang(30081))
-        self.name = lang(30081)
-        self.label = lang(30081)
+        self.set_label(lang(30073))
+        self.name = lang(30073)
+        self.label = lang(30073)
         self.content_type = 'albums'
         self.image = getImage('favorites')
         self.offset = self.get_parameter('offset') or 0

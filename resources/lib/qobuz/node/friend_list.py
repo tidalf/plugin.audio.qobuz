@@ -88,7 +88,7 @@ class Node_friend_list(INode):
         url = self.make_url()
         menu.add(path='friend', label=label, cmd=containerUpdate(url))
         url = self.make_url(nt=Flag.FRIEND, nm='gui_create', nid=self.nid)
-        menu.add(path='friend/add', label='Add', cmd=runPlugin(url))
+        menu.add(path='friend/add', label=lang(30181), cmd=runPlugin(url))
 
         ''' Calling base class '''
         super(Node_friend_list, self).attach_context_menu(item, menu)
