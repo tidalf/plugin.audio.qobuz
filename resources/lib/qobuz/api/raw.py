@@ -122,7 +122,6 @@ class QobuzApiRaw(object):
             _copy_params['password'] = '***'
         """ END / DEBUG """
         r = None
-        info(self, 'url: %s, params: %s, headers: %s' % (url, params, headers))
         try:
             r = self.session.post(url, data=params, headers=headers)
         except:
