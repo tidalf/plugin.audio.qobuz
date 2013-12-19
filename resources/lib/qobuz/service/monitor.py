@@ -103,7 +103,6 @@ class MyPlayer(xbmc.Player):
             warn(self, "No track id set by the player...")
             return False
         self.trackId = nid
-        log(self, "play back started from monitor !!!!!!" + nid )
         elapsed = 0
         while elapsed <= 10:
             if not self.isPlayingAudio():
@@ -134,7 +133,6 @@ class Monitor(xbmc.Monitor):
         if database != 'music':
             return 0
 	
-        log(self, xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') )
 	if (xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') == "12.0.0"): 
 	    dbver = "MyMusic32.db"
         else:
