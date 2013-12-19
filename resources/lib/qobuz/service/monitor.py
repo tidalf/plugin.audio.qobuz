@@ -125,16 +125,9 @@ class Monitor(xbmc.Monitor):
         import sqlite3 as lite
         if database != 'music':
             return 0
-<<<<<<< HEAD
-	
-	if (xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') == "12.0.0"): 
-	    dbver = "MyMusic32.db"
-=======
-        log(self, xbmcaddon.Addon('xbmc.addon').getAddonInfo('version'))
         dbver = ""
         if xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') == "12.0.0":
             dbver = "MyMusic32.db"
->>>>>>> 3a1c2f9ad170437a4dca19c0d281822717d03e69
         else:
             dbver = "MyMusic37.db"
         dbfile = os.path.join(xbmc.translatePath('special://profile/'),
