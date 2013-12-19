@@ -1,35 +1,27 @@
-#     Copyright 2011 Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
-import xbmc
-import xbmcgui
+'''
+    qobuz.player
+    ~~~~~~~~~~~~
 
-import qobuz
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+import xbmc  # @UnresolvedImport
+import xbmcgui  # @UnresolvedImport
+
+import qobuz  # @UnresolvedImport
 from debug import warn
-from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, getImage, \
-    getSetting
+from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl
+from gui.util import getSetting
 from node import Flag, getNode
 
-"""
-    @class: QobuzPlayer
-"""
 keyTrackId = 'QobuzPlayerTrackId'
 
-class QobuzPlayer(xbmc.Player):
 
+class QobuzPlayer(xbmc.Player):
+    """
+        @class: QobuzPlayer
+    """
     def __init__(self, **ka):
         ka['type'] = xbmc.PLAYER_CORE_AUTO
         super(QobuzPlayer, self).__init__()
@@ -45,7 +37,7 @@ class QobuzPlayer(xbmc.Player):
         if not track.fetch(None, 1, Flag.TRACK, Flag.NONE):
             warn(self, "Cannot get track data")
 #            label = "Maybe an invalid track id"
-#            item = xbmcgui.ListItem("No track information", label, '', 
+#            item = xbmcgui.ListItem("No track information", label, '',
 #                                    getImage('icon-error-256'), '')
             return False
         if not track.is_playable():
@@ -66,7 +58,7 @@ class QobuzPlayer(xbmc.Player):
             '''
             if not isFreeAccount():
                 notifyH("Qobuz", "Sample returned")
-        xbmcgui.Window(10000).setProperty(keyTrackId, track_id) 
+        xbmcgui.Window(10000).setProperty(keyTrackId, track_id)
         """
             Notify
         """
@@ -76,7 +68,7 @@ class QobuzPlayer(xbmc.Player):
             We are called from playlist...
         """
         if qobuz.boot.handle == -1:
-            super(QobuzPlayer, self).play(track.get_streaming_url(), 
+            super(QobuzPlayer, self).play(track.get_streaming_url(),
                                           item, False)
         else:
             setResolvedUrl(handle=qobuz.boot.handle,

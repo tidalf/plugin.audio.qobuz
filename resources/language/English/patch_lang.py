@@ -15,7 +15,7 @@ pat_string_id = re.compile(r'^\s*'
 
 pat_lang = re.compile(r'lang\((\d+?)\)', re.S)
 
-# with open('strings.xml') as fh:
+
 for line in fileinput.input('strings.xml', inplace=True): 
     m = pat_string_id.match(line)
     if not m:
@@ -61,10 +61,8 @@ for root, dirs, files in os.walk(os.path.join(os.path.pardir,
             m = re.finditer(pat_lang, line)
             for match in m:
                 fid = int(match.group(1))
-                #print "fid: %s" % fid
                 if not fid in seed_id:
                     print "# ERROR: Missing translation for %s" % fid
                     continue
-                #print "Replace: %s => %s" % (fid, seed_id[fid])
                 line = line.replace(str(fid), str(seed_id[fid]))
             print line,

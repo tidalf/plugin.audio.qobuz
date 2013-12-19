@@ -1,10 +1,11 @@
 '''
-    xbmcswift2.storage
-    ~~~~~~~~~~~~~~~~~~
+    qobue.storage
+    ~~~~~~~~~~~~~
 
     This module contains persistent storage classes.
 
-    :copyright: (c) 2012 by Jonathan Beluch
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
@@ -18,11 +19,13 @@ except ImportError:
 import shutil
 import collections
 from datetime import datetime
-#from xbmcswift2.logger import log
+
+
 class MyLog():
     def debug(self, *a):
         print a[0] % (a[1:])
 log = MyLog()
+
 
 class _PersistentDictMixin(object):
     ''' Persistent dictionary with an API compatible with shelve and anydbm.
@@ -98,7 +101,7 @@ class _PersistentDictMixin(object):
                 return self.initial_update(loader(fileobj))
             except Exception as e:
                 pass
-        raise ValueError('File not in a supported format')
+        raise ValueError('File not in a supported format, %s', e)
 
     def raw_dict(self):
         '''Returns the underlying dict'''
