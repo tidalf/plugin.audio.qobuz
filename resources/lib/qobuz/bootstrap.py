@@ -132,7 +132,8 @@ class QobuzBootstrap(object):
         except:
             warn(self, "No 'mode' parameter")
         for p in self.params:
-            info(self, "Param: " + p + ' = ' + str(self.params[p]))
+            info(self, "Param: %s = %s (%s)" % (p, str(self.params[p]),
+                                                Flag.to_s(self.params['nt'])))
 
     def dispatch(self):
         """Routing based on parameters
