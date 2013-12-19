@@ -35,13 +35,14 @@ class __Flag__():
     ALBUMS_BY_ARTIST = 1 << 21
     PUBLIC_PLAYLISTS = 1 << 22
     COLLECTION = 1 << 23
+    COLLECTIONS = 1 << 24
 
     STOPBUILD = 1 << 100
     NONE = 1 << 101
 
     def __init__(self):
 
-        self.totalFlag = 23
+        self.totalFlag = 24
         self.ALL = 0
         for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
@@ -97,6 +98,8 @@ class __Flag__():
             return "albums_by_artist"
         elif flag & self.COLLECTION == self.COLLECTION:
             return "collection"
+        elif flag & self.COLLECTIONS == self.COLLECTIONS:
+            return "collections"
         else:
             raise QobuzXbmcError(
                 who=self, what='invalid_flag', additional=repr(flag))
