@@ -265,7 +265,7 @@ class Node_playlist(INode):
             warn(self, 'Cannot set current playlist without id')
             return False
         userdata = self.get_user_storage()
-        userdata['current_playlist'] = int(self.nid)
+        userdata['current_playlist'] = int(playlist_id)
         return userdata.sync()
 
     def get_current_playlist(self):
