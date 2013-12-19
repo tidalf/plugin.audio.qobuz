@@ -215,7 +215,7 @@ class INode(object):
                 value: parameter value
 
             * Optional quote=True/False, when quote=True we are using
-            urllib.quote_plus befoer setting value
+            urllib.quote_plus before setting value
         """
         if 'quote' in ka and ka['quote'] == True:
             value = urllib.quote_plus(value)
