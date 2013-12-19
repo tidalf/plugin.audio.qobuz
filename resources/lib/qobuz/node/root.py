@@ -38,8 +38,8 @@ class Node_root(INode):
             search = getNode(Flag.SEARCH)
             search.search_type = 'artists'
             self.add_child(search)
-            search = getNode(Flag.COLLECTION)
-            self.add_child(search)
+            collections = getNode(Flag.COLLECTIONS)
+            self.add_child(collections)
         self.add_child(getNode(Flag.FRIEND_LIST))
         self.add_child(getNode(Flag.GENRE))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
