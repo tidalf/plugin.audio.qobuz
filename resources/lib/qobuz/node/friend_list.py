@@ -48,6 +48,8 @@ class Node_friend_list(INode):
         user_id = api.user_id
         user_data = api.get('/user/login', username=username,
                                 password=password)
+        if not 'user' in user_data:
+            return False
         friend_data = user_data['user']['player_settings']['friends']
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
