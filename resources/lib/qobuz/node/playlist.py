@@ -208,14 +208,44 @@ class Node_playlist(INode):
         if len(nodes) < 1:
             warn(self, 'Empty list...')
             return False
-        strtracks = ''
-        for node in nodes:
-            if node.nt != Flag.TRACK:
-                warn(self, "Not a Node_track node")
-                continue
-            strtracks += '%s,' % (str(node.nid))
-        return api.playlist_addTracks(
-            playlist_id=playlist_id, track_ids=strtracks)
+        step = 500
+        start = 0
+        end = step
+        max = len(nodes)
+        if end > max:
+            end = max
+        ret = False
+        oneFalse = False
+        while end < max:
+            str_tracks = ''
+            for i in range(start, end):
+                info(self, 'start: %s, end: %s' % (start, end))
+                node = nodes[i]
+                if node.nt != Flag.TRACK:
+                    warn(self, "Not a Node_track node")
+                    continue
+                str_tracks += '%s,' % (str(node.nid))
+            if api.playlist_addTracks(
+                                playlist_id=playlist_id, track_ids=str_tracks):
+                ret = True
+            else:
+                oneFalse = True
+            start = start + step
+            end = start + step
+        if end <= max:
+            str_tracks = ''
+            for i in range(end, max - 1):
+                info(self, 'start: %s, end: %s' % (start, end))
+                node = nodes[i]
+                if node.nt != Flag.TRACK:
+                    warn(self, "Not a Node_track node")
+                    continue
+            if api.playlist_addTracks(
+                                playlist_id=playlist_id, track_ids=str_tracks):
+                ret = True
+            else:
+                oneFalse = True
+        return not oneFalse
 
     def gui_add_as_new(self, name=None):
         nodes = []
