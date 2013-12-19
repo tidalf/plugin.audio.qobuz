@@ -1,6 +1,6 @@
 '''
     qobuz.api.easy
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~
 
     Add 'get' to qobuz.api.raw, All requests made trough this method are
     cached (see qobuz.cache.qobuz)

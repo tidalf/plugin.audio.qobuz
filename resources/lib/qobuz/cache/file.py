@@ -1,6 +1,6 @@
 '''
-    qobuz.storage.file
-    ~~~~~~~~~~~~~~~~~~
+    qobuz.cache.file
+    ~~~~~~~~~~~~~~~~
 
     Class that implement caching to disk
 

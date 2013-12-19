@@ -1,5 +1,5 @@
 '''
-    qobue.xbmcrpc
+    qobuz.xbmcrpc
     ~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz

@@ -1,8 +1,8 @@
 '''
     qobuz.api.raw
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~
 
-    Our base api, all method are mapped like <endpoint>_<method>
+    Our base api, all method are mapped like in <endpoint>_<method>
     see Qobuz API on GitHub (https://github.com/Qobuz/api-documentation)
 
     :part_of: xbmc-qobuz

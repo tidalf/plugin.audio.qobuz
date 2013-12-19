@@ -15,7 +15,7 @@ import sys
 VERSION = '0.0.1'
 
 username = password = base_path = stream_type = stream_format = None
-cache_duration_long = 60 *60 *24 * 365
+cache_duration_long = 60 * 60 * 24 * 365
 cache_duration_middle = 60 * 60 * 24 * 365
 stream_format = 5
 __image__ = ''
@@ -208,7 +208,8 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
                 return True
             else:
                 self.send_response(404, "Nops")
-                self.send_header('Content-Type', 'text/html; charset=iso-8859-1')
+                self.send_header('Content-Type',
+                                 'text/html; charset=iso-8859-1')
                 self.end_headers()
                 return True
         except Unauthorized as e:

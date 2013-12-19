@@ -1,5 +1,5 @@
 '''
-    qobue.storage
+    qobuz.storage
     ~~~~~~~~~~~~~
 
     This module contains persistent storage classes.
