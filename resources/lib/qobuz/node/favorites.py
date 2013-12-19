@@ -19,7 +19,7 @@ from exception import QobuzXbmcError as Qerror
 from cache import cache
 # import qobuz  # @UnresolvedImport
 
-dialogHeading = lang(30081)
+dialogHeading = lang(30083)
 
 
 class Node_favorites(INode):
@@ -28,9 +28,9 @@ class Node_favorites(INode):
     def __init__(self, parent=None, parameters=None):
         super(Node_favorites, self).__init__(parent, parameters)
         self.nt = Flag.FAVORITES
-        self.set_label(lang(30079))
-        self.name = lang(30079)
-        self.label = lang(30079)
+        self.set_label(lang(30081))
+        self.name = lang(30081)
+        self.label = lang(30081)
         self.content_type = 'albums'
         self.image = getImage('favorites')
         self.offset = self.get_parameter('offset') or 0
@@ -82,9 +82,9 @@ class Node_favorites(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_albums(qnt, qid)
         if len(nodes) == 0:
-            notifyH(dialogHeading, lang(36004))
+            notifyH(dialogHeading, lang(30143))
             return False
-        ret = xbmcgui.Dialog().select(lang(36005), [
+        ret = xbmcgui.Dialog().select(lang(30144), [
            node.get_label() for node in nodes
         ])
         if ret == -1:
@@ -100,9 +100,9 @@ class Node_favorites(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_artists(qnt, qid)
         if len(nodes) == 0:
-            notifyH(dialogHeading, lang(36004))
+            notifyH(dialogHeading, lang(30143))
             return False
-        ret = xbmcgui.Dialog().select(lang(36007), [
+        ret = xbmcgui.Dialog().select(lang(30146), [
            node.get_label() for node in nodes
         ])
         if ret == -1:
@@ -179,9 +179,10 @@ class Node_favorites(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_tracks(qnt, qid)
         if len(nodes) == 0:
+# ERROR: Missing translation for 3600
             notifyH(dialogHeading, lang(3600))
             return False
-        ret = xbmcgui.Dialog().select(lang(36006), [
+        ret = xbmcgui.Dialog().select(lang(30145), [
            node.get_label() for node in nodes
         ])
         if ret == -1:

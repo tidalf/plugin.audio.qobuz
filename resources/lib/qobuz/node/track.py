@@ -348,7 +348,7 @@ class Node_track(INode):
                 nm='gui_remove_track',
                 mode=Mode.VIEW)
             menu.add(path='playlist/remove',
-                     label=lang(30073),
+                     label=lang(30075),
                      cmd=runPlugin(url), color=colorCaution)
 
         ''' Calling base class '''

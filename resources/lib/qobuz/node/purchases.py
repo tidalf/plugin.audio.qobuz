@@ -18,7 +18,7 @@ class Node_purchases(INode):
     '''
     def __init__(self, parent=None, parameters=None):
         super(Node_purchases, self).__init__(parent, parameters)
-        self.label = lang(30100)
+        self.label = lang(30101)
         self.nt = Flag.PURCHASES
         self.content_type = 'albums'
         self.image = getImage('album')

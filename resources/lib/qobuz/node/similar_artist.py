@@ -23,7 +23,7 @@ class Node_similar_artist(INode):
         self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
-        return lang(39000)
+        return lang(30156)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')

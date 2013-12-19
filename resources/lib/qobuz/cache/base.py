@@ -1,6 +1,6 @@
 '''
-    qobuz.storage.base
-    ~~~~~~~~~~~~~~~~~~
+    qobuz.cache.base
+    ~~~~~~~~~~~~~~~~
 
     A class to handle caching
 

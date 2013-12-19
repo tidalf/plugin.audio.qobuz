@@ -1,8 +1,8 @@
 '''
     qobuz.api.raw
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~
 
-    Our base api, all method are mapped like <endpoint>_<method>
+    Our base api, all method are mapped like in <endpoint>_<method>
     see Qobuz API on GitHub (https://github.com/Qobuz/api-documentation)
 
     :part_of: xbmc-qobuz
@@ -122,7 +122,6 @@ class QobuzApiRaw(object):
             _copy_params['password'] = '***'
         """ END / DEBUG """
         r = None
-        info(self, 'url: %s, params: %s, headers: %s' % (url, params, headers))
         try:
             r = self.session.post(url, data=params, headers=headers)
         except:

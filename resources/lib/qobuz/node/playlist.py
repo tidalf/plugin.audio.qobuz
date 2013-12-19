@@ -134,20 +134,20 @@ class Node_playlist(INode):
         if isOwner:
             url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
                                 nm='set_as_current')
-            menu.add(path='playlist/set_as_current', label=lang(39007),
+            menu.add(path='playlist/set_as_current', label=lang(30163),
                     cmd=containerUpdate(url))
 
             url = self.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
-            menu.add(path='playlist/rename', label=lang(39009),
+            menu.add(path='playlist/rename', label=lang(30165),
                         cmd=runPlugin(url))
 
         else:
             url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
-            menu.add(path='playlist/subscribe', label=lang(39012),
+            menu.add(path='playlist/subscribe', label=lang(30168),
                     cmd=runPlugin(url))
 
         url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
-        menu.add(path='playlist/remove', label=lang(39010),
+        menu.add(path='playlist/remove', label=lang(30166),
                  cmd=runPlugin(url), color=colorCaution)
 
         ''' Calling base class '''
@@ -265,7 +265,7 @@ class Node_playlist(INode):
             warn(self, 'Cannot set current playlist without id')
             return False
         userdata = self.get_user_storage()
-        userdata['current_playlist'] = int(self.nid)
+        userdata['current_playlist'] = int(playlist_id)
         return userdata.sync()
 
     def get_current_playlist(self):
@@ -290,7 +290,7 @@ class Node_playlist(INode):
             return False
         self.data = data
         currentname = self.get_name()
-        k = Keyboard(currentname, lang(30078))
+        k = Keyboard(currentname, lang(30080))
         k.doModal()
         if not k.isConfirmed():
             return False
@@ -307,7 +307,7 @@ class Node_playlist(INode):
             warn(self, "Cannot rename playlist with name %s" % (newname))
             return False
         self.delete_cache(playlist_id)
-        notifyH(lang(30078), (u"%s: %s") % (lang(39009), currentname))
+        notifyH(lang(30080), (u"%s: %s") % (lang(30165), currentname))
         executeBuiltin(containerRefresh())
         return True
 
@@ -320,7 +320,7 @@ class Node_playlist(INode):
         query = self.get_parameter('query', unQuote=True)
         if not query:
             from gui.util import Keyboard
-            k = Keyboard('', lang(42000))
+            k = Keyboard('', lang(30182))
             k.doModal()
             if not k.isConfirmed():
                 warn(self, 'Creating playlist aborted')
@@ -356,8 +356,8 @@ class Node_playlist(INode):
         name = ''
         if 'name' in data:
             name = data['name']
-        ok = xbmcgui.Dialog().yesno(lang(39010),
-                                    lang(30052),
+        ok = xbmcgui.Dialog().yesno(lang(30166),
+                                    lang(30054),
                                     color('FFFF0000', name))
         if not ok:
             info(self, "Deleting playlist aborted...")
@@ -371,11 +371,11 @@ class Node_playlist(INode):
             res = api.playlist_unsubscribe(playlist_id=playlist_id)
         if not res:
             warn(self, "Cannot delete playlist with id " + str(playlist_id))
-            notifyH(lang(42001), lang(42004) +
+            notifyH(lang(30183), lang(30186) +
                     name, getImage('icon-error-256'))
             return False
         self.delete_cache(playlist_id)
-        notifyH(lang(42001), (lang(42002) + "%s" + lang(42003)) % (name))
+        notifyH(lang(30183), (lang(30184) + "%s" + lang(30185)) % (name))
         url = self.make_url(nt=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='',
                             nid='')
         executeBuiltin(containerUpdate(url, True))
@@ -383,7 +383,7 @@ class Node_playlist(INode):
 
     def subscribe(self):
         if api.playlist_subscribe(playlist_id=self.nid):
-            notifyH(lang(42001), lang(42005))
+            notifyH(lang(30183), lang(30187))
             self.delete_cache(self.nid)
             return True
         else:

@@ -53,7 +53,7 @@ class Node_friend(INode):
         if not name:
             from gui.util import Keyboard
             kb = Keyboard('',
-                          str(lang(41102)))
+                          str(lang(30181)))
             kb.doModal()
             name = ''
             if not kb.isConfirmed():

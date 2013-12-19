@@ -1,6 +1,6 @@
 '''
-    qobuz.storage.qobuz
-    ~~~~~~~~~~~~~~~~~~
+    qobuz.cache.qobuz
+    ~~~~~~~~~~~~~~~~~
 
     We are setting ttl here based on key type
     We are caching key who return data in dictionary so further request of

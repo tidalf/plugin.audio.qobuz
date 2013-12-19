@@ -1,26 +1,17 @@
-#     Copyright 2011 Stephen Denham, Joachim Basmaison, Cyril Leclerc
-#
-#     This file is part of xbmc-qobuz.
-#
-#     xbmc-qobuz is free software: you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation, either version 3 of the License, or
-#     (at your option) any later version.
-#
-#     xbmc-qobuz is distributed in the hope that it will be useful,
-#     but WITHOUT ANY WARRANTY; without even the implied warranty of
-#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
-#     GNU General Public License for more details.
-#
-#     You should have received a copy of the GNU General Public License
-#     along with xbmc-qobuz.   If not, see <http://www.gnu.org/licenses/>.
+'''
+    qobuz.service.monitor
+    ~~~~~~~~~~~~~~~~~~~~~
 
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 import os
 import sys
 from time import time
-import xbmcaddon
-import xbmcgui
-import xbmc
+import xbmcaddon  # @UnresolvedImport
+import xbmcgui  # @UnresolvedImport
+import xbmc  # @UnresolvedImport
 
 pluginId = 'plugin.audio.qobuz'
 __addon__ = xbmcaddon.Addon(id=pluginId)
@@ -43,15 +34,16 @@ from cache.cacheutil import clean_old
 keyTrackId = 'QobuzPlayerTrackId'
 keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
+
 class MyPlayer(xbmc.Player):
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
-        self.trackId= None
+        self.trackId = None
         self.lock = threading.Lock()
-    
+
     def playlist(self):
         return xbmc.PlayList(0)
-    
+
     def getProperty(self, key):
         """Wrapper to retrieve property from Xbmc Main Window
             Parameter:
@@ -81,13 +73,13 @@ class MyPlayer(xbmc.Player):
             self.lock.release()
 
     def onPlayBackEnded(self):
-        nid  = self.getProperty(keyTrackId)
-        warn (self, "play back ended from monitor !!!!!!" + nid)
+        nid = self.getProperty(keyTrackId)
+        warn(self, "play back ended from monitor !!!!!!" + nid)
         return True
 
     def onPlayBackStopped(self):
-        nid  = self.getProperty(keyTrackId)
-        warn (self, "play back stopped from monitor !!!!!!" + nid)
+        nid = self.getProperty(keyTrackId)
+        warn(self, "play back stopped from monitor !!!!!!" + nid)
         return True
 
     def onPlayBackStarted(self):
@@ -96,9 +88,9 @@ class MyPlayer(xbmc.Player):
             if self.getProperty(keyTrackId) != self.trackId:
                 self.trackId = None
             else:
-                warn(self, "Already monitoring song id: %s" % (self.trackId)) 
+                warn(self, "Already monitoring song id: %s" % (self.trackId))
                 return False
-        nid  = self.getProperty(keyTrackId)
+        nid = self.getProperty(keyTrackId)
         if not nid:
             warn(self, "No track id set by the player...")
             return False
@@ -110,12 +102,13 @@ class MyPlayer(xbmc.Player):
                 return False
             if self.getProperty(keyTrackId) != self.trackId:
                 self.trackId = None
-                return False 
-            elapsed+=1
+                return False
+            elapsed += 1
             xbmc.sleep(1000)
         api.track_resportStreamingStart(nid)
         self.trackId = None
         return False
+
 
 class Monitor(xbmc.Monitor):
 
@@ -128,21 +121,27 @@ class Monitor(xbmc.Monitor):
     def onAbortRequested(self):
         self.abortRequested = True
 
-    def onDatabaseUpdated( self, database ):
+    def onDatabaseUpdated(self, database):
         import sqlite3 as lite
         if database != 'music':
             return 0
+<<<<<<< HEAD
 	
 	if (xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') == "12.0.0"): 
 	    dbver = "MyMusic32.db"
+=======
+        log(self, xbmcaddon.Addon('xbmc.addon').getAddonInfo('version'))
+        dbver = ""
+        if xbmcaddon.Addon('xbmc.addon').getAddonInfo('version') == "12.0.0":
+            dbver = "MyMusic32.db"
+>>>>>>> 3a1c2f9ad170437a4dca19c0d281822717d03e69
         else:
-	    dbver = "MyMusic37.db"
-
-        dbfile = os.path.join(xbmc.translatePath('special://profile/')
-                              ,"Database",dbver)
+            dbver = "MyMusic37.db"
+        dbfile = os.path.join(xbmc.translatePath('special://profile/'),
+                              "Database", dbver)
         try:
             con = lite.connect(dbfile)
-            cur = con.cursor()    
+            cur = con.cursor()
             cur.execute('SELECT DISTINCT(IdAlbum), comment from song')
             data = cur.fetchall()
             for line in data:
@@ -150,35 +149,39 @@ class Monitor(xbmc.Monitor):
                 import re
                 try:
                     curl = re.search(u'curl=(.*)\)', line[1]).group(1)
-                except: 
+                except:
                     continue
-                sqlcmd = "SELECT rowid from art WHERE media_id=?" 
-                data2=None
+                sqlcmd = "SELECT rowid from art WHERE media_id=?"
+                data2 = None
                 try:
-                    cur.execute(sqlcmd,str(musicdb_idAlbum))
+                    cur.execute(sqlcmd, str(musicdb_idAlbum))
                     data2 = cur.fetchone()
-                except: pass
-                if  data2 is None : 
-                    sqlcmd2 = "INSERT INTO art VALUES ( NULL, (?) , 'album', 'thumb', (?) )"
+                except:
+                    pass
+                if  data2 is None:
+                    sqlcmd2 = "INSERT INTO art VALUES ("
+                    "NULL, (?) , 'album', 'thumb', (?)"
+                    ")"
                     try:
-                        cur.execute (sqlcmd2,(str(musicdb_idAlbum), curl))
-                    except: pass
+                        cur.execute(sqlcmd2, (str(musicdb_idAlbum), curl))
+                    except:
+                        pass
             con.commit()
         except lite.Error, e:
             print "Error %s:" % e.args[0]
-            return -1;
+            return -1
         finally:
             if con:
                 con.commit()
                 con.close()
-        return True       
+        return True
 
     def is_garbage_time(self):
         if time() > (self.last_garbage_on + self.garbage_refresh):
             return True
         return False
 
-    def isIdle(self, since = 1):
+    def isIdle(self, since=1):
         try:
             if xbmc.getGlobalIdleTime() >= since:
                 return True
@@ -189,7 +192,7 @@ class Monitor(xbmc.Monitor):
     def cache_remove_old(self, **ka):
         self.last_garbage_on = time()
         clean_old(cache)
-        
+
     def onSettingsChanged(self):
         pass
 
@@ -217,4 +220,4 @@ try:
     print '[%s] Exiting... bye!' % (logLabel)
 except Exception as e:
     print '[%s] Exiting monitor' % (pluginId)
-    print 'Exception: %s' % (pprint.pformat(e)) 
+    print 'Exception: %s' % (pprint.pformat(e))
