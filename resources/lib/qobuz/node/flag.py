@@ -36,13 +36,14 @@ class __Flag__():
     PUBLIC_PLAYLISTS = 1 << 22
     COLLECTION = 1 << 23
     COLLECTIONS = 1 << 24
+    FAVORITE = 1 << 25
 
     STOPBUILD = 1 << 100
     NONE = 1 << 101
 
     def __init__(self):
 
-        self.totalFlag = 24
+        self.totalFlag = 25
         self.ALL = 0
         for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
@@ -68,6 +69,8 @@ class __Flag__():
             return "purchases"
         elif flag & self.FAVORITES == self.FAVORITES:
             return "favorites"
+        elif flag & self.FAVORITE == self.FAVORITE:
+            return "favorite"
         elif flag & self.SEARCH == self.SEARCH:
             return "search"
         elif flag & self.ARTIST == self.ARTIST:

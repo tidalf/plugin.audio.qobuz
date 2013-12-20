@@ -22,7 +22,7 @@ class dog():
             'nm': "^[\w\d_]+$",    # Method to be called on node
             'genre-type': '^(\d+|null)$',  # Reco params
             'genre-id': '^(\d+|null)$',    # Reco params
-            'search-type': "^(artists|tracks|albums)$",
+            'search-type': "^(artists|tracks|albums|articles|all)$",
             'depth': "^(-)?\d+$",
             'query': "^.*$",
             'track-id': "^\d{1,10}$",

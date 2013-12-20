@@ -17,7 +17,7 @@ from node import Flag
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, \
     getSetting
-from debug import log, warn
+from debug import log, warn, info
 from gui.contextmenu import contextMenu
 from node import getNode
 from renderer import renderer
@@ -313,8 +313,14 @@ class INode(object):
         return self.childs
 
     def set_label(self, label):
-        self.label = label  # label.encode('utf8', 'replace')
+        info(self, "SET LABEL: %s" % label)
+        self._label = label
         return self
+
+    def get_label(self):
+        return self._label
+
+    label = property(get_label, set_label)
 
     def get_image(self):
         if self.image:
@@ -326,9 +332,6 @@ class INode(object):
     def set_image(self, image):
         self.image = image
         return self
-
-    def get_label(self):
-        return self.label
 
     def get_label2(self):
         return self.label2
@@ -454,16 +457,16 @@ class INode(object):
                           label=lang(30160),
                           cmd=containerUpdate(url))
         ''' FAVORITES '''
-        wf = self.nt & (~Flag.FAVORITES)
+        wf = self.nt & (~Flag.FAVORITE)
         if self.parent:
-            wf = wf and self.parent.nt & ~Flag.FAVORITES
+            wf = wf and self.parent.nt & ~Flag.FAVORITE
         if wf:
             ''' ADD TO FAVORITES / TRACKS'''
-            url = self.make_url(nt=Flag.FAVORITES,
+            url = self.make_url(nt=Flag.FAVORITE,
                                 nm='', mode=Mode.VIEW)
             menu.add(path='favorites', label="Favorites",
                      cmd=containerUpdate(url, True), pos=-9)
-            url = self.make_url(nt=Flag.FAVORITES,
+            url = self.make_url(nt=Flag.FAVORITE,
                                           nm='gui_add_tracks',
                                           qid=self.nid,
                                           qnt=self.nt,
@@ -471,7 +474,7 @@ class INode(object):
             menu.add(path='favorites/add_tracks',
                           label=lang(30167) + ' tracks', cmd=runPlugin(url))
             ''' ADD TO FAVORITES / Albums'''
-            url = self.make_url(nt=Flag.FAVORITES,
+            url = self.make_url(nt=Flag.FAVORITE,
                                           nm='gui_add_albums',
                                           qid=self.nid,
                                           qnt=self.nt,
@@ -479,7 +482,7 @@ class INode(object):
             menu.add(path='favorites/add_albums',
                           label=lang(30167) + ' albums', cmd=runPlugin(url))
             ''' ADD TO FAVORITES / Artists'''
-            url = self.make_url(nt=Flag.FAVORITES,
+            url = self.make_url(nt=Flag.FAVORITE,
                                           nm='gui_add_artists',
                                           qid=self.nid,
                                           qnt=self.nt,
@@ -487,12 +490,12 @@ class INode(object):
             menu.add(path='favorites/add_artists',
                           label=lang(30167) + ' artists', cmd=runPlugin(url))
 
-        if self.parent and (self.parent.nt & Flag.FAVORITES):
-            url = self.make_url(nt=Flag.FAVORITES,
+        if self.parent and (self.parent.nt & Flag.FAVORITE):
+            url = self.make_url(nt=Flag.FAVORITE,
                                 nm='', mode=Mode.VIEW)
             menu.add(path='favorites', label="Favorites",
                      cmd=containerUpdate(url, True), pos=-9)
-            url = self.make_url(nt=Flag.FAVORITES, nm='gui_remove',
+            url = self.make_url(nt=Flag.FAVORITE, nm='gui_remove',
                                 qid=self.nid, qnt=self.nt,
                                 mode=Mode.VIEW)
             menu.add(path='favorites/remove',
