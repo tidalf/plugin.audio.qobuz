@@ -313,7 +313,6 @@ class INode(object):
         return self.childs
 
     def set_label(self, label):
-        info(self, "SET LABEL: %s" % label)
         self._label = label
         return self
 
