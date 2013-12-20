@@ -20,7 +20,8 @@ RECOS_TYPE_IDS = {
     2: 'press-awards',
     3: 'best-sellers',
     4: 'editor-picks',
-    5: 'most-featured'
+    5: 'most-featured',
+    6: 'most-streamed'
 }
 
 RECOS_TYPES = {
@@ -29,6 +30,7 @@ RECOS_TYPES = {
     3: lang(30087),
     4: lang(30088),
     5: lang(30103),
+    6: lang(30192)
 }
 
 RECOS_GENRES = {
