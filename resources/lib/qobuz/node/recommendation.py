@@ -13,7 +13,7 @@ from api import api
 from inode import INode
 from node import getNode, Flag
 from gui.util import getSetting, lang, getImage
-from debug import warn
+from debug import warn, info
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -113,7 +113,7 @@ class Node_recommendation(INode):
             label = '%s / %s / %s' % (self.label,
                                       RECOS_TYPES[int(self.genre_type)],
                                      RECOS_GENRES[genre_id])
-            node.set_label(label)
+            node.label = label
             self.add_child(node)
         return True
 
