@@ -25,9 +25,10 @@ socket.timeout = 5
 
 
 def _api_error_string(self, url="", params={}, json=""):
-        return 'Something went wrong with request: %s\n%s\n%s' % (
-                url, pprint.pformat(params),
-                pprint.pformat(json))
+    s = 'Something went wrong with request url=%s\nparams=%s\njson=%s'
+    s %= (url, pprint.pformat(params),
+          pprint.pformat(json))
+    return s
 
 
 class QobuzApiRaw(object):
@@ -106,6 +107,7 @@ class QobuzApiRaw(object):
             Error: [200]
             Error: Bad Request [400]
         """
+        info(self, 'uri: %s, params: %s' % (uri, params))
         self.statTotalRequest += 1
         self.error = ''
         self.status_code = None
@@ -444,17 +446,13 @@ class QobuzApiRaw(object):
         return self._api_request(ka, '/article/get')
 
     def collection_getAlbums(self, **ka):
-        info(self, 'GETTING ALBUMS')
         self._check_ka(ka, [], ['source', 'artist_id', 'query',
                                 'limit', 'offset'])
-        info(self, 'GETTING ALBUMS')
         return self._api_request(ka, '/collection/getAlbums')
 
     def collection_getArtists(self, **ka):
-        info(self, 'GETTING ARTIST %s' % ka)
         self._check_ka(ka, [], ['source', 'query',
                                 'limit', 'offset'])
-        info(self, 'GETTING ARTIST')
         return self._api_request(ka, '/collection/getArtists')
 
     def collection_getTracks(self, **ka):
