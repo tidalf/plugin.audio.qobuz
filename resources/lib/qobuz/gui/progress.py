@@ -7,10 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-
-# import xbmcplugin  # @UnresolvedImport
 import xbmcgui  # @UnresolvedImport
-# import xbmc  # @UnresolvedImport
 from debug import warn
 
 
