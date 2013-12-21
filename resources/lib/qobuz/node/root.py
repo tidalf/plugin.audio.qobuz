@@ -40,7 +40,7 @@ class Node_root(INode):
             self.add_child(search)
             collections = getNode(Flag.COLLECTIONS)
             self.add_child(collections)
-        self.add_child(getNode(Flag.FRIEND_LIST))
+        self.add_child(getNode(Flag.FRIENDS))
         self.add_child(getNode(Flag.GENRE))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
         return True

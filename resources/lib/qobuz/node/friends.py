@@ -13,13 +13,13 @@ from api import api
 from node import getNode, Flag
 
 
-class Node_friend_list(INode):
+class Node_friends(INode):
     '''
     @class Node_friend_list:
     '''
     def __init__(self, parent=None, parameters=None):
-        super(Node_friend_list, self).__init__(parent, parameters)
-        self.nt = Flag.FRIEND_LIST
+        super(Node_friends, self).__init__(parent, parameters)
+        self.nt = Flag.FRIENDS
         self.name = self.get_parameter('query')
         self.image = getImage('artist')
         self.label = str(self.name) + lang(30179) if (
@@ -29,7 +29,7 @@ class Node_friend_list(INode):
         self.content_type = 'artists'
 
     def make_url(self, **ka):
-        url = super(Node_friend_list, self).make_url(**ka)
+        url = super(Node_friends, self).make_url(**ka)
         if self.name:
             url += "&query=" + self.name
         return url
@@ -90,4 +90,4 @@ class Node_friend_list(INode):
         menu.add(path='friend/add', label=lang(30181), cmd=runPlugin(url))
 
         ''' Calling base class '''
-        super(Node_friend_list, self).attach_context_menu(item, menu)
+        super(Node_friends, self).attach_context_menu(item, menu)

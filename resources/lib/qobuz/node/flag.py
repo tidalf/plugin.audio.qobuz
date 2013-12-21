@@ -24,7 +24,7 @@ class FlagEnum(object):
     SIMILAR_ARTIST = 1 << 11
     FAVORITES = 1 << 12
     FRIEND = 1 << 13
-    FRIEND_LIST = 1 << 14
+    FRIENDS = 1 << 14
     GENRE = 1 << 15
     LABEL = 1 << 16
     ALBUMS = 1 << 17
@@ -82,8 +82,8 @@ class FlagEnum(object):
             return "similar_artist"
         elif flag & cls.FRIEND == cls.FRIEND:
             return "friend"
-        elif flag & cls.FRIEND_LIST == cls.FRIEND_LIST:
-            return "friend_list"
+        elif flag & cls.FRIENDS == cls.FRIENDS:
+            return "friends"
         elif flag & cls.GENRE == cls.GENRE:
             return "genre"
         elif flag & cls.LABEL == cls.LABEL:

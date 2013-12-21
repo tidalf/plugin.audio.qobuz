@@ -135,7 +135,7 @@ class Node_friend(INode):
             warn(self, "No friend data")
             return False
         if lvl != -1:
-            self.add_child(getNode(Flag.FRIEND_LIST, self.parameters))
+            self.add_child(getNode(Flag.FRIENDS, self.parameters))
         for pl in data['playlists']['items']:
             node = getNode(Flag.PLAYLIST)
             node.data = pl
