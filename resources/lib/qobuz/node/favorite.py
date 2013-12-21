@@ -31,7 +31,7 @@ class Node_favorite(INode):
         self.image = getImage('favorites')
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
-        self.content_type = 'albums'
+        self.content_type = 'files'
         if self.search_type is None:
             self.label = '%s - %s' % (lang(30081), lang(30098))
         else:
