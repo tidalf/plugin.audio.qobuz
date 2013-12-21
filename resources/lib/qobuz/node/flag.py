@@ -36,13 +36,14 @@ class FlagEnum(object):
     COLLECTION = 1 << 23
     COLLECTIONS = 1 << 24
     FAVORITE = 1 << 25
+    PURCHASE = 1 << 26
 
     STOPBUILD = 1 << 100
     NONE = 1 << 101
 
     def __init__(self):
 
-        self.totalFlag = 25
+        self.totalFlag = 26
         self.ALL = 0
         for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
@@ -67,6 +68,8 @@ class FlagEnum(object):
             return "album"
         elif flag & cls.PURCHASES == cls.PURCHASES:
             return "purchases"
+        elif flag & cls.PURCHASE == cls.PURCHASE:
+            return "purchase"
         elif flag & cls.FAVORITES == cls.FAVORITES:
             return "favorites"
         elif flag & cls.FAVORITE == cls.FAVORITE:
