@@ -7,9 +7,9 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from inode import INode
-from node import getNode, Flag
+from node import Flag
 from api import api
-from debug import warn, info
+from debug import info
 from gui.util import getImage, getSetting
 
 

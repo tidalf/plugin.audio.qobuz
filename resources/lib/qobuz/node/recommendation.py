@@ -7,13 +7,11 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-# import xbmcgui  # @UnresolvedImport
-
 from api import api
 from inode import INode
 from node import getNode, Flag
 from gui.util import getSetting, lang, getImage
-from debug import warn, info
+from debug import warn
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',

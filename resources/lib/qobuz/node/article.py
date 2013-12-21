@@ -7,8 +7,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
-# import xbmc  # @UnresolvedImport
-
 from inode import INode
 from gui.contextmenu import contextMenu
 from node import Flag

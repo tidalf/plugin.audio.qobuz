@@ -6,11 +6,9 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-
 import sys
 import os
 import weakref
-
 import qobuz  # @UnresolvedImport
 from constants import Mode
 from node import Flag

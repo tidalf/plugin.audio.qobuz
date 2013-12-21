@@ -6,10 +6,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-# import qobuz  # @UnresolvedImport
-
 from debug import warn
-
 from inode import INode
 from exception import QobuzXbmcError
 from gui.util import lang, getImage, getSetting

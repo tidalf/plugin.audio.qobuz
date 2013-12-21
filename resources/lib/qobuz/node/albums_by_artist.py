@@ -7,7 +7,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
-
 from inode import INode
 from debug import warn
 import weakref

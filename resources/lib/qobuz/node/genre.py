@@ -6,10 +6,6 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-# import xbmcgui  # @UnresolvedImport
-# import xbmc  # @UnresolvedImport
-
-# import qobuz  # @UnresolvedImport
 from inode import INode
 from gui.util import getImage, getSetting, lang
 from api import api

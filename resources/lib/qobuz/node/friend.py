@@ -6,10 +6,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-# import xbmcgui  # @UnresolvedImport
-# import xbmc  # @UnresolvedImport
 import json
-
 from inode import INode
 from debug import warn
 from gui.util import color, getImage, runPlugin, containerRefresh, \
