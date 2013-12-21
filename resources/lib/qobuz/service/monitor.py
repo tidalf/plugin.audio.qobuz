@@ -152,7 +152,9 @@ class Monitor(xbmc.Monitor):
                 except:
                     pass
                 if  data2 is None:
-                    sqlcmd2 = "INSERT INTO art VALUES (" "NULL, (?) , 'album', 'thumb', (?)" ")"
+                    sqlcmd2 = str("INSERT INTO art VALUES ("
+                                  "NULL, (?) , 'album', 'thumb', (?)"
+                                  ")")
                     cur.execute(sqlcmd2, (str(musicdb_idAlbum), str(curl)))
                     con.commit()
         except lite.Error, e:
