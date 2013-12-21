@@ -8,7 +8,7 @@
 '''
 import xbmcgui  # @UnresolvedImport
 from inode import INode
-from debug import warn, info
+from debug import warn
 from gui.util import lang, getSetting
 from gui.util import getImage, notifyH, executeBuiltin, containerUpdate
 from node import getNode, Flag
@@ -31,6 +31,8 @@ class Node_favorite(INode):
         self.image = getImage('favorites')
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
+        if self.search_type == 'all':
+            self.search_type = None
         self.content_type = 'files'
         if self.search_type is None:
             self.label = '%s - %s' % (lang(30081), lang(30098))
@@ -68,13 +70,11 @@ class Node_favorite(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.method is not None:
             return True
-        info(self, 'POPULATE')
         ret = False
         all_kind = ('artists', 'albums', 'tracks')
         search_for = (self.search_type, )
-        if self.search_type == 'all':
+        if self.search_type is None:
             search_for = all_kind
-        info(self, "Search for %s" % str(search_for))
         for kind in search_for:
             method = '_populate_%s' % kind
             if not hasattr(self, method):
