@@ -1,6 +1,6 @@
 '''
-    qobuz.constant
-    ~~~~~~~~~~~~~~
+    qobuz.constants
+    ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
@@ -10,24 +10,23 @@
 __debugging__ = 0
 
 
-class __Mode():
+class ModeEnum(object):
+    VIEW = 0x1
+    PLAY = 0x2
+    SCAN = 0x3
+    VIEW_BIG_DIR = 0x4
 
-    def __init__(self):
-        self.VIEW = 1
-        self.PLAY = 2
-        self.SCAN = 3
-        self.VIEW_BIG_DIR = 4
-
-    def to_s(self, mode):
-        if mode == self.VIEW:
+    @classmethod
+    def to_s(cls, mode):
+        if mode == cls.VIEW:
             return "view"
-        elif mode == self.PLAY:
+        elif mode == cls.PLAY:
             return "play"
-        elif mode == self.SCAN:
+        elif mode == cls.SCAN:
             return "scan"
-        elif mode == self.VIEW_BIG_DIR:
+        elif mode == cls.VIEW_BIG_DIR:
             return "view big dir"
         else:
             return "Unknow mode: " + str(mode)
 
-Mode = __Mode()
+Mode = ModeEnum
