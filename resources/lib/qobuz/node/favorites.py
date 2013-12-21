@@ -22,6 +22,6 @@ class Node_favorites(INode):
         self.image = getImage('favorites')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        for kind in ['artists', 'albums', 'tracks']:
+        for kind in ['all', 'artists', 'albums', 'tracks']:
             self.add_child(getNode(Flag.FAVORITE, {'search-type': kind}))
         return True
