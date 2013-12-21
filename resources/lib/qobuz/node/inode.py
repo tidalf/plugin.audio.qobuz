@@ -17,7 +17,7 @@ from node import Flag
 from exception import QobuzXbmcError as Qerror
 from gui.util import color, lang, runPlugin, containerUpdate, \
     getSetting
-from debug import log, warn, info
+from debug import log, warn
 from gui.contextmenu import contextMenu
 from node import getNode
 from renderer import renderer
