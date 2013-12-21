@@ -10,7 +10,7 @@ from exception import QobuzXbmcError
 from debug import warn
 
 
-class __Flag__():
+class FlagEnum(object):
     NODE = 1 << 1
     TRACK = 1 << 2
     PLAYLIST = 1 << 3
@@ -47,63 +47,64 @@ class __Flag__():
         for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
 
-    def to_s(self, flag):
+    @classmethod
+    def to_s(cls, flag):
         if not flag:
-            warn(self, "Missing flag parameter")
+            warn(cls, "Missing flag parameter")
             return ''
         flag = int(flag)
-        if flag & self.TRACK == self.TRACK:
+        if flag & cls.TRACK == cls.TRACK:
             return "track"
-        elif flag & self.PLAYLIST == self.PLAYLIST:
+        elif flag & cls.PLAYLIST == cls.PLAYLIST:
             return "playlist"
-        elif flag & self.USERPLAYLISTS == self.USERPLAYLISTS:
+        elif flag & cls.USERPLAYLISTS == cls.USERPLAYLISTS:
             return "user_playlists"
-        elif flag & self.RECOMMENDATION == self.RECOMMENDATION:
+        elif flag & cls.RECOMMENDATION == cls.RECOMMENDATION:
             return "recommendation"
-        elif flag & self.ROOT == self.ROOT:
+        elif flag & cls.ROOT == cls.ROOT:
             return "root"
-        elif flag & self.ALBUM == self.ALBUM:
+        elif flag & cls.ALBUM == cls.ALBUM:
             return "album"
-        elif flag & self.PURCHASES == self.PURCHASES:
+        elif flag & cls.PURCHASES == cls.PURCHASES:
             return "purchases"
-        elif flag & self.FAVORITES == self.FAVORITES:
+        elif flag & cls.FAVORITES == cls.FAVORITES:
             return "favorites"
-        elif flag & self.FAVORITE == self.FAVORITE:
+        elif flag & cls.FAVORITE == cls.FAVORITE:
             return "favorite"
-        elif flag & self.SEARCH == self.SEARCH:
+        elif flag & cls.SEARCH == cls.SEARCH:
             return "search"
-        elif flag & self.ARTIST == self.ARTIST:
+        elif flag & cls.ARTIST == cls.ARTIST:
             return "artist"
-        elif flag & self.SIMILAR_ARTIST == self.SIMILAR_ARTIST:
+        elif flag & cls.SIMILAR_ARTIST == cls.SIMILAR_ARTIST:
             return "similar_artist"
-        elif flag & self.FRIEND == self.FRIEND:
+        elif flag & cls.FRIEND == cls.FRIEND:
             return "friend"
-        elif flag & self.FRIEND_LIST == self.FRIEND_LIST:
+        elif flag & cls.FRIEND_LIST == cls.FRIEND_LIST:
             return "friend_list"
-        elif flag & self.GENRE == self.GENRE:
+        elif flag & cls.GENRE == cls.GENRE:
             return "genre"
-        elif flag & self.LABEL == self.LABEL:
+        elif flag & cls.LABEL == cls.LABEL:
             return "label"
-        elif flag & self.NODE == self.NODE:
+        elif flag & cls.NODE == cls.NODE:
             return "inode"
-        elif flag & self.STOPBUILD == self.STOPBUILD:
+        elif flag & cls.STOPBUILD == cls.STOPBUILD:
             return "stop_build_down"
-        elif flag & self.ARTICLES == self.ARTICLES:
+        elif flag & cls.ARTICLES == cls.ARTICLES:
             return "articles"
-        elif flag & self.ARTICLE == self.ARTICLE:
+        elif flag & cls.ARTICLE == cls.ARTICLE:
             return "article"
-        elif flag & self.PUBLIC_PLAYLISTS == self.PUBLIC_PLAYLISTS:
+        elif flag & cls.PUBLIC_PLAYLISTS == cls.PUBLIC_PLAYLISTS:
             return "public_playlists"
-        elif flag & self.ARTICLE_RUBRICS == self.ARTICLE_RUBRICS:
+        elif flag & cls.ARTICLE_RUBRICS == cls.ARTICLE_RUBRICS:
             return "article_rubrics"
-        elif flag & self.ALBUMS_BY_ARTIST == self.ALBUMS_BY_ARTIST:
+        elif flag & cls.ALBUMS_BY_ARTIST == cls.ALBUMS_BY_ARTIST:
             return "albums_by_artist"
-        elif flag & self.COLLECTION == self.COLLECTION:
+        elif flag & cls.COLLECTION == cls.COLLECTION:
             return "collection"
-        elif flag & self.COLLECTIONS == self.COLLECTIONS:
+        elif flag & cls.COLLECTIONS == cls.COLLECTIONS:
             return "collections"
         else:
             raise QobuzXbmcError(
-                who=self, what='invalid_flag', additional=repr(flag))
+                who=cls, what='invalid_flag', additional=repr(flag))
 
-Flag = __Flag__()
+Flag = FlagEnum()
