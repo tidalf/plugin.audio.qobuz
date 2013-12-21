@@ -34,9 +34,6 @@ class Node_friend_list(INode):
             url += "&query=" + self.name
         return url
 
-    def get_image(self):
-        return ''
-
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         node = getNode(Flag.FRIEND)
         node.create('qobuz.com')
