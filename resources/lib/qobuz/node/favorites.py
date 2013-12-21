@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from inode import INode
-from gui.util import lang
+from gui.util import lang, getImage
 from node import getNode, Flag
 
 
@@ -19,6 +19,7 @@ class Node_favorites(INode):
         self.nt = Flag.FAVORITES
         self.set_label(lang(30081))
         self.content_type = 'files'
+        self.image = getImage('favorites')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for kind in ['artists', 'albums', 'tracks']:
