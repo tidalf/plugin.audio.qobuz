@@ -11,7 +11,6 @@ import xbmcgui  # @UnresolvedImport
 
 from progress import Progress
 import time
-# from debug import log
 from gui.util import lang
 from exception import QobuzXbmcError as Qerror
 
