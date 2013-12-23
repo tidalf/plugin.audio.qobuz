@@ -80,6 +80,21 @@ def dialogLoginFailure():
         return False
 
 
+def dialogServiceTemporarilyUnavailable():
+    """Dialog to be shown when Qobuz is not available (Maintenance)
+    """
+    dialog = xbmcgui.Dialog()
+    dialog.ok('Qobuz Service Temporay Unavailable',
+                    'Qobuz service are down :/',
+                    'Check it later')
+    xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
+                                  updateListing=True, cacheToDisc=False)
+#     else:
+#         xbmc.executebuiltin('ActivateWindow(home)')
+#         return False
+    return False
+
+
 def isFreeAccount():
     """Check if account if it's a Qobuz paid account
     """

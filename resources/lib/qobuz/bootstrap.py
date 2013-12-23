@@ -15,6 +15,7 @@ from dog import dog
 from node import Flag
 from exception import QobuzXbmcError
 from gui.util import dialogLoginFailure, getSetting, containerRefresh
+from gui.util import dialogServiceTemporarilyUnavailable
 import qobuz  # @UnresolvedImport
 from cache import cache
 
@@ -69,7 +70,10 @@ class QobuzBootstrap(object):
         cache.base_path = qobuz.path.cache
         api.stream_format = 6 if getSetting('streamtype') == 'flac' else 5
         if not api.login(getSetting('username'), getSetting('password')):
-            dialogLoginFailure()
+            if api.status_code == 503:
+                dialogServiceTemporarilyUnavailable()
+            else:
+                dialogLoginFailure()
             #@TODO sys.exit killing XBMC? FRODO BUG ?
             # sys.exit(1)
             containerRefresh()
