@@ -24,13 +24,6 @@ from debug import warn, info
 socket.timeout = 5
 
 
-def _api_error_string(self, url="", params={}, json=""):
-    s = 'Something went wrong with request url=%s\nparams=%s\njson=%s'
-    s %= (url, pprint.pformat(params),
-          pprint.pformat(json))
-    return s
-
-
 class QobuzApiRaw(object):
 
     def __init__(self):
@@ -49,6 +42,13 @@ class QobuzApiRaw(object):
         self.statTotalRequest = 0
         self.error = None
         self.__set_s4()
+
+    def _api_error_string(self, url="", params={}, json=""):
+        s = 'Something went wrong with request (code=%s)\nurl=%s\nparams=%s' \
+            '\njson=%s'
+        s %= (self.status_code, url, pprint.pformat(params),
+              pprint.pformat(json))
+        return s
 
     def _check_ka(self, ka, mandatory, allowed=[]):
         """
@@ -142,7 +142,7 @@ class QobuzApiRaw(object):
                 self.error = "Not Found"
             else:
                 self.error = "Server error"
-            self.error = _api_error_string(url, _copy_params)
+            self.error = self._api_error_string(url, _copy_params)
             warn(self, self.error)
             return None
         if not r.content:
@@ -168,7 +168,7 @@ class QobuzApiRaw(object):
         except:
             pass
         if status == 'error':
-            self.error = _api_error_string(url, _copy_params, response_json)
+            self.error = self._api_error_string(url, _copy_params, response_json)
             warn(self, self.error)
             return None
         return response_json
