@@ -120,7 +120,6 @@ class Node_recommendation(INode):
         '''
         if self.data is None:
             return False
-        warn(self, str(self.data))
         if 'albums' not in self.data:
             warn(self, "Recommendation data doesn't contain 'albums' key")
             return False
