@@ -118,7 +118,14 @@ class Node_recommendation(INode):
     def __populate_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
         '''Populate album selected by genre_type and genre_id
         '''
-        if not self.data:
+        if self.data is None:
+            return False
+        warn(self, str(self.data))
+        if 'albums' not in self.data:
+            warn(self, "Recommendation data doesn't contain 'albums' key")
+            return False
+        if self.data['albums'] is None or 'items' not in self.data['albums']:
+            warn(self, "Recommendation data['albums'] doesn't contain items")
             return False
         for product in self.data['albums']['items']:
             node = getNode(Flag.ALBUM)

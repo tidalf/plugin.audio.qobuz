@@ -178,13 +178,15 @@ class INode(object):
         items = None
         need_pagination = False
         for p in paginated:
-            if p in data:
-                items = data[p]
-                if items['limit'] is None:
-                    continue
-                if items['total'] > (items['offset'] + items['limit']):
-                    need_pagination = True
-                    break
+            if not p in data or data[p] is None:
+                warn(self, 'No pagination data')
+                continue
+            items = data[p]
+            if items['limit'] is None:
+                continue
+            if items['total'] > (items['offset'] + items['limit']):
+                need_pagination = True
+                break
         if not need_pagination:
             return False
         url = self.make_url(offset=items['offset'] + items['limit'])
