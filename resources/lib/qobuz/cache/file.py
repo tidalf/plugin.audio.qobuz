@@ -8,7 +8,13 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import pickle
+try:
+    """cPickle is a faster implementation of pickle, we are using it if
+    present
+    """
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import os
 
 from base import CacheBase
