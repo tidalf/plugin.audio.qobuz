@@ -173,7 +173,7 @@ class Node_playlist(INode):
         qnt = int(self.get_parameter('qnt'))
         qid = self.get_parameter('qid')
         nodes = []
-        if qnt & Flag.SEARCH:
+        if qnt & Flag.SEARCH == Flag.SEARCH:
             self.del_parameter('query')
         if qnt & Flag.TRACK == Flag.TRACK:
             node = getNode(qnt, {'nid': qid})
@@ -205,44 +205,31 @@ class Node_playlist(INode):
         if len(nodes) < 1:
             warn(self, 'Empty list...')
             return False
-        step = 500
+        step = 50
         start = 0
-        end = step
-        max = len(nodes)
-        if end > max:
-            end = max
-        ret = False
-        oneFalse = False
-        while end < max:
+        numtracks = len(nodes)
+        if numtracks > 1000:
+            notifyH('Qobuz', 'Max tracks per playlist reached (1000)'
+                    '\nSkipping %s tracks' % (numtracks - 1000),
+                    'icon-error-256')
+            numtracks = 1000
+        while start < numtracks:
+            if (start + step) > numtracks:
+                step = numtracks - start
             str_tracks = ''
-            for i in range(start, end):
-                info(self, 'start: %s, end: %s' % (start, end))
+            info(self, "Adding tracks start: %s, end: %s" %
+                 (start, start + step))
+            for i in range(start, start + step):
                 node = nodes[i]
                 if node.nt != Flag.TRACK:
                     warn(self, "Not a Node_track node")
                     continue
                 str_tracks += '%s,' % (str(node.nid))
-            if api.playlist_addTracks(
+            if not api.playlist_addTracks(
                                 playlist_id=playlist_id, track_ids=str_tracks):
-                ret = True
-            else:
-                oneFalse = True
-            start = start + step
-            end = start + step
-        if end <= max:
-            str_tracks = ''
-            for i in range(end, max - 1):
-                info(self, 'start: %s, end: %s' % (start, end))
-                node = nodes[i]
-                if node.nt != Flag.TRACK:
-                    warn(self, "Not a Node_track node")
-                    continue
-            if api.playlist_addTracks(
-                                playlist_id=playlist_id, track_ids=str_tracks):
-                ret = True
-            else:
-                oneFalse = True
-        return not oneFalse
+                return False
+            start += step
+        return True
 
     def gui_add_as_new(self, name=None):
         nodes = []
