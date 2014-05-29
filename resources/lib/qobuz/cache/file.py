@@ -8,29 +8,34 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import hashlib
-import pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import os
 
 from base import CacheBase
 from fileutil import RenamedTemporaryFile, unlink, find
 
+
 class CacheFile(CacheBase):
     '''Caching to files (base_path/<md5.dat>)
-        
+
         ::Properties:
             base_path: string, location of our cache,
-        
-        ::Note: 
+
+        ::Note:
             if base_path is not set caching is disable
     '''
     def __init__(self, base_path=None):
-        self.base_path = base_path        
+        self.base_path = base_path
         self.ventile = False
         super(CacheFile, self).__init__()
 
     @property
     def base_path(self):
         return self._base_path
+
     @base_path.setter
     def base_path(self, path):
         '''This setter enable cache when feed with valid path
@@ -42,6 +47,7 @@ class CacheFile(CacheBase):
             raise Exception('Bad file path: %s' % (path))
         self._base_path = path
         self.enable = True
+
     @base_path.getter
     def base_path(self):
             return self._base_path
@@ -52,7 +58,7 @@ class CacheFile(CacheBase):
 
     def make_key(self, *a, **ka):
         argstr = '/'.join(a[:])
-        argstr += '/'.join([ '%s=%s' % (key, ka[key]) for key in sorted(ka)])
+        argstr += '/'.join(['%s=%s' % (key, ka[key]) for key in sorted(ka)])
         m = hashlib.md5()
         m.update(argstr)
         return m.hexdigest()
@@ -106,13 +112,13 @@ class CacheFile(CacheBase):
             if not self.check_magic(data):
                 print "Error: bad magic, skipping file %s" % (filename)
                 return True
-            ttl = self.is_fresh( data['key'], data)
+            ttl = self.is_fresh(data['key'], data)
             if ttl:
                 return True
             if self.delete(data['key']):
                 info['count'] += 1
             return True
-        info = { 'count': 0 }
+        info = {'count': 0}
         find(self.base_path, '^.*\.dat$', delete_one, info)
         return info['count']
 
@@ -122,6 +128,7 @@ class CacheFile(CacheBase):
         checkMagic = True
         if 'checkMagic' in ka:
             checkMagic = ka['checkMagic']
+
         def delete_one(filename, info):
             '''::callback that delete one file
             '''
@@ -135,7 +142,6 @@ class CacheFile(CacheBase):
                 print "File deleted: %s" % filename
                 info['count'] += 1
             return True
-        info = { 'count': 0 }
+        info = {'count': 0}
         find(self.base_path, '^.*\.dat$', delete_one, info)
         return info['count']
-

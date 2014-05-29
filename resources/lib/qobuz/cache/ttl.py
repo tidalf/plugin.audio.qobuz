@@ -9,8 +9,9 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from file import CacheFile
+from qobuz.cache.file import CacheFile
 from qobuz.settings import settings
+
 
 class CacheFileTTL(CacheFile):
 
@@ -18,7 +19,6 @@ class CacheFileTTL(CacheFile):
         super(CacheFileTTL, self).__init__()
         self.store = {}
         self.black_keys = ['password']
-
 
     def load(self, key, *a, **ka):
         if key in self.store:

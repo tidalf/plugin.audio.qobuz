@@ -23,13 +23,13 @@ api.pagination_limit = int(settings['pagination_limit'])
 api.login(settings['username'],
           settings['password'])
 
-import xbmc
+import xbmc  # @UnresolvedImport
 from qobuz.xbmc.renderer import XbmcRenderer
 from qobuz.xbmc.commander import QobuzXbmcCommander
 from qobuz.xbmc.player import Player
-renderer = XbmcRenderer(plugin, 
-                        QobuzXbmcCommander(Flag, getNode), 
-                        ItemFactory(), 
+renderer = XbmcRenderer(plugin,
+                        QobuzXbmcCommander(Flag, getNode),
+                        ItemFactory(),
                         Player(plugin=plugin))
 #except Exception as e:
 #    from node.renderer.console import ConsoleRenderer, ItemFactory

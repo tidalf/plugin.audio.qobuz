@@ -8,10 +8,18 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 
-class QobuzException(Exception): pass
 
-class InvalidParameter(QobuzException): pass
+class QobuzException(Exception):
+    pass
 
-class MissingParameter(QobuzException): pass
 
-class InvalidType(QobuzException): pass
+class InvalidParameter(QobuzException):
+    pass
+
+
+class MissingParameter(QobuzException):
+    pass
+
+
+class InvalidType(QobuzException):
+    pass
