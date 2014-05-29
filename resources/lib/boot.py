@@ -31,14 +31,5 @@ renderer = XbmcRenderer(plugin,
                         QobuzXbmcCommander(Flag, getNode),
                         ItemFactory(),
                         Player(plugin=plugin))
-#except Exception as e:
-#    from node.renderer.console import ConsoleRenderer, ItemFactory
-#    renderer = ConsoleRenderer()
-#    renderer.itemFactory = ItemFactory()
-#    renderer.whiteFlag = Flag.ALL & ~Flag.TRACK
-
-#while renderer.alive:
 renderer.render(plugin.route(Flag, getNode))
-#        renderer.ask()
-
 cache.delete_old()

@@ -3,7 +3,7 @@ import xbmcpy.mock.xbmcaddon as xbmcaddon
 from xbmcpy.mock.xbmcgui import xbmcgui
 from node import Mode
 from pyobuz.node import Flag
-from node.renderer.base import BaseRenderer
+from pyobuz.renderer.base import BaseRenderer
 from pyobuz.debug import log
 from pyobuz.exception import QobuzException
 
