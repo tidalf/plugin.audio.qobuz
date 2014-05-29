@@ -15,6 +15,7 @@ import copy
 
 from urllib import quote, unquote
 
+
 class BaseFlag(object):
     Base = 1 << 0
 
@@ -24,6 +25,7 @@ __base_properties__ = {
     'nid': 0,
     'kind': Flag.Base
 }
+
 
 class _Mode_():
 
@@ -47,6 +49,7 @@ class _Mode_():
 
 Mode = _Mode_()
 
+
 def url2dict(url):
     '''Convert url query parameter (?foo=bar&fi=fu) to python dictionary
     '''
@@ -56,16 +59,18 @@ def url2dict(url):
     d = {}
     for kv in urlx:
         kvx = kv.split('=')
-        d[kvx[0]]= kvx[1]
+        d[kvx[0]] = kvx[1]
     return d
+
 
 def dict2url(d):
     '''Convert dictionary to url query parameter
     '''
     url = ''
     for k in d:
-        url += '%s=%s&' % (k, d[k])#urllib.quote_plus(d[k]))
+        url += '%s=%s&' % (k, d[k])  # urllib.quote_plus(d[k]))
     return url[:-1]
+
 
 class Commander(object):
 
@@ -89,8 +94,10 @@ class Commander(object):
             node = self.getNode(tkind, node.parameters)
             target = tmp
         nodename = self.flag.to_s(node.kind)
-        return getattr(self, '%s_%s' % (nodename, action))(renderer, node, target)
-    
+        return getattr(self, '%s_%s' % (nodename, action))(renderer, node,
+                                                           target)
+
+
 class BaseNode(collections.deque):
     '''Our base node that act like a list for his childs
     '''
@@ -107,24 +114,25 @@ class BaseNode(collections.deque):
         self.mode = Mode.VIEW
         self.actions = {}
         super(BaseNode, self).__init__(self)
-    
+
     def pretty(self, Flag):
         s = '[ %s ]\n' % (Flag.to_s(self.kind))
-        s+= ' ::nid:\t%s\n' % self.nid
-        s+= ' ::label:\t%s\n' % self.label
-        for p in ['kind', 'mode', 'parent', 'is_folder', 
+        s += ' ::nid:\t%s\n' % self.nid
+        s += ' ::label:\t%s\n' % self.label
+        for p in ['kind', 'mode', 'parent', 'is_folder',
                   'image']:
-                s+= ' ::%s\t%s\n' % (p, self.__dict__[p])
-        s+= ' ::IsPlayable: %s\n' % (self.is_playable)
-        s+= ' ::Parameters\n\t%s\n' % self.parameters
-        s+= ' ::Actions\n'
+                s += ' ::%s\t%s\n' % (p, self.__dict__[p])
+        s += ' ::IsPlayable: %s\n' % (self.is_playable)
+        s += ' ::Parameters\n\t%s\n' % self.parameters
+        s += ' ::Actions\n'
         for a in self.actions:
             kind = self.kind
             if 'target' in self.actions[a]:
                 kind = self.actions[a]['target']
-            s+= ' [ %s ]\t%s (%s)\n' % (Flag.to_s(kind), a, self.actions[a]['label']) 
+            s += ' [ %s ]\t%s (%s)\n' % (Flag.to_s(kind), a,
+                                         self.actions[a]['label'])
         return s
- 
+
     def add_action(self, path, **ka):
         self.actions[path] = ka
 
@@ -171,7 +179,7 @@ class BaseNode(collections.deque):
                 if v is not None:
                     ka[label] = v
         return '?%s' % (dict2url(ka))
-    
+
     def fetch(self, renderer):
         return True
 
@@ -180,7 +188,8 @@ class BaseNode(collections.deque):
 
     def populating(self, renderer):
 #        print "POPULATING .... %s %s" % (str(depth), str(self))
-        if renderer.depth == 0: return False
+        if renderer.depth == 0:
+            return False
         if renderer.depth != -1:
             if renderer.depth <= 0:
                 renderer.depth = 0
@@ -200,7 +209,8 @@ class BaseNode(collections.deque):
             if child.kind & renderer.whiteFlag == child.kind:
                 renderer.append(child)
             else:
-                print u"Rejecting node: %s" % child.get_label().encode('ascii', 'replace')
+                print u"Rejecting node: %s" % child.get_label().encode('ascii',
+                                                                    'replace')
             child.populating(renderer)
         if hasattr(self, 'populating_hook_after_traversal'):
             self.populating_hook_after_traversal(renderer)
@@ -210,7 +220,7 @@ class BaseNode(collections.deque):
     '''
     def get_label(self):
         return self.label or __name__
-    
+
     def get_image(self):
         return self.image or ''
 
@@ -224,10 +234,10 @@ class BaseNode(collections.deque):
                 string (empty string when all fail or when there's no data)
             * When passing array of string the method return the first
             path returning data
-            
+
             Example:
-                image = self.get_property(['image/extralarge', 
-                                       'image/mega', 
+                image = self.get_property(['image/extralarge',
+                                       'image/mega',
                                        'picture'])
         """
         if isinstance(pathList, basestring):

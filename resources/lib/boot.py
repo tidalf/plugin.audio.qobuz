@@ -8,10 +8,10 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from xbmcpy.plugin import Plugin
-from qobuz.node import getNode, Flag
-from qobuz.cache import cache
-from qobuz.api import api
-from qobuz.xbmc import settings, ItemFactory
+from pyobuz.node import getNode, Flag
+from pyobuz.cache import cache
+from pyobuz.api import api
+from qobuz import settings, ItemFactory
 """Main
 """
 import os
@@ -24,9 +24,9 @@ api.login(settings['username'],
           settings['password'])
 
 import xbmc  # @UnresolvedImport @UnusedImport
-from qobuz.xbmc.renderer import XbmcRenderer
-from qobuz.xbmc.commander import QobuzXbmcCommander
-from qobuz.xbmc.player import Player
+from qobuz.renderer import XbmcRenderer
+from qobuz.commander import QobuzXbmcCommander
+from qobuz.player import Player
 renderer = XbmcRenderer(plugin,
                         QobuzXbmcCommander(Flag, getNode),
                         ItemFactory(),

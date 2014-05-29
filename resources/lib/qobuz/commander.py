@@ -12,8 +12,8 @@ from xbmcpy.util import notifyH, executeBuiltin, containerUpdate
 from xbmcpy.util import containerRefresh
 from xbmcpy.mock.xbmcgui import xbmcgui
 from xbmcpy.mock import xbmcaddon
-from qobuz.i8n import _
-from qobuz.node import Flag
+from pyobuz.i8n import _
+from pyobuz.node import Flag
 from xbmcpy.keyboard import Keyboard
 
 base_url = 'plugin://%s/' % (xbmcaddon.Addon().getAddonInfo('id'))

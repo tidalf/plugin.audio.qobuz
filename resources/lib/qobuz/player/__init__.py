@@ -11,16 +11,17 @@ __all__ = ['Player']
 
 from xbmcpy.mock.xbmc import xbmc
 from xbmcpy.mock.xbmcgui import xbmcgui
-from qobuz.debug import warn
+from pyobuz.debug import warn
 from xbmcpy.util import notifyH, isFreeAccount, lang, setResolvedUrl, \
     getSetting
-from qobuz.node import Flag, getNode
-from qobuz.exception import MissingParameter
+from pyobuz.node import Flag, getNode
+from pyobuz.exception import MissingParameter
 
 """
     @class: QobuzPlayer
 """
 keyTrackId = 'QobuzPlayerTrackId'
+
 
 class Player(xbmc.Player):
 

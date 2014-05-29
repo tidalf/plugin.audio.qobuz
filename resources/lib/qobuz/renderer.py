@@ -2,8 +2,10 @@ from xbmcpy.mock.xbmcplugin import xbmcplugin
 import xbmcpy.mock.xbmcaddon as xbmcaddon
 from xbmcpy.mock.xbmcgui import xbmcgui
 from node import Mode
-from qobuz.node import Flag
+from pyobuz.node import Flag
 from node.renderer.base import BaseRenderer
+from pyobuz.debug import log
+from pyobuz.exception import QobuzException
 
 
 class ItemFactory(object):
@@ -17,9 +19,6 @@ class ItemFactory(object):
         url = '%s%s' % (plugin_id, node.url())
         item = xbmcgui.ListItem(label, label, image, image, url)
         return item
-        return None
-
-from qobuz.exception import QobuzException
 
 
 class AppendItemError(QobuzException):
@@ -38,6 +37,7 @@ class XbmcRenderer(BaseRenderer):
         self.depth = 1
         self.whiteFlag = Flag.ALL
         self.blackFlag = Flag.TRACK
+        self.content_type = 'albums'
 
     def append(self, node):
         handle = self.plugin.handle
@@ -68,6 +68,7 @@ class XbmcRenderer(BaseRenderer):
         self.clear()
         try:
             node.populating(self)
+            self.content_type = node.content_type
         except AppendItemError as _e:
             print "Operation canceled"
             self.clear()
@@ -84,6 +85,8 @@ class XbmcRenderer(BaseRenderer):
             succeeded = True if len(self) > 0 else False
         updateListing = not succeeded
         cacheToDisc = succeeded
+        log(self, "Set content_type: %s" % self.content_type)
+        xbmcplugin.setContent(handle, self.content_type)
         xbmcplugin.endOfDirectory(handle, succeeded, updateListing,
                                   cacheToDisc)
         return True
