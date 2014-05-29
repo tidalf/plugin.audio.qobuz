@@ -427,3 +427,21 @@ class QobuzApiRaw(object):
     def article_get(self, **ka):
         self._check_ka(ka, ['article_id'])
         return self._api_request(ka, '/article/get')
+
+    """
+        Collection
+    """
+    def collection_getAlbums(self, **ka):
+        self._check_ka(ka, [], ['source', 'artist_id', 'query',
+                                'limit', 'offset'])
+        return self._api_request(ka, '/collection/getAlbums')
+
+    def collection_getArtists(self, **ka):
+        self._check_ka(ka, [], ['source', 'query',
+                                'limit', 'offset'])
+        return self._api_request(ka, '/collection/getArtists')
+
+    def collection_getTracks(self, **ka):
+        self._check_ka(ka, [], ['source', 'artist_id', 'album_id', 'query',
+                                'limit', 'offset'])
+        return self._api_request(ka, '/collection/getTracks')
