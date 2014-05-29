@@ -13,7 +13,7 @@ from qobuz.node import Flag, getNode
 from qobuz.node.recommendation import RECOS_TYPE_IDS
 from qobuz.i8n import _
 from node.renderer.list import ListRenderer
-from qobuz.debug import log
+from qobuz.debug import log, warn
 
 
 class Node_genre(INode):
@@ -53,7 +53,7 @@ class Node_genre(INode):
         for gtype in RECOS_TYPE_IDS:
             lr = ListRenderer()
             lr.depth = -1
-            lr.whiteFlag = Flag.ALBUM
+            lr.whiteFlag = Flag.ALBUM | Flag.TRACK
             lr.blackFlag = Flag.TRACK | Flag.ALBUM
             node = getNode(
                 Flag.RECOMMENDATION, {'genre-id': gid, 'genre-type': gtype})
@@ -70,18 +70,18 @@ class Node_genre(INode):
     def fetch(self, renderer=None):
         data = api.get('/genre/list', parent_id=self.nid, offset=self.offset,
                        limit=api.pagination_limit)
-        if not data:
-            self.data = None
-            return True  # Nothing return trigger reco build in build_down
+        if data is None:
+            """Nothing return trigger reco build in build_down"""
+            return True
         self.data = data
         g = self.data['genres']
         lvl = 0
         try:
             lvl = int(g['parent']['level'])
         except Exception as e:
-            pass
+            warn(self, "Exception: %s" % e)
         print "Level: %s" % lvl
-        if 'parent' in g and lvl > 2:
+        if 'parent' in g and lvl > 1:
             self.populate_reco(renderer, int(g['parent']['id']))
         return True
 

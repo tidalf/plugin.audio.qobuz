@@ -12,29 +12,33 @@ from qobuz.node import Flag, getNode
 from qobuz.settings import settings
 from qobuz.i8n import _
 
+
 class INode(BaseNode):
 
-    def __init__(self, parameters = {}):
+    def __init__(self, parameters={}):
         self.data = None
         super(INode, self).__init__(parameters)
         self.content_type = "files"
         self.items_path = None
         self.offset = self.get_parameter('offset', delete=True) or 0
-        self.add_action('add_tracks', 
+        self.add_action('add_tracks',
                         label=_('Add track(s) to favorite'),
                         target=Flag.FAVORITE)
-        self.add_action('add_albums', 
+        self.add_action('add_albums',
                         label=_('Add album(s) to favorite'),
                         target=Flag.FAVORITE)
-        self.add_action('add_artists', 
+        self.add_action('add_artists',
                         label=_('Add artist(s) to favorite'),
                         target=Flag.FAVORITE)
+
     @property
     def offset(self):
         return self._offset
+
     @offset.getter
     def offset(self):
         return self._offset
+
     @offset.setter
     def offset(self, value):
         if value is None:
@@ -52,8 +56,8 @@ class INode(BaseNode):
 
     def add_pagination_node(self, renderer):
         '''We are looking into data and set next node in renderer's list
-            
-            ::note:: each node who implement collection must have 
+
+            ::note:: each node who implement collection must have
                 items_path property so we can lookup to our pagination
                 (we can change data in each node to be consistant here...)
         '''
@@ -67,7 +71,7 @@ class INode(BaseNode):
             return False
         parameters = url2dict(self.url(offset=next_offset))
         node = getNode(self.kind, parameters)
-        node.label = '[%s/%s] %s' % (parameters['offset'], 
+        node.label = '[%s/%s] %s' % (parameters['offset'],
                                      data['total'],
                                      self.get_label())
         self.append(node)

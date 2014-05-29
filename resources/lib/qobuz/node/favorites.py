@@ -12,6 +12,7 @@ from inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.i8n import _
 
+
 class Node_favorites(INode):
 
     def __init__(self, parameters={}):

@@ -84,6 +84,6 @@ class XbmcRenderer(BaseRenderer):
             succeeded = True if len(self) > 0 else False
         updateListing = not succeeded
         cacheToDisc = succeeded
-        xbmcplugin.endOfDirectory(handle, succeeded, updateListing, 
+        xbmcplugin.endOfDirectory(handle, succeeded, updateListing,
                                   cacheToDisc)
         return True

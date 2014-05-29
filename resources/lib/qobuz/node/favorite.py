@@ -22,6 +22,7 @@ _('albums')
 _('tracks')
 _('artists')
 
+
 class Node_favorite(INode):
     '''Displaying user favorites (track and album)
     '''
@@ -33,7 +34,7 @@ class Node_favorite(INode):
         self.items_path = self.get_parameter('items_path', delete=True)
         if not self.items_path:
             self.items_path = 'albums'
-            
+
     def get_label(self):
         return '%s / %s ' % (self.label, _(self.items_path))
 
@@ -44,9 +45,9 @@ class Node_favorite(INode):
 
     def fetch(self, renderer=None):
         print "FETCH FAVORITE %s" % self.items_path
-        data = api.get('/favorite/getUserFavorites', 
-                           user_id=api.user_id, 
-                           limit=api.pagination_limit, 
+        data = api.get('/favorite/getUserFavorites',
+                           user_id=api.user_id,
+                           limit=api.pagination_limit,
                            offset=self.offset, type=self.items_path)
         if not data:
             warn(self, "Build-down: Cannot fetch favorites data")
@@ -134,7 +135,7 @@ class Node_favorite(INode):
                         album_ids[str(node.nid)] = 1
                         albums.append(node)
                 if node.kind & Flag.TRACK == Flag.TRACK:
-                    album = getNode(Flag.ALBUM, 
+                    album = getNode(Flag.ALBUM,
                                     {'nid': node.get_property('album/id')})
                     if 'album' in node.data:
                         album.data = node.data['album']
@@ -167,7 +168,7 @@ class Node_favorite(INode):
             if aid is None:
                 return artists
             artist = getNode(Flag.ARTIST, {'nid': aid})
-            artist.data = { 'nid': aid, 'name': target.get_artist()}
+            artist.data = {'nid': aid, 'name': target.get_artist()}
             artists.append(artist)
         else:
             render = ListRenderer()
@@ -185,7 +186,7 @@ class Node_favorite(INode):
                 elif node.kind & Flag.ALBUM:
                     artist.data = node.data['artist']
                 elif node.kind & Flag.TRACK:
-                    artist.data = { 'nid': aid, 'name': node.get_artist()}
+                    artist.data = {'nid': aid, 'name': node.get_artist()}
                 else:
                     artist.fetch()
                 if not str(artist.nid) in artist_ids:
@@ -251,8 +252,8 @@ class Node_favorite(INode):
         return False
 
     def delete_cache(self, ftype):
-        key = cache.make_key('/favorite/getUserFavorites', 
-                           user_id=api.user_id, 
+        key = cache.make_key('/favorite/getUserFavorites',
+                           user_id=api.user_id,
                            limit=api.pagination_limit,
                            type=ftype,
                            offset=self.offset)
