@@ -12,11 +12,12 @@ from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.debug import warn
 from qobuz.i8n import _
-'''
-    @class Node_artist(Inode): Artist
-'''
+
 
 class Node_artist(INode):
+    '''
+        @class Node_artist(Inode): Artist
+    '''
 
     def __init__(self, parameters={}):
         super(Node_artist, self).__init__(parameters)
@@ -30,8 +31,8 @@ class Node_artist(INode):
                         target=Flag.ALBUMS_BY_ARTIST)
 
     def fetch(self, renderer=None):
-        data = api.get('/artist/get', artist_id=self.nid, 
-                       limit=api.pagination_limit, 
+        data = api.get('/artist/get', artist_id=self.nid,
+                       limit=api.pagination_limit,
                         offset=self.offset, extra='albums')
         if not data:
             warn(self, "Build-down: Cannot fetch artist data")
@@ -43,7 +44,7 @@ class Node_artist(INode):
         node_artist = getNode(Flag.ARTIST, self.parameters)
         node_artist.data = self.data
         node_artist.label = '[ %s ]' % (node_artist.label)
-        if not 'albums' in self.data: 
+        if not 'albums' in self.data:
             return True
         for pData in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, self.parameters)
@@ -64,7 +65,7 @@ class Node_artist(INode):
                                    'image/medium',
                                    'image/small',
                                    'picture'])
-        if image: 
+        if image:
             image = image.replace('126s', '_')
         return image
 

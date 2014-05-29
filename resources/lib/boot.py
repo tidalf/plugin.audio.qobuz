@@ -17,13 +17,13 @@ from qobuz.xbmc import settings, ItemFactory
 import os
 plugin = Plugin('plugin.audio.qobuz')
 profile = plugin.profile()
-cache.base_path = os.path.join(profile, 
+cache.base_path = os.path.join(profile,
                                plugin.plugin_id, 'cache')
 api.pagination_limit = int(settings['pagination_limit'])
 api.login(settings['username'],
           settings['password'])
 
-import xbmc  # @UnresolvedImport
+import xbmc  # @UnresolvedImport @UnusedImport
 from qobuz.xbmc.renderer import XbmcRenderer
 from qobuz.xbmc.commander import QobuzXbmcCommander
 from qobuz.xbmc.player import Player

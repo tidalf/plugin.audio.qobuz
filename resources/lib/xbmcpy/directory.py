@@ -13,7 +13,7 @@ from mock.xbmcplugin import xbmcplugin
 __in_xbmc__ = False
 console = None
 try:
-    import xbmc
+    import xbmc  # @UnresolvedImport @UnusedImport
     __in_xbmc__ = True
 except:
     from xbmcpy.console import console
@@ -38,16 +38,17 @@ class Directory(deque):
                 if not item:
                     return False
                 url = 'plugin://%s/%s' % (self.pluginId, node.url())
-                xbmcplugin.addDirectoryItem(self.handle, url, item, 
+                xbmcplugin.addDirectoryItem(self.handle, url, item,
                                             node.is_folder, 1)
             else:
-                console.write("[%s] %s (%s)\n" % (str(len(self)), 
-                                                  node.get_label(), node.url()))
+                console.write("[%s] %s (%s)\n" % (str(len(self)),
+                                                  node.get_label(),
+                                                  node.url()))
         super(Directory, self).append(node)
 
     def end(self, success=True, updateListing=False, cacheToDisc=True):
         if __in_xbmc__:
-            xbmcplugin.endOfDirectory(self.handle, success, updateListing, 
+            xbmcplugin.endOfDirectory(self.handle, success, updateListing,
                                       cacheToDisc)
         else:
             console.write('Total item: %s\n' % (len(self)))

@@ -68,7 +68,7 @@ class XbmcRenderer(BaseRenderer):
         self.clear()
         try:
             node.populating(self)
-        except AppendItemError as e:
+        except AppendItemError as _e:
             print "Operation canceled"
             self.clear()
 #         except Exception as e:

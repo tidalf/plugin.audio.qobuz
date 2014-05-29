@@ -14,6 +14,7 @@ from qobuz.settings import settings
 from qobuz.i8n import _
 from qobuz.cache import cache
 
+
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
     '''
@@ -45,9 +46,9 @@ class Node_root(INode):
         return True
 
     def append(self, item):
-        item.add_action('cache_delete_all', 
+        item.add_action('cache_delete_all',
                         label=_('Erase all data from cache'), target=Flag.ROOT)
-        item.add_action('cache_delete_old', 
+        item.add_action('cache_delete_old',
                         label=_('Erase old data from cache'), target=Flag.ROOT)
         super(Node_root, self).append(item)
 
@@ -57,7 +58,6 @@ class Node_root(INode):
     def cache_delete_old(self):
         return cache.delete_old()
 
-        
 #    def gui_scan(self):
 #        '''Scanning directory specified in query parameter
 #        '''

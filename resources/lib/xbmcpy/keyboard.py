@@ -12,13 +12,13 @@ __all__ = ['Keyboard']
 Keyboard = None
 
 try:
-    import xbmc # @UnresolvedImport
+    import xbmc  # @UnresolvedImport
     Keyboard = xbmc.Keyboard
 except:
     from console import console
 
     class _Keyboard_():
-        
+
         def __init__(self, default, heading, ktype):
             self.heading = heading
             self.ktype = ktype

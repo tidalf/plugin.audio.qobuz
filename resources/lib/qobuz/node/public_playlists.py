@@ -12,6 +12,7 @@ from qobuz.node import Flag, getNode
 from qobuz.api import api
 from qobuz.i8n import _
 
+
 class Node_public_playlists(INode):
 
     def __init__(self, parameters={}):
@@ -19,13 +20,13 @@ class Node_public_playlists(INode):
         self.kind = Flag.PUBLIC_PLAYLISTS
         self.label = _('Public playlists')
         self.items_path = 'playlists'
-        
+
     def fetch(self, renderer=None):
-        data = api.get('/playlist/getPublicPlaylists', offset=self.offset, 
+        data = api.get('/playlist/getPublicPlaylists', offset=self.offset,
                        limit=api.pagination_limit, type='last-created')
         if not data:
             return False
-        # @bug: we use pagination_limit as limit for the search so we don't 
+        # @bug: we use pagination_limit as limit for the search so we don't
         # need offset... (Fixed if qobuz fix it :p)
         if not 'total' in data[self.items_path]:
             data[self.items_path]['total'] = data[self.items_path]['limit']
@@ -38,4 +39,3 @@ class Node_public_playlists(INode):
             node.data = item
             self.append(node)
         return True
-

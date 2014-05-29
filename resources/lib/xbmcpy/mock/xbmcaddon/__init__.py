@@ -11,10 +11,11 @@ import os
 from xbmcpy.mock.xbmc import xbmc
 _addon_id_ = None
 
+
 class __Addon__(object):
 
-    __info_keys = ['author', 'changelog', 'description', 'disclaimer', 
-                       'fanart', 'icon', 'id', 'name', 'path', 'profile', 
+    __info_keys = ['author', 'changelog', 'description', 'disclaimer',
+                       'fanart', 'icon', 'id', 'name', 'path', 'profile',
                        'stars', 'summary', 'type', 'version']
 
     def __init__(self):
@@ -34,20 +35,20 @@ class __Addon__(object):
 
     def __get_config_xml_root(self):
         import xml.etree.ElementTree as ET
-        return ET.parse(os.path.join(xbmc.translatePath('special://profile/'), 
-                                     'addon_data', self.getAddonInfo('id'), 
+        return ET.parse(os.path.join(xbmc.translatePath('special://profile/'),
+                                     'addon_data', self.getAddonInfo('id'),
                                      'settings.xml'))
 
     def __get_language_xml_root(self):
         import xml.etree.ElementTree as ET
-        return ET.parse(os.path.join(self.getAddonInfo('path'), 'language', 
+        return ET.parse(os.path.join(self.getAddonInfo('path'), 'language',
                                      'English', 'strings.xml'))
 
     def getSetting(self, sid):
         if not self.xmlroot_config:
             self.xmlroot_config = self.__get_config_xml_root()
         #@bug: error on linux (debian/squeeze) with python 2.6
-        elm = self.xmlroot_config.find('.//setting[@id="%s"]' % (sid)) 
+        elm = self.xmlroot_config.find('.//setting[@id="%s"]' % (sid))
         if elm is not None:
             elm = elm.get('value')
         return elm
@@ -62,10 +63,12 @@ class __Addon__(object):
 
 Addon = None
 try:
-    import xbmcaddon # @UnresolvedImport
+    import xbmcaddon  # @UnresolvedImport
     Addon = xbmcaddon.Addon
 except:
     Addon = __Addon__
-    class _xbmc_(): pass
+
+    class _xbmc_():
+        pass
     xbmcaddon = _xbmc_()
     xbmcaddon.Addon = Addon

@@ -15,6 +15,7 @@ from qobuz.api import api
 from qobuz.settings import settings
 from qobuz.i8n import _
 
+
 class Node_track(INode):
     '''
         NODE TRACK
@@ -40,7 +41,7 @@ class Node_track(INode):
             return False
         self.data = data
         return True
-    
+
     def populate(self, renderer=None):
 #        self.append(self)
         return True
@@ -53,7 +54,7 @@ class Node_track(INode):
 #                    str(self.get_artist_id()),
 #                    str(self.parent.nid),
 #                    str(self.nid))
-#        if not 'mode' in ka: 
+#        if not 'mode' in ka:
 #            ka['mode'] = Mode.PLAY
         return super(Node_track, self).url(**ka)
 
@@ -89,15 +90,15 @@ class Node_track(INode):
         if self.parent.kind & Flag.ALBUM:
             return self.parent.get_title()
         return ''
-    
+
     def get_album_id(self):
         aid = self.get_property('album/id')
         if not aid and self.parent:
             return self.parent.nid
         return aid
-    
+
     def get_image(self):
-        image = self.get_property(['album/image/large', 'image/large', 
+        image = self.get_property(['album/image/large', 'image/large',
                                       'image/small',
                                       'image/thumbnail', 'image'])
         if image:
@@ -134,8 +135,8 @@ class Node_track(INode):
         for restriction in restrictions:
             print "Restriction: %s" % (restriction)
         if not 'url' in data:
-            warn(self, "streaming_url, no url returned\n"  
-                "API Error: %s" % (api.error)) 
+            warn(self, "streaming_url, no url returned\n"
+                "API Error: %s" % (api.error))
             return None
         return data['url']
 
@@ -187,6 +188,7 @@ class Node_track(INode):
     @property
     def is_playable(self):
         return True
+
     @is_playable.getter
     def is_playable(self):
         url = self.get_streaming_url()
@@ -198,12 +200,13 @@ class Node_track(INode):
         if 'AlbumUnavailable' in restrictions:
             return False
         return True
+
     @is_playable.setter
     def is_playable(self, v):
         pass
 
     def get_description(self):
-        return '' # Recursion bug ...
+        return ''  # Recursion bug ...
         if self.parent:
             return self.parent.get_description()
         return ''
@@ -219,7 +222,7 @@ class Node_track(INode):
 
     def get_restrictions(self):
         data = self.__getFileUrl()
-        if not data: 
+        if not data:
             raise ErrorNoData('Cannot get track restrictions')
         restrictions = []
         if not 'restrictions' in data:
@@ -235,7 +238,7 @@ class Node_track(INode):
         if 'sample' in data:
             return data['sample']
         return False
-    
+
     def get_mimetype(self):
         data = self.__getFileUrl()
         if not data:
@@ -274,7 +277,7 @@ class Node_track(INode):
 #                qid=self.get_playlist_track_id(),
 #                nm='gui_remove_track',
 #                mode=Mode.VIEW)
-#            menu.add(path='playlist/remove', 
+#            menu.add(path='playlist/remove',
 #                     label=lang(30073),
 #                     cmd=runPlugin(url), color=colorCaution)
 #

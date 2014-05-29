@@ -15,15 +15,16 @@ from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.i8n import _
 
+
 class Node_search(INode):
 
     def __init__(self, parameters=None):
         super(Node_search, self).__init__(parameters)
         self.kind = Flag.SEARCH
-        self.search_type = self.get_parameter('search-type', 
+        self.search_type = self.get_parameter('search-type',
                                               delete=True) or 'albums'
-        self.query = self.get_parameter('query', 
-                                        decode=True, 
+        self.query = self.get_parameter('query',
+                                        decode=True,
                                         delete=True)
         self.label = _('Search')
 
@@ -37,6 +38,7 @@ class Node_search(INode):
     @property
     def search_type(self):
         return self._search_type
+
     @search_type.setter
     def search_type(self, st):
         if st == 'artists':
@@ -51,6 +53,7 @@ class Node_search(INode):
         else:
             raise InvalidType(st)
         self._search_type = st
+
     @search_type.getter
     def search_type(self):
         return self._search_type
@@ -72,7 +75,7 @@ class Node_search(INode):
                 return False
             query = k.getText()
         query.strip()
-        data = api.get('/search/getResults', query=query, type=stype, 
+        data = api.get('/search/getResults', query=query, type=stype,
                            limit=api.pagination_limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")
@@ -102,4 +105,3 @@ class Node_search(INode):
                 node.data = artist
                 self.append(node)
         return True
-

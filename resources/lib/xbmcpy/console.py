@@ -9,24 +9,26 @@
 '''
 import code
 try:
-    import readline # @UnusedImport
+    import readline  # @UnusedImport
 except:
     try:
-        import pyreadline as readline # @UnresolvedImport @Reimport
+        import pyreadline as readline  # @UnresolvedImport @Reimport
     except:
         print "No readline :/"
 import atexit
 import os
 
+
 class HistoryConsole(code.InteractiveConsole):
 
-    def __init__(self, locals=None, filename="<console>", # @ReservedAssignment
+    def __init__(self, locals=None,  # @ReservedAssignment
+                 filename="<console>",
                  histfile=os.path.expanduser("~/.console-history")):
         code.InteractiveConsole.__init__(self, locals, filename)
         self.init_history(histfile)
         self.env_stack = []
         self.prompt = '# '
-        
+
     def init_history(self, histfile):
         readline.parse_and_bind("tab: complete")
         if hasattr(readline, "read_history_file"):
@@ -39,7 +41,7 @@ class HistoryConsole(code.InteractiveConsole):
     def save_history(self, histfile):
         pass
 #        readline.write_history_file(histfile)
-    
+
     def get_command(self):
         inp = self.raw_input(self.prompt)
         inpx = inp.split(' ')

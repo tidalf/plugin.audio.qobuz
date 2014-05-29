@@ -8,6 +8,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 try:
-    import xbmcplugin # @UnresolvedImport
+    import xbmcplugin  # @UnresolvedImport
 except:
-    from _plugin import plugin as xbmcplugin #@Reimport
+    from _plugin import plugin as xbmcplugin  # @Reimport

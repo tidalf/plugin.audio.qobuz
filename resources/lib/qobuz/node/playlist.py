@@ -15,11 +15,12 @@ from qobuz.debug import warn
 from qobuz.i8n import _
 from qobuz.cache import cache
 
+
 class Node_playlist(INode):
     '''
     @class Node_playlist:
     '''
-    def __init__(self, properties = {}):
+    def __init__(self, properties={}):
         super(Node_playlist, self).__init__(properties)
         self.kind = Flag.PLAYLIST
         self.label = _('Playlist')
@@ -55,7 +56,7 @@ class Node_playlist(INode):
         return self.b_is_current
 
     def fetch(self, renderer=None):
-        data = api.get('/playlist/get',playlist_id=self.nid, 
+        data = api.get('/playlist/get', playlist_id=self.nid,
             offset=self.offset, limit=api.pagination_limit, extra='tracks')
         if not data:
             warn(self, "Build-down: Cannot fetch playlist data")
@@ -69,17 +70,17 @@ class Node_playlist(INode):
             node.data = track
             self.append(node)
         return True
-        
+
 #    def get_name(self):
-#        return self.get_property(['name', 'title']) 
-#    
+#        return self.get_property(['name', 'title'])
+#
 #    def get_image(self):
 #        userdata = self.get_user_data()
 #        if userdata:
 #            if self.get_owner() == userdata['login']:
 #                return userdata['avatar']
 #        return getImage('song')
-#    
+#
     def get_owner(self):
         return self.get_property('owner/name')
 
@@ -120,7 +121,7 @@ class Node_playlist(INode):
 #        colorCaution = getSetting('item_caution_color')
 #        login = getSetting('username')
 #        isOwner = True
-#        cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS, 
+#        cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
 #                                    id='', mode=Mode.VIEW))
 #        menu.add(path='playlist', pos = 1,
 #                          label="Playlist", cmd=cmd, mode=Mode.VIEW)
@@ -130,27 +131,27 @@ class Node_playlist(INode):
 #        if isOwner:
 #            url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
 #                                nm='set_as_current')
-#            menu.add(path='playlist/set_as_current', label=lang(39007), 
+#            menu.add(path='playlist/set_as_current', label=lang(39007),
 #                    cmd=containerUpdate(url))
 #
 #            url = self.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
-#            menu.add(path='playlist/rename', label=lang(39009), 
+#            menu.add(path='playlist/rename', label=lang(39009),
 #                        cmd=runPlugin(url))
 #
 #        else:
 #            url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
-#            menu.add(path='playlist/subscribe', label=lang(39012), 
+#            menu.add(path='playlist/subscribe', label=lang(39012),
 #                    cmd=runPlugin(url))
 #
 #        url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
-#        menu.add(path='playlist/remove', label=lang(39010), 
+#        menu.add(path='playlist/remove', label=lang(39010),
 #                 cmd=runPlugin(url), color=colorCaution)
 #
 #        ''' Calling base class '''
 #        super(Node_playlist, self).attach_context_menu(item, menu)
 #
 #    def remove_tracks(self, tracks_id):
-#        if not api.playlist_deleteTracks(playlist_id=self.nid, 
+#        if not api.playlist_deleteTracks(playlist_id=self.nid,
 #                                         playlist_track_ids=tracks_id):
 #            return False
 #        return True
@@ -166,7 +167,7 @@ class Node_playlist(INode):
 #        notifyH(dialogHeading, 'Track removed from playlist')
 #        executeBuiltin(containerRefresh())
 #        return True
-#    
+#
 #    def gui_add_to_current(self):
 #        cid = self.get_current_playlist()
 #        qnt = int(self.get_parameter('qnt'))
@@ -186,20 +187,20 @@ class Node_playlist(INode):
 #            render.run()
 #            nodes = render.nodes
 #        ret = xbmcgui.Dialog().select('Add to current playlist', [
-#           node.get_label() for node in nodes                              
+#           node.get_label() for node in nodes
 #        ])
 #        if ret == -1:
 #            return False
 #        ret = self._add_tracks(cid, nodes)
 #        if not ret:
-#            notifyH('Qobuz', 
-#                'Failed to add tracks') 
+#            notifyH('Qobuz',
+#                'Failed to add tracks')
 #            return False
 #        self.delete_cache(cid)
-#        notifyH('Qobuz / Tracks added', 
-#                '%s added' % (len(nodes))) 
+#        notifyH('Qobuz / Tracks added',
+#                '%s added' % (len(nodes)))
 #        return True
-#           
+#
 #    def _add_tracks(self, playlist_id, nodes):
 #        if len(nodes) < 1:
 #            warn(self, 'Empty list...')
@@ -233,10 +234,10 @@ class Node_playlist(INode):
 #            if not name and render.root.get_parameter('query', unQuote=True):
 #                name = render.root.get_parameter('query', unQuote=True)
 #        if not name:
-#            name = self.get_parameter('query', 
+#            name = self.get_parameter('query',
 #                                      unQuote=True) or self.get_label()
 #        ret = xbmcgui.Dialog().select('Create playlist %s' % (name), [
-#           node.get_label() for node in nodes                              
+#           node.get_label() for node in nodes
 #        ])
 #        if ret == -1:
 #            return False
@@ -246,12 +247,12 @@ class Node_playlist(INode):
 #            warn(self, "Cannot create playlist...")
 #            return False
 #        if not self._add_tracks(playlist['id'], nodes):
-#            notifyH('Qobuz / Cannot add tracks', 
+#            notifyH('Qobuz / Cannot add tracks',
 #                    "%s" % (name), 'icon-error-256')
 #            return False
 #        self.delete_cache(playlist['id'])
-#        notifyH('Qobuz / Playlist added', 
-#                '[%s] %s' % (len(nodes), name)) 
+#        notifyH('Qobuz / Playlist added',
+#                '[%s] %s' % (len(nodes), name))
 #        return True
 #
 #    def set_as_current(self, playlist_id = None):
@@ -263,7 +264,7 @@ class Node_playlist(INode):
 #        userdata = self.get_user_storage()
 #        userdata['current_playlist'] = int(self.nid)
 #        return userdata.sync()
-#    
+#
 #    def get_current_playlist(self):
 #        userdata = self.get_user_storage()
 #        if not 'current_playlist' in userdata:
@@ -293,7 +294,7 @@ class Node_playlist(INode):
 #        newname = k.getText()
 #        newname = newname.strip()
 #        if not newname:
-#            notifyH(dialogHeading, "Don't u call ure child something?", 
+#            notifyH(dialogHeading, "Don't u call ure child something?",
 #                    'icon-error-256')
 #            return False
 #        if newname == currentname:
@@ -308,8 +309,8 @@ class Node_playlist(INode):
 #        return True
 #
     def create(self, name, isPublic=True, isCollaborative=False):
-        if not api.playlist_create(name=name, 
-                                        is_public=isPublic, 
+        if not api.playlist_create(name=name,
+                                        is_public=isPublic,
                                         is_collaborative=isCollaborative):
             return False
         userplaylists = getNode(Flag.USERPLAYLISTS, {})
@@ -384,7 +385,7 @@ class Node_playlist(INode):
 #            return False
 #        self.delete_cache(playlist_id)
 #        notifyH(lang(42001), (lang(42002) + "%s" + lang(42003)) % (name))
-#        url = self.make_url(nt=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='', 
+#        url = self.make_url(nt=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='',
 #                            nid='')
 #        executeBuiltin(containerUpdate(url, True))
 #        return False
@@ -406,12 +407,12 @@ class Node_playlist(INode):
 #        else:
 #            return False
 #
+
     def delete_cache(self):
-        upkey = cache.make_key('/playlist/getUserPlaylists', 
-                               limit=api.pagination_limit, 
+        upkey = cache.make_key('/playlist/getUserPlaylists',
+                               limit=api.pagination_limit,
                                 offset=self.offset, user_id=api.user_id)
-        pkey = cache.make_key('/playlist/get',playlist_id=self.nid, 
+        pkey = cache.make_key('/playlist/get', playlist_id=self.nid,
             offset=self.offset, limit=api.pagination_limit, extra='tracks')
         cache.delete(upkey)
         cache.delete(pkey)
-

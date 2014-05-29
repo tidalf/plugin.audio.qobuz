@@ -8,6 +8,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 try:
-    import xbmc # @UnresolvedImport
+    import xbmc  # @UnresolvedImport
 except:
-    from _xbmc import mock as xbmc #@Reimport
+    from _xbmc import mock as xbmc  # @Reimport

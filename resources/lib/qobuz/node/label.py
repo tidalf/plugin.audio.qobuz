@@ -13,6 +13,7 @@ from qobuz.node import Flag
 from qobuz.api import api
 from qobuz.i8n import _
 
+
 class Node_label(INode):
     '''
     @class Node_label:
@@ -23,8 +24,10 @@ class Node_label(INode):
         self.label = _('Label')
 
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
-        #@bug: Qobuz service seam do don't return total so pagination is broken
-        data = api.get('/label/list', limit=api.pagination_limit, 
+        """
+        @bug: Qobuz service seam do don't return total so pagination is broken
+        """
+        data = api.get('/label/list', limit=api.pagination_limit,
                        offset=self.offset)
         if not data:
             warn(self, "No label data")
@@ -34,4 +37,3 @@ class Node_label(INode):
             node.data = item
             self.append(node)
         return True
-

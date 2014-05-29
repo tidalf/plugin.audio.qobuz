@@ -13,10 +13,11 @@ from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.i8n import _
 
+
 class Node_purchases(INode):
     '''Displaying product purchased by user (track and album)
     '''
-    def __init__(self, properties = {}):
+    def __init__(self, properties={}):
         super(Node_purchases, self).__init__(properties)
         self.kind = Flag.PURCHASES
         self.label = _('Purchases')
@@ -24,7 +25,7 @@ class Node_purchases(INode):
 
     def fetch(self, renderer=None):
         data = api.get('/purchase/getUserPurchases',
-                       limit=api.pagination_limit, offset=self.offset, 
+                       limit=api.pagination_limit, offset=self.offset,
                        user_id=api.user_id)
         if not data:
             warn(self, "Cannot fetch purchases data")

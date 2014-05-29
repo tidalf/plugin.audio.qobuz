@@ -3,13 +3,14 @@
     ~~~~~~~~~~~~~~~~~~
 
     Intercept our query to feed our sql database
-    
+
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from base import CacheBase
 import pprint
 from db.manager import Manager
+
 
 class CacheSQL(CacheBase):
 
@@ -20,23 +21,23 @@ class CacheSQL(CacheBase):
 
     def load(self, key, *a, **ka):
         print "Loading key: %s" % (key)
-    
+
     def make_key(self, key, *a, **ka):
         return key
 
     def get_ttl(self, key, *a, **ka):
         return 0
-    
+
     def parse_artist(self, manager, data, parent_id):
         print "Parsing artist"
         print pprint.pformat(data)
         manager.insert('artist', data)
-        
+
     def parse_album(self, manager, data, parent_id):
         print "Parsing album"
         manager.insert('album', data)
-        
-    def parse(self, manager, data, tid = None):
+
+    def parse(self, manager, data, tid=None):
         if tid is None:
             tid = data['id'] if 'id' in data else None
         fields = {}
@@ -71,6 +72,7 @@ class CacheSQL(CacheBase):
 #                    getattr(self, methname)(data['label'])
 #                else:
 #                    self.parse(data[methname])
+
     def sync(self, key, data, *a, **ka):
         m = Manager('c:\\qobuzdb\\qobuz.sqlite3')
         m.connect('c:\\qobuzdb\\qobuz.sqlite3')

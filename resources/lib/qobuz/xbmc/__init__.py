@@ -22,6 +22,7 @@ from xbmcpy.util import containerUpdate, lang, runPlugin
 from collections import defaultdict
 from qobuz.settings import settings as qobuz_settings
 
+
 class Settings(object):
 
     def __init__(self, qobuz):
@@ -32,7 +33,7 @@ class Settings(object):
 
     def set(self, key, value, **ka):
         self.qobuz[key] = value
-        
+
     def __getitem__(self, *a, **ka):
         v = xbmcaddon.Addon().getSetting(a[0])
         if v:
@@ -55,8 +56,10 @@ settings = Settings(qobuz_settings)
 
 base_url = 'plugin://%s/' % (xbmcaddon.Addon().getAddonInfo('id'))
 
+
 def furl(frag):
     return base_url + frag
+
 
 class ItemFactory(object):
 
@@ -107,20 +110,22 @@ class ItemFactory(object):
         """
 #        colorCaution = getSetting('item_caution_color')
 #        url = node.url(kind=Flag.ROOT, mode=Mode.VIEW)
-#        menu.append( ('Qobuz', containerUpdate(url, False)) )     
+#        menu.append( ('Qobuz', containerUpdate(url, False)) )
 #
 #        ''' ARTIST '''
         if node.kind & (Flag.ALBUM | Flag.TRACK | Flag.ARTIST):
             artist_id = node.get_artist_id()
             artist_name = node.get_artist()
-            url = furl(node.url(kind=Flag.ARTIST, nid=artist_id, mode=Mode.VIEW) )
-            menu.append( ("%s %s" % (lang(32000), artist_name), 
-                          containerUpdate(url)) )  
+            url = furl(node.url(kind=Flag.ARTIST, nid=artist_id,
+                                mode=Mode.VIEW))
+            menu.append(("%s %s" % (lang(32000), artist_name),
+                          containerUpdate(url)))
 
             ''' Similar artist '''
-            url = furl(node.url(kind=Flag.ARTIST_SIMILAR, nid=artist_id, 
+            url = furl(node.url(kind=Flag.ARTIST_SIMILAR, nid=artist_id,
                                      mode=Mode.VIEW))
-            menu.append(( '%s: %s' % (lang(30010), artist_name), containerUpdate(url))) 
+            menu.append(('%s: %s' % (lang(30010), artist_name),
+                          containerUpdate(url)))
 
 #        ''' FAVORITES '''
 #        wf = node.kind & (~Flag.FAVORITES)
@@ -128,57 +133,57 @@ class ItemFactory(object):
 #            wf = wf and node.parent.kind & ~Flag.FAVORITES
 #        if wf:
 #            ''' ADD TO FAVORITES / TRACKS'''
-#            url = furl(node.url(kind=Flag.FAVORITES, 
-#                                          action='add_tracks', 
-#                                          qnid=node.nid, 
-#                                          qkind=node.kind, 
+#            url = furl(node.url(kind=Flag.FAVORITES,
+#                                          action='add_tracks',
+#                                          qnid=node.nid,
+#                                          qkind=node.kind,
 #                                          mode=Mode.VIEW))
 #            menu.append( (lang(32001), runPlugin(url) ))
 #            ''' ADD TO FAVORITES / Albums'''
-#            url = self.make_url(nt=Flag.FAVORITES, 
-#                                          nm='gui_add_albums', 
-#                                          qid=self.nid, 
-#                                          qnt=self.nt, 
+#            url = self.make_url(nt=Flag.FAVORITES,
+#                                          nm='gui_add_albums',
+#                                          qid=self.nid,
+#                                          qnt=self.nt,
 #                                          mode=Mode.VIEW)
-#            menu.add(path='favorites/add_albums', 
+#            menu.add(path='favorites/add_albums',
 #                          label=lang(39011) + ' albums', cmd=runPlugin(url))
 #            ''' ADD TO FAVORITES / Artists'''
-#            url = self.make_url(nt=Flag.FAVORITES, 
-#                                          nm='gui_add_artists', 
-#                                          qid=self.nid, 
-#                                          qnt=self.nt, 
+#            url = self.make_url(nt=Flag.FAVORITES,
+#                                          nm='gui_add_artists',
+#                                          qid=self.nid,
+#                                          qnt=self.nt,
 #                                          mode=Mode.VIEW)
-#            menu.add(path='favorites/add_artists', 
+#            menu.add(path='favorites/add_artists',
 #                          label=lang(39011) + ' artists', cmd=runPlugin(url))
 #
 #        if self.parent and (self.parent.nt & Flag.FAVORITES):
 #            url = self.make_url(nt=Flag.FAVORITES,
 #                                nm='', mode=Mode.VIEW)
-#            menu.add(path='favorites', label="Favorites", 
-#                     cmd=containerUpdate(url, True),pos=-9)  
+#            menu.add(path='favorites', label="Favorites",
+#                     cmd=containerUpdate(url, True),pos=-9)
 #            url = self.make_url(nt=Flag.FAVORITES, nm='gui_remove',
 #                                qid=self.nid, qnt=self.nt,
 #                                mode=Mode.VIEW)
-#            menu.add(path='favorites/remove', 
-#                     label='Remove %s' % (self.get_label()), 
+#            menu.add(path='favorites/remove',
+#                     label='Remove %s' % (self.get_label()),
 #                     cmd=runPlugin(url), color=colorCaution)
 #        wf = ~Flag.USERPLAYLISTS
-##        if self.parent:
-##            wf = wf and self.parent.nt & (~Flag.USERPLAYLISTS)
-#        if wf: 
+# #        if self.parent:
+# #            wf = wf and self.parent.nt & (~Flag.USERPLAYLISTS)
+#        if wf:
 #            ''' PLAYLIST '''
-#            cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS, 
+#            cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
 #                                    nid='', mode=Mode.VIEW))
 #            menu.add(path='playlist', pos = 1,
 #                          label="Playlist", cmd=cmd, mode=Mode.VIEW)
 #
 #            ''' ADD TO CURRENT PLAYLIST '''
-#            cmd = runPlugin(self.make_url(nt=Flag.PLAYLIST, 
-#                                            nm='gui_add_to_current', 
+#            cmd = runPlugin(self.make_url(nt=Flag.PLAYLIST,
+#                                            nm='gui_add_to_current',
 #                                            qnt=self.nt,
 #                                            mode=Mode.VIEW,
 #                                            qid=self.nid))
-#            menu.add(path='playlist/add_to_current', 
+#            menu.add(path='playlist/add_to_current',
 #                          label=lang(39005), cmd=cmd)
 #            label = self.get_label()
 #            try:
@@ -189,47 +194,47 @@ class ItemFactory(object):
 #            label = urllib.quote_plus(label)
 #            ''' ADD AS NEW '''
 #            cmd = runPlugin(self.make_url(nt=Flag.PLAYLIST,
-#                                            nm='gui_add_as_new', 
+#                                            nm='gui_add_as_new',
 #                                            qnt=self.nt,
 #                                            query=label,
 #                                            mode=Mode.VIEW,
 #                                            qid=self.nid))
-#            menu.add(path='playlist/add_as_new', 
+#            menu.add(path='playlist/add_as_new',
 #                          label=lang(30080), cmd=cmd)
 #
-##            ''' Show playlist '''
-##            if not (self.nt ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
-##                cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS, 
-##                                    id='', mode=Mode.VIEW))
-##                menu.add(path='playlist/show', 
-##                          label=lang(39006), cmd=cmd)
+# #            ''' Show playlist '''
+# #            if not (self.nt ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
+# #                cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
+# #                                    id='', mode=Mode.VIEW))
+# #                menu.add(path='playlist/show',
+# #                          label=lang(39006), cmd=cmd)
 #
 #        ''' PLAYLIST / CREATE '''
 #        cFlag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
 #        if self.nt | cFlag == cFlag:
-#            cmd = runPlugin(self.make_url(nt=Flag.PLAYLIST, 
+#            cmd = runPlugin(self.make_url(nt=Flag.PLAYLIST,
 #                                          nm="gui_create", mode=Mode.VIEW))
-#            menu.add(path='playlist/create', 
+#            menu.add(path='playlist/create',
 #                          label=lang(39008), cmd=cmd)
 #        ''' VIEW BIG DIR '''
 #        cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
-#        menu.add(path='qobuz/big_dir', 
+#        menu.add(path='qobuz/big_dir',
 #                          label=lang(39002), cmd=cmd)
 #        ''' SCAN '''
 #        if getSetting('enable_scan_feature', isBool=True):
 #            query = urllib.quote_plus(self.make_url(mode=Mode.SCAN))
 #            url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW,
 #                                nm='gui_scan', query=query)
-#            menu.add(path='qobuz/scan', 
+#            menu.add(path='qobuz/scan',
 #                            cmd=runPlugin(url),
 #                            label='scan')
-#        if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK 
+#        if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK
 #                        & ~Flag.PLAYLIST):
 #            ''' ERASE CACHE '''
-#            cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="cache_remove", 
+#            cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="cache_remove",
 #                                      mode=Mode.VIEW))
-#            menu.add(path='qobuz/erase_cache', 
-#                          label=lang(31009), cmd=cmd, 
+#            menu.add(path='qobuz/erase_cache',
+#                          label=lang(31009), cmd=cmd,
 #                          color=colorCaution, pos=10)
     def make_item_artist(self, node):
         image = node.get_image()
@@ -244,8 +249,8 @@ class ItemFactory(object):
             warn(self, "Error: Cannot make xbmc list item")
             return None
         item.setPath(url)
-        item.setInfo('music' , infoLabels={
-            'artist': node.get_artist(),           
+        item.setInfo('music', infoLabels={
+            'artist': node.get_artist(),
             'comment': node.get_description()
         })
         return item
@@ -318,7 +323,7 @@ class ItemFactory(object):
                      'duration': duration,
                      'year': node.get_year(),
                      'comment': desc + ' (aid=' + node.get_album_id() + ')',
-                     'lyrics': "Chant down babylon lalalala" 
+                     'lyrics': "Chant down babylon lalalala"
                      })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)

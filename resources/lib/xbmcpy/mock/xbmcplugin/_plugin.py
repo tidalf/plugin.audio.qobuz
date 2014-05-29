@@ -9,9 +9,10 @@
 '''
 from collections import deque
 
+
 class Plugin(deque):
 
-    def addDirectoryItem(self, handle, url, listitem, isFolder=False,  
+    def addDirectoryItem(self, handle, url, listitem, isFolder=False,
                              totalItems=False):
         pass
 

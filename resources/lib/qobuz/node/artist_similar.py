@@ -12,6 +12,7 @@ from qobuz.node import getNode, Flag
 from qobuz.api import api
 from qobuz.i8n import _
 
+
 class Node_artist_similar(INode):
 
     def __init__(self, parameters={}):
@@ -22,7 +23,7 @@ class Node_artist_similar(INode):
         self.items_path = 'artists'
 
     def fetch(self, renderer=None):
-        data = api.get('/artist/getSimilarArtists', artist_id=self.nid, 
+        data = api.get('/artist/getSimilarArtists', artist_id=self.nid,
                            offset=self.offset, limit=api.pagination_limit)
         print "GOT DATA %s" % data
         if not data:

@@ -61,7 +61,8 @@ def sep_count(idx):
 
 class QobuzConsole(code.InteractiveConsole):
 
-    def __init__(self, locals=None, filename="<console>",  # @ReservedAssignment
+    def __init__(self, locals=None,  # @ReservedAssignment
+                 filename="<console>",
                  histfile=os.path.expanduser("~/.console-history")):
 
         code.InteractiveConsole.__init__(self, locals, filename)
@@ -161,7 +162,7 @@ class QobuzConsole(code.InteractiveConsole):
 #        try:
         return getattr(self, 'command_%s' % (name))(args)
 #        except Exception as e:
-#            self.write('%s Invalid command %s (%s)\n\t%s\n' % (sep_error, name,
+#            self.write('%s Invalid command %s (%s)\n\t%s\n' % (sep_error,name,
 #                                                                args, e))
         return False
 
@@ -185,7 +186,8 @@ class QobuzConsole(code.InteractiveConsole):
             method = 'display_%s' % (Flag.to_s(node.kind))
             imsg = ''
             if hasattr(self, method):
-                imsg = '%s %s' % (sep_count(count), getattr(self, method)(node))
+                imsg = '%s %s' % (sep_count(count),
+                                  getattr(self, method)(node))
             else:
                 imsg = '%s %s\n' % (sep_count(count), node.get_label())
             msg += imsg
@@ -262,7 +264,8 @@ class QobuzConsole(code.InteractiveConsole):
             self.write(' > set %s = %s' % (key, value))
             return True
         except Exception as e:
-            self.write('Cannot set << %s >> with value << %s >>\n\t%s\n' % (key, value, e))
+            self.write('Cannot set << %s >> with value << %s >>\n\t%s\n'
+                       % (key, value, e))
         return False
 
     def exec_action(self, node, action):
@@ -365,7 +368,7 @@ if not DEBUG and api.password:
 
 c = QobuzConsole()
 c.write_history = True
-c.write('%s qobuz console (%s)\n' % (sep_info , VERSION))
+c.write('%s qobuz console (%s)\n' % (sep_info, VERSION))
 try:
     while not api.is_logged:
         username = c.raw_input(c.get_prompt('Login'))

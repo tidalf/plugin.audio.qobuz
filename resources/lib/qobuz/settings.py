@@ -9,12 +9,13 @@
 '''
 from collections import defaultdict
 
+
 class SettingsProxy(object):
     '''Class that act as a proxy to a underlying dictionnary
-       
+
         ::parameters:
             - proxy: Our underlying dictionary (can be set after creation)
-       
+
         ::methods:
             - lock/unlock: When locked, trying to assign data to new key 
             raise a KeyError (We are locking our singleton)
@@ -48,6 +49,7 @@ class SettingsProxy(object):
 
     def __len__(self, *a, **ka):
         return self.proxy.__len__(*a, **ka)
+
 
 class Settings(defaultdict):
     pass

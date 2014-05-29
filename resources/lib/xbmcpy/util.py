@@ -7,19 +7,22 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os, sys
+import os
+import sys
 import re
 import mock.xbmcaddon as xbmcaddon
 from mock.xbmc import xbmc
 import mock.xbmcgui as xbmcgui
 from mock.xbmcplugin import xbmcplugin
-
 from rpc import showNotification
+import qobuz
+
 
 def htm2xbmc(htm):
     def replace(m):
         return '[' + m.group(1) + m.group(2).upper() + ']'
     return re.sub('<(/?)(i|b)>', replace, htm, re.IGNORECASE)
+
 
 def getImage(name):
     return ''
@@ -27,9 +30,7 @@ def getImage(name):
         return ''
     return os.path.join(qobuz.path.image, name + '.png')
 
-'''
-    Notify Human
-'''
+
 def notifyH(title, text, image=None, mstime=2000):
     """Notify for human... not using localized string :p
     """
@@ -37,18 +38,17 @@ def notifyH(title, text, image=None, mstime=2000):
         image = getImage('icon-default-256')
     return showNotification(title=title, message=text, image=image, displaytime=mstime)
 
-'''
-    Notify
-'''
+
 def notify(title, text, image=None, mstime=2000):
     """Notification that wrap title and text parameter into lang()
     """
     if not image:
         image = getImage('icon-default-256')
-    return showNotification(title=lang(title), 
-                     message=lang(text), 
-                     image= getImage, 
+    return showNotification(title=lang(title),
+                     message=lang(text),
+                     image=getImage,
                      displaytime=mstime)
+
 
 def dialogLoginFailure():
     """Dialog to be shown when we can't login into Qobuz
@@ -62,11 +62,12 @@ def dialogLoginFailure():
         xbmc.executebuiltin('ActivateWindow(home)')
         return False
 
+
 def isFreeAccount():
     """Check if account if it's a Qobuz paid account
     """
     from qobuz.api import api
-    data = api.get('/user/login', username=api.username, 
+    data = api.get('/user/login', username=api.username,
                    password=api.password)
     if not data:
         return True
@@ -95,9 +96,11 @@ def color(colorItem, msg):
     if not colorItem: return msg
     return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
 
+
 def nolang(msg):
     print "[Warn] untranslated string %s" % msg
     return msg
+
 
 def lang(langId):
     s = xbmcaddon.Addon().getLocalizedString(langId)
@@ -105,50 +108,59 @@ def lang(langId):
         raise KeyError(langId)
     return s
 
+
 def runPlugin(url):
     return 'XBMC.RunPlugin("%s")' % (url)
 
-def executeBuiltin(cmd):
-    xbmc.executebuiltin("%s" % (cmd)) # @UndefinedVariable
 
-def containerUpdate(url, replace = False):
-    if replace: 
-        replace = ', "replace"' 
-    else: 
+def executeBuiltin(cmd):
+    xbmc.executebuiltin("%s" % (cmd))  # @UndefinedVariable
+
+
+def containerUpdate(url, replace=False):
+    if replace:
+        replace = ', "replace"'
+    else:
         replace = ''
     s = 'Container.Update("%s"%s)' % (url, replace)
     return s
+
 
 def yesno(heading, line1, line2='', line3=''):
     dialog = xbmcgui.Dialog()
     return dialog.yesno(heading, line1, line2, line3)
 
+
 def containerRefresh():
     return ('Container.Refresh')
+
 
 def containerViewMode():
     label = 'Container.Viewmode'
     data = getInfoLabels(labels=[label])
-    if data: 
+    if data:
         return data[label]
     return ''
+
 
 def containerSortMethod():
     label = 'Container.SortMethod'
     data = getInfoLabels(labels=[label])
-    if data: 
+    if data:
         return data[label]
     return ''
 
+
 def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
+
 
 def getSetting(key, **ka):
     """Helper to access xbmcaddon.getSetting
         Parameter:
         key: Key to retrieve from setting
-        * optional: isBool (convert 'true' and 'false to python boolean), 
-            isInt (return data as integer) 
+        * optional: isBool (convert 'true' and 'false to python boolean),
+            isInt (return data as integer)
     """
     return ''
     data = qobuz.addon.getSetting(key)

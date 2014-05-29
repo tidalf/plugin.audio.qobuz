@@ -15,7 +15,8 @@ from qobuz.debug import warn
 from qobuz.api import api
 from qobuz.cache import cache
 from qobuz.node import Flag, getNode
-from qobuz.settings import settings
+# from qobuz.settings import settings
+
 
 class Node_friend(INode):
     '''
@@ -34,9 +35,11 @@ class Node_friend(INode):
     @property
     def name(self):
         return self._name
+
     @name.getter
     def name(self):
         return self._name
+
     @name.setter
     def name(self, name):
         self._name = name or ''
@@ -50,7 +53,7 @@ class Node_friend(INode):
 #        name = self.get_parameter('query')
 #        if not name:
 #            from gui.util import Keyboard
-#            kb = Keyboard('', 
+#            kb = Keyboard('',
 #                          str(lang(41102)))
 #            kb.doModal()
 #            name = ''
@@ -64,7 +67,7 @@ class Node_friend(INode):
 #            return False
 #        notifyH('Qobuz', 'Friend %s added' % (name))
 #        return True
-    
+
     def create(self, name=None):
         username = api.username
         password = api.password
@@ -85,7 +88,7 @@ class Node_friend(INode):
             return False
         friends.append(name)
         newdata = {'friends': friends}
-        #easyapi.get(name='user')
+        # easyapi.get(name='user')
         if not api.user_update(player_settings=json.dumps(newdata)):
             return False
 #        qobuz.registry.delete(name='user')
@@ -93,10 +96,10 @@ class Node_friend(INode):
         return True
 
     def delete_cache(self):
-        key = cache.make_key('/user/login', username=api.username, 
+        key = cache.make_key('/user/login', username=api.username,
                              password=api.password)
         cache.delete(key)
-        
+
 #    def remove(self):
 #        name = self.get_parameter('query')
 #        if name == 'qobuz.com':
@@ -108,13 +111,13 @@ class Node_friend(INode):
 #            return False
 #        friends = user['player_settings']
 #        if not 'friends' in friends:
-#            notifyH('Qobuz', "You don't have friend", 
+#            notifyH('Qobuz', "You don't have friend",
 #                    'icon-error-256')
 #            warn(self, "No friends in user/player_settings")
 #            return False
 #        friends = friends['friends']
 #        if not name in friends:
-#            notifyH('Qobuz', "You're not friend with %s" % (name), 
+#            notifyH('Qobuz', "You're not friend with %s" % (name),
 #                    'icon-error-256')
 #            warn(self, "Friend " + repr(name) + " not in friends data")
 #            return False
@@ -122,7 +125,7 @@ class Node_friend(INode):
 #        newdata = {'friends': friends}
 #        if not api.user_update(player_settings=json.dumps(newdata)):
 #            notifyH('Qobuz', 'Friend %s added' % (name))
-#            notifyH('Qobuz', "Cannot updata friend's list...", 
+#            notifyH('Qobuz', "Cannot updata friend's list...",
 #                    'icon-error-256')
 #            return False
 #        notifyH('Qobuz', 'Friend %s removed' % (name))
@@ -150,7 +153,7 @@ class Node_friend(INode):
 #        url=self.make_url()
 #        menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
 #        cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm="remove"))
-#        menu.add(path='friend/remove', label='Remove', cmd=cmd, 
+#        menu.add(path='friend/remove', label='Remove', cmd=cmd,
 #                 color=colorWarn)
 #
 #        ''' Calling base class '''

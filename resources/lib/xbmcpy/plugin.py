@@ -10,8 +10,9 @@
 from mock import xbmcaddon
 from mock.xbmc import xbmc
 
-import sys, os
-import pprint
+import sys
+import os
+
 
 def parse_parameters():
     """Parse parameters passed to xbmc plugin as sys.argv
@@ -34,6 +35,7 @@ def parse_parameters():
                 rparam[splitparams[0]] = splitparams[1]
     return rparam
 
+
 class Plugin(object):
     """
     """
@@ -44,10 +46,10 @@ class Plugin(object):
         self._parameters = parse_parameters()
         self.base_url = 'plugin://%s/' % (self.plugin_id)
 
-    
     @property
     def handle(self):
         pass
+
     @handle.getter
     def handle(self):
         if len(sys.argv) < 2:

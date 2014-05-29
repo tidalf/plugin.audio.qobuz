@@ -8,7 +8,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from node import Commander
-from xbmcpy.util import notifyH, executeBuiltin, containerUpdate, containerRefresh
+from xbmcpy.util import notifyH, executeBuiltin, containerUpdate
+from xbmcpy.util import containerRefresh
 from xbmcpy.mock.xbmcgui import xbmcgui
 from xbmcpy.mock import xbmcaddon
 from qobuz.i8n import _
@@ -17,8 +18,10 @@ from xbmcpy.keyboard import Keyboard
 
 base_url = 'plugin://%s/' % (xbmcaddon.Addon().getAddonInfo('id'))
 
+
 def refresh():
     executeBuiltin(containerRefresh())
+
 
 class QobuzXbmcCommander(Commander):
 
@@ -69,7 +72,7 @@ class QobuzXbmcCommander(Commander):
         track.fetch()
         aid = track.get_album_id()
         print "FLAG %s" % Flag.to_s(favorite.kind)
-        favorite.items_path = 'tracks' 
+        favorite.items_path = 'tracks'
         tracks = favorite.list_tracks_from_album(aid)
         ret = xbmcgui.Dialog().select(dialogHeading, [
            track.get_label() for track in tracks
@@ -200,4 +203,3 @@ class QobuzXbmcCommander(Commander):
         for artist in similar:
             renderer.append(artist)
         return None
-

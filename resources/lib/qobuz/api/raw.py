@@ -4,7 +4,7 @@
 
     Our base api, all method are mapped like <endpoint>_<method>
     see Qobuz API on GitHub (https://github.com/Qobuz/api-documentation)
-    
+
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
@@ -21,14 +21,15 @@ from qobuz.debug import warn, log
 
 socket.timeout = 5
 
+
 class QobuzApiRaw(object):
 
     def __init__(self):
-        self.appid = "285473059" # XBMC
-        #self.appid = "214748364" # :]
+        self.appid = "285473059"  # XBMC
+        # self.appid = "214748364" # :]
         self.version = '0.2'
         self.baseUrl = 'http://www.qobuz.com/api.json/'
-        
+
         self.user_auth_token = None
         self.user_id = None
         self.error = None
@@ -39,13 +40,12 @@ class QobuzApiRaw(object):
         self.statTotalRequest = 0
         self.error = None
         self.__set_s4()
-    
-    def _serror(self, msg="", url="", params={}, json=""): 
+
+    def _serror(self, msg="", url="", params={}, json=""):
         import copy
         _copy_params = copy.deepcopy(params)
         if 'password' in _copy_params:
             _copy_params['password'] = '***'
-        label = 'Something went wrong with request:'
         s = 'Something went wrong with request\n' + \
             '\t::message: %s\n' + \
             '\t::url    : %s\n' + \
@@ -89,21 +89,21 @@ class QobuzApiRaw(object):
             Arguments:
             params:    parameters dictionary
             uri   :    service/method
-            opt   :    Optionnal named parameters 
+            opt   :    Optionnal named parameters
                         - noToken=True/False
-                       
+
             Return None if something went wrong
             Return raw data from qobuz on success as dictionary
-            
+
             * on error you can check error and status_code
-            
-            Example: 
-            
-                ret = api._api_request({'username':'foo', 
-                                  'password':'bar'}, 
+
+            Example:
+
+                ret = api._api_request({'username':'foo',
+                                  'password':'bar'},
                                  'user/login', noToken=True)
                 print 'Error: %s [%s]' % (api.error, api.status_code)
-                
+
             This should produce something like:
             Error: [200]
             Error: Bad Request [400]
@@ -145,7 +145,8 @@ class QobuzApiRaw(object):
         try:
             response_json = r.json()
         except Exception as e:
-            warn(self, "Json loads failed to load... retrying!\n%s" %(repr(e)))
+            warn(self, "Json loads failed to load... retrying!\n%s"
+                 % (repr(e)))
             try:
                 response_json = r.json()
             except:
@@ -170,7 +171,7 @@ class QobuzApiRaw(object):
         if not (user_id or user_auth_token):
             raise MissingParameter('uid|token')
         self.user_auth_token = user_auth_token
-        self.user_id = user_id 
+        self.user_id = user_id
         self.logged_on = time()
 
     """
@@ -184,7 +185,7 @@ class QobuzApiRaw(object):
     def user_login(self, **ka):
         data = self._user_login(**ka)
         if data:
-            self.set_user_data(data['user_auth_token'], 
+            self.set_user_data(data['user_auth_token'],
                                data['user']['id'])
             return data
         self.logout()
@@ -251,16 +252,16 @@ class QobuzApiRaw(object):
         # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
         params = {'user_id': self.user_id, 'track_id': track_id}
         return self._api_request(params, '/track/reportStreamingStart')
-    
+
     def track_resportStreamingEnd(self, track_id, duration):
         duration = math.floor(int(duration))
         if duration < 5:
             log(self, 'Duration lesser than 5s, abort reporting')
             return None
-        #@todo ???
-        user_auth_token = ''
+        # @todo ???
+#         user_auth_token = ''
         try:
-            user_auth_token = self.user_auth_token
+            _user_auth_token = self.user_auth_token
         except:
             warn(self, 'No authentification token')
             return None
@@ -285,7 +286,8 @@ class QobuzApiRaw(object):
     Purchase
     '''
     def purchase_getUserPurchases(self, **ka):
-        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit', 'offset'])
+        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit',
+                                'offset'])
         return self._api_request(ka, "/purchase/getUserPurchases")
 
     # SEARCH #
@@ -345,7 +347,7 @@ class QobuzApiRaw(object):
     def playlist_deleteTracks(self, **ka):
         self._check_ka(ka, ['playlist_id'], ['playlist_track_ids'])
         return self._api_request(ka, '/playlist/deleteTracks')
-       
+
     def playlist_subscribe(self, **ka):
         mandatory = ['playlist_id']
         found = None
@@ -380,9 +382,9 @@ class QobuzApiRaw(object):
                        'is_public', 'is_collaborative', 'tracks_id'])
         res = self._api_request(ka, '/playlist/update')
         return res
-    
+
     def playlist_getPublicPlaylists(self, **ka):
-        self._check_ka(ka, '', ['type','limit','offset'])
+        self._check_ka(ka, '', ['type', 'limit', 'offset'])
         res = self._api_request(ka, '/playlist/getPublicPlaylists')
         return res
     """

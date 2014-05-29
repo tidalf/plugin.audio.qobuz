@@ -133,7 +133,7 @@ class Node_recommendation(INode):
 #             warn('Cannot populate genre (empty data)')
 #             return False
 #         if "items" not in self.data[self.items_path]:
-#             warn(self, "Cannot populate genre (No items in data[items_path])")
+#            warn(self, "Cannot populate genre (No items in data[items_path])")
 #             return False
 #         if self.data[self.items_path]['items'] is None:
 #             warn(self, "Cannot populate genre (items is None)")
