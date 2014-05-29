@@ -8,8 +8,9 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 
+
 class __Flag__():
-    
+
     def __init__(self):
         self.count = 0
 
@@ -36,16 +37,16 @@ class __Flag__():
         self.ALBUMS_BY_ARTIST = self._gv()
         self.PUBLIC_PLAYLISTS = self._gv()
         self.FAVORITE = self._gv()
-        
-        self.STOPBUILD = 1 <<  100
+
+        self.STOPBUILD = 1 << 100
         self.NONE = 1 << 101
 
         self.ALL = 0
-        for i in range(1, self.count+1):
+        for i in range(1, self.count + 1):
             self.ALL |= (1 << i)
-    
+
     def _gv(self):
-        self.count+=1
+        self.count += 1
         return 1 << self.count
 
     def to_s(self, flag):

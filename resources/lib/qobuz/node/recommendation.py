@@ -12,7 +12,7 @@
 from qobuz.api import api
 from inode import INode
 from qobuz.node import getNode, Flag
-from qobuz.debug import warn
+from qobuz.debug import warn, error
 from qobuz.i8n import _
 
 RECOS_TYPE_IDS = {
@@ -47,10 +47,11 @@ RECOS_GENRES = {
     'null': _('All'),
 }
 
+
 class Node_recommendation(INode):
     '''Recommendation node, displaying music ordered by category and genre
     '''
-    def __init__(self, parameters = {}):
+    def __init__(self, parameters={}):
         super(Node_recommendation, self).__init__(parameters)
         self.kind = Flag.RECOMMENDATION
         self.label = _('Recommendation')
@@ -85,12 +86,12 @@ class Node_recommendation(INode):
         self.data = data
         return True
 
-    def _get_label(self, label, type='', genre=''): # @ReservedAssignment
-        if type:
-            type = ' / %s' % type # @ReservedAssignment
+    def _get_label(self, label, kind='', genre=''):
+        if kind:
+            kind = ' / %s' % kind  # @ReservedAssignment
         if genre:
             genre = ' / %s' % genre
-        return '%s%s%s' % (label, type, genre)
+        return '%s%s%s' % (label, kind, genre)
 
     def __populate_type(self):
         ''' Populate type, we don't have genre_type nor genre_id
@@ -111,7 +112,7 @@ class Node_recommendation(INode):
             parameters['genre-type'] = self.genre_type
             parameters['genre-id'] = genre_id
             node = getNode(Flag.RECOMMENDATION, parameters)
-            node.label = self._get_label(self.get_label(), 
+            node.label = self._get_label(self.get_label(),
                                          RECOS_TYPES[int(self.genre_type)],
                                          RECOS_GENRES[genre_id])
             self.append(node)
@@ -120,13 +121,32 @@ class Node_recommendation(INode):
     def __populate_type_genre(self):
         '''Populate album selected by genre_type and genre_id
         '''
-        if not self.data:
-            return False
-        for album in self.data[self.items_path]['items']:
-            node = getNode(Flag.ALBUM, self.parameters)
-            node.data = album
-            self.append(node)
-        return True
+        print "items_path: %s" % self.items_path
+#         if self.data is None:
+#             warn(self, "Cannot populate genre (no data)")
+#             return False
+#         print "Data: %s" % self.data
+#         if self.items_path not in self.data:
+#             warn(self, "Cannot populate genre(No item_path in data)")
+#             return False
+#         if self.data[self.items_path] is None:
+#             warn('Cannot populate genre (empty data)')
+#             return False
+#         if "items" not in self.data[self.items_path]:
+#             warn(self, "Cannot populate genre (No items in data[items_path])")
+#             return False
+#         if self.data[self.items_path]['items'] is None:
+#             warn(self, "Cannot populate genre (items is None)")
+#             return False
+        try:
+            for album in self.data[self.items_path]['items']:
+                node = getNode(Flag.ALBUM, self.parameters)
+                node.data = album
+                self.append(node)
+            return True
+        except Exception as e:
+            error(self, "Cannot populate genre: %s" % e)
+        return False
 
     def populate(self, renderer=None):
         '''We are populating our node based on genre_type and genre_id
@@ -137,4 +157,3 @@ class Node_recommendation(INode):
             return self.__populate_genre()
         self.content_type = 'albums'
         return self.__populate_type_genre()
-

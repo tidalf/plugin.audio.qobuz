@@ -5,6 +5,7 @@ from node import Mode
 from qobuz.node import Flag
 from node.renderer.base import BaseRenderer
 
+
 class ItemFactory(object):
 
     def make_item(self, node):
@@ -20,8 +21,10 @@ class ItemFactory(object):
 
 from qobuz.exception import QobuzException
 
+
 class AppendItemError(QobuzException):
     pass
+
 
 class XbmcRenderer(BaseRenderer):
 
@@ -41,7 +44,7 @@ class XbmcRenderer(BaseRenderer):
         item = self.itemFactory.make_item(node)
         if item:
             url = self.plugin.base_url + node.url()
-            if not xbmcplugin.addDirectoryItem(handle, url, item, 
+            if not xbmcplugin.addDirectoryItem(handle, url, item,
                                         node.is_folder, 1):
                 raise AppendItemError()
         else:
@@ -49,7 +52,7 @@ class XbmcRenderer(BaseRenderer):
         return super(XbmcRenderer, self).append(node)
 
     def render(self, node):
-        print node.pretty(Flag)
+        print "Node: %s" % node.pretty(Flag)
         self.alive = False
         if self.commander.has_action(node):
             ret = self.commander.execute(self, node)
@@ -68,8 +71,8 @@ class XbmcRenderer(BaseRenderer):
         except AppendItemError as e:
             print "Operation canceled"
             self.clear()
-        except Exception as e:
-            raise e
+#         except Exception as e:
+#             raise e
         return self.end()
 
     def ask(self):
