@@ -4,7 +4,7 @@
 
     This file is part of qobuz-xbmc
 
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2014 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from xbmcpy.plugin import Plugin
@@ -12,6 +12,7 @@ from pyobuz.node import getNode, Flag
 from pyobuz.cache import cache
 from pyobuz.api import api
 from qobuz import settings, ItemFactory
+
 """Main
 """
 import os
@@ -22,6 +23,7 @@ cache.base_path = os.path.join(profile,
 api.pagination_limit = int(settings['pagination_limit'])
 api.login(settings['username'],
           settings['password'])
+api.appid = "285473059"
 
 import xbmc  # @UnresolvedImport @UnusedImport
 from qobuz.renderer import XbmcRenderer
