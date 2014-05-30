@@ -20,10 +20,10 @@ plugin = Plugin('plugin.audio.qobuz')
 profile = plugin.profile()
 cache.base_path = os.path.join(profile,
                                plugin.plugin_id, 'cache')
+api.set_appid("285473059")
 api.pagination_limit = int(settings['pagination_limit'])
 api.login(settings['username'],
           settings['password'])
-api.appid = "285473059"
 
 import xbmc  # @UnresolvedImport @UnusedImport
 from qobuz.renderer import XbmcRenderer
