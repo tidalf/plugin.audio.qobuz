@@ -16,7 +16,7 @@ from xbmcpy.mock import xbmcaddon
 from xbmcpy.mock.xbmcplugin import xbmcplugin
 from xbmcpy.mock.xbmcgui import xbmcgui
 from pyobuz.node.flag import Flag
-from node import Mode
+from pyobuz.node.ibase import Mode
 from pyobuz.debug import warn
 from xbmcpy.util import containerUpdate, lang, runPlugin
 from collections import defaultdict

@@ -7,7 +7,7 @@
     :copyright: (c) 2012-2014 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from node import Commander
+from pyobuz.node.ibase import Commander
 from xbmcpy.util import notifyH, executeBuiltin, containerUpdate
 from xbmcpy.util import containerRefresh
 from xbmcpy.mock.xbmcgui import xbmcgui
