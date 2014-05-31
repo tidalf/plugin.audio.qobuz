@@ -56,7 +56,7 @@ class XbmcRenderer(BaseRenderer):
         self.alive = False
         if self.commander.has_action(node):
             ret = self.commander.execute(self, node)
-            self.end(ret)
+            self.end(succeeded=ret, cacheToDisc=False, updateListing=False)
             return ret
         if node.get_parameter('mode', number=True) == Mode.PLAY:
             if not node.fetch():
@@ -72,19 +72,13 @@ class XbmcRenderer(BaseRenderer):
         except AppendItemError as _e:
             print "Operation canceled"
             self.clear()
-#         except Exception as e:
-#             raise e
         return self.end()
 
     def ask(self):
         pass
 
-    def end(self, succeeded=None):
+    def end(self, succeeded=True, cacheToDisc=True, updateListing=False):
         handle = self.plugin.handle
-        if succeeded is None:
-            succeeded = True if len(self) > 0 else False
-        updateListing = not succeeded
-        cacheToDisc = succeeded
         log(self, "Set content_type: %s" % self.content_type)
         xbmcplugin.setContent(handle, self.content_type)
         xbmcplugin.endOfDirectory(handle, succeeded, updateListing,
