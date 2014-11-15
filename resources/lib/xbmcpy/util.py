@@ -66,7 +66,7 @@ def dialogLoginFailure():
 def isFreeAccount():
     """Check if account if it's a Qobuz paid account
     """
-    from qobuz.api import api
+    from pyobuz.api import api
     data = api.get('/user/login', username=api.username,
                    password=api.password)
     if not data:
