@@ -31,7 +31,7 @@ class QobuzXbmcCommander(Commander):
             notifyH(dialogHeading, 'Fail')
             return False
         notifyH(dialogHeading, 'Success')
-        return False
+        return False, False, False
 
     def root_cache_delete_old(self, renderer, root, node):
         dialogHeading = _('Delete old data from cache')
@@ -151,13 +151,13 @@ class QobuzXbmcCommander(Commander):
         keyboard = Keyboard('', dialogHeading)
         keyboard.doModal()
         if not keyboard.isConfirmed():
-            return False
+            return False, False, False
         query = keyboard.getText()
         if not playlist.create(query):
             notifyH(dialogHeading, 'Fail')
-            return False
+            return False, False, False
         notifyH(dialogHeading, 'Success')
-        return True
+        return True, True, True
 
     def playlist_rename(self, renderer, playlist, userplaylists):
         dialogHeading = _('Rename playlist')
@@ -175,9 +175,18 @@ class QobuzXbmcCommander(Commander):
         notifyH(dialogHeading, 'Success')
         return True
 
-    def playlist_delete(self, renderer, playlist, none):
+    def playlist_delete(self, renderer, playlist, node):
         dialogHeading = _('Delete playlist')
         if not playlist.delete():
+            notifyH(dialogHeading, 'Fail')
+            return False
+        notifyH(dialogHeading, 'Success')
+        return True
+
+    def playlist_delete_track(self, renderer, playlist, node, target_nid):
+        dialogHeading = _('Delete track %s from playlist %s' % (playlist.nid,
+                                                                target_nid))
+        if not playlist.delete_track(target_nid):
             notifyH(dialogHeading, 'Fail')
             return False
         notifyH(dialogHeading, 'Success')

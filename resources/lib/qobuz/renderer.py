@@ -4,8 +4,8 @@ from xbmcpy.mock.xbmcgui import xbmcgui
 from pyobuz.node.ibase import Mode
 from pyobuz.node import Flag
 from pyobuz.renderer.base import BaseRenderer
-from pyobuz.debug import log
-from pyobuz.exception import QobuzException
+from pyobuz.debug import log, warn
+from pyobuz.exception import AppendItemError
 
 
 class ItemFactory(object):
@@ -19,10 +19,6 @@ class ItemFactory(object):
         url = '%s%s' % (plugin_id, node.url())
         item = xbmcgui.ListItem(label, label, image, image, url)
         return item
-
-
-class AppendItemError(QobuzException):
-    pass
 
 
 class XbmcRenderer(BaseRenderer):
@@ -48,16 +44,16 @@ class XbmcRenderer(BaseRenderer):
                                         node.is_folder, 1):
                 raise AppendItemError()
         else:
-            print "No item... @#!"
+            warn(self, "No item... @#!")
         return super(XbmcRenderer, self).append(node)
 
     def render(self, node):
-        print "Node: %s" % node.pretty(Flag)
         self.alive = False
         if self.commander.has_action(node):
-            ret = self.commander.execute(self, node)
-            self.end(succeeded=ret, cacheToDisc=False, updateListing=False)
-            return ret
+            succeeded, cache, update = self.commander.execute(self, node)
+            self.end(succeeded=succeeded, cacheToDisc=cache,
+                     updateListing=update)
+            return succeeded
         if node.get_parameter('mode', number=True) == Mode.PLAY:
             if not node.fetch():
                 return False
