@@ -193,13 +193,19 @@ class Node_track(INode):
             return False
         return True
 
+    def get_hires(self):
+        return self.get_property('hires')
+
     def get_description(self):
         if self.parent:
             return self.parent.get_description()
         return ''
 
     def __getFileUrl(self):
+        hires = getSetting('hires_enabled', isBool=True)
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
+        if hires and self.get_hires():
+            format_id = 27
         data = api.get('/track/getFileUrl', format_id=format_id,
                            track_id=self.nid, user_id=api.user_id)
         if not data:
