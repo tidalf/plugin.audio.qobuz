@@ -1,3 +1,8 @@
+1.0.3
+-----
+* Feature: Playing HiRes purchased tracks (setting and hires property on track)
+* Fix: Favorite error
+
 1.0.1
 -----
 * update language files from Transifex
