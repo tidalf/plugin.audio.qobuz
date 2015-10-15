@@ -6,24 +6,26 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import sys
 import os
+import sys
+from time import time
+import urllib
 import weakref
-import qobuz  # @UnresolvedImport
+
+from api import api
+from cache import cache
 from constants import Mode
-from node import Flag
+from debug import log, warn
 from exception import QobuzXbmcError as Qerror
+from gui.contextmenu import contextMenu
 from gui.util import color, lang, runPlugin, containerUpdate, \
     getSetting
-from debug import log, warn
-from gui.contextmenu import contextMenu
+from node import Flag
 from node import getNode
+import qobuz  # @UnresolvedImport
 from renderer import renderer
-import urllib
-from time import time
-from cache import cache
 from storage import _Storage
-from api import api
+from util.common import isEmpty
 
 
 class INode(object):
@@ -40,6 +42,7 @@ class INode(object):
         The main buil_down method is responsible for the logic flow (recursive,
             depth, whiteFlag, blackFlag...)
     '''
+
     def __init__(self, parent=None, parameters={}):
         self.data = None
         self.parameters = parameters
@@ -127,6 +130,7 @@ class INode(object):
         self.hook_post_data()
 
     ''' Called after node data is set '''
+
     def hook_post_data(self):
         pass
 
@@ -146,27 +150,30 @@ class INode(object):
                                        'picture'])
         """
         if isinstance(pathList, basestring):
-            return self.__get_property(pathList)
+            res = self.__get_property(pathList)
+            return res if res is not None else ''
         for path in pathList:
             data = self.__get_property(path)
-            if data:
+            if data is not None:
                 return data
         return ''
 
     def __get_property(self, path):
         """Helper used by get_property method
         """
-        if not self.data:
-            return ''
+        if not self.data or self.data is None:
+            return None
         xPath = path.split('/')
         root = self.data
         for i in range(0, len(xPath)):
             if not xPath[i] in root:
-                return ''
+                return None
             root = root[xPath[i]]
+            if isEmpty(root):
+                return None
         if root and root != 'None':
             return root
-        return ''
+        return None
 
     def __add_pagination(self, data):
         """build_down helper: Add pagination data when needed
@@ -201,6 +208,7 @@ class INode(object):
         A hash for storing script parameter, each node have a copy of them.
         TODO: each node don't need to copy parameter
     '''
+
     def set_parameters(self, parameters):
         """Setting parameters property
             Parameter:
@@ -280,6 +288,7 @@ class INode(object):
         return  a xbml list item
         Class can overload this method
     '''
+
     def makeListItem(self, **ka):
         import xbmcgui  # @UnresolvedImport
         if not 'url' in ka:
@@ -466,26 +475,26 @@ class INode(object):
             menu.add(path='favorites', label="Favorites",
                      cmd=containerUpdate(url, True), pos=-9)
             url = self.make_url(nt=Flag.FAVORITE,
-                                          nm='gui_add_tracks',
-                                          qid=self.nid,
-                                          qnt=self.nt,
-                                          mode=Mode.VIEW)
+                                nm='gui_add_tracks',
+                                qid=self.nid,
+                                qnt=self.nt,
+                                mode=Mode.VIEW)
             menu.add(path='favorites/add_tracks',
                           label=lang(30167) + ' tracks', cmd=runPlugin(url))
             ''' ADD TO FAVORITES / Albums'''
             url = self.make_url(nt=Flag.FAVORITE,
-                                          nm='gui_add_albums',
-                                          qid=self.nid,
-                                          qnt=self.nt,
-                                          mode=Mode.VIEW)
+                                nm='gui_add_albums',
+                                qid=self.nid,
+                                qnt=self.nt,
+                                mode=Mode.VIEW)
             menu.add(path='favorites/add_albums',
                           label=lang(30167) + ' albums', cmd=runPlugin(url))
             ''' ADD TO FAVORITES / Artists'''
             url = self.make_url(nt=Flag.FAVORITE,
-                                          nm='gui_add_artists',
-                                          qid=self.nid,
-                                          qnt=self.nt,
-                                          mode=Mode.VIEW)
+                                nm='gui_add_artists',
+                                qid=self.nid,
+                                qnt=self.nt,
+                                mode=Mode.VIEW)
             menu.add(path='favorites/add_artists',
                           label=lang(30167) + ' artists', cmd=runPlugin(url))
 
@@ -506,16 +515,16 @@ class INode(object):
         if wf:
             ''' PLAYLIST '''
             cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
-                                    nid='', mode=Mode.VIEW))
+                                                nid='', mode=Mode.VIEW))
             menu.add(path='playlist', pos=1,
                           label="Playlist", cmd=cmd, mode=Mode.VIEW)
 
             ''' ADD TO CURRENT PLAYLIST '''
             cmd = runPlugin(self.make_url(nt=Flag.PLAYLIST,
-                                            nm='gui_add_to_current',
-                                            qnt=self.nt,
-                                            mode=Mode.VIEW,
-                                            qid=self.nid))
+                                          nm='gui_add_to_current',
+                                          qnt=self.nt,
+                                          mode=Mode.VIEW,
+                                          qid=self.nid))
             menu.add(path='playlist/add_to_current',
                           label=lang(30161), cmd=cmd)
             label = self.get_label()
@@ -527,11 +536,11 @@ class INode(object):
             label = urllib.quote_plus(label)
             ''' ADD AS NEW '''
             cmd = runPlugin(self.make_url(nt=Flag.PLAYLIST,
-                                            nm='gui_add_as_new',
-                                            qnt=self.nt,
-                                            query=label,
-                                            mode=Mode.VIEW,
-                                            qid=self.nid))
+                                          nm='gui_add_as_new',
+                                          qnt=self.nt,
+                                          query=label,
+                                          mode=Mode.VIEW,
+                                          qid=self.nid))
             menu.add(path='playlist/add_as_new',
                           label=lang(30082), cmd=cmd)
 
@@ -552,20 +561,20 @@ class INode(object):
         ''' VIEW BIG DIR '''
         cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
         menu.add(path='qobuz/big_dir',
-                          label=lang(30158), cmd=cmd)
+                 label=lang(30158), cmd=cmd)
         ''' SCAN '''
         if getSetting('enable_scan_feature', isBool=True):
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN))
             url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW,
                                 nm='gui_scan', query=query)
             menu.add(path='qobuz/scan',
-                            cmd=runPlugin(url),
-                            label='scan')
+                     cmd=runPlugin(url),
+                     label='scan')
         if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK
-                        & ~Flag.PLAYLIST):
+                      & ~Flag.PLAYLIST):
             ''' ERASE CACHE '''
             cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="cache_remove",
-                                      mode=Mode.VIEW))
+                                          mode=Mode.VIEW))
             menu.add(path='qobuz/erase_cache',
                           label=lang(30117), cmd=cmd,
                           color=colorCaution, pos=10)
@@ -574,7 +583,7 @@ class INode(object):
         if self.user_storage:
             return self.user_storage
         filename = os.path.join(cache.base_path, 'localuserdata-%s.local' %
-                            str(api.user_id))
+                                str(api.user_id))
         self.user_storage = _Storage(filename)
         return self.user_storage
 
