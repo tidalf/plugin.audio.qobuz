@@ -229,14 +229,17 @@ class INode(object):
             value = urllib.quote_plus(value)
         self.parameters[name] = value
 
-    def get_parameter(self, name, **ka):
+    def get_parameter(self, name, default=None, **ka):
         if not self.parameters:
-            return None
+            return default
         if not name in self.parameters:
-            return None
+            return default
+        value = self.parameters[name]
+        if value is None:
+            return default
         if 'unQuote' in ka and ka['unQuote'] == True:
-            return urllib.unquote_plus(self.parameters[name])
-        return self.parameters[name]
+            return urllib.unquote_plus(value)
+        return value
 
     def del_parameter(self, name):
         if not name in self.parameters:

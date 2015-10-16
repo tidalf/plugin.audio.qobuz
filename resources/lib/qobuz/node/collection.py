@@ -10,7 +10,7 @@ from inode import INode
 from node import Flag, getNode
 from api import api
 from debug import info
-from gui.util import getImage, getSetting
+from gui.util import getImage, getSetting, lang
 
 
 dialogHeading = 'Qobuz collection'
@@ -27,9 +27,8 @@ class Node_collection(INode):
         self.url = None
         self.is_folder = True
         self.image = getImage('songs')
-        self.search_type = self.get_parameter('search-type')
-        if self.search_type is None:
-            self.search_type = 'artists'
+        self.search_type = self.get_parameter('search-type', default='tracks')
+#         self.content_type = self.search_type
         self.query = self.get_parameter('query', unQuote=True)
         self.offset = self.get_parameter('offset') or 0
         self.source = self.get_parameter('source')
@@ -37,6 +36,7 @@ class Node_collection(INode):
         self.seen_album = {}
         self.seen_track = {}
         self.data = None
+        self.label = '%s / %s' % ( lang(30194),  self.search_type.capitalize())
 
     def make_url(self, **ka):
         url = super(Node_collection, self).make_url(**ka)
@@ -70,6 +70,7 @@ class Node_collection(INode):
             data = api.get('/collection/getArtists', **kwargs)
         elif self.search_type == 'tracks':
             data = api.get('/collection/getTracks', **kwargs)
+        print 'Data: %s' % data
         if data is None:
             return False
         self.data = data
