@@ -42,6 +42,10 @@ def htm2xbmc(htm):
 
 
 def getImage(name):
+    if name is None:
+        return ''
+    if name.startswith('http'):
+        return name
     if not qobuz.path:
         return ''
     return os.path.join(qobuz.path.image, name + '.png')
@@ -50,20 +54,33 @@ def getImage(name):
 def notifyH(title, text, image=None, mstime=2000):
     """Notify for human... not using localized string :p
     """
-    if not image:
+    if image is None:
         image = getImage('icon-default-256')
+    else:
+        image = getImage(image)
     return showNotification(title=title, message=text, image=image,
                             displaytime=mstime)
 
 
+def notify_log(title, text, **ka):
+    return notifyH(title, text, image='icon-default-256', **ka)
+
+def notify_error(title, text, **ka):
+    return notifyH(title, text, image='icon-error-256', **ka)
+
+def notify_warn(title, text, **ka):
+    return notifyH(title, text, image='icon-warn-256', **ka)
+
 def notify(title, text, image=None, mstime=2000):
     """Notification that wrap title and text parameter into lang()
     """
-    if not image:
+    if image is None:
         image = getImage('icon-default-256')
+    else:
+        image = getImage(image)
     return showNotification(title=lang(title),
                      message=lang(text),
-                     image=getImage,
+                     image=image,
                      displaytime=mstime)
 
 

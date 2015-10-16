@@ -128,9 +128,6 @@ class Node_track(INode):
         data = self.__getFileUrl()
         if not data:
             return False
-        restrictions = self.get_restrictions()
-        for restriction in restrictions:
-            print "Restriction: %s" % (restriction)
         if not 'url' in data:
             warn(self, "streaming_url, no url returned\n"
                 "API Error: %s" % (api.error))
@@ -206,6 +203,7 @@ class Node_track(INode):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         if hires and self.get_hires():
             format_id = 27
+        print ('FormatId: %s' % format_id)
         data = api.get('/track/getFileUrl', format_id=format_id,
                            track_id=self.nid, user_id=api.user_id)
         if not data:
@@ -241,7 +239,7 @@ class Node_track(INode):
             return False
         formatId = int(data['format_id'])
         mime = ''
-        if formatId == 6:
+        if formatId in [6, 27]:
             mime = 'audio/flac'
         elif formatId == 5:
             mime = 'audio/mpeg'

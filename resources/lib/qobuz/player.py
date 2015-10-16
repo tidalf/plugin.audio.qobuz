@@ -11,7 +11,7 @@ import xbmcgui  # @UnresolvedImport
 
 import qobuz  # @UnresolvedImport
 from debug import warn
-from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl
+from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
 from gui.util import getSetting
 from node import Flag, getNode
 
@@ -43,6 +43,11 @@ class QobuzPlayer(xbmc.Player):
         if not track.is_playable():
             warn(self, "Cannot get streaming URL")
             return False
+        restrictions = ''
+        for restriction in track.get_restrictions():
+            restrictions += '%s\n' % restriction
+        if restrictions != '':
+            notify_warn("Restriction", restrictions)
         item = track.makeListItem()
         track.item_add_playing_property(item)
         '''Some tracks are not authorized for stream and a 60s sample is
@@ -57,13 +62,13 @@ class QobuzPlayer(xbmc.Player):
             limited)
             '''
             if not isFreeAccount():
-                notifyH("Qobuz", "Sample returned")
+                notify_warn("Qobuz", "Sample returned")
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id)
         """
             Notify
         """
         if getSetting('notification_playingsong', isBool=True):
-            notifyH(lang(30132), track.get_label(), track.get_image())
+            notifyH(lang(30132), track.get_label(), image=track.get_image())
         """
             We are called from playlist...
         """
