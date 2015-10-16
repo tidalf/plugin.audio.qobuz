@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from inode import INode
-from node import Flag
+from node import Flag, getNode
 from api import api
 from debug import info
 from gui.util import getImage, getSetting
@@ -64,53 +64,42 @@ class Node_collection(INode):
         if source is not None:
             kwargs['source'] = source
         data = None
-        self.data = data
         if self.search_type == 'albums':
             data = api.get('/collection/getAlbums', **kwargs)
         elif self.search_type == 'artists':
             data = api.get('/collection/getArtists', **kwargs)
         elif self.search_type == 'tracks':
             data = api.get('/collection/getTracks', **kwargs)
-#         try:
-#             self.data = data['items']
-#             return True
-#         except Exception as e:
-#             warn(self, 'Exception: %s' % e)
+        if data is None:
+            return False
         self.data = data
-        return False
+        return True
 
+    def get_description(self):
+        return None
+
+    def _populate_albums(self, data):
+        node = getNode(Flag.ALBUM)
+        node.data = data
+        self.add_child(node)
+        return True
+
+    def _populate_tracks(self, data):
+        node = getNode(Flag.TRACK)
+        node.data = data
+        self.add_child(node)
+        return True
+    
+    def _populate_artists(self, data):
+        node = getNode(Flag.ARTIST)
+        node.data = data
+        self.add_child(node)
+        return True
+    
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        import pprint
         if self.data is None:
             return False
-        for item in self.data:
-            print "Item: %s" % item
-#             node = None
-#             if self.search_type == 'artists':
-#                 for subdata in self.data[]
-#                 node = getNode(Flag.ARTIST)
-#                 node.data = item['artist']
-# #                 if node.nid in self.seen_artist:
-# #                     node = None
-# #                 else:
-# #                     self.seen_artist[node.nid] = True
-#             elif self.search_type == 'albums':
-#                 node = getNode(Flag.ALBUM)
-#                 node.data = item['album']
-# #                 if node.nid in self.seen_album:
-# #                     node = None
-# #                 else:
-# #                     self.seen_album[node.nid] = True
-#             elif self.search_type == 'tracks':
-#                 node = getNode(Flag.TRACK)
-#                 node.data = item['track']
-# #                 if node.nid in self.seen_track:
-# #                     node = None
-# #                 else:
-# #                     self.seen_track[node.nid] = True
-#             if node is None:
-#                 continue
-# #             node.set_parameter('search-type', self.search_type)
-# #             node.set_parameter('query', self.query)
-#             self.add_child(node)
+        method = '_populate_%s' % self.search_type
+        for item in self.data['items']:
+            getattr(self, method)(item)
         return True
