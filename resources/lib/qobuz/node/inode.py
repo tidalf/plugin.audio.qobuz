@@ -134,7 +134,7 @@ class INode(object):
     def hook_post_data(self):
         pass
 
-    def get_property(self, pathList):
+    def get_property(self, pathList, defaultReturn=u''):
         """Property are just a easy way to access JSON data (self.data)
             Parameters:
             pathList: a string or a list of string, each string can be
@@ -151,12 +151,12 @@ class INode(object):
         """
         if isinstance(pathList, basestring):
             res = self.__get_property(pathList)
-            return res if res is not None else ''
+            return res if res is not None else defaultReturn
         for path in pathList:
             data = self.__get_property(path)
             if data is not None:
                 return data
-        return ''
+        return defaultReturn
 
     def __get_property(self, path):
         """Helper used by get_property method
@@ -308,7 +308,6 @@ class INode(object):
         )
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
         item.addContextMenuItems(ctxMenu.getTuples(), ka['replaceItems'])
         return item
 
