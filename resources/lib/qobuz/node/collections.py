@@ -22,7 +22,6 @@ class Node_collections(INode):
         self.image = getImage('album')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        print('populate')
         for kind in ['artists', 'albums', 'tracks']:
             self.add_child(getNode(Flag.COLLECTION, {'search-type': kind}))
         return True

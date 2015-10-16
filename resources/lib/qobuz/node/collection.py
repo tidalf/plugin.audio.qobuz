@@ -70,7 +70,6 @@ class Node_collection(INode):
             data = api.get('/collection/getArtists', **kwargs)
         elif self.search_type == 'tracks':
             data = api.get('/collection/getTracks', **kwargs)
-        print 'Data: %s' % data
         if data is None:
             return False
         self.data = data
