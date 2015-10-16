@@ -64,5 +64,4 @@ class Node_root(INode):
         '''Scanning directory specified in query parameter
         '''
         query = self.get_parameter('query', unQuote=True)
-        print "Scanning folder: %s" % (query)
         executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))

@@ -19,15 +19,6 @@ def getNode(qnt, params={}, **ka):
         modulePath = nodeName
         moduleName = 'Node_' + nodeName
         Module = module_import(modulePath, moduleName)
-#        mixinPath = 'qobuzxbmc.node.%s_mixin' % nodeName
-#        mixinName = 'Node_' + nodeName + '_mixin'
-#        Final = Module
-#        try:
-#            Mixin = module_import(mixinPath, mixinName)
-#            Final = mixin_factory(moduleName, Module, Mixin)
-#        except Exception as e:
-#            print repr(e)
-#            pass
         """
             Initializing our new node
             - no parent

@@ -55,7 +55,6 @@ class JsonRequest:
         if self.id:
             jDict['id'] = self.id
         data = json.dumps(jDict)
-        print "Data: %s" % (data)
         return data
 
 

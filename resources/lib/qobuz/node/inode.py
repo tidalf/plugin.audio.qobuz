@@ -447,9 +447,6 @@ class INode(object):
         ''' ARTIST '''
         if self.nt & (Flag.ALBUM | Flag.TRACK | Flag.ARTIST):
             artist_id = self.get_artist_id()
-            # if not artist_id:
-            #    import pprint
-            #    print pprint.pformat(self.data)
             artist_name = self.get_artist()
             urlArtist = self.make_url(nt=Flag.ARTIST, nid=artist_id,
                                       mode=Mode.VIEW)

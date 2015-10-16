@@ -203,7 +203,6 @@ class Node_track(INode):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         if hires and self.get_hires():
             format_id = 27
-        print ('FormatId: %s' % format_id)
         data = api.get('/track/getFileUrl', format_id=format_id,
                            track_id=self.nid, user_id=api.user_id)
         if not data:
