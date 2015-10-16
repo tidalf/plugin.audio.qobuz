@@ -17,7 +17,13 @@ from node import Flag, getNode
 
 keyTrackId = 'QobuzPlayerTrackId'
 
-
+def notify_restriction(track):
+    restrictions = ''
+    for restriction in track.get_restrictions():
+        restrictions += '%s\n' % restriction
+    if restrictions != '':
+        notify_warn("Restriction", restrictions)
+        
 class QobuzPlayer(xbmc.Player):
     """
         @class: QobuzPlayer
@@ -43,11 +49,6 @@ class QobuzPlayer(xbmc.Player):
         if not track.is_playable():
             warn(self, "Cannot get streaming URL")
             return False
-        restrictions = ''
-        for restriction in track.get_restrictions():
-            restrictions += '%s\n' % restriction
-        if restrictions != '':
-            notify_warn("Restriction", restrictions)
         item = track.makeListItem()
         track.item_add_playing_property(item)
         '''Some tracks are not authorized for stream and a 60s sample is
@@ -68,7 +69,9 @@ class QobuzPlayer(xbmc.Player):
             Notify
         """
         if getSetting('notification_playingsong', isBool=True):
+            notify_restriction(track)
             notifyH(lang(30132), track.get_label(), image=track.get_image())
+        
         """
             We are called from playlist...
         """
