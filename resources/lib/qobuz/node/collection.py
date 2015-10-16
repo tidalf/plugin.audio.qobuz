@@ -79,18 +79,21 @@ class Node_collection(INode):
         return None
 
     def _populate_albums(self, data):
+        """helper"""
         node = getNode(Flag.ALBUM)
         node.data = data
         self.add_child(node)
         return True
 
     def _populate_tracks(self, data):
+        """helper"""
         node = getNode(Flag.TRACK)
         node.data = data
         self.add_child(node)
         return True
     
     def _populate_artists(self, data):
+        """helper"""
         node = getNode(Flag.ARTIST)
         node.data = data
         self.add_child(node)
@@ -99,7 +102,8 @@ class Node_collection(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.data is None:
             return False
-        method = '_populate_%s' % self.search_type
+        # Call helper method on each item
+        method = getattr(self, '_populate_%s' % self.search_type)
         for item in self.data['items']:
-            getattr(self, method)(item)
+            method(item)
         return True
