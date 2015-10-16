@@ -36,7 +36,7 @@ class Node_collection(INode):
         self.seen_album = {}
         self.seen_track = {}
         self.data = None
-        self.label = '%s / %s' % ( lang(30194),  self.search_type.capitalize())
+        self.label = '%s - %s' % ( lang(30194),  self.search_type.capitalize())
 
     def make_url(self, **ka):
         url = super(Node_collection, self).make_url(**ka)

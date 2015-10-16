@@ -96,7 +96,7 @@ class Node_recommendation(INode):
             node = getNode(Flag.RECOMMENDATION, {'genre-type': gid})
 #            node.genre_type = gid
             node.set_label(
-                self.label + ' / ' + RECOS_TYPES[gid])
+                self.label + ' - ' + RECOS_TYPES[gid])
             self.add_child(node)
         return True
 
@@ -108,7 +108,7 @@ class Node_recommendation(INode):
                                                  'genre-id': genre_id})
 #            node.genre_type = self.genre_type
 #            node.genre_id = genre_id
-            label = '%s / %s / %s' % (self.label,
+            label = '%s - %s / %s' % (self.label,
                                       RECOS_TYPES[int(self.genre_type)],
                                      RECOS_GENRES[genre_id])
             node.label = label
