@@ -17,9 +17,8 @@ dialogHeading = 'Qobuz collection'
 
 
 class Node_collection(INode):
-    '''
-    @class Node_collection:
-    '''
+    """@class Node_collection:
+    """
 
     def __init__(self, parent=None, parameters=None):
         super(Node_collection, self).__init__(parent, parameters)
@@ -28,7 +27,6 @@ class Node_collection(INode):
         self.is_folder = True
         self.image = getImage('songs')
         self.search_type = self.get_parameter('search-type', default='tracks')
-#         self.content_type = self.search_type
         self.query = self.get_parameter('query', unQuote=True)
         self.offset = self.get_parameter('offset') or 0
         self.source = self.get_parameter('source')
@@ -36,7 +34,7 @@ class Node_collection(INode):
         self.seen_album = {}
         self.seen_track = {}
         self.data = None
-        self.label = '%s - %s' % ( lang(30194),  self.search_type.capitalize())
+        self.label = '%s - %s' % (lang(30194),  self.search_type.capitalize())
 
     def make_url(self, **ka):
         url = super(Node_collection, self).make_url(**ka)
@@ -60,7 +58,7 @@ class Node_collection(INode):
         source = self.source
         kwargs = {'query': query,
                   'limit': limit,
-        }
+                  }
         if source is not None:
             kwargs['source'] = source
         data = None
@@ -91,14 +89,14 @@ class Node_collection(INode):
         node.data = data
         self.add_child(node)
         return True
-    
+
     def _populate_artists(self, data):
         """helper"""
         node = getNode(Flag.ARTIST)
         node.data = data
         self.add_child(node)
         return True
-    
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.data is None:
             return False

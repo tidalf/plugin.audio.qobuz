@@ -18,9 +18,9 @@ SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
 
 
 class Node_album(INode):
-    '''
-        @class Node_product:
-    '''
+    """@class Node_product:
+    """
+
     def __init__(self, parent, params):
         super(Node_album, self).__init__(parent, params)
         self.nt = Flag.ALBUM
@@ -38,9 +38,11 @@ class Node_album(INode):
         @property
         def nid(self):
             return self._nid
+
         @nid.getter  # @IgnorePep8
         def nid(self):
             return self._nid
+
         @nid.setter  # @IgnorePep8
         def nid(self, value):
             self._id = value
@@ -94,13 +96,14 @@ class Node_album(INode):
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
-    '''
+    """
     PROPERTIES
-    '''
+    """
+
     def get_artist(self):
         return self.get_property(['artist/name',
-                               'interpreter/name',
-                               'composer/name'])
+                                  'interpreter/name',
+                                  'composer/name'])
 
     def get_album(self):
         album = self.get_property('name')
@@ -110,8 +113,8 @@ class Node_album(INode):
 
     def get_artist_id(self):
         return self.get_property(['artist/id',
-                               'interpreter/id',
-                              'composer/id'])
+                                  'interpreter/id',
+                                  'composer/id'])
 
     def get_title(self):
         return self.get_property('title')
@@ -120,9 +123,9 @@ class Node_album(INode):
         if not size:
             size = self.imageDefaultSize
         return self.get_property(['image/%s' % (size),
-                                   'image/large',
-                                   'image/small',
-                                   'image/thumbnail'])
+                                  'image/large',
+                                  'image/small',
+                                  'image/thumbnail'])
 
     def get_label(self):
         artist = self.get_artist() or 'VA'

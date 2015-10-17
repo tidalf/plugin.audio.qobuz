@@ -21,8 +21,9 @@ dialogHeading = lang(30083)
 
 
 class Node_favorite(INode):
-    '''Displaying user favorites (track and album)
-    '''
+    """Displaying user favorites (track and album)
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_favorite, self).__init__(parent, parameters)
         self.nt = Flag.FAVORITE
@@ -134,7 +135,7 @@ class Node_favorite(INode):
             notifyH(dialogHeading, lang(30143))
             return False
         ret = xbmcgui.Dialog().select(lang(30144), [
-           node.get_label() for node in nodes
+            node.get_label() for node in nodes
         ])
         if ret == -1:
             return False
@@ -153,7 +154,7 @@ class Node_favorite(INode):
             notifyH(dialogHeading, lang(30143))
             return False
         ret = xbmcgui.Dialog().select(lang(30146), [
-           node.get_label() for node in nodes
+            node.get_label() for node in nodes
         ])
         if ret == -1:
             return False
@@ -230,11 +231,11 @@ class Node_favorite(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_tracks(qnt, qid)
         if len(nodes) == 0:
-# ERROR: Missing translation for 3600
+            # ERROR: Missing translation for 3600
             notifyH(dialogHeading, lang(3600))
             return False
         ret = xbmcgui.Dialog().select(lang(30145), [
-           node.get_label() for node in nodes
+            node.get_label() for node in nodes
         ])
         if ret == -1:
             return False
@@ -301,15 +302,15 @@ class Node_favorite(INode):
         limit = getSetting('pagination_limit')
         keys = []
         keys.append(cache.make_key('/favorite/getUserFavorites',
-                           user_id=api.user_id,
-                           limit=limit,
-                           offset=self.offset))
+                                   user_id=api.user_id,
+                                   limit=limit,
+                                   offset=self.offset))
         for kind in ['artists', 'albums', 'tracks']:
             keys.append(cache.make_key('/favorite/getUserFavorites',
-                           user_id=api.user_id,
-                           limit=limit,
-                           type=kind,
-                           offset=self.offset))
+                                       user_id=api.user_id,
+                                       limit=limit,
+                                       type=kind,
+                                       offset=self.offset))
         ret = False
         for key in keys:
             if cache.delete(key):
@@ -352,7 +353,7 @@ class Node_favorite(INode):
                     'Cannot remove item: %s' % (node.get_label()))
             return False
         notifyH(dialogHeading,
-                    'Item successfully removed: %s' % (node.get_label()))
+                'Item successfully removed: %s' % (node.get_label()))
         url = self.make_url(nt=self.nt, nid='', nm='')
         executeBuiltin(containerUpdate(url, True))
         return True

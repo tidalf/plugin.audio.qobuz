@@ -29,9 +29,10 @@ class Node_search(INode):
     def get_description(self):
         return self.get_label()
 
-    ''' Property / search_type '''
     @property
     def search_type(self):
+        """Property / search_type
+        """
         return self._search_type
 
     @search_type.setter
@@ -80,7 +81,7 @@ class Node_search(INode):
             query = k.getText()
         query.strip()
         data = api.get('/search/getResults', query=query, type=stype,
-                           limit=limit, offset=self.offset)
+                       limit=limit, offset=self.offset)
         if not data:
             warn(self, "Search return no data")
             return False

@@ -14,8 +14,9 @@ from node import getNode, Flag
 
 
 class Node_root(INode):
-    '''Our root node, we are displaying all qobuz nodes from here
-    '''
+    """Our root node, we are displaying all qobuz nodes from here
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_root, self).__init__(parent, parameters)
         self.nt = Flag.ROOT
@@ -46,8 +47,8 @@ class Node_root(INode):
         return True
 
     def cache_remove(self):
-        '''GUI/Removing all cached data
-        '''
+        """GUI/Removing all cached data
+        """
         from gui.util import yesno, notifyH, getImage
         from debug import log
         if not yesno(lang(30121), lang(30122)):
@@ -61,7 +62,7 @@ class Node_root(INode):
         return True
 
     def gui_scan(self):
-        '''Scanning directory specified in query parameter
-        '''
+        """Scanning directory specified in query parameter
+        """
         query = self.get_parameter('query', unQuote=True)
         executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))

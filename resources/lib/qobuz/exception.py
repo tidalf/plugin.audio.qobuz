@@ -13,7 +13,6 @@ import traceback
 class QobuzXbmcError(Exception):
 
     def __init__(self, **ka):
-#        exc_type, exc_value, exc_traceback = sys.exc_info()
         if not 'additional' in ka or ka['additional'] is None:
             ka['additional'] = ''
         if (not 'who' in ka) or (not 'what' in ka):

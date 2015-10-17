@@ -51,6 +51,7 @@ class QobuzBootstrap(object):
     """Set some boot properties
     and route query based on parameters
     """
+
     def __init__(self, __addon__, __handle__):
         qobuz.addon = __addon__
         self.handle = __handle__
@@ -87,6 +88,7 @@ class QobuzBootstrap(object):
         import xbmc  # @UnresolvedImport
 
         class PathObject ():
+
             def __init__(self):
                 self.base = qobuz.addon.getAddonInfo('path')
 
@@ -110,6 +112,7 @@ class QobuzBootstrap(object):
             '''
             Make dir
             '''
+
             def mkdir(self, path):
                 if not os.path.isdir(path):
                     try:

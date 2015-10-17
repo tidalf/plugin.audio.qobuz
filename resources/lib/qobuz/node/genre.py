@@ -14,9 +14,9 @@ from node.recommendation import RECOS_TYPE_IDS
 
 
 class Node_genre(INode):
-    '''
-    @class Node_genre:
-    '''
+    """@class Node_genre:
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_genre, self).__init__(parent, parameters)
         self.nt = Flag.GENRE
@@ -56,13 +56,13 @@ class Node_genre(INode):
         g = self.data['genres']
         if 'parent' in g and int(g['parent']['level']) > 1:
             self.populate_reco(Dir, lvl, whiteFlag, blackFlag,
-                                  g['parent']['id'])
+                               g['parent']['id'])
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.data or len(self.data['genres']['items']) == 0:
             return self.populate_reco(Dir, lvl,
-                                         whiteFlag, blackFlag, self.nid)
+                                      whiteFlag, blackFlag, self.nid)
         for genre in self.data['genres']['items']:
             node = Node_genre(self, {'nid': genre['id']})
             node.data = genre

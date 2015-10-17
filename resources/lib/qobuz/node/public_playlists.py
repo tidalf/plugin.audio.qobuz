@@ -13,9 +13,9 @@ from api import api
 
 
 class Node_public_playlists(INode):
-    '''
-    @class Node_public_playlists
-    '''
+    """@class Node_public_playlists
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_public_playlists, self).__init__(parent, parameters)
         self.nt = Flag.PUBLIC_PLAYLISTS

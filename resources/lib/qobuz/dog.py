@@ -12,6 +12,7 @@ import re
 class dog():
     '''Checking script parameter against regular expression
     '''
+
     def __init__(self):
         self.allowed_keys = {
             'mode': '^\d{1,10}$',  # Mode View/Scan/BigDir ...

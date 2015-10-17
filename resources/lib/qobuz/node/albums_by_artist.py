@@ -17,18 +17,15 @@ from node import getNode, Flag
 
 
 class Node_albums_by_artist(INode):
-    '''
-        @class Node_product_by_artist:
-    '''
+    """@class Node_product_by_artist:
+    """
 
     def __init__(self, parent=None, parameters=None):
         super(Node_albums_by_artist, self).__init__(parent, parameters)
         self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
         self.offset = self.get_parameter('offset') or 0
-    '''
-        Getter
-    '''
+
     def get_label(self):
         return self.get_artist()
 
@@ -49,9 +46,6 @@ class Node_albums_by_artist(INode):
     def get_artist_id(self):
         return self.nid
 
-    '''
-        Build Down
-    '''
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/artist/getSimilarArtist', artist_id=self.nid,
@@ -81,9 +75,6 @@ class Node_albums_by_artist(INode):
             self.add_child(node)
         return True
 
-    '''
-        Make XbmcListItem
-    '''
     def makeListItem(self, replaceItems=False):
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),

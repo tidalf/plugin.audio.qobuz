@@ -31,6 +31,7 @@ class Directory():
             replaceItem: When attaching context menu to item, control if
                 we are replacing Xbmc Default menu
     """
+
     def __init__(self, root, nodeList=[], **ka):
         self.nodes = []
         self.label = "Qobuz Progress / "
@@ -102,8 +103,8 @@ class Directory():
             return False
         url = node.make_url(asLocalURL=self.asLocalURL)
         if not self.add_to_xbmc_directory(url=url,
-                                item=item,
-                                is_folder=node.is_folder):
+                                          item=item,
+                                          is_folder=node.is_folder):
             self.put_item_ok = False
             return False
         return True
@@ -162,10 +163,10 @@ class Directory():
                 is_folder: bool
         """
         if not xbmcplugin.addDirectoryItem(self.handle,
-                                    ka['url'],
-                                    ka['item'],
-                                    ka['is_folder'],
-                                    self.total_put):
+                                           ka['url'],
+                                           ka['item'],
+                                           ka['is_folder'],
+                                           self.total_put):
             return False
         self.total_put += 1
         return True
@@ -189,12 +190,12 @@ class Directory():
             success = False
         if not self.asList:
             xbmcplugin.setContent(
-                                  handle=self.handle,
-                                  content=self.content_type)
+                handle=self.handle,
+                content=self.content_type)
             xbmcplugin.endOfDirectory(handle=self.handle,
-                                  succeeded=success,
-                                  updateListing=False,
-                                  cacheToDisc=success)
+                                      succeeded=success,
+                                      updateListing=False,
+                                      cacheToDisc=success)
         self.update({'count': 100, 'total': 100}, lang(30172),
                     "%s : %s items" % (lang(30171), str(self.total_put)))
         self.close()

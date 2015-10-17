@@ -7,10 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-# import socket
 import re
 import sys
-# import urllib2
 
 VERSION = '0.0.1'
 
@@ -22,7 +20,6 @@ __image__ = ''
 
 
 import xbmcaddon  # @UnresolvedImport
-# import xbmcplugin  # @UnresolvedImport
 import xbmc  # @UnresolvedImport
 import os
 pluginId = 'plugin.audio.qobuz'
@@ -62,7 +59,7 @@ api.login(username, password)
 
 stream_format = 6 if __addon__.getSetting('streamtype') == 'flac' else 5
 cache_durationm_middle = int(
-                    __addon__.getSetting('cache_duration_middle')) * 60
+    __addon__.getSetting('cache_duration_middle')) * 60
 cache_duration_long = int(__addon__.getSetting('cache_duration_long')) * 60
 
 if stream_format == 6:
@@ -75,11 +72,13 @@ from node import getNode, Flag
 
 
 class XbmcAbort(Exception):
+
     def __init__(self, *a, **ka):
         super(XbmcAbort, self).__init__(*a, **ka)
 
 
 class BadRequest(Exception):
+
     def __init__(self, *a, **ka):
         self.code = 400
         self.message = 'Bad Request '
@@ -87,6 +86,7 @@ class BadRequest(Exception):
 
 
 class Unauthorized(Exception):
+
     def __init__(self, *a, **ka):
         self.code = 401
         self.message = 'Unauthorized '
@@ -94,6 +94,7 @@ class Unauthorized(Exception):
 
 
 class RequestFailed(Exception):
+
     def __init__(self, *a, **ka):
         self.code = 402
         self.message = 'Request Failed'
@@ -101,6 +102,7 @@ class RequestFailed(Exception):
 
 
 class ServerErrors(Exception):
+
     def __init__(self, *a, **ka):
         self.code = 500
         self.message = 'Server errors'
@@ -193,8 +195,8 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.send_error(e.code, e.message)
         except Exception as e:
             msg = 'Server errors (%s / %s)\n%s' % (
-                                                  sys.exc_type, sys.exc_value,
-                                                  repr(e))
+                sys.exc_type, sys.exc_value,
+                repr(e))
             self.log_message(msg)
             self.send_error(500, msg)
 
@@ -218,8 +220,8 @@ class QobuzHttpResolver_Handler(BaseHTTPRequestHandler):
             self.send_error(e.code, e.message)
         except Exception as e:
             msg = 'Server errors (%s / %s)\n%s' % (
-                                                  sys.exc_type, sys.exc_value,
-                                                  repr(e))
+                sys.exc_type, sys.exc_value,
+                repr(e))
             self.log_message(msg)
             self.send_error(500, msg)
 
@@ -237,24 +239,6 @@ class QobuzHttpResolver(ThreadingMixIn, HTTPServer):
             False
         return False
 
-#    def get_request(self):
-#        """Get the request and client address from the socket."""
-#        self.socket.settimeout(0.1)
-#        result = None
-#        while not result:
-#            print "TIMEOUT"
-#            if self.abortRequested():
-#                self.__shutdown_request = True
-#                raise KeyboardInterrupt()
-#            try:
-#                result = self.socket.accept()
-#            except socket.timeout:
-#                print 'Socket timeout'
-#                pass
-#        ''' Reset timeout on the new socket '''
-#        result[0].settimeout(None)
-#        return result
-
     def verify_request(self, path, client_address):
         host, _port = client_address
         if host == '127.0.0.1':
@@ -266,7 +250,7 @@ class QobuzXbmcHttpResolver(QobuzHttpResolver):
 
     def __init__(self):
         QobuzHttpResolver.__init__(self, ('127.0.0.1', 33574),
-                                                    QobuzHttpResolver_Handler)
+                                   QobuzHttpResolver_Handler)
 
 
 def main():

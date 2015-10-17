@@ -14,9 +14,9 @@ from gui.util import getImage, getSetting
 
 
 class Node_article_rubrics(INode):
-    '''
-        @class Node_article_rubrics
-    '''
+    """@class Node_article_rubrics
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_article_rubrics, self).__init__(parent, parameters)
         self.nt = Flag.ARTICLE_RUBRICS
@@ -40,9 +40,9 @@ class Node_article_rubrics(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(
-                                  name='article_listrubrics',
-                                  id=self.nid, offset=self.offset,
-                                  limit=limit)
+            name='article_listrubrics',
+            id=self.nid, offset=self.offset,
+            limit=limit)
         if not data:
             return False
         self.data = data['data']

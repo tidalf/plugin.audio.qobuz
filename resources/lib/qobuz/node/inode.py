@@ -18,8 +18,7 @@ from constants import Mode
 from debug import log, warn
 from exception import QobuzXbmcError as Qerror
 from gui.contextmenu import contextMenu
-from gui.util import color, lang, runPlugin, containerUpdate, \
-    getSetting
+from gui.util import color, lang, runPlugin, containerUpdate, getSetting
 from node import Flag
 from node import getNode
 import qobuz  # @UnresolvedImport

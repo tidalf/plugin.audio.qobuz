@@ -18,9 +18,8 @@ from node import Flag, getNode
 
 
 class Node_friend(INode):
-    '''
-    @class Node_friend:
-    '''
+    """@class Node_friend:
+    """
 
     def __init__(self, parent=None, parameters=None):
         super(Node_friend, self).__init__(parent, parameters)
@@ -84,10 +83,8 @@ class Node_friend(INode):
             return False
         friends.append(name)
         newdata = {'friends': friends}
-        #easyapi.get(name='user')
         if not api.user_update(player_settings=json.dumps(newdata)):
             return False
-#        qobuz.registry.delete(name='user')
         executeBuiltin(containerRefresh())
         return True
 

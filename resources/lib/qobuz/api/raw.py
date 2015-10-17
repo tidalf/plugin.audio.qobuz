@@ -28,7 +28,6 @@ class QobuzApiRaw(object):
 
     def __init__(self):
         self.appid = "285473059"  # XBMC
-        # self.appid = "214748364" # :]
         self.version = '0.2'
         self.baseUrl = 'http://www.qobuz.com/api.json/'
 
@@ -51,8 +50,7 @@ class QobuzApiRaw(object):
         return s
 
     def _check_ka(self, ka, mandatory, allowed=[]):
-        """
-        Checking parameters before sending our request
+        """Checking parameters before sending our request
         - if mandatory parameter is missing raise error
         - if a given parameter is neither in mandatory or allowed
         raise error (Creating exception class like MissingParameter
@@ -155,7 +153,7 @@ class QobuzApiRaw(object):
             response_json = r.json()
         except Exception as e:
             warn(self, "Json loads failed to load... retrying!\n%s" % (
-                                                                    repr(e)))
+                repr(e)))
             try:
                 response_json = r.json()
             except:
@@ -168,15 +166,12 @@ class QobuzApiRaw(object):
         except:
             pass
         if status == 'error':
-            self.error = self._api_error_string(url, _copy_params, response_json)
+            self.error = self._api_error_string(
+                url, _copy_params, response_json)
             warn(self, self.error)
             return None
         return response_json
 
-    """
-        This method is used when you are caching token and want to skip
-        login
-    """
     def set_user_data(self, user_id, user_auth_token):
         if not (user_id or user_auth_token):
             raise QobuzXbmcError(who=self, what='missing_argument',
@@ -185,9 +180,6 @@ class QobuzApiRaw(object):
         self.user_id = user_id
         self.logged_on = time()
 
-    """
-        Erase user specific data
-    """
     def logout(self):
         self.user_auth_token = None
         self.user_id = None
@@ -202,9 +194,6 @@ class QobuzApiRaw(object):
         self.logout()
         return None
 
-    '''
-    User
-    '''
     def _user_login(self, **ka):
         self._check_ka(ka, ['username', 'password'], ['email'])
         data = self._api_request(ka, '/user/login', noToken=True)
@@ -226,9 +215,6 @@ class QobuzApiRaw(object):
         data = self._api_request(ka, '/user/update')
         return data
 
-    '''
-    Track
-    '''
     def track_get(self, **ka):
         self._check_ka(ka, ['track_id'])
         data = self._api_request(ka, '/track/get')
@@ -251,7 +237,6 @@ class QobuzApiRaw(object):
                   }
         return self._api_request(params, '/track/getFileUrl')
 
-    # MAPI UNTESTED
     def track_search(self, **ka):
         self._check_ka(ka, ['query'], ['limit'])
         data = self._api_request(ka, '/track/search')
@@ -282,9 +267,6 @@ class QobuzApiRaw(object):
                   }
         return self._api_request(params, '/track/reportStreamingEnd')
 
-    '''
-    Album
-    '''
     def album_get(self, **ka):
         self._check_ka(ka, ['album_id'])
         return self._api_request(ka, '/album/get')
@@ -293,15 +275,11 @@ class QobuzApiRaw(object):
         self._check_ka(ka, [], ['type', 'genre_id', 'limit', 'offset'])
         return self._api_request(ka, '/album/getFeatured')
 
-    '''
-    Purchase
-    '''
     def purchase_getUserPurchases(self, **ka):
         self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit',
                                 'offset'])
         return self._api_request(ka, "/purchase/getUserPurchases")
 
-    # SEARCH #
     def search_getResults(self, **ka):
         self._check_ka(ka, ['query'], ['type', 'limit', 'offset'])
         mandatory = ['query', 'type']
@@ -312,9 +290,6 @@ class QobuzApiRaw(object):
                                      additional=label)
         return self._api_request(ka, '/search/getResults')
 
-    """
-        Favorite
-    """
     def favorite_getUserFavorites(self, **ka):
         self._check_ka(ka, [], ['user_id', 'type', 'limit', 'offset'])
         return self._api_request(ka, '/favorite/getUserFavorites')
@@ -341,9 +316,6 @@ class QobuzApiRaw(object):
                                  additional='artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/delete')
 
-    """
-    Playlist
-    """
     def playlist_get(self, **ka):
         self._check_ka(ka, ['playlist_id'], ['extra', 'limit', 'offset'])
         return self._api_request(ka, '/playlist/get')
@@ -380,7 +352,7 @@ class QobuzApiRaw(object):
 
     def playlist_create(self, **ka):
         self._check_ka(ka, ['name'], ['is_public',
-                       'is_collaborative', 'tracks_id', 'album_id'])
+                                      'is_collaborative', 'tracks_id', 'album_id'])
         if not 'is_public' in ka:
             ka['is_public'] = True
         if not 'is_collaborative' in ka:
@@ -396,7 +368,7 @@ class QobuzApiRaw(object):
 
     def playlist_update(self, **ka):
         self._check_ka(ka, ['playlist_id'], ['name', 'description',
-                       'is_public', 'is_collaborative', 'tracks_id'])
+                                             'is_public', 'is_collaborative', 'tracks_id'])
         res = self._api_request(ka, '/playlist/update')
         return res
 
@@ -404,9 +376,7 @@ class QobuzApiRaw(object):
         self._check_ka(ka, '', ['type', 'limit', 'offset'])
         res = self._api_request(ka, '/playlist/getPublicPlaylists')
         return res
-    """
-        Artist
-    """
+
     def artist_getSimilarArtists(self, **ka):
         self._check_ka(ka, ['artist_id', 'limit', 'offset'])
         return self._api_request(ka, '/artist/getSimilarArtists')
@@ -416,23 +386,14 @@ class QobuzApiRaw(object):
         data = self._api_request(ka, '/artist/get')
         return data
 
-    """
-        Genre
-    """
     def genre_list(self, **ka):
         self._check_ka(ka, [], ['parent_id', 'limit', 'offset'])
         return self._api_request(ka, '/genre/list')
 
-    """
-        Label
-    """
     def label_list(self, **ka):
         self._check_ka(ka, [], ['limit', 'offset'])
         return self._api_request(ka, '/label/list')
 
-    """
-        Article
-    """
     def article_listRubrics(self, **ka):
         self._check_ka(ka, [], ['extra', 'limit', 'offset'])
         return self._api_request(ka, '/article/listRubrics')

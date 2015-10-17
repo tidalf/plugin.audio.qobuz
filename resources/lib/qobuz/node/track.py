@@ -16,9 +16,9 @@ from api import api
 
 
 class Node_track(INode):
-    '''
-        NODE TRACK
-    '''
+    """NODE TRACK
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_track, self).__init__(parent, parameters)
         self.nt = Flag.TRACK
@@ -47,9 +47,9 @@ class Node_track(INode):
             if not album_id:
                 album_id = self.parent.nid
             url = 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
-                    str(self.get_artist_id()),
-                    album_id,
-                    str(self.nid))
+                str(self.get_artist_id()),
+                album_id,
+                str(self.nid))
             return url
         if not 'mode' in ka:
             ka['mode'] = Mode.PLAY
@@ -96,8 +96,8 @@ class Node_track(INode):
 
     def get_image(self):
         image = self.get_property(['album/image/large', 'image/large',
-                                      'image/small',
-                                      'image/thumbnail', 'image'])
+                                   'image/small',
+                                   'image/thumbnail', 'image'])
         if image:
             return image.replace('_230.', '_600.')
         if not self.parent:
@@ -130,17 +130,17 @@ class Node_track(INode):
             return False
         if not 'url' in data:
             warn(self, "streaming_url, no url returned\n"
-                "API Error: %s" % (api.error))
+                 "API Error: %s" % (api.error))
             return None
         return data['url']
 
     def get_artist(self):
         return self.get_property(['artist/name',
-                               'composer/name',
-                               'performer/name',
-                               'interpreter/name',
-                               'composer/name',
-                               'album/artist/name'])
+                                  'composer/name',
+                                  'performer/name',
+                                  'interpreter/name',
+                                  'composer/name',
+                                  'album/artist/name'])
 
     def get_artist_id(self):
         s = self.get_property(['artist/id',
@@ -204,7 +204,7 @@ class Node_track(INode):
         if hires and self.get_hires():
             format_id = 27
         data = api.get('/track/getFileUrl', format_id=format_id,
-                           track_id=self.nid, user_id=api.user_id)
+                       track_id=self.nid, user_id=api.user_id)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return None
@@ -212,7 +212,7 @@ class Node_track(INode):
 
     def get_restrictions(self):
         data = self.__getFileUrl()
-        if not data: 
+        if not data:
             raise ErrorNoData('Cannot get track restrictions')
         restrictions = []
         if not 'restrictions' in data:
@@ -247,10 +247,10 @@ class Node_track(INode):
             mime = 'audio/mpeg'
         return mime
 
-    """ We add this information only when playing item because it require
-        us to fetch data from Qobuz
-    """
     def item_add_playing_property(self, item):
+        """ We add this information only when playing item because it require
+        us to fetch data from Qobuz
+        """
         mime = self.get_mimetype()
         if not mime:
             warn(self, "Cannot set item streaming url")
@@ -314,8 +314,6 @@ class Node_track(INode):
         '''
         artist = self.get_artist()
         if self.parent and hasattr(self.parent, 'get_artist_id'):
-#             artist_id = str(self.parent.get_artist_id())
-            #if artist_id in ['26887', '145383', '255948']:
             if self.parent.get_artist() != artist:
                 artist = '%s / %s' % (self.parent.get_artist(), artist)
         desc = description or 'Qobuz Music Streaming'
@@ -329,14 +327,13 @@ class Node_track(INode):
                      'duration': duration,
                      'year': self.get_year(),
                      'comment': desc + '(aid=' + self.get_album_id()
-                        + ',curl=' + self.get_image() + ')'
-                     # 'lyrics': "Chant down babylon lalalala"
+                     + ',curl=' + self.get_image() + ')'
+                     # 'lyrics': "loreum..."
                      })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
-#        item.setProperty('mimetype', 'audio/mpeg')
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
@@ -346,10 +343,10 @@ class Node_track(INode):
         if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
             colorCaution = getSetting('item_caution_color')
             url = self.parent.make_url(nt=Flag.PLAYLIST,
-                id=self.parent.nid,
-                qid=self.get_playlist_track_id(),
-                nm='gui_remove_track',
-                mode=Mode.VIEW)
+                                       id=self.parent.nid,
+                                       qid=self.get_playlist_track_id(),
+                                       nm='gui_remove_track',
+                                       mode=Mode.VIEW)
             menu.add(path='playlist/remove',
                      label=lang(30075),
                      cmd=runPlugin(url), color=colorCaution)

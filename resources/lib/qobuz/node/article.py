@@ -20,7 +20,6 @@ class WidgetArticle(xbmcgui.WindowDialog):
 
     def onInit(self):
         self.image = xbmcgui.ControlImage(100, 250, 125, 75, aspectRatio=2)
-        pass
 
     def onClick(self, action):
         super(WidgetArticle, self).onClick(action)
@@ -33,9 +32,8 @@ class WidgetArticle(xbmcgui.WindowDialog):
 
 
 class Node_article(INode):
-    '''
-        @class Node_articles
-    '''
+    """@class Node_articles
+    """
     def __init__(self, parent=None, parameters=None):
         super(Node_article, self).__init__(parent, parameters)
         self.nt = Flag.ARTICLE

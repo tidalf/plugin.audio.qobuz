@@ -36,6 +36,7 @@ keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
 
 class MyPlayer(xbmc.Player):
+
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
         self.trackId = None
@@ -151,7 +152,7 @@ class Monitor(xbmc.Monitor):
                     data2 = cur.fetchone()
                 except:
                     pass
-                if  data2 is None:
+                if data2 is None:
                     sqlcmd2 = str("INSERT INTO art VALUES ("
                                   "NULL, (?) , 'album', 'thumb', (?)"
                                   ")")

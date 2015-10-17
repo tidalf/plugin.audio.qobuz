@@ -17,6 +17,7 @@ class IRenderer(object):
         node_type: int, type of node (see node.NodeFlag)
         parameters: dictionary, parameters passed to our plugin
     """
+
     def __init__(self, node_type, parameters={}):
         self.node_type = node_type
         self.parameters = parameters

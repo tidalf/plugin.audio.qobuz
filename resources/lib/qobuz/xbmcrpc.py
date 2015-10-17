@@ -33,9 +33,9 @@ def getInfoLabels(**ka):
 
 
 class JsonRequest:
+    """@class: JsonRequest
     """
-        @class: JsonRequest
-    """
+
     def __init__(self, method):
         self.method = method
         self.version = '2.0'
@@ -48,9 +48,9 @@ class JsonRequest:
 
     def to_json(self):
         jDict = {
-                'method': self.method,
-                'jsonrpc': self.version,
-                'params': self.parameters,
+            'method': self.method,
+            'jsonrpc': self.version,
+            'params': self.parameters,
         }
         if self.id:
             jDict['id'] = self.id
@@ -91,9 +91,9 @@ class JsonResponse:
 
 
 class XbmcRPC:
+    """@class: XbmcRPC
     """
-        @class: XbmcRPC
-    """
+
     def __init__(self):
         pass
 
@@ -131,31 +131,31 @@ class XbmcRPC:
         request.id = 1
         request.add_parameters({'songid': int(sid),
                                 "properties": ["title",
-      "artist",
-      "albumartist",
-      "genre",
-      "year",
-      "rating",
-      "album",
-      "track",
-      "duration",
-      "comment",
-      "lyrics",
-      "musicbrainztrackid",
-      "musicbrainzartistid",
-      "musicbrainzalbumid",
-      "musicbrainzalbumartistid",
-      "playcount",
-      "fanart",
-      "thumbnail",
-      "file",
-      "albumid",
-      "lastplayed",
-      "disc",
-      "genreid",
-      "artistid",
-      "displayartist",
-      "albumartistid"]})
+                                               "artist",
+                                               "albumartist",
+                                               "genre",
+                                               "year",
+                                               "rating",
+                                               "album",
+                                               "track",
+                                               "duration",
+                                               "comment",
+                                               "lyrics",
+                                               "musicbrainztrackid",
+                                               "musicbrainzartistid",
+                                               "musicbrainzalbumid",
+                                               "musicbrainzalbumartistid",
+                                               "playcount",
+                                               "fanart",
+                                               "thumbnail",
+                                               "file",
+                                               "albumid",
+                                               "lastplayed",
+                                               "disc",
+                                               "genreid",
+                                               "artistid",
+                                               "displayartist",
+                                               "albumartistid"]})
         return self.send(request)
 
 rpc = XbmcRPC()

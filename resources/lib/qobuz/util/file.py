@@ -21,13 +21,14 @@ def unlink(filename):
     return os.unlink(tmpfile)
 
 
-# From http://stackoverflow.com/
-# questions/12003805/threadsafe-and-fault-tolerant-file-writes
 class RenamedTemporaryFile(object):
-    """
-    A temporary file object which will be renamed to the specified
+    """A temporary file object which will be renamed to the specified
     path on exit.
+
+    From http://stackoverflow.com/
+        questions/12003805/threadsafe-and-fault-tolerant-file-writes
     """
+
     def __init__(self, final_path, **kwargs):
         tmpfile_dir = kwargs.pop('dir', None)
 
@@ -42,8 +43,7 @@ class RenamedTemporaryFile(object):
         self.final_path = final_path
 
     def __getattr__(self, attr):
-        """
-        Delegate attribute access to the underlying temporary file object.
+        """Delegate attribute access to the underlying temporary file object.
         """
         return getattr(self.tmpfile, attr)
 
@@ -64,19 +64,19 @@ class RenamedTemporaryFile(object):
 
 
 def find(directory, pattern, callback=None, gData=None):
-        flist = []
-        fok = re.compile(pattern)
-        for dirname, _dirnames, filenames in os.walk(directory):
-            for filename in filenames:
-                if fok.match(filename):
-                    path = os.path.join(dirname, filename)
-                    if callback:
-                        try:
-                            if not callback(path, gData):
-                                return None
-                        except Exception as e:
-                            warn('[find]', 'Callback raise exception: '
-                                 '' + repr(e))
+    flist = []
+    fok = re.compile(pattern)
+    for dirname, _dirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            if fok.match(filename):
+                path = os.path.join(dirname, filename)
+                if callback:
+                    try:
+                        if not callback(path, gData):
                             return None
-                    flist.append(path)
-        return flist
+                    except Exception as e:
+                        warn('[find]', 'Callback raise exception: '
+                             '' + repr(e))
+                        return None
+                flist.append(path)
+    return flist

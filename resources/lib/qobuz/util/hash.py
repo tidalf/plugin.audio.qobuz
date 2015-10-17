@@ -2,7 +2,7 @@ import hashlib
 
 
 def hashit(s):
-    """ Using our own wrapper against hash function
+    """Using our own wrapper against hash function
         @note: Md5 seem to be the fastest in hashlib
         We don't really need cryptographic algo but well dunnon what to use :)
     """

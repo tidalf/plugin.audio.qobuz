@@ -13,9 +13,9 @@ from api import api
 
 
 class Node_similar_artist(INode):
-    '''
-        NODE ARTIST
-    '''
+    """NODE ARTIST
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_similar_artist, self).__init__(parent, parameters)
         self.nt = Flag.SIMILAR_ARTIST
@@ -28,7 +28,7 @@ class Node_similar_artist(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/artist/getSimilarArtists', artist_id=self.nid,
-                           offset=self.offset, limit=limit)
+                       offset=self.offset, limit=limit)
         if not data:
             return False
         self.data = data

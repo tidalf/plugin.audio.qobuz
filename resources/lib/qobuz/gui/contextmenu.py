@@ -11,11 +11,12 @@ from gui.util import color, getSetting
 
 
 class contextMenu():
-    '''Creating context menu:
+    """Creating context menu:
         add(path='test', cmd='foo' ...)
         add(path='test/test_one', cmd='bar', ...)
         ...
-    '''
+    """
+
     def __init__(self):
         self.data = {}
         self.defaultSection = 'qobuz'
@@ -41,14 +42,14 @@ class contextMenu():
         return section, path
 
     def add(self, **ka):
-        '''Add menu entry
+        """Add menu entry
             Parameters:
                 path: string, <section>/<id> (id juste need to be unique)
                 cmd: string, xbmc command to run
                 color: string, override default color
                 pos: int, position in menu
-        '''
-        for key in  ['label', 'cmd']:
+        """
+        for key in ['label', 'cmd']:
             if not key in ka:
                 raise Qerror(who=self,
                              what='missing_parameter', additional=key)
@@ -91,7 +92,7 @@ class contextMenu():
             return self.data[key]['pos']
 
         def itemSort(item):
-                return item['pos']
+            return item['pos']
         for section in sorted(self.data, key=sectionSort):
             colorItem = self.color_section
             data = self.data[section]
@@ -106,13 +107,3 @@ class contextMenu():
                 label = '%s' % (color(colorItem, item['label']))
                 menuItems.append((label, item['cmd']))
         return menuItems
-
-if __name__ == '__main__':
-    c = contextMenu()
-    c.add(path='qobuz', label='Qobuz', cmd='playlist', pos=1)
-    c.add(path='playlist', label='Global', cmd='playlist', pos=2)
-    c.add(path='friends', label='Global', cmd='toto', pos=3)
-    c.add(path='friends/titi', label='Titi', cmd='nop', pos=1)
-    c.add(path='friends/toto', label='Toto', cmd='nop', pos=4)
-    c.add(path='friends/plop', label='Plop', cmd='nop', pos=0)
-    c.getTuples()

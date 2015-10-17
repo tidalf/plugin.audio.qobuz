@@ -49,8 +49,9 @@ RECOS_GENRES = {
 
 
 class Node_recommendation(INode):
-    '''Recommendation node, displaying music ordered by category and genre
-    '''
+    """Recommendation node, displaying music ordered by category and genre
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
         self.nt = Flag.RECOMMENDATION
@@ -79,10 +80,10 @@ class Node_recommendation(INode):
         offset = self.offset or 0
         limit = getSetting('pagination_limit')
         data = api.get('/album/getFeatured',
-                                  type=RECOS_TYPE_IDS[int(self.genre_type)],
-                                  genre_id=self.genre_id,
-                                  limit=limit,
-                                  offset=offset)
+                       type=RECOS_TYPE_IDS[int(self.genre_type)],
+                       genre_id=self.genre_id,
+                       limit=limit,
+                       offset=offset)
         if not data:
             warn(self, "Cannot fetch data for recommendation")
             return False
@@ -90,34 +91,31 @@ class Node_recommendation(INode):
         return True
 
     def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
-        ''' Populate type, we don't have genre_type nor genre_id
-        '''
+        """Populate type, we don't have genre_type nor genre_id
+        """
         for gid in RECOS_TYPE_IDS:
             node = getNode(Flag.RECOMMENDATION, {'genre-type': gid})
-#            node.genre_type = gid
             node.set_label(
                 self.label + ' - ' + RECOS_TYPES[gid])
             self.add_child(node)
         return True
 
     def __populate_genre(self, Dir, lvl, whiteFlag, blackFlag):
-        '''Populate genre, we have genre_type but no genre_id
-        '''
+        """Populate genre, we have genre_type but no genre_id
+        """
         for genre_id in RECOS_GENRES:
             node = getNode(Flag.RECOMMENDATION, {'genre-type': self.genre_type,
                                                  'genre-id': genre_id})
-#            node.genre_type = self.genre_type
-#            node.genre_id = genre_id
             label = '%s - %s / %s' % (self.label,
                                       RECOS_TYPES[int(self.genre_type)],
-                                     RECOS_GENRES[genre_id])
+                                      RECOS_GENRES[genre_id])
             node.label = label
             self.add_child(node)
         return True
 
     def __populate_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
-        '''Populate album selected by genre_type and genre_id
-        '''
+        """Populate album selected by genre_type and genre_id
+        """
         if self.data is None:
             return False
         if 'albums' not in self.data:
@@ -133,8 +131,8 @@ class Node_recommendation(INode):
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        '''We are populating our node based on genre_type and genre_id
-        '''
+        """We are populating our node based on genre_type and genre_id
+        """
         if not self.genre_type:
             return self.__populate_type(Dir, lvl, whiteFlag, blackFlag)
         elif not self.genre_id:

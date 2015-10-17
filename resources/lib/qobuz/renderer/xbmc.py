@@ -20,6 +20,7 @@ class QobuzXbmcRenderer(IRenderer):
             params: dictionary, parameters passed to our plugin
         * You can set parameter after init (see renderer.Irenderer)
     """
+
     def __init__(self, node_type, params={}):
         super(QobuzXbmcRenderer, self).__init__(node_type, params)
 
@@ -71,18 +72,18 @@ class QobuzXbmcRenderer(IRenderer):
             import xbmcplugin  # @UnresolvedImport
             Dir.set_content(self.root.content_type)
             methods = [
-                       xbmcplugin.SORT_METHOD_UNSORTED,
-                       xbmcplugin.SORT_METHOD_LABEL,
-                       xbmcplugin.SORT_METHOD_DATE,
-                       xbmcplugin.SORT_METHOD_TITLE,
-                       xbmcplugin.SORT_METHOD_VIDEO_YEAR,
-                       xbmcplugin.SORT_METHOD_GENRE,
-                       xbmcplugin.SORT_METHOD_ARTIST,
-                       xbmcplugin.SORT_METHOD_ALBUM,
-                       xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
-                       xbmcplugin.SORT_METHOD_TRACKNUM, ]
+                xbmcplugin.SORT_METHOD_UNSORTED,
+                xbmcplugin.SORT_METHOD_LABEL,
+                xbmcplugin.SORT_METHOD_DATE,
+                xbmcplugin.SORT_METHOD_TITLE,
+                xbmcplugin.SORT_METHOD_VIDEO_YEAR,
+                xbmcplugin.SORT_METHOD_GENRE,
+                xbmcplugin.SORT_METHOD_ARTIST,
+                xbmcplugin.SORT_METHOD_ALBUM,
+                xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
+                xbmcplugin.SORT_METHOD_TRACKNUM, ]
             [xbmcplugin.addSortMethod(handle=qobuz.boot.handle,
-                                  sortMethod=method) for method in methods]
+                                      sortMethod=method) for method in methods]
         return Dir.end_of_directory()
 
     def scan(self):
@@ -106,7 +107,7 @@ class QobuzXbmcRenderer(IRenderer):
             Dir.add_node(self.root)
         else:
             self.root.populating(Dir, self.depth,
-                                       self.whiteFlag, self.blackFlag)
+                                 self.whiteFlag, self.blackFlag)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()
         notifyH('Scanning results', str(Dir.total_put) +

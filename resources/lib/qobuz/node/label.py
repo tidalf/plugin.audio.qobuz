@@ -17,6 +17,7 @@ class Node_label(INode):
     '''
     @class Node_label:
     '''
+
     def __init__(self, parent=None, parameters=None):
         super(Node_label, self).__init__(parent, parameters)
         self.nt = Flag.LABEL

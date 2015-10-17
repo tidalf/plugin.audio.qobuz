@@ -15,9 +15,9 @@ from node import getNode, Flag
 
 
 class Node_artist(INode):
-    '''
-        @class Node_artist(Inode): Artist
-    '''
+    """@class Node_artist(Inode): Artist
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_artist, self).__init__(parent, parameters)
         self.nt = Flag.ARTIST
@@ -37,7 +37,7 @@ class Node_artist(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/artist/get', artist_id=self.nid, limit=limit,
-                           offset=self.offset, extra='albums')
+                       offset=self.offset, extra='albums')
         if not data:
             warn(self, "Build-down: Cannot fetch artist data")
             return False
@@ -102,12 +102,8 @@ class Node_artist(INode):
             return None
         item.setPath(url)
         item.setInfo('music', infoLabels={
-#            'genre': 'reggae', # self.get_genre(),
-#            'year': '2000', # self.get_year(),
             'artist': self.get_artist(),
-#            'album': self.get_title(),
             'comment': self.get_description()
-#           'Artist_Description': 'coucou'
         })
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)

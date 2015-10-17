@@ -12,8 +12,9 @@ from node import getNode, Flag
 
 
 class Node_purchases(INode):
-    '''Our root node, we are displaying all qobuz nodes from here
-    '''
+    """Our root node, we are displaying all qobuz nodes from here
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_purchases, self).__init__(parent, parameters)
         self.nt = Flag.PURCHASES

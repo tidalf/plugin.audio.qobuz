@@ -13,9 +13,9 @@ from node import getNode, Flag
 
 
 class Node_articles(INode):
-    '''
-    @class Node_articles
-    '''
+    """@class Node_articles
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_articles, self).__init__(parent, parameters)
         self.nt = Flag.ARTICLES
@@ -32,10 +32,10 @@ class Node_articles(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = qobuz.registry.get(name='article_listlastarticles',
-                                      id=self.nid,
-                                      rubric_ids=self.nid,
-                                      offset=self.offset,
-                                      limit=limit)
+                                  id=self.nid,
+                                  rubric_ids=self.nid,
+                                  offset=self.offset,
+                                  limit=limit)
         if not data:
             return False
         self.data = data['data']

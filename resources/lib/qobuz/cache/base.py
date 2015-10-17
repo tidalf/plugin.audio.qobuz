@@ -26,15 +26,16 @@ DeleteError = 1 << 5
 
 
 class CacheBase(object):
-    ''' A base class for caching
-    '''
+    """A base class for caching
+    """
+
     def __init__(self, *a, **ka):
         self.cached_function_name = __name__
 
     def cached(self, f, *a, **ka):
-        '''Decorator
+        """Decorator
             All positional and named parameters are used to make the key
-        '''
+        """
         that = self
         self.cached_function_name = f.__name__
 
@@ -59,13 +60,13 @@ class CacheBase(object):
                 if black_key in ka:
                     del ka[black_key]
             entry = {
-                 'updated_on': time(),
-                 'data': data,
-                 'ttl': that.get_ttl(key, *a, **ka),
-                 'pa': a,
-                 'ka': ka,
-                 'magic': __magic__,
-                 'key': key
+                'updated_on': time(),
+                'data': data,
+                'ttl': that.get_ttl(key, *a, **ka),
+                'pa': a,
+                'ka': ka,
+                'magic': __magic__,
+                'key': key
             }
             if not that.sync(key, entry):
                 that.error &= StoreError
@@ -99,10 +100,10 @@ class CacheBase(object):
         return True
 
     def load(self, key, *a, **ka):
-        ''' return tuple (Status, Data)
+        """Return tuple (Status, Data)
             Status: Bool
             Data: Arbitrary data
-        '''
+        """
         raise NotImplemented()
 
     def load_from_store(self, *a, **ka):

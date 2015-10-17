@@ -17,6 +17,7 @@ class Node_user_playlists(INode):
     """User playlists node
         This node list playlist made by user and saved on Qobuz server
     """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_user_playlists, self).__init__(parent, parameters)
         self.label = lang(30021)
@@ -54,7 +55,7 @@ class Node_user_playlists(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/playlist/getUserPlaylists', limit=limit,
-                                offset=self.offset, user_id=api.user_id)
+                       offset=self.offset, user_id=api.user_id)
         if not data:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False

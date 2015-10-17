@@ -14,8 +14,9 @@ from gui.util import lang, getImage, getSetting
 
 
 class Node_purchase(INode):
-    '''Displaying product purchased by user (track and album)
-    '''
+    """Displaying product purchased by user (track and album)
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_purchase, self).__init__(parent, parameters)
         self.nt = Flag.PURCHASE
@@ -38,7 +39,7 @@ class Node_purchase(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
         data = api.get('/purchase/getUserPurchases', limit=limit,
-                           offset=self.offset, user_id=api.user_id)
+                       offset=self.offset, user_id=api.user_id)
         if not data:
             warn(self, "Cannot fetch purchases data")
             return False

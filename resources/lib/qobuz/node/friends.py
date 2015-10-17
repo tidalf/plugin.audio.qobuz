@@ -14,9 +14,9 @@ from node import getNode, Flag
 
 
 class Node_friends(INode):
-    '''
-    @class Node_friend_list:
-    '''
+    """@class Node_friend_list:
+    """
+
     def __init__(self, parent=None, parameters=None):
         super(Node_friends, self).__init__(parent, parameters)
         self.nt = Flag.FRIENDS
@@ -44,17 +44,17 @@ class Node_friends(INode):
         password = api.password
         user_id = api.user_id
         user_data = api.get('/user/login', username=username,
-                                password=password)
+                            password=password)
         if not 'user' in user_data:
             return False
         friend_data = user_data['user']['player_settings']['friends']
         info(self, "Build-down friends list " + repr(self.name))
         if self.name:
             data = api.get('/playlist/getUserPlaylists',
-                               username=self.name, limit=0)
+                           username=self.name, limit=0)
         else:
             data = api.get('/playlist/getUserPlaylists',
-                               user_id=user_id, limit=0)
+                           user_id=user_id, limit=0)
         if not data:
             warn(self, "No friend data")
             return False
@@ -88,6 +88,4 @@ class Node_friends(INode):
         menu.add(path='friend', label=label, cmd=containerUpdate(url))
         url = self.make_url(nt=Flag.FRIEND, nm='gui_create', nid=self.nid)
         menu.add(path='friend/add', label=lang(30181), cmd=runPlugin(url))
-
-        ''' Calling base class '''
         super(Node_friends, self).attach_context_menu(item, menu)

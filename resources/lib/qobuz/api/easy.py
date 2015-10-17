@@ -10,7 +10,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from cache import cache
-from api.raw  import QobuzApiRaw
+from api.raw import QobuzApiRaw
 
 
 class InvalidQuery(Exception):
@@ -23,12 +23,13 @@ class QobuzApiEasy(QobuzApiRaw):
         self.cache_base_path = None
         super(QobuzApiEasy, self).__init__()
         self.is_logged = False
-        ''' Setting default stream format to mp3 '''
+        """Setting default stream format to mp3
+        """
         self.stream_format = 5
 
     @cache.cached
     def get(self, *a, **ka):
-        '''Wrapper that cache query to our raw api. We are enforcing format
+        """Wrapper that cache query to our raw api. We are enforcing format
         because cache entry key are made based on *a and **ka parameters.
         ('artist/get' and '/artist/get' will generate different key)
         Path are mapped to raw api and raise InvalidQuery on error
@@ -49,7 +50,7 @@ class QobuzApiEasy(QobuzApiRaw):
             None on error
 
         ::note api.error will contain last error message
-        '''
+        """
         if not a[0] or not a[0].startswith('/'):
             raise InvalidQuery("Missing starting << / >>")
         path = '/'.join(a)
@@ -63,15 +64,16 @@ class QobuzApiEasy(QobuzApiRaw):
         methname = '%s_%s' % (xpath[0], xpath[1])
         if not hasattr(self, methname):
             raise InvalidQuery(path)
-        '''Passing user_id create different key for the cache...
-        '''
+        """Passing user_id create different key for the cache...
+        """
         for label in self.__clean_ka(xpath[0], xpath[1], **ka):
             del ka[label]
         return getattr(self, methname)(**ka)
 
     def __clean_ka(self, endpoint, method, **ka):
-        ''' We are removing some key that are not needed by our raw api but
-        generate different cache entry (Data bound to specific user...) '''
+        """We are removing some key that are not needed by our raw api but
+        generate different cache entry (Data bound to specific user...)
+        """
         keys = []
         if endpoint == 'track' and method == 'getFileUrl':
             if 'user_id' in ka:
@@ -82,12 +84,12 @@ class QobuzApiEasy(QobuzApiRaw):
         return keys
 
     def login(self, username, password):
-        '''We are storing our authentication token back to our raw api on
+        """We are storing our authentication token back to our raw api on
         success.
 
         ::return
             True on success, else False
-        '''
+        """
         self.username = username
         self.password = password
         data = self.get('/user/login', username=username, password=password)

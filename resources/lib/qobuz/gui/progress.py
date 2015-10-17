@@ -29,6 +29,7 @@ class Progress(xbmcgui.DialogProgress):
         Parameter:
             is_enable: bool (default: True)
     """
+
     def __init__(self, is_enable=True):
         self.is_enable = is_enable
         if self.is_enable:

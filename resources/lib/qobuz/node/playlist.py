@@ -23,9 +23,8 @@ dialogHeading = 'Qobuz playlist'
 
 
 class Node_playlist(INode):
-    '''
-    @class Node_playlist:
-    '''
+    """@class Node_playlist:
+    """
 
     def __init__(self, parent=None, parameters=None):
         super(Node_playlist, self).__init__(parent, parameters)
@@ -146,8 +145,6 @@ class Node_playlist(INode):
         url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
         menu.add(path='playlist/remove', label=lang(30166),
                  cmd=runPlugin(url), color=colorCaution)
-
-        ''' Calling base class '''
         super(Node_playlist, self).attach_context_menu(item, menu)
 
     def remove_tracks(self, tracks_id):
@@ -282,10 +279,6 @@ class Node_playlist(INode):
             return None
         return int(userdata['current_playlist'])
 
-    '''
-        Rename playlist
-    '''
-
     def gui_rename(self, playlist_id=None):
         if not playlist_id:
             playlist_id = self.nid
@@ -343,10 +336,6 @@ class Node_playlist(INode):
         url = self.make_url(nt=Flag.USERPLAYLISTS)
         executeBuiltin(containerUpdate(url))
         return ret['id']
-
-    '''
-        Remove playlist
-    '''
 
     def gui_remove(self, playlist_id=None):
         if not playlist_id:

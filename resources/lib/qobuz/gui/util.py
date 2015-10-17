@@ -11,16 +11,14 @@ import sys
 import re
 
 try:
-    """
-    Dirty trick that permit to import this module outside of xbmc
+    """Dirty trick that permit to import this module outside of xbmc
     All function using xbmc module will fail ...
     """
     import xbmc  # @UnresolvedImport
     import xbmcgui  # @UnresolvedImport
     import xbmcplugin  # @UnresolvedImport
-    '''
-    Keyboard
-    '''
+    """Keyboard
+    """
     class Keyboard(xbmc.Keyboard):
 
         def __init__(self, default, heading, hidden=True):
@@ -29,9 +27,7 @@ try:
 except:
     print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"
 
-# from debug import log, debug
 import qobuz  # @UnresolvedImport
-
 from xbmcrpc import showNotification, getInfoLabels
 
 
@@ -65,11 +61,14 @@ def notifyH(title, text, image=None, mstime=2000):
 def notify_log(title, text, **ka):
     return notifyH(title, text, image='icon-default-256', **ka)
 
+
 def notify_error(title, text, **ka):
     return notifyH(title, text, image='icon-error-256', **ka)
 
+
 def notify_warn(title, text, **ka):
     return notifyH(title, text, image='icon-warn-256', **ka)
+
 
 def notify(title, text, image=None, mstime=2000):
     """Notification that wrap title and text parameter into lang()
@@ -79,9 +78,9 @@ def notify(title, text, image=None, mstime=2000):
     else:
         image = getImage(image)
     return showNotification(title=lang(title),
-                     message=lang(text),
-                     image=image,
-                     displaytime=mstime)
+                            message=lang(text),
+                            image=image,
+                            displaytime=mstime)
 
 
 def dialogLoginFailure():
@@ -102,13 +101,10 @@ def dialogServiceTemporarilyUnavailable():
     """
     dialog = xbmcgui.Dialog()
     dialog.ok('Qobuz Service Temporay Unavailable',
-                    'Qobuz service are down :/',
-                    'Check it later')
+              'Qobuz service are down :/',
+              'Check it later')
     xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
-                                  updateListing=True, cacheToDisc=False)
-#     else:
-#         xbmc.executebuiltin('ActivateWindow(home)')
-#         return False
+                              updateListing=True, cacheToDisc=False)
     return False
 
 
