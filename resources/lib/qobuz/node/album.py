@@ -63,11 +63,13 @@ class Node_album(INode):
             if not 'image' in track:
                 track['image'] = self.get_image()
             node.data = track
-
             self.add_child(node)
         return len(self.data['tracks']['items'])
 
     def make_url(self, **ka):
+        purchased = self.get_parameter('purchased')
+        if purchased:
+            ka['purchased'] = self.get_parameter('purchased')
         if 'asLocalURL' in ka and ka['asLocalURL']:
             from constants import Mode
             ka['mode'] = Mode.SCAN

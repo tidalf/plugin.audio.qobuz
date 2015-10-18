@@ -149,7 +149,7 @@ class QobuzBootstrap(object):
             from player import QobuzPlayer
             debug(self, "Playing song")
             player = QobuzPlayer()
-            if player.play(self.params['nid']):
+            if player.play(self.params['nid'],self.params):
                 return True
             return False
 

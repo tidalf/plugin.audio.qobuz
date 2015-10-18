@@ -20,6 +20,7 @@ class dog():
             'nt':   '^\d{1,10}$',  # Node type (node.type)
             'qnt':  '^\d{1,20}$',  # Node type in query
             'qid':  '^\d{1,14}$',  # Node id in query
+            'purchased': '^\d{1,10}$',
             'nm': "^[\w\d_]+$",    # Method to be called on node
             'genre-type': '^(\d+|null)$',  # Reco params
             'genre-id': '^(\d+|null)$',    # Reco params

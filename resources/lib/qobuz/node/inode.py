@@ -264,6 +264,8 @@ class INode(object):
             str(ka['nt'])
         if 'nid' in ka:
             url += "&nid=" + str(ka['nid'])
+        if 'purchased' in ka:
+            url += "&purchased=" + str(ka['purchased'])
         offset = self.offset
         if 'offset' in ka:
             offset = ka['offset']

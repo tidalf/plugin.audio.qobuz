@@ -39,7 +39,7 @@ class QobuzPlayer(xbmc.Player):
         self.total = None
         self.elapsed = None
 
-    def play(self, track_id):
+    def play(self, track_id, params={}):
         """Playing track given a track id
         """
         track = getNode(Flag.TRACK, {'nid': track_id})
@@ -49,6 +49,8 @@ class QobuzPlayer(xbmc.Player):
         if not track.is_playable():
             warn(self, "Cannot get streaming URL")
             return False
+        if 'purchased' in params:
+            track.parameters['purchased']= True
         item = track.makeListItem()
         track.item_add_playing_property(item)
         """Some tracks are not authorized for stream and a 60s sample is

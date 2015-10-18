@@ -220,15 +220,15 @@ class QobuzApiRaw(object):
         data = self._api_request(ka, '/track/get')
         return data
 
-    def track_getFileUrl(self, **ka):
+    def track_getFileUrl(self, intent="stream", **ka):
         self._check_ka(ka, ['format_id', 'track_id'])
         ka['request_ts'] = time()
         params = {'format_id': str(ka['format_id']),
-                  'intent': 'stream',
+                  'intent': intent,
                   'request_ts': ka['request_ts'],
                   'request_sig': str(hashlib.md5("trackgetFileUrlformat_id"
                                                  + str(ka['format_id'])
-                                                 + "intentstream"
+                                                 + "intent"+intent
                                                  + "track_id"
                                                  + str(ka['track_id'])
                                                  + str(ka['request_ts'])

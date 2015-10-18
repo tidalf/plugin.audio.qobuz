@@ -34,6 +34,7 @@ class Node_purchase(INode):
         url = super(Node_purchase, self).make_url(**ka)
         if self.search_type:
             url += '&search-type=' + str(self.search_type)
+            url += '&purchased=1'
         return url
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
@@ -65,6 +66,7 @@ class Node_purchase(INode):
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM)
             node.data = album
+            node.data['purchased'] = True
             self.add_child(node)
             ret = True
         return ret
@@ -74,6 +76,7 @@ class Node_purchase(INode):
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK)
             node.data = track
+            node.data['purchased'] = True
             self.add_child(node)
             ret = True
         return ret

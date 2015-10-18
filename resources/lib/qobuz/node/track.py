@@ -27,6 +27,7 @@ class Node_track(INode):
         self.is_folder = False
         self.status = None
         self.image = getImage('song')
+        self.purchased = False
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
@@ -53,6 +54,10 @@ class Node_track(INode):
             return url
         if not 'mode' in ka:
             ka['mode'] = Mode.PLAY
+        purchased = self.get_parameter('purchased')
+        if purchased:
+            ka['purchased'] = purchased
+            self.purchased = True
         return super(Node_track, self).make_url(**ka)
 
     def get_label(self, sFormat="%a - %t"):
@@ -193,6 +198,9 @@ class Node_track(INode):
     def get_hires(self):
         return self.get_property('hires')
 
+    def get_purchased(self):
+        return self.get_property('purchased')
+    
     def get_description(self):
         if self.parent:
             return self.parent.get_description()
@@ -203,8 +211,12 @@ class Node_track(INode):
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         if hires and self.get_hires():
             format_id = 27
+        if self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased:
+            intent = "download"
+        else:
+            intent = "stream"
         data = api.get('/track/getFileUrl', format_id=format_id,
-                       track_id=self.nid, user_id=api.user_id)
+                       track_id=self.nid, user_id=api.user_id, intent=intent)
         if not data:
             warn(self, "Cannot get stream type for track (network problem?)")
             return None
