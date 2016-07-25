@@ -18,15 +18,13 @@ class ModeEnum(object):
 
     @classmethod
     def to_s(cls, mode):
-        if mode == cls.VIEW:
-            return "view"
-        elif mode == cls.PLAY:
-            return "play"
-        elif mode == cls.SCAN:
-            return "scan"
-        elif mode == cls.VIEW_BIG_DIR:
-            return "view big dir"
-        else:
-            return "Unknow mode: " + str(mode)
+        return cls._code_to_human[mode]
+
+ModeEnum._code_to_human = {
+    ModeEnum.VIEW: 'view',
+    ModeEnum.PLAY: 'play',
+    ModeEnum.SCAN: 'scan',
+    ModeEnum.VIEW_BIG_DIR: 'view_big_dir'
+}
 
 Mode = ModeEnum
