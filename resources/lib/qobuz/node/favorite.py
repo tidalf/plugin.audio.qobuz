@@ -354,6 +354,6 @@ class Node_favorite(INode):
             return False
         notifyH(dialogHeading,
                 'Item successfully removed: %s' % (node.get_label()))
-        url = self.make_url(nt=self.nt, nid='', nm='')
+        url = self.make_url(nt=self.nt, nid=None, nm=None)
         executeBuiltin(containerUpdate(url, True))
         return True
