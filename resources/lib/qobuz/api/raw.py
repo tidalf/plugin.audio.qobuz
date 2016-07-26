@@ -27,7 +27,7 @@ socket.timeout = 5
 class QobuzApiRaw(object):
 
     def __init__(self):
-        self.appid = "285473059"  # XBMC
+        self.appid = '285473059'  # XBMC
         self.version = '0.2'
         self.baseUrl = 'http://www.qobuz.com/api.json/'
 
@@ -42,21 +42,22 @@ class QobuzApiRaw(object):
         self.error = None
         self.__set_s4()
 
-    def _api_error_string(self, url="", params={}, json=""):
-        return 'Something went wrong with request (code={status_code})\n' \
+    def _api_error_string(self, request, url='', params={}, json=''):
+        print('Error %s %s' % (dir(request), request.reason))
+        return '{reason} (code={status_code})\n' \
                 'url={url}\nparams={params}' \
-                '\njson={json}'.format(status_code=self.status_code,
+                '\njson={json}'.format(reason=request.reason, status_code=self.status_code,
                                        url=url,
-                                       params=pprint.pformat(params),
-                                       json=pprint.pformat(json))
+                                       params=str(['%s: %s' % (k, v) for k, v in params.items() ]),
+                                       json=str(json))
 
     def _check_ka(self, ka, mandatory, allowed=[]):
-        """Checking parameters before sending our request
+        '''Checking parameters before sending our request
         - if mandatory parameter is missing raise error
         - if a given parameter is neither in mandatory or allowed
         raise error (Creating exception class like MissingParameter
         may be a good idea)
-        """
+        '''
         for label in mandatory:
             if not label in ka:
                 raise QobuzXbmcError(who=self,
@@ -69,19 +70,19 @@ class QobuzApiRaw(object):
                                      additional=label)
 
     def __set_s4(self):
-        """appid and associated secret is for this app usage only
+        '''appid and associated secret is for this app usage only
         Any use of the API implies your full acceptance of the
         General Terms and Conditions
         (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
-        """
-        s3b = "Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8="
+        '''
+        s3b = 'Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8='
         s3s = binascii.a2b_base64(s3b)
         self.s4 = ''.join(chr(ord(x) ^ ord(y))
                           for (x, y) in izip(s3s,
                                              cycle(self.appid)))
 
     def _api_request(self, params, uri, **opt):
-        """Qobuz API HTTP get request
+        '''Qobuz API HTTP get request
             Arguments:
             params:    parameters dictionary
             uri   :    service/method
@@ -103,8 +104,8 @@ class QobuzApiRaw(object):
             This should produce something like:
             Error: [200]
             Error: Bad Request [400]
-        """
-        info(self, 'uri: %s, params: %s' % (uri, params))
+        '''
+        info(self, 'uri: {}, params: {}', uri, str(params))
         self.statTotalRequest += 1
         self.error = ''
         self.status_code = None
@@ -112,37 +113,36 @@ class QobuzApiRaw(object):
         useToken = False if (opt and 'noToken' in opt) else True
         headers = {}
         if useToken and self.user_auth_token:
-            headers["x-user-auth-token"] = self.user_auth_token
-        headers["x-app-id"] = self.appid
-        """ DEBUG """
+            headers['x-user-auth-token'] = self.user_auth_token
+        headers['x-app-id'] = self.appid
+        '''DEBUG'''
         import copy
         _copy_params = copy.deepcopy(params)
         if 'password' in _copy_params:
             _copy_params['password'] = '***'
-        """ END / DEBUG """
+        '''END / DEBUG'''
         r = None
         try:
             r = self.session.post(url, data=params, headers=headers)
         except:
-            self.error = "Post request fail"
+            self.error = 'Post request fail'
             warn(self, self.error)
             return None
         self.status_code = int(r.status_code)
         if self.status_code != 200:
-            self.error = self._api_error_string(url, _copy_params)
+            self.error = self._api_error_string(r, url, _copy_params)
             warn(self, self.error)
             return None
         if not r.content:
-            self.error = "Request return no content"
+            self.error = 'Request return no content'
             warn(self, self.error)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
-        """ Retry get if connexion fail """
+        '''Retry get if connexion fail'''
         try:
             response_json = r.json()
         except Exception as e:
-            warn(self, "Json loads failed to load... retrying!\n%s" % (
-                repr(e)))
+            warn(self, 'Json loads failed to load... retrying!\n{}', repr(e))
             try:
                 response_json = r.json()
             except:
@@ -213,10 +213,10 @@ class QobuzApiRaw(object):
         params = {'format_id': str(ka['format_id']),
                   'intent': intent,
                   'request_ts': ka['request_ts'],
-                  'request_sig': str(hashlib.md5("trackgetFileUrlformat_id"
+                  'request_sig': str(hashlib.md5('trackgetFileUrlformat_id'
                                                  + str(ka['format_id'])
-                                                 + "intent"+intent
-                                                 + "track_id"
+                                                 + 'intent'+intent
+                                                 + 'track_id'
                                                  + str(ka['track_id'])
                                                  + str(ka['request_ts'])
                                                  + self.s4).hexdigest()),
@@ -264,7 +264,7 @@ class QobuzApiRaw(object):
     def purchase_getUserPurchases(self, **ka):
         self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit',
                                 'offset'])
-        return self._api_request(ka, "/purchase/getUserPurchases")
+        return self._api_request(ka, '/purchase/getUserPurchases')
 
     def search_getResults(self, **ka):
         self._check_ka(ka, ['query'], ['type', 'limit', 'offset'])
