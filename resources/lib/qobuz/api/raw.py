@@ -43,7 +43,6 @@ class QobuzApiRaw(object):
         self.__set_s4()
 
     def _api_error_string(self, request, url='', params={}, json=''):
-        print('Error %s %s' % (dir(request), request.reason))
         return '{reason} (code={status_code})\n' \
                 'url={url}\nparams={params}' \
                 '\njson={json}'.format(reason=request.reason, status_code=self.status_code,
