@@ -130,7 +130,7 @@ class QobuzBootstrap(object):
         """
         self.MODE = None
         self.params = get_checked_parameters()
-        if not 'nt' in self.params:
+        if 'nt' not in self.params:
             self.params['nt'] = Flag.ROOT
             self.MODE = Mode.VIEW
         self.nodeType = int(self.params['nt'])
@@ -138,8 +138,8 @@ class QobuzBootstrap(object):
             self.MODE = int(self.params['mode'])
         except:
             warn(self, "No 'mode' parameter")
-        for p in self.params:
-            info(self, "Param: %s = %s (%s)" % (p, str(self.params[p]),
+        for name in self.params:
+            info(self, "Param: %s = %s (%s)" % (name, str(self.params[name]),
                                                 Flag.to_s(self.params['nt'])))
 
     def dispatch(self):
