@@ -169,7 +169,7 @@ class INode(object):
         if not data:
             return False
         paginated = ['albums', 'labels', 'tracks', 'artists',
-                     'playlists', 'playlist', 'public_playlists', 'genres']
+                     'playlists', 'playlist', 'public_playlists', 'genresp']
         items = None
         need_pagination = False
         for p in paginated:
@@ -247,40 +247,27 @@ class INode(object):
             Nodes with custom parameters must override this method
             @todo: Ugly need rewrite =]
         '''
-        if not 'mode' in ka:
+        if 'mode' not in ka:
             ka['mode'] = Mode.VIEW
-        else:
-            ka['mode'] = int(ka['mode'])
-        if not 'nt' in ka:
+        if 'nt' not in ka:
             ka['nt'] = self.nt
-        if not 'nid' in ka and self.nid:
+        if 'nid' not in ka:
             ka['nid'] = self.nid
-
-        url = sys.argv[0] + '?mode=' + str(ka['mode']) + '&nt=' + \
-            str(ka['nt'])
-        if 'nid' in ka:
-            url += "&nid=" + str(ka['nid'])
-        if 'purchased' in ka:
-            url += "&purchased=" + str(ka['purchased'])
-        offset = self.offset
-        if 'offset' in ka:
-            offset = ka['offset']
-        if offset != None:
-            url += '&offset=' + str(offset)
-        if 'nm' in ka:
-            url += '&nm=' + ka['nm']
-        qnt = self.get_parameter('qnt')
-        if 'qnt' in ka:
-            qnt = ka['qnt']
-        if qnt:
-            url += '&qnt=' + str(qnt)
-        qid = self.get_parameter('qid')
-        if 'qid' in ka:
-            qid = ka['qid']
-        if qid:
-            url += '&qid=' + str(qid)
-        if 'query' in ka:
-            url += '&query=' + ka['query']
+        if 'offset' not in ka:
+            ka['offset'] = self.offset
+        for name in ['qnt', 'qid']:
+            if name in ka:
+                continue
+            value = self.get_parameter(name)
+            if value is None:
+                continue
+            ka[name] = self.get_parameter(name)
+        url = sys.argv[0] + '?'
+        for name in ['mode', 'nt', 'nid', 'purchased', 'offset', 'nm', 'qnt', 'qid', 'query']:
+            if name in ka and ka[name] is not None:
+                url += name + '=' + str(ka[name]) + '&'
+        url = url[:-1]
+        log(self, 'url: {}', url)
         return url
 
     def makeListItem(self, **ka):
