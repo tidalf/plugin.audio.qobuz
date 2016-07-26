@@ -189,7 +189,7 @@ class Node_playlist(INode):
             return False
         ret = self._add_tracks(cid, nodes)
         if not ret:
-            notif_warn('Qobuz', 'Failed to add tracks')
+            notify_warn('Qobuz', 'Failed to add tracks')
             return False
         self.delete_cache(cid)
         notify_log('Qobuz / Tracks added', '%s added' % (len(nodes)))
