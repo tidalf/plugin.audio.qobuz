@@ -11,7 +11,7 @@ from gui.util import getImage, getSetting, lang
 from api import api
 from node import Flag, getNode
 from node.recommendation import RECOS_TYPE_IDS
-
+from debug import log
 
 class Node_genre(INode):
     """@class Node_genre:
@@ -27,8 +27,8 @@ class Node_genre(INode):
 
     def make_url(self, **ka):
         url = super(Node_genre, self).make_url(**ka)
-        if self.parent and self.parent.nid:
-            url += "&parent-id=" + self.parent.nid
+        if self.parent is not None and self.parent.nid is not None:
+            url += "&parent-id=" + str(self.parent.nid)
         return url
 
     def hook_post_data(self):
@@ -37,11 +37,15 @@ class Node_genre(INode):
     def get_name(self):
         return self.get_property('name')
 
-    def populate_reco(self, Dir, lvl, whiteFlag, blackFlag, ID):
-        for gtype in RECOS_TYPE_IDS:
-            node = getNode(
-                Flag.RECOMMENDATION, {'parent': self, 'genre-id': ID,
-                                      'genre-type': gtype})
+    def populate_reco(self, Dir, lvl, whiteFlag, blackFlag, genre_id):
+        for genre_type in RECOS_TYPE_IDS:
+            node = getNode(Flag.RECOMMENDATION, {
+                'parent': self,
+                'genre-id': genre_id,
+                'genre-type': genre_type
+            })
+            log(self, '>>> Pop with parent: {}, genre-id: {}, genre-type: {}',
+                self, genre_id, genre_type)
             node.populating(Dir, 1, Flag.ALBUM, blackFlag)
         return True
 
@@ -53,16 +57,15 @@ class Node_genre(INode):
             self.data = None
             return True  # Nothing returned trigger reco build in build_down
         self.data = data
-        g = self.data['genres']
-        if 'parent' in g and int(g['parent']['level']) > 1:
+        genres = self.data['genres']
+        if 'parent' in genres and int(genres['parent']['level']) > 0:
             self.populate_reco(Dir, lvl, whiteFlag, blackFlag,
-                               g['parent']['id'])
+                               genres['parent']['id'])
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.data or len(self.data['genres']['items']) == 0:
-            return self.populate_reco(Dir, lvl,
-                                      whiteFlag, blackFlag, self.nid)
+            return self.populate_reco(Dir, lvl, whiteFlag, blackFlag, self.nid)
         for genre in self.data['genres']['items']:
             node = Node_genre(self, {'nid': genre['id']})
             node.data = genre
