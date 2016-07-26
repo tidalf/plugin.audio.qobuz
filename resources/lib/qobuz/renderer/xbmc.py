@@ -30,11 +30,11 @@ class QobuzXbmcRenderer(IRenderer):
                 is_folder: bool (default: True)
                 image: string (default: '')
         """
-        if not 'is_folder' in ka or ka['is_folder']:
+        if 'is_folder' not in ka or ka['is_folder']:
             ka['is_folder'] = 1
         else:
             ka['is_folder'] = 0
-        if not 'image' in ka:
+        if 'image' not in ka:
             ka['image'] = ''
         item = ka['dir']._xbmc_item(**ka)
         ka['dir'].add_item(url=ka['url'], item=item,
