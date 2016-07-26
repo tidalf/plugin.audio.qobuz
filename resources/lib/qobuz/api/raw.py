@@ -155,7 +155,7 @@ class QobuzApiRaw(object):
         except:
             pass
         if status == 'error':
-            self.error = self._api_error_string(url, _copy_params,
+            self.error = self._api_error_string(r, url, _copy_params,
                                                 response_json)
             warn(self, self.error)
             return None
