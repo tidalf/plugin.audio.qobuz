@@ -11,7 +11,7 @@ from api import api
 from inode import INode
 from node import getNode, Flag
 from gui.util import getSetting, lang, getImage
-from debug import warn
+from debug import warn, info
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -49,8 +49,8 @@ RECOS_GENRES = {
 
 
 class Node_recommendation(INode):
-    """Recommendation node, displaying music ordered by category and genre
-    """
+    '''Recommendation node, displaying music ordered by category and genre
+    '''
 
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
@@ -63,10 +63,11 @@ class Node_recommendation(INode):
 
     def make_url(self, **ka):
         url = super(Node_recommendation, self).make_url(**ka)
-        if self.genre_type:
+        if self.genre_type is not None:
             url += '&genre-type=' + str(self.genre_type)
-        if self.genre_id:
+        if self.genre_id is not None:
             url += '&genre-id=' + str(self.genre_id)
+        info(self, 'reco url {}', url)
         return url
 
     def myid(self):
@@ -75,7 +76,7 @@ class Node_recommendation(INode):
         return str(self.genre_type) + '-' + str(self.genre_id)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        if not (self.genre_type and self.genre_id):
+        if not (self.genre_type is not None and self.genre_id is not None):
             return True
         offset = self.offset or 0
         limit = getSetting('pagination_limit')
@@ -84,28 +85,29 @@ class Node_recommendation(INode):
                        genre_id=self.genre_id,
                        limit=limit,
                        offset=offset)
-        if not data:
-            warn(self, "Cannot fetch data for recommendation")
+        if data is None:
+            warn(self, 'Cannot fetch data for recommendation')
             return False
         self.data = data
         return True
 
     def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
-        """Populate type, we don't have genre_type nor genre_id
-        """
-        for gid in RECOS_TYPE_IDS:
-            node = getNode(Flag.RECOMMENDATION, {'genre-type': gid})
-            node.set_label(
-                self.label + ' - ' + RECOS_TYPES[gid])
+        '''Populate type, we don't have genre_type nor genre_id
+        '''
+        for genre_type_id in RECOS_TYPE_IDS:
+            node = getNode(Flag.RECOMMENDATION, {'genre-type': genre_type_id})
+            node.set_label(self.label + ' - ' + RECOS_TYPES[genre_type_id])
             self.add_child(node)
         return True
 
     def __populate_genre(self, Dir, lvl, whiteFlag, blackFlag):
-        """Populate genre, we have genre_type but no genre_id
-        """
+        '''Populate genre, we have genre_type but no genre_id
+        '''
         for genre_id in RECOS_GENRES:
-            node = getNode(Flag.RECOMMENDATION, {'genre-type': self.genre_type,
-                                                 'genre-id': genre_id})
+            node = getNode(Flag.RECOMMENDATION, {
+                'genre-type': self.genre_type,
+                'genre-id': genre_id
+            })
             label = '%s - %s / %s' % (self.label,
                                       RECOS_TYPES[int(self.genre_type)],
                                       RECOS_GENRES[genre_id])
@@ -114,12 +116,12 @@ class Node_recommendation(INode):
         return True
 
     def __populate_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
-        """Populate album selected by genre_type and genre_id
-        """
+        '''Populate album selected by genre_type and genre_id
+        '''
         if self.data is None:
             return False
         if 'albums' not in self.data:
-            warn(self, "Recommendation data doesn't contain 'albums' key")
+            warn(self, "Recommendation data doesn't contain <albums> key")
             return False
         if self.data['albums'] is None or 'items' not in self.data['albums']:
             warn(self, "Recommendation data['albums'] doesn't contain items")
@@ -131,8 +133,8 @@ class Node_recommendation(INode):
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        """We are populating our node based on genre_type and genre_id
-        """
+        '''We are populating our node based on genre_type and genre_id
+        '''
         if not self.genre_type:
             return self.__populate_type(Dir, lvl, whiteFlag, blackFlag)
         elif not self.genre_id:
