@@ -14,8 +14,8 @@ from node.recommendation import RECOS_TYPE_IDS
 from debug import log
 
 class Node_genre(INode):
-    """@class Node_genre:
-    """
+    '''@class Node_genre:
+    '''
 
     def __init__(self, parent=None, parameters=None):
         super(Node_genre, self).__init__(parent, parameters)
@@ -44,8 +44,6 @@ class Node_genre(INode):
                 'genre-id': genre_id,
                 'genre-type': genre_type
             })
-            log(self, '>>> Pop with parent: {}, genre-id: {}, genre-type: {}',
-                self, genre_id, genre_type)
             node.populating(Dir, 1, Flag.ALBUM, blackFlag)
         return True
 
