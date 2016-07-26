@@ -8,39 +8,37 @@
 '''
 import re
 
+_allowed_keys = {
+    'mode': r'^\d{1,10}$',  # Mode View/Scan/BigDir ...
+    'nid':  r'^\d{1,14}$',  # Node id (node.nid)
+    'nt':   r'^\d{1,10}$',  # Node type (node.type)
+    'qnt':  r'^\d{1,20}$',  # Node type in query
+    'qid':  r'^\d{1,14}$',  # Node id in query
+    'purchased': r'^\d{1,10}$',
+    'nm': r'^[\w\d_]+$',    # Method to be called on node
+    'genre-type': r'^(\d+|null)$',  # Reco params
+    'genre-id': r'^(\d+|null)$',    # Reco params
+    'search-type': r'^(artists|tracks|albums|articles|all)$',
+    'depth': r'^(-)?\d+$',
+    'query': r'^.*$',
+    'track-id': r'^\d{1,10}$',
+    'parent-id': r'^\d{1,10}$',
+    'offset': r'^\d{1,10}$',
+    'source': r'^(all|playlists|purchases|favorites)$',
+    'asLocalURL': r'^(True|False|1|0)$'
+}
+_allowed_keys = {key: re.compile(value) for key, value in _allowed_keys.items()}
 
 class dog():
     '''Checking script parameter against regular expression
     '''
 
     def __init__(self):
-        self.allowed_keys = {
-            'mode': '^\d{1,10}$',  # Mode View/Scan/BigDir ...
-            'nid':  '^\d{1,14}$',  # Node id (node.nid)
-            'nt':   '^\d{1,10}$',  # Node type (node.type)
-            'qnt':  '^\d{1,20}$',  # Node type in query
-            'qid':  '^\d{1,14}$',  # Node id in query
-            'purchased': '^\d{1,10}$',
-            'nm': "^[\w\d_]+$",    # Method to be called on node
-            'genre-type': '^(\d+|null)$',  # Reco params
-            'genre-id': '^(\d+|null)$',    # Reco params
-            'search-type': "^(artists|tracks|albums|articles|all)$",
-            'depth': "^(-)?\d+$",
-            'query': "^.*$",
-            'track-id': "^\d{1,10}$",
-            'parent-id': "^\d{1,10}$",
-            'offset': "^\d{1,10}$",
-            'source': '^(all|playlists|purchases|favorites)$'
-        }
+        pass
 
     def kv_is_ok(self, key, value):
-        if key not in self.allowed_keys:
+        if key not in _allowed_keys:
             return False
-        match = None
-        try:
-            match = re.match(self.allowed_keys[key], value)
-        except:
-            pass
-        if not match:
+        if _allowed_keys[key].match(value) is None:
             return False
         return True
