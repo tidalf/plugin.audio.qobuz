@@ -29,20 +29,21 @@ from util.common import isEmpty
 
 class INode(object):
     '''Our base node, every node must inherit or mimic is behaviour
-        Parameters:
-            parent: object, does this node have a parent
-            parameters: dictionary, system argument parsed as dictionary
 
-        Calling build_down on a node start the building process
+        Calling build_down on a node start the build process
             - pre_build_down: Retrieve data (disk, internet...) and store
                 result in self.data
             - _build_down: If pre_build_down return true, parse data
-                and populate our node with child
-        The main buil_down method is responsible for the logic flow (recursive,
+                and populate our node with childs
+        The main build_down method is responsible for the logic flow (recursive,
             depth, whiteFlag, blackFlag...)
     '''
 
     def __init__(self, parent=None, parameters={}):
+        '''Constructor
+        @param parent=None: Parent node if not None
+        @param parameters={}: dictionary
+        '''
         self.data = None
         self.parameters = parameters
         self.nt = None
@@ -60,94 +61,82 @@ class INode(object):
         self.hasWidget = False
         self.user_storage = None
 
-    ''' Id '''
-    @property
-    def nid(self):
-        return self._nid
-
-    @nid.setter
-    def nid(self, value):
+    def set_nid(self, value):
+        '''@setter nid'''
         self._nid = value
 
-    @nid.getter
-    def nid(self):
+    def get_nid(self):
+        '''@getter nid'''
         if self._data and 'id' in self._data:
             return self._data['id']
         return self._nid
 
-    ''' Parent '''
-    @property
-    def parent(self):
+    nid = property(get_nid, set_nid)
+
+    def get_parent(self):
+        '''@getter parent'''
         return self._parent
 
-    @parent.setter
-    def parent(self, parent):
+    def set_parent(self, parent):
+        '''@setter parent'''
         if not parent:
             self._parent = None
             return
         self._parent = weakref.proxy(parent)
 
-    @parent.getter
-    def parent(self):
-        return self._parent
+    parent = property(get_parent, set_parent)
 
     def delete_tree(self):
+        '''Recursive delete
+        '''
         for child in self.childs:
             child.delete_tree()
         self.childs = None
         self.parent = None
         self.parameters = None
 
-    ''' content_type '''
-    @property
-    def content_type(self):
+
+    def get_content_type(self):
+        '''@getter content_type'''
         return self._content_type
 
-    @content_type.getter
-    def content_type(self):
-        return self._content_type
-
-    @content_type.setter
-    def content_type(self, kind):
+    def set_content_type(self, kind):
+        '''@setter content_type'''
         if kind not in ['songs', 'albums', 'files', 'artists']:
             raise Qerror(
                 who=self, what='invalid_type', additional=kind)
         self._content_type = kind
 
-    ''' data '''
-    @property
-    def data(self):
+    content_type = property(get_content_type, set_content_type)
+
+    def get_data(self):
+        '''@getter data'''
         return self._data
 
-    @data.getter
-    def data(self):
-        return self._data
-
-    @data.setter
-    def data(self, value):
+    def set_data(self, value):
+        '''@setter data'''
         self._data = value
         self.hook_post_data()
 
-    ''' Called after node data is set '''
+    data = property(get_data, set_data)
 
     def hook_post_data(self):
+        ''' Called after node data is set '''
         pass
 
     def get_property(self, pathList, defaultReturn=u''):
-        """Property are just a easy way to access JSON data (self.data)
-            Parameters:
-            pathList: a string or a list of string, each string can be
-                a path like 'album/image/large'
-            Return:
-                string (empty string when all fail or when there's no data)
+        '''Property are just a easy way to access JSON data (self.data)
+        @param pathList: a string or a list of string, each string can be
+            a path like 'album/image/large'
+        @return: string (empty string when all fail or when there's no data)
             * When passing array of string the method return the first
             path returning data
 
-            Example:
-                image = self.get_property(['image/extralarge',
-                                       'image/mega',
-                                       'picture'])
-        """
+        Example:
+            image = self.get_property(['image/extralarge',
+                                   'image/mega',
+                                   'picture'])
+        '''
         if isinstance(pathList, basestring):
             res = self.__get_property(pathList)
             return res if res is not None else defaultReturn
@@ -158,8 +147,8 @@ class INode(object):
         return defaultReturn
 
     def __get_property(self, path):
-        """Helper used by get_property method
-        """
+        '''Helper used by get_property method
+        '''
         if not self.data or self.data is None:
             return None
         xPath = path.split('/')
@@ -175,12 +164,12 @@ class INode(object):
         return None
 
     def __add_pagination(self, data):
-        """build_down helper: Add pagination data when needed
-        """
+        '''build_down helper: Add pagination data when needed
+        '''
         if not data:
             return False
         paginated = ['albums', 'labels', 'tracks', 'artists',
-                     'playlists', 'playlist']
+                     'playlists', 'playlist', 'public_playlists', 'genres']
         items = None
         need_pagination = False
         for p in paginated:
@@ -188,6 +177,8 @@ class INode(object):
                 warn(self, 'No pagination data')
                 continue
             items = data[p]
+            if 'limit' not in items or 'total' not in items:
+                continue
             if items['limit'] is None:
                 continue
             if items['total'] > (items['offset'] + items['limit']):
@@ -201,6 +192,7 @@ class INode(object):
         self.pagination_offset = items['offset']
         self.pagination_limit = items['limit']
         self.pagination_next_offset = items['offset'] + items['limit']
+        return True
 
     '''
         Parameters
@@ -209,39 +201,43 @@ class INode(object):
     '''
 
     def set_parameters(self, parameters):
-        """Setting parameters property
-            Parameter:
-                parameters: Dictionary
-        """
+        '''Setting parameters property
+        @param parameters: Dictionary
+        '''
         self.parameters = parameters
 
-    def set_parameter(self, name, value, **ka):
-        """Setting a parameter
-            Parameters:
-                name: parameter name
-                value: parameter value
-
-            * Optional quote=True/False, when quote=True we are using
-            urllib.quote_plus before setting value
-        """
-        if 'quote' in ka and ka['quote'] == True:
+    def set_parameter(self, name, value, quote=False, **ka):
+        '''Setting a parameter
+        @param name: parameter name
+        @param value: parameter value
+        @param quote=False: use urllib.quote_plus against return value when True
+        '''
+        if quote is True:
             value = urllib.quote_plus(value)
         self.parameters[name] = value
 
-    def get_parameter(self, name, default=None, **ka):
+    def get_parameter(self, name, default=None, unQuote=False, **ka):
+        '''Getting parameter by name
+        @param name: parameter name
+        @param default=None: value set when parameter not found or value is None
+        @param unQuote=False: boolean, when True unquote value
+        '''
         if not self.parameters:
             return default
-        if not name in self.parameters:
+        if name not in self.parameters:
             return default
         value = self.parameters[name]
         if value is None:
             return default
-        if 'unQuote' in ka and ka['unQuote'] == True:
+        if unQuote is True:
             return urllib.unquote_plus(value)
         return value
 
     def del_parameter(self, name):
-        if not name in self.parameters:
+        '''Deleting parameter
+        @param name: parameter name
+        '''
+        if name not in self.parameters:
             return False
         del self.parameters[name]
         return True
@@ -287,13 +283,12 @@ class INode(object):
             url += '&query=' + ka['query']
         return url
 
-    '''
-        Make Xbmc List Item
-        return  a xbml list item
-        Class can overload this method
-    '''
-
     def makeListItem(self, **ka):
+        '''
+            Make Xbmc List Item
+            return  a xbml list item
+            Class can overload this method
+        '''
         import xbmcgui  # @UnresolvedImport
         if not 'url' in ka:
             ka['url'] = self.make_url()
@@ -582,8 +577,8 @@ class INode(object):
     def get_user_storage(self):
         if self.user_storage:
             return self.user_storage
-        filename = os.path.join(cache.base_path, 'localuserdata-%s.local' %
-                                str(api.user_id))
+        filename = os.path.join(cache.base_path,
+                                'localuserdata-%s.local' % str(api.user_id))
         self.user_storage = _Storage(filename)
         return self.user_storage
 
