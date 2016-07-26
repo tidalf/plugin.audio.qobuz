@@ -24,22 +24,27 @@ try:
     __debugging__ = False
     if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         __debugging__ = True
-except:
+except Exception as e:
+    print('Not inside Kodi, Error %s', e)
     LOGDEBUG = '[DEBUG]'
     LOGNOTICE = '[NOTICE]'
     LOGERROR = '[ERROR]'
     LOGSEVERE = '[SEVERE]'
 
     def logfunc(msg, lvl):
-        print lvl + msg
+        print('[%s] %s' % (lvl, msg))
     ourlog = logfunc
 
 
-def log(obj, msg, lvl=LOGNOTICE):
-    """Base for all logging function, run in/out Xbmc
+def log(obj, *a, **ka):
+    '''Base for all logging function, run in/out Xbmc
         Inside Xbmc loggin functions use xbmc.log else they just print
         message to STDOUT
-    """
+    '''
+    lvl = LOGNOTICE
+    if 'lvl' in ka:
+        lvl = ka['lvl']
+        del ka['lvl']
     if not __debugging__:
         return
     name = None
@@ -50,28 +55,34 @@ def log(obj, msg, lvl=LOGNOTICE):
             name = obj.__class__.__name__
         except:
             name = type(obj)
-    ourlog('[Qobuz/' + str(name) + "] " + msg, lvl)
+    msg = None
+    num_argument = len(a)
+    if num_argument == 1:
+        msg = a[0].format(**ka)
+    elif num_argument > 1:
+        msg = a[0].format(*a[1:], **ka)
+    ourlog('[Qobuz/{name}][{level}] {msg}'
+            .format(name=str(name), msg=msg, level=lvl))
 
 
-def warn(obj, msg):
-    """facility: LOGERROR
-    """
-    log(obj, msg, LOGERROR)
+def warn(obj, *a, **ka):
+    '''facility: LOGERROR'''
+    ka['lvl']= LOGERROR
+    log(obj, *a, **ka)
 
 
-def info(obj, msg):
-    """facility: LOGNOTICE
-    """
-    log(obj, msg, LOGNOTICE)
+def info(obj, *a, **ka):
+    '''facility: LOGNOTICE'''
+    ka['lvl'] = LOGNOTICE
+    log(obj, *a, **ka)
 
 
-def debug(obj, msg):
-    """facility: LOGDEBUG
-    """
-    log(obj, msg, LOGDEBUG)
+def debug(obj, *a, **ka):
+    '''facility: LOGDEBUG'''
+    ka['lvl'] = LOGDEBUG
+    log(obj, *a, **ka)
 
 
-def error(obj, msg):
-    """facility: LOGSEVERE
-    """
-    log(obj, msg, LOGSEVERE)
+def error(obj, *a, **ka):
+    '''facility: LOGSEVERE'''
+    log(obj, *a, **ka)
