@@ -267,7 +267,6 @@ class INode(object):
             if name in ka and ka[name] is not None:
                 url += name + '=' + str(ka[name]) + '&'
         url = url[:-1]
-        log(self, 'url: {}', url)
         return url
 
     def makeListItem(self, **ka):
