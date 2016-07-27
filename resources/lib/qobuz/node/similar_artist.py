@@ -6,10 +6,10 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from node import getNode, Flag
-from gui.util import lang, getSetting
-from api import api
+from qobuz.inode import INode
+from qobuz.node import getNode, Flag
+from qobuz.gui.util import lang, getSetting
+from qobuz.api import api
 
 
 class Node_similar_artist(INode):
@@ -20,7 +20,6 @@ class Node_similar_artist(INode):
         super(Node_similar_artist, self).__init__(parent, parameters)
         self.nt = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
-        self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
         return lang(30156)
@@ -36,7 +35,7 @@ class Node_similar_artist(INode):
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for aData in self.data['artists']['items']:
-            artist = getNode(Flag.ARTIST, {'offset': 0, 'nid': aData['id']})
+            artist = getNode(Flag.ARTIST)
             artist.data = aData
             self.add_child(artist)
         return True

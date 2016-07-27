@@ -6,13 +6,13 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from constants import Mode
-from node import Flag, ErrorNoData
-from inode import INode
-from debug import warn
-from gui.util import lang, getImage, runPlugin, getSetting
-from gui.contextmenu import contextMenu
-from api import api
+from qobuz.constants import Mode
+from qobuz.node import Flag, ErrorNoData
+from qobuz.node.inode import INode
+from qobuz.debug import warn, log
+from qobuz.gui.util import lang, getImage, runPlugin, getSetting
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.api import api
 
 
 class Node_track(INode):
@@ -69,23 +69,14 @@ class Node_track(INode):
         return sFormat
 
     def get_composer(self):
-        try:
-            return self.get_property('composer/name')
-        except:
-            return -1
+        return self.get_property('composer/name', default=-1)
 
     def get_interpreter(self):
-        try:
-            return self.get_property('performer/name')
-        except:
-            return -1
+        return self.get_property('performer/name', default=-1)
 
     def get_album(self):
-        try:
-            album = self.get_property('album/title')
-        except:
-            return -1
-        if album:
+        album = self.get_property('album/title', default=None)
+        if album is not None:
             return album
         if not self.parent:
             return ''
@@ -120,20 +111,17 @@ class Node_track(INode):
         return self.get_property('title')
 
     def get_genre(self):
-        genre = self.get_property('album/genre/name')
-        if genre:
-            return genre
-        if not self.parent:
-            return ''
-        if self.parent.nt & Flag.ALBUM:
-            return self.parent.get_genre()
-        return ''
+        genre = self.get_property('album/genre/name', default=None)
+        if genre is None:
+            if self.parent is not None and self.parent.nt & Flag.ALBUM:
+                genre = self.parent.get_genre()
+        return genre
 
     def get_streaming_url(self):
         data = self.__getFileUrl()
         if not data:
-            return False
-        if not 'url' in data:
+            return None
+        if 'url' not in data:
             warn(self, "streaming_url, no url returned\n"
                  "API Error: %s" % (api.error))
             return None
@@ -148,40 +136,34 @@ class Node_track(INode):
                                   'album/artist/name'])
 
     def get_artist_id(self):
-        s = self.get_property(['artist/id',
+        artist_id = self.get_property(['artist/id',
                                'composer/id',
                                'performer/id',
-                               'interpreter/id'])
-        if s:
-            return int(s)
-        return None
+                               'interpreter/id'], default=None)
+        if artist_id is None:
+            return None
+        return int(artist_id)
 
     def get_track_number(self):
-        return self.get_property('track_number')
+        return self.get_property('track_number', default=0)
 
     def get_media_number(self):
-        return self.get_property('media_number')
+        return self.get_property('media_number', default=0)
 
     def get_duration(self):
-        duration = self.get_property('duration')
-        if duration and int(duration) != 0:
-            return duration
-        else:
-            return -1
+        return self.get_property('duration', default=-1)
 
     def get_year(self):
         import time
-        try:
-            date = self.get_property('album/released_at')
-            if not date and self.parent and self.parent.nt & Flag.ALBUM:
+        date = self.get_property('album/released_at', default=None)
+        if date is None:
+            if self.parent is not None and self.parent.nt & Flag.ALBUM:
                 return self.parent.get_year()
-        except:
-            pass
         year = 0
         try:
             year = time.strftime("%Y", time.localtime(date))
-        except:
-            pass
+        except Exception as e:
+            warn(self, 'Invalid date format %s', date)
         return year
 
     def is_playable(self):
@@ -200,7 +182,7 @@ class Node_track(INode):
 
     def get_purchased(self):
         return self.get_property('purchased')
-    
+
     def get_description(self):
         if self.parent:
             return self.parent.get_description()

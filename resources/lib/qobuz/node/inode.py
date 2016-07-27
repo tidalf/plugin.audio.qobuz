@@ -12,21 +12,23 @@ from time import time
 import urllib
 import weakref
 
-from api import api
-from cache import cache
-from constants import Mode
-from debug import log, warn
-from exception import QobuzXbmcError as Qerror
-from gui.contextmenu import contextMenu
-from gui.util import color, lang, runPlugin, containerUpdate, getSetting
-from node import Flag
-from node import getNode
+from qobuz.api import api
+from qobuz.cache import cache
+from qobuz.constants import Mode
+from qobuz.debug import log, warn
+from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.gui.util import color, lang, runPlugin, containerUpdate, getSetting
+from qobuz.node import Flag
+from qobuz.node import getNode
 import qobuz  # @UnresolvedImport
-from renderer import renderer
-from storage import _Storage
-from util.common import isEmpty
+from qobuz.renderer import renderer
+from qobuz.storage import _Storage
+from qobuz.util.common import isEmpty
+from qobuz import config
 
-
+_paginated = ['albums', 'labels', 'tracks', 'artists',
+                     'playlists', 'playlist', 'public_playlists', 'genres']
 class INode(object):
     '''Our base node, every node must inherit or mimic is behaviour
 
@@ -44,10 +46,14 @@ class INode(object):
         @param parent=None: Parent node if not None
         @param parameters={}: dictionary
         '''
+        self._nid = None
+        self._parent = None
+        self._content_type = None
+        self._data = None
+        self._label = None
         self.data = None
         self.parameters = parameters
         self.nt = None
-        self.nid = self.get_parameter('nid')
         self.parent = parent
         self.content_type = "files"
         self.image = None
@@ -57,9 +63,10 @@ class INode(object):
         self.is_folder = True
         self.pagination_next = None
         self.pagination_prev = None
-        self.offset = None
+        self.offset = self.get_parameter('offset') or 0
         self.hasWidget = False
         self.user_storage = None
+        self.nid = self.get_parameter('nid') or self.get_property('id')
 
     def set_nid(self, value):
         '''@setter nid'''
@@ -79,7 +86,7 @@ class INode(object):
 
     def set_parent(self, parent):
         '''@setter parent'''
-        if not parent:
+        if parent is None:
             self._parent = None
             return
         self._parent = weakref.proxy(parent)
@@ -103,8 +110,7 @@ class INode(object):
     def set_content_type(self, kind):
         '''@setter content_type'''
         if kind not in ['songs', 'albums', 'files', 'artists']:
-            raise Qerror(
-                who=self, what='invalid_type', additional=kind)
+            raise Qerror(who=self, what='invalid_type', additional=kind)
         self._content_type = kind
 
     content_type = property(get_content_type, set_content_type)
@@ -124,7 +130,7 @@ class INode(object):
         ''' Called after node data is set '''
         pass
 
-    def get_property(self, pathList, defaultReturn=u''):
+    def get_property(self, pathList, default=u''):
         '''Property are just a easy way to access JSON data (self.data)
         @param pathList: a string or a list of string, each string can be
             a path like 'album/image/large'
@@ -139,12 +145,12 @@ class INode(object):
         '''
         if isinstance(pathList, basestring):
             res = self.__get_property(pathList)
-            return res if res is not None else defaultReturn
+            return res if res is not None else default
         for path in pathList:
             data = self.__get_property(path)
             if data is not None:
                 return data
-        return defaultReturn
+        return default
 
     def __get_property(self, path):
         '''Helper used by get_property method
@@ -168,12 +174,10 @@ class INode(object):
         '''
         if not data:
             return False
-        paginated = ['albums', 'labels', 'tracks', 'artists',
-                     'playlists', 'playlist', 'public_playlists', 'genresp']
         items = None
         need_pagination = False
-        for p in paginated:
-            if not p in data or data[p] is None:
+        for p in _paginated:
+            if p not in data or data[p] is None:
                 warn(self, 'No pagination data')
                 continue
             items = data[p]
@@ -184,7 +188,7 @@ class INode(object):
             if items['total'] > (items['offset'] + items['limit']):
                 need_pagination = True
                 break
-        if not need_pagination:
+        if need_pagination is False:
             return False
         url = self.make_url(offset=items['offset'] + items['limit'])
         self.pagination_next = url
@@ -222,8 +226,6 @@ class INode(object):
         @param default=None: value set when parameter not found or value is None
         @param unQuote=False: boolean, when True unquote value
         '''
-        if not self.parameters:
-            return default
         if name not in self.parameters:
             return default
         value = self.parameters[name]
@@ -263,9 +265,14 @@ class INode(object):
                 continue
             ka[name] = self.get_parameter(name)
         url = sys.argv[0] + '?'
-        for name in ['mode', 'nt', 'nid', 'purchased', 'offset', 'nm', 'qnt', 'qid', 'query']:
-            if name in ka and ka[name] is not None:
-                url += name + '=' + str(ka[name]) + '&'
+        for key in sorted(ka):
+            value = ka[key]
+            if value is None:
+                continue
+            value = str(value).strip()
+            if value == '':
+                continue
+            url += key + '=' + value + '&'
         url = url[:-1]
         return url
 
@@ -276,13 +283,13 @@ class INode(object):
             Class can overload this method
         '''
         import xbmcgui  # @UnresolvedImport
-        if not 'url' in ka:
+        if 'url' not in ka:
             ka['url'] = self.make_url()
-        if not 'label' in ka:
+        if 'label' not in ka:
             ka['label'] = self.get_label()
-        if not 'label2' in ka:
+        if 'label2' not in ka:
             ka['label2'] = self.get_label()
-        if not 'image' in ka:
+        if 'image' not in ka:
             ka['image'] = self.get_image()
         item = xbmcgui.ListItem(
             ka['label'],
@@ -348,7 +355,7 @@ class INode(object):
                    gData=None):
         if Dir.Progress.iscanceled():
             return False
-        if not gData:
+        if gData is None:
             gData = {'count': 0,
                      'total': 100,
                      'startedOn': time()}
@@ -400,20 +407,22 @@ class INode(object):
         """
         if self.pagination_next:
             colorItem = getSetting('color_item')
-            params = qobuz.boot.params
+            params = config.app.bootstrap.params
             params['offset'] = self.pagination_next_offset
             params['nid'] = self.nid
             node = getNode(self.nt, params)
             node.data = self.data
             label = self.get_label()
-            if not label and self.parent:
-                label = self.parent.get_label()
-            if self.label2:
-                label = self.label2
-            nextLabel = (
-                '[ %s  %s / %s ]') % (color(colorItem, label),
-                                      self.pagination_next_offset,
-                                      self.pagination_total)
+            if label is None:
+                if self.label2 is not None:
+                    label = self.label2
+                elif self.parent is not None:
+                    label = self.parent.get_label()
+                else:
+                    label = '[no-label]'
+            nextLabel = u'[ {}  {} / {} ]'.format(color(colorItem, label),
+                                                self.pagination_next_offset,
+                                                self.pagination_total)
             node.label = nextLabel
             node.label2 = label
             self.add_child(node)

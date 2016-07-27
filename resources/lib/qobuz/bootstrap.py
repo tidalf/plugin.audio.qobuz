@@ -9,15 +9,15 @@
 import sys
 import os
 
-from constants import Mode
-from debug import info, debug, warn
-from dog import dog
-from node import Flag
-from exception import QobuzXbmcError
-from gui.util import dialogLoginFailure, getSetting, containerRefresh
-from gui.util import dialogServiceTemporarilyUnavailable
-import qobuz  # @UnresolvedImport
-from cache import cache
+from qobuz.constants import Mode
+from qobuz.debug import info, debug, warn
+from qobuz.dog import dog
+from qobuz.node import Flag
+from qobuz.exception import QobuzXbmcError
+from qobuz.gui.util import dialogLoginFailure, getSetting, containerRefresh
+from qobuz.gui.util import dialogServiceTemporarilyUnavailable
+import qobuz.config as config
+from qobuz.cache import cache
 
 
 def get_checked_parameters():
@@ -47,28 +47,28 @@ def get_checked_parameters():
     return rparam
 
 
-class QobuzBootstrap(object):
+class Bootstrap(object):
     """Set some boot properties
     and route query based on parameters
     """
 
     def __init__(self, __addon__, __handle__):
-        qobuz.addon = __addon__
+        config.addon = __addon__
         self.handle = __handle__
-        qobuz.boot = self
+        config.boot = self
 
-    def bootstrap_app(self):
+    def init_app(self):
         """General bootstrap
         """
         from xbmcrpc import XbmcRPC
         self.bootstrap_directories()
         self.bootstrap_registry()
         self.bootstrap_sys_args()
-        qobuz.rpc = XbmcRPC()
+        config.rpc = XbmcRPC()
 
     def bootstrap_registry(self):
-        from api import api
-        cache.base_path = qobuz.path.cache
+        from qobuz.api import api
+        cache.base_path = config.path.cache
         api.stream_format = 6 if getSetting('streamtype') == 'flac' else 5
         if not api.login(getSetting('username'), getSetting('password')):
             if api.status_code == 503:
@@ -90,18 +90,18 @@ class QobuzBootstrap(object):
         class PathObject ():
 
             def __init__(self):
-                self.base = qobuz.addon.getAddonInfo('path')
+                self.base = config.addon.getAddonInfo('path')
 
             def _set_dir(self):
                 profile = xbmc.translatePath('special://profile/')
                 self.profile = os.path.join(profile,
                                             'addon_data',
-                                            qobuz.addon.getAddonInfo('id'))
+                                            config.addon.getAddonInfo('id'))
                 self.cache = os.path.join(self.profile, 'cache')
                 self.resources = xbmc.translatePath(
-                    os.path.join(qobuz.path.base, 'resources'))
+                    os.path.join(config.path.base, 'resources'))
                 self.image = xbmc.translatePath(
-                    os.path.join(qobuz.path.resources, 'img'))
+                    os.path.join(config.path.resources, 'img'))
 
             def to_s(self):
                 out = 'profile : ' + self.profile + "\n"
@@ -121,9 +121,9 @@ class QobuzBootstrap(object):
                         warn("Cannot create directory: " + path)
                         exit(2)
                     info(self, "Directory created: " + path)
-        qobuz.path = PathObject()
-        qobuz.path._set_dir()
-        qobuz.path.mkdir(qobuz.path.cache)
+        config.path = PathObject()
+        config.path._set_dir()
+        config.path.mkdir(config.path.cache)
 
     def bootstrap_sys_args(self):
         """Parsing sys arg parameters and store them

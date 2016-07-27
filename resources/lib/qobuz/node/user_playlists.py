@@ -6,11 +6,11 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from node import Flag, getNode
-from inode import INode
-from debug import warn, error
-from gui.util import lang, getImage, getSetting
-from api import api
+from qobuz.node import Flag, getNode
+from qobuz.node.inode import INode
+from qobuz.debug import warn, error
+from qobuz.gui.util import lang, getImage, getSetting
+from qobuz.api import api
 
 
 class Node_user_playlists(INode):
@@ -30,7 +30,6 @@ class Node_user_playlists(INode):
         self.set_display_by(display_by)
         display_cover = getSetting('userplaylists_display_cover', isBool=True)
         self.display_product_cover = display_cover
-        self.offset = self.get_parameter('offset') or 0
 
     def set_display_by(self, dtype):
         vtype = ('product', 'songs')
@@ -54,9 +53,11 @@ class Node_user_playlists(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = api.get('/playlist/getUserPlaylists', limit=limit,
-                       offset=self.offset, user_id=api.user_id)
-        if not data:
+        data = api.get('/playlist/getUserPlaylists',
+                       limit=limit,
+                       offset=self.offset,
+                       user_id=api.user_id)
+        if data is None:
             warn(self, "Build-down: Cannot fetch user playlists data")
             return False
         self.data = data
@@ -66,11 +67,11 @@ class Node_user_playlists(INode):
         login = getSetting('username')
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST, {'offset': 0})
+            node = getNode(Flag.PLAYLIST)
             node.data = data
-            if self.display_product_cover:
-                pass
-            if (cid and cid == node.nid):
+            #if self.display_product_cover:
+            #    pass
+            if cid and cid == node.nid:
                 node.set_is_current(True)
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)

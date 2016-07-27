@@ -6,9 +6,9 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from debug import log
-from node import Flag
-from node import getNode
+from qobuz.debug import log
+from qobuz.node import Flag
+from qobuz.node import getNode
 
 
 class IRenderer(object):

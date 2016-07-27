@@ -10,10 +10,11 @@ import xbmc  # @UnresolvedImport
 import xbmcgui  # @UnresolvedImport
 
 import qobuz  # @UnresolvedImport
-from debug import warn
-from gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
-from gui.util import getSetting
-from node import Flag, getNode
+from qobuz.debug import warn
+from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
+from qobuz.gui.util import getSetting
+from qobuz.node import Flag, getNode
+from qobuz import config
 
 keyTrackId = 'QobuzPlayerTrackId'
 
@@ -75,11 +76,11 @@ class QobuzPlayer(xbmc.Player):
 
         """We are called from playlist...
         """
-        if qobuz.boot.handle == -1:
+        if config.app.handle == -1:
             super(QobuzPlayer, self).play(track.get_streaming_url(),
                                           item, False)
         else:
-            setResolvedUrl(handle=qobuz.boot.handle,
+            setResolvedUrl(handle=config.app.handle,
                            succeeded=True,
                            listitem=item)
         return True

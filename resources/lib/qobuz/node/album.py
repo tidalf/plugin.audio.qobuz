@@ -6,12 +6,12 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from debug import warn
-from gui.util import getImage, getSetting, htm2xbmc
-from gui.contextmenu import contextMenu
-from api import api
-from node import getNode, Flag
+from qobuz.node.inode import INode
+from qobuz.debug import warn, info
+from qobuz.gui.util import getImage, getSetting, htm2xbmc
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.api import api
+from qobuz.node import getNode, Flag
 
 SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']
@@ -27,27 +27,23 @@ class Node_album(INode):
         self.image = getImage('album')
         self.content_type = 'songs'
         self.is_special_purchase = False
-        self.offset = None
         self.imageDefaultSize = 'large'
         self.label = 'Album'
+        self.offset = self.get_parameter('offset') or 0
         try:
             self.imageDefaultSize = getSetting('image_default_size')
-        except:
-            pass
+        except Exception as e:
+            warn(self, 'Cannot set image default size, Error: {}', e)
 
-        @property
-        def nid(self):
-            return self._nid
+    def get_nid(self):
+        return super(Node_album, self).get_nid()
 
-        @nid.getter  # @IgnorePep8
-        def nid(self):
-            return self._nid
+    def set_nid(self, value):
+        super(Node_album, self).set_nid(value)
+        if value in SPECIAL_PURCHASES:
+            self.is_special_purchase = True
 
-        @nid.setter  # @IgnorePep8
-        def nid(self, value):
-            self._id = value
-            if value in SPECIAL_PURCHASES:
-                self.is_special_purchase = True
+    nid = property(get_nid, set_nid)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         data = api.get('/album/get', album_id=self.nid)
@@ -59,18 +55,17 @@ class Node_album(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK)
-            if not 'image' in track:
+            node = getNode(Flag.TRACK, data=track)
+            if 'image' not in track:
                 track['image'] = self.get_image()
-            node.data = track
             self.add_child(node)
         return len(self.data['tracks']['items'])
 
     def make_url(self, **ka):
         purchased = self.get_parameter('purchased')
-        if purchased:
+        if purchased is not None:
             ka['purchased'] = self.get_parameter('purchased')
-        if 'asLocalURL' in ka and ka['asLocalURL']:
+        if 'asLocalURL' in ka and ka['asLocalURL'] == 'True':
             from constants import Mode
             ka['mode'] = Mode.SCAN
         return super(Node_album, self).make_url(**ka)
@@ -80,7 +75,7 @@ class Node_album(INode):
         image = self.get_image()
         item = xbmcgui.ListItem(
             label=self.get_label(),
-            label2=self.get_label(),
+            label2=self.get_label2(),
             iconImage=image,
             thumbnailImage=image,
             path=self.make_url(),
@@ -108,10 +103,7 @@ class Node_album(INode):
                                   'composer/name'])
 
     def get_album(self):
-        album = self.get_property('name')
-        if not album:
-            return ''
-        return album
+        return self.get_property('name')
 
     def get_artist_id(self):
         return self.get_property(['artist/id',
@@ -131,20 +123,19 @@ class Node_album(INode):
 
     def get_label(self):
         artist = self.get_artist() or 'VA'
-        label = '%s - %s' % (artist, self.get_title())
-        return label
+        return '%s - %s' % (artist, self.get_title())
 
     def get_genre(self):
         return self.get_property('genre/name')
 
     def get_year(self):
         import time
-        date = self.get_property('released_at')
+        date = self.get_property('released_at', default=None)
         year = 0
         try:
             year = time.strftime("%Y", time.localtime(date))
-        except:
-            pass
+        except Exception:
+            warn(self, 'Invalid date format %s', date)
         return year
 
     def get_description(self):

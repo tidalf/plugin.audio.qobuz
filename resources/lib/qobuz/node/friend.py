@@ -7,14 +7,14 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import json
-from inode import INode
-from debug import warn
-from gui.util import color, getImage, runPlugin, containerRefresh, \
+from qobuz.node.inode import INode
+from qobuz.debug import warn
+from qobuz.gui.util import color, getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, getSetting, lang
-from api import api
-from cache import cache
+from qobuz.api import api
+from qobuz.cache import cache
 
-from node import Flag, getNode
+from qobuz.node import Flag, getNode
 
 
 class Node_friend(INode):
@@ -25,7 +25,6 @@ class Node_friend(INode):
         super(Node_friend, self).__init__(parent, parameters)
         self.nt = Flag.FRIEND
         self.image = getImage('artist')
-        self.name = ''
         self.set_name(self.get_parameter('query'))
         self.set_label(self.name)
         self.url = None
@@ -41,8 +40,9 @@ class Node_friend(INode):
         return self
 
     def make_url(self, **ka):
-        url = super(Node_friend, self).make_url(**ka) + "&query=" + self.name
-        return url
+        if self.name:
+            ka['query'] = self.name
+        return super(Node_friend, self).make_url(**ka)
 
     def gui_create(self):
         name = self.get_parameter('query')

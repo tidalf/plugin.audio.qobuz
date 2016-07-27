@@ -6,12 +6,12 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from debug import warn
-from inode import INode
-from exception import QobuzXbmcError
-from gui.util import lang, getImage, getSetting
-from api import api
-from node import getNode, Flag
+from qobuz.debug import warn
+from qobuz.node.inode import INode
+from qobuz.exception import QobuzXbmcError
+from qobuz.gui.util import lang, getImage, getSetting
+from qobuz.api import api
+from qobuz.node import getNode, Flag
 
 
 class Node_search(INode):
@@ -21,7 +21,6 @@ class Node_search(INode):
         self.nt = Flag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
-        self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
         return self.label
@@ -29,14 +28,7 @@ class Node_search(INode):
     def get_description(self):
         return self.get_label()
 
-    @property
-    def search_type(self):
-        """Property / search_type
-        """
-        return self._search_type
-
-    @search_type.setter
-    def search_type(self, st):
+    def set_search_type(self, st):
         if st == 'artists':
             self.label = lang(30017)
             self.content_type = 'files'
@@ -57,16 +49,17 @@ class Node_search(INode):
             raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
         self._search_type = st
 
-    @search_type.getter
-    def search_type(self):
+
+    def get_search_type(self):
         return self._search_type
 
+    search_type = property(get_search_type, set_search_type)
+
     def make_url(self, **ka):
-        url = super(Node_search, self).make_url(**ka)
-        url += '&search-type=' + self.search_type
+        ka['search-type'] = self.search_type
         if self.query:
-            url += '&query=' + self.query
-        return url
+            ka['query'] = self.query
+        return super(Node_search, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
@@ -87,7 +80,7 @@ class Node_search(INode):
             return False
         if data[stype]['total'] == 0:
             return False
-        if not 'items' in data[stype]:
+        if 'items' not in data[stype]:
             return False
         self.set_parameter('query', query, quote=True)
         self.data = data

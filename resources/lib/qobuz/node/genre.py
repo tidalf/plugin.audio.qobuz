@@ -6,12 +6,12 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from gui.util import getImage, getSetting, lang
-from api import api
-from node import Flag, getNode
-from node.recommendation import RECOS_TYPE_IDS
-from debug import log
+from qobuz.node.inode import INode
+from qobuz.gui.util import getImage, getSetting, lang
+from qobuz.api import api
+from qobuz.node import Flag, getNode
+from qobuz.node.recommendation import RECOS_TYPE_IDS
+from qobuz.debug import log
 
 class Node_genre(INode):
     '''@class Node_genre:
@@ -26,10 +26,9 @@ class Node_genre(INode):
         self.offset = self.get_parameter('offset') or 0
 
     def make_url(self, **ka):
-        url = super(Node_genre, self).make_url(**ka)
         if self.parent is not None and self.parent.nid is not None:
-            url += "&parent-id=" + str(self.parent.nid)
-        return url
+            ka['parent-id'] = self.parent.nid
+        return super(Node_genre, self).make_url(**ka)
 
     def hook_post_data(self):
         self.label = self.get_property('name')
@@ -56,7 +55,7 @@ class Node_genre(INode):
             return True  # Nothing returned trigger reco build in build_down
         self.data = data
         genres = self.data['genres']
-        if 'parent' in genres and int(genres['parent']['level']) > 0:
+        if 'parent' in genres and int(genres['parent']['level']) > 1:
             self.populate_reco(Dir, lvl, whiteFlag, blackFlag,
                                genres['parent']['id'])
         return True

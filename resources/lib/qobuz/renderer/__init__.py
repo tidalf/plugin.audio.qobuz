@@ -6,7 +6,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from renderer.xbmc import QobuzXbmcRenderer as OurRenderer
+from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
 
 
 def renderer(nType, params=None):

@@ -6,12 +6,12 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from debug import warn
-from gui.util import getSetting
-from gui.contextmenu import contextMenu
-from api import api
-from node import getNode, Flag
+from qobuz.node.inode import INode
+from qobuz.debug import warn
+from qobuz.gui.util import getSetting
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.api import api
+from qobuz.node import getNode, Flag
 
 
 class Node_artist(INode):
@@ -25,7 +25,6 @@ class Node_artist(INode):
         self.is_folder = True
         self.slug = ''
         self.content_type = 'artists'
-        self.offset = self.get_parameter('offset') or 0
 
     def hook_post_data(self):
         self.nid = self.get_property('id')
@@ -45,14 +44,12 @@ class Node_artist(INode):
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        node_artist = getNode(Flag.ARTIST)
-        node_artist.data = self.data
+        node_artist = getNode(Flag.ARTIST, data=self.data)
         node_artist.label = '[ %s ]' % (node_artist.label)
         if not 'albums' in self.data:
             return True
-        for pData in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM)
-            node.data = pData
+        for data in self.data['albums']['items']:
+            node = getNode(Flag.ALBUM, data=data)
             self.add_child(node)
         return True
 

@@ -6,8 +6,8 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from exception import QobuzXbmcError
-from debug import warn
+from qobuz.exception import QobuzXbmcError
+from qobuz.debug import warn
 
 
 class FlagEnum(object):

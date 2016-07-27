@@ -6,11 +6,11 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from gui.util import getSetting, executeBuiltin, lang
-from cache import cache
-from cache.cacheutil import clean_all
-from node import getNode, Flag
+from qobuz.node.inode import INode
+from qobuz.gui.util import getSetting, executeBuiltin, lang
+from qobuz.cache import cache
+from qobuz.cache.cache_util import clean_all
+from qobuz.node import getNode, Flag
 
 
 class Node_root(INode):

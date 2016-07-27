@@ -6,11 +6,11 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from debug import info, warn
-from gui.util import getImage, runPlugin, containerUpdate, lang
-from api import api
-from node import getNode, Flag
+from qobuz.node.inode import INode
+from qobuz.debug import info, warn
+from qobuz.gui.util import getImage, runPlugin, containerUpdate, lang
+from qobuz.api import api
+from qobuz.node import getNode, Flag
 
 
 class Node_friends(INode):
@@ -29,10 +29,9 @@ class Node_friends(INode):
         self.content_type = 'artists'
 
     def make_url(self, **ka):
-        url = super(Node_friends, self).make_url(**ka)
         if self.name:
-            url += "&query=" + self.name
-        return url
+            ka['query'] = self.name
+        return super(Node_friends, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         node = getNode(Flag.FRIEND)

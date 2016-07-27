@@ -9,19 +9,19 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from cache import cache
-from api.raw import QobuzApiRaw
+from qobuz.cache import cache
+from qobuz.api.raw import RawApi
 
 
 class InvalidQuery(Exception):
     pass
 
 
-class QobuzApiEasy(QobuzApiRaw):
+class EasyApi(RawApi):
 
     def __init__(self):
         self.cache_base_path = None
-        super(QobuzApiEasy, self).__init__()
+        super(EasyApi, self).__init__()
         self.is_logged = False
         """Setting default stream format to mp3
         """
@@ -51,6 +51,12 @@ class QobuzApiEasy(QobuzApiRaw):
 
         ::note api.error will contain last error message
         """
+        key_to_del = []
+        for key, value in ka.items():
+            if value is None or value == '':
+                key_to_del.append(key)
+        for key in key_to_del:
+            del ka[key]
         if not a[0] or not a[0].startswith('/'):
             raise InvalidQuery("Missing starting << / >>")
         path = '/'.join(a)

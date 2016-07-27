@@ -6,9 +6,9 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from gui.util import lang, getImage
-from node import getNode, Flag
+from qobuz.node.inode import INode
+from qobuz.gui.util import lang, getImage
+from qobuz.node import getNode, Flag
 
 
 class Node_favorites(INode):

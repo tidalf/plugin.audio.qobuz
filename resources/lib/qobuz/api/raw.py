@@ -19,12 +19,12 @@ import binascii
 from itertools import izip, cycle
 import requests
 
-from exception import QobuzXbmcError
-from debug import warn, info
+from qobuz.exception import QobuzXbmcError
+from qobuz.debug import warn, info
 
 socket.timeout = 5
 
-class QobuzApiRaw(object):
+class RawApi(object):
 
     def __init__(self):
         self.appid = '285473059'  # XBMC

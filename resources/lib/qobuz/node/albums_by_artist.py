@@ -24,7 +24,6 @@ class Node_albums_by_artist(INode):
         super(Node_albums_by_artist, self).__init__(parent, parameters)
         self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
-        self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
         return self.get_artist()
@@ -68,8 +67,7 @@ class Node_albums_by_artist(INode):
                 except:
                     warn(self, "Strange thing happen")
                     pass
-            node = getNode(Flag.ALBUM)
-            node.data = album
+            node = getNode(Flag.ALBUM, data=album)
             count += 1
             Dir.update(count, total, "Add album:" + node.get_label(), '')
             self.add_child(node)

@@ -8,7 +8,7 @@
 '''
 import time
 import xbmcgui  # @UnresolvedImport
-from debug import warn
+from qobuz.debug import warn
 
 
 def pretty_epoch(time):

@@ -7,15 +7,15 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
-from inode import INode
-from debug import warn
-from gui.util import lang, getSetting
-from gui.util import getImage, notifyH, executeBuiltin, containerUpdate
-from node import getNode, Flag
-from renderer import renderer
-from api import api
-from exception import QobuzXbmcError as Qerror
-from cache import cache
+from qobuz.node.inode import INode
+from qobuz.debug import warn
+from qobuz.gui.util import lang, getSetting
+from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
+from qobuz.node import getNode, Flag
+from qobuz.renderer import renderer
+from qobuz.api import api
+from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz.cache import cache
 
 dialogHeading = lang(30083)
 
@@ -46,7 +46,6 @@ class Node_favorite(INode):
         else:
             self.label = '%s - %s' % (lang(30081),
                                       self.search_type.capitalize())
-        self.offset = self.get_parameter('offset') or 0
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
@@ -69,10 +68,9 @@ class Node_favorite(INode):
         return True
 
     def make_url(self, **ka):
-        url = super(Node_favorite, self).make_url(**ka)
         if self.search_type:
-            url += '&search-type=' + str(self.search_type)
-        return url
+            ka['search-type'] = self.search_type
+        return super(Node_favorite, self).make_url(**ka)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.method is not None:
@@ -96,8 +94,7 @@ class Node_favorite(INode):
         if not 'tracks' in self.data:
             return False
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK)
-            node.data = track
+            node = getNode(Flag.TRACK, data=track)
             self.add_child(node)
             ret = True
         return ret
@@ -107,8 +104,7 @@ class Node_favorite(INode):
         if not 'albums' in self.data:
             return False
         for album in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM)
-            node.data = album
+            node = getNode(Flag.ALBUM, data=album)
             self.add_child(node)
             ret = True
         return ret
@@ -118,8 +114,7 @@ class Node_favorite(INode):
         if not 'artists' in self.data:
             return False
         for artist in self.data['artists']['items']:
-            node = getNode(Flag.ARTIST)
-            node.data = artist
+            node = getNode(Flag.ARTIST, data=artist)
             node.fetch(None, None, None, Flag.NONE)
             self.add_child(node)
             ret = True

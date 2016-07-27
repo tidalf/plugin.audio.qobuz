@@ -6,8 +6,8 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from exception import QobuzXbmcError as Qerror
-from gui.util import color, getSetting
+from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz.gui.util import color, getSetting
 
 
 class contextMenu():

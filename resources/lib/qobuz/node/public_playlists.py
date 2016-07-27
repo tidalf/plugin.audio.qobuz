@@ -6,10 +6,10 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from node import Flag, getNode
-from inode import INode
-from gui.util import lang, getImage, getSetting
-from api import api
+from qobuz.node import Flag, getNode
+from qobuz.node.inode import INode
+from qobuz.gui.util import lang, getImage, getSetting
+from qobuz.api import api
 
 
 class Node_public_playlists(INode):

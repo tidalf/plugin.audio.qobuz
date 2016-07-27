@@ -7,11 +7,11 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import qobuz  # @UnresolvedImport
-from debug import warn
-from irenderer import IRenderer
-from gui.util import notifyH, getSetting
-from exception import QobuzXbmcError as Qerror
-
+from qobuz.debug import warn
+from qobuz.renderer.irenderer import IRenderer
+from qobuz.gui.util import notifyH, getSetting
+from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import config
 
 class QobuzXbmcRenderer(IRenderer):
     """Specific renderer for Xbmc
@@ -52,11 +52,11 @@ class QobuzXbmcRenderer(IRenderer):
             return self.root.displayWidget()
         if self.has_method_parameter():
             return self.execute_method_parameter()
-        from gui.directory import Directory
+        from qobuz.gui.directory import Directory
         Dir = Directory(self.root, self.nodes,
                         withProgress=self.enable_progress)
         Dir.asList = self.asList
-        Dir.handle = qobuz.boot.handle
+        Dir.handle = config.app.handle
         if getSetting('contextmenu_replaceitems', isBool=True):
             Dir.replaceItems = True
         try:
@@ -82,7 +82,7 @@ class QobuzXbmcRenderer(IRenderer):
                 xbmcplugin.SORT_METHOD_ALBUM,
                 xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
                 xbmcplugin.SORT_METHOD_TRACKNUM, ]
-            [xbmcplugin.addSortMethod(handle=qobuz.boot.handle,
+            [xbmcplugin.addSortMethod(handle=config.app.handle,
                                       sortMethod=method) for method in methods]
         return Dir.end_of_directory()
 

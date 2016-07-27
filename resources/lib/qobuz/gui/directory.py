@@ -9,10 +9,10 @@
 import xbmcplugin  # @UnresolvedImport
 import xbmcgui  # @UnresolvedImport
 
-from progress import Progress
+from qobuz.gui.progress import Progress
 import time
-from gui.util import lang
-from exception import QobuzXbmcError as Qerror
+from qobuz.gui.util import lang
+from qobuz.exception import QobuzXbmcError as Qerror
 
 
 class Directory():
@@ -109,7 +109,7 @@ class Directory():
             return False
         return True
 
-    def update(self, gData, line1, line2='', line3=''):
+    def update(self, gData, line1='', line2='', line3=''):
         """Update progress bar associated with this directory
 
             Parameters:

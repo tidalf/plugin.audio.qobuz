@@ -7,10 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 
-__all__ = ['getNode', 'flag']
-
-from node.flag import Flag
-from debug import log
+from qobuz.node.flag import Flag
+from qobuz.debug import log
 
 
 def getNode(qnt, params={}, data=None, **ka):

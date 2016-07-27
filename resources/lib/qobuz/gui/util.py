@@ -28,8 +28,8 @@ except:
     print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"
 
 import qobuz  # @UnresolvedImport
-from xbmcrpc import showNotification, getInfoLabels
-
+from qobuz.xbmcrpc import showNotification, getInfoLabels
+from qobuz import config
 
 def htm2xbmc(htm):
     def replace(m):
@@ -42,9 +42,9 @@ def getImage(name):
         return ''
     if name.startswith('http'):
         return name
-    if not qobuz.path:
+    if not config.path:
         return ''
-    return os.path.join(qobuz.path.image, name + '.png')
+    return os.path.join(config.path.image, name + '.png')
 
 
 def notifyH(title, text, image=None, mstime=2000):
@@ -145,7 +145,7 @@ def color(colorItem, msg):
 
 
 def lang(langId):
-    s = qobuz.addon.getLocalizedString(langId)
+    s = config.app.addon.getLocalizedString(langId)
     if not s:
         raise KeyError(langId)
     return s
@@ -204,7 +204,7 @@ def getSetting(key, **ka):
         * optional: isBool (convert 'true' and 'false to python boolean),
             isInt (return data as integer)
     """
-    data = qobuz.addon.getSetting(key)
+    data = config.app.addon.getSetting(key)
     if not data:
         return ''
     if 'isBool' in ka and ka['isBool']:

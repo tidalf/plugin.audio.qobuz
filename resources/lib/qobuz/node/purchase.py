@@ -6,11 +6,11 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from debug import warn
-from api import api
-from node import Flag, getNode
-from gui.util import lang, getImage, getSetting
+from qobuz.node.inode import INode
+from qobuz.debug import warn
+from qobuz.api import api
+from qobuz.node import Flag, getNode
+from qobuz.gui.util import lang, getImage, getSetting
 
 
 class Node_purchase(INode):
@@ -23,7 +23,6 @@ class Node_purchase(INode):
         self.content_type = 'albums'
         self.image = getImage('album')
         self.search_type = self.get_parameter('search-type') or 'all'
-        self.offset = self.get_parameter('offset') or 0
         if self.search_type == 'all':
             self.label = '%s - %s' % (lang(30101), lang(30098))
         else:
@@ -31,11 +30,10 @@ class Node_purchase(INode):
                                       self.search_type.capitalize())
 
     def make_url(self, **ka):
-        url = super(Node_purchase, self).make_url(**ka)
         if self.search_type:
-            url += '&search-type=' + str(self.search_type)
-            url += '&purchased=1'
-        return url
+            ka['search-type'] = str(self.search_type)
+            ka['purchased'] = 1
+        return super(Node_purchase, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')

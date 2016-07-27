@@ -10,7 +10,7 @@ import os
 import re
 import tempfile
 
-from debug import warn
+from qobuz.debug import warn
 
 
 def unlink(filename):

@@ -7,17 +7,17 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
-from inode import INode
-from node import getNode, Flag
-from api import api
-from cache import cache
-from debug import warn, info
-from renderer import renderer
-from gui.util import notify_warn, notify_error, notify_log, getSetting
-from gui.util import color, lang, getImage, runPlugin, executeBuiltin
-from gui.util import containerRefresh, containerUpdate
-from gui.contextmenu import contextMenu
-from constants import Mode
+from qobuz.node.inode import INode
+from qobuz.node import getNode, Flag
+from qobuz.api import api
+from qobuz.cache import cache
+from qobuz.debug import warn, info
+from qobuz.renderer import renderer
+from qobuz.gui.util import notify_warn, notify_error, notify_log, getSetting
+from qobuz.gui.util import color, lang, getImage, runPlugin, executeBuiltin
+from qobuz.gui.util import containerRefresh, containerUpdate
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.constants import Mode
 
 dialogHeading = 'Qobuz playlist'
 
@@ -40,7 +40,6 @@ class Node_playlist(INode):
             self.content_type = 'albums'
         else:
             self.content_type = 'songs'
-        self.offset = self.get_parameter('offset') or 0
         self.image = getImage('song')
 
     def get_label(self):
@@ -241,11 +240,10 @@ class Node_playlist(INode):
             render.asList = True
             render.run()
             nodes = render.nodes
-            if not name and render.root.get_parameter('query', unQuote=True):
-                name = render.root.get_parameter('query', unQuote=True)
-        if not name:
-            name = self.get_parameter('query',
-                                      unQuote=True) or self.get_label()
+
+        if name is None:
+            name = self.get_parameter('query', unQuote=True, default=None) \
+                or self.get_label()
         ret = xbmcgui.Dialog().select('Create playlist %s' % (name), [
             node.get_label() for node in nodes
         ])
@@ -261,6 +259,7 @@ class Node_playlist(INode):
             return False
         self.delete_cache(playlist['id'])
         notify_log('Qobuz / Playlist added', '[%s] %s' % (len(nodes), name))
+        executeBuiltin(containerRefresh())
         return True
 
     def set_as_current(self, playlist_id=None):

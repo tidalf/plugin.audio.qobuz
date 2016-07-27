@@ -7,11 +7,11 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from api import api
-from inode import INode
-from node import getNode, Flag
-from gui.util import getSetting, lang, getImage
-from debug import warn, info
+from qobuz.api import api
+from qobuz.node.inode import INode
+from qobuz.node import getNode, Flag
+from qobuz.gui.util import getSetting, lang, getImage
+from qobuz.debug import warn, info
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -55,35 +55,32 @@ class Node_recommendation(INode):
     def __init__(self, parent=None, parameters=None):
         super(Node_recommendation, self).__init__(parent, parameters)
         self.nt = Flag.RECOMMENDATION
-        self.genre_id = self.get_parameter('genre-id')
-        self.genre_type = self.get_parameter('genre-type')
+        self.genre_id = self.get_parameter('genre-id', default=None)
+        self.genre_type = self.get_parameter('genre-type', default=None)
         self.set_label(lang(30084))
         self.image = getImage('album')
-        self.offset = self.get_parameter('offset') or 0
 
     def make_url(self, **ka):
-        url = super(Node_recommendation, self).make_url(**ka)
         if self.genre_type is not None:
-            url += '&genre-type=' + str(self.genre_type)
+            ka['genre-type'] = self.genre_type
         if self.genre_id is not None:
-            url += '&genre-id=' + str(self.genre_id)
-        info(self, 'reco url {}', url)
-        return url
+            ka['genre-id'] = self.genre_id
+        return super(Node_recommendation, self).make_url(**ka)
 
     def myid(self):
-        if not self.genre_id or not self.genre_type:
+        if self.genre_id is None or self.genre_type is None:
             return None
         return str(self.genre_type) + '-' + str(self.genre_id)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        if not (self.genre_type is not None and self.genre_id is not None):
+        if self.genre_type is  None or self.genre_id is None:
             return True
         offset = self.offset or 0
         limit = getSetting('pagination_limit')
         data = api.get('/album/getFeatured',
                        type=RECOS_TYPE_IDS[int(self.genre_type)],
                        genre_id=self.genre_id,
-                       limit=limit,
+                       limit=10,
                        offset=offset)
         if data is None:
             warn(self, 'Cannot fetch data for recommendation')
@@ -127,7 +124,7 @@ class Node_recommendation(INode):
             warn(self, "Recommendation data['albums'] doesn't contain items")
             return False
         for product in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM)
+            node = getNode(Flag.ALBUM, {'nid': product['id']})
             node.data = product
             self.add_child(node)
         return True
