@@ -62,7 +62,7 @@ def log(obj, *a, **ka):
     elif num_argument > 1:
         msg = a[0].format(*a[1:], **ka)
     ourlog('[Qobuz/{name}][{level}] {msg}'
-            .format(name=str(name), msg=msg, level=lvl))
+            .format(name=str(name), msg=msg, level=lvl), lvl)
 
 
 def warn(obj, *a, **ka):

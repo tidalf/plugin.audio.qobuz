@@ -47,24 +47,16 @@ def get_checked_parameters():
     return rparam
 
 
-class Bootstrap(object):
-    """Set some boot properties
-    and route query based on parameters
-    """
+class MinimalBootstrap(object):
 
-    def __init__(self, __addon__, __handle__):
-        config.addon = __addon__
-        self.handle = __handle__
+    def __init__(self, application):
+        config.addon = application.addon
+        self.application = application
+        self.handle = application.handle
         config.boot = self
 
     def init_app(self):
-        """General bootstrap
-        """
-        from qobuz.xbmcrpc import XbmcRPC
         self.bootstrap_directories()
-        self.bootstrap_registry()
-        self.bootstrap_sys_args()
-        config.rpc = XbmcRPC()
 
     def bootstrap_registry(self):
         from qobuz.api import api
@@ -173,3 +165,21 @@ class Bootstrap(object):
             raise QobuzXbmcError(
                 who=self, what="unknow_mode", additional=self.MODE)
         return True
+
+
+class Bootstrap(MinimalBootstrap):
+    """Set some boot properties
+    and route query based on parameters
+    """
+
+    def __init__(self, application):
+        super(Bootstrap, self).__init__(application)
+
+    def init_app(self):
+        """General bootstrap
+        """
+        super(Bootstrap, self).init_app()
+        self.bootstrap_registry()
+        self.bootstrap_sys_args()
+        from qobuz.xbmcrpc import XbmcRPC
+        config.rpc = XbmcRPC()

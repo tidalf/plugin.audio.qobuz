@@ -97,7 +97,7 @@ class QobuzXbmcRenderer(IRenderer):
             warn(self, "Cannot set root node ('%s')" % (str(
                 self.node_type)))
             return False
-        handle = qobuz.boot.handle
+        handle = config.app.handle
         Dir = Directory(self.root, self.nodes, withProgress=False)
         Dir.handle = int(sys.argv[1])
         Dir.asList = False

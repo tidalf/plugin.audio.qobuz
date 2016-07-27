@@ -207,7 +207,7 @@ def getSetting(key, default='', asInt=False, asBool=False, asList=False, sep=' '
     @param_kwa asList : Return value splited with sep keyword
     @param_kwa sep    : Separator field for asList
     """
-    value = config.app.addon.getSetting(key)
+    value = config.app.registry.get(key) #addon.getSetting(key)
     if value is None or value == '':
         return default
     if asBool is True:
