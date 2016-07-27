@@ -66,7 +66,7 @@ class INode(object):
         self.offset = self.get_parameter('offset') or 0
         self.hasWidget = False
         self.user_storage = None
-        self.nid = self.get_parameter('nid') or self.get_property('id')
+        self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
 
     def set_nid(self, value):
         '''@setter nid'''
@@ -576,6 +576,9 @@ class INode(object):
                                 'localuserdata-%s.local' % str(api.user_id))
         self.user_storage = _Storage(filename)
         return self.user_storage
+
+    def get_user_path(self):
+        return os.path.join(cache.base_path)
 
     def get_user_data(self):
         data = api.get('/user/login', username=api.username,

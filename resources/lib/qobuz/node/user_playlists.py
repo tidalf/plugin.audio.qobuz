@@ -8,10 +8,10 @@
 '''
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
-from qobuz.debug import warn, error
+from qobuz.debug import warn, error, info
 from qobuz.gui.util import lang, getImage, getSetting
 from qobuz.api import api
-
+import os
 
 class Node_user_playlists(INode):
     """User playlists node
@@ -24,8 +24,8 @@ class Node_user_playlists(INode):
         self.image = getImage('userplaylists')
         self.nt = Flag.USERPLAYLISTS
         self.content_type = 'files'
-        display_by = self.get_parameter('display-by')
-        if not display_by:
+        display_by = self.get_parameter('display-by', default=None)
+        if display_by is None:
             display_by = 'songs'
         self.set_display_by(display_by)
         display_cover = getSetting('userplaylists_display_cover', isBool=True)
@@ -47,7 +47,7 @@ class Node_user_playlists(INode):
 
     def get_current_playlist_id(self):
         userdata = self.get_user_storage()
-        if not 'current_playlist' in userdata:
+        if 'current_playlist' not in userdata:
             return None
         return int(userdata['current_playlist'])
 
@@ -67,8 +67,7 @@ class Node_user_playlists(INode):
         login = getSetting('username')
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST)
-            node.data = data
+            node = getNode(Flag.PLAYLIST, data=data)
             #if self.display_product_cover:
             #    pass
             if cid and cid == node.nid:

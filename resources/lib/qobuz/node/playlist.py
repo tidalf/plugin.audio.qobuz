@@ -6,6 +6,8 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import os
+import random
 import xbmcgui  # @UnresolvedImport
 from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
@@ -18,8 +20,10 @@ from qobuz.gui.util import color, lang, getImage, runPlugin, executeBuiltin
 from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
-
+from qobuz.storage import _Storage
+from qobuz.util import data as dataUtil
 dialogHeading = 'Qobuz playlist'
+
 
 
 class Node_playlist(INode):
@@ -36,11 +40,60 @@ class Node_playlist(INode):
         self.url = None
         self.is_folder = True
         self.packby = ''
+        self.playlist_storage = None
         if self.packby == 'album':
             self.content_type = 'albums'
         else:
             self.content_type = 'songs'
-        self.image = getImage('song')
+        self.image = self.get_image()
+
+
+    def get_image(self):
+        if self.nid is not None:
+            storage = self.get_playlist_storage()
+            images = []
+            images_len = 0
+            if 'image' not in storage:
+                images = dataUtil.list_image(self.data)
+                images_len = len(images)
+                if images_len > 0:
+                    storage['image'] = images
+                    storage.sync()
+            else:
+                images = storage['image']
+                images_len = len(images)
+                if images_len > 0:
+                    img = images[random.randrange(0, images_len, 1)]
+                    info(self, 'image from storage {}', img)
+                    return img
+                else:
+                    del storage['image']
+                    storage.sync()
+        #userdata = self.get_user_data()
+        # if userdata:
+        #     if self.get_owner() == userdata['login']:
+        #         return userdata['avatar']
+        return getImage(self.content_type)
+
+    def get_playlist_storage(self):
+        if self.playlist_storage is not None:
+            return self.playlist_storage
+        if api.user_id is None or self.nid is None:
+            warn(self, 'Missing user_id: {user_id} or nid: {nid}',
+                 user_id=api.user_id, nid=self.nid)
+            return None
+        self.playlist_storage = _Storage(self._get_playlist_storage_filename())
+        return self.playlist_storage
+
+    def _get_playlist_storage_filename(self):
+        name = u'localuserdata-{}-playlist-{}.local'.format(api.user_id,
+                                                            self.nid)
+        return os.path.join(cache.base_path, name)
+
+    def remove_playlist_storage():
+        filename = self._get_playlist_storage_filename()
+        if os.path.exists(filename):
+            os.unlink(filename)
 
     def get_label(self):
         return self.label or self.get_name()
@@ -62,24 +115,17 @@ class Node_playlist(INode):
             warn(self, "Build-down: Cannot fetch playlist data")
             return False
         self.data = data
+        self.get_image() # Buld thumbnail if neeeded
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK)
-            node.data = track
+            node = getNode(Flag.TRACK, data=track)
             self.add_child(node)
         return True
 
     def get_name(self):
         return self.get_property(['name', 'title'])
-
-    def get_image(self):
-        userdata = self.get_user_data()
-        if userdata:
-            if self.get_owner() == userdata['login']:
-                return userdata['avatar']
-        return getImage('song')
 
     def get_owner(self):
         return self.get_property('owner/name')
@@ -100,7 +146,8 @@ class Node_playlist(INode):
         if not self.is_my_playlist:
             label = '%s - %s' % (color(colorItem, owner), label)
         if self.b_is_current:
-            label = '-o] %s [o-' % (color(colorPl, label))
+            fmt = getSetting('playlist_current_format')
+            label = fmt % (color(colorPl, label))
         item = xbmcgui.ListItem(label,
                                 owner,
                                 image,
@@ -284,7 +331,7 @@ class Node_playlist(INode):
         if not playlist_id:
             warn(self, "Can't rename playlist without id")
             return False
-        from gui.util import Keyboard
+        from qobuz.gui.util import Keyboard
         data = api.get('/playlist/get', playlist_id=playlist_id)
         if not data:
             warn(self, "Something went wrong while renaming playlist")

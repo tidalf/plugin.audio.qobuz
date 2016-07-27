@@ -114,8 +114,8 @@ class Node_track(INode):
         genre = self.get_property('album/genre/name', default=None)
         if genre is None:
             if self.parent is not None and self.parent.nt & Flag.ALBUM:
-                genre = self.parent.get_genre()
-        return genre
+                return self.parent.get_genre()
+        return ''
 
     def get_streaming_url(self):
         data = self.__getFileUrl()

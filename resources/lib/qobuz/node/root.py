@@ -49,8 +49,8 @@ class Node_root(INode):
     def cache_remove(self):
         """GUI/Removing all cached data
         """
-        from gui.util import yesno, notifyH, getImage
-        from debug import log
+        from qobuz.gui.util import yesno, notifyH, getImage
+        from qobuz.debug import log
         if not yesno(lang(30121), lang(30122)):
             log(self, "Deleting cached data aborted")
             return False
