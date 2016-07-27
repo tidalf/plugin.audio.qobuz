@@ -28,7 +28,7 @@ class Node_user_playlists(INode):
         if display_by is None:
             display_by = 'songs'
         self.set_display_by(display_by)
-        display_cover = getSetting('userplaylists_display_cover', isBool=True)
+        display_cover = getSetting('userplaylists_display_cover', asBool=True)
         self.display_product_cover = display_cover
 
     def set_display_by(self, dtype):

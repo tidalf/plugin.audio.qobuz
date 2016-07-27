@@ -66,7 +66,7 @@ class Node_search(INode):
         stype = self.search_type
         query = self.get_parameter('query', unQuote=True)
         if not query:
-            from gui.util import Keyboard
+            from qobuz.gui.util import Keyboard
             k = Keyboard('', stype)
             k.doModal()
             if not k.isConfirmed():

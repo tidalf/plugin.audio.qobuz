@@ -7,13 +7,13 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
-from inode import INode
-from debug import warn
+from qobuz.node.inode import INode
+from qobuz.debug import warn
 import weakref
-from api import api
-from gui.contextmenu import contextMenu
-from gui.util import getSetting
-from node import getNode, Flag
+from qobuz.api import api
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.gui.util import getSetting
+from qobuz.node import getNode, Flag
 
 
 class Node_albums_by_artist(INode):

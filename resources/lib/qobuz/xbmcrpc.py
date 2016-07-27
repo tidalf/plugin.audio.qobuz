@@ -12,9 +12,9 @@ try:
 except:
     print "Outsided xbmc"
 
-from exception import QobuzXbmcError
+from qobuz.exception import QobuzXbmcError
 import pprint
-from debug import log
+from qobuz.debug import log
 
 
 def showNotification(**ka):

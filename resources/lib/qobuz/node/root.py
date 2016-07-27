@@ -25,11 +25,11 @@ class Node_root(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(getNode(Flag.USERPLAYLISTS))
-        if getSetting('show_recommendations', isBool=True):
+        if getSetting('show_recommendations', asBool=True):
             self.add_child(getNode(Flag.RECOMMENDATION))
         self.add_child(getNode(Flag.PURCHASES))
         self.add_child(getNode(Flag.FAVORITES))
-        if getSetting('search_enabled', isBool=True):
+        if getSetting('search_enabled', asBool=True):
             search = getNode(Flag.SEARCH)
             search.search_type = 'albums'
             self.add_child(search)

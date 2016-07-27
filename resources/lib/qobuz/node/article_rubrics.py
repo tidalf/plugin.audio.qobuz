@@ -7,10 +7,10 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import qobuz  # @UnresolvedImport
-from flag import Flag
-from inode import INode
-from articles import Node_articles
-from gui.util import getImage, getSetting
+from qobuz.node.flag import Flag
+from qobuz.node.inode import INode
+from qobuz.node.articles import Node_articles
+from qobuz.gui.util import getImage, getSetting
 
 
 class Node_article_rubrics(INode):

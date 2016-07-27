@@ -189,7 +189,7 @@ class Node_track(INode):
         return ''
 
     def __getFileUrl(self):
-        hires = getSetting('hires_enabled', isBool=True)
+        hires = getSetting('hires_enabled', asBool=True)
         format_id = 6 if getSetting('streamtype') == 'flac' else 5
         if hires and self.get_hires():
             format_id = 27

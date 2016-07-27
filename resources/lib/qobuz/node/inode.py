@@ -553,7 +553,7 @@ class INode(object):
         menu.add(path='qobuz/big_dir',
                  label=lang(30158), cmd=cmd)
         ''' SCAN '''
-        if getSetting('enable_scan_feature', isBool=True):
+        if getSetting('enable_scan_feature', asBool=True):
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN))
             url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW,
                                 nm='gui_scan', query=query)

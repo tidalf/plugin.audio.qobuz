@@ -7,10 +7,10 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
-from inode import INode
-from gui.contextmenu import contextMenu
-from node import Flag
-from api import api
+from qobuz.node.inode import INode
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.node import Flag
+from qobuz.api import api
 import qobuz  # @UnresolvedImport
 
 

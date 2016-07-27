@@ -35,5 +35,5 @@ class QobuzCache(FileCache):
             if a[0] == '/track/getFileUrl':
                 return 60 * 15
         if 'user_id' in ka:
-            return getSetting('cache_duration_middle', isInt=True) * 60
-        return getSetting('cache_duration_long', isInt=True) * 60
+            return getSetting('cache_duration_middle', asInt=True) * 60
+        return getSetting('cache_duration_long', asInt=True) * 60

@@ -49,6 +49,7 @@ class Node_playlist(INode):
 
 
     def get_image(self):
+        desired_size = getSetting('image_default_size', default=None)
         images = []
         if self.nid is not None:
             storage = self.get_playlist_storage()
@@ -103,7 +104,7 @@ class Node_playlist(INode):
         return self.b_is_current
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit', isInt=True)
+        limit = getSetting('pagination_limit', asInt=True)
         data = api.get('/playlist/get', playlist_id=self.nid,
                        offset=self.offset, limit=limit, extra='tracks')
         if not data:
@@ -141,7 +142,7 @@ class Node_playlist(INode):
         if not self.is_my_playlist:
             label = '%s - %s' % (color(colorItem, owner), label)
         if self.b_is_current:
-            fmt = getSetting('playlist_current_format')
+            fmt = getSetting('playlist_current_format').encode('utf8')
             label = fmt % (color(colorPl, label))
         item = xbmcgui.ListItem(label,
                                 owner,
@@ -361,7 +362,7 @@ class Node_playlist(INode):
     def gui_create(self):
         query = self.get_parameter('query', unQuote=True)
         if not query:
-            from gui.util import Keyboard
+            from qobuz.gui.util import Keyboard
             k = Keyboard('', lang(30182))
             k.doModal()
             if not k.isConfirmed():

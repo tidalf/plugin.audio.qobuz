@@ -6,11 +6,11 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from node import Flag, getNode
-from api import api
-from debug import info
-from gui.util import getImage, getSetting, lang
+from qobuz.node.inode import INode
+from qobuz.node import Flag, getNode
+from qobuz.api import api
+from qobuz.debug import info
+from qobuz.gui.util import getImage, getSetting, lang
 
 
 dialogHeading = 'Qobuz collection'
@@ -41,7 +41,7 @@ class Node_collection(INode):
 
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit', isInt=True)
+        limit = getSetting('pagination_limit', asInt=True)
         self.data = None
         query = self.query
         if not query:

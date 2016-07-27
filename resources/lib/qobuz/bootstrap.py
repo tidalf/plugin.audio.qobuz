@@ -60,7 +60,7 @@ class Bootstrap(object):
     def init_app(self):
         """General bootstrap
         """
-        from xbmcrpc import XbmcRPC
+        from qobuz.xbmcrpc import XbmcRPC
         self.bootstrap_directories()
         self.bootstrap_registry()
         self.bootstrap_sys_args()
@@ -146,7 +146,7 @@ class Bootstrap(object):
         """Routing based on parameters
         """
         if self.MODE == Mode.PLAY:
-            from player import QobuzPlayer
+            from qobuz.player import QobuzPlayer
             debug(self, "Playing song")
             player = QobuzPlayer()
             if player.play(self.params['nid'],self.params):

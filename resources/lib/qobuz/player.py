@@ -70,7 +70,7 @@ class QobuzPlayer(xbmc.Player):
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id)
         """Notify
         """
-        if getSetting('notification_playingsong', isBool=True):
+        if getSetting('notification_playingsong', asBool=True):
             notify_restriction(track)
             notifyH(lang(30132), track.get_label(), image=track.get_image())
 

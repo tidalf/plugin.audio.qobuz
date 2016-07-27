@@ -35,8 +35,8 @@ class EasyApi(RawApi):
         Path are mapped to raw api and raise InvalidQuery on error
 
         ::example
-        from api import api
-        from cache import cache
+        from qobuz.api import api
+        from qobuz.cache import cache
         cace.base_path = '/srv/qobuz/cache/'
         data = api.get('/artist/get')
         data = api.get('/user/login',

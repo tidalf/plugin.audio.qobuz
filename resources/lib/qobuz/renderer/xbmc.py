@@ -57,7 +57,7 @@ class QobuzXbmcRenderer(IRenderer):
                         withProgress=self.enable_progress)
         Dir.asList = self.asList
         Dir.handle = config.app.handle
-        if getSetting('contextmenu_replaceitems', isBool=True):
+        if getSetting('contextmenu_replaceitems', asBool=True):
             Dir.replaceItems = True
         try:
             ret = self.root.populating(Dir, self.depth,
@@ -88,11 +88,11 @@ class QobuzXbmcRenderer(IRenderer):
 
     def scan(self):
         import sys
-        from node.flag import Flag
+        from qobuz.node.flag import Flag
         """Building tree when using Xbmc library scanning
         feature
         """
-        from gui.directory import Directory
+        from qobuz.gui.directory import Directory
         if not self.set_root_node():
             warn(self, "Cannot set root node ('%s')" % (str(
                 self.node_type)))

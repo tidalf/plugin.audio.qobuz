@@ -7,8 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
-from exception import QobuzXbmcError
-from debug import warn
+from qobuz.exception import QobuzXbmcError
+from qobuz.debug import warn
 from qobuz.bootstrap import Bootstrap
 from qobuz import config
 

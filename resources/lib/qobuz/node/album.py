@@ -66,7 +66,7 @@ class Node_album(INode):
         if purchased is not None:
             ka['purchased'] = self.get_parameter('purchased')
         if 'asLocalURL' in ka and ka['asLocalURL'] == 'True':
-            from constants import Mode
+            from qobuz.constants import Mode
             ka['mode'] = Mode.SCAN
         return super(Node_album, self).make_url(**ka)
 

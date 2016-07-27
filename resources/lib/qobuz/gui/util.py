@@ -30,7 +30,8 @@ except:
 import qobuz  # @UnresolvedImport
 from qobuz.xbmcrpc import showNotification, getInfoLabels
 from qobuz import config
-
+from qobuz.debug import info
+from qobuz.util import common as commonUtil
 def htm2xbmc(htm):
     def replace(m):
         return '[' + m.group(1) + m.group(2).upper() + ']'
@@ -111,7 +112,7 @@ def dialogServiceTemporarilyUnavailable():
 def isFreeAccount():
     """Check if account if it's a Qobuz paid account
     """
-    from api import api
+    from qobuz.api import api
     data = api.get('/user/login', username=api.username,
                    password=api.password)
     if not data:
@@ -197,20 +198,24 @@ def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
 
 
-def getSetting(key, **ka):
+def getSetting(key, default='', asInt=False, asBool=False, asList=False, sep=' '):
     """Helper to access xbmcaddon.getSetting
-        Parameter:
-        key: Key to retrieve from setting
-        * optional: isBool (convert 'true' and 'false to python boolean),
-            isInt (return data as integer)
+    @param_pos key: Key to retrieve from setting
+    @param_kwa default: When vlaue from addon is None or ''
+    @param_kwa asBool : Return value converted to bool
+    @param_kwa asInt  : Return value converted to int
+    @param_kwa asList : Return value splited with sep keyword
+    @param_kwa sep    : Separator field for asList
     """
-    data = config.app.addon.getSetting(key)
-    if not data:
-        return ''
-    if 'isBool' in ka and ka['isBool']:
-        if data == 'true':
-            return True
-        return False
-    if 'isInt' in ka and ka['isInt']:
-        return int(data)
-    return data
+    value = config.app.addon.getSetting(key)
+    if value is None or value == '':
+        return default
+    if asBool is True:
+        value = commonUtil.input2bool(value)
+    elif asInt is True:
+        value = int(value)
+    elif asList is True:
+        value = value.split(sep)
+    if value is None or value == '':
+         return default
+    return value
