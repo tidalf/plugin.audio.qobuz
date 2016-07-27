@@ -142,7 +142,7 @@ class Node_playlist(INode):
         if not self.is_my_playlist:
             label = '%s - %s' % (color(colorItem, owner), label)
         if self.b_is_current:
-            fmt = getSetting('playlist_current_format').encode('utf8')
+            fmt = getSetting('playlist_current_format')
             label = fmt % (color(colorPl, label))
         item = xbmcgui.ListItem(label,
                                 owner,
