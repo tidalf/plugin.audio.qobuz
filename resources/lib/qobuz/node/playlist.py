@@ -49,9 +49,9 @@ class Node_playlist(INode):
 
 
     def get_image(self):
+        images = []
         if self.nid is not None:
             storage = self.get_playlist_storage()
-            images = []
             images_len = 0
             if 'image' not in storage:
                 images = dataUtil.list_image(self.data)
@@ -61,15 +61,10 @@ class Node_playlist(INode):
                     storage.sync()
             else:
                 images = storage['image']
-                images_len = len(images)
-                if images_len > 0:
-                    img = images[random.randrange(0, images_len, 1)]
-                    info(self, 'image from storage {}', img)
-                    return img
-                else:
-                    del storage['image']
-                    storage.sync()
-        #userdata = self.get_user_data()
+        images_len = len(images)
+        if images_len > 0:
+            return images[random.randrange(0, images_len, 1)]
+        # userdata = self.get_user_data()
         # if userdata:
         #     if self.get_owner() == userdata['login']:
         #         return userdata['avatar']
