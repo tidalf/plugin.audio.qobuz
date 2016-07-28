@@ -6,12 +6,15 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import sys
 import qobuz  # @UnresolvedImport
 from qobuz.debug import warn
 from qobuz.renderer.irenderer import IRenderer
 from qobuz.gui.util import notifyH, getSetting
 from qobuz.exception import QobuzXbmcError as Qerror
 from qobuz import config
+from qobuz.node.flag import Flag
+from qobuz.gui.directory import Directory
 
 class QobuzXbmcRenderer(IRenderer):
     """Specific renderer for Xbmc
@@ -23,22 +26,6 @@ class QobuzXbmcRenderer(IRenderer):
 
     def __init__(self, node_type, params={}):
         super(QobuzXbmcRenderer, self).__init__(node_type, params)
-
-    def add_directory_item(self, **ka):
-        """Add item to directory
-            Named parameter:
-                is_folder: bool (default: True)
-                image: string (default: '')
-        """
-        if 'is_folder' not in ka or ka['is_folder']:
-            ka['is_folder'] = 1
-        else:
-            ka['is_folder'] = 0
-        if 'image' not in ka:
-            ka['image'] = ''
-        item = ka['dir']._xbmc_item(**ka)
-        ka['dir'].add_item(url=ka['url'], item=item,
-                           is_folder=ka['is_folder'])
 
     def run(self):
         """Building our tree, creating root node based on our node_type
@@ -87,12 +74,9 @@ class QobuzXbmcRenderer(IRenderer):
         return Dir.end_of_directory()
 
     def scan(self):
-        import sys
-        from qobuz.node.flag import Flag
         """Building tree when using Xbmc library scanning
         feature
         """
-        from qobuz.gui.directory import Directory
         if not self.set_root_node():
             warn(self, "Cannot set root node ('%s')" % (str(
                 self.node_type)))
