@@ -11,10 +11,11 @@ from qobuz import base_path
 from qobuz.plugin import Plugin
 from qobuz.bootstrap import MinimalBootstrap
 qobuzApp = QobuzApplication(Plugin('plugin.audio.qobuz'), bootstrapClass=MinimalBootstrap)
-qobuzApp.bootstrap.cache = P.abspath(P.join(base_path, 'cache'))
+cache_path = P.join(base_path, '__data__', 'cache')
+qobuzApp.bootstrap.cache = cache_path
 cache.base_path = qobuzApp.bootstrap.cache
 if not P.exists(qobuzApp.bootstrap.cache):
-    os.mkdir(qobuzApp.bootstrap.cache)
+    os.makedirs(qobuzApp.bootstrap.cache)
 api.login(username=qobuzApp.registry.get('username'),
           password=qobuzApp.registry.get('password'))
 
