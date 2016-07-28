@@ -12,21 +12,21 @@ from qobuz.debug import log
 
 
 def getNode(qnt, params={}, data=None, parent=None, **ka):
-    nodeName = Flag.to_s(qnt)
-    moduleName = 'Node_' + nodeName
-    Module = module_import(nodeName, moduleName)
-    return Module(parent, params, data=data)
+    return module_import(Flag.to_s(qnt))(parent=parent, parameters=params, data=data, **ka)
 
 
 def mixin_factory(name, base, mixin):
     return type(name, (base, mixin), {})
 
+__cache__ = {}
 
-def module_import(path, name, **ka):
+def module_import(path):
     '''From node.foo import Node_foo
     '''
-    modPackage = __import__(path, globals(), locals(), [name], -1)
-    return getattr(modPackage, name)
+    name = 'Node_' + path
+    if name not in __cache__:
+        __cache__[name] = getattr(__import__(path, globals(), locals(), [name], -1), name)
+    return __cache__[name]
 
 
 class ErrorNoData(Exception):
