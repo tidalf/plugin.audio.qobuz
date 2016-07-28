@@ -43,6 +43,8 @@
 	<!-- Other -->
 	<category label="30152">
 		<setting id="enable_scan_feature" label="30154" type="bool" default="true" />
+		<setting id="enable_httpd_service"
+			label="Enable httpd (playing qobuz from Library / need restart" type="bool" default="true" />
 		<!-- <setting id="resolver_enabled" label="33000" type="bool" default="true"/> -->
 		<setting id="debug" label="debug (xbmc.log, activated via system menu)" type="bool" default="false" />
 		<setting id="contextmenu_replaceitems" label="Only qobuz context menu" type="bool" default="false" />

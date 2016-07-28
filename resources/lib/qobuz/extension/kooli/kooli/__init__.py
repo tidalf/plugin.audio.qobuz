@@ -15,4 +15,4 @@ if not P.exists(log_dir):
 log_file = P.join(log_dir, 'extension-kooli.log')
 logging.basicConfig(filename=log_file)
 log = logging.getLogger('kooli')
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.ERROR)

@@ -47,8 +47,10 @@ class QobuzXbmcRenderer(IRenderer):
         if getSetting('contextmenu_replaceitems', asBool=True):
             Dir.replaceItems = True
         try:
-            ret = self.root.populating(Dir, self.depth,
-                                       self.whiteFlag, self.blackFlag)
+            ret = self.root.populating(Dir,
+                                       self.depth,
+                                       self.whiteFlag,
+                                       self.blackFlag)
         except Qerror as e:
             Dir.end_of_directory(False)
             Dir = None
@@ -86,7 +88,7 @@ class QobuzXbmcRenderer(IRenderer):
         Dir.handle = int(sys.argv[1])
         Dir.asList = False
         Dir.asLocalURL = True
-        if self.root.nt & Flag.TRACK:
+        if self.root.nt & Flag.TRACK == Flag.TRACK:
             self.root.fetch(None, None, Flag.TRACK, Flag.NONE)
             Dir.add_node(self.root)
         else:

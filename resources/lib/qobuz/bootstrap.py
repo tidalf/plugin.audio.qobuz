@@ -57,10 +57,13 @@ class MinimalBootstrap(object):
 
     def init_app(self):
         self.bootstrap_directories()
+        self.init_cache()
+
+    def init_cache(self):
+        cache.base_path = config.path.cache
 
     def bootstrap_registry(self):
         from qobuz.api import api
-        cache.base_path = config.path.cache
         api.stream_format = 6 if getSetting('streamtype') == 'flac' else 5
         if not api.login(getSetting('username'), getSetting('password')):
             if api.status_code == 503:

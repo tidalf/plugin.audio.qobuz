@@ -47,7 +47,7 @@ class Node_collection(INode):
         self.data = None
         query = self.query
         if not query:
-            from gui.util import Keyboard
+            from qobuz.gui.util import Keyboard
             k = Keyboard('', 'My %s' % self.search_type)
             k.doModal()
             if not k.isConfirmed():
