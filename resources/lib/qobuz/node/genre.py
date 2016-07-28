@@ -17,8 +17,10 @@ class Node_genre(INode):
     '''@class Node_genre:
     '''
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_genre, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_genre, self).__init__(parent=parent,
+                                         parameters=parameters,
+                                         data=data)
         self.nt = Flag.GENRE
         self.set_label(lang(30189))
         self.is_folder = True

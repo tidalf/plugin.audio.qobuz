@@ -18,8 +18,10 @@ class Node_label(INode):
     @class Node_label:
     '''
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_label, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_label, self).__init__(parent=parent,
+                                         parameters=parameters,
+                                         data=data)
         self.nt = Flag.LABEL
         self.set_label(lang(30188))
         self.url = None

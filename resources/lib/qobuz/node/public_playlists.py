@@ -16,8 +16,10 @@ class Node_public_playlists(INode):
     """@class Node_public_playlists
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_public_playlists, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_public_playlists, self).__init__(parent=parent,
+                                                    parameters=parameters,
+                                                    data=data)
         self.nt = Flag.PUBLIC_PLAYLISTS
         self.set_label(lang(30190))
         self.is_folder = True

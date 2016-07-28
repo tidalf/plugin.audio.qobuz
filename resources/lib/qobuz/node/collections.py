@@ -13,8 +13,10 @@ from qobuz.node import getNode, Flag
 
 class Node_collections(INode):
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_collections, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_collections, self).__init__(parent=parent,
+                                               parameters=parameters,
+                                               data=data)
         self.nt = Flag.COLLECTIONS
         self.label = lang(30194)
         self.content_type = 'albums'

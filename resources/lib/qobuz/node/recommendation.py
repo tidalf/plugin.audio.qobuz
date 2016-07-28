@@ -52,8 +52,10 @@ class Node_recommendation(INode):
     '''Recommendation node, displaying music ordered by category and genre
     '''
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_recommendation, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_recommendation, self).__init__(parent=parent,
+                                                  parameters=parameters,
+                                                  data=data)
         self.nt = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id', default=None)
         self.genre_type = self.get_parameter('genre-type', default=None)

@@ -20,8 +20,10 @@ class Node_albums_by_artist(INode):
     """@class Node_product_by_artist:
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_albums_by_artist, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_albums_by_artist, self).__init__(parent=parent,
+                                                    parameters=parameters,
+                                                    data=data)
         self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
 

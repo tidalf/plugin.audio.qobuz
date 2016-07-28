@@ -24,8 +24,10 @@ class Node_favorite(INode):
     """Displaying user favorites (track and album)
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_favorite, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_favorite, self).__init__(parent=parent,
+                                            parameters=parameters,
+                                            data=data)
         self.nt = Flag.FAVORITE
 
         self.name = lang(30073)

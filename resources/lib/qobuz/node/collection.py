@@ -20,8 +20,10 @@ class Node_collection(INode):
     """@class Node_collection:
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_collection, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_collection, self).__init__(parent=parent,
+                                              parameters=parameters,
+                                              data=data)
         self.nt = Flag.COLLECTION
         self.url = None
         self.is_folder = True

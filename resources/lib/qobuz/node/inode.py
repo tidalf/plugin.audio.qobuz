@@ -41,7 +41,7 @@ class INode(object):
             depth, whiteFlag, blackFlag...)
     '''
 
-    def __init__(self, parent=None, parameters={}):
+    def __init__(self, parent=None, parameters={}, data=None):
         '''Constructor
         @param parent=None: Parent node if not None
         @param parameters={}: dictionary
@@ -51,7 +51,6 @@ class INode(object):
         self._content_type = None
         self._data = None
         self._label = None
-        self.data = None
         self.parameters = parameters
         self.nt = None
         self.parent = parent
@@ -67,6 +66,7 @@ class INode(object):
         self.hasWidget = False
         self.user_storage = None
         self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
+        self.data = data
 
     def set_nid(self, value):
         '''@setter nid'''

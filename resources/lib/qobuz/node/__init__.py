@@ -11,24 +11,11 @@ from qobuz.node.flag import Flag
 from qobuz.debug import log
 
 
-def getNode(qnt, params={}, data=None, **ka):
-    '''Caching import ???
-    '''
+def getNode(qnt, params={}, data=None, parent=None, **ka):
     nodeName = Flag.to_s(qnt)
-    modulePath = nodeName
     moduleName = 'Node_' + nodeName
-    Module = module_import(modulePath, moduleName)
-    '''Initializing our new node
-        - no parent
-        - parameters
-    '''
-    parent = None
-    if 'parent' in ka:
-        parent = ka['parent']
-    module = Module(parent, params)
-    if data is not None:
-        module.data = data
-    return module
+    Module = module_import(nodeName, moduleName)
+    return Module(parent, params, data=data)
 
 
 def mixin_factory(name, base, mixin):

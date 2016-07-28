@@ -15,8 +15,10 @@ class Node_purchases(INode):
     """Our root node, we are displaying all qobuz nodes from here
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_purchases, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_purchases, self).__init__(parent=parent,
+                                             parameters=parameters,
+                                             data=data)
         self.nt = Flag.PURCHASES
         self.label = lang(30101)
         self.content_type = 'files'

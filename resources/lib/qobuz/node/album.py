@@ -21,8 +21,10 @@ class Node_album(INode):
     """@class Node_product:
     """
 
-    def __init__(self, parent, params):
-        super(Node_album, self).__init__(parent, params)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_album, self).__init__(parent=parent,
+                                         parameters=parameters,
+                                         data=data)
         self.nt = Flag.ALBUM
         self.image = getImage('album')
         self.content_type = 'songs'

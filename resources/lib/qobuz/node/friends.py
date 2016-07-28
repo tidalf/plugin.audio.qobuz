@@ -17,8 +17,10 @@ class Node_friends(INode):
     """@class Node_friend_list:
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_friends, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_friends, self).__init__(parent=parent,
+                                           parameters=parameters,
+                                           data=data)
         self.nt = Flag.FRIENDS
         self.name = self.get_parameter('query')
         self.image = getImage('artist')

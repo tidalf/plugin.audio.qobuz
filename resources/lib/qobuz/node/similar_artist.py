@@ -16,8 +16,10 @@ class Node_similar_artist(INode):
     """NODE ARTIST
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_similar_artist, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_similar_artist, self).__init__(parent=parent,
+                                                  parameters=parameters,
+                                                  data=data)
         self.nt = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
 

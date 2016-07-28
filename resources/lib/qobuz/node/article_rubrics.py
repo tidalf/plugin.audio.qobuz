@@ -17,8 +17,10 @@ class Node_article_rubrics(INode):
     """@class Node_article_rubrics
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_article_rubrics, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_article_rubrics, self).__init__(parent=parent,
+                                                   parameters=parameters,
+                                                   data=data)
         self.nt = Flag.ARTICLE_RUBRICS
         self.rubric_id = self.get_parameter('qid')
         self.is_folder = True

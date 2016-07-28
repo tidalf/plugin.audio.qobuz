@@ -30,8 +30,10 @@ class Node_playlist(INode):
     """@class Node_playlist:
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_playlist, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_playlist, self).__init__(parent=parent,
+                                            parameters=parameters,
+                                            data=data)
         self.nt = Flag.PLAYLIST
         self.label = None
         self.current_playlist_id = None

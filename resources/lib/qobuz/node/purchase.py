@@ -17,8 +17,10 @@ class Node_purchase(INode):
     """Displaying product purchased by user (track and album)
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_purchase, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_purchase, self).__init__(parent=parent,
+                                            parameters=parameters,
+                                            data=data)
         self.nt = Flag.PURCHASE
         self.content_type = 'albums'
         self.image = getImage('album')

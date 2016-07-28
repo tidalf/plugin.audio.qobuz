@@ -18,8 +18,10 @@ class Node_user_playlists(INode):
         This node list playlist made by user and saved on Qobuz server
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_user_playlists, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_user_playlists, self).__init__(parent=parent,
+                                                  parameters=parameters,
+                                                  data=data)
         self.label = lang(30021)
         self.image = getImage('userplaylists')
         self.nt = Flag.USERPLAYLISTS

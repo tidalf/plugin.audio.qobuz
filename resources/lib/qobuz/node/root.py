@@ -17,8 +17,10 @@ class Node_root(INode):
     """Our root node, we are displaying all qobuz nodes from here
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_root, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_root, self).__init__(parent=parent,
+                                        parameters=parameters,
+                                        data=data)
         self.nt = Flag.ROOT
         self.content_type = 'files'
         self.label = "Qobuz"

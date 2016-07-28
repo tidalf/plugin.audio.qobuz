@@ -16,8 +16,10 @@ from qobuz.node import getNode, Flag
 
 class Node_search(INode):
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_search, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_search, self).__init__(parent=parent,
+                                          parameters=parameters,
+                                          data=data)
         self.nt = Flag.SEARCH
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)

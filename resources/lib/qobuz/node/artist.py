@@ -18,8 +18,10 @@ class Node_artist(INode):
     """@class Node_artist(Inode): Artist
     """
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_artist, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_artist, self).__init__(parent=parent,
+                                          parameters=parameters,
+                                          data=data)
         self.nt = Flag.ARTIST
         self.set_label(self.get_name())
         self.is_folder = True

@@ -34,8 +34,10 @@ class WidgetArticle(xbmcgui.WindowDialog):
 class Node_article(INode):
     """@class Node_articles
     """
-    def __init__(self, parent=None, parameters=None):
-        super(Node_article, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_article, self).__init__(parent=parent,
+                                           parameters=parameters,
+                                           data=data)
         self.nt = Flag.ARTICLE
         self.is_folder = True
         self.hasWidget = False
