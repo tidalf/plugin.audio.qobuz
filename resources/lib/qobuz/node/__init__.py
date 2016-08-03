@@ -12,7 +12,8 @@ from qobuz.debug import log
 
 
 def getNode(qnt, params={}, data=None, parent=None, **ka):
-    return module_import(Flag.to_s(qnt))(parent=parent, parameters=params, data=data, **ka)
+    return module_import(Flag.to_s(qnt))(parent=parent, parameters=params,
+                                         data=data, **ka)
 
 
 def mixin_factory(name, base, mixin):
@@ -25,7 +26,8 @@ def module_import(path):
     '''
     name = 'Node_' + path
     if name not in __cache__:
-        __cache__[name] = getattr(__import__(path, globals(), locals(), [name], -1), name)
+        __cache__[name] = getattr(__import__(path, globals(), locals(),
+                                             [name], -1), name)
     return __cache__[name]
 
 
