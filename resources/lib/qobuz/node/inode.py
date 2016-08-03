@@ -15,7 +15,7 @@ import weakref
 from qobuz.api import api
 from qobuz.cache import cache
 from qobuz.constants import Mode
-from qobuz.debug import log, warn
+from qobuz.debug import log, warn, info
 from qobuz.exception import QobuzXbmcError as Qerror
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import color, lang, runPlugin, containerUpdate, getSetting
@@ -178,7 +178,6 @@ class INode(object):
         need_pagination = False
         for p in _paginated:
             if p not in data or data[p] is None:
-                warn(self, 'No pagination data')
                 continue
             items = data[p]
             if 'limit' not in items or 'total' not in items:
@@ -368,7 +367,7 @@ class INode(object):
             else:
                 self.__add_pagination(self.data)
         self.populate(Dir, lvl, whiteFlag, blackFlag)
-        """ Recursive mode dont't decrement level """
+        ''' Recursive mode dont't decrement level '''
         if lvl != -1:
             lvl -= 1
         label = self.get_label()
@@ -379,7 +378,7 @@ class INode(object):
         for child in self.childs:
             if Dir.is_canceled():
                 return False
-            """ Only white Flagged added to the listing """
+            ''' Only white Flagged nodes added to the listing '''
             if child.nt & whiteFlag == child.nt:
                 if not Dir.add_node(child):
                     warn(self, "Something went wrong... aborting")
@@ -389,16 +388,17 @@ class INode(object):
                 Dir.update(gData, "Working", label, child.get_label())
             else:
                 log(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
-            """ Calling builiding down on child """
+            ''' Calling builiding down on child '''
             child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
+        info(self, 'Populated {}', self)
         return gData['count']
 
     def populate(self, xbmc_directory, lvl, Flag):
-        """Hook/_build_down:
+        '''Hook / _build_down:
         This method is called by build_down, each object who
         inherit from Inode can overide it. Lot of object
         simply fetch data from qobuz (cached data)
-        """
+        '''
         pass
 
     def __add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
@@ -412,26 +412,17 @@ class INode(object):
             params['nid'] = self.nid
             node = getNode(self.nt, params)
             node.data = self.data
-            label = self.get_label()
-            if label is None:
-                if self.label2 is not None:
-                    label = self.label2
-                elif self.parent is not None:
-                    label = self.parent.get_label()
-                else:
-                    label = '[no-label]'
-            nextLabel = u'[ {}  {} / {} ]'.format(color(colorItem, label),
-                                                self.pagination_next_offset,
+            node.label = u'{label} [{next_offset} / {pagination_total}]'.format(label=self.get_label(),
+                                    next_offset=self.pagination_next_offset,
+                                    pagination_total=self.pagination_total)
+            node.label2 = u'[ {} / {} ]'.format(self.pagination_next_offset,
                                                 self.pagination_total)
-            node.label = nextLabel
-            node.label2 = label
             self.add_child(node)
 
     def attach_context_menu(self, item, menu):
-        """
-            Note: Url made with make_url must set mode (like mode=Mode.VIEW)
+        '''Note: Url made with make_url must set mode (like mode=Mode.VIEW)
             else we are copying current mode (for track it's Mode.PLAY ...)
-        """
+        '''
         ''' HOME '''
         colorCaution = getSetting('item_caution_color')
 
@@ -586,3 +577,12 @@ class INode(object):
         if not data:
             return None
         return data['user']
+
+    def get_class_name(self):
+        return self.__class__.__name__
+
+    def as_dict(self):
+        return {k: getattr(self, 'get_%s' % k)() for k in ['class_name', 'nid', 'parent']}
+
+    def __str__(self):
+        return '<{class_name} nid={nid}>'.format(**self.as_dict())

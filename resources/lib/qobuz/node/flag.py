@@ -51,61 +51,61 @@ class FlagEnum(object):
     @classmethod
     def to_s(cls, flag):
         if not flag:
-            warn(cls, "Missing flag parameter")
+            warn(cls, 'Missing flag parameter')
             return ''
         flag = int(flag)
         if flag & cls.TRACK == cls.TRACK:
-            return "track"
+            return 'track'
         elif flag & cls.PLAYLIST == cls.PLAYLIST:
-            return "playlist"
+            return 'playlist'
         elif flag & cls.USERPLAYLISTS == cls.USERPLAYLISTS:
-            return "user_playlists"
+            return 'user_playlists'
         elif flag & cls.RECOMMENDATION == cls.RECOMMENDATION:
-            return "recommendation"
+            return 'recommendation'
         elif flag & cls.ROOT == cls.ROOT:
-            return "root"
+            return 'root'
         elif flag & cls.ALBUM == cls.ALBUM:
-            return "album"
+            return 'album'
         elif flag & cls.PURCHASES == cls.PURCHASES:
-            return "purchases"
+            return 'purchases'
         elif flag & cls.PURCHASE == cls.PURCHASE:
-            return "purchase"
+            return 'purchase'
         elif flag & cls.FAVORITES == cls.FAVORITES:
-            return "favorites"
+            return 'favorites'
         elif flag & cls.FAVORITE == cls.FAVORITE:
-            return "favorite"
+            return 'favorite'
         elif flag & cls.SEARCH == cls.SEARCH:
-            return "search"
+            return 'search'
         elif flag & cls.ARTIST == cls.ARTIST:
-            return "artist"
+            return 'artist'
         elif flag & cls.SIMILAR_ARTIST == cls.SIMILAR_ARTIST:
-            return "similar_artist"
+            return 'similar_artist'
         elif flag & cls.FRIEND == cls.FRIEND:
-            return "friend"
+            return 'friend'
         elif flag & cls.FRIENDS == cls.FRIENDS:
-            return "friends"
+            return 'friends'
         elif flag & cls.GENRE == cls.GENRE:
-            return "genre"
+            return 'genre'
         elif flag & cls.LABEL == cls.LABEL:
-            return "label"
+            return 'label'
         elif flag & cls.NODE == cls.NODE:
-            return "inode"
+            return 'inode'
         elif flag & cls.STOPBUILD == cls.STOPBUILD:
-            return "stop_build_down"
+            return 'stop_build_down'
         elif flag & cls.ARTICLES == cls.ARTICLES:
-            return "articles"
+            return 'articles'
         elif flag & cls.ARTICLE == cls.ARTICLE:
-            return "article"
+            return 'article'
         elif flag & cls.PUBLIC_PLAYLISTS == cls.PUBLIC_PLAYLISTS:
-            return "public_playlists"
+            return 'public_playlists'
         elif flag & cls.ARTICLE_RUBRICS == cls.ARTICLE_RUBRICS:
-            return "article_rubrics"
+            return 'article_rubrics'
         elif flag & cls.ALBUMS_BY_ARTIST == cls.ALBUMS_BY_ARTIST:
-            return "albums_by_artist"
+            return 'albums_by_artist'
         elif flag & cls.COLLECTION == cls.COLLECTION:
-            return "collection"
+            return 'collection'
         elif flag & cls.COLLECTIONS == cls.COLLECTIONS:
-            return "collections"
+            return 'collections'
         else:
             raise QobuzXbmcError(
                 who=cls, what='invalid_flag', additional=repr(flag))

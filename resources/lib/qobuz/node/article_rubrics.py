@@ -14,8 +14,8 @@ from qobuz.gui.util import getImage, getSetting
 
 
 class Node_article_rubrics(INode):
-    """@class Node_article_rubrics
-    """
+    '''@class Node_article_rubrics
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_article_rubrics, self).__init__(parent=parent,
@@ -30,13 +30,13 @@ class Node_article_rubrics(INode):
     def make_url(self, **ka):
         url = super(Node_article_rubrics, self).make_url(**ka)
         if self.rubric_id:
-            url += "&qid=" + str(self.rubric_id)
+            url += '&qid=' + str(self.rubric_id)
         return url
 
     def get_label(self):
         l = self.get_property('title')
         if not l:
-            return "Articles"
+            return 'Articles'
         return l
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):

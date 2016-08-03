@@ -57,7 +57,7 @@ class Directory():
         self.content_type = 'files'
         self.nodes = nodeList
         self.replaceItems = False
-        self.asLocalURL = False
+        self.asLocalUrl = False
 
     def __del__(self):
         """Cleaning our tree on delete
@@ -101,7 +101,7 @@ class Directory():
         item = node.makeListItem(replaceItems=self.replaceItems)
         if not item:
             return False
-        url = node.make_url(asLocalURL=self.asLocalURL)
+        url = node.make_url(asLocalUrl=self.asLocalUrl)
         if not self.add_to_xbmc_directory(url=url,
                                           item=item,
                                           is_folder=node.is_folder):

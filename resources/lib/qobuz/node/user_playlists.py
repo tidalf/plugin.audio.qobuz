@@ -14,9 +14,9 @@ from qobuz.api import api
 import os
 
 class Node_user_playlists(INode):
-    """User playlists node
+    '''User playlists node
         This node list playlist made by user and saved on Qobuz server
-    """
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_user_playlists, self).__init__(parent=parent,
@@ -70,8 +70,6 @@ class Node_user_playlists(INode):
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
             node = getNode(Flag.PLAYLIST, data=data)
-            #if self.display_product_cover:
-            #    pass
             if cid and cid == node.nid:
                 node.set_is_current(True)
             if node.get_owner() == login:

@@ -14,8 +14,8 @@ from qobuz.node import getNode, Flag
 
 
 class Node_friends(INode):
-    """@class Node_friend_list:
-    """
+    '''@class Node_friend_list:
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_friends, self).__init__(parent=parent,
@@ -49,15 +49,17 @@ class Node_friends(INode):
         if not 'user' in user_data:
             return False
         friend_data = user_data['user']['player_settings']['friends']
-        info(self, "Build-down friends list " + repr(self.name))
+        info(self, 'Build-down friends list ' + repr(self.name))
         if self.name:
             data = api.get('/playlist/getUserPlaylists',
-                           username=self.name, limit=0)
+                           username=self.name,
+                           limit=0)
         else:
             data = api.get('/playlist/getUserPlaylists',
-                           user_id=user_id, limit=0)
+                           user_id=user_id,
+                           limit=0)
         if not data:
-            warn(self, "No friend data")
+            warn(self, 'No friend data')
             return False
         # extract all owner names from the list
         friend_list = []

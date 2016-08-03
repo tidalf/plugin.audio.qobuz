@@ -12,8 +12,8 @@ from qobuz.node import getNode, Flag
 
 
 class Node_favorites(INode):
-    """Our root node, we are displaying all qobuz nodes from here
-    """
+    '''Our root node, we are displaying all qobuz nodes from here
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_favorites, self).__init__(parent=parent,

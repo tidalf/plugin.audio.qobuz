@@ -44,23 +44,16 @@ class Node_track(INode):
         Dir.add_node(self)
         return True
 
-    def make_url(self, **ka):
-        if 'asLocalURL' in ka and ka['asLocalURL']:
-            album_id = self.get_property('album/id')
-            if not album_id:
-                album_id = self.parent.nid
-            url = 'http://127.0.0.1:33574/qobuz/%s/%s/%s.mpc' % (
-                str(self.get_artist_id()),
-                album_id,
-                str(self.nid))
-            return url
-        if not 'mode' in ka:
-            ka['mode'] = Mode.PLAY
+    def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
+        if asLocalUrl is True:
+            return 'http://127.0.0.1:33574/qobuz/track/%s' % str(self.nid)
         purchased = self.get_parameter('purchased')
         if purchased:
             ka['purchased'] = purchased
             self.purchased = True
-        return super(Node_track, self).make_url(**ka)
+        return super(Node_track, self).make_url(mode=mode,
+                                                asLocalUrl=asLocalUrl,
+                                                **ka)
 
     def get_label(self, sFormat="%a - %t"):
         sFormat = sFormat.replace("%a", self.get_artist())

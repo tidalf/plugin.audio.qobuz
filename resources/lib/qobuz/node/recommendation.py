@@ -120,10 +120,10 @@ class Node_recommendation(INode):
         if self.data is None:
             return False
         if 'albums' not in self.data:
-            warn(self, "Recommendation data doesn't contain <albums> key")
+            warn(self, 'Recommendation data doesn\'t contain <albums> key')
             return False
         if self.data['albums'] is None or 'items' not in self.data['albums']:
-            warn(self, "Recommendation data['albums'] doesn't contain items")
+            warn(self, 'Recommendation data[\'albums\'] doesn\'t contain items')
             return False
         for product in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, {'nid': product['id']})

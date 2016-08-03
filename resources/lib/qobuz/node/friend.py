@@ -18,8 +18,8 @@ from qobuz.node import Flag, getNode
 
 
 class Node_friend(INode):
-    """@class Node_friend:
-    """
+    '''@class Node_friend:
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_friend, self).__init__(parent=parent,
@@ -106,21 +106,21 @@ class Node_friend(INode):
             return False
         friends = user['player_settings']
         if not 'friends' in friends:
-            notifyH('Qobuz', "You don't have friend",
+            notifyH('Qobuz', 'You don't have friend',
                     'icon-error-256')
-            warn(self, "No friends in user/player_settings")
+            warn(self, 'No friends in user/player_settings')
             return False
         friends = friends['friends']
         if not name in friends:
-            notifyH('Qobuz', "You're not friend with %s" % (name),
+            notifyH('Qobuz', 'You're not friend with %s' % (name),
                     'icon-error-256')
-            warn(self, "Friend " + repr(name) + " not in friends data")
+            warn(self, 'Friend ' + repr(name) + ' not in friends data')
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
         if not api.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', 'Friend %s added' % (name))
-            notifyH('Qobuz', "Cannot updata friend's list...",
+            notifyH('Qobuz', 'Cannot updata friend's list...',
                     'icon-error-256')
             return False
         notifyH('Qobuz', 'Friend %s removed' % (name))
@@ -131,7 +131,7 @@ class Node_friend(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         data = api.get('/playlist/getUserPlaylists', username=self.name)
         if not data:
-            warn(self, "No friend data")
+            warn(self, 'No friend data')
             return False
         if lvl != -1:
             self.add_child(getNode(Flag.FRIENDS, self.parameters))
@@ -147,9 +147,7 @@ class Node_friend(INode):
         colorWarn = getSetting('item_caution_color')
         url = self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
-        cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm="remove"))
+        cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm='remove'))
         menu.add(path='friend/remove', label='Remove', cmd=cmd,
                  color=colorWarn)
-
-        ''' Calling base class '''
         super(Node_friend, self).attach_context_menu(item, menu)

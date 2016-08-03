@@ -13,6 +13,28 @@ from qobuz.gui.util import lang, getImage, getSetting
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 
+data_search_type = {
+    'artists': {
+        'label': lang(30017),
+        'content_type' : 'files',
+        'image' : getImage('artist'),
+    },
+    'albums': {
+        'label' : lang(30016),
+        'content_type' : 'albums',
+        'image' : getImage('album'),
+    },
+    'tracks': {
+        'label' : lang(30015),
+        'content_type' : 'songs',
+        'image' : getImage('song'),
+    },
+    'collection': {
+        'label' : lang(30018),
+        'content_type' : 'files',
+        'image' : getImage('song')
+    }
+}
 
 class Node_search(INode):
 
@@ -21,6 +43,7 @@ class Node_search(INode):
                                           parameters=parameters,
                                           data=data)
         self.nt = Flag.SEARCH
+        self._search_type = None
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
 
@@ -30,26 +53,14 @@ class Node_search(INode):
     def get_description(self):
         return self.get_label()
 
-    def set_search_type(self, st):
-        if st == 'artists':
-            self.label = lang(30017)
-            self.content_type = 'files'
-            self.image = getImage('artist')
-        elif st == 'albums':
-            self.label = lang(30016)
-            self.content_type = 'albums'
-            self.image = getImage('album')
-        elif st == 'tracks':
-            self.label = lang(30015)
-            self.content_type = 'songs'
-            self.image = getImage('song')
-        elif st == 'collection':
-            self.label = lang(30018)
-            self.content_type = 'files'
-            self.image = getImage('song')
+    def set_search_type(self, search_type):
+        if search_type in data_search_type:
+            self.label = data_search_type[search_type]['label']
+            self.content_type = data_search_type[search_type]['content_type']
+            self.image = data_search_type[search_type]['image']
         else:
-            raise QobuzXbmcError(who=self, what='invalid_type', additional=st)
-        self._search_type = st
+            raise QobuzXbmcError(who=self, what='invalid_type', additional=search_type)
+        self._search_type = search_type
 
 
     def get_search_type(self):
@@ -77,7 +88,7 @@ class Node_search(INode):
         query.strip()
         data = api.get('/search/getResults', query=query, type=stype,
                        limit=limit, offset=self.offset)
-        if not data:
+        if data is None:
             warn(self, "Search return no data")
             return False
         if data[stype]['total'] == 0:

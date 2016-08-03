@@ -32,8 +32,8 @@ class WidgetArticle(xbmcgui.WindowDialog):
 
 
 class Node_article(INode):
-    """@class Node_articles
-    """
+    '''@class Node_articles
+    '''
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_article, self).__init__(parent=parent,
                                            parameters=parameters,
@@ -50,7 +50,6 @@ class Node_article(INode):
                              self.get_property('title'))
 
     def makeListItem(self, **ka):
-
         item = xbmcgui.ListItem(
             self.get_label(),
             self.get_property('source'),

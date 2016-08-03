@@ -14,8 +14,8 @@ from qobuz.node import getNode, Flag
 
 
 class Node_root(INode):
-    """Our root node, we are displaying all qobuz nodes from here
-    """
+    '''Our root node, we are displaying all qobuz nodes from here
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_root, self).__init__(parent=parent,
@@ -23,7 +23,7 @@ class Node_root(INode):
                                         data=data)
         self.nt = Flag.ROOT
         self.content_type = 'files'
-        self.label = "Qobuz"
+        self.label = 'Qobuz'
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(getNode(Flag.USERPLAYLISTS))
@@ -49,12 +49,12 @@ class Node_root(INode):
         return True
 
     def cache_remove(self):
-        """GUI/Removing all cached data
-        """
+        '''GUI/Removing all cached data
+        '''
         from qobuz.gui.util import yesno, notifyH, getImage
         from qobuz.debug import log
         if not yesno(lang(30121), lang(30122)):
-            log(self, "Deleting cached data aborted")
+            log(self, 'Deleting cached data aborted')
             return False
         if clean_all(cache):
             notifyH(lang(30119), lang(30123))
@@ -64,7 +64,7 @@ class Node_root(INode):
         return True
 
     def gui_scan(self):
-        """Scanning directory specified in query parameter
-        """
+        '''Scanning directory specified in query parameter
+        '''
         query = self.get_parameter('query', unQuote=True)
-        executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))
+        executeBuiltin("XBMC.UpdateLibrary('music', '%s')" % (query))

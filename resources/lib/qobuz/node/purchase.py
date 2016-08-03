@@ -14,8 +14,8 @@ from qobuz.gui.util import lang, getImage, getSetting
 
 
 class Node_purchase(INode):
-    """Displaying product purchased by user (track and album)
-    """
+    '''Displaying product purchased by user (track and album)
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_purchase, self).__init__(parent=parent,
@@ -42,7 +42,7 @@ class Node_purchase(INode):
         data = api.get('/purchase/getUserPurchases', limit=limit,
                        offset=self.offset, user_id=api.user_id)
         if not data:
-            warn(self, "Cannot fetch purchases data")
+            warn(self, 'Cannot fetch purchases data')
             return False
         self.data = data
         return True
@@ -55,7 +55,7 @@ class Node_purchase(INode):
         for kind in wanted:
             method = '_populate_%s' % kind
             if not hasattr(self, method):
-                warn(self, "No method named %s" % method)
+                warn(self, 'No method named %s' % method)
                 continue
             if getattr(self, method)(Dir, lvl, whiteFlag, blackFlag):
                 ret = True

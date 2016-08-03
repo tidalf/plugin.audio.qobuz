@@ -15,8 +15,8 @@ from qobuz.node import getNode, Flag
 
 
 class Node_artist(INode):
-    """@class Node_artist(Inode): Artist
-    """
+    '''@class: Node_artist
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_artist, self).__init__(parent=parent,
@@ -40,7 +40,7 @@ class Node_artist(INode):
         data = api.get('/artist/get', artist_id=self.nid, limit=limit,
                        offset=self.offset, extra='albums')
         if not data:
-            warn(self, "Build-down: Cannot fetch artist data")
+            warn(self, 'Build-down: Cannot fetch artist data')
             return False
         self.data = data
         return True
@@ -97,7 +97,7 @@ class Node_artist(INode):
                                 image,
                                 url)
         if not item:
-            warn(self, "Error: Cannot make xbmc list item")
+            warn(self, 'Error: Cannot make xbmc list item')
             return None
         item.setPath(url)
         item.setInfo('music', infoLabels={

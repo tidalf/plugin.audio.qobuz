@@ -13,8 +13,8 @@ from qobuz.api import api
 
 
 class Node_public_playlists(INode):
-    """@class Node_public_playlists
-    """
+    '''@class Node_public_playlists
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_public_playlists, self).__init__(parent=parent,
@@ -30,7 +30,7 @@ class Node_public_playlists(INode):
         limit = getSetting('pagination_limit')
         data = api.get('/playlist/getPublicPlaylists', offset=self.offset,
                        limit=limit, type='last-created')
-        if not data:
+        if data is None:
             return False
         # @bug: we use pagination_limit as limit for the search so we don't
         # need offset... (Fixed if qobuz fix it :p)

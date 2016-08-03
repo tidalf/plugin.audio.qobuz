@@ -25,8 +25,10 @@ _allowed_keys = {
     'parent-id': r'^\d{1,10}$',
     'offset': r'^\d{1,10}$',
     'source': r'^(all|playlists|purchases|favorites)$',
-    'asLocalURL': r'^(True|False|1|0)$'
+
 }
+_allowed_boolean = ['asLocalUrl']
+
 _allowed_keys = {key: re.compile(value) for key, value in _allowed_keys.items()}
 
 class dog():
@@ -37,6 +39,10 @@ class dog():
         pass
 
     def kv_is_ok(self, key, value):
+        if key in _allowed_boolean:
+            if value not in ['True', 'False']:
+                return False
+            return True
         if key not in _allowed_keys:
             return False
         if _allowed_keys[key].match(value) is None:

@@ -17,8 +17,8 @@ from qobuz.node import getNode, Flag
 
 
 class Node_albums_by_artist(INode):
-    """@class Node_product_by_artist:
-    """
+    '''@class Node_product_by_artist:
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_albums_by_artist, self).__init__(parent=parent,

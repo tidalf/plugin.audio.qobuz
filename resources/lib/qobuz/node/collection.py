@@ -17,8 +17,8 @@ dialogHeading = 'Qobuz collection'
 
 
 class Node_collection(INode):
-    """@class Node_collection:
-    """
+    '''@class Node_collection:
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_collection, self).__init__(parent=parent,
@@ -77,19 +77,19 @@ class Node_collection(INode):
         return None
 
     def _populate_albums(self, data):
-        """helper"""
+        '''helper'''
         node = getNode(Flag.ALBUM, data=data)
         self.add_child(node)
         return True
 
     def _populate_tracks(self, data):
-        """helper"""
+        '''helper'''
         node = getNode(Flag.TRACK, data=data)
         self.add_child(node)
         return True
 
     def _populate_artists(self, data):
-        """helper"""
+        '''helper'''
         node = getNode(Flag.ARTIST, data=data)
         self.add_child(node)
         return True

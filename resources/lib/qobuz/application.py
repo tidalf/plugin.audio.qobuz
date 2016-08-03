@@ -18,7 +18,6 @@ class Application(object):
     def __init__(self, plugin=None, bootstrapClass=Bootstrap):
         self.plugin = plugin
         self.registry = Registry(self)
-        print('username %s' % self.registry.get('username'))
         config.app = self
         self.handle = 0
         if len(sys.argv) > 1:
@@ -37,4 +36,4 @@ class Application(object):
             self.bootstrap.init_app()
             self.bootstrap.dispatch()
         except QobuzXbmcError as e:
-            warn('[' + pluginId + ']', "Exception while running plugin")
+            warn('[' + self.plugin.plugin_id + ']', "Exception while running plugin")

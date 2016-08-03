@@ -1,5 +1,9 @@
 def list_image(data, size='large'):
     result = []
+    def append(url):
+        if url not in result:
+            result.append(url)
+
     if data is None:
         return result
     current = data
@@ -11,10 +15,10 @@ def list_image(data, size='large'):
             if 'image' in album:
                 image = album['image']
                 if size in image:
-                    result.append(image[size])
+                    append(image[size])
                 else:
                     for size in ['large', 'small', 'xlarge', 'thumbnail']:
                         if size in image:
-                            result.append(image['size'])
-                result.append(album['image']['thumbnail'])
+                            append(image['size'])
+                append(album['image']['thumbnail'])
     return result

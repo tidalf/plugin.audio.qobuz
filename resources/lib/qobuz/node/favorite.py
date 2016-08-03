@@ -21,8 +21,8 @@ dialogHeading = lang(30083)
 
 
 class Node_favorite(INode):
-    """Displaying user favorites (track and album)
-    """
+    '''Displaying user favorites (track and album)
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_favorite, self).__init__(parent=parent,
@@ -64,7 +64,7 @@ class Node_favorite(INode):
                            limit=limit,
                            offset=self.offset)
         if not data:
-            warn(self, "Build-down: Cannot fetch favorites data")
+            warn(self, 'Build-down: Cannot fetch favorites data')
             return False
         self.data = data
         return True

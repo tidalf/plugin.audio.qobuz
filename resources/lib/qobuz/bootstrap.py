@@ -142,14 +142,12 @@ class MinimalBootstrap(object):
         """
         if self.MODE == Mode.PLAY:
             from qobuz.player import QobuzPlayer
-            debug(self, "Playing song")
             player = QobuzPlayer()
             if player.play(self.params['nid'],self.params):
                 return True
             return False
 
         from renderer import renderer
-
         if self.MODE == Mode.VIEW:
             r = renderer(self.nodeType, self.params)
             return r.run()

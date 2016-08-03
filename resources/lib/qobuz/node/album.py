@@ -18,8 +18,8 @@ SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
 
 
 class Node_album(INode):
-    """@class Node_product:
-    """
+    '''@class Node_product:
+    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_album, self).__init__(parent=parent,
@@ -63,11 +63,11 @@ class Node_album(INode):
             self.add_child(node)
         return len(self.data['tracks']['items'])
 
-    def make_url(self, **ka):
+    def make_url(self, asLocalUrl=False, **ka):
         purchased = self.get_parameter('purchased')
         if purchased is not None:
             ka['purchased'] = self.get_parameter('purchased')
-        if 'asLocalURL' in ka and ka['asLocalURL'] == 'True':
+        if asLocalUrl is True:
             from qobuz.constants import Mode
             ka['mode'] = Mode.SCAN
         return super(Node_album, self).make_url(**ka)
@@ -94,10 +94,6 @@ class Node_album(INode):
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
-
-    """
-    PROPERTIES
-    """
 
     def get_artist(self):
         return self.get_property(['artist/name',

@@ -36,6 +36,7 @@ def nocache(view):
         return response
 
     return update_wrapper(no_cache, view)
+
 def http_error(name):
     return getattr(exceptions, name)()
 
@@ -55,9 +56,18 @@ def shutdown_server():
     func()
 
 @nocache
-@application.route('/qobuz/<int:user_id>/<int:album_id>/<int:track_id>.mpc', methods=['GET'])
-def route_track(user_id=None, album_id=None, track_id=None):
-    info(__name__, 'GET track_id {}', track_id)
+@application.route('/qobuz/track/<int:track_id>', methods=['HEAD'])
+def route_track_head(track_id=None):
+    response = api.get('/track/getFileUrl',
+                       format_id=get_format_id(),
+                       track_id=track_id)
+    if response is None or 'url' not in response:
+        return http_error('NotFound')
+    return 'ok', 200
+
+@nocache
+@application.route('/qobuz/track/<int:track_id>', methods=['GET'])
+def route_track(track_id=None):
     response = api.get('/track/getFileUrl',
                        format_id=get_format_id(),
                        track_id=track_id)
