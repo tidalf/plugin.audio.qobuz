@@ -95,7 +95,8 @@ class MinimalBootstrap(object):
                 self.resources = xbmc.translatePath(
                     os.path.join(config.path.base, 'resources'))
                 self.image = xbmc.translatePath(
-                    os.path.join(config.path.resources, 'img'))
+                    os.path.join(config.path.resources, 'img', 'theme',
+                                 'default'))
 
             def to_s(self):
                 out = 'profile : ' + self.profile + "\n"
