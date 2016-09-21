@@ -9,11 +9,11 @@ from flask import Response, redirect
 from qobuz import base_path
 from qobuz.plugin import Plugin
 from qobuz.bootstrap import MinimalBootstrap
-from qobuz.debug import info, warn, error
+from qobuz import debug
 qobuzApp = QobuzApplication(Plugin('plugin.audio.qobuz'),
                             bootstrapClass=MinimalBootstrap)
 qobuzApp.bootstrap.init_app()
-info(None, 'Username %s Password %s' % (qobuzApp.registry.get('username'),
+debug.info(None, 'Username %s Password %s' % (qobuzApp.registry.get('username'),
                                    qobuzApp.registry.get('password')))
 api.login(username=qobuzApp.registry.get('username'),
           password=qobuzApp.registry.get('password'))
@@ -51,15 +51,15 @@ def get_format_id(default=3):
     return default
 
 def shutdown_server():
-    info(__name__, 'Shutting down server')
+    debug.info(__name__, 'Shutting down server')
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
 
 @nocache
-@application.route('/qobuz/track/<int:track_id>.mpc', methods=['HEAD'])
-def route_track_head(track_id=None):
+@application.route('/qobuz/album/<int:album_id>/track/<int:track_id>/file.mpc', methods=['HEAD'])
+def route_track_head(album_id=None, track_id=None):
     response = api.get('/track/getFileUrl',
                        format_id=get_format_id(),
                        track_id=track_id)
@@ -68,16 +68,20 @@ def route_track_head(track_id=None):
     return 'ok', 200
 
 @nocache
-@application.route('/qobuz/track/<int:track_id>.mpc', methods=['GET'])
-def route_track(track_id=None):
+@application.route('/qobuz/album/<int:album_id>/track/<int:track_id>/file.mpc', methods=['GET'])
+def route_track(album_id=None, track_id=None):
     response = api.get('/track/getFileUrl',
                        format_id=get_format_id(),
                        track_id=track_id)
     if response is None or 'url' not in response:
         return http_error('NotFound')
-    return redirect(response['url'])
+    return redirect(response['url'], code=302)
 
 @application.route('/<path:path>')
 def sniff(path=None):
-    info(__name__, 'Request[{}] {}', request.method, path)
+    debug.info(__name__, 'Request[{}] {}', request.method, path)
     return http_error('NotFound')
+
+#  CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/track/disc.png
+# 23:23:34 T:123145335918592   ERROR: CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/track/cdart.png
+# 23:23:34 T:123145335918592   ERROR: CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/album.nfo
