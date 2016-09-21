@@ -37,10 +37,10 @@ if __name__ == '__main__':
             #shutdown_server()
 
     debug.info(__name__, 'Starting Qobuz HTTP Service http://localhost:{}', port)
-    while True: #not monitor.abortRequested():
+    while not monitor.abortRequested():
         try:
             application.run(port=port)
         except Exception as e:
             debug.error(__name__, 'Error {}', e)
             xbmc.sleep(1)
-    debug.info(__name__, 'Bye!')
+    debug.info(__name__, 'MONITOR END Bye!')
