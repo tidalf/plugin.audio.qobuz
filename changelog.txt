@@ -1,3 +1,8 @@
+1.3.0
+-----
+* Kodi 17.0-Krypton compatible
+* Feature: playlist random cover from tracks
+
 1.2.1
 -----
 * Feature: Playing HiRes purchased tracks (setting and hires property on track)
