@@ -6,7 +6,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.debug import log
+from qobuz import debug
 from qobuz.node import Flag
 from qobuz.node import getNode
 
@@ -53,7 +53,7 @@ class IRenderer(object):
         if 'nm' in self.parameters:
             methodName = self.parameters['nm']
             del self.parameters['nm']
-            log(self, "Executing method on node: " + repr(methodName))
+            debug.info(self, "Executing method on node: " + repr(methodName))
             if getattr(self.root, methodName)():
                 return True
             return False

@@ -8,7 +8,7 @@
 '''
 import xbmcgui  # @UnresolvedImport
 from qobuz.node.inode import INode
-from qobuz.debug import warn
+from qobuz import debug
 import weakref
 from qobuz.api import api
 from qobuz.gui.contextmenu import contextMenu
@@ -52,7 +52,7 @@ class Node_albums_by_artist(INode):
         data = api.get('/artist/getSimilarArtist', artist_id=self.nid,
                        limit=limit, offset=self.offset, extra='albums')
         if not data:
-            warn(self, "Cannot fetch albums for artist: " + self.get_label())
+            debug.warn(self, "Cannot fetch albums for artist: " + self.get_label())
             return False
         self.data = data
         return True
@@ -67,7 +67,7 @@ class Node_albums_by_artist(INode):
                     if k in self.data['artist']:
                         album[k] = weakref.proxy(self.data['artist'][k])
                 except:
-                    warn(self, "Strange thing happen")
+                    debug.warn(self, "Strange thing happen")
                     pass
             node = getNode(Flag.ALBUM, data=album)
             count += 1

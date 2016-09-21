@@ -11,7 +11,7 @@ from qobuz.gui.util import getSetting, executeBuiltin, lang
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
 from qobuz.node import getNode, Flag
-
+from qobuz import debug
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -67,4 +67,5 @@ class Node_root(INode):
         '''Scanning directory specified in query parameter
         '''
         query = self.get_parameter('query', unQuote=True)
+        debug.info(self, 'SCANING query: %s', query)
         executeBuiltin("XBMC.UpdateLibrary('music', '%s')" % (query))

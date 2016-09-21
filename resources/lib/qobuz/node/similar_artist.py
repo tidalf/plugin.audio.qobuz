@@ -6,7 +6,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.inode import INode
+from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.gui.util import lang, getSetting
 from qobuz.api import api

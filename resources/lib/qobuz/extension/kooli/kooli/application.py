@@ -10,17 +10,19 @@ from qobuz import base_path
 from qobuz.plugin import Plugin
 from qobuz.bootstrap import MinimalBootstrap
 from qobuz.debug import info, warn, error
-from qobuz.gui.util import getSetting
-
 qobuzApp = QobuzApplication(Plugin('plugin.audio.qobuz'),
                             bootstrapClass=MinimalBootstrap)
 qobuzApp.bootstrap.init_app()
+info(None, 'Username %s Password %s' % (qobuzApp.registry.get('username'),
+                                   qobuzApp.registry.get('password')))
 api.login(username=qobuzApp.registry.get('username'),
           password=qobuzApp.registry.get('password'))
-from werkzeug import exceptions
+
 
 application = Flask(__name__)
 
+from qobuz.gui.util import getSetting
+from werkzeug import exceptions
 from flask import make_response
 from functools import wraps, update_wrapper
 from datetime import datetime

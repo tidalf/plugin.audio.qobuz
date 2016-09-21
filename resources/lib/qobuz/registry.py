@@ -22,7 +22,12 @@ class RegistryBackend(IRegistryBackend):
     def _init(self):
         import ConfigParser
         self.conf = ConfigParser.ConfigParser()
-        self.paths = [P.join(data_path, 'qobuz.conf')]
+        self.paths = [
+            P.join(data_path, 'qobuz.conf'),
+            P.expanduser('/etc/qobuz/qobuz.conf'),
+            P.expanduser('~/.config/qobuz/qobuz.conf'),
+            P.expanduser('~/.qobuz/qobuz.conf')
+        ]
         self.conf.read(self.paths)
 
     def get(self, key):

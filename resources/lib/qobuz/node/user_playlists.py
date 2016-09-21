@@ -8,7 +8,7 @@
 '''
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
-from qobuz.debug import warn, error, info
+from qobuz import debug
 from qobuz.gui.util import lang, getImage, getSetting
 from qobuz.api import api
 import os
@@ -60,7 +60,7 @@ class Node_user_playlists(INode):
                        offset=self.offset,
                        user_id=api.user_id)
         if data is None:
-            warn(self, "Build-down: Cannot fetch user playlists data")
+            debug.warn(self, "Build-down: Cannot fetch user playlists data")
             return False
         self.data = data
         return True

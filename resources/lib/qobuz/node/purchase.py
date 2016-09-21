@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.debug import warn
+from qobuz import debug
 from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.gui.util import lang, getImage, getSetting
@@ -42,7 +42,7 @@ class Node_purchase(INode):
         data = api.get('/purchase/getUserPurchases', limit=limit,
                        offset=self.offset, user_id=api.user_id)
         if not data:
-            warn(self, 'Cannot fetch purchases data')
+            debug.warn(self, 'Cannot fetch purchases data')
             return False
         self.data = data
         return True
@@ -55,7 +55,7 @@ class Node_purchase(INode):
         for kind in wanted:
             method = '_populate_%s' % kind
             if not hasattr(self, method):
-                warn(self, 'No method named %s' % method)
+                debug.warn(self, 'No method named %s' % method)
                 continue
             if getattr(self, method)(Dir, lvl, whiteFlag, blackFlag):
                 ret = True

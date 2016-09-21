@@ -19,8 +19,8 @@ import binascii
 from itertools import izip, cycle
 import requests
 
-from qobuz.exception import QobuzXbmcError
-from qobuz.debug import warn, info
+from qobuz import exception
+from qobuz import debug
 
 socket.timeout = 5
 
@@ -59,14 +59,10 @@ class RawApi(object):
         '''
         for label in mandatory:
             if not label in ka:
-                raise QobuzXbmcError(who=self,
-                                     what='missing_parameter',
-                                     additional=label)
+                raise exception.MissingParameter(label)
         for label in ka:
             if label not in mandatory and label not in allowed:
-                raise QobuzXbmcError(who=self,
-                                     what='invalid_parameter',
-                                     additional=label)
+                raise exception.InvalidParameter(label)
 
     def __set_s4(self):
         '''appid and associated secret is for this app usage only
@@ -104,7 +100,7 @@ class RawApi(object):
             Error: [200]
             Error: Bad Request [400]
         '''
-        info(self, 'uri: {}, params: {}', uri, str(params))
+        debug.info(self, 'uri: {}, params: {}', uri, str(params))
         self.statTotalRequest += 1
         self.error = ''
         self.status_code = None
@@ -125,28 +121,28 @@ class RawApi(object):
             r = self.session.post(url, data=params, headers=headers)
         except:
             self.error = 'Post request fail'
-            warn(self, self.error)
+            debug.warn(self, self.error)
             return None
         self.status_code = int(r.status_code)
         if self.status_code != 200:
             self.error = self._api_error_string(r, url, _copy_params)
-            warn(self, self.error)
+            debug.warn(self, self.error)
             return None
         if not r.content:
             self.error = 'Request return no content'
-            warn(self, self.error)
+            debug.warn(self, self.error)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
         '''Retry get if connexion fail'''
         try:
             response_json = r.json()
         except Exception as e:
-            warn(self, 'Json loads failed to load... retrying!\n{}', repr(e))
+            debug.warn(self, 'Json loads failed to load... retrying!\n{}', repr(e))
             try:
                 response_json = r.json()
             except:
                 self.error = "Failed to load json two times...abort"
-                warn(self, self.error)
+                debug.warn(self, self.error)
                 return None
         status = None
         try:
@@ -156,14 +152,13 @@ class RawApi(object):
         if status == 'error':
             self.error = self._api_error_string(r, url, _copy_params,
                                                 response_json)
-            warn(self, self.error)
+            debug.warn(self, self.error)
             return None
         return response_json
 
     def set_user_data(self, user_id, user_auth_token):
         if not (user_id and user_auth_token):
-            raise QobuzXbmcError(who=self, what='missing_argument',
-                                 additional='uid|token')
+            raise exception.MissingArgument('uid|token')
         self.user_auth_token = user_auth_token
         self.user_id = user_id
         self.logged_on = time()
@@ -237,14 +232,14 @@ class RawApi(object):
     def track_resportStreamingEnd(self, track_id, duration):
         duration = math.floor(int(duration))
         if duration < 5:
-            info(self, 'Duration lesser than 5s, abort reporting')
+            debug.info(self, 'Duration lesser than 5s, abort reporting')
             return None
         # @todo ???
         user_auth_token = ''  # @UnusedVariable
         try:
             user_auth_token = self.user_auth_token  # @UnusedVariable
         except:
-            warn(self, 'No authentification token')
+            debug.warn(self, 'No authentification token')
             return None
         params = {'user_id': self.user_id,
                   'track_id': track_id,
@@ -270,9 +265,7 @@ class RawApi(object):
         mandatory = ['query', 'type']
         for label in mandatory:
             if not label in ka:
-                raise QobuzXbmcError(who=self,
-                                     what='missing_parameter',
-                                     additional=label)
+                raise exception.MissingParameter(label)
         return self._api_request(ka, '/search/getResults')
 
     def favorite_getUserFavorites(self, **ka):
@@ -286,8 +279,7 @@ class RawApi(object):
             if label in ka:
                 found = label
         if not found:
-            raise QobuzXbmcError(who=self, what='missing_parameter',
-                                 additional='artist_ids|albums_ids|track_ids')
+            raise exception.MissingParameter('artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/create')
 
     def favorite_delete(self, **ka):
@@ -297,8 +289,7 @@ class RawApi(object):
             if label in ka:
                 found = label
         if not found:
-            raise QobuzXbmcError(who=self, what='missing_parameter',
-                                 additional='artist_ids|albums_ids|track_ids')
+            raise exception.MissingParameter('artist_ids|albums_ids|track_ids')
         return self._api_request(ka, '/favorite/delete')
 
     def playlist_get(self, **ka):
@@ -326,8 +317,7 @@ class RawApi(object):
             if label in ka:
                 found = label
         if not found:
-            raise QobuzXbmcError(
-                who=self, what='missing_parameter', additional='playlist_id')
+            raise exception.MissingParameter('playlist_id')
         return self._api_request(ka, '/playlist/subscribe')
 
     def playlist_unsubscribe(self, **ka):
@@ -346,8 +336,7 @@ class RawApi(object):
     def playlist_delete(self, **ka):
         self._check_ka(ka, ['playlist_id'])
         if not 'playlist_id' in ka:
-            raise QobuzXbmcError(
-                who=self, what='missing_parameter', additional='playlist_id')
+            raise exception.MissingParamter('playlist_id')
         return self._api_request(ka, '/playlist/delete')
 
     def playlist_update(self, **ka):

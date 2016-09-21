@@ -10,10 +10,10 @@ import sys
 import os
 
 from qobuz.constants import Mode
-from qobuz.debug import info, debug, warn
+from qobuz import debug
 from qobuz.dog import dog
 from qobuz.node import Flag
-from qobuz.exception import QobuzXbmcError
+from qobuz import exception
 from qobuz.gui.util import dialogLoginFailure, getSetting, containerRefresh
 from qobuz.gui.util import dialogServiceTemporarilyUnavailable
 import qobuz.config as config
@@ -42,7 +42,7 @@ def get_checked_parameters():
                 if d.kv_is_ok(splitparams[0], splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
-                    warn('[DOG]', "--- Invalid key: %s / value: %s" %
+                    debug.warn('[DOG]', "--- Invalid key: %s / value: %s" %
                          (splitparams[0], splitparams[1]))
     return rparam
 
@@ -73,8 +73,7 @@ class MinimalBootstrap(object):
             #@TODO sys.exit killing XBMC? FRODO BUG ?
             # sys.exit(1)
             containerRefresh()
-            raise QobuzXbmcError(
-                who=self, what='invalid_login', additional=None)
+            raise exception.InvalidLogin(None)
 
     def bootstrap_directories(self):
         """Setting some common path used by our application
@@ -113,9 +112,9 @@ class MinimalBootstrap(object):
                     try:
                         os.makedirs(path)
                     except:
-                        warn("Cannot create directory: " + path)
+                        debug.warn("Cannot create directory: " + path)
                         exit(2)
-                    info(self, "Directory created: " + path)
+                    debug.info(self, "Directory created: " + path)
         config.path = PathObject()
         config.path._set_dir()
         config.path.mkdir(config.path.cache)
@@ -132,9 +131,9 @@ class MinimalBootstrap(object):
         try:
             self.MODE = int(self.params['mode'])
         except:
-            warn(self, "No 'mode' parameter")
+            debug.warn(self, "No 'mode' parameter")
         for name in self.params:
-            info(self, "Param: %s = %s (%s)" % (name, str(self.params[name]),
+            debug.info(self, "Param: %s = %s (%s)" % (name, str(self.params[name]),
                                                 Flag.to_s(self.params['nt'])))
 
     def dispatch(self):
@@ -157,14 +156,14 @@ class MinimalBootstrap(object):
             r.depth = -1
             return r.run()
         elif self.MODE == Mode.SCAN:
+
             r = renderer(self.nodeType, self.params)
             r.enable_progress = False
             r.whiteFlag = Flag.TRACK
             r.depth = -1
             return r.scan()
         else:
-            raise QobuzXbmcError(
-                who=self, what="unknow_mode", additional=self.MODE)
+            raise exception.UnknownMode(self.MODE)
         return True
 
 

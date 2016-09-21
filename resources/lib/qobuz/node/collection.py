@@ -9,7 +9,7 @@
 from qobuz.node.inode import INode
 from qobuz.node import Flag, getNode
 from qobuz.api import api
-from qobuz.debug import info
+from qobuz import debug
 from qobuz.gui.util import getImage, getSetting, lang
 
 
@@ -54,7 +54,7 @@ class Node_collection(INode):
                 return False
             query = k.getText()
         query.strip()
-        info(self, 'search_type: %s, query: %s' % (self.search_type, query))
+        debug.info(self, 'search_type: %s, query: %s' % (self.search_type, query))
         source = self.source
         kwargs = {'query': query,
                   'limit': limit,

@@ -15,8 +15,8 @@ import weakref
 from qobuz.api import api
 from qobuz.cache import cache
 from qobuz.constants import Mode
-from qobuz.debug import log, warn, info
-from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import debug
+from qobuz import exception
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import color, lang, runPlugin, containerUpdate, getSetting
 from qobuz.node import Flag
@@ -110,7 +110,7 @@ class INode(object):
     def set_content_type(self, kind):
         '''@setter content_type'''
         if kind not in ['songs', 'albums', 'files', 'artists']:
-            raise Qerror(who=self, what='invalid_type', additional=kind)
+            raise exception.InvalidKind(kind)
         self._content_type = kind
 
     content_type = property(get_content_type, set_content_type)
@@ -381,16 +381,16 @@ class INode(object):
             ''' Only white Flagged nodes added to the listing '''
             if child.nt & whiteFlag == child.nt:
                 if not Dir.add_node(child):
-                    warn(self, "Something went wrong... aborting")
+                    debug.warn(self, "Something went wrong... aborting")
                     self.childs = []
-                    raise Qerror(who=self, what='build_down_abort')
+                    raise exception.BuildCanceled('down')
                 gData['count'] += 1
                 Dir.update(gData, "Working", label, child.get_label())
             else:
-                log(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
+                debug.log(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
             ''' Calling builiding down on child '''
             child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
-        info(self, 'Populated {}', self)
+        debug.info(self, 'Populated {}', self)
         return gData['count']
 
     def populate(self, xbmc_directory, lvl, Flag):
@@ -512,7 +512,7 @@ class INode(object):
             try:
                 label = label.encode('utf8', 'replace')
             except:
-                warn(self, "Cannot set query..." + repr(label))
+                debug.warn(self, "Cannot set query..." + repr(label))
                 label = ''
             label = urllib.quote_plus(label)
             ''' ADD AS NEW '''

@@ -8,13 +8,13 @@
 '''
 import xbmcgui  # @UnresolvedImport
 from qobuz.node.inode import INode
-from qobuz.debug import warn
+from qobuz import debug
 from qobuz.gui.util import lang, getSetting
 from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
 from qobuz.node import getNode, Flag
 from qobuz.renderer import renderer
 from qobuz.api import api
-from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import exception
 from qobuz.cache import cache
 
 dialogHeading = lang(30083)
@@ -64,7 +64,7 @@ class Node_favorite(INode):
                            limit=limit,
                            offset=self.offset)
         if not data:
-            warn(self, 'Build-down: Cannot fetch favorites data')
+            debug.warn(self, 'Build-down: Cannot fetch favorites data')
             return False
         self.data = data
         return True
@@ -85,7 +85,7 @@ class Node_favorite(INode):
         for kind in search_for:
             method = '_populate_%s' % kind
             if not hasattr(self, method):
-                warn(self, 'No method named %s' % method)
+                debug.warn(self, 'No method named %s' % method)
                 continue
             if getattr(self, method)(Dir, lvl, whiteFlag, blackFlag):
                 ret = True
@@ -343,8 +343,7 @@ class Node_favorite(INode):
         elif qnt & Flag.ARTIST == Flag.ARTIST:
             ret = self.del_artist(node.nid)
         else:
-            raise Qerror(who=self, what='invalid_node_type',
-                         additional=self.nt)
+            raise exception.InvalidNodeType(self.nt)
         if not ret:
             notifyH(dialogHeading,
                     'Cannot remove item: %s' % (node.get_label()))

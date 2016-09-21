@@ -13,7 +13,7 @@ from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.api import api
 from qobuz.cache import cache
-from qobuz.debug import warn, info
+from qobuz import debug
 from qobuz.renderer import renderer
 from qobuz.gui.util import notify_warn, notify_error, notify_log, getSetting
 from qobuz.gui.util import color, lang, getImage, runPlugin, executeBuiltin
@@ -107,7 +107,7 @@ class Node_playlist(INode):
         data = api.get('/playlist/get', playlist_id=self.nid,
                        offset=self.offset, limit=limit, extra='tracks')
         if data is None:
-            warn(self, 'Build-down: Cannot fetch playlist data')
+            debug.warn(self, 'Build-down: Cannot fetch playlist data')
             return False
         self.data = data
         self.get_image() # Buld thumbnail if neeeded
@@ -149,7 +149,7 @@ class Node_playlist(INode):
                                 image,
                                 url)
         if not item:
-            warn(self, 'Error: Cannot make xbmc list item')
+            debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
         item.setPath(url)
         ctxMenu = contextMenu()
@@ -238,7 +238,7 @@ class Node_playlist(INode):
 
     def _add_tracks(self, playlist_id, nodes):
         if len(nodes) < 1:
-            warn(self, 'Empty list...')
+            debug.warn(self, 'Empty list...')
             return False
         step = 50
         start = 0
@@ -251,12 +251,12 @@ class Node_playlist(INode):
             if (start + step) > numtracks:
                 step = numtracks - start
             str_tracks = ''
-            info(self, 'Adding tracks start: %s, end: %s' %
+            debug.info(self, 'Adding tracks start: %s, end: %s' %
                  (start, start + step))
             for i in range(start, start + step):
                 node = nodes[i]
                 if node.nt != Flag.TRACK:
-                    warn(self, 'Not a Node_track node')
+                    debug.warn(self, 'Not a Node_track node')
                     continue
                 str_tracks += '%s,' % (str(node.nid))
             if not api.playlist_addTracks(
@@ -294,7 +294,7 @@ class Node_playlist(INode):
         playlist = self.create(name)
         if not playlist:
             notify_error('Qobuz', 'Playlist creationg failed')
-            warn(self, 'Cannot create playlist...')
+            debug.warn(self, 'Cannot create playlist...')
             return False
         if not self._add_tracks(playlist['id'], nodes):
             notify_error('Qobuz / Cannot add tracks', '%s' % (name))
@@ -308,7 +308,7 @@ class Node_playlist(INode):
         if playlist_id is None:
             playlist_id = self.nid
         if playlist_id is None:
-            warn(self, 'Cannot set current playlist without id')
+            debug.warn(self, 'Cannot set current playlist without id')
             return False
         userdata = self.get_user_storage()
         userdata['current_playlist'] = int(playlist_id)
@@ -327,12 +327,12 @@ class Node_playlist(INode):
         if not playlist_id:
             playlist_id = self.nid
         if not playlist_id:
-            warn(self, 'Can\'t rename playlist without id')
+            debug.warn(self, 'Can\'t rename playlist without id')
             return False
         from qobuz.gui.util import Keyboard
         data = api.get('/playlist/get', playlist_id=playlist_id)
         if not data:
-            warn(self, 'Something went wrong while renaming playlist')
+            debug.warn(self, 'Something went wrong while renaming playlist')
             return False
         self.data = data
         currentname = self.get_name()
@@ -349,7 +349,7 @@ class Node_playlist(INode):
             return True
         res = api.playlist_update(playlist_id=playlist_id, name=newname)
         if not res:
-            warn(self, 'Cannot rename playlist with name %s' % (newname))
+            debug.warn(self, 'Cannot rename playlist with name %s' % (newname))
             return False
         self.delete_cache(playlist_id)
         notify_log(lang(30080), (u'%s: %s') % (lang(30165), currentname))
@@ -368,12 +368,12 @@ class Node_playlist(INode):
             k = Keyboard('', lang(30182))
             k.doModal()
             if not k.isConfirmed():
-                warn(self, 'Creating playlist aborted')
+                debug.warn(self, 'Creating playlist aborted')
                 return None
             query = k.getText()
         ret = self.create(query)
         if not ret:
-            warn(self, 'Cannot create playlist named '' + query + ''')
+            debug.warn(self, 'Cannot create playlist named '' + query + ''')
             return None
         self.set_as_current(ret['id'])
         self.delete_cache(ret['id'])
@@ -400,17 +400,17 @@ class Node_playlist(INode):
                                     lang(30054),
                                     color('FFFF0000', name))
         if not ok:
-            info(self, 'Deleting playlist aborted...')
+            debug.info(self, 'Deleting playlist aborted...')
             return False
         res = False
         if data['owner']['name'] == login:
-            info(self, 'Deleting playlist: ' + str(playlist_id))
+            debug.info(self, 'Deleting playlist: ' + str(playlist_id))
             res = api.playlist_delete(playlist_id=playlist_id)
         else:
-            info(self, 'Unsuscribe playlist' + str(playlist_id))
+            debug.info(self, 'Unsuscribe playlist' + str(playlist_id))
             res = api.playlist_unsubscribe(playlist_id=playlist_id)
         if not res:
-            warn(self, 'Cannot delete playlist with id ' + str(playlist_id))
+            debug.warn(self, 'Cannot delete playlist with id ' + str(playlist_id))
             notify_error(lang(30183), lang(30186) + name)
             return False
         self.delete_cache(playlist_id)

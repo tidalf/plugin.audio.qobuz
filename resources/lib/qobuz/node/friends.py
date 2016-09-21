@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.debug import info, warn
+from qobuz import debug
 from qobuz.gui.util import getImage, runPlugin, containerUpdate, lang
 from qobuz.api import api
 from qobuz.node import getNode, Flag
@@ -49,7 +49,7 @@ class Node_friends(INode):
         if not 'user' in user_data:
             return False
         friend_data = user_data['user']['player_settings']['friends']
-        info(self, 'Build-down friends list ' + repr(self.name))
+        debug.info(self, 'Build-down friends list ' + repr(self.name))
         if self.name:
             data = api.get('/playlist/getUserPlaylists',
                            username=self.name,
@@ -59,7 +59,7 @@ class Node_friends(INode):
                            user_id=user_id,
                            limit=0)
         if not data:
-            warn(self, 'No friend data')
+            debug.warn(self, 'No friend data')
             return False
         # extract all owner names from the list
         friend_list = []

@@ -11,7 +11,7 @@ import qobuz  # @UnresolvedImport
 from qobuz.debug import warn
 from qobuz.renderer.irenderer import IRenderer
 from qobuz.gui.util import notifyH, getSetting
-from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import exception
 from qobuz import config
 from qobuz.node.flag import Flag
 from qobuz.gui.directory import Directory
@@ -51,7 +51,7 @@ class QobuzXbmcRenderer(IRenderer):
                                        self.depth,
                                        self.whiteFlag,
                                        self.blackFlag)
-        except Qerror as e:
+        except exception.QobuzError as e:
             Dir.end_of_directory(False)
             Dir = None
             warn(self,

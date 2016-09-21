@@ -11,7 +11,7 @@ from qobuz.api import api
 from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.gui.util import getSetting, lang, getImage
-from qobuz.debug import warn, info
+from qobuz import debug
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -85,7 +85,7 @@ class Node_recommendation(INode):
                        limit=10,
                        offset=offset)
         if data is None:
-            warn(self, 'Cannot fetch data for recommendation')
+            debug.warn(self, 'Cannot fetch data for recommendation')
             return False
         self.data = data
         return True
@@ -120,10 +120,10 @@ class Node_recommendation(INode):
         if self.data is None:
             return False
         if 'albums' not in self.data:
-            warn(self, 'Recommendation data doesn\'t contain <albums> key')
+            debug.warn(self, 'Recommendation data doesn\'t contain <albums> key')
             return False
         if self.data['albums'] is None or 'items' not in self.data['albums']:
-            warn(self, 'Recommendation data[\'albums\'] doesn\'t contain items')
+            debug.warn(self, 'Recommendation data[\'albums\'] doesn\'t contain items')
             return False
         for product in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, {'nid': product['id']})

@@ -9,7 +9,7 @@
 from qobuz.constants import Mode
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node.inode import INode
-from qobuz.debug import warn, log
+from qobuz import debug
 from qobuz.gui.util import lang, getImage, runPlugin, getSetting
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
@@ -117,7 +117,7 @@ class Node_track(INode):
         if not data:
             return None
         if 'url' not in data:
-            warn(self, "streaming_url, no url returned\n"
+            debug.warn(self, "streaming_url, no url returned\n"
                  "API Error: %s" % (api.error))
             return None
         return data['url']
@@ -158,7 +158,7 @@ class Node_track(INode):
         try:
             year = time.strftime("%Y", time.localtime(date))
         except Exception as e:
-            warn(self, 'Invalid date format %s', date)
+            debug.warn(self, 'Invalid date format %s', date)
         return year
 
     def is_playable(self):
@@ -195,7 +195,7 @@ class Node_track(INode):
         data = api.get('/track/getFileUrl', format_id=format_id,
                        track_id=self.nid, user_id=api.user_id, intent=intent)
         if not data:
-            warn(self, "Cannot get stream type for track (network problem?)")
+            debug.warn(self, "Cannot get stream type for track (network problem?)")
             return None
         return data
 
@@ -223,7 +223,7 @@ class Node_track(INode):
         if not data:
             return False
         if not 'format_id' in data:
-            warn(self, "Cannot get mime/type for track (restricted track?)")
+            debug.warn(self, "Cannot get mime/type for track (restricted track?)")
             return False
         formatId = int(data['format_id'])
         mime = ''
@@ -232,7 +232,7 @@ class Node_track(INode):
         elif formatId == 5:
             mime = 'audio/mpeg'
         else:
-            warn(self, "Unknow format " + str(formatId))
+            debug.warn(self, "Unknow format " + str(formatId))
             mime = 'audio/mpeg'
         return mime
 
@@ -242,7 +242,7 @@ class Node_track(INode):
         """
         mime = self.get_mimetype()
         if not mime:
-            warn(self, "Cannot set item streaming url")
+            debug.warn(self, "Cannot set item streaming url")
             return False
         item.setProperty('mimetype', mime)
         item.setPath(self.get_streaming_url())
@@ -279,7 +279,7 @@ class Node_track(INode):
         item.setIconImage(image)
         item.setThumbnailImage(image)
         if not item:
-            warn(self, "Cannot create xbmc list item")
+            debug.warn(self, "Cannot create xbmc list item")
             return None
         item.setPath(url)
         track_number = self.get_track_number()

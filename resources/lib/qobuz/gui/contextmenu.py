@@ -6,7 +6,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import exception
 from qobuz.gui.util import color, getSetting
 
 
@@ -51,8 +51,7 @@ class contextMenu():
         """
         for key in ['label', 'cmd']:
             if not key in ka:
-                raise Qerror(who=self,
-                             what='missing_parameter', additional=key)
+                raise exception.MissingParameter(key)
         section, path = self.get_section_path(**ka)
         root = self.data
         pos = 0

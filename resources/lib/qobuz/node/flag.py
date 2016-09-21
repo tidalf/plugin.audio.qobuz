@@ -6,8 +6,8 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.exception import QobuzXbmcError
-from qobuz.debug import warn
+from qobuz import exception
+from qobuz import debug
 
 
 class FlagEnum(object):
@@ -51,7 +51,7 @@ class FlagEnum(object):
     @classmethod
     def to_s(cls, flag):
         if not flag:
-            warn(cls, 'Missing flag parameter')
+            debug.warn(cls, 'Missing flag parameter')
             return ''
         flag = int(flag)
         if flag & cls.TRACK == cls.TRACK:
@@ -107,7 +107,6 @@ class FlagEnum(object):
         elif flag & cls.COLLECTIONS == cls.COLLECTIONS:
             return 'collections'
         else:
-            raise QobuzXbmcError(
-                who=cls, what='invalid_flag', additional=repr(flag))
+            raise exception.InvalidFlag(repr(flag))
 
 Flag = FlagEnum()

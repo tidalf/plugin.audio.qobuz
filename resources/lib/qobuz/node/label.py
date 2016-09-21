@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from inode import INode
-from debug import warn
+from qobuz import debug
 from gui.util import getImage, getSetting, lang
 from node import Flag
 from api import api
@@ -38,7 +38,7 @@ class Node_label(INode):
         limit = getSetting('pagination_limit')
         data = api.get('/label/list', limit=limit, offset=offset)
         if not data:
-            warn(self, "No label data")
+            debug.warn(self, "No label data")
             return False
         for item in data['labels']['items']:
             node = Node_label()

@@ -8,7 +8,7 @@
 '''
 import json
 from qobuz.node.inode import INode
-from qobuz.debug import warn
+from qobuz import debug
 from qobuz.gui.util import color, getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, getSetting, lang
 from qobuz.api import api
@@ -106,21 +106,21 @@ class Node_friend(INode):
             return False
         friends = user['player_settings']
         if not 'friends' in friends:
-            notifyH('Qobuz', 'You don't have friend',
+            notifyH('Qobuz', 'You don\'t have friend',
                     'icon-error-256')
-            warn(self, 'No friends in user/player_settings')
+            debug.warn(self, 'No friends in user/player_settings')
             return False
         friends = friends['friends']
         if not name in friends:
-            notifyH('Qobuz', 'You're not friend with %s' % (name),
+            notifyH('Qobuz', 'You\'re not friend with %s' % (name),
                     'icon-error-256')
-            warn(self, 'Friend ' + repr(name) + ' not in friends data')
+            debug.warn(self, 'Friend ' + repr(name) + ' not in friends data')
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
         if not api.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', 'Friend %s added' % (name))
-            notifyH('Qobuz', 'Cannot updata friend's list...',
+            notifyH('Qobuz', 'Cannot updata friend\'s list...',
                     'icon-error-256')
             return False
         notifyH('Qobuz', 'Friend %s removed' % (name))
@@ -131,7 +131,7 @@ class Node_friend(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         data = api.get('/playlist/getUserPlaylists', username=self.name)
         if not data:
-            warn(self, 'No friend data')
+            debug.warn(self, 'No friend data')
             return False
         if lvl != -1:
             self.add_child(getNode(Flag.FRIENDS, self.parameters))

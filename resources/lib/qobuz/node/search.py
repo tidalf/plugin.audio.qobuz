@@ -6,9 +6,9 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.debug import warn
+from qobuz import debug
 from qobuz.node.inode import INode
-from qobuz.exception import QobuzXbmcError
+from qobuz import exception
 from qobuz.gui.util import lang, getImage, getSetting
 from qobuz.api import api
 from qobuz.node import getNode, Flag
@@ -59,7 +59,7 @@ class Node_search(INode):
             self.content_type = data_search_type[search_type]['content_type']
             self.image = data_search_type[search_type]['image']
         else:
-            raise QobuzXbmcError(who=self, what='invalid_type', additional=search_type)
+            raise exception.InvalidSearchType(search_type)
         self._search_type = search_type
 
 
@@ -89,7 +89,7 @@ class Node_search(INode):
         data = api.get('/search/getResults', query=query, type=stype,
                        limit=limit, offset=self.offset)
         if data is None:
-            warn(self, "Search return no data")
+            debug.warn(self, "Search return no data")
             return False
         if data[stype]['total'] == 0:
             return False
@@ -102,17 +102,15 @@ class Node_search(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type == 'albums':
             for album in self.data['albums']['items']:
-                node = getNode(Flag.ALBUM)
-                node.data = album
+                node = getNode(Flag.ALBUM, data=album)
                 self.add_child(node)
         elif self.search_type == 'tracks':
             for track in self.data['tracks']['items']:
-                node = getNode(Flag.TRACK)
-                node.data = track
+                node = getNode(Flag.TRACK, data=track)
                 self.add_child(node)
         elif self.search_type == 'artists':
             for artist in self.data['artists']['items']:
-                node = getNode(Flag.ARTIST)
-                node.data = artist
+                node = getNode(Flag.ARTIST, data=artist)
+                print('Artist %s', artist)
                 self.add_child(node)
         return True

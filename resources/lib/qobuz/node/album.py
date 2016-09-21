@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.debug import warn, info
+from qobuz import debug
 from qobuz.gui.util import getImage, getSetting, htm2xbmc
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
@@ -35,7 +35,7 @@ class Node_album(INode):
         try:
             self.imageDefaultSize = getSetting('image_default_size')
         except Exception as e:
-            warn(self, 'Cannot set image default size, Error: {}', e)
+           debug.warn(self, 'Cannot set image default size, Error: {}', e)
 
     def get_nid(self):
         return super(Node_album, self).get_nid()
@@ -50,7 +50,7 @@ class Node_album(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         data = api.get('/album/get', album_id=self.nid)
         if not data:
-            warn(self, "Cannot fetch product data")
+            debug.warn(self, "Cannot fetch product data")
             return False
         self.data = data
         return True
@@ -133,7 +133,7 @@ class Node_album(INode):
         try:
             year = time.strftime("%Y", time.localtime(date))
         except Exception:
-            warn(self, 'Invalid date format %s', date)
+            debug.warn(self, 'Invalid date format %s', date)
         return year
 
     def get_description(self):

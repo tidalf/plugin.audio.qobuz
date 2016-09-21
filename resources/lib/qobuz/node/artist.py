@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.debug import warn
+from qobuz import debug
 from qobuz.gui.util import getSetting
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
@@ -29,7 +29,7 @@ class Node_artist(INode):
         self.content_type = 'artists'
 
     def hook_post_data(self):
-        self.nid = self.get_property('id')
+        self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
         self.name = self.get_property('name')
         self.image = self.get_image()
         self.slug = self.get_property('slug')
@@ -40,7 +40,7 @@ class Node_artist(INode):
         data = api.get('/artist/get', artist_id=self.nid, limit=limit,
                        offset=self.offset, extra='albums')
         if not data:
-            warn(self, 'Build-down: Cannot fetch artist data')
+            debug.warn(self, 'Build-down: Cannot fetch artist data')
             return False
         self.data = data
         return True
@@ -48,7 +48,7 @@ class Node_artist(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         node_artist = getNode(Flag.ARTIST, data=self.data)
         node_artist.label = '[ %s ]' % (node_artist.label)
-        if not 'albums' in self.data:
+        if 'albums' not in self.data:
             return True
         for data in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=data)
@@ -97,7 +97,7 @@ class Node_artist(INode):
                                 image,
                                 url)
         if not item:
-            warn(self, 'Error: Cannot make xbmc list item')
+            debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
         item.setPath(url)
         item.setInfo('music', infoLabels={

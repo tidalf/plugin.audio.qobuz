@@ -7,13 +7,13 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import json
-try:
-    import xbmc  # @UnresolvedImport
-except:
-    print "Outsided xbmc"
-
-from qobuz.exception import QobuzXbmcError
 import pprint
+try:
+    import xbmc
+except ImportError as e:
+    print "ImportError(Outside XBMC): %s" % e
+
+from qobuz import exception
 from qobuz.debug import log
 
 
@@ -99,8 +99,7 @@ class XbmcRPC:
 
     def send(self, request):
         if not request:
-            raise QobuzXbmcError(
-                who=self, what='missing_parameter', additional='request')
+            raise exception.MissingParameter('equest')
         return JsonResponse(xbmc.executeJSONRPC(request.to_json()))
 
     def ping(self):

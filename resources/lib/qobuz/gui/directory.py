@@ -12,7 +12,7 @@ import xbmcgui  # @UnresolvedImport
 from qobuz.gui.progress import Progress
 import time
 from qobuz.gui.util import lang
-from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import exception
 
 
 class Directory():
@@ -83,8 +83,7 @@ class Directory():
         * @attention: broken, Raise exception if user has canceled progress
         """
         if self.Progress.iscanceled():
-            raise Qerror(who=self, what="build_down_canceled")
-            return False
+            raise exception.BuildCanceled('down')
         if self.asList:
             self.nodes.append(node)
             self.total_put += 1

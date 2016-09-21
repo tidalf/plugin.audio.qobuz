@@ -7,8 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
-from qobuz.exception import QobuzXbmcError
-from qobuz.debug import warn
+from qobuz import exception
+from qobuz import debug
 from qobuz.bootstrap import Bootstrap
 from qobuz import config
 from qobuz.registry import Registry
@@ -35,5 +35,5 @@ class Application(object):
         try:
             self.bootstrap.init_app()
             self.bootstrap.dispatch()
-        except QobuzXbmcError as e:
-            warn('[' + self.plugin.plugin_id + ']', "Exception while running plugin")
+        except exception.QobuzError as e:
+            debug.warn('[' + self.plugin.plugin_id + ']', "Exception while running plugin")
