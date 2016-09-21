@@ -9,5 +9,5 @@
 from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
 
 
-def renderer(nType, params=None):
-    return OurRenderer(nType, params)
+def renderer(nType, params=None, mode=None):
+    return OurRenderer(nType, params, mode)

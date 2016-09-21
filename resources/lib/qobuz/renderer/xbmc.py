@@ -24,8 +24,8 @@ class QobuzXbmcRenderer(IRenderer):
         * You can set parameter after init (see renderer.Irenderer)
     """
 
-    def __init__(self, node_type, params={}):
-        super(QobuzXbmcRenderer, self).__init__(node_type, params)
+    def __init__(self, node_type, params={}, mode=None):
+        super(QobuzXbmcRenderer, self).__init__(node_type, params, mode)
 
     def run(self):
         """Building our tree, creating root node based on our node_type
@@ -85,7 +85,7 @@ class QobuzXbmcRenderer(IRenderer):
         Dir = Directory(self.root, self.nodes, withProgress=False)
         Dir.handle = int(sys.argv[1])
         Dir.asList = False
-        Dir.asLocalURL = True
+        Dir.asLocalUrl = True
         if self.root.nt & Flag.TRACK == Flag.TRACK:
             self.root.fetch(Dir, None, Flag.TRACK, Flag.NONE)
             Dir.add_node(self.root)

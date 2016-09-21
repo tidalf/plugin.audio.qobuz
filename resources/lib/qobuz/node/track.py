@@ -46,7 +46,6 @@ class Node_track(INode):
 
     def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
         if asLocalUrl is True:
-            debug.info('MakeUrl {} asLocalUrl', str(self.nid))
             return 'http://127.0.0.1:33574/qobuz/track/%s.mpc' % str(self.nid)
         purchased = self.get_parameter('purchased')
         if purchased:
@@ -272,11 +271,7 @@ class Node_track(INode):
         mode = Mode.PLAY
         url = self.make_url(mode=mode)
         image = self.get_image()
-        item = xbmcgui.ListItem(label,
-                                label,
-                                image,
-                                image,
-                                url)
+        item = xbmcgui.ListItem(label, label, image, image, url)
         item.setIconImage(image)
         item.setThumbnailImage(image)
         if not item:
@@ -316,10 +311,9 @@ class Node_track(INode):
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': desc + '(aid=' + self.get_album_id()
-                     + ',curl=' + self.get_image() + ')' # @hack
-                     # 'lyrics': "loreum..."
-                     })
+                     #'comment': desc + '(aid=' + self.get_album_id()
+                     #+ ',curl=' + self.get_image() + ')' # @hack
+        })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)

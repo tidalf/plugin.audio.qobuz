@@ -13,6 +13,7 @@ from qobuz.gui.progress import Progress
 import time
 from qobuz.gui.util import lang
 from qobuz import exception
+from qobuz import debug
 
 
 class Directory(object):
@@ -101,6 +102,7 @@ class Directory(object):
         if not item:
             return False
         url = node.make_url(asLocalUrl=self.asLocalUrl)
+        debug.warn('URL {}', url)
         if not self.add_to_xbmc_directory(url=url,
                                           item=item,
                                           is_folder=node.is_folder):
@@ -161,11 +163,8 @@ class Directory(object):
                 item: xbmc.ListItem
                 is_folder: bool
         """
-        if not xbmcplugin.addDirectoryItem(self.handle,
-                                           ka['url'],
-                                           ka['item'],
-                                           ka['is_folder'],
-                                           self.total_put):
+        if not xbmcplugin.addDirectoryItem(self.handle, ka['url'], ka['item'],
+                                           ka['is_folder'], self.total_put):
             return False
         self.total_put += 1
         return True

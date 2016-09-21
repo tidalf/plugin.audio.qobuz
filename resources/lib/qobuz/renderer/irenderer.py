@@ -18,7 +18,7 @@ class IRenderer(object):
         parameters: dictionary, parameters passed to our plugin
     """
 
-    def __init__(self, node_type, parameters={}):
+    def __init__(self, node_type, parameters={}, mode=None):
         self.node_type = node_type
         self.parameters = parameters
         self.root = None
@@ -28,6 +28,7 @@ class IRenderer(object):
         self.asList = False
         self.nodes = []
         self.enable_progress = False
+        self.mode = mode
 
     def set_root_node(self):
         """Import correct node object based on node_type parameter, setting

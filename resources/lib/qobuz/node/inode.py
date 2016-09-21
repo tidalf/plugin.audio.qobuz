@@ -549,7 +549,7 @@ class INode(object):
         if getSetting('enable_scan_feature', asBool=True):
             ''' SCAN '''
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN,
-                                                    asLocalURL=False))
+                                                    asLocalURL=True))
             url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan',
                                 query=query)
             menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')

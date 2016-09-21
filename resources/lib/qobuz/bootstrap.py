@@ -157,8 +157,7 @@ class MinimalBootstrap(object):
             r.depth = -1
             return r.run()
         elif self.MODE == Mode.SCAN:
-
-            r = renderer(self.nodeType, self.params)
+            r = renderer(self.nodeType, self.params, self.MODE)
             r.enable_progress = False
             r.whiteFlag = Flag.TRACK
             r.depth = -1

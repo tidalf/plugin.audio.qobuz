@@ -65,9 +65,9 @@ class _PersistentDictMixin(object):
         fileobj = open(tempname, 'wb' if self.file_format == 'pickle' else 'w')
         try:
             self.dump(fileobj)
-        except Exception:
+        except Exception as e:
             os.remove(tempname)
-            raise
+            raise e
         finally:
             fileobj.close()
         shutil.move(tempname, self.filename)    # atomic commit
