@@ -18,8 +18,7 @@ class Node_root(INode):
     '''
 
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_root, self).__init__(parent=parent,
-                                        parameters=parameters,
+        super(Node_root, self).__init__(parent=parent, parameters=parameters,
                                         data=data)
         self.nt = Flag.ROOT
         self.content_type = 'files'
@@ -66,6 +65,5 @@ class Node_root(INode):
     def gui_scan(self):
         '''Scanning directory specified in query parameter
         '''
-        query = self.get_parameter('query', unQuote=True)
-        debug.info(self, 'SCANING query: %s', query)
-        executeBuiltin("XBMC.UpdateLibrary('music', '%s')" % (query))
+        executeBuiltin('UpdateLibrary("music", "%s")' % (
+            self.get_parameter('query', unQuote=True)))

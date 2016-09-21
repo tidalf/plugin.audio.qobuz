@@ -27,7 +27,7 @@ class IRenderer(object):
         self.depth = 1
         self.asList = False
         self.nodes = []
-        self.enable_progress = True
+        self.enable_progress = False
 
     def set_root_node(self):
         """Import correct node object based on node_type parameter, setting

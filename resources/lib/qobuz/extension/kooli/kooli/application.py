@@ -58,7 +58,7 @@ def shutdown_server():
     func()
 
 @nocache
-@application.route('/qobuz/track/<int:track_id>', methods=['HEAD'])
+@application.route('/qobuz/track/<int:track_id>.mpc', methods=['HEAD'])
 def route_track_head(track_id=None):
     response = api.get('/track/getFileUrl',
                        format_id=get_format_id(),
@@ -68,7 +68,7 @@ def route_track_head(track_id=None):
     return 'ok', 200
 
 @nocache
-@application.route('/qobuz/track/<int:track_id>', methods=['GET'])
+@application.route('/qobuz/track/<int:track_id>.mpc', methods=['GET'])
 def route_track(track_id=None):
     response = api.get('/track/getFileUrl',
                        format_id=get_format_id(),

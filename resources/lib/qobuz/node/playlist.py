@@ -73,7 +73,7 @@ class Node_playlist(INode):
         if self.playlist_storage is not None:
             return self.playlist_storage
         if api.user_id is None or self.nid is None:
-            warn(self, 'Missing user_id: {user_id} or nid: {nid}',
+            debug.warn(self, 'Missing user_id: {user_id} or nid: {nid}',
                  user_id=api.user_id, nid=self.nid)
             return None
         self.playlist_storage = _Storage(self._get_playlist_storage_filename())

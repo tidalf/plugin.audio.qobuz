@@ -8,7 +8,7 @@
 '''
 import sys
 import qobuz  # @UnresolvedImport
-from qobuz.debug import warn
+from qobuz import debug
 from qobuz.renderer.irenderer import IRenderer
 from qobuz.gui.util import notifyH, getSetting
 from qobuz import exception
@@ -31,9 +31,8 @@ class QobuzXbmcRenderer(IRenderer):
         """Building our tree, creating root node based on our node_type
         """
         if not self.set_root_node():
-            warn(self,
-                 ("Cannot set root node (%s, %s)") %
-                 (str(self.node_type), str(self.root.get_parameter('nid'))))
+            debug.warn(self, ("Cannot set root node ({}, {})") %
+                (str(self.node_type), str(self.root.get_parameter('nid'))))
             return False
         if self.root.hasWidget:
             return self.root.displayWidget()
@@ -54,8 +53,7 @@ class QobuzXbmcRenderer(IRenderer):
         except exception.QobuzError as e:
             Dir.end_of_directory(False)
             Dir = None
-            warn(self,
-                 "Error while populating our directory: %s" % (repr(e)))
+            debug.warn(self, "Error while populating our directory: %s" % (repr(e)))
             return False
         if not self.asList:
             import xbmcplugin  # @UnresolvedImport
@@ -80,8 +78,8 @@ class QobuzXbmcRenderer(IRenderer):
         feature
         """
         if not self.set_root_node():
-            warn(self, "Cannot set root node ('%s')" % (str(
-                self.node_type)))
+            debug.warn(self, "Cannot set root node ('{}')",
+                       str(self.node_type))
             return False
         handle = config.app.handle
         Dir = Directory(self.root, self.nodes, withProgress=False)
@@ -89,13 +87,15 @@ class QobuzXbmcRenderer(IRenderer):
         Dir.asList = False
         Dir.asLocalURL = True
         if self.root.nt & Flag.TRACK == Flag.TRACK:
-            self.root.fetch(None, None, Flag.TRACK, Flag.NONE)
+            self.root.fetch(Dir, None, Flag.TRACK, Flag.NONE)
             Dir.add_node(self.root)
         else:
             self.root.populating(Dir, self.depth,
                                  self.whiteFlag, self.blackFlag)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()
-        notifyH('Scanning results', str(Dir.total_put) +
-                ' items where scanned', mstime=3000)
+        notifyH('Scanning results',
+                '%s items where scanned' % str(Dir.total_put),
+                mstime=3000)
+        debug.info(self, 'scanning result total_put: {}', str(Dir.total_put))
         return True

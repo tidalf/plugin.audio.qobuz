@@ -15,7 +15,7 @@ from qobuz.gui.util import lang
 from qobuz import exception
 
 
-class Directory():
+class Directory(object):
     """This class permit to add item to Xbmc directory or store nodes
         that we retrieve while building our tree
 
@@ -34,14 +34,14 @@ class Directory():
 
     def __init__(self, root, nodeList=[], **ka):
         self.nodes = []
-        self.label = "Qobuz Progress / "
+        self.label = "Qobuz / "
         self.root = root
         self.asList = False
         self.handle = None
         self.put_item_ok = True
         withProgress = True
         if 'withProgress' in ka:
-            if ka['withProgress']:
+            if ka['withProgress'] is True:
                 withProgress = True
             else:
                 withProgress = False

@@ -30,7 +30,7 @@ except:
 import qobuz  # @UnresolvedImport
 from qobuz.xbmcrpc import showNotification, getInfoLabels
 from qobuz import config
-from qobuz.debug import info
+from qobuz import debug
 from qobuz.util import common as commonUtil
 def htm2xbmc(htm):
     def replace(m):
@@ -175,6 +175,7 @@ def containerRefresh():
 
 
 def executeBuiltin(cmd):
+    debug.warn('util', 'Executing builtin: {}', cmd)
     xbmc.executebuiltin("%s" % (cmd))
 
 

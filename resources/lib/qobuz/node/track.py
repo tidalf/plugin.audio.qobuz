@@ -46,7 +46,8 @@ class Node_track(INode):
 
     def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
         if asLocalUrl is True:
-            return 'http://127.0.0.1:33574/qobuz/track/%s' % str(self.nid)
+            debug.info('MakeUrl {} asLocalUrl', str(self.nid))
+            return 'http://127.0.0.1:33574/qobuz/track/%s.mpc' % str(self.nid)
         purchased = self.get_parameter('purchased')
         if purchased:
             ka['purchased'] = purchased
@@ -258,7 +259,7 @@ class Node_track(INode):
         duration = self.get_duration()
         if duration == -1:
             import pprint
-            print "Error: no duration\n%s" % (pprint.pformat(self.data))
+            debug.error(self, "no duration\n%s" % (pprint.pformat(self.data)))
         label = self.get_label()
         isplayable = 'true'
 
@@ -316,7 +317,7 @@ class Node_track(INode):
                      'duration': duration,
                      'year': self.get_year(),
                      'comment': desc + '(aid=' + self.get_album_id()
-                     + ',curl=' + self.get_image() + ')'
+                     + ',curl=' + self.get_image() + ')' # @hack
                      # 'lyrics': "loreum..."
                      })
         item.setProperty('DiscNumber', str(media_number))

@@ -155,17 +155,18 @@ class INode(object):
     def __get_property(self, path):
         '''Helper used by get_property method
         '''
-        if not self.data or self.data is None:
+        if self.data is None:
             return None
         xPath = path.split('/')
         root = self.data
         for i in range(0, len(xPath)):
             if not xPath[i] in root:
+                #debug.warn(self, 'Invalid property path {} in {}', path, xPath[i])
                 return None
             root = root[xPath[i]]
             if isEmpty(root):
                 return None
-        if root and root != 'None':
+        if root is not None and root != 'None':
             return root
         return None
 
@@ -226,9 +227,11 @@ class INode(object):
         @param unQuote=False: boolean, when True unquote value
         '''
         if name not in self.parameters:
+            debug.warn(self, '%s not in parameters', name)
             return default
         value = self.parameters[name]
         if value is None:
+            debug.warn(self, '%s value is None', name)
             return default
         if unQuote is True:
             return urllib.unquote_plus(value)
@@ -387,7 +390,7 @@ class INode(object):
                 gData['count'] += 1
                 Dir.update(gData, "Working", label, child.get_label())
             else:
-                debug.log(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
+                debug.info(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
             ''' Calling builiding down on child '''
             child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
         debug.info(self, 'Populated {}', self)
@@ -543,14 +546,13 @@ class INode(object):
         cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
         menu.add(path='qobuz/big_dir',
                  label=lang(30158), cmd=cmd)
-        ''' SCAN '''
         if getSetting('enable_scan_feature', asBool=True):
-            query = urllib.quote_plus(self.make_url(mode=Mode.SCAN))
-            url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW,
-                                nm='gui_scan', query=query)
-            menu.add(path='qobuz/scan',
-                     cmd=runPlugin(url),
-                     label='scan')
+            ''' SCAN '''
+            query = urllib.quote_plus(self.make_url(mode=Mode.SCAN,
+                                                    asLocalURL=False))
+            url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan',
+                                query=query)
+            menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
         if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK
                       & ~Flag.PLAYLIST):
             ''' ERASE CACHE '''
