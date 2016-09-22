@@ -23,7 +23,7 @@ application = Flask(__name__)
 
 from qobuz.gui.util import getSetting
 from werkzeug import exceptions
-from flask import make_response
+from flask import make_response, render_template
 from functools import wraps, update_wrapper
 from datetime import datetime
 
@@ -82,6 +82,14 @@ def sniff(path=None):
     debug.info(__name__, 'Request[{}] {}', request.method, path)
     return http_error('NotFound')
 
+@nocache
+@application.route('/qobuz/album/<int:album_id>/track/<int:track_id>/album.nfo', methods=['HEAD'])
+def route_track_head(album_id=None, track_id=None):
+    response = api.get('/album/get', album_id=album_id)
+    if response is None or 'url' not in response:
+        return http_error('NotFound')
+    debug.info(__name__, 'Response: {}', response)
+    return render_template('tpl/album.nfo.tpl', entries=response)
 #  CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/track/disc.png
 # 23:23:34 T:123145335918592   ERROR: CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/track/cdart.png
 # 23:23:34 T:123145335918592   ERROR: CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/album.nfo

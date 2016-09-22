@@ -10,12 +10,12 @@ try:
 except ImportError:
     sys.path.append(P.abspath(P.join(base_path, P.pardir, P.pardir)))
 
-try:
-    import flask
-except Exception:
-    from kooli import qobuz_lib_path
-    path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask', 'lib')
-    sys.path.append(path)
+#try:
+#    import flask
+#except Exception:
+from kooli import qobuz_lib_path
+path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask', 'lib')
+sys.path.append(path)
 
 from kooli.application import application, shutdown_server
 from kooli import log
