@@ -49,7 +49,7 @@ class Node_friend(INode):
     def gui_create(self):
         name = self.get_parameter('query')
         if not name:
-            from gui.util import Keyboard
+            from qobuz.gui.util import Keyboard
             kb = Keyboard('',
                           str(lang(30181)))
             kb.doModal()
@@ -87,6 +87,7 @@ class Node_friend(INode):
         newdata = {'friends': friends}
         if not api.user_update(player_settings=json.dumps(newdata)):
             return False
+        self.delete_cache()
         executeBuiltin(containerRefresh())
         return True
 
