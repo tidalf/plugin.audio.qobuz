@@ -2,8 +2,8 @@ import sys
 import os
 from os import path as P
 import logging
-
-base_path = P.abspath(P.join(P.dirname(__file__), P.pardir))
+kooli_path = P.abspath(P.join(P.dirname(__file__)))
+base_path = P.join(kooli_path, P.pardir)
 qobuz_lib_path = P.abspath(P.join(base_path, P.pardir, P.pardir, P.pardir))
 try:
     import qobuz

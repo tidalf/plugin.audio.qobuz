@@ -10,6 +10,7 @@ from qobuz import base_path
 from qobuz.plugin import Plugin
 from qobuz.bootstrap import MinimalBootstrap
 from qobuz import debug
+from kooli import kooli_path
 qobuzApp = QobuzApplication(Plugin('plugin.audio.qobuz'),
                             bootstrapClass=MinimalBootstrap)
 qobuzApp.bootstrap.init_app()
@@ -18,8 +19,9 @@ debug.info(None, 'Username %s Password %s' % (qobuzApp.registry.get('username'),
 api.login(username=qobuzApp.registry.get('username'),
           password=qobuzApp.registry.get('password'))
 
-
-application = Flask(__name__)
+kooli_tpl = P.join(kooli_path, 'tpl')
+debug.info("FOO", 'base_path {}', kooli_tpl)
+application = Flask(__name__, template_folder=kooli_tpl)
 
 from qobuz.gui.util import getSetting
 from werkzeug import exceptions
@@ -58,7 +60,7 @@ def shutdown_server():
     func()
 
 @nocache
-@application.route('/qobuz/album/<int:album_id>/track/<int:track_id>/file.mpc', methods=['HEAD'])
+@application.route('/qobuz/album/<string:album_id>/track/<string:track_id>/file.mpc', methods=['HEAD'])
 def route_track_head(album_id=None, track_id=None):
     response = api.get('/track/getFileUrl',
                        format_id=get_format_id(),
@@ -68,7 +70,7 @@ def route_track_head(album_id=None, track_id=None):
     return 'ok', 200
 
 @nocache
-@application.route('/qobuz/album/<int:album_id>/track/<int:track_id>/file.mpc', methods=['GET'])
+@application.route('/qobuz/album/<string:album_id>/track/<string:track_id>/file.mpc', methods=['GET'])
 def route_track(album_id=None, track_id=None):
     response = api.get('/track/getFileUrl',
                        format_id=get_format_id(),
@@ -77,19 +79,20 @@ def route_track(album_id=None, track_id=None):
         return http_error('NotFound')
     return redirect(response['url'], code=302)
 
-@application.route('/<path:path>')
-def sniff(path=None):
-    debug.info(__name__, 'Request[{}] {}', request.method, path)
-    return http_error('NotFound')
+# @application.route('/<path:path>')
+# def sniff(path=None):
+#     debug.info(__name__, 'Request[{}] {}', request.method, path)
+#     return http_error('NotFound')
 
 @nocache
-@application.route('/qobuz/album/<int:album_id>/track/<int:track_id>/album.nfo', methods=['HEAD'])
-def route_track_head(album_id=None, track_id=None):
+@application.route('/qobuz/album/<string:album_id>/track/<string:track_id>/album.nfo', methods=['GET', 'HEAD'])
+def route_nfo_album(album_id=None, track_id=None):
+    debug.info(__name__, 'ROUTE ALBUM.NFO')
     response = api.get('/album/get', album_id=album_id)
-    if response is None or 'url' not in response:
+    if response is None:
         return http_error('NotFound')
     debug.info(__name__, 'Response: {}', response)
-    return render_template('tpl/album.nfo.tpl', entries=response)
+    return render_template('album.nfo.tpl', **response)
 #  CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/track/disc.png
 # 23:23:34 T:123145335918592   ERROR: CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/track/cdart.png
 # 23:23:34 T:123145335918592   ERROR: CCurlFile::Exists - Failed: Couldn't connect to server(7) for http://127.0.0.1:33574/qobuz/album.nfo

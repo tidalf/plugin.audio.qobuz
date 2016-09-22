@@ -31,10 +31,11 @@ if __name__ == '__main__':
     monitor = xbmc.Monitor()
     port = 33574
 
-    #@application.before_request
-    #def shutdown_request():
-        #pass #if monitor.abortRequested():
-            #shutdown_server()
+    @application.before_request
+    def shutdown_request():
+        if monitor.abortRequested():
+            debug.info(__name__, 'Shutdown Qobuz Httpd requested')
+            shutdown_server()
 
     debug.info(__name__, 'Starting Qobuz HTTP Service http://localhost:{}', port)
     while not monitor.abortRequested():
