@@ -11,7 +11,7 @@
   <label>{{label.name}}</label>
   {% for track in tracks['items'] %}
     <track>
-      <position>{{track.media_number}}</position>
+      <position>{{track.track_number}}</position>
       <title>{{track.title}}</title>
       <duration>{{track.duration}}</duration>
     </track>
