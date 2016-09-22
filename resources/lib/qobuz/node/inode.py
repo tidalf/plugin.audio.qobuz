@@ -227,7 +227,6 @@ class INode(object):
         @param unQuote=False: boolean, when True unquote value
         '''
         if name not in self.parameters:
-            debug.warn(self, '{} not in parameters', name)
             return default
         value = self.parameters[name]
         if value is None:
