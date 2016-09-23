@@ -19,13 +19,7 @@ except ImportError:
 import shutil
 import collections
 from datetime import datetime
-
-
-class MyLog():
-
-    def debug(self, *a):
-        print a[0] % (a[1:])
-log = MyLog()
+from qobuz import debug
 
 
 class _PersistentDictMixin(object):
@@ -49,8 +43,6 @@ class _PersistentDictMixin(object):
         self.file_format = file_format      # 'csv', 'json', or 'pickle'
         self.filename = filename
         if flag != 'n' and os.access(filename, os.R_OK):
-            #log.debug('Reading %s storage from disk at "%s"',
-            #          self.file_format, self.filename)
             fileobj = open(filename, 'rb' if file_format == 'pickle' else 'r')
             with fileobj:
                 self.load(fileobj)
@@ -59,7 +51,7 @@ class _PersistentDictMixin(object):
         """Write the dict to disk
         """
         if self.flag == 'r':
-            return
+            return False
         filename = self.filename
         tempname = filename + '.tmp'
         fileobj = open(tempname, 'wb' if self.file_format == 'pickle' else 'w')
@@ -70,9 +62,13 @@ class _PersistentDictMixin(object):
             raise e
         finally:
             fileobj.close()
+        if not os.path.exists(tempname):
+            debug.error(self, 'Temporary file does not exists {}', tempname)
+            return False
         shutil.move(tempname, self.filename)    # atomic commit
         if self.mode is not None:
             os.chmod(self.filename, self.mode)
+        return True
 
     def close(self):
         """Calls sync

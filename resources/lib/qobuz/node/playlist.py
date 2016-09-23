@@ -55,18 +55,20 @@ class Node_playlist(INode):
         images = []
         if self.nid is not None:
             storage = self.get_playlist_storage()
-            images_len = 0
-            if 'image' not in storage:
-                images = dataUtil.list_image(self.data)
+            if storage is not None:
+                debug.error(self, 'Cannot get playlist storage')
+                images_len = 0
+                if 'image' not in storage:
+                    images = dataUtil.list_image(self.data)
+                    images_len = len(images)
+                    if images_len > 0:
+                        storage['image'] = images
+                        storage.sync()
+                else:
+                    images = storage['image']
                 images_len = len(images)
                 if images_len > 0:
-                    storage['image'] = images
-                    storage.sync()
-            else:
-                images = storage['image']
-        images_len = len(images)
-        if images_len > 0:
-            return images[random.randrange(0, images_len, 1)]
+                    return images[random.randrange(0, images_len, 1)]
         return getImage(self.content_type)
 
     def get_playlist_storage(self):

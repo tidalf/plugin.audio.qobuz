@@ -7,7 +7,18 @@
   {% endfor %}
   <releasedate>{{released_at}}</releasedate>
   <type>{{type}}</type>
-  <thumb>{{image.small}}</thumb>
+  {% if image[image_default_size] %}
+    <thumb>{{image[image_default_size]}}</thumb>
+  {% endif %}
+  {% if image.large %}
+    <thumb>{{image.large}}</thumb>
+  {% endif %}
+  {% if image.small %}
+    <thumb>{{image.small}}</thumb>
+  {% endif %}
+  {% if image.thumbnail %}
+    <thumb>{{image.thumbnail}}</thumb>
+  {% endif %}
   <label>{{label.name}}</label>
   {% for track in tracks['items'] %}
     <track>
@@ -17,8 +28,12 @@
     </track>
   {% endfor %}
 <review>{%- if true -%}
-{{catchline}}
-{{description}}
+{%- if catchline -%}
+{{catchline|striptags}}
+{% endif %}
+{%- if description -%}
+  {{description|striptags}}
+{% endif %}
 Duration : {{duration / 60}}mn
 Tracks   : {{tracks_count}}
 Media    : {{media_count}}

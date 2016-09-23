@@ -102,7 +102,6 @@ class Directory(object):
         if not item:
             return False
         url = node.make_url(asLocalUrl=self.asLocalUrl)
-        debug.warn('URL {}', url)
         if not self.add_to_xbmc_directory(url=url,
                                           item=item,
                                           is_folder=node.is_folder):

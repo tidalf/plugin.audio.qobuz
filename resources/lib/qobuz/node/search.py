@@ -78,7 +78,7 @@ class Node_search(INode):
         limit = getSetting('pagination_limit')
         stype = self.search_type
         query = self.get_parameter('query', unQuote=True)
-        if not query:
+        if query is None:
             from qobuz.gui.util import Keyboard
             k = Keyboard('', stype)
             k.doModal()

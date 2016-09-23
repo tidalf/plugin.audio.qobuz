@@ -46,7 +46,7 @@ class Node_track(INode):
 
     def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
         if asLocalUrl is True:
-            return 'http://127.0.0.1:33574/qobuz/%s/%s.mpc' \
+            return 'http://127.0.0.1:33574/qobuz/%s/%s/file.mpc' \
                 % (self.get_album_id(), str(self.nid))
         purchased = self.get_parameter('purchased')
         if purchased:

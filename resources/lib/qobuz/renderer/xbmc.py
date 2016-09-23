@@ -87,7 +87,7 @@ class QobuzXbmcRenderer(IRenderer):
         Dir.asList = False
         Dir.asLocalUrl = True
         if self.root.nt & Flag.TRACK == Flag.TRACK:
-            self.root.fetch(Dir, None, Flag.TRACK, Flag.NONE)
+            self.root.fetch(None, None, Flag.TRACK, Flag.NONE)
             Dir.add_node(self.root)
         else:
             self.root.populating(Dir, self.depth,

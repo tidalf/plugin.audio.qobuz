@@ -356,27 +356,26 @@ class INode(object):
                    gData=None):
         if Dir.Progress.iscanceled():
             return False
-        if gData is None:
-            gData = {'count': 0,
-                     'total': 100,
-                     'startedOn': time()}
+        # if gData is None:
+        #     gData = {'count': 0,
+        #              'total': 100,
+        #              'startedOn': time()}
         if lvl != -1 and lvl < 1:
             return False
-        Dir.update(gData, 'Fetching', '', '')
+        # Dir.update(gData, 'Fetching', '', '')
         if not (self.nt & blackFlag == self.nt):
             if not self.fetch(Dir, lvl, whiteFlag, blackFlag):
                 return False
             else:
                 self.__add_pagination(self.data)
         self.populate(Dir, lvl, whiteFlag, blackFlag)
-        ''' Recursive mode dont't decrement level '''
         if lvl != -1:
             lvl -= 1
         label = self.get_label()
-        gData['count'] = 0
-        gData['total'] = len(self.childs)
+        # gData['count'] = 0
+        # gData['total'] = len(self.childs)
         self.__add_pagination_node(Dir, lvl, whiteFlag)
-        Dir.update(gData, 'Working', label, '')
+        # Dir.update(gData, 'Working', label, '')
         for child in self.childs:
             if Dir.is_canceled():
                 return False
@@ -386,14 +385,14 @@ class INode(object):
                     debug.warn(self, "Something went wrong... aborting")
                     self.childs = []
                     raise exception.BuildCanceled('down')
-                gData['count'] += 1
-                Dir.update(gData, "Working", label, child.get_label())
+                # gData['count'] += 1
+                # Dir.update(gData, "Working", label, child.get_label())
             else:
                 debug.info(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
             ''' Calling builiding down on child '''
             child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
         debug.info(self, 'Populated {}', self)
-        return gData['count']
+        #return gData['count']
 
     def populate(self, xbmc_directory, lvl, Flag):
         '''Hook / _build_down:
@@ -548,7 +547,7 @@ class INode(object):
         if getSetting('enable_scan_feature', asBool=True):
             ''' SCAN '''
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN,
-                                                    asLocalURL=True))
+                                                    asLocalUrl=True))
             url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan',
                                 query=query)
             menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
@@ -565,7 +564,7 @@ class INode(object):
         if self.user_storage:
             return self.user_storage
         filename = os.path.join(cache.base_path,
-                                'localuserdata-%s.local' % str(api.user_id))
+                                'user-%s.local' % str(api.user_id))
         self.user_storage = _Storage(filename)
         return self.user_storage
 
