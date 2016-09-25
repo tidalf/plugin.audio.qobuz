@@ -75,7 +75,6 @@ class Node_search(INode):
         return super(Node_search, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
         stype = self.search_type
         query = self.get_parameter('query', unQuote=True)
         if query is None:
@@ -87,7 +86,7 @@ class Node_search(INode):
             query = k.getText()
         query.strip()
         data = api.get('/search/getResults', query=query, type=stype,
-                       limit=limit, offset=self.offset)
+                       limit=self.limit, offset=self.offset)
         if data is None:
             debug.warn(self, "Search return no data")
             return False
@@ -111,6 +110,5 @@ class Node_search(INode):
         elif self.search_type == 'artists':
             for artist in self.data['artists']['items']:
                 node = getNode(Flag.ARTIST, data=artist)
-                print('Artist %s', artist)
                 self.add_child(node)
         return True

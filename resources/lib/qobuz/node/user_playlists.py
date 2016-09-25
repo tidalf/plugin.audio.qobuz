@@ -54,9 +54,8 @@ class Node_user_playlists(INode):
         return int(userdata['current_playlist'])
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
         data = api.get('/playlist/getUserPlaylists',
-                       limit=limit,
+                       limit=self.limit,
                        offset=self.offset,
                        user_id=api.user_id)
         if data is None:

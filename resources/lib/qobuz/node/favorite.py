@@ -50,23 +50,23 @@ class Node_favorite(INode):
                                       self.search_type.capitalize())
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
         data = None
         if self.search_type != 'all':
             data = api.get('/favorite/getUserFavorites',
                            user_id=api.user_id,
                            type=self.search_type,
-                           limit=limit,
+                           limit=self.limit,
                            offset=self.offset)
         else:
             data = api.get('/favorite/getUserFavorites',
                            user_id=api.user_id,
-                           limit=limit,
+                           limit=self.limit,
                            offset=self.offset)
         if not data:
             debug.warn(self, 'Build-down: Cannot fetch favorites data')
             return False
         self.data = data
+        self.image = self.get_image()
         return True
 
     def make_url(self, **ka):
@@ -353,3 +353,14 @@ class Node_favorite(INode):
         url = self.make_url(nt=self.nt, nid=None, nm=None)
         executeBuiltin(containerUpdate(url, True))
         return True
+
+    def get_image(self):
+        image = self.get_image_from_storage()
+        if image is None:
+            image = super(Node_favorite, self).get_image()
+        return image
+
+    def _get_node_storage_filename(self):
+        return u'userdata-{user_id}-favorite-{nid}.local'.format(
+            user_id=api.user_id,
+            nid=self.nid)

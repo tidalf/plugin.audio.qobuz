@@ -27,9 +27,8 @@ class Node_similar_artist(INode):
         return lang(30156)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
         data = api.get('/artist/getSimilarArtists', artist_id=self.nid,
-                       offset=self.offset, limit=limit)
+                       offset=self.offset, limit=self.limit)
         if not data:
             return False
         self.data = data

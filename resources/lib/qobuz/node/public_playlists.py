@@ -24,12 +24,10 @@ class Node_public_playlists(INode):
         self.set_label(lang(30190))
         self.is_folder = True
         self.image = getImage('userplaylists')
-        self.offset = self.get_parameter('offset') or 0
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
         data = api.get('/playlist/getPublicPlaylists', offset=self.offset,
-                       limit=limit, type='last-created')
+                       limit=self.limit, type='last-created')
         if data is None:
             return False
         # @bug: we use pagination_limit as limit for the search so we don't

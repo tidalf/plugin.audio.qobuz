@@ -53,11 +53,11 @@ class Node_friends(INode):
         if self.name:
             data = api.get('/playlist/getUserPlaylists',
                            username=self.name,
-                           limit=0)
+                           limit=self.limit, offset=self.offset)
         else:
             data = api.get('/playlist/getUserPlaylists',
                            user_id=user_id,
-                           limit=0)
+                           limit=self.limit, offset=self.offset)
         if not data:
             debug.warn(self, 'No friend data')
             return False

@@ -56,11 +56,11 @@ class Node_recommendation(INode):
         super(Node_recommendation, self).__init__(parent=parent,
                                                   parameters=parameters,
                                                   data=data)
+        self.content_type = 'files'
         self.nt = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id', default=None)
         self.genre_type = self.get_parameter('genre-type', default=None)
         self.set_label(lang(30084))
-        self.image = getImage('album')
 
     def make_url(self, **ka):
         if self.genre_type is not None:
@@ -77,13 +77,11 @@ class Node_recommendation(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if self.genre_type is  None or self.genre_id is None:
             return True
-        offset = self.offset or 0
-        limit = getSetting('pagination_limit')
         data = api.get('/album/getFeatured',
                        type=RECOS_TYPE_IDS[int(self.genre_type)],
                        genre_id=self.genre_id,
-                       limit=10,
-                       offset=offset)
+                       limit=self.limit,
+                       offset=self.offset)
         if data is None:
             debug.warn(self, 'Cannot fetch data for recommendation')
             return False

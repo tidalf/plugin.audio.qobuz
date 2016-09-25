@@ -49,9 +49,8 @@ class Node_genre(INode):
         return True
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
         data = api.get('/genre/list', parent_id=self.nid, offset=self.offset,
-                       limit=limit)
+                       limit=self.limit)
         if not data:
             self.data = None
             return True  # Nothing returned trigger reco build in build_down

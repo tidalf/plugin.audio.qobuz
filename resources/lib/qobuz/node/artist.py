@@ -36,8 +36,7 @@ class Node_artist(INode):
         self.label = self.name
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/artist/get', artist_id=self.nid, limit=limit,
+        data = api.get('/artist/get', artist_id=self.nid, limit=self.limit,
                        offset=self.offset, extra='albums')
         if not data:
             debug.warn(self, 'Build-down: Cannot fetch artist data')

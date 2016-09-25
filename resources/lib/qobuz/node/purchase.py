@@ -38,8 +38,7 @@ class Node_purchase(INode):
         return super(Node_purchase, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/purchase/getUserPurchases', limit=limit,
+        data = api.get('/purchase/getUserPurchases', limit=self.limit,
                        offset=self.offset, user_id=api.user_id)
         if not data:
             debug.warn(self, 'Cannot fetch purchases data')

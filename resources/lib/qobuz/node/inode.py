@@ -11,6 +11,7 @@ import sys
 from time import time
 import urllib
 import weakref
+import random
 
 from qobuz.api import api
 from qobuz.cache import cache
@@ -19,6 +20,7 @@ from qobuz import debug
 from qobuz import exception
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import color, lang, runPlugin, containerUpdate, getSetting
+from qobuz.gui.util import getImage
 from qobuz.node import Flag
 from qobuz.node import getNode
 import qobuz  # @UnresolvedImport
@@ -26,6 +28,7 @@ from qobuz.renderer import renderer
 from qobuz.storage import _Storage
 from qobuz.util.common import isEmpty
 from qobuz import config
+from qobuz.util import data as dataUtil
 
 _paginated = ['albums', 'labels', 'tracks', 'artists',
                      'playlists', 'playlist', 'public_playlists', 'genres']
@@ -67,6 +70,8 @@ class INode(object):
         self.user_storage = None
         self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
         self.data = data
+        self.node_storage = None
+        self.limit = getSetting('pagination_limit')
 
     def set_nid(self, value):
         '''@setter nid'''
@@ -347,12 +352,12 @@ class INode(object):
         return render
 
     # When returning False we are not displaying directory content
-    def fetch(self, Dir, lvl=1, whiteFlag=None, blackFlag=None):
+    def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None):
         '''This method fetch data from cache
         '''
         return True
 
-    def populating(self, Dir, lvl=1, whiteFlag=None, blackFlag=None,
+    def populating(self, Dir, lvl=1, whiteFlag=Flag.ALL, blackFlag=Flag.NONE,
                    gData=None):
         if Dir.Progress.iscanceled():
             return False
@@ -379,19 +384,17 @@ class INode(object):
         for child in self.childs:
             if Dir.is_canceled():
                 return False
-            ''' Only white Flagged nodes added to the listing '''
             if child.nt & whiteFlag == child.nt:
                 if not Dir.add_node(child):
-                    debug.warn(self, "Something went wrong... aborting")
-                    self.childs = []
+                    debug.error(self, "Could not add node")
+                    #self.childs = []
                     raise exception.BuildCanceled('down')
                 # gData['count'] += 1
                 # Dir.update(gData, "Working", label, child.get_label())
-            else:
-                debug.info(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
-            ''' Calling builiding down on child '''
+            # else:
+            #     debug.info(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
             child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
-        debug.info(self, 'Populated {}', self)
+        #debug.info(self, 'Populated {}', self)
         #return gData['count']
 
     def populate(self, xbmc_directory, lvl, Flag):
@@ -586,3 +589,40 @@ class INode(object):
 
     def __str__(self):
         return '<{class_name} nid={nid}>'.format(**self.as_dict())
+
+    def get_node_storage(self):
+        if self.node_storage is not None:
+            return self.node_storage
+        path = os.path.join(cache.base_path, self._get_node_storage_filename())
+        self.node_storage = _Storage(path)
+        return self.node_storage
+
+    def _get_node_storage_filename(self):
+        raise NotImplmentedError()
+
+    def remove_playlist_storage():
+        path = os.path.join(cache.base_path, self._get_node_storage_filename())
+        if os.path.exists(path):
+            os.unlink(path)
+
+    def get_image_from_storage(self):
+        desired_size = getSetting('image_default_size', default=None)
+        images = []
+        if self.nid is not None:
+            storage = self.get_node_storage()
+            if storage is not None:
+                images_len = 0
+                if 'image' not in storage:
+                    images = dataUtil.list_image(self.data)
+                    images_len = len(images)
+                    if images_len > 0:
+                        storage['image'] = images
+                        storage.sync()
+                else:
+                    images = storage['image']
+                images_len = len(images)
+                if images_len > 0:
+                    return images[random.randrange(0, images_len, 1)]
+            else:
+                debug.error(self, 'Cannot get node storage')
+        return None

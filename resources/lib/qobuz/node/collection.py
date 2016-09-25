@@ -13,7 +13,7 @@ from qobuz import debug
 from qobuz.gui.util import getImage, getSetting, lang
 
 
-dialogHeading = 'Qobuz collection'
+dialogHeading = 'Collection'
 
 
 class Node_collection(INode):
@@ -39,13 +39,14 @@ class Node_collection(INode):
     def make_url(self, **ka):
         if self.search_type is not None:
             ka['search-type'] = self.search_type
+        query = self.get_parameter('query')
+        if self.query is not None:
+            ka['query'] = query
         return super(Node_collection, self).make_url(**ka)
 
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit', asInt=True)
-        self.data = None
-        query = self.query
+        query = self.get_parameter('query', unQuote=True)
         if not query:
             from qobuz.gui.util import Keyboard
             k = Keyboard('', 'My %s' % self.search_type)
@@ -56,9 +57,10 @@ class Node_collection(INode):
         query.strip()
         debug.info(self, 'search_type: %s, query: %s' % (self.search_type, query))
         source = self.source
-        kwargs = {'query': query,
-                  'limit': limit,
-                  }
+        kwargs = {
+            'query': query,
+            'limit': self.limit,
+        }
         if source is not None:
             kwargs['source'] = source
         data = None
@@ -77,27 +79,20 @@ class Node_collection(INode):
         return None
 
     def _populate_albums(self, data):
-        '''helper'''
-        node = getNode(Flag.ALBUM, data=data)
-        self.add_child(node)
-        return True
+        return getNode(Flag.ALBUM, data=data)
 
     def _populate_tracks(self, data):
-        '''helper'''
-        node = getNode(Flag.TRACK, data=data)
-        self.add_child(node)
-        return True
+        return getNode(Flag.TRACK, data=data)
 
     def _populate_artists(self, data):
-        '''helper'''
-        node = getNode(Flag.ARTIST, data=data)
-        self.add_child(node)
-        return True
+        return getNode(Flag.ARTIST, data=data)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.data is None:
             return False
         method = getattr(self, '_populate_%s' % self.search_type)
         for item in self.data['items']:
-            method(item)
+            node = method(item)
+            node.set_parameter('query', self.get_parameter('query'))
+            self.add_child(node)
         return True

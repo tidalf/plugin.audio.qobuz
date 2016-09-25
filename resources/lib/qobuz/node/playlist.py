@@ -20,8 +20,6 @@ from qobuz.gui.util import color, lang, getImage, runPlugin, executeBuiltin
 from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
-from qobuz.storage import _Storage
-from qobuz.util import data as dataUtil
 dialogHeading = 'Qobuz playlist'
 
 
@@ -51,46 +49,15 @@ class Node_playlist(INode):
 
 
     def get_image(self):
-        desired_size = getSetting('image_default_size', default=None)
-        images = []
-        if self.nid is not None:
-            storage = self.get_playlist_storage()
-            if storage is not None:
-                debug.error(self, 'Cannot get playlist storage')
-                images_len = 0
-                if 'image' not in storage:
-                    images = dataUtil.list_image(self.data)
-                    images_len = len(images)
-                    if images_len > 0:
-                        storage['image'] = images
-                        storage.sync()
-                else:
-                    images = storage['image']
-                images_len = len(images)
-                if images_len > 0:
-                    return images[random.randrange(0, images_len, 1)]
-        return getImage(self.content_type)
+        image = self.get_image_from_storage()
+        if image is None:
+            image = super(Node_playlist, self).get_image()
+        return image
 
-    def get_playlist_storage(self):
-        if self.playlist_storage is not None:
-            return self.playlist_storage
-        if api.user_id is None or self.nid is None:
-            debug.warn(self, 'Missing user_id: {user_id} or nid: {nid}',
-                 user_id=api.user_id, nid=self.nid)
-            return None
-        self.playlist_storage = _Storage(self._get_playlist_storage_filename())
-        return self.playlist_storage
-
-    def _get_playlist_storage_filename(self):
-        name = u'localuserdata-{user_id}-playlist-{nid}.local'.format(
+    def _get_node_storage_filename(self):
+        return u'userdata-{user_id}-playlist-{nid}.local'.format(
             user_id=api.user_id,
             nid=self.nid)
-        return os.path.join(cache.base_path, name)
-
-    def remove_playlist_storage():
-        filename = self._get_playlist_storage_filename()
-        if os.path.exists(filename):
-            os.unlink(filename)
 
     def get_label(self):
         return self.label or self.get_name()
@@ -105,9 +72,9 @@ class Node_playlist(INode):
         return self.b_is_current
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit', asInt=True)
+        #limit = getSetting('pagination_limit', asInt=True)
         data = api.get('/playlist/get', playlist_id=self.nid,
-                       offset=self.offset, limit=limit, extra='tracks')
+                       offset=self.offset, limit=self.limit, extra='tracks')
         if data is None:
             debug.warn(self, 'Build-down: Cannot fetch playlist data')
             return False

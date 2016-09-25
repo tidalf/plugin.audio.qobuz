@@ -31,7 +31,6 @@ class Node_album(INode):
         self.is_special_purchase = False
         self.imageDefaultSize = 'large'
         self.label = 'Album'
-        self.offset = self.get_parameter('offset') or 0
         try:
             self.imageDefaultSize = getSetting('image_default_size')
         except Exception as e:
