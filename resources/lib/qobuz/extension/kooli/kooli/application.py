@@ -14,13 +14,7 @@ from kooli import kooli_path
 qobuzApp = QobuzApplication(Plugin('plugin.audio.qobuz'),
                             bootstrapClass=MinimalBootstrap)
 qobuzApp.bootstrap.init_app()
-debug.info(None, 'Username %s Password %s' % (qobuzApp.registry.get('username'),
-                                   qobuzApp.registry.get('password')))
-api.login(username=qobuzApp.registry.get('username'),
-          password=qobuzApp.registry.get('password'))
-
 kooli_tpl = P.join(kooli_path, 'tpl')
-debug.info("FOO", 'base_path {}', kooli_tpl)
 application = Flask(__name__, template_folder=kooli_tpl)
 
 from qobuz.gui.util import getSetting
@@ -28,6 +22,8 @@ from werkzeug import exceptions
 from flask import make_response, render_template
 from functools import wraps, update_wrapper
 from datetime import datetime
+from qobuz.node import getNode, Flag
+from qobuz.gui.directory import Directory
 
 def nocache(view):
     @wraps(view)
@@ -59,6 +55,18 @@ def shutdown_server():
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
 
+
+@nocache
+@application.route('/qobuz', methods=['HEAD', 'GET'])
+def roote_root():
+    node = getNode(Flag.ROOT)
+    debug.info(__name__, 'NODE {}', node)
+    directory = Directory(node)
+    node.populating(directory)
+    response = {
+        'childs': [{'label': c.label} for c in node.childs],
+    }
+    return render_template('root.tpl', **response)
 
 @nocache
 @application.route('/qobuz/<string:album_id>/<string:track_id>/file.mpc', methods=['HEAD'])
@@ -108,11 +116,3 @@ def route_nfo_artist(album_id=None):
         return http_error('NotFound')
     response['image_default_size'] = qobuzApp.registry.get('image_default_size')
     return render_template('artist.nfo.tpl', **response)
-
-@nocache
-@application.route('/qobuz/<string:album_id>/<string:track_id>', methods=['GET', 'HEAD'])
-def route_nfo_album_nofile(album_id=None, track_id=None):
-    response = api.get('/album/get', album_id=album_id)
-    if response is None:
-        return http_error('NotFound')
-    return render_template('dir.tpl', **response)
