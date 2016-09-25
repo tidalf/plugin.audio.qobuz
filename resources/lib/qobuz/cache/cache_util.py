@@ -9,7 +9,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.util.file import find
-
+from qobuz import debug
 
 def clean_old(cache):
     """Callback deleting one file
@@ -35,7 +35,7 @@ def clean_all(cache):
         '''
         data = cache.load_from_store(filename)
         if not cache.check_magic(data):
-            print "Error: bad magic, skipping file %s" % (filename)
+            debug.error(__name__, "Error: bad magic, skipping file {}", filename)
             return True
         cache.delete(data['key'])
         return True

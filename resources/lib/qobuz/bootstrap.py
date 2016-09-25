@@ -113,7 +113,7 @@ class MinimalBootstrap(object):
                     try:
                         os.makedirs(path)
                     except:
-                        debug.warn("Cannot create directory: " + path)
+                        debug.warn(self, "Cannot create directory: " + path)
                         exit(2)
                     debug.info(self, "Directory created: " + path)
         config.path = PathObject()

@@ -14,6 +14,7 @@ import time
 from qobuz.gui.util import lang
 from qobuz import exception
 from qobuz import debug
+from qobuz import config
 
 
 class Directory(object):
@@ -33,12 +34,12 @@ class Directory(object):
                 we are replacing Xbmc Default menu
     """
 
-    def __init__(self, root, nodeList=[], **ka):
+    def __init__(self, root, nodeList=[], handle=None, **ka):
         self.nodes = []
         self.label = "Qobuz / "
         self.root = root
         self.asList = False
-        self.handle = None
+        self.handle = handle
         self.put_item_ok = True
         withProgress = True
         if 'withProgress' in ka:
@@ -97,6 +98,7 @@ class Directory(object):
             node: node, node to add
         """
         if self.is_canceled():
+            debug.info(self, 'Directory canceled')
             return False
         item = node.makeListItem(replaceItems=self.replaceItems)
         if not item:
@@ -162,7 +164,8 @@ class Directory(object):
                 item: xbmc.ListItem
                 is_folder: bool
         """
-        if not xbmcplugin.addDirectoryItem(self.handle, ka['url'], ka['item'],
+        if not xbmcplugin.addDirectoryItem(self.handle,
+                                           ka['url'], ka['item'],
                                            ka['is_folder'], self.total_put):
             return False
         self.total_put += 1
