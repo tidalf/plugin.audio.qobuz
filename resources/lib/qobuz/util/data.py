@@ -1,6 +1,11 @@
-def list_image(data, size='large'):
+from qobuz import debug
+
+def list_image(data, desired_size='xlarge'):
+    all_size = [desired_size]
+    [all_size.append(s) for s in ['xlarge', 'large', 'small', 'thumbnail']]
     result = []
     def append(url):
+        debug.info(__name__, 'appending url: {}', url)
         if url not in result:
             result.append(url)
 
@@ -14,11 +19,8 @@ def list_image(data, size='large'):
             album = item['album']
             if 'image' in album:
                 image = album['image']
-                if size in image:
-                    append(image[size])
-                else:
-                    for size in ['large', 'small', 'xlarge', 'thumbnail']:
-                        if size in image:
-                            append(image['size'])
-                append(album['image']['thumbnail'])
+                for size in all_size:
+                    if size in image:
+                        append(image[size])
+                        break   
     return result

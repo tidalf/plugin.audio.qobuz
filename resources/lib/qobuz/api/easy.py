@@ -11,11 +11,18 @@
 '''
 from qobuz.cache import cache
 from qobuz.api.raw import RawApi
-
+from qobuz import debug
 
 class InvalidQuery(Exception):
     pass
 
+class QobuzAccount(object):
+    def __init__(self, data=None):
+        self.data = data
+
+    def __str__(self):
+        import pprint
+        return pprint.pformat(self)
 
 class EasyApi(RawApi):
 
@@ -51,6 +58,7 @@ class EasyApi(RawApi):
 
         ::note api.error will contain last error message
         """
+        debug.info('API/GET {} / {}', str(a), str(ka))
         key_to_del = []
         for key, value in ka.items():
             if value is None or value == '':
@@ -96,11 +104,13 @@ class EasyApi(RawApi):
         ::return
             True on success, else False
         """
-        self.username = username
-        self.password = password
+        self.username = self.password = None
         data = self.get('/user/login', username=username, password=password)
         if not data:
             return False
+        self.username = username
+        self.password = password
+        u = QobuzAccount(data)
         user = data['user']
         self.set_user_data(user['id'], data['user_auth_token'])
         self.is_logged = True

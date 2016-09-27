@@ -24,6 +24,7 @@ import qobuz.gui.util as gui
 from qobuz import debug
 from flask import request
 import traceback
+import threading
 
 def is_empty(obj):
     if obj is None:
@@ -53,33 +54,36 @@ def shutdown_request():
         shutdown_server()
     return None
 
-class KooliService(object):
+class KooliService(threading.Thread):
     name = 'httpd'
     def __init__(self, port=33574):
+        threading.Thread.__init__(self)
         self.port = port
         self.running = False
         self.threaded = True
+        self.processes = 2
+        self.alive = True
 
-    def start(self):
-        if not self.running:
-            try:
-                application.run(port=self.port, threaded=self.threaded)
-                self.running = True
-            except Exception as e:
-                self.running = False
-                debug.error(self, 'KooliService port: {} Error: {}', self.port, e)
+    def stop(self):
+        self.alive = False
+        shutdown_server()
 
-    def step(self):
-        if not is_authentication_set():
-            gui.notify_warn('Authentication not set', 'You need to enter credentials')
-            xbmc.sleep(5000)
-            return True
-        if not api.login(username=qobuzApp.registry.get('username'),
-            password=qobuzApp.registry.get('password')):
-            gui.notify_warn('Login failed', 'Invalid credentials')
-            xbmc.sleep(5000)
-            return True
-        debug.info(self, "KooliService step")
+    def run(self):
+        while self.alive:
+            if not is_authentication_set():
+                gui.notify_warn('Authentication not set', 'You need to enter credentials')
+            elif not api.is_logged:
+                if not api.login(username=qobuzApp.registry.get('username'),
+                    password=qobuzApp.registry.get('password')):
+                    gui.notify_warn('Login failed', 'Invalid credentials')
+                else:
+                    try:
+                        debug.info(self, 'Starting {} on port {}', self.name, self.port)
+                        application.run(port=self.port, threaded=True)
+                    except Exception as e:
+                        debug.error(self, 'KooliService port: {} Error: {}', self.port, e)
+            xbmc.sleep(1000)
+
 
 if __name__ == '__main__':
     if not is_service_enable():
@@ -100,11 +104,7 @@ if __name__ == '__main__':
             debug.info(__name__, 'Abort!')
             alive = False
             continue
-        try:
-            monitor.step()
-        except Exception as e:
-            debug.error(__name__, 'Error in monitor step {}', e)
-        xbmc.sleep(1)
+        xbmc.sleep(1000)
     #     try:
     #         if not is_authentication_set():
     #             gui.notify_warn('Authentication not set', 'You need to enter credentials')
@@ -124,4 +124,5 @@ if __name__ == '__main__':
     #         traceback.print_exc(file=sys.stdout)
     #         print '-'*60
     #         xbmc.sleep(1000)
-    # debug.info(__name__, 'MONITOR END Bye!')
+    monitor.stop_all_service()
+    debug.info(__name__, 'Qobuz/Kooli ended!')

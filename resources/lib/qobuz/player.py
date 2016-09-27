@@ -24,7 +24,7 @@ def notify_restriction(track):
     for restriction in track.get_restrictions():
         restrictions += '%s\n' % restriction
     if restrictions != '':
-        notify_warn("Restriction", restrictions)
+        notify_warn("Restriction", restrictions, mstime=5000)
 
 
 class QobuzPlayer(xbmc.Player):

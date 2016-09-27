@@ -40,4 +40,5 @@ def clean_all(cache):
         cache.delete(data['key'])
         return True
     find(cache.base_path, '^.*\.dat$', delete_one)
+    find(cache.base_path, '^.*\.local$', delete_one)
     return True

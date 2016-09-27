@@ -613,7 +613,7 @@ class INode(object):
             if storage is not None:
                 images_len = 0
                 if 'image' not in storage:
-                    images = dataUtil.list_image(self.data)
+                    images = dataUtil.list_image(self.data, desired_size=desired_size)
                     images_len = len(images)
                     if images_len > 0:
                         storage['image'] = images

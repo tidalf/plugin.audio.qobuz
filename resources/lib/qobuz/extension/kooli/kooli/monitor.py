@@ -47,6 +47,9 @@ class Monitor(xbmc.Monitor):
     def start_all_service(self):
         [s.start() for s in self.service.values()]
 
+    def stop_all_service(self):
+        [s.stop() for s in self.service.values()]
+
     def step(self):
         if self.isIdle():
             [s.step() for s in self.service.values() if s.on_idle]
