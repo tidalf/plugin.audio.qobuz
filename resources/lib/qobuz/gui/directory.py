@@ -50,7 +50,9 @@ class Directory(object):
         self.Progress = Progress(withProgress)
         self.total_put = 0
         self.started_on = time.time()
-        self.Progress.create(self.label + root.get_label())
+        debug.info(self, 'Label: {}', self.label)
+        debug.info(self, 'Root label: {}', root.get_label())
+        self.Progress.create(self.label + root.get_label(default=''))
         self.update({'count': 0, 'total': 100}, lang(30169))
         self.line1 = ''
         self.line2 = ''

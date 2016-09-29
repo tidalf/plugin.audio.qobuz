@@ -56,7 +56,7 @@ class Node_track(INode):
                                                 asLocalUrl=asLocalUrl,
                                                 **ka)
 
-    def get_label(self, sFormat="%a - %t"):
+    def get_label(self, sFormat="%a - %t", default=None):
         sFormat = sFormat.replace("%a", self.get_artist())
         sFormat = sFormat.replace("%t", self.get_title())
         sFormat = sFormat.replace("%A", self.get_album())

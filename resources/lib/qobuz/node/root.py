@@ -25,6 +25,8 @@ class Node_root(INode):
         self.label = 'Qobuz'
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
+        if getSetting('debug', asBool=True):
+            self.add_child(getNode(Flag.TESTING))
         self.add_child(getNode(Flag.USERPLAYLISTS))
         if getSetting('show_recommendations', asBool=True):
             self.add_child(getNode(Flag.RECOMMENDATION))

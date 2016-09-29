@@ -322,7 +322,9 @@ class INode(object):
         self._label = label
         return self
 
-    def get_label(self):
+    def get_label(self, default=None):
+        if self._label is None:
+            return default
         return self._label
 
     label = property(get_label, set_label)

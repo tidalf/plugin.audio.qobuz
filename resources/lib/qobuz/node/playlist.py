@@ -59,7 +59,7 @@ class Node_playlist(INode):
             user_id=api.user_id,
             nid=self.nid)
 
-    def get_label(self):
+    def get_label(self, default=None):
         return self.label or self.get_name()
 
     def set_is_my_playlist(self, b):
@@ -72,14 +72,13 @@ class Node_playlist(INode):
         return self.b_is_current
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        #limit = getSetting('pagination_limit', asInt=True)
         data = api.get('/playlist/get', playlist_id=self.nid,
                        offset=self.offset, limit=self.limit, extra='tracks')
         if data is None:
             debug.warn(self, 'Build-down: Cannot fetch playlist data')
             return False
         self.data = data
-        self.get_image() # Buld thumbnail if neeeded
+        self.get_image()
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

@@ -27,7 +27,7 @@ class Node_albums_by_artist(INode):
         self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
 
-    def get_label(self):
+    def get_label(self, default=None):
         return self.get_artist()
 
     def get_image(self):

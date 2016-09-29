@@ -47,9 +47,6 @@ class Node_search(INode):
         self.search_type = self.get_parameter('search-type') or 'albums'
         self.query = self.get_parameter('query', unQuote=True)
 
-    def get_label(self):
-        return self.label
-
     def get_description(self):
         return self.get_label()
 

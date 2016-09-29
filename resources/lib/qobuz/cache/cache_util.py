@@ -8,6 +8,7 @@
     :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import os
 from qobuz.util.file import find
 from qobuz import debug
 
@@ -30,15 +31,19 @@ def clean_old(cache):
 def clean_all(cache):
     """Clean all data from cache
     """
-    def delete_one(filename, info):
+    def delete_one(filename, info, check_magic=True):
         '''::callback that delete one file
         '''
         data = cache.load_from_store(filename)
-        if not cache.check_magic(data):
+        if check_magic and not cache.check_magic(data):
             debug.error(__name__, "Error: bad magic, skipping file {}", filename)
             return True
         cache.delete(data['key'])
         return True
+    def delete_nocheck(filename, info):
+        debug.info(__name__, 'deleting: {}', filename)
+        os.unlink(filename)
+        return True
     find(cache.base_path, '^.*\.dat$', delete_one)
-    find(cache.base_path, '^.*\.local$', delete_one)
+    find(cache.base_path, '^.*\.local$', delete_nocheck)
     return True

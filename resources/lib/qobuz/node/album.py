@@ -118,7 +118,7 @@ class Node_album(INode):
                                   'image/small',
                                   'image/thumbnail'])
 
-    def get_label(self):
+    def get_label(self, default=None):
         artist = self.get_artist() or 'VA'
         return '%s - %s' % (artist, self.get_title())
 

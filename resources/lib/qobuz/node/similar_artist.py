@@ -23,7 +23,7 @@ class Node_similar_artist(INode):
         self.nt = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
 
-    def get_label(self):
+    def get_label(self, default=None):
         return lang(30156)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
