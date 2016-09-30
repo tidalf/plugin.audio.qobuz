@@ -38,6 +38,7 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 def http_error(name):
+    debug.info(__name__, 'name: {}', name)
     return getattr(exceptions, name)()
 
 def get_format_id(default=3):
@@ -50,10 +51,14 @@ def get_format_id(default=3):
 
 def shutdown_server():
     debug.info(__name__, 'Shutting down server')
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
+    try:
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        return func()
+    except Exception as e:
+        debug.error(__name__, 'shutdown server error {}', e)
+    return False
 
 
 @nocache

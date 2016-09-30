@@ -297,7 +297,7 @@ class RawApi(object):
         return self._api_request(ka, '/playlist/get')
 
     def playlist_getUserPlaylists(self, **ka):
-        self._check_ka(ka, [], ['user_id', 'username', 'order', 'offset', 'limit'])
+        self._check_ka(ka, ['type'], ['user_id', 'username', 'order', 'offset', 'limit'])
         if not 'user_id' in ka and not 'username' in ka:
             ka['user_id'] = self.user_id
         return self._api_request(ka, '/playlist/getUserPlaylists')

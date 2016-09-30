@@ -10,7 +10,7 @@ from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
 from qobuz.gui.util import lang, getImage, getSetting
 from qobuz.api import api
-
+from qobuz import debug
 
 class Node_public_playlists(INode):
     '''@class Node_public_playlists
@@ -22,24 +22,21 @@ class Node_public_playlists(INode):
                                                     data=data)
         self.nt = Flag.PUBLIC_PLAYLISTS
         self.set_label(lang(30190))
-        self.is_folder = True
         self.image = getImage('userplaylists')
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+        debug.info(self, 'FETCH offset: {}, limit: {}', self.offset, self.limit)
         data = api.get('/playlist/getPublicPlaylists', offset=self.offset,
                        limit=self.limit, type='last-created')
         if data is None:
             return False
-        # @bug: we use pagination_limit as limit for the search so we don't
-        # need offset... (Fixed if qobuz fix it :p)
-        if not 'total' in data['playlists']:
-            data['playlists']['total'] = data['playlists']['limit']
+        # import pprint
+        # debug.info(self, 'PUBLIC PL DATA {}', pprint.pformat(data))
         self.data = data
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for item in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST)
-            node.data = item
+            node = getNode(Flag.PLAYLIST, data=item)
             self.add_child(node)
         return True

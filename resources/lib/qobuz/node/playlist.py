@@ -106,6 +106,15 @@ class Node_playlist(INode):
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
+        users_count = int(self.get_property('users_count'))
+        privacy = 'Private'
+        privacy_color = '55FF0000'
+        if bool(self.get_property('is_public')):
+            privacy = 'Public'
+            privacy_color = '5500FF00'
+        tag = ' (tracks: %s / privacy: %s / users: %s)' % (self.get_property('tracks_count'),privacy, users_count, )
+        tag = color(privacy_color, tag)
+        label = '%s%s' % (label, tag)
         if not self.is_my_playlist:
             label = '%s - %s' % (color(colorItem, owner), label)
         if self.b_is_current:

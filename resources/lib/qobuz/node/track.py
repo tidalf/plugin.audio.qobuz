@@ -44,10 +44,18 @@ class Node_track(INode):
         Dir.add_node(self)
         return True
 
+    def make_local_url(self):
+        scheme = 'http'
+        return '{scheme}://{host}:{port}/qobuz/{album_id}/{nid}/file.mpc'.format(
+                scheme=scheme,
+                host=getSetting('httpd_host'),
+                port=getSetting('httpd_port'),
+                album_id=self.get_album_id(),
+                nid=str(self.nid))
+
     def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
         if asLocalUrl is True:
-            return 'http://127.0.0.1:33574/qobuz/%s/%s/file.mpc' \
-                % (self.get_album_id(), str(self.nid))
+            return self.make_local_url()
         purchased = self.get_parameter('purchased')
         if purchased:
             ka['purchased'] = purchased

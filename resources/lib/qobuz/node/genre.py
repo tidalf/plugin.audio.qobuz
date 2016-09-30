@@ -25,7 +25,7 @@ class Node_genre(INode):
         self.set_label(lang(30189))
         self.is_folder = True
         self.image = getImage('album')
-        self.offset = self.get_parameter('offset') or 0
+        self.limit = 25
 
     def make_url(self, **ka):
         if self.parent is not None and self.parent.nid is not None:

@@ -48,7 +48,6 @@ def is_service_enable():
 
 @application.before_request
 def shutdown_request():
-    debug.info(__name__, 'request: {}', request.url)
     if monitor.abortRequested:
         debug.info(__name__, 'Shutdown Qobuz Httpd requested')
         shutdown_server()

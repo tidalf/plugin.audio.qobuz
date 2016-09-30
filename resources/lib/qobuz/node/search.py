@@ -43,68 +43,68 @@ class Node_search(INode):
                                           parameters=parameters,
                                           data=data)
         self.nt = Flag.SEARCH
-        self._search_type = None
-        self.search_type = self.get_parameter('search-type') or 'albums'
-        self.query = self.get_parameter('query', unQuote=True)
+        self.set_search_type(self.get_parameter('search-type'))
+        #self.search_type = self.get_parameter('search-type') or 'albums'
+        #self.query = self.get_parameter('query', unQuote=True)
 
     def get_description(self):
         return self.get_label()
 
     def set_search_type(self, search_type):
+        search_type = self.get_parameter('search-type')
+        if search_type is None:
+            self.set_parameter('search-type', 'albums')
+            search_type = self.get_parameter('search-type')
         if search_type in data_search_type:
             self.label = data_search_type[search_type]['label']
             self.content_type = data_search_type[search_type]['content_type']
             self.image = data_search_type[search_type]['image']
         else:
             raise exception.InvalidSearchType(search_type)
-        self._search_type = search_type
-
-
-    def get_search_type(self):
-        return self._search_type
-
-    search_type = property(get_search_type, set_search_type)
 
     def make_url(self, **ka):
-        ka['search-type'] = self.search_type
-        if self.query:
-            ka['query'] = self.query
+        #ka['search-type'] = self.search_type
         return super(Node_search, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        stype = self.search_type
+        search_type = self.get_parameter('search-type')
         query = self.get_parameter('query', unQuote=True)
         if query is None:
             from qobuz.gui.util import Keyboard
-            k = Keyboard('', stype)
+            k = Keyboard('', search_type)
             k.doModal()
             if not k.isConfirmed():
                 return False
             query = k.getText()
-        query.strip()
-        data = api.get('/search/getResults', query=query, type=stype,
-                       limit=self.limit, offset=self.offset)
+            query = query.strip()
+            if query is None:
+                return False
+            self.set_parameter('query', query, quote=True)
+        data = api.get('/search/getResults', query=query,
+                       type=search_type, limit=self.limit, offset=self.offset)
         if data is None:
             debug.warn(self, "Search return no data")
             return False
-        if data[stype]['total'] == 0:
+        if data[search_type]['total'] == 0:
+            debug.warn(self, "Search type total is zero")
             return False
-        if 'items' not in data[stype]:
+        if 'items' not in data[search_type]:
+            debug.warn(self, 'Items in {}', data[search_type])
             return False
-        self.set_parameter('query', query, quote=True)
         self.data = data
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        if self.search_type == 'albums':
+        search_type = self.get_parameter('search-type')
+        if search_type == 'albums':
             for album in self.data['albums']['items']:
                 node = getNode(Flag.ALBUM, data=album)
                 self.add_child(node)
-        elif self.search_type == 'tracks':
+        elif search_type == 'tracks':
             for track in self.data['tracks']['items']:
                 node = getNode(Flag.TRACK, data=track)
                 self.add_child(node)
-        elif self.search_type == 'artists':
+        elif search_type == 'artists':
             for artist in self.data['artists']['items']:
                 node = getNode(Flag.ARTIST, data=artist)
                 self.add_child(node)

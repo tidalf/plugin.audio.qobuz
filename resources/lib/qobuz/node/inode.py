@@ -235,7 +235,7 @@ class INode(object):
             return default
         value = self.parameters[name]
         if value is None:
-            debug.warn(self, '%s value is None', name)
+            debug.warn(self, '{} value is None', name)
             return default
         if unQuote is True:
             return urllib.unquote_plus(value)
@@ -263,7 +263,7 @@ class INode(object):
             ka['nid'] = self.nid
         if 'offset' not in ka:
             ka['offset'] = self.offset
-        for name in ['qnt', 'qid']:
+        for name in ['qnt', 'qid', 'query', 'search-type']:
             if name in ka:
                 continue
             value = self.get_parameter(name)
@@ -280,6 +280,7 @@ class INode(object):
                 continue
             url += key + '=' + value + '&'
         url = url[:-1]
+        #debug.info(self, 'MakeURL: {}', url)
         return url
 
     def makeListItem(self, **ka):
@@ -334,6 +335,11 @@ class INode(object):
             return self.image
         if self.parent:
             return self.parent.get_image()
+        if self.data is not None:
+            for name in ['images300', 'images150', 'images']:
+                if name in self.data and len(self.data[name]) > 0:
+                    debug.info(self, 'IMAGE DATA {}', self.data[name])
+                    return self.data[name][random.randrange(len(self.data[name]))]
         return self.get_property('image')
 
     def set_image(self, image):

@@ -25,7 +25,7 @@ class Node_user_playlists(INode):
         self.label = lang(30021)
         self.image = getImage('userplaylists')
         self.nt = Flag.USERPLAYLISTS
-        self.content_type = 'files'
+        self.content_type = 'albums'
         display_by = self.get_parameter('display-by', default=None)
         if display_by is None:
             display_by = 'songs'
@@ -57,10 +57,13 @@ class Node_user_playlists(INode):
         data = api.get('/playlist/getUserPlaylists',
                        limit=self.limit,
                        offset=self.offset,
-                       user_id=api.user_id)
+                       user_id=api.user_id,
+                       type='last-created')
         if data is None:
             debug.warn(self, "Build-down: Cannot fetch user playlists data")
             return False
+        import pprint
+        debug.info(self, 'USER PL DATA {}', pprint.pformat(data))
         self.data = data
         return True
 
