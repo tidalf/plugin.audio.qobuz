@@ -141,11 +141,6 @@ class Node_playlist(INode):
         menu.add(path='playlist', pos=1,
                  label='Playlist', cmd=cmd, mode=Mode.VIEW)
 
-        url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
-                                nm='toggle_privacy')
-        menu.add(path='playlist/toggle_privacy', post=2,
-                 label='Toggle privacy',
-                 cmd=containerUpdate(url))
         if login != self.get_property('owner/name'):
             isOwner = False
 
@@ -158,10 +153,14 @@ class Node_playlist(INode):
             url = self.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
             menu.add(path='playlist/rename', label=lang(30165),
                      cmd=runPlugin(url))
-
-        else:
-            url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
-            menu.add(path='playlist/subscribe', label=lang(30168),
+            url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
+                                    nm='toggle_privacy')
+            menu.add(path='playlist/toggle_privacy', post=2,
+                     label='Toggle privacy',
+                     cmd=containerUpdate(url))
+        elif self.parent and self.parent.nt & (Flag.ALL ^ Flag.USERPLAYLISTS):
+                url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
+                menu.add(path='playlist/subscribe', label=lang(30168),
                      cmd=runPlugin(url))
 
         url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
@@ -370,10 +369,13 @@ class Node_playlist(INode):
                          'Invalid playlist %s' % (str(playlist_id)))
             return False
         login = getSetting('username')
-        offset = 0
-        limit = getSetting('pagination_limit')
-        data = api.get('/playlist/get', playlist_id=playlist_id, limit=limit,
-                       offset=offset)
+        data = api.get('/playlist/get',
+                       playlist_id=playlist_id,
+                       limit=self.limit,
+                       offset=self.offset)
+        if data is None:
+            debug.error(self, 'Cannot get playlist with id {}', playlist_id)
+            return False
         name = ''
         if 'name' in data:
             name = data['name']
