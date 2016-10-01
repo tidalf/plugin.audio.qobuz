@@ -24,10 +24,8 @@ class Node_friends(INode):
         self.nt = Flag.FRIENDS
         self.name = self.get_parameter('query')
         self.image = getImage('artist')
-        self.label = str(self.name) + lang(30179) if (
-            self.name) else lang(30180)
+        self.label = str(self.name) + lang(30179) if (self.name) else lang(30180)
         self.url = None
-        self.is_folder = True
         self.content_type = 'artists'
 
     def make_url(self, **ka):
@@ -41,49 +39,44 @@ class Node_friends(INode):
         return {}
 
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
-        username = api.username
-        password = api.password
-        user_id = api.user_id
-        user_data = api.get('/user/login', username=username,
-                            password=password)
+        user_data = api.get('/user/login',
+                            username=api.username,
+                            password=api.password)
         if not 'user' in user_data:
             return False
         friend_data = user_data['user']['player_settings']['friends']
-        debug.info(self, 'Build-down friends list ' + repr(self.name))
-        if self.name:
+        if self.name is not None:
             data = api.get('/playlist/getUserPlaylists',
                            username=self.name,
-                           limit=self.limit, offset=self.offset)
+                           limit=self.limit, offset=self.offset,
+                           type='last-created')
+            debug.info('Friend {} data {}', self.name, data)
         else:
             data = api.get('/playlist/getUserPlaylists',
-                           user_id=user_id,
-                           limit=self.limit, offset=self.offset)
-        if not data:
+                           user_id=api.user_id,
+                           limit=self.limit, offset=self.offset,
+                           type='last-created')
+        if data is None:
             debug.warn(self, 'No friend data')
             return False
-        # extract all owner names from the list
-        friend_list = []
-        for item in data['playlists']['items']:
-            if item['owner']['name'] == user_data['user']['login']:
-                continue
-            friend_list.append(item['owner']['name'])
-        # add previously stored
-        if (not self.name):
-            for name in friend_data:
-                friend_list.append(str(name))
-        # remove duplicates
-        keys = {}
-        for e in friend_list:
-            keys[e] = 1
-        friend_list = keys.keys()
-        # and add them to the directory
-        for name in friend_list:
-            node = getNode(Flag.FRIEND, {'query': str(name)})
+        friend_list = {}
+        def add_name(name):
+            if name in friend_list:
+                return None
+            if name == user_data['user']['login']:
+                return None
             if name == self.name:
-                continue
-            if name in friend_data:
-                node.label = 'Friend / %s' % (node.label)
+                return None
+            friend_list[name] = 1
+            node = getNode(Flag.FRIEND, {'query': str(name)})
+            node.label = 'Friend / %s' % (node.label)
             self.add_child(node)
+            return node
+        for item in data['playlists']['items']:
+            add_name(item['owner']['name'])
+        for name in friend_data:
+            add_name(name)
+        return True
 
     def attach_context_menu(self, item, menu):
         label = self.get_label()

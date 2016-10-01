@@ -28,9 +28,7 @@ class Node_friend(INode):
         self.nt = Flag.FRIEND
         self.image = getImage('artist')
         self.set_name(self.get_parameter('query'))
-        self.set_label(self.name)
-        self.url = None
-        self.is_folder = True
+        #self.url = None
 
     def set_label(self, label):
         colorItem = getSetting('color_item')
@@ -68,7 +66,9 @@ class Node_friend(INode):
     def create(self, name=None):
         username = api.username
         password = api.password
-        friendpl = api.get('/playlist/getUserPlaylists', username=name)
+        friendpl = api.get('/playlist/getUserPlaylists',
+                           username=name,
+                           type='last-created')
         if not friendpl:
             return False
         user = api.get('/user/login', username=username, password=password)
@@ -129,20 +129,25 @@ class Node_friend(INode):
         executeBuiltin(containerRefresh())
         return True
 
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+        node = getNode(Flag.FRIEND)
+        node.create('qobuz.com')
+        debug.info(self, 'Fetch friend {}', self.name)
+        return api.get('/playlist/getUserPlaylists',
+                       type='last-created',
+                       username=self.name)
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/playlist/getUserPlaylists', username=self.name)
-        if not data:
-            debug.warn(self, 'No friend data')
-            return False
+        result = False
         if lvl != -1:
             self.add_child(getNode(Flag.FRIENDS, self.parameters))
-        for pl in data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST)
-            node.data = pl
+        for playlist in self.data['playlists']['items']:
+            node = getNode(Flag.PLAYLIST, data=playlist)
             if node.get_owner() == self.label:
                 self.nid = node.get_owner_id()
             self.add_child(node)
-        return True
+            result = True
+        return result
 
     def attach_context_menu(self, item, menu):
         colorWarn = getSetting('item_caution_color')
