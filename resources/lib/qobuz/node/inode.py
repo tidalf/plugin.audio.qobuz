@@ -569,6 +569,10 @@ class INode(object):
             menu.add(path='qobuz/erase_cache',
                           label=lang(30117), cmd=cmd,
                           color=colorCaution, pos=10)
+            cmd = runPlugin(self.make_url(nt=Flag.TESTING, nm="window_httpd",
+                                          mode=Mode.VIEW))
+            menu.add(path='qobuz/test httpd',
+                          label='Test web service', cmd=cmd, pos=11)
 
     def get_user_storage(self):
         if self.user_storage:

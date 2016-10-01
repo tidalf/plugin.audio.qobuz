@@ -7,10 +7,14 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.gui.util import lang, getImage
+from qobuz.gui import util
 from qobuz.node import getNode, Flag
 from qobuz import debug
 import requests
+
+import xbmcgui
+class Window(xbmcgui.Window):
+    pass
 
 class Node_testing(INode):
 
@@ -21,13 +25,14 @@ class Node_testing(INode):
         self.nt = Flag.TESTING
         self.label = 'Testing'
         self.content_type = 'files'
-        #self.image = getImage('album')
-        self.api_url = 'http://127.0.0.1:33574'
+        self.api_url = 'http://{host}:{port}'.format(
+            host=util.getSetting('httpd_host'),
+            port=util.getSetting('httpd_port'))
 
     def add_text(self, text='n/a'):
         self.add_child(getNode(Flag.TEXT, {'label': text}))
 
-    def _httpd_running(self):
+    def window_httpd(self):
         def test():
             res = None
             try:
@@ -38,12 +43,14 @@ class Node_testing(INode):
             if res is None:
                 return False
             debug.info(self, 'code {}', res)
-            if res.status_code != 404:
+            if res.status_code != 200:
                 return False
             return True
-        self.add_text('- httpd service: %s' % test())
-        self.add_text('            url: %s' % self.api_url)
-
+        d = xbmcgui.Dialog()
+        d.ok('Web service / Kooli',
+             'Testing web service: %s' % self.api_url,
+             '- running: %s' % test(),
+             'Tip: You can disable/enable Qobuz addon to restart web service')
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        self._httpd_running()
+        #self._httpd_running()
         return True

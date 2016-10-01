@@ -62,8 +62,13 @@ def shutdown_server():
 
 
 @nocache
+@application.route('/qobuz/ping', methods=['HEAD', 'GET'])
+def route_ping():
+    return 'pong', 200
+
+@nocache
 @application.route('/qobuz', methods=['HEAD', 'GET'])
-def roote_root():
+def route_root():
     node = getNode(Flag.ROOT)
     debug.info(__name__, 'NODE {}', node)
     directory = Directory(node)

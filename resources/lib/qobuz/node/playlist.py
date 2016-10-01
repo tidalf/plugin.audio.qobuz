@@ -21,13 +21,11 @@ from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
 from qobuz.util import common as util
+
 dialogHeading = 'Qobuz playlist'
 
 
-
 class Node_playlist(INode):
-    '''@class Node_playlist:
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_playlist, self).__init__(parent=parent,
@@ -68,11 +66,6 @@ class Node_playlist(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         return api.get('/playlist/get', playlist_id=self.nid,
                        offset=self.offset, limit=self.limit, extra='tracks')
-        # if data is None:
-        #     debug.warn(self, 'Build-down: Cannot fetch playlist data')
-        #     return False
-        # self.data = data
-        # return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
@@ -129,12 +122,13 @@ class Node_playlist(INode):
 
     def toggle_privacy(self):
         privacy = util.input2bool(self.get_property('is_public'))
-        debug.info(self, 'IS PUBLIC {}', privacy)
+        debug.info(self, 'privacy: {}', privacy)
         res = api.playlist_update(playlist_id=self.nid, is_public=str(privacy).lower())
         if res is None:
             notify_error('Qobuz', 'Cannot toggle privacy')
             return False
         self.delete_cache(self.nid)
+        notify_log(dialogHeading, 'Privacy changed public: %s' % privacy)
         executeBuiltin(containerRefresh())
         return True
 
