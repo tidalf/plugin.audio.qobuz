@@ -27,16 +27,11 @@ class Node_similar_artist(INode):
         return lang(30156)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/artist/getSimilarArtists', artist_id=self.nid,
+        return api.get('/artist/getSimilarArtists', artist_id=self.nid,
                        offset=self.offset, limit=self.limit)
-        if not data:
-            return False
-        self.data = data
-        return len(data['artists']['items'])
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
-        for aData in self.data['artists']['items']:
-            artist = getNode(Flag.ARTIST)
-            artist.data = aData
+        for data in self.data['artists']['items']:
+            artist = getNode(Flag.ARTIST, data=data)
             self.add_child(artist)
         return True

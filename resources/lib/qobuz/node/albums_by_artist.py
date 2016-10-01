@@ -48,13 +48,8 @@ class Node_albums_by_artist(INode):
         return self.nid
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/artist/getSimilarArtist', artist_id=self.nid,
+        return api.get('/artist/getSimilarArtist', artist_id=self.nid,
                        limit=self.limit, offset=self.offset, extra='albums')
-        if not data:
-            debug.warn(self, "Cannot fetch albums for artist: " + self.get_label())
-            return False
-        self.data = data
-        return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         count = 0

@@ -75,18 +75,13 @@ class Node_recommendation(INode):
         return str(self.genre_type) + '-' + str(self.genre_id)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        if self.genre_type is  None or self.genre_id is None:
-            return True
-        data = api.get('/album/getFeatured',
+        if self.genre_type is None or self.genre_id is None:
+            return {}
+        return api.get('/album/getFeatured',
                        type=RECOS_TYPE_IDS[int(self.genre_type)],
                        genre_id=self.genre_id,
                        limit=self.limit,
                        offset=self.offset)
-        if data is None:
-            debug.warn(self, 'Cannot fetch data for recommendation')
-            return False
-        self.data = data
-        return True
 
     def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
         '''Populate type, we don't have genre_type nor genre_id

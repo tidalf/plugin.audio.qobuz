@@ -15,8 +15,6 @@ from qobuz.node import getNode, Flag
 
 
 class Node_artist(INode):
-    '''@class: Node_artist
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_artist, self).__init__(parent=parent,
@@ -36,13 +34,8 @@ class Node_artist(INode):
         self.label = self.name
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/artist/get', artist_id=self.nid, limit=self.limit,
+        return api.get('/artist/get', artist_id=self.nid, limit=self.limit,
                        offset=self.offset, extra='albums')
-        if not data:
-            debug.warn(self, 'Build-down: Cannot fetch artist data')
-            return False
-        self.data = data
-        return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         node_artist = getNode(Flag.ARTIST, data=self.data)

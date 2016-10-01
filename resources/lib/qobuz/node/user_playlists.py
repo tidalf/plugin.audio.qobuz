@@ -14,17 +14,14 @@ from qobuz.api import api
 import os
 
 class Node_user_playlists(INode):
-    '''User playlists node
-        This node list playlist made by user and saved on Qobuz server
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_user_playlists, self).__init__(parent=parent,
                                                   parameters=parameters,
                                                   data=data)
+        self.nt = Flag.USERPLAYLISTS
         self.label = lang(30021)
         self.image = getImage('userplaylists')
-        self.nt = Flag.USERPLAYLISTS
         self.content_type = 'albums'
         display_by = self.get_parameter('display-by', default=None)
         if display_by is None:
@@ -54,18 +51,11 @@ class Node_user_playlists(INode):
         return int(userdata['current_playlist'])
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/playlist/getUserPlaylists',
+        return api.get('/playlist/getUserPlaylists',
                        limit=self.limit,
                        offset=self.offset,
                        user_id=api.user_id,
                        type='last-created')
-        if data is None:
-            debug.warn(self, "Build-down: Cannot fetch user playlists data")
-            return False
-        import pprint
-        debug.info(self, 'USER PL DATA {}', pprint.pformat(data))
-        self.data = data
-        return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         login = getSetting('username')

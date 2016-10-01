@@ -16,8 +16,6 @@ from qobuz.api import api
 
 
 class Node_track(INode):
-    """NODE TRACK
-    """
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_track, self).__init__(parent=parent,
@@ -33,12 +31,8 @@ class Node_track(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
-            return False
-        data = api.get('/track/get', track_id=self.nid)
-        if not data:
-            return False
-        self.data = data
-        return True
+            return None
+        return api.get('/track/get', track_id=self.nid)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         Dir.add_node(self)

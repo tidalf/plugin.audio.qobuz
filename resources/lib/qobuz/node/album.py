@@ -47,12 +47,7 @@ class Node_album(INode):
     nid = property(get_nid, set_nid)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/album/get', album_id=self.nid)
-        if not data:
-            debug.warn(self, "Cannot fetch product data")
-            return False
-        self.data = data
-        return True
+        return api.get('/album/get', album_id=self.nid)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:

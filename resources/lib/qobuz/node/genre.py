@@ -51,15 +51,14 @@ class Node_genre(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         data = api.get('/genre/list', parent_id=self.nid, offset=self.offset,
                        limit=self.limit)
-        if not data:
-            self.data = None
-            return True  # Nothing returned trigger reco build in build_down
-        self.data = data
-        genres = self.data['genres']
+        if data is None:
+            return None
+            #return True  # Nothing returned trigger reco build in build_down
+        genres = data['genres']
         if 'parent' in genres and int(genres['parent']['level']) > 1:
             self.populate_reco(Dir, lvl, whiteFlag, blackFlag,
                                genres['parent']['id'])
-        return True
+        return data
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.data or len(self.data['genres']['items']) == 0:

@@ -45,10 +45,9 @@ class Node_article_rubrics(INode):
             name='article_listrubrics',
             id=self.nid, offset=self.offset,
             limit=limit)
-        if not data:
-            return False
-        self.data = data['data']
-        return True
+        if data is None or not 'data' in data:
+            return None
+        return data['data']
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for rubric in self.data['rubrics']['items']:

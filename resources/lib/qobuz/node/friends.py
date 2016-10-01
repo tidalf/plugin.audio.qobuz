@@ -38,7 +38,7 @@ class Node_friends(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         node = getNode(Flag.FRIEND)
         node.create('qobuz.com')
-        return True
+        return {}
 
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         username = api.username

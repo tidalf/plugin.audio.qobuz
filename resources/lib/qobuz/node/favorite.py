@@ -50,24 +50,16 @@ class Node_favorite(INode):
                                       self.search_type.capitalize())
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = None
         if self.search_type != 'all':
-            data = api.get('/favorite/getUserFavorites',
+            return api.get('/favorite/getUserFavorites',
                            user_id=api.user_id,
                            type=self.search_type,
                            limit=self.limit,
                            offset=self.offset)
-        else:
-            data = api.get('/favorite/getUserFavorites',
-                           user_id=api.user_id,
-                           limit=self.limit,
-                           offset=self.offset)
-        if not data:
-            debug.warn(self, 'Build-down: Cannot fetch favorites data')
-            return False
-        self.data = data
-        self.image = self.get_image()
-        return True
+        return api.get('/favorite/getUserFavorites',
+                        user_id=api.user_id,
+                        limit=self.limit,
+                        offset=self.offset)
 
     def make_url(self, **ka):
         if self.search_type:
@@ -77,7 +69,7 @@ class Node_favorite(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.method is not None:
             return True
-        ret = False
+        result = False
         all_kind = ('artists', 'albums', 'tracks')
         search_for = (self.search_type, )
         if self.search_type is None:
@@ -88,8 +80,8 @@ class Node_favorite(INode):
                 debug.warn(self, 'No method named %s' % method)
                 continue
             if getattr(self, method)(Dir, lvl, whiteFlag, blackFlag):
-                ret = True
-        return ret
+                result = True
+        return result
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         ret = False

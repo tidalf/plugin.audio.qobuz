@@ -38,13 +38,8 @@ class Node_purchase(INode):
         return super(Node_purchase, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/purchase/getUserPurchases', limit=self.limit,
+        return api.get('/purchase/getUserPurchases', limit=self.limit,
                        offset=self.offset, user_id=api.user_id)
-        if not data:
-            debug.warn(self, 'Cannot fetch purchases data')
-            return False
-        self.data = data
-        return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         wanted = ['albums', 'tracks']
@@ -61,14 +56,12 @@ class Node_purchase(INode):
         return ret
 
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
         for album in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM)
-            node.data = album
+            node = getNode(Flag.ALBUM, data=album)
             node.data['purchased'] = True
             self.add_child(node)
-            ret = True
-        return ret
+            result = True
+        return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         ret = False

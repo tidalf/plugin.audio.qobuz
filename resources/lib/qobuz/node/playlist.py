@@ -20,6 +20,7 @@ from qobuz.gui.util import color, lang, getImage, runPlugin, executeBuiltin
 from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
+from qobuz.util import common as util
 dialogHeading = 'Qobuz playlist'
 
 
@@ -47,13 +48,6 @@ class Node_playlist(INode):
             self.content_type = 'songs'
         self.image = self.get_image()
 
-
-    def get_image(self):
-        image = self.get_image_from_storage()
-        if image is None:
-            image = super(Node_playlist, self).get_image()
-        return image
-
     def _get_node_storage_filename(self):
         return u'userdata-{user_id}-playlist-{nid}.local'.format(
             user_id=api.user_id,
@@ -72,14 +66,13 @@ class Node_playlist(INode):
         return self.b_is_current
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/playlist/get', playlist_id=self.nid,
+        return api.get('/playlist/get', playlist_id=self.nid,
                        offset=self.offset, limit=self.limit, extra='tracks')
-        if data is None:
-            debug.warn(self, 'Build-down: Cannot fetch playlist data')
-            return False
-        self.data = data
-        self.get_image()
-        return True
+        # if data is None:
+        #     debug.warn(self, 'Build-down: Cannot fetch playlist data')
+        #     return False
+        # self.data = data
+        # return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
@@ -134,6 +127,17 @@ class Node_playlist(INode):
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
+    def toggle_privacy(self):
+        privacy = util.input2bool(self.get_property('is_public'))
+        debug.info(self, 'IS PUBLIC {}', privacy)
+        res = api.playlist_update(playlist_id=self.nid, is_public=str(privacy).lower())
+        if res is None:
+            notify_error('Qobuz', 'Cannot toggle privacy')
+            return False
+        self.delete_cache(self.nid)
+        executeBuiltin(containerRefresh())
+        return True
+
     def attach_context_menu(self, item, menu):
         colorCaution = getSetting('item_caution_color')
         login = getSetting('username')
@@ -142,6 +146,12 @@ class Node_playlist(INode):
                                             id='', mode=Mode.VIEW))
         menu.add(path='playlist', pos=1,
                  label='Playlist', cmd=cmd, mode=Mode.VIEW)
+
+        url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
+                                nm='toggle_privacy')
+        menu.add(path='playlist/toggle_privacy', post=2,
+                 label='Toggle privacy',
+                 cmd=containerUpdate(url))
         if login != self.get_property('owner/name'):
             isOwner = False
 
@@ -237,7 +247,7 @@ class Node_playlist(INode):
                     continue
                 str_tracks += '%s,' % (str(node.nid))
             if not api.playlist_addTracks(
-                    playlist_id=playlist_id, track_ids=str_tracks):
+                    playlist_id=self.nid, track_ids=str_tracks):
                 return False
             start += step
         return True

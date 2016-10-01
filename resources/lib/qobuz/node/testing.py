@@ -20,7 +20,7 @@ class Node_testing(INode):
                                                data=data)
         self.nt = Flag.TESTING
         self.label = 'Testing'
-        self.content_type = 'albums'
+        self.content_type = 'files'
         #self.image = getImage('album')
         self.api_url = 'http://127.0.0.1:33574'
 

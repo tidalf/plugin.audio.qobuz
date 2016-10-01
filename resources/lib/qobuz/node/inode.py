@@ -280,7 +280,6 @@ class INode(object):
                 continue
             url += key + '=' + value + '&'
         url = url[:-1]
-        #debug.info(self, 'MakeURL: {}', url)
         return url
 
     def makeListItem(self, **ka):
@@ -338,7 +337,6 @@ class INode(object):
         if self.data is not None:
             for name in ['images300', 'images150', 'images']:
                 if name in self.data and len(self.data[name]) > 0:
-                    debug.info(self, 'IMAGE DATA {}', self.data[name])
                     return self.data[name][random.randrange(len(self.data[name]))]
         return self.get_property('image')
 
@@ -359,11 +357,10 @@ class INode(object):
         render.run()
         return render
 
-    # When returning False we are not displaying directory content
     def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None):
-        '''This method fetch data from cache
+        '''When returning None we are not displaying directory content
         '''
-        return True
+        return {}
 
     def populating(self, Dir, lvl=1, whiteFlag=Flag.ALL, blackFlag=Flag.NONE,
                    gData=None):
@@ -377,9 +374,11 @@ class INode(object):
             return False
         # Dir.update(gData, 'Fetching', '', '')
         if not (self.nt & blackFlag == self.nt):
-            if not self.fetch(Dir, lvl, whiteFlag, blackFlag):
+            data = self.fetch(Dir, lvl, whiteFlag, blackFlag)
+            if data is None: #not self.fetch(Dir, lvl, whiteFlag, blackFlag):
                 return False
             else:
+                self.data = data
                 self.__add_pagination(self.data)
         self.populate(Dir, lvl, whiteFlag, blackFlag)
         if lvl != -1:

@@ -52,10 +52,8 @@ class Node_collection(INode):
             k = Keyboard('', 'My %s' % self.search_type)
             k.doModal()
             if not k.isConfirmed():
-                return False
-            query = k.getText()
-        query.strip()
-        debug.info(self, 'search_type: %s, query: %s' % (self.search_type, query))
+                return None
+            query = k.getText().strip()
         source = self.source
         kwargs = {
             'query': query,
@@ -63,17 +61,13 @@ class Node_collection(INode):
         }
         if source is not None:
             kwargs['source'] = source
-        data = None
         if self.search_type == 'albums':
-            data = api.get('/collection/getAlbums', **kwargs)
+            return api.get('/collection/getAlbums', **kwargs)
         elif self.search_type == 'artists':
-            data = api.get('/collection/getArtists', **kwargs)
+            return api.get('/collection/getArtists', **kwargs)
         elif self.search_type == 'tracks':
-            data = api.get('/collection/getTracks', **kwargs)
-        if data is None:
-            return False
-        self.data = data
-        return True
+            return api.get('/collection/getTracks', **kwargs)
+        return None
 
     def get_description(self):
         return None

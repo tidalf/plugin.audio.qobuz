@@ -32,8 +32,7 @@ class WidgetArticle(xbmcgui.WindowDialog):
 
 
 class Node_article(INode):
-    '''@class Node_articles
-    '''
+
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_article, self).__init__(parent=parent,
                                            parameters=parameters,
@@ -73,11 +72,7 @@ class Node_article(INode):
         return image
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/article/get', article_id=self.nid)
-        if not data:
-            return False
-        self.data = data['data']
-        return True
+        return api.get('/article/get', article_id=self.nid)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         pass
