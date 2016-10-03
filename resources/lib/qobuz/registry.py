@@ -41,6 +41,9 @@ class XbmcRegistryBackend(IRegistryBackend):
     def get(self, key):
         return self.application.addon.getSetting(key)
 
+    def set(self, key, value):
+        self.application.addon.setSetting(key, str(value))
+
 class Registry(object):
 
     def __init__(self, application):
@@ -53,6 +56,9 @@ class Registry(object):
 
     def get(self, key):
         return self.backend.get(key)
+
+    def set(self, key, value):
+        self.backend.set(key, value)
 
     def __getitem__(self, key):
         return self.backend.get(key)

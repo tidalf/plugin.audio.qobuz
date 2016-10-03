@@ -34,34 +34,28 @@ class Directory(object):
                 we are replacing Xbmc Default menu
     """
 
-    def __init__(self, root, nodeList=[], handle=None, **ka):
-        self.nodes = []
-        self.label = "Qobuz / "
+    def __init__(self, root=None, nodes=[], handle=None,
+                 asList=False, asLocalUrl=False, withProgress=False, **ka):
+        self.nodes = nodes
+        self.label = 'Qobuz'
+        if root is not None:
+            self.label = '%s / %s' % (self.label, root.label)
         self.root = root
-        self.asList = False
+        self.asList = asList
         self.handle = handle
         self.put_item_ok = True
-        withProgress = True
-        if 'withProgress' in ka:
-            if ka['withProgress'] is True:
-                withProgress = True
-            else:
-                withProgress = False
         self.Progress = Progress(withProgress)
         self.total_put = 0
         self.started_on = time.time()
-        debug.info(self, 'Label: {}', self.label)
-        debug.info(self, 'Root label: {}', root.get_label())
-        self.Progress.create(self.label + root.get_label(default=''))
+        self.Progress.create(self.label)
         self.update({'count': 0, 'total': 100}, lang(30169))
         self.line1 = ''
         self.line2 = ''
         self.line3 = ''
         self.percent = 0
         self.content_type = 'files'
-        self.nodes = nodeList
         self.replaceItems = False
-        self.asLocalUrl = False
+        self.asLocalUrl = asLocalUrl
 
     def __del__(self):
         """Cleaning our tree on delete
@@ -159,16 +153,16 @@ class Directory(object):
             ka['image'],
             ka['url'])
 
-    def add_to_xbmc_directory(self, **ka):
+    def add_to_xbmc_directory(self, is_folder=False, **ka):
         """Add item to Xbmc Directory
             Named parameters:
                 url: string
                 item: xbmc.ListItem
                 is_folder: bool
         """
-        if not xbmcplugin.addDirectoryItem(self.handle,
-                                           ka['url'], ka['item'],
-                                           ka['is_folder'], self.total_put):
+        if not xbmcplugin.addDirectoryItem(self.handle, ka['url'], ka['item'],
+                                           is_folder,
+                                           self.total_put):
             return False
         self.total_put += 1
         return True

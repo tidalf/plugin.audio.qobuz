@@ -70,7 +70,6 @@ def route_ping():
 @application.route('/qobuz', methods=['HEAD', 'GET'])
 def route_root():
     node = getNode(Flag.ROOT)
-    debug.info(__name__, 'NODE {}', node)
     directory = Directory(node)
     node.populating(directory)
     response = {

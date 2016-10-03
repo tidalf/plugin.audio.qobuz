@@ -10,15 +10,19 @@ import os
 import re
 import tempfile
 
-from qobuz.debug import warn
-
+from qobuz import debug
 
 def unlink(filename):
     if not os.path.exists(filename):
         return False
     tmpfile = tempfile.mktemp('.dat', 'invalid-', os.path.dirname(filename))
-    os.rename(filename, tmpfile)
-    return os.unlink(tmpfile)
+    try:
+        os.rename(filename, tmpfile)
+        return os.unlink(tmpfile)
+    except Exception as e:
+        debug.error(__name__, 'Unlinking fails: {filename}, error: {error)',
+                    filename=filename, error=e)
+    return False
 
 
 class RenamedTemporaryFile(object):
@@ -75,7 +79,7 @@ def find(directory, pattern, callback=None, gData=None):
                         if not callback(path, gData):
                             return None
                     except Exception as e:
-                        warn('[find]', 'Callback raise exception: '
+                        debug.warn('[find]', 'Callback raise exception: '
                              '' + repr(e))
                         return None
                 flist.append(path)

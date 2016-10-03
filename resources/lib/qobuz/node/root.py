@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.gui.util import getSetting, executeBuiltin, lang
+from qobuz.gui.util import getSetting, setSetting, executeBuiltin, lang
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
 from qobuz.node import getNode, Flag
@@ -64,3 +64,6 @@ class Node_root(INode):
         '''
         executeBuiltin('UpdateLibrary("music", "%s")' % (
             self.get_parameter('query', unQuote=True)))
+
+    def stop_scan(self):
+        setSetting('scan_stop', False)

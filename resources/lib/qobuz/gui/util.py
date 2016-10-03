@@ -199,6 +199,9 @@ def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
 
 
+def setSetting(key, value):
+    config.app.registry.set(key, value)
+
 def getSetting(key, default='', asInt=False, asBool=False, asList=False, sep=' '):
     """Helper to access xbmcaddon.getSetting
     @param_pos key: Key to retrieve from setting

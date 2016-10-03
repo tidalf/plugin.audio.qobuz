@@ -58,7 +58,7 @@ class EasyApi(RawApi):
 
         ::note api.error will contain last error message
         """
-        debug.info('API/GET {} / {}', str(a), str(ka))
+        #debug.info('API/GET {} / {}', str(a), str(ka))
         key_to_del = []
         for key, value in ka.items():
             if value is None or value == '':

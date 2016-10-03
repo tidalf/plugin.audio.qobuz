@@ -46,7 +46,7 @@ class Node_album(INode):
 
     nid = property(get_nid, set_nid)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None):
         return api.get('/album/get', album_id=self.nid)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

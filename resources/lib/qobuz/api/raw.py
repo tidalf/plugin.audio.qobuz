@@ -100,7 +100,6 @@ class RawApi(object):
             Error: [200]
             Error: Bad Request [400]
         '''
-        debug.info(self, 'uri: {}, params: {}', uri, str(params))
         self.statTotalRequest += 1
         self.error = ''
         self.status_code = None

@@ -87,14 +87,17 @@ class INode(object):
 
     def get_parent(self):
         '''@getter parent'''
-        return self._parent
+        if self._parent is None:
+            return None
+        return self._parent()
 
     def set_parent(self, parent):
         '''@setter parent'''
         if parent is None:
             self._parent = None
             return
-        self._parent = weakref.proxy(parent)
+        #self._parent = weakref.proxy(parent)
+        self._parent = weakref.ref(parent)
 
     parent = property(get_parent, set_parent)
 
@@ -231,6 +234,8 @@ class INode(object):
         @param default=None: value set when parameter not found or value is None
         @param unQuote=False: boolean, when True unquote value
         '''
+        if self.parameters is None:
+            return default
         if name not in self.parameters:
             return default
         value = self.parameters[name]
@@ -555,7 +560,8 @@ class INode(object):
         menu.add(path='qobuz/big_dir',
                  label=lang(30158), cmd=cmd)
         if getSetting('enable_scan_feature', asBool=True):
-            ''' SCAN '''
+            ''' SCAN
+            '''
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN,
                                                     asLocalUrl=True))
             url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan',
@@ -563,16 +569,25 @@ class INode(object):
             menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
         if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK
                       & ~Flag.PLAYLIST):
-            ''' ERASE CACHE '''
+            ''' ERASE CACHE
+            '''
             cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="cache_remove",
                                           mode=Mode.VIEW))
             menu.add(path='qobuz/erase_cache',
                           label=lang(30117), cmd=cmd,
                           color=colorCaution, pos=10)
+            ''' HTTP / Kooli
+            '''
             cmd = runPlugin(self.make_url(nt=Flag.TESTING, nm="window_httpd",
                                           mode=Mode.VIEW))
             menu.add(path='qobuz/test httpd',
                           label='Test web service', cmd=cmd, pos=11)
+            ''' Stop scan
+            '''
+            cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="stop_scan",
+                                          mode=Mode.VIEW))
+            menu.add(path='qobuz/stop_scan',
+                          label='Stop scan', cmd=cmd, pos=12)
 
     def get_user_storage(self):
         if self.user_storage:
