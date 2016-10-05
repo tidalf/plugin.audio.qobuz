@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
@@ -32,8 +32,8 @@ class QobuzXbmcRenderer(IRenderer):
         super(QobuzXbmcRenderer, self).__init__(node_type, params, mode)
 
     def run(self):
-        """Building our tree, creating root node based on our node_type
-        """
+        '''Building our tree, creating root node based on our node_type
+        '''
         if not self.set_root_node():
             debug.warn(self, ("Cannot set root node ({}, {})") %
                 (str(self.node_type), str(self.root.get_parameter('nid'))))

@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
@@ -21,7 +21,7 @@ class Node_favorites(INode):
                                              data=data)
         self.nt = Flag.FAVORITES
         self.label = lang(30081)
-        self.content_type = 'files'
+        self.content_type = 'albums'
         self.image = getImage('album')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

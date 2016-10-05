@@ -3,14 +3,14 @@
     ~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmc  # @UnresolvedImport
 import xbmcgui  # @UnresolvedImport
 
 import qobuz  # @UnresolvedImport
-from qobuz.debug import warn
+from qobuz import debug
 from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
 from qobuz.gui.util import getSetting
 from qobuz.node import Flag, getNode
@@ -44,14 +44,16 @@ class QobuzPlayer(xbmc.Player):
         """Playing track given a track id
         """
         track = getNode(Flag.TRACK, {'nid': track_id})
-        if not track.fetch(None, 1, Flag.TRACK, Flag.NONE):
-            warn(self, "Cannot get track data")
+        data = track.fetch(None, 1, Flag.TRACK, Flag.NONE)
+        if data is None:
+            debug.warn(self, "Cannot get track data")
             return False
+        track.data = data
         if not track.is_playable():
-            warn(self, "Cannot get streaming URL")
+            debug.warn(self, "Cannot get streaming URL")
             return False
         if 'purchased' in params:
-            track.parameters['purchased']= True
+            track.parameters['purchased'] = True
         item = track.makeListItem()
         track.item_add_playing_property(item)
         """Some tracks are not authorized for stream and a 60s sample is
@@ -59,7 +61,7 @@ class QobuzPlayer(xbmc.Player):
         """
         if track.is_sample():
             item.setInfo(
-                'music', infoLabels={
+                'Music', infoLabels={
                     'duration': 60,
                 })
             """Don't warn for free account (all songs except purchases are 60s

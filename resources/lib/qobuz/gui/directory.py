@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcplugin  # @UnresolvedImport
@@ -94,7 +94,6 @@ class Directory(object):
             node: node, node to add
         """
         if self.is_canceled():
-            debug.info(self, 'Directory canceled')
             return False
         item = node.makeListItem(replaceItems=self.replaceItems)
         if not item:

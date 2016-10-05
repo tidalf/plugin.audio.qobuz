@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
@@ -18,7 +18,7 @@ from qobuz.gui.util import dialogLoginFailure, getSetting, containerRefresh
 from qobuz.gui.util import dialogServiceTemporarilyUnavailable
 import qobuz.config as config
 from qobuz.cache import cache
-
+from qobuz.renderer import renderer
 
 def get_checked_parameters():
     """Parse parameters passed to xbmc plugin as sys.argv
@@ -76,9 +76,6 @@ class MinimalBootstrap(object):
             raise exception.InvalidLogin(None)
 
     def bootstrap_directories(self):
-        """Setting some common path used by our application
-            cache, image...
-        """
         import xbmc  # @UnresolvedImport
 
         class PathObject ():
@@ -104,9 +101,6 @@ class MinimalBootstrap(object):
                 out += 'resources: ' + self.resources + "\n"
                 out += 'image   : ' + self.image + "\n"
                 return out
-            '''
-            Make dir
-            '''
 
             def mkdir(self, path):
                 if not os.path.isdir(path):
@@ -115,14 +109,12 @@ class MinimalBootstrap(object):
                     except:
                         debug.warn(self, "Cannot create directory: " + path)
                         exit(2)
-                    debug.info(self, "Directory created: " + path)
         config.path = PathObject()
         config.path._set_dir()
         config.path.mkdir(config.path.cache)
 
     def bootstrap_sys_args(self):
-        """Parsing sys arg parameters and store them
-        """
+        '''Store sys arguments'''
         self.MODE = None
         self.params = get_checked_parameters()
         if 'nt' not in self.params:
@@ -133,22 +125,21 @@ class MinimalBootstrap(object):
             self.MODE = int(self.params['mode'])
         except:
             debug.warn(self, "No 'mode' parameter")
-        for name in self.params:
-            debug.info(self, "Param: %s = %s (%s)" % (name, str(self.params[name]),
-                                                Flag.to_s(self.params['nt'])))
+        if getSetting('debug', asBool=True):
+            for name in self.params:
+                debug.info(self, "Param: %s = %s (%s)" % (name,
+                                str(self.params[name]),
+                                Flag.to_s(self.params['nt'])))
 
     def dispatch(self):
-        """Routing based on parameters
-        """
+        '''Routing'''
         if self.MODE == Mode.PLAY:
             from qobuz.player import QobuzPlayer
             player = QobuzPlayer()
             if player.play(self.params['nid'],self.params):
                 return True
             return False
-
-        from renderer import renderer
-        if self.MODE == Mode.VIEW:
+        elif self.MODE == Mode.VIEW:
             r = renderer(self.nodeType, self.params)
             return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
@@ -181,5 +172,3 @@ class Bootstrap(MinimalBootstrap):
         super(Bootstrap, self).init_app()
         self.bootstrap_registry()
         self.bootstrap_sys_args()
-        from qobuz.xbmcrpc import XbmcRPC
-        config.rpc = XbmcRPC()

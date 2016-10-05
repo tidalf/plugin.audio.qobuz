@@ -6,7 +6,7 @@
     cached (see qobuz.cache.qobuz)
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.cache import cache
@@ -58,7 +58,6 @@ class EasyApi(RawApi):
 
         ::note api.error will contain last error message
         """
-        #debug.info('API/GET {} / {}', str(a), str(ka))
         key_to_del = []
         for key, value in ka.items():
             if value is None or value == '':

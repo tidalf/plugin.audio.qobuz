@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
@@ -34,13 +34,13 @@ class Node_favorite(INode):
         self.image = getImage('favorites')
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
-        self.content_type = 'files'
+        self.content_type = 'albums'
         if self.search_type == 'all':
             self.search_type = None
         elif self.search_type == 'albums':
             self.content_type = 'albums'
         elif self.search_type == 'tracks':
-            self.content_type = 'files'
+            self.content_type = 'songs'
         elif self.search_type == 'artists':
             self.content_type = 'artists'
         if self.search_type is None:
@@ -75,6 +75,8 @@ class Node_favorite(INode):
         if self.search_type is None:
             search_for = all_kind
         for kind in search_for:
+            if not kind in self.data:
+                continue
             method = '_populate_%s' % kind
             if not hasattr(self, method):
                 debug.warn(self, 'No method named %s' % method)
@@ -85,8 +87,6 @@ class Node_favorite(INode):
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         ret = False
-        if not 'tracks' in self.data:
-            return False
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, data=track)
             self.add_child(node)
@@ -95,8 +95,6 @@ class Node_favorite(INode):
 
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         ret = False
-        if not 'albums' in self.data:
-            return False
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
             self.add_child(node)
@@ -105,8 +103,6 @@ class Node_favorite(INode):
 
     def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
         ret = False
-        if not 'artists' in self.data:
-            return False
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
             node.fetch(None, None, None, Flag.NONE)

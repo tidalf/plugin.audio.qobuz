@@ -5,7 +5,7 @@
     Little utility class for cleaning cache purpose
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
@@ -41,7 +41,6 @@ def clean_all(cache):
         cache.delete(data['key'])
         return True
     def delete_nocheck(filename, info):
-        debug.info(__name__, 'deleting: {}', filename)
         os.unlink(filename)
         return True
     find(cache.base_path, '^.*\.dat$', delete_one)

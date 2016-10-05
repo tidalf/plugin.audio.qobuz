@@ -37,8 +37,6 @@ def is_empty(obj):
 def is_authentication_set():
     username = gui.getSetting('username')
     password = gui.getSetting('password')
-    debug.info(__name__, 'username: {}, password: {}', username,
-               '***' if password else 'None')
     if not is_empty(username) and not is_empty(password):
         return True
     return False
@@ -49,7 +47,6 @@ def is_service_enable():
 @application.before_request
 def shutdown_request():
     if monitor.abortRequested:
-        debug.info(__name__, 'Shutdown Qobuz Httpd requested')
         shutdown_server()
     return None
 
@@ -77,7 +74,6 @@ class KooliService(threading.Thread):
                     gui.notify_warn('Login failed', 'Invalid credentials')
                 else:
                     try:
-                        debug.info(self, 'Starting {} on port {}', self.name, self.port)
                         application.run(port=self.port, threaded=True)
                     except Exception as e:
                         debug.error(self, 'KooliService port: {} Error: {}', self.port, e)
@@ -91,7 +87,6 @@ if __name__ == '__main__':
     monitor = Monitor()
     monitor.add_service(KooliService())
     monitor.start_all_service()
-    #debug.info(__name__, 'Listening on http://localhost: {}', monitor.service['httpd'].service.port)
     alive = True
     while alive:
         abort = False
@@ -100,28 +95,7 @@ if __name__ == '__main__':
         except Exception as e:
             debug.error(__name__, 'Error while getting abortRequested {}', e)
         if abort:
-            debug.info(__name__, 'Abort!')
             alive = False
             continue
         xbmc.sleep(1000)
-    #     try:
-    #         if not is_authentication_set():
-    #             gui.notify_warn('Authentication not set', 'You need to enter credentials')
-    #             xbmc.sleep(5000)
-    #             continue
-    #         if not api.login(username=qobuzApp.registry.get('username'),
-    #             password=qobuzApp.registry.get('password')):
-    #             gui.notify_warn('Login failed', 'Invalid credentials')
-    #             xbmc.sleep(5000)
-    #             continue
-    #         debug.info(__name__, '--> starting Flask')
-    #         application.run(port=port, threaded=True)
-    #         while True:
-    #             xbmc.sleep(1000)
-    #     except Exception as e:
-    #         debug.error(__name__, '>>>[-] Flask failed...Error {}', e)
-    #         traceback.print_exc(file=sys.stdout)
-    #         print '-'*60
-    #         xbmc.sleep(1000)
     monitor.stop_all_service()
-    debug.info(__name__, 'Qobuz/Kooli ended!')

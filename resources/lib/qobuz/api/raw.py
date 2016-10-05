@@ -6,7 +6,7 @@
     see Qobuz API on GitHub (https://github.com/Qobuz/api-documentation)
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
@@ -231,7 +231,7 @@ class RawApi(object):
     def track_resportStreamingEnd(self, track_id, duration):
         duration = math.floor(int(duration))
         if duration < 5:
-            debug.info(self, 'Duration lesser than 5s, abort reporting')
+            debug.warn(self, 'Duration lesser than 5s, abort reporting')
             return None
         # @todo ???
         user_auth_token = ''  # @UnusedVariable

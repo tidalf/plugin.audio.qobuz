@@ -1,3 +1,11 @@
+'''
+    qobuz.util.data
+    ~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 from qobuz import debug
 
 def list_image(data, desired_size='xlarge'):
@@ -5,7 +13,6 @@ def list_image(data, desired_size='xlarge'):
     [all_size.append(s) for s in ['xlarge', 'large', 'small', 'thumbnail']]
     result = []
     def append(url):
-        debug.info(__name__, 'appending url: {}', url)
         if url not in result:
             result.append(url)
 
@@ -22,5 +29,5 @@ def list_image(data, desired_size='xlarge'):
                 for size in all_size:
                     if size in image:
                         append(image[size])
-                        break   
+                        break
     return result

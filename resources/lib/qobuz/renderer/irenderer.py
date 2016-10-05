@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz import debug
@@ -54,7 +54,6 @@ class IRenderer(object):
         if 'nm' in self.parameters:
             methodName = self.parameters['nm']
             del self.parameters['nm']
-            debug.info(self, "Executing method on node: " + repr(methodName))
             if getattr(self.root, methodName)():
                 return True
             return False

@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
@@ -22,7 +22,6 @@ class Node_artist(INode):
                                           data=data)
         self.nt = Flag.ARTIST
         self.set_label(self.get_name())
-        self.is_folder = True
         self.slug = ''
         self.content_type = 'artists'
 

@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
@@ -50,7 +50,6 @@ class Node_friends(INode):
                            username=self.name,
                            limit=self.limit, offset=self.offset,
                            type='last-created')
-            debug.info('Friend {} data {}', self.name, data)
         else:
             data = api.get('/playlist/getUserPlaylists',
                            user_id=api.user_id,

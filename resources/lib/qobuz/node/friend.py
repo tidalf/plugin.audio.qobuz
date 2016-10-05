@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import json
@@ -132,7 +132,6 @@ class Node_friend(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         node = getNode(Flag.FRIEND)
         node.create('qobuz.com')
-        debug.info(self, 'Fetch friend {}', self.name)
         return api.get('/playlist/getUserPlaylists',
                        type='last-created',
                        username=self.name)

@@ -4,7 +4,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.api import api
@@ -56,7 +56,7 @@ class Node_recommendation(INode):
         super(Node_recommendation, self).__init__(parent=parent,
                                                   parameters=parameters,
                                                   data=data)
-        self.content_type = 'files'
+        self.content_type = 'albums'
         self.nt = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id', default=None)
         self.genre_type = self.get_parameter('genre-type', default=None)
@@ -88,7 +88,7 @@ class Node_recommendation(INode):
         '''
         for genre_type_id in RECOS_TYPE_IDS:
             node = getNode(Flag.RECOMMENDATION, {'genre-type': genre_type_id})
-            node.set_label(self.label + ' - ' + RECOS_TYPES[genre_type_id])
+            node.label = self.label + ' - ' + RECOS_TYPES[genre_type_id]
             self.add_child(node)
         return True
 
@@ -96,14 +96,13 @@ class Node_recommendation(INode):
         '''Populate genre, we have genre_type but no genre_id
         '''
         for genre_id in RECOS_GENRES:
-            node = getNode(Flag.RECOMMENDATION, {
+            node = getNode(Flag.RECOMMENDATION, parameters={
                 'genre-type': self.genre_type,
                 'genre-id': genre_id
             })
-            label = '%s - %s / %s' % (self.label,
+            node.label = '%s - %s / %s' % (self.label,
                                       RECOS_TYPES[int(self.genre_type)],
                                       RECOS_GENRES[genre_id])
-            node.label = label
             self.add_child(node)
         return True
 
@@ -119,17 +118,19 @@ class Node_recommendation(INode):
             debug.warn(self, 'Recommendation data[\'albums\'] doesn\'t contain items')
             return False
         for product in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM, {'nid': product['id']})
-            node.data = product
-            self.add_child(node)
+            self.add_child(getNode(Flag.ALBUM,
+                                   parameters={'nid': product['id']},
+                                   data=product))
         return True
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         '''We are populating our node based on genre_type and genre_id
         '''
         if not self.genre_type:
+            self.content_type = 'files'
             return self.__populate_type(Dir, lvl, whiteFlag, blackFlag)
         elif not self.genre_id:
+            self.content_type = 'files'
             return self.__populate_genre(Dir, lvl, whiteFlag, blackFlag)
         self.content_type = 'albums'
         return self.__populate_type_genre(Dir, lvl, whiteFlag, blackFlag)

@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
@@ -40,10 +40,10 @@ class Node_playlist(INode):
         self.is_folder = True
         self.packby = ''
         self.playlist_storage = None
-        if self.packby == 'album':
-            self.content_type = 'albums'
-        else:
-            self.content_type = 'songs'
+        # if self.packby == 'album':
+        #     self.content_type = 'albums'
+        # else:
+        self.content_type = 'songs'
         self.image = self.get_image()
 
     def _get_node_storage_filename(self):
@@ -76,6 +76,15 @@ class Node_playlist(INode):
     def get_name(self):
         return self.get_property(['name', 'title'])
 
+    def get_genre(self):
+        def cmp_genre(a, b):
+            if a['percent'] < b['percent']:
+                return 1
+            elif a['percent'] > b['percent']:
+                return -1
+            return 0
+        return [g['name'] for g in sorted(self.get_property('genres'), cmp_genre)]
+
     def get_owner(self):
         return self.get_property('owner/name')
 
@@ -92,10 +101,10 @@ class Node_playlist(INode):
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
-        users_count = int(self.get_property('users_count'))
+        users_count = self.get_property('users_count', to='int')
         privacy = 'Private'
         privacy_color = '55FF0000'
-        if bool(self.get_property('is_public')):
+        if self.get_property('is_public', to='bool'):
             privacy = 'Public'
             privacy_color = '5500FF00'
         tag = ' (tracks: %s / privacy: %s / users: %s)' % (self.get_property('tracks_count'),privacy, users_count, )
@@ -114,15 +123,22 @@ class Node_playlist(INode):
         if not item:
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
+        item.setInfo(type='Music', infoLabels={
+            'genre': self.get_genre()[0],
+            'duration': self.get_duration(),
+            'comment': self.get_description(),
+        })
         item.setPath(url)
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
+    def get_duration(self):
+        return self.get_property('duration')
+
     def toggle_privacy(self):
         privacy = util.input2bool(self.get_property('is_public'))
-        debug.info(self, 'privacy: {}', privacy)
         res = api.playlist_update(playlist_id=self.nid, is_public=str(privacy).lower())
         if res is None:
             notify_error('Qobuz', 'Cannot toggle privacy')
@@ -231,8 +247,6 @@ class Node_playlist(INode):
             if (start + step) > numtracks:
                 step = numtracks - start
             str_tracks = ''
-            debug.info(self, 'Adding tracks start: %s, end: %s' %
-                 (start, start + step))
             for i in range(start, start + step):
                 node = nodes[i]
                 if node.nt != Flag.TRACK:
@@ -383,14 +397,11 @@ class Node_playlist(INode):
                                     lang(30054),
                                     color('FFFF0000', name))
         if not ok:
-            debug.info(self, 'Deleting playlist aborted...')
             return False
         res = False
         if data['owner']['name'] == login:
-            debug.info(self, 'Deleting playlist: ' + str(playlist_id))
             res = api.playlist_delete(playlist_id=playlist_id)
         else:
-            debug.info(self, 'Unsuscribe playlist' + str(playlist_id))
             res = api.playlist_unsubscribe(playlist_id=playlist_id)
         if not res:
             debug.warn(self, 'Cannot delete playlist with id ' + str(playlist_id))
@@ -412,15 +423,14 @@ class Node_playlist(INode):
             return False
 
     def delete_cache(self, playlist_id):
-        limit = getSetting('pagination_limit')
         upkey = cache.make_key('/playlist/getUserPlaylists',
-                               limit=limit,
+                               limit=self.limit,
                                offset=self.offset,
                                user_id=api.user_id)
         pkey = cache.make_key('/playlist/get',
                               playlist_id=playlist_id,
                               offset=self.offset,
-                              limit=limit,
+                              limit=self.limit,
                               extra='tracks')
         cache.delete(upkey)
         cache.delete(pkey)

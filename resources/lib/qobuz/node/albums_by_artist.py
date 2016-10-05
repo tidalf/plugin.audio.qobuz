@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui  # @UnresolvedImport
@@ -55,8 +55,7 @@ class Node_albums_by_artist(INode):
         count = 0
         total = len(self.data['albums']['items'])
         for album in self.data['albums']['items']:
-            keys = ['artist', 'interpreter', 'composer', 'performer']
-            for k in keys:
+            for k in ['artist', 'interpreter', 'composer', 'performer']:
                 try:
                     if k in self.data['artist']:
                         album[k] = weakref.proxy(self.data['artist'][k])
@@ -65,9 +64,8 @@ class Node_albums_by_artist(INode):
                     pass
             node = getNode(Flag.ALBUM, data=album)
             count += 1
-            Dir.update(count, total, "Add album:" + node.get_label(), '')
             self.add_child(node)
-        return True
+        return count
 
     def makeListItem(self, replaceItems=False):
         item = xbmcgui.ListItem(self.get_label(),

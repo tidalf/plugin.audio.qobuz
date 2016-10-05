@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
@@ -27,14 +27,9 @@ class Node_album(INode):
                                          data=data)
         self.nt = Flag.ALBUM
         self.image = getImage('album')
-        self.content_type = 'songs'
+        self.content_type = 'albums'
         self.is_special_purchase = False
-        self.imageDefaultSize = 'large'
-        self.label = 'Album'
-        try:
-            self.imageDefaultSize = getSetting('image_default_size')
-        except Exception as e:
-           debug.warn(self, 'Cannot set image default size, Error: {}', e)
+        self.imageDefaultSize = getSetting('image_default_size')
 
     def get_nid(self):
         return super(Node_album, self).get_nid()
@@ -51,10 +46,7 @@ class Node_album(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK, data=track)
-            if 'image' not in track:
-                track['image'] = self.get_image()
-            self.add_child(node)
+            self.add_child(getNode(Flag.TRACK, data=track))
         return len(self.data['tracks']['items'])
 
     def make_url(self, asLocalUrl=False, **ka):
@@ -72,8 +64,8 @@ class Node_album(INode):
         item = xbmcgui.ListItem(
             label=self.get_label(),
             label2=self.get_label2(),
-            iconImage=image,
-            thumbnailImage=image,
+            iconImage=self.get_image(),
+            thumbnailImage=self.get_image(),
             path=self.make_url(),
         )
         item.setInfo('music', infoLabels={
@@ -81,7 +73,7 @@ class Node_album(INode):
             'year': self.get_year(),
             'artist': self.get_artist(),
             'title': self.get_title(),
-            'album': self.get_title(),
+            'album': self.get_album(),
             'comment': self.get_description()
         })
         ctxMenu = contextMenu()
@@ -95,7 +87,7 @@ class Node_album(INode):
                                   'composer/name'])
 
     def get_album(self):
-        return self.get_property('name')
+        return self.get_property('title')
 
     def get_artist_id(self):
         return self.get_property(['artist/id',
@@ -113,12 +105,15 @@ class Node_album(INode):
                                   'image/small',
                                   'image/thumbnail'])
 
+    def get_label2(self, default=None):
+        return self.get_title()
+
     def get_label(self, default=None):
         artist = self.get_artist() or 'VA'
         return '%s - %s' % (artist, self.get_title())
 
-    def get_genre(self):
-        return self.get_property('genre/name')
+    def get_genre(self, default=u''):
+        return self.get_property('genre/name', default=default)
 
     def get_year(self):
         import time

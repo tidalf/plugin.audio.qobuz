@@ -1,9 +1,9 @@
 '''
-    qobuz.node.collections
-    ~~~~~~~~~~~~~~~~~~~~
+    qobuz.node.text
+    ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
@@ -21,10 +21,3 @@ class Node_text(INode):
         self.label = self.get_parameter('label')
         self.is_folder = False
         self.content_type = 'files'
-        #self.content_type = 'files'
-        #self.image = getImage('album')
-
-    #def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        # for kind in ['artists', 'albums', 'tracks']:
-        #     self.add_child(getNode(Flag.COLLECTION, {'search-type': kind}))
-        # return True

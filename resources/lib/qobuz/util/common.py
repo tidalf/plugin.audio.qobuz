@@ -1,6 +1,6 @@
 '''
     qobuz.util.common
-    ~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2015 by Joachim Basmaison, Cyril Leclerc
@@ -27,7 +27,7 @@ def input2bool(value):
             return False
         return True
 
-def isEmpty(value):
+def is_empty(value):
     if value is None or value == '':
         return True
     return False

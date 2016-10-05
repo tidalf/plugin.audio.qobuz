@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node import Flag, getNode
@@ -23,10 +23,10 @@ class Node_user_playlists(INode):
         self.label = lang(30021)
         self.image = getImage('userplaylists')
         self.content_type = 'albums'
-        display_by = self.get_parameter('display-by', default=None)
-        if display_by is None:
-            display_by = 'songs'
-        self.set_display_by(display_by)
+        # display_by = self.get_parameter('display-by', default=None)
+        # if display_by is None:
+        #     display_by = 'songs'
+        # self.set_display_by(display_by)
         display_cover = getSetting('userplaylists_display_cover', asBool=True)
         self.display_product_cover = display_cover
 

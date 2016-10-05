@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
@@ -26,10 +26,25 @@ from qobuz.node import getNode
 import qobuz  # @UnresolvedImport
 from qobuz.renderer import renderer
 from qobuz.storage import _Storage
-from qobuz.util.common import isEmpty
 from qobuz import config
 from qobuz.util import data as dataUtil
+from qobuz.util import common
 
+class Converter(object):
+
+    def raw(self, data):
+        return data
+
+    def int(self, data):
+        if common.is_empty(data):
+            return None
+        return int(data)
+
+    def bool(self, data):
+        return common.input2bool(data)
+
+
+converter = Converter()
 _paginated = ['albums', 'labels', 'tracks', 'artists',
                      'playlists', 'playlist', 'public_playlists', 'genres']
 class INode(object):
@@ -117,7 +132,8 @@ class INode(object):
 
     def set_content_type(self, kind):
         '''@setter content_type'''
-        if kind not in ['songs', 'albums', 'files', 'artists']:
+        if kind not in ['files', 'songs', 'artists', 'albums', 'movies',
+                        'tvshows', 'episodes', 'musicvideos']:
             raise exception.InvalidKind(kind)
         self._content_type = kind
 
@@ -138,7 +154,7 @@ class INode(object):
         ''' Called after node data is set '''
         pass
 
-    def get_property(self, pathList, default=u''):
+    def get_property(self, pathList, default=u'', to='raw'):
         '''Property are just a easy way to access JSON data (self.data)
         @param pathList: a string or a list of string, each string can be
             a path like 'album/image/large'
@@ -157,8 +173,8 @@ class INode(object):
         for path in pathList:
             data = self.__get_property(path)
             if data is not None:
-                return data
-        return default
+                return getattr(converter, to)(data)
+        return getattr(converter, to)(default)
 
     def __get_property(self, path):
         '''Helper used by get_property method
@@ -172,7 +188,7 @@ class INode(object):
                 #debug.warn(self, 'Invalid property path {} in {}', path, xPath[i])
                 return None
             root = root[xPath[i]]
-            if isEmpty(root):
+            if common.is_empty(root):
                 return None
         if root is not None and root != 'None':
             return root
@@ -371,16 +387,11 @@ class INode(object):
                    gData=None):
         if Dir.Progress.iscanceled():
             return False
-        # if gData is None:
-        #     gData = {'count': 0,
-        #              'total': 100,
-        #              'startedOn': time()}
         if lvl != -1 and lvl < 1:
             return False
-        # Dir.update(gData, 'Fetching', '', '')
         if not (self.nt & blackFlag == self.nt):
             data = self.fetch(Dir, lvl, whiteFlag, blackFlag)
-            if data is None: #not self.fetch(Dir, lvl, whiteFlag, blackFlag):
+            if data is None:
                 return False
             else:
                 self.data = data
@@ -389,25 +400,15 @@ class INode(object):
         if lvl != -1:
             lvl -= 1
         label = self.get_label()
-        # gData['count'] = 0
-        # gData['total'] = len(self.childs)
         self.__add_pagination_node(Dir, lvl, whiteFlag)
-        # Dir.update(gData, 'Working', label, '')
         for child in self.childs:
             if Dir.is_canceled():
                 return False
             if child.nt & whiteFlag == child.nt:
                 if not Dir.add_node(child):
                     debug.error(self, "Could not add node")
-                    #self.childs = []
                     raise exception.BuildCanceled('down')
-                # gData['count'] += 1
-                # Dir.update(gData, "Working", label, child.get_label())
-            # else:
-            #     debug.info(self, "Skipping node: %s" % (Flag.to_s(child.nt)))
             child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
-        #debug.info(self, 'Populated {}', self)
-        #return gData['count']
 
     def populate(self, xbmc_directory, lvl, Flag):
         '''Hook / _build_down:

@@ -38,7 +38,6 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 def http_error(name):
-    debug.info(__name__, 'name: {}', name)
     return getattr(exceptions, name)()
 
 def get_format_id(default=3):
@@ -50,7 +49,6 @@ def get_format_id(default=3):
     return default
 
 def shutdown_server():
-    debug.info(__name__, 'Shutting down server')
     try:
         func = request.environ.get('werkzeug.server.shutdown')
         if func is None:
@@ -105,8 +103,6 @@ def route_nfo_album(album_id=None, track_id=None):
     response = api.get('/album/get', album_id=album_id)
     if response is None:
         response = api.get('/track/get', track_id=track_id)
-        import pprint
-        debug.info(__name__, 'TRACK {}', pprint.pformat(response))
         if response is None:
             return http_error('NotFound')
     response['image_default_size'] = qobuzApp.registry.get('image_default_size')

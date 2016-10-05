@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.constants import Mode
@@ -22,7 +22,7 @@ class Node_track(INode):
                                          parameters=parameters,
                                          data=data)
         self.nt = Flag.TRACK
-        self.content_type = 'songs'
+        self.content_type = 'files'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
         self.status = None
@@ -35,8 +35,7 @@ class Node_track(INode):
         return api.get('/track/get', track_id=self.nid)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        Dir.add_node(self)
-        return True
+        return Dir.add_node(self)
 
     def make_local_url(self):
         scheme = 'http'
@@ -76,11 +75,9 @@ class Node_track(INode):
         album = self.get_property('album/title', default=None)
         if album is not None:
             return album
-        if not self.parent:
-            return ''
-        if self.parent.nt & Flag.ALBUM:
+        if self.parent and (self.parent.nt & Flag.ALBUM):
             return self.parent.get_title()
-        return ''
+        return u''
 
     def get_album_id(self):
         aid = self.get_property('album/id')
@@ -91,13 +88,13 @@ class Node_track(INode):
     def get_image(self):
         image = self.get_property(['album/image/large', 'image/large',
                                    'image/small',
-                                   'image/thumbnail', 'image'])
-        if image:
-            return image.replace('_230.', '_600.')
-        if not self.parent:
-            return self.image
+                                   'image/thumbnail', 'image'], default=None)
+
+        if image is not None:
+            return image
         if self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
             return self.parent.get_image()
+        return u''
 
     def get_playlist_track_id(self):
         return self.get_property('playlist_track_id')
@@ -110,10 +107,11 @@ class Node_track(INode):
 
     def get_genre(self):
         genre = self.get_property('album/genre/name', default=None)
-        if genre is None:
-            if self.parent is not None and self.parent.nt & Flag.ALBUM:
-                return self.parent.get_genre()
-        return ''
+        if genre is not None:
+            return genre
+        if self.parent is not None:
+            return self.parent.get_genre()
+        return u''
 
     def get_streaming_url(self):
         data = self.__getFileUrl()
@@ -126,6 +124,11 @@ class Node_track(INode):
         return data['url']
 
     def get_artist(self):
+        if self.get_parameter('mode') == 'scan':
+            artist = self.get_property('album/artist/name', default=None)
+            if artist is None and self.parent:
+                return self.parent.get_artist()
+        #debug.info(self, 'Mode {}', mode)
         return self.get_property(['artist/name',
                                   'composer/name',
                                   'performer/name',
@@ -134,22 +137,19 @@ class Node_track(INode):
                                   'album/artist/name'])
 
     def get_artist_id(self):
-        artist_id = self.get_property(['artist/id',
+        return self.get_property(['artist/id',
                                'composer/id',
                                'performer/id',
-                               'interpreter/id'], default=None)
-        if artist_id is None:
-            return None
-        return int(artist_id)
+                               'interpreter/id'], default=None, to='int')
 
     def get_track_number(self):
-        return self.get_property('track_number', default=0)
+        return self.get_property('track_number', default=0, to='int')
 
     def get_media_number(self):
-        return self.get_property('media_number', default=0)
+        return self.get_property('media_number', default=0, to='int')
 
     def get_duration(self):
-        return self.get_property('duration', default=-1)
+        return self.get_property('duration')
 
     def get_year(self):
         import time
@@ -259,8 +259,7 @@ class Node_track(INode):
         else:
             media_number = int(media_number)
         duration = self.get_duration()
-        if duration == -1:
-            import pprint
+        if duration is None:
             debug.error(self, "no duration\n%s" % (pprint.pformat(self.data)))
         label = self.get_label()
         isplayable = 'true'
@@ -300,22 +299,27 @@ class Node_track(INode):
                 {u'id': 145383, u'name': u'Various Artists'}
                 {u'id': 255948, u'name': u'Multi Interpretes'}
         '''
-        artist = self.get_artist()
-        if self.parent and hasattr(self.parent, 'get_artist_id'):
-            if self.parent.get_artist() != artist:
-                artist = '%s / %s' % (self.parent.get_artist(), artist)
-        desc = description or 'Qobuz Music Streaming'
-        item.setInfo(type='music', infoLabels={
+        # artist = self.get_artist()
+        # if self.parent and hasattr(self.parent, 'get_artist_id'):
+        #     if self.parent.get_artist() != artist:
+        #         artist = '%s / %s' % (self.parent.get_artist(), artist)
+        #description or 'Qobuz Music Streaming'
+        comment = u'''Popularity: {popularity}
+copyright: {copyright}
+        '''.format(popularity=self.get_property('popularity', default='n/a'),
+                   copyright=self.get_property('copyright', default=''))
+
+        item.setInfo(type='Music', infoLabels={
                      'count': self.nid,
-                     'title': self.get_title(),
+                     'title': self.get_label(),
                      'album': self.get_album(),
                      'genre': self.get_genre(),
-                     'artist': artist,
+                     'artist': self.get_artist(),
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     #'comment': desc + '(aid=' + self.get_album_id()
-                     #+ ',curl=' + self.get_image() + ')' # @hack
+                     'comment': comment,
+                     'rating': self.get_property('album/popularity') * 100,
         })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
