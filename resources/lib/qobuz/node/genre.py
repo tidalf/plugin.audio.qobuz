@@ -11,7 +11,7 @@ from qobuz.gui.util import getImage, getSetting, lang
 from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.node.recommendation import RECOS_TYPE_IDS
-from qobuz.debug import log
+from qobuz import debug
 
 class Node_genre(INode):
     '''@class Node_genre:
@@ -34,6 +34,7 @@ class Node_genre(INode):
 
     def hook_post_data(self):
         self.label = self.get_property('name')
+        self.label2 = self.label
 
     def get_name(self):
         return self.get_property('name')
@@ -49,22 +50,19 @@ class Node_genre(INode):
         return True
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/genre/list', parent_id=self.nid, offset=self.offset,
+        return api.get('/genre/list', parent_id=self.nid, offset=self.offset,
                        limit=self.limit)
-        if data is None:
-            return None
-            #return True  # Nothing returned trigger reco build in build_down
-        genres = data['genres']
-        if 'parent' in genres and int(genres['parent']['level']) > 1:
-            self.populate_reco(Dir, lvl, whiteFlag, blackFlag,
-                               genres['parent']['id'])
-        return data
+        # if data is None:
+        #     return None
+        # genres = data['genres']
+        # if 'parent' in genres and int(genres['parent']['level']) > 1:
+        #     self.populate_reco(Dir, lvl, whiteFlag, blackFlag,
+        #                        genres['parent']['id'])
+        # return data
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if not self.data or len(self.data['genres']['items']) == 0:
             return self.populate_reco(Dir, lvl, whiteFlag, blackFlag, self.nid)
         for genre in self.data['genres']['items']:
-            node = Node_genre(self, {'nid': genre['id']})
-            node.data = genre
-            self.add_child(node)
+            self.add_child(Node_genre(self, {'nid': genre['id']}, data=genre))
         return True

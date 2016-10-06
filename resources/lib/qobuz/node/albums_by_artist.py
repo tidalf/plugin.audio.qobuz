@@ -52,8 +52,6 @@ class Node_albums_by_artist(INode):
                        limit=self.limit, offset=self.offset, extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        count = 0
-        total = len(self.data['albums']['items'])
         for album in self.data['albums']['items']:
             for k in ['artist', 'interpreter', 'composer', 'performer']:
                 try:
@@ -62,10 +60,8 @@ class Node_albums_by_artist(INode):
                 except:
                     debug.warn(self, "Strange thing happen")
                     pass
-            node = getNode(Flag.ALBUM, data=album)
-            count += 1
-            self.add_child(node)
-        return count
+            self.add_child(getNode(Flag.ALBUM, data=album))
+        return len(self.data['albums']['items'])
 
     def makeListItem(self, replaceItems=False):
         item = xbmcgui.ListItem(self.get_label(),

@@ -26,7 +26,6 @@ class Node_collection(INode):
                                               data=data)
         self.nt = Flag.COLLECTION
         self.url = None
-        self.is_folder = True
         self.image = getImage('songs')
         self.search_type = self.get_parameter('search-type', default='tracks')
         self.query = self.get_parameter('query', unQuote=True)
@@ -72,21 +71,19 @@ class Node_collection(INode):
     def get_description(self):
         return None
 
-    def _populate_albums(self, data):
-        return getNode(Flag.ALBUM, data=data)
+    def _populate_albums(self, data=None, parameters={}):
+        return getNode(Flag.ALBUM, data=data, parameters=parameters)
 
-    def _populate_tracks(self, data):
-        return getNode(Flag.TRACK, data=data)
+    def _populate_tracks(self, data=None, parameters={}):
+        return getNode(Flag.TRACK, data=data, parameters=parameters)
 
-    def _populate_artists(self, data):
-        return getNode(Flag.ARTIST, data=data)
+    def _populate_artists(self, data=None, parameters={}):
+        return getNode(Flag.ARTIST, data=data, parameters=parameters)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.data is None:
             return False
         method = getattr(self, '_populate_%s' % self.search_type)
         for item in self.data['items']:
-            node = method(item)
-            node.set_parameter('query', self.get_parameter('query'))
-            self.add_child(node)
+            self.add_child(method(data=item, parameters={'query': self.get_parameter('query')}))
         return True

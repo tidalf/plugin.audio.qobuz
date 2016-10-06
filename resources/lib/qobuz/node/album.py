@@ -18,8 +18,6 @@ SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
 
 
 class Node_album(INode):
-    '''@class Node_product:
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_album, self).__init__(parent=parent,

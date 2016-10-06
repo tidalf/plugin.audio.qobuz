@@ -67,4 +67,4 @@ class Node_user_playlists(INode):
             if node.get_owner() == login:
                 node.set_is_my_playlist(True)
             self.add_child(node)
-        return True
+        return True if len(self.data['playlists']['items']) > 0 else False

@@ -124,11 +124,13 @@ class Node_track(INode):
         return data['url']
 
     def get_artist(self):
-        if self.get_parameter('mode') == 'scan':
+        mode = self.get_parameter('mode')
+        mode = int(mode) if mode is not None else None
+        if mode is None or mode == Mode.SCAN:
             artist = self.get_property('album/artist/name', default=None)
             if artist is None and self.parent:
                 return self.parent.get_artist()
-        #debug.info(self, 'Mode {}', mode)
+            return artist
         return self.get_property(['artist/name',
                                   'composer/name',
                                   'performer/name',

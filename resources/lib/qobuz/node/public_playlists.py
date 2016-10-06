@@ -31,4 +31,4 @@ class Node_public_playlists(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for item in self.data['playlists']['items']:
             self.add_child(getNode(Flag.PLAYLIST, data=item))
-        return True
+        return True if len(self.data['playlists']['items']) > 0 else False

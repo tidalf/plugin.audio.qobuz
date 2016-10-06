@@ -32,17 +32,9 @@ class Node_playlist(INode):
                                             parameters=parameters,
                                             data=data)
         self.nt = Flag.PLAYLIST
-        self.label = None
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
-        self.url = None
-        self.is_folder = True
-        self.packby = ''
-        self.playlist_storage = None
-        # if self.packby == 'album':
-        #     self.content_type = 'albums'
-        # else:
         self.content_type = 'songs'
         self.image = self.get_image()
 
@@ -69,21 +61,25 @@ class Node_playlist(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK, data=track)
-            self.add_child(node)
-        return True
+            self.add_child(getNode(Flag.TRACK, data=track))
+        return True if len(self.data['tracks']['items']) > 0 else False
 
     def get_name(self):
         return self.get_property(['name', 'title'])
 
-    def get_genre(self):
+    def get_genre(self, first=False):
         def cmp_genre(a, b):
             if a['percent'] < b['percent']:
                 return 1
             elif a['percent'] > b['percent']:
                 return -1
             return 0
-        return [g['name'] for g in sorted(self.get_property('genres'), cmp_genre)]
+        genres = [g['name'] for g in sorted(self.get_property('genres'), cmp_genre)]
+        if len(genres) == 0:
+            return u''
+        if first:
+            return genres[0]
+        return genres
 
     def get_owner(self):
         return self.get_property('owner/name')
@@ -124,8 +120,7 @@ class Node_playlist(INode):
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
         item.setInfo(type='Music', infoLabels={
-            'genre': self.get_genre()[0],
-            'duration': self.get_duration(),
+            'genre': self.get_genre(first=True),
             'comment': self.get_description(),
         })
         item.setPath(url)
@@ -133,9 +128,6 @@ class Node_playlist(INode):
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
-
-    def get_duration(self):
-        return self.get_property('duration')
 
     def toggle_privacy(self):
         privacy = util.input2bool(self.get_property('is_public'))

@@ -21,9 +21,7 @@ class Node_articles(INode):
                                             parameters=parameters,
                                             data=data)
         self.nt = Flag.ARTICLES
-        self.is_folder = True
         self.image = getImage('album')
-        self.offset = self.get_parameter('offset') or 0
 
     def get_label(self):
         l = self.get_property('title')
@@ -32,19 +30,14 @@ class Node_articles(INode):
         return l
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(name='article_listlastarticles',
+        return qobuz.registry.get(name='article_listlastarticles',
                                   id=self.nid,
                                   rubric_ids=self.nid,
                                   offset=self.offset,
-                                  limit=limit)
-        if not data:
-            return False
-        self.data = data['data']
-        return True
+                                  limit=self.limit)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for article in self.data['articles']['items']:
-            node = getNode(Flag.ARTICLE, {'nid': article['id']})
-            node.data = article
-            self.add_child(node)
+            self.add_child(getNode(Flag.ARTICLE, {'nid': article['id']},
+                                   data=article))
+        return True

@@ -86,29 +86,21 @@ class Node_favorite(INode):
         return result
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK, data=track)
-            self.add_child(node)
-            ret = True
-        return ret
+            self.add_child(getNode(Flag.TRACK, data=track))
+        return True if len(self.data['tracks']['items']) > 0 else False
 
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
         for album in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM, data=album)
-            self.add_child(node)
-            ret = True
-        return ret
+            self.add_child(getNode(Flag.ALBUM, data=album))
+        return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
             node.fetch(None, None, None, Flag.NONE)
             self.add_child(node)
-            ret = True
-        return ret
+        return True if len(self.data['artists']['items']) > 0 else False
 
     def get_description(self):
         return self.get_property('description')

@@ -42,11 +42,8 @@ class Node_artist(INode):
         if 'albums' not in self.data:
             return True
         for data in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM, data=data)
-            self.add_child(node)
-        return True
-
-        del self._data['tracks']
+            self.add_child(getNode(Flag.ALBUM, data=data))
+        return True if len(self.data['albums']['items']) > 0 else False
 
     def get_artist_id(self):
         return self.nid

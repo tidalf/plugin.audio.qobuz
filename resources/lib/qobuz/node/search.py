@@ -71,7 +71,7 @@ class Node_search(INode):
             query = k.getText().strip()
             if query is None or query == '':
                 return None
-            self.set_parameter('query', query, quote=True)
+        self.set_parameter('query', query, quote=True)
         return api.get('/search/getResults',
                        query=query,
                        type=self.get_parameter('search-type'),
@@ -79,23 +79,26 @@ class Node_search(INode):
                        offset=self.offset)
 
 
+    def _get_parameters(self):
+        return {
+            'query': self.get_parameter('query'),
+            'search-type': self.get_parameter('search-type')
+        }
+
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM, data=album)
-            self.add_child(node)
-        return True
+            self.add_child(getNode(Flag.ALBUM, parameters=self._get_parameters(), data=album))
+        return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK, data=track)
-            self.add_child(node)
-        return True
+            self.add_child(getNode(Flag.TRACK, parameters=self._get_parameters(), data=track))
+        return True if len(self.data['tracks']['items']) > 0 else False
 
     def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
         for artist in self.data['artists']['items']:
-            node = getNode(Flag.ARTIST, data=artist)
-            self.add_child(node)
-        return True
+            self.add_child(getNode(Flag.ARTIST, parameters=self._get_parameters(), data=artist))
+        return True if len(self.data['artists']['items']) > 0 else False
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         return getattr(self, '_populate_%s' % self.get_parameter('search-type'))(Dir, lvl, whiteFlag, blackFlag)
