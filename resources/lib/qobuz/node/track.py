@@ -57,13 +57,13 @@ class Node_track(INode):
                                                 asLocalUrl=asLocalUrl,
                                                 **ka)
 
-    def get_label(self, sFormat="%a - %t", default=None):
-        sFormat = sFormat.replace("%a", self.get_artist())
-        sFormat = sFormat.replace("%t", self.get_title())
-        sFormat = sFormat.replace("%A", self.get_album())
-        sFormat = sFormat.replace("%n", str(self.get_track_number()))
-        sFormat = sFormat.replace("%g", self.get_genre())
-        return sFormat
+    def get_label(self, fmt="%a - %t", default=None):
+        fmt = fmt.replace("%a", self.get_artist())
+        fmt = fmt.replace("%t", self.get_title())
+        fmt = fmt.replace("%A", self.get_album())
+        fmt = fmt.replace("%n", str(self.get_track_number()))
+        fmt = fmt.replace("%g", self.get_genre())
+        return fmt
 
     def get_composer(self):
         return self.get_property('composer/name', default=-1)
@@ -255,6 +255,7 @@ class Node_track(INode):
 
     def makeListItem(self, replaceItems=False):
         import xbmcgui  # @UnresolvedImport
+        current_mode = self.get_parameter('mode', to='int')
         media_number = self.get_media_number()
         if not media_number:
             media_number = 1
@@ -263,9 +264,12 @@ class Node_track(INode):
         duration = self.get_duration()
         if duration is None:
             debug.error(self, "no duration\n%s" % (pprint.pformat(self.data)))
-        label = self.get_label()
+        label = None
+        if current_mode == Mode.SCAN:
+            label = self.get_label(fmt='%t')
+        else:
+            label = self.get_label()
         isplayable = 'true'
-
         # Disable free account checking here, purchased track are
         # still playable even with free account, but we don't know yet.
         # if qobuz.gui.is_free_account():
@@ -276,11 +280,11 @@ class Node_track(INode):
         url = self.make_url(mode=mode)
         image = self.get_image()
         item = xbmcgui.ListItem(label, label, image, image, url)
-        item.setIconImage(image)
-        item.setThumbnailImage(image)
         if not item:
             debug.warn(self, "Cannot create xbmc list item")
             return None
+        item.setIconImage(image)
+        item.setThumbnailImage(image)
         item.setPath(url)
         track_number = self.get_track_number()
         if not track_number:

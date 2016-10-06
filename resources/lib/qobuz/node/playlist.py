@@ -270,7 +270,7 @@ class Node_playlist(INode):
             nodes = render.nodes
 
         if name is None:
-            name = self.get_parameter('query', unQuote=True, default=None) \
+            name = self.get_parameter('query', to='unquote', default=None) \
                 or self.get_label()
         ret = xbmcgui.Dialog().select('Create playlist %s' % (name), [
             node.get_label() for node in nodes
@@ -348,7 +348,7 @@ class Node_playlist(INode):
                                    is_collaborative=isCollaborative)
 
     def gui_create(self):
-        query = self.get_parameter('query', unQuote=True)
+        query = self.get_parameter('query', to='unquote')
         if not query:
             from qobuz.gui.util import Keyboard
             k = Keyboard('', lang(30182))

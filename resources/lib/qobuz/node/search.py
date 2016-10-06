@@ -61,7 +61,7 @@ class Node_search(INode):
             raise exception.InvalidSearchType(search_type)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        query = self.get_parameter('query', unQuote=True)
+        query = self.get_parameter('query', to='unquote')
         if query is None:
             from qobuz.gui.util import Keyboard
             k = Keyboard('', self.get_parameter('search-type'))

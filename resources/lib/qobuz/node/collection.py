@@ -28,7 +28,7 @@ class Node_collection(INode):
         self.url = None
         self.image = getImage('songs')
         self.search_type = self.get_parameter('search-type', default='tracks')
-        self.query = self.get_parameter('query', unQuote=True)
+        self.query = self.get_parameter('query', to='unquote')
         self.source = self.get_parameter('source')
         self.seen_artist = {}
         self.seen_album = {}

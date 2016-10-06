@@ -43,6 +43,11 @@ class Converter(object):
     def bool(self, data):
         return common.input2bool(data)
 
+    def unquote(self, data):
+        return urllib.unquote_plus(data)
+
+    def quote(self, data):
+        return urllib.quote_plus(data)
 
 converter = Converter()
 _paginated = ['albums', 'labels', 'tracks', 'artists',
@@ -87,6 +92,7 @@ class INode(object):
         self.data = data
         self.node_storage = None
         self.limit = getSetting('pagination_limit')
+        self.mode = self.get_parameter('mode')
 
     def set_nid(self, value):
         '''@setter nid'''
@@ -244,23 +250,21 @@ class INode(object):
             value = urllib.quote_plus(value)
         self.parameters[name] = value
 
-    def get_parameter(self, name, default=None, unQuote=False, **ka):
+    def get_parameter(self, name, default=None, to='raw'):
         '''Getting parameter by name
         @param name: parameter name
         @param default=None: value set when parameter not found or value is None
-        @param unQuote=False: boolean, when True unquote value
+        @param to='raw': string, converter used (raw is returning value unchanged)
         '''
         if self.parameters is None:
-            return default
+            return getattr(converter, to)(default)
         if name not in self.parameters:
-            return default
+            return getattr(converter, to)(default)
         value = self.parameters[name]
         if value is None:
             debug.warn(self, '{} value is None', name)
-            return default
-        if unQuote is True:
-            return urllib.unquote_plus(value)
-        return value
+            return getattr(converter, to)(default)
+        return getattr(converter, to)(value)
 
     def del_parameter(self, name):
         '''Deleting parameter

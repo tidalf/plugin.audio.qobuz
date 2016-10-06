@@ -43,10 +43,8 @@ class QobuzXbmcRenderer(IRenderer):
         if self.has_method_parameter():
             return self.execute_method_parameter()
         from qobuz.gui.directory import Directory
-        Dir = Directory(self.root, self.nodes,
-                        withProgress=self.enable_progress)
-        Dir.asList = self.asList
-        Dir.handle = config.app.handle
+        Dir = Directory(self.root, self.nodes, handle=config.app.handle,
+                        withProgress=self.enable_progress, asList=self.asList)
         if getSetting('contextmenu_replaceitems', asBool=True):
             Dir.replaceItems = True
         try:
@@ -85,7 +83,7 @@ class QobuzXbmcRenderer(IRenderer):
             debug.warn(self, "Cannot set root node ('{}')",
                        str(self.node_type))
             return False
-        setSetting('scan_stop', False)
+        # setSetting('scan_stop', False)
         handle = config.app.handle
         Dir = Directory(self.root, nodes=self.nodes, withProgress=False,
                         handle=int(sys.argv[1]), asLocalUrl=True)
@@ -98,13 +96,10 @@ class QobuzXbmcRenderer(IRenderer):
             def list_track(root):
                 predir = Directory(None, asList=True)
                 findir = Directory(None, asList=True)
-                root.populating(predir, 1, Flag.ALL)
+                root.populating(predir, -1, Flag.ALL)
                 seen = {}
                 seen_tracks = {}
                 for node in predir.nodes:
-                    if getSetting('stop_scan', asBool=True):
-                        notify_warn('Scanning', 'Stopped from menu')
-                        return []
                     notifier.notify(node.get_label(), check=True)
                     notifier.check()
                     if node.nt & Flag.TRACK == Flag.TRACK:
@@ -119,7 +114,7 @@ class QobuzXbmcRenderer(IRenderer):
                             continue
                         seen[album_id] = 1
                         album = getNode(Flag.ALBUM, parameters={'nid': album_id})
-                        album.populating(findir, -1, Flag.TRACK)
+                        album.populating(findir, 1, Flag.TRACK)
                     else:
                         node.populating(findir, -1, Flag.TRACK)
                 return findir.nodes

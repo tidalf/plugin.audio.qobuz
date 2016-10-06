@@ -63,7 +63,7 @@ class Node_root(INode):
         '''Scanning directory specified in query parameter
         '''
         executeBuiltin('UpdateLibrary("music", "%s")' % (
-            self.get_parameter('query', unQuote=True)))
+            self.get_parameter('query', to='unquote')))
 
     def stop_scan(self):
         setSetting('scan_stop', False)
