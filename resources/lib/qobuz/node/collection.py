@@ -46,7 +46,7 @@ class Node_collection(INode):
 
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        query = self.get_parameter('query', unQuote=True)
+        query = self.get_parameter('query', to='unquote')
         if not query:
             from qobuz.gui.util import Keyboard
             k = Keyboard('', 'My %s' % self.search_type)
