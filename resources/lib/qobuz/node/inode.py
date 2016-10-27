@@ -32,21 +32,30 @@ from qobuz.util import common
 
 class Converter(object):
 
-    def raw(self, data):
+    def raw(self, data, default=None):
         return data
 
-    def int(self, data):
+    def string(self, data, default=''):
+        if data is None:
+            return default
+        return str(data)
+
+    def int(self, data, default=None):
         if common.is_empty(data):
             return None
         return int(data)
 
-    def bool(self, data):
+    def bool(self, data, default=None):
         return common.input2bool(data)
 
-    def unquote(self, data):
+    def unquote(self, data, default=None):
+        if data is None:
+            return default
         return urllib.unquote_plus(data)
 
-    def quote(self, data):
+    def quote(self, data, default=None):
+        if data is None:
+            return default
         return urllib.quote_plus(data)
 
 converter = Converter()
@@ -77,7 +86,7 @@ class INode(object):
         self.parameters = parameters
         self.nt = None
         self.parent = parent
-        self.content_type = "files"
+        self.content_type = 'files'
         self.image = None
         self.childs = []
         self.label = ''
@@ -117,7 +126,6 @@ class INode(object):
         if parent is None:
             self._parent = None
             return
-        #self._parent = weakref.proxy(parent)
         self._parent = weakref.ref(parent)
 
     parent = property(get_parent, set_parent)
@@ -125,8 +133,9 @@ class INode(object):
     def delete_tree(self):
         '''Recursive delete
         '''
-        for child in self.childs:
-            child.delete_tree()
+        if self.childs is not None:
+            for child in self.childs:
+                child.delete_tree()
         self.childs = None
         self.parent = None
         self.parameters = None
@@ -288,7 +297,7 @@ class INode(object):
             ka['nid'] = self.nid
         if 'offset' not in ka:
             ka['offset'] = self.offset
-        for name in ['qnt', 'qid', 'query', 'search-type']:
+        for name in ['qnt', 'qid', 'query', 'search-type', 'mode']:
             if name in ka:
                 continue
             value = self.get_parameter(name)
@@ -388,16 +397,17 @@ class INode(object):
         return {}
 
     def populating(self, Dir, lvl=1, whiteFlag=Flag.ALL, blackFlag=Flag.NONE,
-                   gData=None):
+                   data={}):
         if Dir.Progress.iscanceled():
             return False
         if lvl != -1 and lvl < 1:
             return False
         if not (self.nt & blackFlag == self.nt):
-            data = self.fetch(Dir, lvl, whiteFlag, blackFlag)
-            if data is None:
+            new_data = self.fetch(Dir, lvl, whiteFlag, blackFlag)
+            if new_data is None:
                 return False
             else:
+                data.update(new_data)
                 self.data = data
                 self.__add_pagination(self.data)
         self.populate(Dir, lvl, whiteFlag, blackFlag)
@@ -412,9 +422,10 @@ class INode(object):
                 if not Dir.add_node(child):
                     debug.error(self, "Could not add node")
                     raise exception.BuildCanceled('down')
-            child.populating(Dir, lvl, whiteFlag, blackFlag, gData)
+            child.populating(Dir, lvl, whiteFlag, blackFlag)
 
-    def populate(self, xbmc_directory, lvl, Flag):
+    def populate(self, xbmc_directory=None, lvl=-1, whiteFlag=Flag.ALL,
+                 blackFlag=Flag.STOPBUILD):
         '''Hook / _build_down:
         This method is called by build_down, each object who
         inherit from Inode can overide it. Lot of object

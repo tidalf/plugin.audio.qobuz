@@ -38,7 +38,7 @@ class Node_favorite(INode):
         if self.search_type == 'all':
             self.search_type = None
         elif self.search_type == 'albums':
-            self.content_type = 'albums'
+            pass #self.content_type = 'files'
         elif self.search_type == 'tracks':
             self.content_type = 'songs'
         elif self.search_type == 'artists':
@@ -98,7 +98,7 @@ class Node_favorite(INode):
     def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
-            node.fetch(None, None, None, Flag.NONE)
+            node.fetch(None, -1, None, Flag.ALL)
             self.add_child(node)
         return True if len(self.data['artists']['items']) > 0 else False
 
@@ -148,7 +148,7 @@ class Node_favorite(INode):
         nodes = []
         if qnt & Flag.ALBUM == Flag.ALBUM:
             node = getNode(Flag.ALBUM, {'nid': qid})
-            node.fetch(None, None, None, None)
+            node.data = node.fetch(None, None, None, None)
             album_ids[str(node.nid)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
@@ -183,8 +183,8 @@ class Node_favorite(INode):
                     render.asList = True
                     render.run()
                     if len(render.nodes) > 0:
-                        newnode = getNode(Flag.ALBUM)
-                        newnode.data = render.nodes[0].data['album']
+                        newnode = getNode(Flag.ALBUM, data=render.nodes[0].data['album'])
+                        #newnode.data = render.nodes[0].data['album']
                         if not str(newnode.nid) in album_ids:
                             nodes.append(newnode)
                             album_ids[str(newnode.nid)] = 1

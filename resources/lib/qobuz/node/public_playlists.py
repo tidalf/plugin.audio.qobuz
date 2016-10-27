@@ -21,6 +21,7 @@ class Node_public_playlists(INode):
         self.nt = Flag.PUBLIC_PLAYLISTS
         self.set_label(lang(30190))
         self.image = getImage('userplaylists')
+        self.content_type = 'albums'
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         return api.get('/playlist/getPublicPlaylists',

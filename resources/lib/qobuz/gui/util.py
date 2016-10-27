@@ -137,12 +137,13 @@ def executeJSONRPC(json):
     return xbmc.executeJSONRPC(json)
 
 
-def color(colorItem, msg):
-    if not msg:
-        return ''
-    if not colorItem:
-        return msg
-    return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
+def convert_color(color):
+    if color.startswith('#'):
+        return '%sFF' % color[1:]
+    return color
+
+def color(color, msg):
+    return '[COLOR=%s]%s[/COLOR]' % (convert_color(color), msg)
 
 
 def lang(langId):

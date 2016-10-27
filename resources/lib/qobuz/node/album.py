@@ -8,7 +8,7 @@
 '''
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import getImage, getSetting, htm2xbmc
+from qobuz.gui.util import getImage, getSetting, htm2xbmc, color
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
 from qobuz.node import getNode, Flag
@@ -25,7 +25,7 @@ class Node_album(INode):
                                          data=data)
         self.nt = Flag.ALBUM
         self.image = getImage('album')
-        self.content_type = 'albums'
+        self.content_type = 'songs'
         self.is_special_purchase = False
         self.imageDefaultSize = getSetting('image_default_size')
 
@@ -44,8 +44,14 @@ class Node_album(INode):
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
+            track.update({
+                'album': {
+                    'title': self.get_title(),
+                    'id': self.nid
+                }
+            })
             self.add_child(getNode(Flag.TRACK, data=track))
-        return len(self.data['tracks']['items'])
+        return True if len(self.data['tracks']['items']) > 0 else False
 
     def make_url(self, asLocalUrl=False, **ka):
         purchased = self.get_parameter('purchased')
@@ -72,8 +78,12 @@ class Node_album(INode):
             'artist': self.get_artist(),
             'title': self.get_title(),
             'album': self.get_album(),
-            'comment': self.get_description()
+            'comment': self.get_description(),
+            'duration': self.get_duration(),
+            'discnumber': self.get_property('media_count')
         })
+        item.setProperty('album_description', self.get_description())
+        item.setProperty('album_label', self.get_album_label())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
@@ -86,6 +96,9 @@ class Node_album(INode):
 
     def get_album(self):
         return self.get_property('title')
+
+    def get_album_label(self):
+        return self.get_property('label/name')
 
     def get_artist_id(self):
         return self.get_property(['artist/id',
@@ -107,8 +120,10 @@ class Node_album(INode):
         return self.get_title()
 
     def get_label(self, default=None):
+        rgb = self.get_property('genre/color', default='#00000')
+        genre = self.get_property('genre/name', default='n/a')
         artist = self.get_artist() or 'VA'
-        return '%s - %s' % (artist, self.get_title())
+        return '%s - %s' % (artist, self.get_title()) #, color(rgb, genre))
 
     def get_genre(self, default=u''):
         return self.get_property('genre/name', default=default)
@@ -124,4 +139,7 @@ class Node_album(INode):
         return year
 
     def get_description(self):
-        return htm2xbmc(self.get_property('description'))
+        return htm2xbmc(self.get_property('description', default=""))
+
+    def get_duration(self):
+        return self.get_property('duration')

@@ -139,7 +139,7 @@ class Node_friend(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         result = False
         if lvl != -1:
-            self.add_child(getNode(Flag.FRIENDS, self.parameters))
+            self.add_child(getNode(Flag.FRIENDS, parameters=self.parameters))
         for playlist in self.data['playlists']['items']:
             node = getNode(Flag.PLAYLIST, data=playlist)
             if node.get_owner() == self.label:

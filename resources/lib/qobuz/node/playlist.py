@@ -35,7 +35,7 @@ class Node_playlist(INode):
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
-        self.content_type = 'songs'
+        self.content_type = 'albums'
         self.image = self.get_image()
 
     def _get_node_storage_filename(self):
@@ -67,7 +67,7 @@ class Node_playlist(INode):
     def get_name(self):
         return self.get_property(['name', 'title'])
 
-    def get_genre(self, first=False):
+    def get_genre(self, first=False, default=[]):
         def cmp_genre(a, b):
             if a['percent'] < b['percent']:
                 return 1
@@ -76,7 +76,7 @@ class Node_playlist(INode):
             return 0
         genres = [g['name'] for g in sorted(self.get_property('genres'), cmp_genre)]
         if len(genres) == 0:
-            return u''
+            return default
         if first:
             return genres[0]
         return genres
@@ -90,6 +90,12 @@ class Node_playlist(INode):
     def get_description(self):
         return self.get_property('description')
 
+    def get_tag(self):
+        return u' (tracks: %s, users: %s)' % (
+            self.get_property('tracks_count', to='int'),
+            #'Public' if self.get_property('is_public', to='bool') else 'Private',
+            self.get_property('users_count', to='int'))
+
     def makeListItem(self, replaceItems=False):
         colorItem = getSetting('item_default_color')
         colorPl = getSetting('item_section_color')
@@ -97,14 +103,8 @@ class Node_playlist(INode):
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
-        users_count = self.get_property('users_count', to='int')
-        privacy = 'Private'
-        privacy_color = '55FF0000'
-        if self.get_property('is_public', to='bool'):
-            privacy = 'Public'
-            privacy_color = '5500FF00'
-        tag = ' (tracks: %s / privacy: %s / users: %s)' % (self.get_property('tracks_count'),privacy, users_count, )
-        tag = color(privacy_color, tag)
+        privacy_color = '55FF0000' if self.get_property('is_public', to='bool') else  '5500FF00'
+        tag = color(privacy_color, self.get_tag())
         label = '%s%s' % (label, tag)
         if not self.is_my_playlist:
             label = '%s - %s' % (color(colorItem, owner), label)
@@ -120,8 +120,8 @@ class Node_playlist(INode):
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
         item.setInfo(type='Music', infoLabels={
-            'genre': self.get_genre(first=True),
-            'comment': self.get_description(),
+            'genre': ', '.join(self.get_genre()),
+            'comment': 'public: %s' % (self.get_property('is_public', to='string'))
         })
         item.setPath(url)
         ctxMenu = contextMenu()
@@ -130,7 +130,7 @@ class Node_playlist(INode):
         return item
 
     def toggle_privacy(self):
-        privacy = util.input2bool(self.get_property('is_public'))
+        privacy = not self.get_property('is_public', to='bool')
         res = api.playlist_update(playlist_id=self.nid, is_public=str(privacy).lower())
         if res is None:
             notify_error('Qobuz', 'Cannot toggle privacy')

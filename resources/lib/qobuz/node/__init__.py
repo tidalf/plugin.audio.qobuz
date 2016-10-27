@@ -8,8 +8,6 @@
 '''
 
 from qobuz.node.flag import Flag
-from qobuz.debug import log
-
 
 def getNode(qnt, parameters={}, data=None, parent=None, **ka):
     return module_import(Flag.to_s(qnt))(parent=parent, parameters=parameters,

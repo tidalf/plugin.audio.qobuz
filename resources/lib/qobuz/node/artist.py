@@ -22,19 +22,16 @@ class Node_artist(INode):
                                           data=data)
         self.nt = Flag.ARTIST
         self.set_label(self.get_name())
-        self.slug = ''
         self.content_type = 'artists'
 
     def hook_post_data(self):
         self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
         self.name = self.get_property('name')
         self.image = self.get_image()
-        self.slug = self.get_property('slug')
         self.label = self.name
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        return api.get('/artist/get', artist_id=self.nid, limit=self.limit,
-                       offset=self.offset, extra='albums')
+    def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None):
+        return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         node_artist = getNode(Flag.ARTIST, data=self.data)
@@ -59,6 +56,12 @@ class Node_artist(INode):
             image = image.replace('126s', '_')
         return image
 
+    def get_label(self, fmt='%a (%C)'):
+        fmt = fmt.replace('%a', self.get_artist())
+        fmt = fmt.replace('%G', self.get_genre())
+        fmt = fmt.replace('%C', str(self.get_property('albums_count', default=0)))
+        return fmt
+
     def get_title(self):
         return self.get_name()
 
@@ -68,6 +71,9 @@ class Node_artist(INode):
     def get_name(self):
         return self.get_property('name')
 
+    def get_genre(self):
+        return self.get_property('genre/name', default='n/a')
+
     def get_owner(self):
         return self.get_property('owner/name')
 
@@ -76,22 +82,21 @@ class Node_artist(INode):
 
     def makeListItem(self, replaceItems=False):
         import xbmcgui  # @UnresolvedImport
-        image = self.get_image()
-        url = self.make_url()
-        name = self.get_label()
-        item = xbmcgui.ListItem(name,
-                                name,
-                                image,
-                                image,
-                                url)
+        item = xbmcgui.ListItem(self.get_label(),
+                                self.get_label(),
+                                self.get_image(),
+                                self.get_image(),
+                                self.make_url())
         if not item:
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
-        item.setPath(url)
-        item.setInfo('music', infoLabels={
-            'artist': self.get_artist(),
+        item.setPath(self.make_url())
+        item.setInfo('Music', infoLabels={
+            'Artist': self.get_artist(),
             'comment': self.get_description()
         })
+        item.setProperty('AlbumArtist', self.get_artist())
+        item.setProperty('Album_Genre', self.get_genre())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)

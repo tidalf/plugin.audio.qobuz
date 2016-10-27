@@ -7,7 +7,9 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
+from qobuz.node import Flag
 
-
-def renderer(nType, params=None, mode=None):
-    return OurRenderer(nType, params, mode)
+def renderer(nType, params=None, mode=None, whiteFlag=Flag.ALL,
+             blackFlag=Flag.STOPBUILD):
+    return OurRenderer(nType, params, mode, whiteFlag=whiteFlag,
+                       blackFlag=blackFlag)

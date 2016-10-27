@@ -16,7 +16,7 @@ from qobuz.node import getNode, Flag
 data_search_type = {
     'artists': {
         'label': lang(30017),
-        'content_type' : 'files',
+        'content_type' : 'artists',
         'image' : getImage('artist'),
     },
     'albums': {
@@ -31,7 +31,7 @@ data_search_type = {
     },
     'collection': {
         'label' : lang(30018),
-        'content_type' : 'files',
+        'content_type' : 'albums',
         'image' : getImage('song')
     }
 }
@@ -48,6 +48,13 @@ class Node_search(INode):
     def get_description(self):
         return self.get_label()
 
+    def get_label(self):
+        query = self.get_parameter('query', to='unquote')
+        if query is not None:
+            return 'search %s: %s' % (self.get_parameter('search-type'),
+                                      self.get_parameter('query'))
+        return super(Node_search, self).get_label()
+
     def set_search_type(self, search_type):
         search_type = self.get_parameter('search-type')
         if search_type is None:
@@ -59,6 +66,13 @@ class Node_search(INode):
             self.image = data_search_type[search_type]['image']
         else:
             raise exception.InvalidSearchType(search_type)
+
+    # def makeListItem(self, **ka):
+    #     #query = self.get_parameter('query', to='unquote')
+    #     #if query is not None:
+    #     #    ka['query'] = query
+    #     item = super(Node_search, self).makeListItem(**ka)
+    #     return item
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         query = self.get_parameter('query', to='unquote')
@@ -87,17 +101,23 @@ class Node_search(INode):
 
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
-            self.add_child(getNode(Flag.ALBUM, parameters=self._get_parameters(), data=album))
+            self.add_child(getNode(Flag.ALBUM,
+                                   parameters=self._get_parameters(),
+                                   data=album))
         return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
         for track in self.data['tracks']['items']:
-            self.add_child(getNode(Flag.TRACK, parameters=self._get_parameters(), data=track))
+            self.add_child(getNode(Flag.TRACK,
+                                   parameters=self._get_parameters(),
+                                   data=track))
         return True if len(self.data['tracks']['items']) > 0 else False
 
     def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
         for artist in self.data['artists']['items']:
-            self.add_child(getNode(Flag.ARTIST, parameters=self._get_parameters(), data=artist))
+            self.add_child(getNode(Flag.ARTIST,
+                                   parameters=self._get_parameters(),
+                                   data=artist))
         return True if len(self.data['artists']['items']) > 0 else False
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

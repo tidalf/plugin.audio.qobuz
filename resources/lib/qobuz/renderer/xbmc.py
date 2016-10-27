@@ -14,6 +14,7 @@ from qobuz.gui.util import notifyH, getSetting, setSetting
 from qobuz import exception
 from qobuz import config
 from qobuz.node.flag import Flag
+from qobuz.constants import Mode
 from qobuz.node import getNode
 from qobuz.gui.directory import Directory
 from qobuz.alarm import Notifier
@@ -28,8 +29,11 @@ class QobuzXbmcRenderer(IRenderer):
         * You can set parameter after init (see renderer.Irenderer)
     """
 
-    def __init__(self, node_type, params={}, mode=None):
-        super(QobuzXbmcRenderer, self).__init__(node_type, params, mode)
+    def __init__(self, node_type, params={}, mode=None, whiteFlag=Flag.ALL,
+                 blackFlag=Flag.STOPBUILD):
+        super(QobuzXbmcRenderer, self).__init__(node_type, params, mode,
+                                                whiteFlag=whiteFlag,
+                                                blackFlag=blackFlag)
 
     def run(self):
         '''Building our tree, creating root node based on our node_type
@@ -55,7 +59,8 @@ class QobuzXbmcRenderer(IRenderer):
         except exception.QobuzError as e:
             Dir.end_of_directory(False)
             Dir = None
-            debug.warn(self, "Error while populating our directory: %s" % (repr(e)))
+            debug.warn(self,
+                       "Error while populating our directory: %s" % (repr(e)))
             return False
         if not self.asList:
             import xbmcplugin  # @UnresolvedImport
@@ -83,45 +88,59 @@ class QobuzXbmcRenderer(IRenderer):
             debug.warn(self, "Cannot set root node ('{}')",
                        str(self.node_type))
             return False
-        # setSetting('scan_stop', False)
-        handle = config.app.handle
         Dir = Directory(self.root, nodes=self.nodes, withProgress=False,
-                        handle=int(sys.argv[1]), asLocalUrl=True)
+                        handle=config.app.handle, asLocalUrl=True)
         notifier.notify('Scanning root directory: %s' % self.root.label,
                         check=True)
         tracks = {}
-        if self.root.nt & Flag.TRACK == Flag.TRACK:
-            tracks[self.root.nid] = self.root
-        else:
-            def list_track(root):
-                predir = Directory(None, asList=True)
-                findir = Directory(None, asList=True)
-                root.populating(predir, -1, Flag.ALL)
-                seen = {}
-                seen_tracks = {}
-                for node in predir.nodes:
-                    notifier.notify(node.get_label(), check=True)
-                    notifier.check()
-                    if node.nt & Flag.TRACK == Flag.TRACK:
-                        if node.nid in seen_tracks:
-                            continue
-                        seen_tracks[node.nid] = 1
-                        album_id = node.get_album_id()
-                        if album_id is None or album_id == '':
-                            findir.add_node(node)
-                            continue
-                        if album_id in seen:
-                            continue
-                        seen[album_id] = 1
-                        album = getNode(Flag.ALBUM, parameters={'nid': album_id})
-                        album.populating(findir, 1, Flag.TRACK)
-                    else:
-                        node.populating(findir, -1, Flag.TRACK)
-                return findir.nodes
-            tracks.update({track.nid: track for track in list_track(self.root)})
+        #self.root.set_parameter('mode', Mode.SCAN)
+        # if self.root.nt & Flag.TRACK == Flag.TRACK:
+        #
+        #     self.root.fetch()
+        #     tracks[self.root.nid] = self.root
+        #
+        # else:
+        def list_track(root):
+            predir = Directory(None, asList=True)
+            findir = Directory(None, asList=True)
+            if root.nt & Flag.TRACK == Flag.TRACK:
+                predir.add_node(root)
+            else:
+                root.populating(predir, -1, Flag.ALL, Flag.STOPBUILD)
+            seen = {}
+            seen_tracks = {}
+            for node in predir.nodes:
+                node.set_parameter('mode', Mode.SCAN)
+                notifier.notify(node.get_label(), check=True)
+                notifier.check()
+                if node.nt & Flag.TRACK == Flag.TRACK:
+                    if node.nid in seen_tracks:
+                        continue
+                    seen_tracks[node.nid] = 1
+                    album_id = node.get_album_id()
+                    if album_id is None or album_id == '':
+                        debug.error(self,
+                                    'Track without album_id: {}, label: {}',
+                                    node, node.get_label().encode('ascii', errors='ignore'))
+                        #findir.add_node(node)
+                        continue
+                    seen[album_id] = 1
+                    album = getNode(Flag.ALBUM,
+                                    parameters={
+                                        'nid': album_id,
+                                        'mode': Mode.SCAN
+                                    })
+                    album.populating(findir, -1, Flag.TRACK, Flag.STOPBUILD)
+                else:
+                    node.populating(findir, -1, Flag.TRACK, Flag.STOPBUILD)
+            return findir.nodes
+
+        tracks.update({track.nid: track for track in list_track(self.root)})
+        if len(tracks.keys()) == 0:
+            return False
         import xbmcgui
         ret = xbmcgui.Dialog().select('Add to library?', [
-            node.get_label() for nid, node in tracks.items()
+            node.get_label('%a - %t (%A)') for nid, node in tracks.items()
         ])
         if ret == -1:
             return False

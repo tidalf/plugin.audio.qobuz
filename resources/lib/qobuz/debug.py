@@ -6,6 +6,10 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import os
+from os import path as P
+from qobuz import exception as exc
+
 __debugging__ = True
 ourlog = None
 LOGDEBUG = None
@@ -13,7 +17,15 @@ LOGNOTICE = None
 LOGERROR = None
 LOGSEVERE = None
 LOGWARNING = None
+filename = None #'~/qobuz.log'
 
+if filename is not None:
+    filename = P.abspath(P.expanduser(filename))
+    base = P.dirname(filename)
+    if not P.exists(base):
+        raise exc.InvalidDebugPath(filename)
+    if not os.access(base, os.W_OK):
+        raise exc.DirectoryNotWritable(filename)
 try:
     import xbmc  # @UnresolvedImport
     import xbmcaddon  # @UnresolvedImport
@@ -38,8 +50,12 @@ except Exception as e:
         print('[%s] %s' % (lvl, msg))
     ourlog = logfunc
 
+def clear(msg='--- kodi/plugin/qobuz ---\n'):
+    if filename is not None:
+        with open(filename, 'a+') as fh:
+            fh.write(msg)
 
-def log(obj, lvl, *a, **ka):
+def _log(obj, lvl, *a, **ka):
     '''Base for all logging function, run in/out Xbmc
         Inside Xbmc loggin functions use xbmc.log else they just print
         message to STDOUT
@@ -60,17 +76,21 @@ def log(obj, lvl, *a, **ka):
         msg = a[0].format(lvl=lvl, **ka)
     elif num_argument > 1:
         msg = a[0].format(lvl=lvl, *a[1:], **ka)
-    ourlog('[Qobuz/{name}][{level}] {msg}'
-            .format(name=str(name), msg=msg, level=lvl), lvl)
+    msg = '[Qobuz/{name}][{level}] {msg}'.format(name=str(name),
+                                                 msg=msg, level=lvl)
+    if filename is not None:
+        with open(filename, 'a+') as fh:
+            fh.write('%s\n' % msg)
+    ourlog(msg, lvl)
 
 def warn(obj, *a, **ka):
-    log(obj, LOGWARNING, *a, **ka)
+    _log(obj, LOGWARNING, *a, **ka)
 
 def info(obj, *a, **ka):
-    log(obj, LOGNOTICE, *a, **ka)
+    _log(obj, LOGNOTICE, *a, **ka)
 
 def debug(obj, *a, **ka):
-    log(obj, LOGDEBUG, *a, **ka)
+    _log(obj, LOGDEBUG, *a, **ka)
 
 def error(obj, *a, **ka):
-    log(obj, LOGERROR, *a, **ka)
+    _log(obj, LOGERROR, *a, **ka)

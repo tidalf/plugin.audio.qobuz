@@ -42,7 +42,7 @@ def is_authentication_set():
     return False
 
 def is_service_enable():
-    return gui.getSetting('enable_httpd_service', asBool=True)
+    return gui.getSetting('enable_scan_feature', asBool=True)
 
 @application.before_request
 def shutdown_request():

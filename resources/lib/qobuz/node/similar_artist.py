@@ -26,12 +26,15 @@ class Node_similar_artist(INode):
     def get_label(self, default=None):
         return lang(30156)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None):
         return api.get('/artist/getSimilarArtists', artist_id=self.nid,
                        offset=self.offset, limit=self.limit)
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for data in self.data['artists']['items']:
+            if data['albums_count'] <= 0 and not getSetting('display_artist_without_album', asBool=True):
+                continue
             artist = getNode(Flag.ARTIST, data=data)
+            artist.data = artist.fetch()
             self.add_child(artist)
         return True

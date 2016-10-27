@@ -20,7 +20,7 @@ def unlink(filename):
         os.rename(filename, tmpfile)
         return os.unlink(tmpfile)
     except Exception as e:
-        debug.error(__name__, 'Unlinking fails: {filename}, error: {error)',
+        debug.error(__name__, 'Unlinking fails: {filename}, error: {error}',
                     filename=filename, error=e)
     return False
 

@@ -125,7 +125,7 @@ class RawApi(object):
         self.status_code = int(r.status_code)
         if self.status_code != 200:
             self.error = self._api_error_string(r, url, _copy_params)
-            debug.warn(self, self.error)
+            debug.error(self, self.error)
             return None
         if not r.content:
             self.error = 'Request return no content'
@@ -348,11 +348,14 @@ class RawApi(object):
         return self._api_request(ka, '/playlist/getPublicPlaylists')
 
     def artist_getSimilarArtists(self, **ka):
+        limit_max = 100 # @note: when limit > 100 server respond 40x
+        if 'limit' in ka and ka['limit'] > limit_max:
+            ka['limit'] = limit_max
         self._check_ka(ka, ['artist_id'], ['limit', 'offset'])
         return self._api_request(ka, '/artist/getSimilarArtists')
 
     def artist_get(self, **ka):
-        self._check_ka(ka, ['artist_id'], ['extra', 'limit', 'offset'])
+        self._check_ka(ka, ['artist_id'], ['extra'])
         return self._api_request(ka, '/artist/get')
 
     def genre_list(self, **ka):

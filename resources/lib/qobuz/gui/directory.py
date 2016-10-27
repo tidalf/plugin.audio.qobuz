@@ -62,13 +62,17 @@ class Directory(object):
             @attention: may be useless
         """
         try:
-            for node in self.nodes:
-                node.delete_tree()
+            if self.nodes is not None:
+                for node in self.nodes:
+                    node.delete_tree()
             self.nodes = None
-            self.root.delete_tree()
-            self.root = None
-        except:
-            print "Something went wrong while deleting tree"
+            if self.root is not None:
+                self.root.delete_tree()
+                self.root = None
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            debug.warn("Something went wrong while deleting tree: {}", e)
 
     def elapsed(self):
         """Return elapsed time since directory has been created
@@ -96,7 +100,7 @@ class Directory(object):
         if self.is_canceled():
             return False
         item = node.makeListItem(replaceItems=self.replaceItems)
-        if not item:
+        if item is None:
             return False
         url = node.make_url(asLocalUrl=self.asLocalUrl)
         if not self.add_to_xbmc_directory(url=url,

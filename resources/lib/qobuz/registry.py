@@ -1,6 +1,5 @@
 from os import path as P
 from qobuz import base_path, data_path
-from qobuz.debug import log
 
 class IRegistryBackend(object):
 

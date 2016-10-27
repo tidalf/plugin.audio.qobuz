@@ -56,7 +56,6 @@ class Node_recommendation(INode):
         super(Node_recommendation, self).__init__(parent=parent,
                                                   parameters=parameters,
                                                   data=data)
-        self.content_type = 'albums'
         self.nt = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id', default=None)
         self.genre_type = self.get_parameter('genre-type', default=None)
@@ -109,6 +108,7 @@ class Node_recommendation(INode):
     def __populate_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
         '''Populate album selected by genre_type and genre_id
         '''
+        self.content_type = 'albums'
         if self.data is None:
             return False
         if 'albums' not in self.data:
@@ -127,10 +127,7 @@ class Node_recommendation(INode):
         '''We are populating our node based on genre_type and genre_id
         '''
         if not self.genre_type:
-            self.content_type = 'files'
             return self.__populate_type(Dir, lvl, whiteFlag, blackFlag)
         elif not self.genre_id:
-            self.content_type = 'files'
             return self.__populate_genre(Dir, lvl, whiteFlag, blackFlag)
-        self.content_type = 'albums'
         return self.__populate_type_genre(Dir, lvl, whiteFlag, blackFlag)

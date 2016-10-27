@@ -22,8 +22,8 @@ class Node_purchase(INode):
                                             parameters=parameters,
                                             data=data)
         self.nt = Flag.PURCHASE
-        self.content_type = 'albums'
         self.image = getImage('album')
+        self.content_type = 'files'
         self.search_type = self.get_parameter('search-type') or 'all'
         if self.search_type == 'all':
             self.label = '%s - %s' % (lang(30101), lang(30098))
@@ -56,19 +56,18 @@ class Node_purchase(INode):
         return ret
 
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
+        self.content_type = 'albums'
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
             node.data['purchased'] = True
             self.add_child(node)
-            result = True
         return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
+        self.content_type = 'songs'
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK)
-            node.data = track
+            node = getNode(Flag.TRACK, data=track)
             node.data['purchased'] = True
             self.add_child(node)
             ret = True
-        return ret
+        return True if len(self.data['tracks']['items']) > 0 else False

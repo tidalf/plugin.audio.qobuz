@@ -22,7 +22,6 @@
 		<setting type="sep"/>
 		<setting id="pagination_limit" type="labelenum" label="30155"
 			default="100" values="6|12|25|50|100|500|1000|5000|10000" />
-
 	</category>
 
 	<!-- Options -->
@@ -33,24 +32,24 @@
 		<setting id="cache_duration_middle" type="labelenum" label="30111"
 			default="770" values="0|5|10|30|60|770|1440|10080" />
 		<setting type="sep" />
-		<setting id="image_default_size" type="labelenum"
-		    label="Image default size"
+		<setting id="image_default_size" type="labelenum" label="Image default size"
             default="large" values="thumbnail|small|large|xlarge" />
-        <setting id="notification_playingsong" label="30142" type="bool"
-			default="false" />
 	</category>
 
+	<category label="Library (beta)">
+				<setting id="enable_scan_feature" label="30154" type="bool" default="true" />
+				<setting id="scan_by_album" label="Scan by album" type="bool" default="true" />
+				<!--<setting id="httpd_enable" label="enable" type="bool" default="true" />-->
+				<setting id="httpd_port" label="port" type="number" default="33574" />
+				<setting id="httpd_host" label="host" type="text" default="127.0.0.1" />
+				<!--<setting id="httpd_ssl" label="ssl" type="bool" default="false" option="hidden" />-->
+	</category>
 	<!-- Other -->
 	<category label="30152">
-		<setting id="enable_scan_feature" label="30154" type="bool" default="true" />
-		<setting id="scan_by_album" label="Scan by album" type="bool" default="true" />
 
-		<setting id="enable_httpd_service"
-			label="Enable httpd (playing qobuz from Library / need restart" type="bool" default="true" />
 		<!-- <setting id="resolver_enabled" label="33000" type="bool" default="true"/> -->
 		<setting id="debug" label="debug (xbmc.log, activated via system menu)" type="bool" default="false" />
 		<setting id="contextmenu_replaceitems" label="Only qobuz context menu" type="bool" default="false" />
-		<!-- <setting id="userplaylists_display_cover" label="(i8n) Playlist - show cover" type="bool" default="true" /> -->
 		<setting id="show_recommendations" type="bool" default="true" label="30153" option="" />
 		<setting id="search_enabled" label="30135" type="bool" default="true" />
     <setting id="item_default_color" label="30128" type="text" default="FFDB7656" />
@@ -58,14 +57,12 @@
     <setting id="item_section_format" label="30131" type="text" default=".o[ %s ]o." />
 		<setting id="playlist_current_format" label="30195" type="text" default="[ %s ]" />
     <setting id="item_caution_color" label="30129" type="text" default="FFDBB956" />
-		<setting id="warn_free_account" type="bool" default="true" option="hidden" />
+		<setting id="display_artist_without_album" label="(b) Display artist without album" type="bool" default="false" />
 		<setting id="scan_stop" type="bool" default="true" option="hidden" />
 	</category>
-	<category label="Web Service">
-		<setting id="httpd_enable" label="enable" type="bool" default="true" />
-		<setting id="httpd_port" label="port" type="number" default="33574" />
-		<setting id="httpd_host" label="host" type="text" default="127.0.0.1" />
-		<!--<setting id="httpd_ssl" label="ssl" type="bool" default="false" option="hidden" />-->
-		<setting type="sep" label="Warning: You need to delete you\'re library after changing host or port" />
+	<category label="Notification">
+		<setting id="notification_playingsong" label="30142" type="bool" default="false" />
+		<setting id="warn_free_account" label="Warn free account" type="bool" default="true" />
+		<setting id="notify_library_san_progress" label="Library scan progress" type="bool" default="true" />
 	</category>
 </settings>

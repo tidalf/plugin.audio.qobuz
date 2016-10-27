@@ -39,3 +39,9 @@ class UnknownMode(QobuzError):
 
 class InvalidSearchType(QobuzError):
     pass
+
+class InvalidDebugPath(QobuzError):
+    pass
+
+class DirectoryNotWritable(QobuzError):
+    pass

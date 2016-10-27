@@ -39,12 +39,13 @@ class FlagEnum(object):
     PURCHASE = 1 << 26
     TESTING = 1 << 27
     TEXT = 1 << 28
+    SEARCH_RESULT = 1 << 29
 
     STOPBUILD = 1 << 100
     NONE = 1 << 101
 
     def __init__(self):
-        self.totalFlag = 28
+        self.totalFlag = 29
         self.ALL = 0
         for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
@@ -77,6 +78,8 @@ class FlagEnum(object):
             return 'favorite'
         elif flag & cls.SEARCH == cls.SEARCH:
             return 'search'
+        elif flag & cls.SEARCH_RESULT == cls.SEARCH_RESULT:
+            return 'search_result'
         elif flag & cls.ARTIST == cls.ARTIST:
             return 'artist'
         elif flag & cls.SIMILAR_ARTIST == cls.SIMILAR_ARTIST:

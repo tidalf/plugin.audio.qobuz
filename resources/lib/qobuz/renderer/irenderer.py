@@ -18,12 +18,12 @@ class IRenderer(object):
         parameters: dictionary, parameters passed to our plugin
     """
 
-    def __init__(self, node_type, parameters={}, mode=None):
+    def __init__(self, node_type, parameters={}, mode=None, whiteFlag=Flag.ALL, blackFlag=Flag.STOPBUILD):
         self.node_type = node_type
         self.parameters = parameters
         self.root = None
-        self.whiteFlag = Flag.ALL
-        self.blackFlag = Flag.STOPBUILD
+        self.whiteFlag = whiteFlag
+        self.blackFlag = blackFlag
         self.depth = 1
         self.asList = False
         self.nodes = []

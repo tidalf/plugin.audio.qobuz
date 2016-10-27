@@ -22,7 +22,7 @@ class Node_track(INode):
                                          parameters=parameters,
                                          data=data)
         self.nt = Flag.TRACK
-        self.content_type = 'files'
+        self.content_type = 'songs'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
         self.status = None
@@ -92,7 +92,7 @@ class Node_track(INode):
 
         if image is not None:
             return image
-        if self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
+        if self.parent and self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
             return self.parent.get_image()
         return u''
 
@@ -123,13 +123,15 @@ class Node_track(INode):
             return None
         return data['url']
 
-    def get_artist(self):
-        mode = self.get_parameter('mode')
-        mode = int(mode) if mode is not None else None
-        if mode is None or mode == Mode.SCAN:
-            artist = self.get_property('album/artist/name', default=None)
-            if artist is None and self.parent:
-                return self.parent.get_artist()
+    def get_artist(self, by='track'):
+        if by == 'album':
+            artist = self.get_property(['album/artist/name',
+                                        'performer/name'], default=None)
+            if artist is None:
+                if self.parent:
+                    artist = self.parent.get_artist()
+            if artist is None:
+                return u''
             return artist
         return self.get_property(['artist/name',
                                   'composer/name',
@@ -264,11 +266,9 @@ class Node_track(INode):
         duration = self.get_duration()
         if duration is None:
             debug.error(self, "no duration\n%s" % (pprint.pformat(self.data)))
-        label = None
+        label = self.get_label(fmt='%a - %t')
         if current_mode == Mode.SCAN:
             label = self.get_label(fmt='%t')
-        else:
-            label = self.get_label()
         isplayable = 'true'
         # Disable free account checking here, purchased track are
         # still playable even with free account, but we don't know yet.
@@ -276,10 +276,9 @@ class Node_track(INode):
         #    duration = 60
         # label = '[COLOR=FF555555]' + label + '[/COLOR]
         # [[COLOR=55FF0000]Sample[/COLOR]]'
-        mode = Mode.PLAY
-        url = self.make_url(mode=mode)
         image = self.get_image()
-        item = xbmcgui.ListItem(label, label, image, image, url)
+        url = self.make_url(mode=Mode.PLAY)
+        item = xbmcgui.ListItem(label, self.get_label(), image, image, url)
         if not item:
             debug.warn(self, "Cannot create xbmc list item")
             return None
@@ -292,12 +291,6 @@ class Node_track(INode):
         else:
             track_number = int(track_number)
         mlabel = self.get_property('label/name')
-        description = self.get_description()
-        comment = ''
-        if mlabel:
-            comment = mlabel
-        if description:
-            comment += ' - ' + description
         '''Xbmc Library fix: Compilation showing one entry by track
             We are setting artist like 'VA / Artist'
             Data snippet:
@@ -310,22 +303,26 @@ class Node_track(INode):
         #     if self.parent.get_artist() != artist:
         #         artist = '%s / %s' % (self.parent.get_artist(), artist)
         #description or 'Qobuz Music Streaming'
-        comment = u'''Popularity: {popularity}
+        comment = u'''
+Popularity: {popularity}
 copyright: {copyright}
-        '''.format(popularity=self.get_property('popularity', default='n/a'),
-                   copyright=self.get_property('copyright', default=''))
+description: {description}
+'''.format(popularity=self.get_property('popularity', default='n/a'),
+            copyright=self.get_property('copyright', default=''),
+            description=self.get_description())
 
         item.setInfo(type='Music', infoLabels={
                      'count': self.nid,
-                     'title': self.get_label(),
+                     'title': label,
                      'album': self.get_album(),
                      'genre': self.get_genre(),
                      'artist': self.get_artist(),
+                     'album_artist': self.get_artist(by='album'),
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
                      'comment': comment,
-                     'rating': self.get_property('album/popularity') * 100,
+                     'rating': self.get_property('album/popularity'),
         })
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
