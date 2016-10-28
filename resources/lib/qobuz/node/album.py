@@ -102,7 +102,6 @@ class Node_album(INode):
         return item
 
     def get_information(self):
-        debug.info(self, '{} popularity: {}', self.get_label().encode('ascii', errors='ignore'), self.get_property('popularity'))
         txt = ''
         description = self.get_description(default=None)
         if description is not None:

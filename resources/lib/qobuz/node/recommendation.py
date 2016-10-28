@@ -117,12 +117,7 @@ class Node_recommendation(INode):
         if self.data['albums'] is None or 'items' not in self.data['albums']:
             debug.warn(self, 'Recommendation data[\'albums\'] doesn\'t contain items')
             return False
-        seen = {}
         for product in self.data['albums']['items']:
-            if product['id'] in seen:
-                debug.info(self, 'Album in seen %s' % product['id'])
-                continue
-            seen[product['id']] = 1
             self.add_child(getNode(Flag.ALBUM, data=product))
         return True
 

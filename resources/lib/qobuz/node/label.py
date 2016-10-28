@@ -55,14 +55,12 @@ class Node_label(INode):
         return api.get('/label/get', label_id=self.nid)
 
     def populate(self, xdir, lvl, whiteFlag, blackFlag):
-        debug.info(self, 'DATA {}', self.data)
         if self.nid is None:
             for item in self.data['labels']['items']:
                 node = Node_label()
                 node.data = item
                 self.add_child(node)
         else:
-            debug.info(self, 'Click on label: {}', self.get_property('name'))
             xdir.add_node(self)
             xdir.add_node(getNode(Flag.LABEL,
                                   parameters={
