@@ -32,17 +32,19 @@ class Node_root(INode):
         self.add_child(getNode(Flag.PURCHASES))
         self.add_child(getNode(Flag.FAVORITES))
         if getSetting('search_enabled', asBool=True):
-            search = getNode(Flag.SEARCH, {'search-type': 'albums'})
+            search = getNode(Flag.SEARCH, parameters={'search-type': 'albums'})
             self.add_child(search)
-            search = getNode(Flag.SEARCH, {'search-type': 'tracks'})
+            search = getNode(Flag.SEARCH, parameters={'search-type': 'tracks'})
             self.add_child(search)
-            search = getNode(Flag.SEARCH, {'search-type': 'artists'})
+            search = getNode(Flag.SEARCH, parameters={'search-type': 'artists'})
             self.add_child(search)
             collections = getNode(Flag.COLLECTIONS)
             self.add_child(collections)
         self.add_child(getNode(Flag.FRIENDS))
         self.add_child(getNode(Flag.GENRE))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
+        self.add_child(getNode(Flag.LABEL))
+
         return True
 
     def cache_remove(self):

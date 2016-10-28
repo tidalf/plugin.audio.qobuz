@@ -11,7 +11,7 @@ from qobuz.constants import Mode
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import lang, getImage, runPlugin, getSetting
+from qobuz.gui.util import lang, getImage, runPlugin, getSetting, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
 
@@ -387,7 +387,7 @@ Downloadable: {downloadable}
         if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
             colorCaution = getSetting('item_caution_color')
             url = self.parent.make_url(nt=Flag.PLAYLIST,
-                                       id=self.parent.nid,
+                                       nid=self.parent.nid,
                                        qid=self.get_playlist_track_id(),
                                        nm='gui_remove_track',
                                        mode=Mode.VIEW)
@@ -396,9 +396,12 @@ Downloadable: {downloadable}
                      cmd=runPlugin(url), color=colorCaution)
         label = self.get_album_label(default=None)
         if label is not None:
+            label_id = self.get_album_label_id()
+            debug.info(self, 'LabelID {}', label_id)
             #node = getNode(Label, parameters={'nid': self.get_album_label_id(})
-            url = self.make_url(nt=Flag.LABEL, nid=self.get_album_label_id(), mode=Mode.VIEW)
+            url = self.make_url(nt=Flag.LABEL, nid=self.get_album_label_id(),
+                                mode=Mode.VIEW)
             menu.add(path='label/view', label='View label (i8n): %s' % label,
-                     cmd=runPlugin(url))
+                     cmd=containerUpdate(url))
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menu)
