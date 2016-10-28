@@ -68,7 +68,9 @@ class QobuzPlayer(xbmc.Player):
             limited)
             """
             if not isFreeAccount():
-                notify_warn("Qobuz", "Sample returned")
+                notify_warn("Qobuz / Free Account", "Sample returned")
+            if track.is_uncredentialed():
+                notify_warn("Qobuz / Uncredentialed", "Sample returned")
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id)
         """Notify
         """

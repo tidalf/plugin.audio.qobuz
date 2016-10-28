@@ -6,6 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import time
 from qobuz.constants import Mode
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node.inode import INode
@@ -58,12 +59,15 @@ class Node_track(INode):
                                                 **ka)
 
     def get_label(self, fmt="%a - %t", default=None):
-        fmt = fmt.replace("%a", self.get_artist())
+        fmt = fmt.replace("%a", self.get_album_artist())
         fmt = fmt.replace("%t", self.get_title())
         fmt = fmt.replace("%A", self.get_album())
         fmt = fmt.replace("%n", str(self.get_track_number()))
         fmt = fmt.replace("%g", self.get_genre())
         return fmt
+
+    def get_label2(self):
+        return self.get_artist()
 
     def get_composer(self):
         return self.get_property('composer/name', default=-1)
@@ -77,6 +81,7 @@ class Node_track(INode):
             return album
         if self.parent and (self.parent.nt & Flag.ALBUM):
             return self.parent.get_title()
+        debug.warn(self, 'Track without album name: {}', self.get_label())
         return u''
 
     def get_album_id(self):
@@ -85,16 +90,36 @@ class Node_track(INode):
             return self.parent.nid
         return aid
 
-    def get_image(self):
-        image = self.get_property(['album/image/large', 'image/large',
-                                   'image/small',
-                                   'image/thumbnail', 'image'], default=None)
+    def get_album_label(self, default=None):
+        label = self.get_property('album/label/name')
+        if label is None:
+            return default
+        return '%s (albums: %s)' % (label, self.get_property('album/label/albums_count', default=0))
 
+    def get_album_label_id(self, default=None):
+        return self.get_property('album/label/id', default=default)
+
+
+    def get_image(self, size=None, type='front', default=None):
+        if size is None:
+            size = getSetting('image_default_size')
+        if type == 'thumbnail':
+            image = self.get_property('album/image/thumbnail', default=None)
+            if image is not None:
+                return image
+        elif type == 'back':
+            image = self.get_property('album/image/back', default=None)
+            if image is not None:
+                return image
+        image = self.get_property(['image/%s' % (size),
+                                  'image/large',
+                                  'image/small',
+                                  'image/thumbnail'], default=None)
         if image is not None:
             return image
         if self.parent and self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
             return self.parent.get_image()
-        return u''
+        return default
 
     def get_playlist_track_id(self):
         return self.get_property('playlist_track_id')
@@ -123,16 +148,16 @@ class Node_track(INode):
             return None
         return data['url']
 
-    def get_artist(self, by='track'):
-        if by == 'album':
-            artist = self.get_property(['album/artist/name',
-                                        'performer/name'], default=None)
-            if artist is None:
-                if self.parent:
-                    artist = self.parent.get_artist()
-            if artist is None:
-                return u''
+    def get_album_artist(self):
+        artist = self.get_property(['album/artist/name',
+                                    'album/performer/name'], default=None)
+        if artist is not None:
             return artist
+        if self.parent is not None:
+            return self.parent.get_artist()
+        return 'n/a'
+
+    def get_artist(self):
         return self.get_property(['artist/name',
                                   'composer/name',
                                   'performer/name',
@@ -142,9 +167,11 @@ class Node_track(INode):
 
     def get_artist_id(self):
         return self.get_property(['artist/id',
-                               'composer/id',
-                               'performer/id',
-                               'interpreter/id'], default=None, to='int')
+                                  'composer/id',
+                                  'performer/id',
+                                  'interpreter/id',
+                                  'composer/id',
+                                  'album/artist/id'], default=None, to='int')
 
     def get_track_number(self):
         return self.get_property('track_number', default=0, to='int')
@@ -156,7 +183,9 @@ class Node_track(INode):
         return self.get_property('duration')
 
     def get_year(self):
-        import time
+        date = self.get_property('album/year')
+        if date is not None:
+            return date
         date = self.get_property('album/released_at', default=None)
         if date is None:
             if self.parent is not None and self.parent.nt & Flag.ALBUM:
@@ -169,6 +198,9 @@ class Node_track(INode):
         return year
 
     def is_playable(self):
+        streamable = self.get_property('streamable', default=None)
+        if streamable is False:
+            return False
         url = self.get_streaming_url()
         if not url:
             return False
@@ -185,10 +217,10 @@ class Node_track(INode):
     def get_purchased(self):
         return self.get_property('purchased')
 
-    def get_description(self):
-        if self.parent:
-            return self.parent.get_description()
-        return ''
+    def get_description(self, default='n/a'):
+        if self.parent and self.parent.nt & Flag.ALBUM == Flag.ALBUM:
+            return self.parent.get_description(default=default)
+        return default
 
     def __getFileUrl(self):
         hires = getSetting('hires_enabled', asBool=True)
@@ -217,10 +249,18 @@ class Node_track(INode):
             restrictions.append(restriction['code'])
         return restrictions
 
+    def is_uncredentialed(self):
+        for restriction in ['UserUncredentialed', 'TrackRestrictedByPurchaseCredentials']:
+            if restriction in self.get_restrictions():
+                return True
+        return False
+
     def is_sample(self):
         data = self.__getFileUrl()
         if not data:
             return False
+        if self.is_uncredentialed():
+            return True
         if 'sample' in data:
             return data['sample']
         return False
@@ -278,38 +318,45 @@ class Node_track(INode):
         # [[COLOR=55FF0000]Sample[/COLOR]]'
         image = self.get_image()
         url = self.make_url(mode=Mode.PLAY)
-        item = xbmcgui.ListItem(label, self.get_label(), image, image, url)
+        item = xbmcgui.ListItem(self.get_label(),
+                                self.get_label2(),
+                                self.get_image(),
+                                self.get_image(type='back'), url)
+        item.setIconImage(self.get_image(type='thumbnail'))
+        item.setThumbnailImage(self.get_image())
         if not item:
             debug.warn(self, "Cannot create xbmc list item")
             return None
-        item.setIconImage(image)
-        item.setThumbnailImage(image)
-        item.setPath(url)
         track_number = self.get_track_number()
         if not track_number:
             track_number = 0
         else:
             track_number = int(track_number)
-        mlabel = self.get_property('label/name')
-        '''Xbmc Library fix: Compilation showing one entry by track
-            We are setting artist like 'VA / Artist'
-            Data snippet:
-                {u'id': 26887, u'name': u'Interpr\xe8tes Divers'}
-                {u'id': 145383, u'name': u'Various Artists'}
-                {u'id': 255948, u'name': u'Multi Interpretes'}
-        '''
-        # artist = self.get_artist()
-        # if self.parent and hasattr(self.parent, 'get_artist_id'):
-        #     if self.parent.get_artist() != artist:
-        #         artist = '%s / %s' % (self.parent.get_artist(), artist)
-        #description or 'Qobuz Music Streaming'
-        comment = u'''
+        comment = u'''Label: {label}
+Description: {description}
+Purchasable: {purchasable} / Purchased: {purchased}
+Copyright: {copyright}
 Popularity: {popularity}
-copyright: {copyright}
-description: {description}
+Maximum sampling rate: {maximum_sampling_rate}
+HiRes: {hires} / HiRes purchased: {hires_purchased}
+Streamable: {streamable}
+Previewable: {previewable}
+Sampleable: {sampleable}
+Downloadable: {downloadable}
 '''.format(popularity=self.get_property('popularity', default='n/a'),
-            copyright=self.get_property('copyright', default=''),
-            description=self.get_description())
+           label=self.get_album_label(),
+            copyright=self.get_property('copyright', default='n/a'),
+            maximum_sampling_rate=self.get_property('maximum_sampling_rate'),
+            description=self.get_description(),
+            hires=self.get_property('hires'),
+            sampleable=self.get_property('sampleable'),
+            downloadable=self.get_property('downloadable'),
+            purchasable=self.get_property('purchasable'),
+            purchased=self.get_property('purchased', default=False),
+            previewable=self.get_property('previewable'),
+            streamable=self.get_property('streamable'),
+            hires_purchased=self.get_property('hires_purchased', default=False)
+            )
 
         item.setInfo(type='Music', infoLabels={
                      'count': self.nid,
@@ -317,13 +364,16 @@ description: {description}
                      'album': self.get_album(),
                      'genre': self.get_genre(),
                      'artist': self.get_artist(),
-                     'album_artist': self.get_artist(by='album'),
                      'tracknumber': track_number,
                      'duration': duration,
                      'year': self.get_year(),
-                     'comment': comment,
+                     #'description': comment,
                      'rating': self.get_property('album/popularity'),
         })
+        item.setProperty('album_artist', self.get_album_artist())
+        item.setProperty('album_description', comment)
+        item.setProperty('album_style', self.get_genre())
+        item.setProperty('album_label', self.get_property('album/label/name'))
         item.setProperty('DiscNumber', str(media_number))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
@@ -344,6 +394,11 @@ description: {description}
             menu.add(path='playlist/remove',
                      label=lang(30075),
                      cmd=runPlugin(url), color=colorCaution)
-
+        label = self.get_album_label(default=None)
+        if label is not None:
+            #node = getNode(Label, parameters={'nid': self.get_album_label_id(})
+            url = self.make_url(nt=Flag.LABEL, nid=self.get_album_label_id(), mode=Mode.VIEW)
+            menu.add(path='label/view', label='View label (i8n): %s' % label,
+                     cmd=runPlugin(url))
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menu)

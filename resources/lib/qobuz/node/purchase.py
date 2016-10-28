@@ -23,7 +23,7 @@ class Node_purchase(INode):
                                             data=data)
         self.nt = Flag.PURCHASE
         self.image = getImage('album')
-        self.content_type = 'files'
+        self.content_type = 'albums'
         self.search_type = self.get_parameter('search-type') or 'all'
         if self.search_type == 'all':
             self.label = '%s - %s' % (lang(30101), lang(30098))

@@ -26,7 +26,7 @@ data_search_type = {
     },
     'tracks': {
         'label' : lang(30015),
-        'content_type' : 'songs',
+        'content_type' : 'albums',
         'image' : getImage('song'),
     },
     'collection': {
@@ -44,6 +44,7 @@ class Node_search(INode):
                                           data=data)
         self.nt = Flag.SEARCH
         self.set_search_type(self.get_parameter('search-type'))
+        self.content_type = 'albums'
 
     def get_description(self):
         return self.get_label()

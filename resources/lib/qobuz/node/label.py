@@ -6,11 +6,11 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
+from qobuz.node.inode import INode
 from qobuz import debug
-from gui.util import getImage, getSetting, lang
-from node import Flag
-from api import api
+from qobuz.gui.util import getImage, getSetting, lang
+from qobuz.node import Flag
+from qobuz.api import api
 
 
 class Node_label(INode):
@@ -28,20 +28,18 @@ class Node_label(INode):
         self.is_folder = True
         self.image = getImage('album')
 
-    def hook_post_data(self):
-        self.label = self.get_property('name')
-        self.nid = self.get_property('nid')
+    def fetch(self, *a, **ka):
+        if self.nid is None:
+            return api.get('/label/list', limit=self.limit, offset=self.offset)
+        return api.get('/label/get', label_id=self.nid)
 
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
-        offset = self.get_parameter('offset') or 0
-        #@bug: Qobuz service seam do don't return total so pagination is broken
-        limit = getSetting('pagination_limit')
-        data = api.get('/label/list', limit=limit, offset=offset)
-        if not data:
-            debug.warn(self, "No label data")
-            return False
-        for item in data['labels']['items']:
-            node = Node_label()
-            node.data = item
-            self.add_child(node)
+        debug.info(self, 'DATA {}', self.data)
+        if self.nid is None:
+            for item in self.data['labels']['items']:
+                node = Node_label()
+                node.data = item
+                self.add_child(node)
+        else:
+            debug.info(self, 'Click on label: {}', self.get_property('name'))
         return True

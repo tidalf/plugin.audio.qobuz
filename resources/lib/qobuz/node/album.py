@@ -6,6 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import time
 from qobuz.node.inode import INode
 from qobuz import debug
 from qobuz.gui.util import getImage, getSetting, htm2xbmc, color
@@ -25,7 +26,7 @@ class Node_album(INode):
                                          data=data)
         self.nt = Flag.ALBUM
         self.image = getImage('album')
-        self.content_type = 'songs'
+        self.content_type = 'albums'
         self.is_special_purchase = False
         self.imageDefaultSize = getSetting('image_default_size')
 
@@ -47,7 +48,18 @@ class Node_album(INode):
             track.update({
                 'album': {
                     'title': self.get_title(),
-                    'id': self.nid
+                    'id': self.nid,
+                    'genre': {
+                        'name': self.get_genre()
+                    },
+                    'label': {
+                        'name': self.get_album_label(),
+                        'albums_count': self.get_property('label/albums_count')
+                    },
+                    'year': self.get_year(),
+                    'artist': {
+                        'name': self.get_artist()
+                    }
                 }
             })
             self.add_child(getNode(Flag.TRACK, data=track))
@@ -78,16 +90,24 @@ class Node_album(INode):
             'artist': self.get_artist(),
             'title': self.get_title(),
             'album': self.get_album(),
-            'comment': self.get_description(),
+            'comment': self.get_description(default=None),
             'duration': self.get_duration(),
             'discnumber': self.get_property('media_count')
         })
-        item.setProperty('album_description', self.get_description())
+        item.setProperty('album_description', self.get_information())
         item.setProperty('album_label', self.get_album_label())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
+
+    def get_information(self):
+        debug.info(self, '{} popularity: {}', self.get_label().encode('ascii', errors='ignore'), self.get_property('popularity'))
+        txt = ''
+        description = self.get_description(default=None)
+        if description is not None:
+            txt += 'description: %s' % description
+        return txt
 
     def get_artist(self):
         return self.get_property(['artist/name',
@@ -129,7 +149,6 @@ class Node_album(INode):
         return self.get_property('genre/name', default=default)
 
     def get_year(self):
-        import time
         date = self.get_property('released_at', default=None)
         year = 0
         try:
@@ -138,8 +157,11 @@ class Node_album(INode):
             debug.warn(self, 'Invalid date format %s', date)
         return year
 
-    def get_description(self):
-        return htm2xbmc(self.get_property('description', default=""))
+    def get_description(self, default='n/a'):
+        txt = self.get_property('description', default=None)
+        if txt is not None:
+            return htm2xbmc(txt)
+        return default
 
     def get_duration(self):
         return self.get_property('duration')

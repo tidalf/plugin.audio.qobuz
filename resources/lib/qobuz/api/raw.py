@@ -18,6 +18,7 @@ import socket
 import binascii
 from itertools import izip, cycle
 import requests
+import copy
 
 from qobuz import exception
 from qobuz import debug
@@ -29,17 +30,16 @@ class RawApi(object):
     def __init__(self):
         self.appid = '285473059'  # XBMC
         self.version = '0.2'
-        self.baseUrl = 'http://www.qobuz.com/api.json/'
-
+        self.baseUrl = 'http://www.qobuz.com/api.json'
         self.user_auth_token = None
         self.user_id = None
         self.error = None
         self.status_code = None
-        self._baseUrl = self.baseUrl + self.version
+        self.status = None
+        self._baseUrl = '%s/%s' % (self.baseUrl, self.version)
         self.session = requests.Session()
         self.statContentSizeTotal = 0
         self.statTotalRequest = 0
-        self.error = None
         self.__set_s4()
 
     def _api_error_string(self, request, url='', params={}, json=''):
@@ -101,8 +101,9 @@ class RawApi(object):
             Error: Bad Request [400]
         '''
         self.statTotalRequest += 1
-        self.error = ''
+        self.error = None
         self.status_code = None
+        self.status = None
         url = self._baseUrl + uri
         useToken = False if (opt and 'noToken' in opt) else True
         headers = {}
@@ -110,7 +111,6 @@ class RawApi(object):
             headers['x-user-auth-token'] = self.user_auth_token
         headers['x-app-id'] = self.appid
         '''DEBUG'''
-        import copy
         _copy_params = copy.deepcopy(params)
         if 'password' in _copy_params:
             _copy_params['password'] = '***'
@@ -118,9 +118,10 @@ class RawApi(object):
         r = None
         try:
             r = self.session.post(url, data=params, headers=headers)
-        except:
-            self.error = 'Post request fail'
-            debug.warn(self, self.error)
+        except Exception as e:
+            self.status_code = 500
+            self.error = 'Post request fail: %s' % e
+            debug.error(self, self.error)
             return None
         self.status_code = int(r.status_code)
         if self.status_code != 200:
@@ -129,7 +130,8 @@ class RawApi(object):
             return None
         if not r.content:
             self.error = 'Request return no content'
-            debug.warn(self, self.error)
+            self.status_code = 500
+            debug.error(self, self.error)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
         '''Retry get if connexion fail'''
@@ -143,14 +145,14 @@ class RawApi(object):
                 self.error = "Failed to load json two times...abort"
                 debug.warn(self, self.error)
                 return None
-        status = None
         try:
-            status = response_json['status']
+            self.status = response_json['status']
         except:
             pass
-        if status == 'error':
+        if self.status == 'error':
             self.error = self._api_error_string(r, url, _copy_params,
                                                 response_json)
+            self.status_code = 500
             debug.warn(self, self.error)
             return None
         return response_json
@@ -365,6 +367,10 @@ class RawApi(object):
     def label_list(self, **ka):
         self._check_ka(ka, [], ['limit', 'offset'])
         return self._api_request(ka, '/label/list')
+
+    def label_get(self, **ka):
+        self._check_ka(ka, ['label_id'], ['limit', 'offset'])
+        return self._api_request(ka, '/label/get')
 
     def article_listRubrics(self, **ka):
         self._check_ka(ka, [], ['extra', 'limit', 'offset'])
