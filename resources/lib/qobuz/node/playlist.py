@@ -36,7 +36,6 @@ class Node_playlist(INode):
         self.b_is_current = False
         self.is_my_playlist = False
         self.content_type = 'albums'
-        self.image = self.get_image()
 
     def _get_node_storage_filename(self):
         return u'userdata-{user_id}-playlist-{nid}.local'.format(
@@ -93,7 +92,6 @@ class Node_playlist(INode):
     def get_tag(self):
         return u' (tracks: %s, users: %s)' % (
             self.get_property('tracks_count', to='int'),
-            #'Public' if self.get_property('is_public', to='bool') else 'Private',
             self.get_property('users_count', to='int'))
 
     def makeListItem(self, replaceItems=False):
@@ -103,7 +101,7 @@ class Node_playlist(INode):
         image = self.get_image()
         owner = self.get_owner()
         url = self.make_url()
-        privacy_color = '55FF0000' if self.get_property('is_public', to='bool') else  '5500FF00'
+        privacy_color = '55FF0000' if self.get_property('is_public', to='bool') else '5500FF00'
         tag = color(privacy_color, self.get_tag())
         label = '%s%s' % (label, tag)
         if not self.is_my_playlist:
@@ -121,7 +119,8 @@ class Node_playlist(INode):
             return None
         item.setInfo(type='Music', infoLabels={
             'genre': ', '.join(self.get_genre()),
-            'comment': 'public: %s' % (self.get_property('is_public', to='string'))
+            'comment': 'public: %s' % (self.get_property('is_public',
+                                                         to='string'))
         })
         item.setPath(url)
         ctxMenu = contextMenu()

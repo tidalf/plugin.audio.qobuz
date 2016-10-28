@@ -295,6 +295,10 @@ class Node_track(INode):
         item.setPath(self.get_streaming_url())
         return True
 
+    def get_popularity(self, default=0.0):
+        return round(min(self.get_property('popularity', to='float',
+                                           default=default), 1.0) * 5.0)
+
     def makeListItem(self, replaceItems=False):
         import xbmcgui  # @UnresolvedImport
         current_mode = self.get_parameter('mode', to='int')
@@ -310,20 +314,17 @@ class Node_track(INode):
         if current_mode == Mode.SCAN:
             label = self.get_label(fmt='%t')
         isplayable = 'true'
-        # Disable free account checking here, purchased track are
-        # still playable even with free account, but we don't know yet.
-        # if qobuz.gui.is_free_account():
-        #    duration = 60
-        # label = '[COLOR=FF555555]' + label + '[/COLOR]
-        # [[COLOR=55FF0000]Sample[/COLOR]]'
         image = self.get_image()
         url = self.make_url(mode=Mode.PLAY)
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label2(),
                                 self.get_image(),
                                 self.get_image(type='back'), url)
-        item.setIconImage(self.get_image(type='thumbnail'))
-        item.setThumbnailImage(self.get_image())
+        item.setArt({
+            'thumb': self.get_image(),
+            'icon': self.get_image(type='thumbnail')
+        })
+        #item.setThumbnailImage(self.get_image())
         if not item:
             debug.warn(self, "Cannot create xbmc list item")
             return None
@@ -332,17 +333,17 @@ class Node_track(INode):
             track_number = 0
         else:
             track_number = int(track_number)
-        comment = u'''Label: {label}
-Description: {description}
-Purchasable: {purchasable} / Purchased: {purchased}
-Copyright: {copyright}
-Popularity: {popularity}
-Maximum sampling rate: {maximum_sampling_rate}
-HiRes: {hires} / HiRes purchased: {hires_purchased}
-Streamable: {streamable}
-Previewable: {previewable}
-Sampleable: {sampleable}
-Downloadable: {downloadable}
+        comment = u'''- Label: {label}
+- Description: {description}
+- Purchasable: {purchasable} / Purchased: {purchased}
+- Copyright: {copyright}
+- Popularity: {popularity}
+- Maximum sampling rate: {maximum_sampling_rate}
+- HiRes: {hires} / HiRes purchased: {hires_purchased}
+- Streamable: {streamable}
+- Previewable: {previewable}
+- Sampleable: {sampleable}
+- Downloadable: {downloadable}
 '''.format(popularity=self.get_property('popularity', default='n/a'),
            label=self.get_album_label(),
             copyright=self.get_property('copyright', default='n/a'),
@@ -368,7 +369,7 @@ Downloadable: {downloadable}
                      'duration': duration,
                      'year': self.get_year(),
                      #'description': comment,
-                     'rating': self.get_property('album/popularity'),
+                     'rating': str(self.get_popularity()),
         })
         item.setProperty('album_artist', self.get_album_artist())
         item.setProperty('album_description', comment)

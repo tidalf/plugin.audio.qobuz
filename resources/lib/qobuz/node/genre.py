@@ -23,6 +23,7 @@ class Node_genre(INode):
                                          data=data)
         self.nt = Flag.GENRE
         self.image = getImage('album')
+        self.content_type = 'albums'
 
     def get_label(self):
         label = self.get_property('name', default=None)
