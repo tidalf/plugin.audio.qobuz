@@ -1,5 +1,5 @@
 ## Documentation Kodi/Qobuz
-Some useful links while developing **Qobuz** *add-on* **Kodi**
+Some useful links while developing **Qobuz** *add-on* on **Kodi**
 
 #### GitHub
 - [src code](https://github.com/tidalf/plugin.audio.qobuz)

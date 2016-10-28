@@ -33,28 +33,33 @@ class Node_genre(INode):
     def get_label2(self):
         return self.get_label()
 
-    def populate_reco(self, Dir, lvl, whiteFlag, blackFlag, genre_id):
+    def populate_reco(self, xdir, lvl, whiteFlag, blackFlag, genre_id):
         for genre_type in RECOS_TYPE_IDS:
             node = getNode(Flag.RECOMMENDATION, {
-                'parent': self,
                 'genre-id': genre_id,
                 'genre-type': genre_type
             })
-            node.populating(Dir, -1, Flag.ALBUM, Flag.TRACK)
+            node.populating(xdir, 1, Flag.ALBUM, Flag.TRACK & Flag.STOPBUILD)
         return True
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        parent_id = self.get_parameter('parent-id')
-        if parent_id is None:
+    def fetch(self, xdir, lvl, whiteFlag, blackFlag):
+        if self.nid is None:
             return api.get('/genre/list', offset=self.offset, limit=self.limit)
-        return api.get('/genre/list', parent_id=parent_id, offset=self.offset,
+        return api.get('/genre/list', parent_id=self.nid, offset=self.offset,
                        limit=self.limit)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, xdir, lvl, whiteFlag, blackFlag):
         if not self.data and len(self.data['genres']['items']) == 0:
-            return self.populate_reco(Dir, lvl, whiteFlag, blackFlag, self.nid)
-        for genre in self.data['genres']['items']:
-            self.add_child(Node_genre(parameters={
-                                          'nid': genre['id'],
-                                          'parent-id': self.nid}, data=genre))
+            return self.populate_reco(xdir, lvl, whiteFlag, blackFlag, self.nid)
+        if self.nid is not None and self.data and len(self.data['genres']['items']) == 0:
+            for genre_type in RECOS_TYPE_IDS:
+                node = getNode(Flag.RECOMMENDATION, {
+                    'genre-id': self.nid,
+                    'genre-type': genre_type
+                })
+                node.populating(xdir, 1, Flag.ALBUM, Flag.TRACK & Flag.STOPBUILD)
+        else:
+            for genre in self.data['genres']['items']:
+                self.add_child(Node_genre(parameters={'nid': genre['id']},
+                                          data=genre))
         return True

@@ -397,8 +397,6 @@ Downloadable: {downloadable}
         label = self.get_album_label(default=None)
         if label is not None:
             label_id = self.get_album_label_id()
-            debug.info(self, 'LabelID {}', label_id)
-            #node = getNode(Label, parameters={'nid': self.get_album_label_id(})
             url = self.make_url(nt=Flag.LABEL, nid=self.get_album_label_id(),
                                 mode=Mode.VIEW)
             menu.add(path='label/view', label='View label (i8n): %s' % label,
