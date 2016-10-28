@@ -1,8 +1,11 @@
 ## Documentation Kodi/Qobuz
 Some useful links while developing **Qobuz** *add-on* **Kodi**
 
+#### GitHub
+- [src code](https://github.com/tidalf/plugin.audio.qobuz)
+
 #### Qobuz
-- [api/endpoints](https://github.com/Qobuz/api-documentation/tree/master/endpoints)
+- [api endpoints](https://github.com/Qobuz/api-documentation/tree/master/endpoints)
 
 #### Kodi
 - [python](http://mirrors.kodi.tv/docs/python-docs)
