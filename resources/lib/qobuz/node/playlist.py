@@ -21,7 +21,7 @@ from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
 from qobuz.util import common as util
-
+from qobuz.theme import theme
 dialogHeading = 'Qobuz playlist'
 
 
@@ -45,20 +45,20 @@ class Node_playlist(INode):
     def get_label(self, default=None):
         return self.label or self.get_name()
 
-    def set_is_my_playlist(self, b):
-        self.is_my_playlist = b
+    def set_is_my_playlist(self, value):
+        self.is_my_playlist = value
 
-    def set_is_current(self, b):
-        self.b_is_current = b
+    def set_is_current(self, value):
+        self.b_is_current = value
 
     def is_current(self):
         return self.b_is_current
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, *a, **ka):
         return api.get('/playlist/get', playlist_id=self.nid,
                        offset=self.offset, limit=self.limit, extra='tracks')
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         for track in self.data['tracks']['items']:
             self.add_child(getNode(Flag.TRACK, data=track))
         return True if len(self.data['tracks']['items']) > 0 else False
@@ -94,35 +94,38 @@ class Node_playlist(INode):
             self.get_property('tracks_count', to='int'),
             self.get_property('users_count', to='int'))
 
+    def get_image(self):
+        images = self.get_property(['images300', 'images150', 'images'],
+                                   default=None)
+        if not images:
+            return None
+        return images[random.randint(0, len(images) - 1)]
+
     def makeListItem(self, replaceItems=False):
-        colorItem = getSetting('item_default_color')
-        colorPl = getSetting('item_section_color')
-        label = self.get_label()
-        image = self.get_image()
-        owner = self.get_owner()
-        url = self.make_url()
-        privacy_color = '55FF0000' if self.get_property('is_public', to='bool') else '5500FF00'
+        privacy_color = theme.get('item/public/color') if self.get_property('is_public', to='bool') else theme.get('item/private/color')
         tag = color(privacy_color, self.get_tag())
-        label = '%s%s' % (label, tag)
+        label = '%s%s' % (self.get_label(), tag)
         if not self.is_my_playlist:
-            label = '%s - %s' % (color(colorItem, owner), label)
+            label = '%s - %s' % (color(theme.get('item/default/color'), self.get_owner()), label)
         if self.b_is_current:
             fmt = getSetting('playlist_current_format')
             label = fmt % (color(colorPl, label))
         item = xbmcgui.ListItem(label,
-                                owner,
-                                image,
-                                image,
-                                url)
+                                self.get_owner(),
+                                self.get_image(),
+                                self.get_image(),
+                                self.make_url())
         if not item:
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
+        item.setArt({'icon': self.get_image(),
+                     'thumb': self.get_image()})
         item.setInfo(type='Music', infoLabels={
             'genre': ', '.join(self.get_genre()),
             'comment': 'public: %s' % (self.get_property('is_public',
                                                          to='string'))
         })
-        item.setPath(url)
+        item.setPath(self.make_url())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
@@ -140,7 +143,6 @@ class Node_playlist(INode):
         return True
 
     def attach_context_menu(self, item, menu):
-        colorCaution = getSetting('item_caution_color')
         login = getSetting('username')
         isOwner = True
         cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
@@ -172,7 +174,7 @@ class Node_playlist(INode):
 
         url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
         menu.add(path='playlist/remove', label=lang(30166),
-                 cmd=runPlugin(url), color=colorCaution)
+                 cmd=runPlugin(url), color=theme.get('item/caution/color'))
         super(Node_playlist, self).attach_context_menu(item, menu)
 
     def remove_tracks(self, tracks_id):

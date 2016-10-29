@@ -29,6 +29,7 @@ from qobuz.storage import _Storage
 from qobuz import config
 from qobuz.util import data as dataUtil
 from qobuz.util import common
+from qobuz.theme import theme
 
 class Converter(object):
 
@@ -105,7 +106,7 @@ class INode(object):
         self.data = data
         self.node_storage = None
         self.limit = getSetting('pagination_limit')
-        self.mode = self.get_parameter('mode')
+        self.mode = self.get_parameter('mode', to='int')
 
     def set_nid(self, value):
         '''@setter nid'''
@@ -460,8 +461,7 @@ class INode(object):
             else we are copying current mode (for track it's Mode.PLAY ...)
         '''
         ''' HOME '''
-        colorCaution = getSetting('item_caution_color')
-
+        colorCaution = theme.get('item/caution/color')
         url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW, nm='')
         menu.add(path='qobuz', label="Qobuz", cmd=containerUpdate(url, False),
                  id='', pos=-5)
@@ -602,12 +602,12 @@ class INode(object):
                                           mode=Mode.VIEW))
             menu.add(path='qobuz/test httpd',
                           label='Test web service', cmd=cmd, pos=11)
-            ''' Stop scan
-            '''
-            cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="stop_scan",
-                                          mode=Mode.VIEW))
-            menu.add(path='qobuz/stop_scan',
-                          label='Stop scan', cmd=cmd, pos=12)
+            # ''' Stop scan
+            # '''
+            # cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="stop_scan",
+            #                               mode=Mode.VIEW))
+            # menu.add(path='qobuz/stop_scan',
+            #               label='Stop scan', cmd=cmd, pos=12)
 
     def get_user_storage(self):
         if self.user_storage:

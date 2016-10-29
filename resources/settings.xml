@@ -54,6 +54,8 @@
 		<setting id="search_enabled" label="30135" type="bool" default="true" />
     <setting id="item_default_color" label="30128" type="text" default="FFDB7656" />
     <setting id="item_section_color" label="30130" type="text" default="FF56BBDB" />
+		<setting id="item_public_color" label="item public color (i8n)" type="text" default="5500FF00" />
+		<setting id="item_private_color" label="item private color (i8n)" type="text" default="55FF0000" />
     <setting id="item_section_format" label="30131" type="text" default=".o[ %s ]o." />
 		<setting id="playlist_current_format" label="30195" type="text" default="[ %s ]" />
     <setting id="item_caution_color" label="30129" type="text" default="FFDBB956" />

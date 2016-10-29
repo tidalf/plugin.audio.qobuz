@@ -14,6 +14,7 @@ from qobuz import debug
 from qobuz.gui.util import lang, getImage, runPlugin, getSetting, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
+from qobuz.theme import theme
 
 
 class Node_track(INode):
@@ -30,18 +31,17 @@ class Node_track(INode):
         self.image = getImage('song')
         self.purchased = False
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, xdir, lvl, whiteFlag, blackFlag):
         if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
             return None
         return api.get('/track/get', track_id=self.nid)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        return Dir.add_node(self)
+    def populate(self, xdir, lvl, whiteFlag, blackFlag):
+        return xdir.add_node(self)
 
     def make_local_url(self):
-        scheme = 'http'
         return '{scheme}://{host}:{port}/qobuz/{album_id}/{nid}/file.mpc'.format(
-                scheme=scheme,
+                scheme='http',
                 host=getSetting('httpd_host'),
                 port=getSetting('httpd_port'),
                 album_id=self.get_album_id(),
@@ -111,10 +111,10 @@ class Node_track(INode):
             image = self.get_property('album/image/back', default=None)
             if image is not None:
                 return image
-        image = self.get_property(['image/%s' % (size),
-                                  'image/large',
-                                  'image/small',
-                                  'image/thumbnail'], default=None)
+        image = self.get_property(['album/image/%s' % (size),
+                                  'album/image/large',
+                                  'album/image/small',
+                                  'album/image/thumbnail'], default=None)
         if image is not None:
             return image
         if self.parent and self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
@@ -173,14 +173,18 @@ class Node_track(INode):
                                   'composer/id',
                                   'album/artist/id'], default=None, to='int')
 
-    def get_track_number(self):
-        return self.get_property('track_number', default=0, to='int')
+    def get_track_number(self, default=0):
+        return self.get_property('track_number', default=default, to='int')
 
-    def get_media_number(self):
-        return self.get_property('media_number', default=0, to='int')
+    def get_media_number(self, default=0):
+        return self.get_property('media_number', default=default, to='int')
 
     def get_duration(self):
-        return self.get_property('duration')
+        duration = self.get_property('duration', default=None)
+        if duration is None:
+            debug.error(self, "no duration\n%s" % (pprint.pformat(self.data)))
+        return duration
+
 
     def get_year(self):
         date = self.get_property('album/year')
@@ -301,38 +305,19 @@ class Node_track(INode):
 
     def makeListItem(self, replaceItems=False):
         import xbmcgui  # @UnresolvedImport
-        current_mode = self.get_parameter('mode', to='int')
-        media_number = self.get_media_number()
-        if not media_number:
-            media_number = 1
-        else:
-            media_number = int(media_number)
-        duration = self.get_duration()
-        if duration is None:
-            debug.error(self, "no duration\n%s" % (pprint.pformat(self.data)))
-        label = self.get_label(fmt='%a - %t')
-        if current_mode == Mode.SCAN:
-            label = self.get_label(fmt='%t')
         isplayable = 'true'
-        image = self.get_image()
-        url = self.make_url(mode=Mode.PLAY)
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label2(),
                                 self.get_image(),
-                                self.get_image(type='back'), url)
+                                self.get_image(type='back'),
+                                self.make_url(mode=Mode.PLAY))
+        if not item:
+            debug.warn(self, "Cannot create xbmc list item")
+            return None
         item.setArt({
             'thumb': self.get_image(),
             'icon': self.get_image(type='thumbnail')
         })
-        #item.setThumbnailImage(self.get_image())
-        if not item:
-            debug.warn(self, "Cannot create xbmc list item")
-            return None
-        track_number = self.get_track_number()
-        if not track_number:
-            track_number = 0
-        else:
-            track_number = int(track_number)
         comment = u'''- Label: {label}
 - Description: {description}
 - Purchasable: {purchasable} / Purchased: {purchased}
@@ -361,21 +346,20 @@ class Node_track(INode):
 
         item.setInfo(type='Music', infoLabels={
                      'count': self.nid,
-                     'title': label,
+                     'title': self.get_title(),
                      'album': self.get_album(),
                      'genre': self.get_genre(),
-                     'artist': self.get_artist(),
-                     'tracknumber': track_number,
-                     'duration': duration,
+                     'artist': self.get_album_artist(),
+                     'tracknumber': self.get_track_number(default=0),
+                     'duration': round(self.get_duration()),
                      'year': self.get_year(),
-                     #'description': comment,
                      'rating': str(self.get_popularity()),
         })
         item.setProperty('album_artist', self.get_album_artist())
         item.setProperty('album_description', comment)
         item.setProperty('album_style', self.get_genre())
         item.setProperty('album_label', self.get_property('album/label/name'))
-        item.setProperty('DiscNumber', str(media_number))
+        item.setProperty('DiscNumber', str(self.get_media_number(default=1)))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)
         item.setProperty('Music', isplayable)
@@ -386,7 +370,6 @@ class Node_track(INode):
 
     def attach_context_menu(self, item, menu):
         if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
-            colorCaution = getSetting('item_caution_color')
             url = self.parent.make_url(nt=Flag.PLAYLIST,
                                        nid=self.parent.nid,
                                        qid=self.get_playlist_track_id(),
@@ -394,7 +377,7 @@ class Node_track(INode):
                                        mode=Mode.VIEW)
             menu.add(path='playlist/remove',
                      label=lang(30075),
-                     cmd=runPlugin(url), color=colorCaution)
+                     cmd=runPlugin(url), color=theme.get('item/caution/color'))
         label = self.get_album_label(default=None)
         if label is not None:
             label_id = self.get_album_label_id()

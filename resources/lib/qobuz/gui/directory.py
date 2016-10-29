@@ -44,11 +44,11 @@ class Directory(object):
         self.asList = asList
         self.handle = handle
         self.put_item_ok = True
-        self.Progress = Progress(withProgress)
+        self.Progress = Progress(enable=withProgress)
         self.total_put = 0
         self.started_on = time.time()
-        self.Progress.create(self.label)
-        self.update({'count': 0, 'total': 100}, lang(30169))
+        #self.Progress.create(self.label)
+        #self.update({'count': 0, 'total': 100}, lang(30169))
         self.line1 = ''
         self.line2 = ''
         self.line3 = ''
@@ -110,33 +110,6 @@ class Directory(object):
             return False
         return True
 
-    def update(self, gData, line1='', line2='', line3=''):
-        """Update progress bar associated with this directory
-
-            Parameters:
-            gData: Dictionary object that keep information across call
-            line1: progress line 1
-            line2: progress line 2
-            line3: progress line 3
-        """
-        percent = 100
-        total = gData['total']
-        count = gData['count']
-        if total and count:
-            percent = count * (1 + 100 / total)
-        else:
-            percent = count
-            if percent > 100:
-                percent = 100
-        labstat = '[%05i]' % (self.total_put)
-        self.line1 = labstat
-        self.line2 = line2
-        self.line3 = line3
-        self.percent = percent
-        line1 = "[%05i] %s" % (self.total_put, line1)
-        self.Progress.update(percent, line1, line2, line3)
-        return True
-
     def is_canceled(self):
         """Return is_canceled value from our progress dialog
         """
@@ -195,8 +168,6 @@ class Directory(object):
                                       succeeded=success,
                                       updateListing=False,
                                       cacheToDisc=success)
-        self.update({'count': 100, 'total': 100}, lang(30172),
-                    "%s : %s items" % (lang(30171), str(self.total_put)))
         self.close()
         return self.total_put
 

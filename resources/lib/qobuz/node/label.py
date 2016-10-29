@@ -57,14 +57,13 @@ class Node_label(INode):
     def populate(self, xdir, lvl, whiteFlag, blackFlag):
         if self.nid is None:
             for item in self.data['labels']['items']:
-                node = Node_label()
-                node.data = item
-                self.add_child(node)
+                self.add_child(getNode(Flag.LABEL, data=item))
         else:
             xdir.add_node(self)
-            xdir.add_node(getNode(Flag.LABEL,
-                                  parameters={
-                                      'nid': self.get_property('supplier_id')},
-                                  data={'name': '-> supplier'}
+            supplier_id = self.get_property('supplier_id', default=None)
+            if supplier_id is not None:
+                xdir.add_node(getNode(Flag.LABEL,
+                                  parameters={'nid': supplier_id},
+                                  data={'name': '[Supplier]'}
             ))
         return True

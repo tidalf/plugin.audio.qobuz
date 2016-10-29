@@ -8,7 +8,7 @@
 '''
 from qobuz import exception
 from qobuz.gui.util import color, getSetting
-
+from qobuz.theme import theme
 
 class contextMenu():
     """Creating context menu:
@@ -20,8 +20,8 @@ class contextMenu():
     def __init__(self):
         self.data = {}
         self.defaultSection = 'qobuz'
-        self.color_default = getSetting('item_default_color')
-        self.color_section = getSetting('item_section_color')
+        self.color_default = theme.get('item/default/color')
+        self.color_section = theme.get('item/section/color')
         formatStr = getSetting('item_section_format')
         try:
             test = formatStr % ('plop')

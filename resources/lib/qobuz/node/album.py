@@ -91,7 +91,7 @@ class Node_album(INode):
             'title': self.get_title(),
             'album': self.get_album(),
             'comment': self.get_description(default=None),
-            'duration': self.get_duration(),
+            'duration': round(self.get_duration()),
             'discnumber': self.get_property('media_count')
         })
         item.setProperty('album_description', self.get_information())

@@ -30,8 +30,8 @@ class Progress(xbmcgui.DialogProgress):
             is_enable: bool (default: True)
     """
 
-    def __init__(self, is_enable=False):
-        self.is_enable = is_enable
+    def __init__(self, enable=False):
+        self.is_enable = enable
         if self.is_enable:
             super(Progress, self).__init__()
         self.line1 = 'Working...'

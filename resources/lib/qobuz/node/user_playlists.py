@@ -46,14 +46,14 @@ class Node_user_playlists(INode):
             return None
         return int(userdata['current_playlist'])
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, *a, **ka):
         return api.get('/playlist/getUserPlaylists',
                        limit=self.limit,
                        offset=self.offset,
                        user_id=api.user_id,
                        type='last-created')
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         login = getSetting('username')
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:

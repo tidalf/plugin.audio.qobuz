@@ -105,6 +105,8 @@ def route_nfo_album(album_id=None, track_id=None):
         response = api.get('/track/get', track_id=track_id)
         if response is None:
             return http_error('NotFound')
+    if not response['description']:
+        response['description'] = ''
     response['image_default_size'] = qobuzApp.registry.get('image_default_size')
     return render_template('album.nfo.tpl', **response)
 
