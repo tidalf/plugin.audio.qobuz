@@ -18,6 +18,9 @@ class Theme(object):
             },
             'section': {
                 'color': getSetting('item_section_color')
+            },
+            'selected': {
+                'color': getSetting('item_selected_color')
             }
 
         }

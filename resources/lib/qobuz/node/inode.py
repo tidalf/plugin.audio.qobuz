@@ -105,6 +105,7 @@ class INode(object):
         self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
         self.data = data
         self.node_storage = None
+        self.user_storage = None
         self.limit = getSetting('pagination_limit')
         self.mode = self.get_parameter('mode', to='int')
 
@@ -602,15 +603,9 @@ class INode(object):
                                           mode=Mode.VIEW))
             menu.add(path='qobuz/test httpd',
                           label='Test web service', cmd=cmd, pos=11)
-            # ''' Stop scan
-            # '''
-            # cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="stop_scan",
-            #                               mode=Mode.VIEW))
-            # menu.add(path='qobuz/stop_scan',
-            #               label='Stop scan', cmd=cmd, pos=12)
 
     def get_user_storage(self):
-        if self.user_storage:
+        if self.user_storage is not None:
             return self.user_storage
         filename = os.path.join(cache.base_path,
                                 'user-%s.local' % str(api.user_id))

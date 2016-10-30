@@ -109,7 +109,7 @@ class Node_playlist(INode):
             label = '%s - %s' % (color(theme.get('item/default/color'), self.get_owner()), label)
         if self.b_is_current:
             fmt = getSetting('playlist_current_format')
-            label = fmt % (color(colorPl, label))
+            label = fmt % (color(theme.get('item/selected/color'), label))
         item = xbmcgui.ListItem(label,
                                 self.get_owner(),
                                 self.get_image(),

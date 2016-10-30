@@ -18,7 +18,7 @@ from qobuz.constants import Mode
 from qobuz.node import getNode
 from qobuz.gui.directory import Directory
 from qobuz.alarm import Notifier
-
+from qobuz.gui.bg_progress import Progress
 notifier = Notifier(title='Scanning progress')
 
 class QobuzXbmcRenderer(IRenderer):
@@ -88,31 +88,30 @@ class QobuzXbmcRenderer(IRenderer):
             debug.warn(self, "Cannot set root node ('{}')",
                        str(self.node_type))
             return False
+        progress = Progress(heading='Qobuz Scan', message=self.root.get_label())
+        progress.create()
         Dir = Directory(self.root, nodes=self.nodes, withProgress=False,
                         handle=config.app.handle, asLocalUrl=True)
-        notifier.notify('Scanning root directory: %s' % self.root.label,
-                        check=True)
         tracks = {}
-        #self.root.set_parameter('mode', Mode.SCAN)
-        # if self.root.nt & Flag.TRACK == Flag.TRACK:
-        #
-        #     self.root.fetch()
-        #     tracks[self.root.nid] = self.root
-        #
-        # else:
         def list_track(root):
+            total = 0
             predir = Directory(None, asList=True)
             findir = Directory(None, asList=True)
             if root.nt & Flag.TRACK == Flag.TRACK:
                 predir.add_node(root)
             else:
                 root.populating(predir, 3, Flag.ALL, Flag.STOPBUILD)
+            total = len(predir.nodes)
+            done = 0
+            def percent():
+                return (done / total) * 100
+            progress.update(percent(), 'Begin')
             seen = {}
             seen_tracks = {}
             for node in predir.nodes:
+                progress.update(percent(), 'Scanning', node.get_label())
+                done += 1
                 node.set_parameter('mode', Mode.SCAN)
-                notifier.notify(node.get_label(), check=True)
-                notifier.check()
                 if node.nt & Flag.TRACK == Flag.TRACK:
                     if node.nid in seen_tracks:
                         debug.info(self, 'Skip track {}', node.nid)
@@ -147,6 +146,7 @@ class QobuzXbmcRenderer(IRenderer):
             node.get_label('%a - %t (%A)') for nid, node in tracks.items()
         ])
         if ret == -1:
+            progress.close()
             return False
         for nid, track in tracks.items():
             Dir.add_node(track)
@@ -155,4 +155,5 @@ class QobuzXbmcRenderer(IRenderer):
         notifyH('Scanning results',
                 '%s items where scanned' % str(Dir.total_put),
                 mstime=3000)
+        progress.close()
         return True
