@@ -43,12 +43,9 @@ class RawApi(object):
         self.__set_s4()
 
     def _api_error_string(self, request, url='', params={}, json=''):
-        return '{reason} (code={status_code})\n' \
-                'url={url}\nparams={params}' \
-                '\njson={json}'.format(reason=request.reason, status_code=self.status_code,
-                                       url=url,
-                                       params=str(['%s: %s' % (k, v) for k, v in params.items() ]),
-                                       json=str(json))
+        return '{reason} ({status_code}): {error}'.format(reason=request.reason,
+                                                          status_code=self.status_code,
+                                                          error=self.error)
 
     def _check_ka(self, ka, mandatory, allowed=[]):
         '''Checking parameters before sending our request

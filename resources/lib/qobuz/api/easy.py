@@ -12,6 +12,7 @@
 from qobuz.cache import cache
 from qobuz.api.raw import RawApi
 from qobuz import debug
+from qobuz.gui.util import getSetting, notify_error
 
 class InvalidQuery(Exception):
     pass
@@ -30,6 +31,7 @@ class EasyApi(RawApi):
         self.cache_base_path = None
         super(EasyApi, self).__init__()
         self.is_logged = False
+        self.notify = getSetting('notify_api_error')
         """Setting default stream format to mp3
         """
         self.stream_format = 5
@@ -81,7 +83,16 @@ class EasyApi(RawApi):
         """
         for label in self.__clean_ka(xpath[0], xpath[1], **ka):
             del ka[label]
-        return getattr(self, methname)(**ka)
+        response = getattr(self, methname)(**ka)
+        if self.status_code != 200:
+            debug.info(self, 'Method: {method}/{status_code}: {error}',
+                       method=methname, error=self.error,
+                       status_code=self.status_code)
+            if self.notify:
+                notify_error('API Error/{method} {status_code}'.format(method=methname,
+                                                                       status_code=self.status_code),
+                             '{error}'.format(error=self.error))
+        return response
 
     def __clean_ka(self, endpoint, method, **ka):
         """We are removing some key that are not needed by our raw api but
