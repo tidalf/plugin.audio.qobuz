@@ -31,10 +31,12 @@ class EasyApi(RawApi):
         self.cache_base_path = None
         super(EasyApi, self).__init__()
         self.is_logged = False
-        self.notify = getSetting('notify_api_error')
-        """Setting default stream format to mp3
-        """
-        self.stream_format = 5
+        self.stream_format = 5 # default stream format: 5 == mp3
+
+    def get_notify(self):
+        return getSetting('notify_api_error', asBool=True)
+
+    notify = property(get_notify)
 
     @cache.cached
     def get(self, *a, **ka):

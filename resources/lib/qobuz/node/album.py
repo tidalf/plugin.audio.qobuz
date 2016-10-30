@@ -26,7 +26,7 @@ class Node_album(INode):
                                          data=data)
         self.nt = Flag.ALBUM
         self.image = getImage('album')
-        self.content_type = 'albums'
+        self.content_type = 'songs'
         self.is_special_purchase = False
         self.imageDefaultSize = getSetting('image_default_size')
 

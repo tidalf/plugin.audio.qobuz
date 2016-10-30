@@ -24,7 +24,7 @@ class Node_track(INode):
                                          parameters=parameters,
                                          data=data)
         self.nt = Flag.TRACK
-        self.content_type = 'songs'
+        self.content_type = 'files'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
         self.status = None

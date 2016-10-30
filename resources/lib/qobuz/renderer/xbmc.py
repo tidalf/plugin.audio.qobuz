@@ -106,7 +106,7 @@ class QobuzXbmcRenderer(IRenderer):
             if root.nt & Flag.TRACK == Flag.TRACK:
                 predir.add_node(root)
             else:
-                root.populating(predir, -1, Flag.ALL, Flag.STOPBUILD)
+                root.populating(predir, 3, Flag.ALL, Flag.STOPBUILD)
             seen = {}
             seen_tracks = {}
             for node in predir.nodes:
@@ -115,6 +115,7 @@ class QobuzXbmcRenderer(IRenderer):
                 notifier.check()
                 if node.nt & Flag.TRACK == Flag.TRACK:
                     if node.nid in seen_tracks:
+                        debug.info(self, 'Skip track {}', node.nid)
                         continue
                     seen_tracks[node.nid] = 1
                     album_id = node.get_album_id()
@@ -124,15 +125,18 @@ class QobuzXbmcRenderer(IRenderer):
                                     node, node.get_label().encode('ascii', errors='ignore'))
                         #findir.add_node(node)
                         continue
+                    if album_id in seen:
+                        debug.info(self, 'Skip album {}', album_id)
+                        continue
                     seen[album_id] = 1
                     album = getNode(Flag.ALBUM,
                                     parameters={
                                         'nid': album_id,
                                         'mode': Mode.SCAN
                                     })
-                    album.populating(findir, -1, Flag.TRACK, Flag.STOPBUILD)
+                    album.populating(findir, 1, Flag.TRACK, Flag.STOPBUILD)
                 else:
-                    node.populating(findir, -1, Flag.TRACK, Flag.STOPBUILD)
+                    node.populating(findir, 1, Flag.TRACK, Flag.STOPBUILD)
             return findir.nodes
 
         tracks.update({track.nid: track for track in list_track(self.root)})
