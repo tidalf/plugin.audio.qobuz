@@ -63,7 +63,6 @@ class User(object):
             self.error = self.api.error
             return False
         self.data = data
-        debug.info(self, 'USER DATA: {}', self.data)
         self.logged = True
         return True
 

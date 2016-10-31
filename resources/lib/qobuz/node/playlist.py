@@ -42,12 +42,9 @@ class Node_playlist(INode):
 
     def get_is_folder(self):
         count = self.get_property('tracks_count')
-        debug.info(self, 'count: {}', count)
         if count is not None and count > 0:
-            debug.info(self, 'IS FOLDER')
             return True
         items = self.get_property('tracks/items')
-        debug.info(self, 'items: {}', items)
         if items is not None and len(items) > 0:
             return True
         return False
