@@ -26,6 +26,7 @@ from qobuz.api import api
 import qobuz.gui.util as gui
 from qobuz import config
 from qobuz import debug
+from qobuz.api.user import current as user
 
 
 def is_empty(obj):
@@ -70,7 +71,7 @@ class KooliService(threading.Thread):
         while self.alive:
             if not is_authentication_set():
                 gui.notify_warn('Authentication not set', 'You need to enter credentials')
-            elif not api.is_logged:
+            elif not user.logged:
                 if not api.login(username=qobuzApp.registry.get('username'),
                     password=qobuzApp.registry.get('password')):
                     gui.notify_warn('Login failed', 'Invalid credentials')

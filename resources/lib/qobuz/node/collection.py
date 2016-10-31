@@ -10,7 +10,7 @@ from qobuz.node.inode import INode
 from qobuz.node import Flag, getNode
 from qobuz.api import api
 from qobuz import debug
-from qobuz.gui.util import getImage, getSetting, lang
+from qobuz.gui.util import getImage, lang
 
 
 dialogHeading = 'Collection'
