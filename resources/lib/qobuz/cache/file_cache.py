@@ -61,7 +61,7 @@ class FileCache(BaseCache):
         path = os.path.join(self.base_path, filename)
         if not os.path.exists(path):
             return None
-        with open(filename, 'rb') as f:
+        with open(path, 'rb') as f:
             return pickle.load(f)
         return None
 
