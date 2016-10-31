@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.gui import util
+from qobuz import config
 from qobuz.node import getNode, Flag
 from qobuz import debug
 import requests
@@ -26,8 +26,8 @@ class Node_testing(INode):
         self.label = 'Testing'
         self.content_type = 'files'
         self.api_url = 'http://{host}:{port}'.format(
-            host=util.getSetting('httpd_host'),
-            port=util.getSetting('httpd_port'))
+            host=config.app.registry.get('httpd_host'),
+            port=config.app.registry.get('httpd_port'))
 
     def add_text(self, text='n/a'):
         self.add_child(getNode(Flag.TEXT, {'label': text}))
