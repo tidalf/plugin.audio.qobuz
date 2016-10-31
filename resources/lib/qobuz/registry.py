@@ -1,5 +1,7 @@
 from os import path as P
 from qobuz import base_path, data_path
+from qobuz.util.converter import converter
+from qobuz import debug
 
 class IRegistryBackend(object):
 
@@ -53,8 +55,8 @@ class Registry(object):
         except ImportError:
             self.backend = RegistryBackend(application)
 
-    def get(self, key):
-        return self.backend.get(key)
+    def get(self, key, to='raw', default=None):
+        return getattr(converter, to)(self.backend.get(key), default=default)
 
     def set(self, key, value):
         self.backend.set(key, value)

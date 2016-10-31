@@ -40,12 +40,13 @@ class FlagEnum(object):
     TESTING = 1 << 27
     TEXT = 1 << 28
     SEARCH_RESULT = 1 << 29
+    USER = 1 << 30
 
     STOPBUILD = 1 << 100
     NONE = 1 << 101
 
     def __init__(self):
-        self.totalFlag = 29
+        self.totalFlag = 30
         self.ALL = 0
         for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
@@ -114,6 +115,8 @@ class FlagEnum(object):
             return 'testing'
         elif flag & cls.TEXT == cls.TEXT:
             return 'text'
+        elif flag & cls.USER == cls.USER:
+            return 'user'
         else:
             raise exception.InvalidFlag(repr(flag))
 

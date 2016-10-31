@@ -1,26 +1,26 @@
 from qobuz import debug
-from qobuz.gui.util import getSetting
+from qobuz import config
 
 class Theme(object):
     data = {
         'item': {
             'caution': {
-                'color': getSetting('item_caution_color')
+                'color': config.app.registry.get('item_caution_color')
             },
             'default': {
-                'color': getSetting('item_default_color')
+                'color': config.app.registry.get('item_default_color')
             },
             'public': {
-                'color': getSetting('item_public_color')
+                'color': config.app.registry.get('item_public_color')
             },
             'private': {
-                'color': getSetting('item_private_color')
+                'color': config.app.registry.get('item_private_color')
             },
             'section': {
-                'color': getSetting('item_section_color')
+                'color': config.app.registry.get('item_section_color')
             },
             'selected': {
-                'color': getSetting('item_selected_color')
+                'color': config.app.registry.get('item_selected_color')
             }
 
         }

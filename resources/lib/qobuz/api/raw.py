@@ -22,6 +22,7 @@ import copy
 
 from qobuz import exception
 from qobuz import debug
+from qobuz.api.user import current as user
 
 socket.timeout = 5
 
@@ -31,8 +32,8 @@ class RawApi(object):
         self.appid = '285473059'  # XBMC
         self.version = '0.2'
         self.baseUrl = 'http://www.qobuz.com/api.json'
-        self.user_auth_token = None
-        self.user_id = None
+        #self.user_auth_token = None
+        #self.user_id = None
         self.error = None
         self.status_code = None
         self.status = None
@@ -104,8 +105,8 @@ class RawApi(object):
         url = self._baseUrl + uri
         useToken = False if (opt and 'noToken' in opt) else True
         headers = {}
-        if useToken and self.user_auth_token:
-            headers['x-user-auth-token'] = self.user_auth_token
+        if useToken and user.get_token():
+            headers['x-user-auth-token'] = user.get_token()
         headers['x-app-id'] = self.appid
         '''DEBUG'''
         _copy_params = copy.deepcopy(params)
@@ -154,25 +155,25 @@ class RawApi(object):
             return None
         return response_json
 
-    def set_user_data(self, user_id, user_auth_token):
-        if not (user_id and user_auth_token):
-            raise exception.MissingArgument('uid|token')
-        self.user_auth_token = user_auth_token
-        self.user_id = user_id
-        self.logged_on = time()
+    # def set_user_data(self, user_id, user_auth_token):
+    #     if not (user_id and user_auth_token):
+    #         raise exception.MissingArgument('uid|token')
+    #     self.user_auth_token = user_auth_token
+    #     self.user_id = user_id
+    #     self.logged_on = time()
 
-    def logout(self):
-        self.user_auth_token = None
-        self.user_id = None
-        self.logged_on = None
+    # def logout(self):
+    #     self.user_auth_token = None
+    #     self.user_id = None
+    #     self.logged_on = None
 
     def user_login(self, **ka):
         data = self._user_login(**ka)
         if not data:
             self.logout()
             return None
-        self.set_user_data(data['user_auth_token'],
-                               data['user']['id'])
+        #self.set_user_data(data['user_auth_token'],
+                               #data['user']['id'])
         return data
 
     def _user_login(self, **ka):
@@ -224,7 +225,7 @@ class RawApi(object):
         # Any use of the API implies your full acceptance
         # of the General Terms and Conditions
         # (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
-        params = {'user_id': self.user_id, 'track_id': track_id}
+        params = {'user_id': user.get_id(), 'track_id': track_id}
         return self._api_request(params, '/track/reportStreamingStart')
 
     def track_resportStreamingEnd(self, track_id, duration):
@@ -297,7 +298,7 @@ class RawApi(object):
     def playlist_getUserPlaylists(self, **ka):
         self._check_ka(ka, ['type'], ['user_id', 'username', 'order', 'offset', 'limit'])
         if not 'user_id' in ka and not 'username' in ka:
-            ka['user_id'] = self.user_id
+            ka['user_id'] = user.get_id()
         return self._api_request(ka, '/playlist/getUserPlaylists')
 
     def playlist_addTracks(self, **ka):

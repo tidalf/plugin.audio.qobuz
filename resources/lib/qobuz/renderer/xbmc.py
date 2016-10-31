@@ -10,7 +10,7 @@ import sys
 import qobuz  # @UnresolvedImport
 from qobuz import debug
 from qobuz.renderer.irenderer import IRenderer
-from qobuz.gui.util import notifyH, getSetting, setSetting
+from qobuz.gui.util import notifyH
 from qobuz import exception
 from qobuz import config
 from qobuz.node.flag import Flag
@@ -49,7 +49,7 @@ class QobuzXbmcRenderer(IRenderer):
         from qobuz.gui.directory import Directory
         Dir = Directory(self.root, self.nodes, handle=config.app.handle,
                         withProgress=self.enable_progress, asList=self.asList)
-        if getSetting('contextmenu_replaceitems', asBool=True):
+        if config.app.registry.get('contextmenu_replaceitems', to='bool'):
             Dir.replaceItems = True
         try:
             ret = self.root.populating(Dir,
@@ -114,7 +114,6 @@ class QobuzXbmcRenderer(IRenderer):
                 node.set_parameter('mode', Mode.SCAN)
                 if node.nt & Flag.TRACK == Flag.TRACK:
                     if node.nid in seen_tracks:
-                        debug.info(self, 'Skip track {}', node.nid)
                         continue
                     seen_tracks[node.nid] = 1
                     album_id = node.get_album_id()
@@ -122,10 +121,8 @@ class QobuzXbmcRenderer(IRenderer):
                         debug.error(self,
                                     'Track without album_id: {}, label: {}',
                                     node, node.get_label().encode('ascii', errors='ignore'))
-                        #findir.add_node(node)
                         continue
                     if album_id in seen:
-                        debug.info(self, 'Skip album {}', album_id)
                         continue
                     seen[album_id] = 1
                     album = getNode(Flag.ALBUM,

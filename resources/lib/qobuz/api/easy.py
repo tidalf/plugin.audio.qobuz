@@ -12,29 +12,22 @@
 from qobuz.cache import cache
 from qobuz.api.raw import RawApi
 from qobuz import debug
-from qobuz.gui.util import getSetting, notify_error
+from qobuz.gui.util import notify_error, notify_warn
+from qobuz.api.user import current as current_user
+from qobuz.util import common
+from qobuz import config
 
 class InvalidQuery(Exception):
     pass
-
-class QobuzAccount(object):
-    def __init__(self, data=None):
-        self.data = data
-
-    def __str__(self):
-        import pprint
-        return pprint.pformat(self)
 
 class EasyApi(RawApi):
 
     def __init__(self):
         self.cache_base_path = None
         super(EasyApi, self).__init__()
-        self.is_logged = False
-        self.stream_format = 5 # default stream format: 5 == mp3
 
     def get_notify(self):
-        return getSetting('notify_api_error', asBool=True)
+        return config.app.registry.get('notify_api_error', to='bool')
 
     notify = property(get_notify)
 
@@ -87,7 +80,7 @@ class EasyApi(RawApi):
             del ka[label]
         response = getattr(self, methname)(**ka)
         if self.status_code != 200:
-            debug.info(self, 'Method: {method}/{status_code}: {error}',
+            debug.warn(self, 'Method: {method}/{status_code}: {error}',
                        method=methname, error=self.error,
                        status_code=self.status_code)
             if self.notify:
@@ -116,14 +109,10 @@ class EasyApi(RawApi):
         ::return
             True on success, else False
         """
-        self.username = self.password = None
-        data = self.get('/user/login', username=username, password=password)
-        if not data:
+        if common.is_empty(username) and common.is_empty(password):
+            return True
+        current_user.set_credentials(username, password)
+        if not current_user.login(api=self):
+            debug.error(self, 'Cannot login with current credentials')
             return False
-        self.username = username
-        self.password = password
-        u = QobuzAccount(data)
-        user = data['user']
-        self.set_user_data(user['id'], data['user_auth_token'])
-        self.is_logged = True
         return True

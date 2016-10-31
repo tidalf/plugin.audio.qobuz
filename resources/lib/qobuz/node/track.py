@@ -11,11 +11,13 @@ from qobuz.constants import Mode
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import lang, getImage, runPlugin, getSetting, containerUpdate
+from qobuz.gui.util import lang, getImage, runPlugin, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
+from qobuz.api.user import current as user
 from qobuz.theme import theme
-
+from qobuz import config
+import math
 
 class Node_track(INode):
 
@@ -42,8 +44,8 @@ class Node_track(INode):
     def make_local_url(self):
         return '{scheme}://{host}:{port}/qobuz/{album_id}/{nid}/file.mpc'.format(
                 scheme='http',
-                host=getSetting('httpd_host'),
-                port=getSetting('httpd_port'),
+                host=config.app.registry.get('httpd_host'),
+                port=config.app.registry.get('httpd_port'),
                 album_id=self.get_album_id(),
                 nid=str(self.nid))
 
@@ -102,7 +104,7 @@ class Node_track(INode):
 
     def get_image(self, size=None, type='front', default=None):
         if size is None:
-            size = getSetting('image_default_size')
+            size = config.app.registry.get('image_default_size')
         if type == 'thumbnail':
             image = self.get_property('album/image/thumbnail', default=None)
             if image is not None:
@@ -180,11 +182,7 @@ class Node_track(INode):
         return self.get_property('media_number', default=default, to='int')
 
     def get_duration(self):
-        duration = self.get_property('duration', default=None)
-        if duration is None:
-            debug.error(self, "no duration\n%s" % (pprint.pformat(self.data)))
-        return duration
-
+        return round(self.get_property('duration', default=0.0) / 60.0, 2)
 
     def get_year(self):
         date = self.get_property('album/year')
@@ -203,7 +201,7 @@ class Node_track(INode):
 
     def is_playable(self):
         streamable = self.get_property('streamable', default=None)
-        if streamable is False:
+        if streamable is False and not user.is_free_account():
             return False
         url = self.get_streaming_url()
         if not url:
@@ -227,16 +225,15 @@ class Node_track(INode):
         return default
 
     def __getFileUrl(self):
-        hires = getSetting('hires_enabled', asBool=True)
-        format_id = 6 if getSetting('streamtype') == 'flac' else 5
+        hires = config.app.registry.get('hires_enabled', to='bool')
         if hires and self.get_hires():
             format_id = 27
         if self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased:
             intent = "download"
         else:
             intent = "stream"
-        data = api.get('/track/getFileUrl', format_id=format_id,
-                       track_id=self.nid, user_id=api.user_id, intent=intent)
+        data = api.get('/track/getFileUrl', format_id=user.stream_format(),
+                       track_id=self.nid, user_id=user.get_id(), intent=intent)
         if not data:
             debug.warn(self, "Cannot get stream type for track (network problem?)")
             return None
@@ -318,22 +315,27 @@ class Node_track(INode):
             'thumb': self.get_image(),
             'icon': self.get_image(type='thumbnail')
         })
-        comment = u'''- Label: {label}
-- Description: {description}
-- Purchasable: {purchasable} / Purchased: {purchased}
-- Copyright: {copyright}
-- Popularity: {popularity}
-- Maximum sampling rate: {maximum_sampling_rate}
+        comment = u'''{description}
+- Label: {label}
+- duration: {duration} mn
+- awards: {awards}
+- articles: {articles}
+- purchasable: {purchasable} / Purchased: {purchased}
+- copyright: {copyright}
+- popularity: {popularity}
+- maximum sampling rate: {maximum_sampling_rate}
 - HiRes: {hires} / HiRes purchased: {hires_purchased}
-- Streamable: {streamable}
-- Previewable: {previewable}
-- Sampleable: {sampleable}
-- Downloadable: {downloadable}
+- streamable: {streamable}
+- previewable: {previewable}
+- sampleable: {sampleable}
+- downloadable: {downloadable}
+
 '''.format(popularity=self.get_property('popularity', default='n/a'),
+           duration=self.get_duration(),
            label=self.get_album_label(),
             copyright=self.get_property('copyright', default='n/a'),
             maximum_sampling_rate=self.get_property('maximum_sampling_rate'),
-            description=self.get_description(),
+            description=self.get_description(default=self.get_label()),
             hires=self.get_property('hires'),
             sampleable=self.get_property('sampleable'),
             downloadable=self.get_property('downloadable'),
@@ -341,7 +343,9 @@ class Node_track(INode):
             purchased=self.get_property('purchased', default=False),
             previewable=self.get_property('previewable'),
             streamable=self.get_property('streamable'),
-            hires_purchased=self.get_property('hires_purchased', default=False)
+            hires_purchased=self.get_property('hires_purchased', default=False),
+            awards=','.join([a['name'] for a in self.get_property('awards', default=[])]),
+            articles='|'.join(['%s (%s%s)' % (a['label'], a['price'], a['currency']) for a in self.get_property('articles', default=[])]),
             )
 
         item.setInfo(type='Music', infoLabels={
@@ -351,7 +355,7 @@ class Node_track(INode):
                      'genre': self.get_genre(),
                      'artist': self.get_album_artist(),
                      'tracknumber': self.get_track_number(default=0),
-                     'duration': round(self.get_duration()),
+                     'duration': self.get_property('duration'),
                      'year': self.get_year(),
                      'rating': str(self.get_popularity()),
         })
@@ -359,6 +363,7 @@ class Node_track(INode):
         item.setProperty('album_description', comment)
         item.setProperty('album_style', self.get_genre())
         item.setProperty('album_label', self.get_property('album/label/name'))
+        item.setProperty('Role.Composer', self.get_property('album/composer/name'))
         item.setProperty('DiscNumber', str(self.get_media_number(default=1)))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)

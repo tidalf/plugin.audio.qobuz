@@ -12,7 +12,6 @@ import xbmcgui  # @UnresolvedImport
 import qobuz  # @UnresolvedImport
 from qobuz import debug
 from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
-from qobuz.gui.util import getSetting
 from qobuz.node import Flag, getNode
 from qobuz import config
 
@@ -74,7 +73,7 @@ class QobuzPlayer(xbmc.Player):
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id)
         """Notify
         """
-        if getSetting('notification_playingsong', asBool=True):
+        if config.app.registry.get('notification_playingsong', to='bool'):
             notify_restriction(track)
             notifyH(lang(30132), track.get_label(), image=track.get_image())
 

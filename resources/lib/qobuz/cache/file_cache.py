@@ -20,7 +20,7 @@ import os
 from qobuz.cache.base_cache import BaseCache
 from qobuz.util.file import RenamedTemporaryFile, unlink
 from qobuz.util.hash import hashit
-
+from qobuz import debug
 
 class FileCache(BaseCache):
 
@@ -71,6 +71,5 @@ class FileCache(BaseCache):
     def delete(self, key, *a, **ka):
         filename = self._make_path(key)
         if not os.path.exists(filename):
-            print "Cache file doesn't exist %s" % (filename)
             return False
         return unlink(filename)

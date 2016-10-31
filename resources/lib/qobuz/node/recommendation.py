@@ -10,7 +10,7 @@
 from qobuz.api import api
 from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
-from qobuz.gui.util import getSetting, lang, getImage
+from qobuz.gui.util import lang, getImage
 from qobuz import debug
 
 RECOS_TYPE_IDS = {
@@ -60,6 +60,7 @@ class Node_recommendation(INode):
         self.genre_id = self.get_parameter('genre-id', default=None)
         self.genre_type = self.get_parameter('genre-type', default=None)
         self.set_label(lang(30084))
+        self.content_type = 'files'
 
     def make_url(self, **ka):
         if self.genre_type is not None:

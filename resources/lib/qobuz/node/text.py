@@ -19,5 +19,7 @@ class Node_text(INode):
                                                data=data)
         self.nt = Flag.TEXT
         self.label = self.get_parameter('label')
+        self.label2 = self.get_parameter('label2')
+        self.image = self.get_parameter('image')
         self.is_folder = False
         self.content_type = 'files'

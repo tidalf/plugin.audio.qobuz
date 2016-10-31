@@ -14,7 +14,7 @@ from qobuz import debug
 from qobuz.dog import dog
 from qobuz.node import Flag
 from qobuz import exception
-from qobuz.gui.util import dialogLoginFailure, getSetting, containerRefresh
+from qobuz.gui.util import dialogLoginFailure, containerRefresh
 from qobuz.gui.util import dialogServiceTemporarilyUnavailable
 import qobuz.config as config
 from qobuz.cache import cache
@@ -64,14 +64,12 @@ class MinimalBootstrap(object):
 
     def bootstrap_registry(self):
         from qobuz.api import api
-        api.stream_format = 6 if getSetting('streamtype') == 'flac' else 5
-        if not api.login(getSetting('username'), getSetting('password')):
+        if not api.login(config.app.registry.get('username'),
+                         config.app.registry.get('password')):
             if api.status_code == 503:
                 dialogServiceTemporarilyUnavailable()
             else:
                 dialogLoginFailure()
-            #@TODO sys.exit killing XBMC? FRODO BUG ?
-            # sys.exit(1)
             containerRefresh()
             raise exception.InvalidLogin(None)
 
@@ -125,7 +123,7 @@ class MinimalBootstrap(object):
             self.MODE = int(self.params['mode'])
         except:
             debug.warn(self, "No 'mode' parameter")
-        if getSetting('debug', asBool=True):
+        if config.app.registry.get('debug', to='bool'):
             for name in self.params:
                 debug.info(self, "Param: %s = %s (%s)" % (name,
                                 str(self.params[name]),

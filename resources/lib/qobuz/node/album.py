@@ -9,10 +9,11 @@
 import time
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import getImage, getSetting, htm2xbmc, color
+from qobuz.gui.util import getImage, color
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
 from qobuz.node import getNode, Flag
+from qobuz import config
 
 SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']
@@ -26,9 +27,9 @@ class Node_album(INode):
                                          data=data)
         self.nt = Flag.ALBUM
         self.image = getImage('album')
-        self.content_type = 'songs'
+        self.content_type = 'albums'
         self.is_special_purchase = False
-        self.imageDefaultSize = getSetting('image_default_size')
+        self.imageDefaultSize = config.app.registry.get('image_default_size')
 
     def get_nid(self):
         return super(Node_album, self).get_nid()
@@ -91,7 +92,7 @@ class Node_album(INode):
             'title': self.get_title(),
             'album': self.get_album(),
             'comment': self.get_description(default=None),
-            'duration': round(self.get_duration()),
+            'duration': self.get_duration(),
             'discnumber': self.get_property('media_count')
         })
         item.setProperty('album_description', self.get_information())
@@ -102,11 +103,44 @@ class Node_album(INode):
         return item
 
     def get_information(self):
-        txt = ''
-        description = self.get_description(default=None)
-        if description is not None:
-            txt += 'description: %s' % description
-        return txt
+        return u'''{description}
+- popularity: {popularity}
+- duration: {duration} mn
+- previewable: {previewable}
+- streamable: {streamable}
+- media_count: {media_count}
+- purchasable: {purchasable}
+- released_at: {released_at}
+- tracks_count: {tracks_count}
+- displayable: {displayable}
+- label: {label}
+- downloadable: {downloadable}
+- hires: {hires}
+- sampleable: {sampleable}
+- awards: {awards}
+- genre: {genre}
+- articles: {articles}
+- artist: {artist}
+- maximum_sampling_rate: {maximum_sampling_rate}
+        '''.format(popularity=self.get_property('popularity'),
+                   description=self.get_property('description', default=self.get_label()),
+                   duration=round(self.get_property('duration', default=0.0) / 60.0, 2),
+                   previewable=self.get_property('previewable'),
+                   streamable=self.get_property('streamable'),
+                   media_count=self.get_property('media_count'),
+                   purchasable=self.get_property('purchasable'),
+                   released_at=self.get_property('released_at'),
+                   tracks_count=self.get_property('tracks_count'),
+                   displayable=self.get_property('displayable'),
+                   label=self.get_property('label/name'),
+                   downloadable=self.get_property('downloadable'),
+                   hires=self.get_property('hires'),
+                   sampleable=self.get_property('sampleable'),
+                   awards=','.join([a['name'] for a in self.get_property('awards', default=[])]),
+                   genre=self.get_property('genre/name'),
+                   articles='|'.join(['%s (%s%s)' % (a['label'], a['price'], a['currency']) for a in self.get_property('articles', default=[])]),
+                   artist=self.get_artist(),
+                   maximum_sampling_rate=self.get_property('maximum_sampling_rate'))
 
     def get_artist(self):
         return self.get_property(['artist/name',
@@ -157,10 +191,7 @@ class Node_album(INode):
         return year
 
     def get_description(self, default='n/a'):
-        txt = self.get_property('description', default=None)
-        if txt is not None:
-            return htm2xbmc(txt)
-        return default
+        return self.get_property('description', default=None, to='htm2xbmc')
 
     def get_duration(self):
-        return self.get_property('duration')
+        return self.get_property('duration', default=None, to='math_floor')

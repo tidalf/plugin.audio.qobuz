@@ -16,7 +16,7 @@ class InvalidParameter(QobuzError):
 class MissingParameter(QobuzError):
     pass
 
-class MissingAgument(QobuzError):
+class MissingArgument(QobuzError):
     pass
 
 class InvalidFlag(QobuzError):

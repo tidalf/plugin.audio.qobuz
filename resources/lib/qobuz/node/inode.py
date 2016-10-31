@@ -14,12 +14,13 @@ import weakref
 import random
 
 from qobuz.api import api
+from qobuz.api.user import current as current_user
 from qobuz.cache import cache
 from qobuz.constants import Mode
 from qobuz import debug
 from qobuz import exception
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import color, lang, runPlugin, containerUpdate, getSetting
+from qobuz.gui.util import color, lang, runPlugin, containerUpdate
 from qobuz.gui.util import getImage
 from qobuz.node import Flag
 from qobuz.node import getNode
@@ -30,40 +31,9 @@ from qobuz import config
 from qobuz.util import data as dataUtil
 from qobuz.util import common
 from qobuz.theme import theme
+from qobuz.util.converter import converter
+from qobuz import config
 
-class Converter(object):
-
-    def raw(self, data, default=None):
-        return data
-
-    def string(self, data, default=None):
-        if data is None:
-            return default
-        return str(data)
-
-    def int(self, data, default=None):
-        if common.is_empty(data):
-            return default
-        return int(data)
-
-    def float(self, data, default=None):
-        if common.is_empty(data):
-            return default
-        return float(data)
-    def bool(self, data, default=None):
-        return common.input2bool(data)
-
-    def unquote(self, data, default=None):
-        if data is None:
-            return default
-        return urllib.unquote_plus(data)
-
-    def quote(self, data, default=None):
-        if data is None:
-            return default
-        return urllib.quote_plus(data)
-
-converter = Converter()
 _paginated = ['albums', 'labels', 'tracks', 'artists',
                      'playlists', 'playlist', 'public_playlists', 'genres']
 class INode(object):
@@ -74,8 +44,8 @@ class INode(object):
                 result in self.data
             - _build_down: If pre_build_down return true, parse data
                 and populate our node with childs
-        The main build_down method is responsible for the logic flow (recursive,
-            depth, whiteFlag, blackFlag...)
+        The main build_down method is responsible for the logic flow
+        (recursive, depth, whiteFlag, blackFlag...)
     '''
 
     def __init__(self, parent=None, parameters={}, data=None):
@@ -99,14 +69,15 @@ class INode(object):
         self.is_folder = True
         self.pagination_next = None
         self.pagination_prev = None
-        self.offset = self.get_parameter('offset') or 0
+        self.offset = self.get_parameter('offset', default=0)
         self.hasWidget = False
         self.user_storage = None
-        self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
+        self.nid = self.get_parameter('nid', default=None) \
+            or self.get_property('id', default=None)
         self.data = data
         self.node_storage = None
         self.user_storage = None
-        self.limit = getSetting('pagination_limit')
+        self.limit = config.app.registry.get('pagination_limit', to='int')
         self.mode = self.get_parameter('mode', to='int')
 
     def set_nid(self, value):
@@ -206,7 +177,6 @@ class INode(object):
         root = self.data
         for i in range(0, len(xPath)):
             if not xPath[i] in root:
-                #debug.warn(self, 'Invalid property path {} in {}', path, xPath[i])
                 return None
             root = root[xPath[i]]
             if common.is_empty(root):
@@ -268,8 +238,8 @@ class INode(object):
     def get_parameter(self, name, default=None, to='raw'):
         '''Getting parameter by name
         @param name: parameter name
-        @param default=None: value set when parameter not found or value is None
-        @param to='raw': string, converter used (raw is returning value unchanged)
+        @param default: value set when parameter not found or value is None
+        @param to='raw': string, converter used
         '''
         if self.parameters is None:
             return getattr(converter, to)(default)
@@ -277,7 +247,6 @@ class INode(object):
             return getattr(converter, to)(default)
         value = self.parameters[name]
         if value is None:
-            debug.warn(self, '{} value is None', name)
             return getattr(converter, to)(default)
         return getattr(converter, to)(value)
 
@@ -377,7 +346,8 @@ class INode(object):
         if self.data is not None:
             for name in ['images300', 'images150', 'images']:
                 if name in self.data and len(self.data[name]) > 0:
-                    return self.data[name][random.randrange(len(self.data[name]))]
+                    return self.data[name][
+                        random.randrange(len(self.data[name]))]
         return self.get_property('image')
 
     def set_image(self, image):
@@ -444,15 +414,16 @@ class INode(object):
         required
         """
         if self.pagination_next:
-            colorItem = getSetting('color_item')
+            colorItem = theme.get('item/default/color')
             params = config.app.bootstrap.params
             params['offset'] = self.pagination_next_offset
             params['nid'] = self.nid
             node = getNode(self.nt, params)
             node.data = self.data
-            node.label = u'{label} [{next_offset} / {pagination_total}]'.format(label=self.get_label(),
-                                    next_offset=self.pagination_next_offset,
-                                    pagination_total=self.pagination_total)
+            node.label = u'{label} [{next_offset} / {pagination_total}]'.format(
+                label=self.get_label(),
+                next_offset=self.pagination_next_offset,
+                pagination_total=self.pagination_total)
             node.label2 = u'[ {} / {} ]'.format(self.pagination_next_offset,
                                                 self.pagination_total)
             self.add_child(node)
@@ -528,8 +499,6 @@ class INode(object):
                      label='Remove %s' % (self.get_label()),
                      cmd=runPlugin(url), color=colorCaution)
         wf = ~Flag.USERPLAYLISTS
-#        if self.parent:
-#            wf = wf and self.parent.nt & (~Flag.USERPLAYLISTS)
         if wf:
             ''' PLAYLIST '''
             cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
@@ -562,13 +531,6 @@ class INode(object):
             menu.add(path='playlist/add_as_new',
                           label=lang(30082), cmd=cmd)
 
-#            ''' Show playlist '''
-#            if not (self.nt ^ Flag.USERPLAYLISTS != Flag.USERPLAYLISTS):
-#                cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
-#                                    id='', mode=Mode.VIEW))
-#                menu.add(path='playlist/show',
-#                          label=lang(30162), cmd=cmd)
-
         ''' PLAYLIST / CREATE '''
         cFlag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
         if self.nt | cFlag == cFlag:
@@ -580,7 +542,7 @@ class INode(object):
         cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
         menu.add(path='qobuz/big_dir',
                  label=lang(30158), cmd=cmd)
-        if getSetting('enable_scan_feature', asBool=True):
+        if config.app.registry.get('enable_scan_feature', to='bool'):
             ''' SCAN
             '''
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN,
@@ -608,7 +570,7 @@ class INode(object):
         if self.user_storage is not None:
             return self.user_storage
         filename = os.path.join(cache.base_path,
-                                'user-%s.local' % str(api.user_id))
+                                'user-%s.local' % str(current_user.get_id()))
         self.user_storage = _Storage(filename)
         return self.user_storage
 
@@ -626,17 +588,25 @@ class INode(object):
         return self.__class__.__name__
 
     def as_dict(self):
-        return {k: getattr(self, 'get_%s' % k)() for k in ['class_name', 'nid', 'parent']}
+        return {k: getattr(self, 'get_%s' % k)() for k in ['class_name', 'nid',
+                                                           'parent']}
 
     def __str__(self):
         return '<{class_name} nid={nid}>'.format(**self.as_dict())
 
+    def get_node_storage_path(self):
+        return os.path.join(cache.base_path, self._get_node_storage_filename())
+
     def get_node_storage(self):
         if self.node_storage is not None:
             return self.node_storage
-        path = os.path.join(cache.base_path, self._get_node_storage_filename())
-        self.node_storage = _Storage(path)
+        self.node_storage = _Storage(self.get_node_storage_path())
         return self.node_storage
+
+    def remove_node_storage(self):
+        filename = self.get_node_storage_path()
+        if os.path.exists(filename):
+            os.unlink(filename)
 
     def _get_node_storage_filename(self):
         raise NotImplmentedError()
@@ -647,14 +617,16 @@ class INode(object):
             os.unlink(path)
 
     def get_image_from_storage(self):
-        desired_size = getSetting('image_default_size', default=None)
+        desired_size = config.app.registry.get('image_default_size',
+                                               default=None)
         images = []
         if self.nid is not None:
             storage = self.get_node_storage()
             if storage is not None:
                 images_len = 0
                 if 'image' not in storage:
-                    images = dataUtil.list_image(self.data, desired_size=desired_size)
+                    images = dataUtil.list_image(self.data,
+                                                 desired_size=desired_size)
                     images_len = len(images)
                     if images_len > 0:
                         storage['image'] = images

@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.gui.util import getImage, getSetting, lang
+from qobuz.gui.util import getImage, lang
 from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.node.recommendation import RECOS_TYPE_IDS

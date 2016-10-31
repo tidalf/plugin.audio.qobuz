@@ -7,8 +7,9 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz import exception
-from qobuz.gui.util import color, getSetting
+from qobuz.gui.util import color
 from qobuz.theme import theme
+from qobuz import config
 
 class contextMenu():
     """Creating context menu:
@@ -22,7 +23,7 @@ class contextMenu():
         self.defaultSection = 'qobuz'
         self.color_default = theme.get('item/default/color')
         self.color_section = theme.get('item/section/color')
-        formatStr = getSetting('item_section_format')
+        formatStr = config.app.registry.get('item_section_format')
         try:
             test = formatStr % ('plop')
         except:

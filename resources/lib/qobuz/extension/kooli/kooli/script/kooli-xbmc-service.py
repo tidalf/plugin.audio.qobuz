@@ -2,8 +2,10 @@ import sys
 import os
 from os import path as P
 import time
-import requests
 import errno
+import traceback
+import threading
+import requests
 base_path = P.abspath(P.dirname(__file__))
 try:
   import kooli
@@ -14,17 +16,17 @@ from kooli import qobuz_lib_path
 path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask', 'lib')
 sys.path.append(path)
 
+from flask import request
+import xbmc
 from kooli.application import application, shutdown_server, qobuzApp
 from kooli import log
 from kooli.monitor import Monitor
-import xbmc
-from qobuz.gui.util import getSetting, notify_warn
+from qobuz.gui.util import notify_warn
 from qobuz.api import api
 import qobuz.gui.util as gui
+from qobuz import config
 from qobuz import debug
-from flask import request
-import traceback
-import threading
+
 
 def is_empty(obj):
     if obj is None:
@@ -35,14 +37,14 @@ def is_empty(obj):
     return False
 
 def is_authentication_set():
-    username = gui.getSetting('username')
-    password = gui.getSetting('password')
+    username = config.app.registry.get('username')
+    password = config.app.registry.get('password')
     if not is_empty(username) and not is_empty(password):
         return True
     return False
 
 def is_service_enable():
-    return gui.getSetting('enable_scan_feature', asBool=True)
+    return config.app.registry.get('enable_scan_feature', to='bool')
 
 @application.before_request
 def shutdown_request():

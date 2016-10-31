@@ -9,7 +9,7 @@
 from qobuz import debug
 from qobuz.node.inode import INode
 from qobuz import exception
-from qobuz.gui.util import lang, getImage, getSetting
+from qobuz.gui.util import lang, getImage
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 
@@ -57,7 +57,6 @@ class Node_search(INode):
         return super(Node_search, self).get_label()
 
     def set_search_type(self, search_type):
-        search_type = self.get_parameter('search-type')
         if search_type is None:
             self.set_parameter('search-type', 'albums')
             search_type = self.get_parameter('search-type')

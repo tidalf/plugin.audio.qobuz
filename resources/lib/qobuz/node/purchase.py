@@ -10,8 +10,8 @@ from qobuz.node.inode import INode
 from qobuz import debug
 from qobuz.api import api
 from qobuz.node import Flag, getNode
-from qobuz.gui.util import lang, getImage, getSetting
-
+from qobuz.gui.util import lang, getImage
+from qobuz.api.user import current as user
 
 class Node_purchase(INode):
     '''Displaying product purchased by user (track and album)
@@ -39,7 +39,7 @@ class Node_purchase(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         return api.get('/purchase/getUserPurchases', limit=self.limit,
-                       offset=self.offset, user_id=api.user_id)
+                       offset=self.offset, user_id=user.get_id())
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         wanted = ['albums', 'tracks']

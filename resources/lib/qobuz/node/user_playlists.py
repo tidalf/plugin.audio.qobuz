@@ -6,12 +6,14 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import os
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import lang, getImage, getSetting
+from qobuz.gui.util import lang, getImage
 from qobuz.api import api
-import os
+from qobuz.api.user import current as user
+from qobuz import config
 
 class Node_user_playlists(INode):
 
@@ -23,8 +25,9 @@ class Node_user_playlists(INode):
         self.label = lang(30021)
         self.image = getImage('userplaylists')
         self.content_type = 'albums'
-        display_cover = getSetting('userplaylists_display_cover', asBool=True)
-        self.display_product_cover = display_cover
+        self.display_product_cover = config.app.registry.get(
+            'userplaylists_display_cover',
+            to='bool')
 
     def set_display_by(self, dtype):
         vtype = ('product', 'songs')
@@ -50,17 +53,17 @@ class Node_user_playlists(INode):
         return api.get('/playlist/getUserPlaylists',
                        limit=self.limit,
                        offset=self.offset,
-                       user_id=api.user_id,
+                       user_id=user.get_id(),
                        type='last-created')
 
     def populate(self, *a, **ka):
-        login = getSetting('username')
+        login = config.app.registry.get('username')
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
             node = getNode(Flag.PLAYLIST, data=data)
             if cid and cid == node.nid:
                 node.set_is_current(True)
-            if node.get_owner() == login:
+            if node.get_owner() == user.username:
                 node.set_is_my_playlist(True)
             self.add_child(node)
         return True if len(self.data['playlists']['items']) > 0 else False

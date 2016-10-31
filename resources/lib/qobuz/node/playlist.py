@@ -12,10 +12,11 @@ import xbmcgui  # @UnresolvedImport
 from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.api import api
+from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz import debug
 from qobuz.renderer import renderer
-from qobuz.gui.util import notify_warn, notify_error, notify_log, getSetting
+from qobuz.gui.util import notify_warn, notify_error, notify_log
 from qobuz.gui.util import color, lang, getImage, runPlugin, executeBuiltin
 from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
@@ -37,9 +38,26 @@ class Node_playlist(INode):
         self.is_my_playlist = False
         self.content_type = 'albums'
 
+    def get_is_folder(self):
+        count = self.get_property('tracks_count')
+        debug.info(self, 'count: {}', count)
+        if count is not None and count > 0:
+            debug.info(self, 'IS FOLDER')
+            return True
+        items = self.get_property('tracks/items')
+        debug.info(self, 'items: {}', items)
+        if items is not None and len(items) > 0:
+            return True
+        return False
+
+    def set_is_folder(self, value):
+        pass
+
+    is_folder = property(get_is_folder, set_is_folder)
+
     def _get_node_storage_filename(self):
         return u'userdata-{user_id}-playlist-{nid}.local'.format(
-            user_id=api.user_id,
+            user_id=user.get_id(),
             nid=self.nid)
 
     def get_label(self, default=None):
@@ -108,7 +126,7 @@ class Node_playlist(INode):
         if not self.is_my_playlist:
             label = '%s - %s' % (color(theme.get('item/default/color'), self.get_owner()), label)
         if self.b_is_current:
-            fmt = getSetting('playlist_current_format')
+            fmt = config.app.registry.get('playlist_current_format')
             label = fmt % (color(theme.get('item/selected/color'), label))
         item = xbmcgui.ListItem(label,
                                 self.get_owner(),
@@ -120,11 +138,22 @@ class Node_playlist(INode):
             return None
         item.setArt({'icon': self.get_image(),
                      'thumb': self.get_image()})
+        description = u'''{description}
+- Owner: {owner}
+- Tracks: {tracks_count}
+- Public: {is_public}
+- Published: {is_published}
+- Duration : {duration} mn'''.format(
+            description=self.get_property('description', default=self.get_property('name')),
+            owner=self.get_property('owner/name', default='n/a'),
+            tracks_count=self.get_property('tracks_count'),
+            is_public=self.get_property('is_public'),
+            is_published=self.get_property('is_published'),
+            duration=round(self.get_property('duration', default=0.0) / 60.0, 2))
         item.setInfo(type='Music', infoLabels={
             'genre': ', '.join(self.get_genre()),
-            'comment': 'public: %s' % (self.get_property('is_public',
-                                                         to='string'))
         })
+        item.setProperty('album_description', description)
         item.setPath(self.make_url())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
@@ -143,14 +172,13 @@ class Node_playlist(INode):
         return True
 
     def attach_context_menu(self, item, menu):
-        login = getSetting('username')
         isOwner = True
         cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
                                             id='', mode=Mode.VIEW))
         menu.add(path='playlist', pos=1,
                  label='Playlist', cmd=cmd, mode=Mode.VIEW)
 
-        if login != self.get_property('owner/name'):
+        if user.username != self.get_property('owner/name'):
             isOwner = False
 
         if isOwner:
@@ -375,7 +403,6 @@ class Node_playlist(INode):
             notify_error(dialogHeading,
                          'Invalid playlist %s' % (str(playlist_id)))
             return False
-        login = getSetting('username')
         data = api.get('/playlist/get',
                        playlist_id=playlist_id,
                        limit=self.limit,
@@ -392,7 +419,7 @@ class Node_playlist(INode):
         if not ok:
             return False
         res = False
-        if data['owner']['name'] == login:
+        if data['owner']['name'] == user.username:
             res = api.playlist_delete(playlist_id=playlist_id)
         else:
             res = api.playlist_unsubscribe(playlist_id=playlist_id)
@@ -419,7 +446,7 @@ class Node_playlist(INode):
         upkey = cache.make_key('/playlist/getUserPlaylists',
                                limit=self.limit,
                                offset=self.offset,
-                               user_id=api.user_id)
+                               user_id=user.get_id())
         pkey = cache.make_key('/playlist/get',
                               playlist_id=playlist_id,
                               offset=self.offset,
@@ -427,3 +454,4 @@ class Node_playlist(INode):
                               extra='tracks')
         cache.delete(upkey)
         cache.delete(pkey)
+        self.remove_node_storage()

@@ -32,9 +32,5 @@ class Application(object):
     addon = property(get_addon)
 
     def start(self):
-        try:
-            self.bootstrap.init_app()
-            self.bootstrap.dispatch()
-        except exception.QobuzError as e:
-            debug.warn('[' + self.plugin.plugin_id + ']',
-                       'Exception while running plugin')
+        self.bootstrap.init_app()
+        self.bootstrap.dispatch()

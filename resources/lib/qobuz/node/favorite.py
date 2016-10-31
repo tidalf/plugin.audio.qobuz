@@ -9,13 +9,14 @@
 import xbmcgui  # @UnresolvedImport
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import lang, getSetting
+from qobuz.gui.util import lang
 from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
 from qobuz.node import getNode, Flag
 from qobuz.renderer import renderer
 from qobuz.api import api
 from qobuz import exception
 from qobuz.cache import cache
+from qobuz.api.user import current as user
 
 dialogHeading = lang(30083)
 
@@ -52,12 +53,12 @@ class Node_favorite(INode):
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type != 'all':
             return api.get('/favorite/getUserFavorites',
-                           user_id=api.user_id,
+                           user_id=user.get_id(),
                            type=self.search_type,
                            limit=self.limit,
                            offset=self.offset)
         return api.get('/favorite/getUserFavorites',
-                        user_id=api.user_id,
+                        user_id=user.get_id(),
                         limit=self.limit,
                         offset=self.offset)
 
@@ -276,16 +277,15 @@ class Node_favorite(INode):
         return True
 
     def _delete_cache(self):
-        limit = getSetting('pagination_limit')
         keys = []
         keys.append(cache.make_key('/favorite/getUserFavorites',
-                                   user_id=api.user_id,
-                                   limit=limit,
+                                   user_id=user.get_id(),
+                                   limit=self.limit,
                                    offset=self.offset))
         for kind in ['artists', 'albums', 'tracks']:
             keys.append(cache.make_key('/favorite/getUserFavorites',
-                                       user_id=api.user_id,
-                                       limit=limit,
+                                       user_id=user.get_id(),
+                                       limit=self.limit,
                                        type=kind,
                                        offset=self.offset))
         ret = False
@@ -342,5 +342,5 @@ class Node_favorite(INode):
 
     def _get_node_storage_filename(self):
         return u'userdata-{user_id}-favorite-{nid}.local'.format(
-            user_id=api.user_id,
+            user_id=user.get_id(),
             nid=self.nid)

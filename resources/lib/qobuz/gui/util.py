@@ -32,11 +32,6 @@ from qobuz.xbmcrpc import showNotification, getInfoLabels
 from qobuz import config
 from qobuz import debug
 from qobuz.util import common as commonUtil
-def htm2xbmc(htm):
-    def replace(m):
-        return '[' + m.group(1) + m.group(2).upper() + ']'
-    return re.sub('<(/?)(i|b)>', replace, htm, re.IGNORECASE)
-
 
 def getImage(name):
     if name is None:
@@ -112,14 +107,16 @@ def dialogServiceTemporarilyUnavailable():
 def isFreeAccount():
     """Check if account if it's a Qobuz paid account
     """
-    from qobuz.api import api
-    data = api.get('/user/login', username=api.username,
-                   password=api.password)
-    if not data:
-        return True
-    if not data['user']['credential']['id']:
-        return True
-    return False
+    from qobuz.api.user import current
+    return current.is_free_account()
+    # from qobuz.api import api
+    # data = api.get('/user/login', username=user.username,
+    #                password=user.password)
+    # if not data:
+    #     return True
+    # if not data['user']['credential']['id']:
+    #     return True
+    # return False
 
 
 def dialogFreeAccount():
@@ -200,27 +197,20 @@ def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
 
 
-def setSetting(key, value):
-    config.app.registry.set(key, value)
-
-def getSetting(key, default='', asInt=False, asBool=False, asList=False, sep=' '):
-    """Helper to access xbmcaddon.getSetting
-    @param_pos key: Key to retrieve from setting
-    @param_kwa default: When vlaue from addon is None or ''
-    @param_kwa asBool : Return value converted to bool
-    @param_kwa asInt  : Return value converted to int
-    @param_kwa asList : Return value splited with sep keyword
-    @param_kwa sep    : Separator field for asList
-    """
-    value = config.app.registry.get(key) #addon.getSetting(key)
-    if value is None or value == '':
-        return default
-    if asBool is True:
-        value = commonUtil.input2bool(value)
-    elif asInt is True:
-        value = int(value)
-    elif asList is True:
-        value = value.split(sep)
-    if value is None or value == '':
-         return default
-    return value
+# def setSetting(key, value):
+#     config.app.registry.set(key, value)
+#
+# def getSetting(key, default='', to='raw', sep=' ', asList=False):
+#     """Helper to access xbmcaddon.getSetting
+#     @param_pos key: Key to retrieve from setting
+#     @param_kwa default: When vlaue from addon is None or ''
+#     @param_kwa to='raw': convert value (raw is returning value unchanged)
+#     @param_kwa asList : Return value splited with sep keyword
+#     @param_kwa sep    : Separator field for asList
+#     """
+#     value = config.app.registry.get(key, to=to, default=None) #addon.getSetting(key)
+#     if value is None:
+#          return default
+#     if asList is True and value is not None:
+#         value = value.split(sep)
+#     return value

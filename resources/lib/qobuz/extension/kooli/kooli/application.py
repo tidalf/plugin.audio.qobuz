@@ -17,13 +17,13 @@ qobuzApp.bootstrap.init_app()
 kooli_tpl = P.join(kooli_path, 'tpl')
 application = Flask(__name__, template_folder=kooli_tpl)
 
-from qobuz.gui.util import getSetting
 from werkzeug import exceptions
 from flask import make_response, render_template
 from functools import wraps, update_wrapper
 from datetime import datetime
 from qobuz.node import getNode, Flag
 from qobuz.gui.directory import Directory
+from qobuz import config
 
 def nocache(view):
     @wraps(view)
@@ -41,7 +41,7 @@ def http_error(name):
     return getattr(exceptions, name)()
 
 def get_format_id(default=3):
-    stream_type = getSetting('streamtype')
+    stream_type = config.app.registry.get('streamtype')
     if stream_type == 'flac':
         return 5
     elif stream_type == 'mp3':

@@ -31,3 +31,8 @@ def is_empty(value):
     if value is None or value == '':
         return True
     return False
+
+def htm2xbmc(htm):
+    def replace(m):
+        return '[' + m.group(1) + m.group(2).upper() + ']'
+    return re.sub('<(/?)(i|b)>', replace, htm, re.IGNORECASE)

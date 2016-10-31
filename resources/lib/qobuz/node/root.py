@@ -7,12 +7,19 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.gui.util import getSetting, setSetting, executeBuiltin, lang
+from qobuz.gui.util import executeBuiltin, lang
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
 from qobuz.node import getNode, Flag
 from qobuz import debug
 from qobuz.gui.util import yesno, notifyH, getImage
+from qobuz.api.user import current as current_user
+from qobuz import config
+
+def makeSubscriptionNode():
+    return getNode(Flag.TEXT, parameters={
+                'label': '(Free Account / Subscribe on qobuz.com)',
+                'image': 'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'})
 
 class Node_root(INode):
     '''Our root node, we are displaying all qobuz nodes from here
@@ -26,25 +33,29 @@ class Node_root(INode):
         self.label = 'Qobuz'
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        self.add_child(getNode(Flag.USERPLAYLISTS))
-        if getSetting('show_recommendations', asBool=True):
+        free = current_user.is_free_account()
+        if free:
+            self.add_child(makeSubscriptionNode())
+        if not free:
+            self.add_child(getNode(Flag.USER))
+            self.add_child(getNode(Flag.USERPLAYLISTS))
+        if config.app.registry.get('show_recommendations', to='bool'):
             self.add_child(getNode(Flag.RECOMMENDATION))
-        self.add_child(getNode(Flag.PURCHASES))
-        self.add_child(getNode(Flag.FAVORITES))
-        if getSetting('search_enabled', asBool=True):
-            search = getNode(Flag.SEARCH, parameters={'search-type': 'albums'})
-            self.add_child(search)
-            search = getNode(Flag.SEARCH, parameters={'search-type': 'tracks'})
-            self.add_child(search)
-            search = getNode(Flag.SEARCH, parameters={'search-type': 'artists'})
-            self.add_child(search)
-            collections = getNode(Flag.COLLECTIONS)
-            self.add_child(collections)
-        self.add_child(getNode(Flag.FRIENDS))
+        if not free:
+            self.add_child(getNode(Flag.PURCHASES))
+            self.add_child(getNode(Flag.FAVORITES))
+        if config.app.registry.get('search_enabled', to='bool'):
+            self.add_child(getNode(Flag.SEARCH, parameters={'search-type': 'albums'}))
+            self.add_child(getNode(Flag.SEARCH, parameters={'search-type': 'tracks'}))
+            self.add_child(getNode(Flag.SEARCH, parameters={'search-type': 'artists'}))
+        if not free:
+            self.add_child(getNode(Flag.COLLECTIONS))
+            self.add_child(getNode(Flag.FRIENDS))
         self.add_child(getNode(Flag.GENRE))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
         self.add_child(getNode(Flag.LABEL))
-
+        if free:
+            self.add_child(makeSubscriptionNode())
         return True
 
     def cache_remove(self):
@@ -65,6 +76,3 @@ class Node_root(INode):
         '''
         executeBuiltin('UpdateLibrary("music", "%s")' % (
             self.get_parameter('query', to='unquote')))
-
-    def stop_scan(self):
-        setSetting('scan_stop', False)

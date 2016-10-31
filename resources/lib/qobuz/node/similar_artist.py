@@ -8,8 +8,9 @@
 '''
 from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
-from qobuz.gui.util import lang, getSetting
+from qobuz.gui.util import lang
 from qobuz.api import api
+from qobuz import config
 
 
 class Node_similar_artist(INode):
@@ -32,7 +33,7 @@ class Node_similar_artist(INode):
 
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for data in self.data['artists']['items']:
-            if data['albums_count'] <= 0 and not getSetting('display_artist_without_album', asBool=True):
+            if data['albums_count'] <= 0 and not config.app.registry.get('display_artist_without_album', to='bool'):
                 continue
             artist = getNode(Flag.ARTIST, data=data)
             artist.data = artist.fetch()

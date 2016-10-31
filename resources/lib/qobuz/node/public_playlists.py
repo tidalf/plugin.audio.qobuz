@@ -8,7 +8,7 @@
 '''
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
-from qobuz.gui.util import lang, getImage, getSetting
+from qobuz.gui.util import lang, getImage
 from qobuz.api import api
 from qobuz import debug
 

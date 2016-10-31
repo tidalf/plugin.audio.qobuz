@@ -8,7 +8,6 @@
 '''
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import getSetting
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
 from qobuz.node import getNode, Flag
