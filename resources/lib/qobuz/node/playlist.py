@@ -23,6 +23,8 @@ from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
 from qobuz.util import common as util
 from qobuz.theme import theme
+from qobuz import config
+
 dialogHeading = 'Qobuz playlist'
 
 
