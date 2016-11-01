@@ -34,7 +34,7 @@ class Node_track(INode):
         self.purchased = False
 
     def fetch(self, xdir, lvl, whiteFlag, blackFlag):
-        if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
+        if blackFlag is not None and blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
             return None
         return api.get('/track/get', track_id=self.nid)
 
@@ -61,11 +61,11 @@ class Node_track(INode):
                                                 **ka)
 
     def get_label(self, fmt="%a - %t", default=None):
-        fmt = fmt.replace("%a", self.get_album_artist())
-        fmt = fmt.replace("%t", self.get_title())
-        fmt = fmt.replace("%A", self.get_album())
-        fmt = fmt.replace("%n", str(self.get_track_number()))
-        fmt = fmt.replace("%g", self.get_genre())
+        fmt = fmt.replace("%a", self.get_album_artist()) if '%a' in fmt else fmt
+        fmt = fmt.replace("%t", self.get_title()) if '%t' in fmt else fmt
+        #fmt = fmt.replace("%A", self.get_album())
+        fmt = fmt.replace("%n", str(self.get_track_number())) if '%n' in fmt else fmt
+        fmt = fmt.replace("%g", self.get_genre()) if '%g' in fmt else fmt
         return fmt
 
     def get_label2(self):
@@ -81,8 +81,8 @@ class Node_track(INode):
         album = self.get_property('album/title', default=None)
         if album is not None:
             return album
-        if self.parent and (self.parent.nt & Flag.ALBUM):
-            return self.parent.get_title()
+        if self.parent is not None and self.parent.nt & Flag.ALBUM == Flag.ALBUM:
+            return self.parent.get_title(default=u'')
         debug.warn(self, 'Track without album name: {}', self.get_label())
         return u''
 

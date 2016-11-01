@@ -158,8 +158,8 @@ class Node_album(INode):
                                   'interpreter/id',
                                   'composer/id'])
 
-    def get_title(self):
-        return self.get_property('title')
+    def get_title(self, default=None):
+        return self.get_property('title', default=default)
 
     def get_image(self, size=None):
         if not size:

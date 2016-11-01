@@ -45,7 +45,6 @@ class Converter(object):
         return common.htm2xbmc(data)
 
     def color(self, data, default=None):
-        debug.info(self, 'COLOR {}', data)
         if data is None:
             return default
         if data.startswith('#') and len(data) == 7:

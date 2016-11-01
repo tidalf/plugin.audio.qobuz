@@ -172,6 +172,8 @@ class Node_playlist(INode):
 
     def attach_context_menu(self, item, menu):
         isOwner = True
+        def c(txt):
+            return color(theme.get('menu/playlist/color'), txt)
         cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
                                             id='', mode=Mode.VIEW))
         menu.add(path='playlist', pos=1,
@@ -183,24 +185,24 @@ class Node_playlist(INode):
         if isOwner:
             url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
                                 nm='set_as_current')
-            menu.add(path='playlist/set_as_current', label=lang(30163),
+            menu.add(path='playlist/set_as_current', label=c(lang(30163)),
                      cmd=containerUpdate(url))
 
             url = self.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
-            menu.add(path='playlist/rename', label=lang(30165),
+            menu.add(path='playlist/rename', label=c(lang(30165)),
                      cmd=runPlugin(url))
             url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
                                     nm='toggle_privacy')
             menu.add(path='playlist/toggle_privacy', post=2,
-                     label='Toggle privacy',
+                     label=c('Toggle privacy'),
                      cmd=containerUpdate(url))
         elif self.parent and self.parent.nt & (Flag.ALL ^ Flag.USERPLAYLISTS):
                 url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
-                menu.add(path='playlist/subscribe', label=lang(30168),
+                menu.add(path='playlist/subscribe', label=c(lang(30168)),
                      cmd=runPlugin(url))
 
         url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
-        menu.add(path='playlist/remove', label=lang(30166),
+        menu.add(path='playlist/remove', label=c(lang(30166)),
                  cmd=runPlugin(url), color=theme.get('item/caution/color'))
         super(Node_playlist, self).attach_context_menu(item, menu)
 
@@ -395,9 +397,16 @@ class Node_playlist(INode):
         executeBuiltin(containerUpdate(url))
         return ret['id']
 
-    def gui_remove(self, playlist_id=None):
-        if not playlist_id:
+    def _get_playlist_id(self, playlist_id=None):
+        if playlist_id is None:
             playlist_id = self.nid
+        return playlist_id
+
+    def gui_set_description(self, playlist_id=None):
+        pass
+
+    def gui_remove(self, playlist_id=None):
+        playlist_id = self._get_playlist_id(playlist_id=playlist_id)
         if not playlist_id:
             notify_error(dialogHeading,
                          'Invalid playlist %s' % (str(playlist_id)))
@@ -438,14 +447,15 @@ class Node_playlist(INode):
             notify_log(lang(30183), lang(30187))
             self.delete_cache(self.nid)
             return True
-        else:
-            return False
+        return False
 
     def delete_cache(self, playlist_id):
+        """Warning: Parameter must be the same has the fetch method"""
         upkey = cache.make_key('/playlist/getUserPlaylists',
                                limit=self.limit,
                                offset=self.offset,
-                               user_id=user.get_id())
+                               user_id=user.get_id(),
+                               type='last-created')
         pkey = cache.make_key('/playlist/get',
                               playlist_id=playlist_id,
                               offset=self.offset,

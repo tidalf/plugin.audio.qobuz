@@ -38,7 +38,6 @@ class Node_user(INode):
         return user.get_property('user/avatar')
 
     def fetch(self, *a, **ka):
-        debug.info(self, 'user {}', user.data)
         return user.data
 
     def populate(self, *a, **ka):

@@ -209,13 +209,20 @@ class Node_favorite(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_tracks(qnt, qid)
         if len(nodes) == 0:
-            # ERROR: Missing translation for 3600
             notifyH(dialogHeading, lang(3600))
             return False
-        ret = xbmcgui.Dialog().select(lang(30145), [
-            node.get_label() for node in nodes
-        ])
-        if ret == -1:
+        label = lang(30145)
+        from qobuz.gui.dialog import DialogSelect
+        for node in nodes:
+            try:
+                label = node.get_label()
+                if label is not None:
+                    label = label.encode('utf8', errors='ignore')
+            except Exception as e:
+                debug.error(self, u'Error: {}', e)
+        dialog = DialogSelect(label=label,
+                              items=[node.get_label() for node in nodes])
+        if dialog.open() == -1:
             return False
         track_ids = ','.join([str(node.nid) for node in nodes])
         if not self.add_tracks(track_ids):
@@ -229,8 +236,8 @@ class Node_favorite(INode):
         track_ids = {}
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
-            node = getNode(Flag.TRACK, {'nid': qid})
-            node.fetch(None, None, None, Flag.NONE)
+            node = getNode(Flag.TRACK, parameters={'nid': qid})
+            node.data = node.fetch(None, None, None, Flag.NONE)
             track_ids[str(node.nid)] = 1
             nodes.append(node)
         else:

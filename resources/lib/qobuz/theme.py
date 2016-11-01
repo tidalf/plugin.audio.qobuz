@@ -22,7 +22,14 @@ class Theme(object):
             'selected': {
                 'color': config.app.registry.get('item_selected_color')
             }
-
+        },
+        'menu': {
+            'playlist': {
+                'color': config.app.registry.get('menu_playlist_color')
+            },
+            'favorite': {
+                'color': config.app.registry.get('menu_favorite_color')
+            }
         }
     }
     _cache = {}
