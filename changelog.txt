@@ -1,8 +1,9 @@
 1.3.0
 -----
 * Kodi 17.0-Krypton compatible
-* playlist: covers, genre list
-* library: experimental
+* Album/Track/Playlist: more tags
+* Playlist: covers, genre list
+* Feature: Library, experimental scanning
 
 1.2.1
 -----
