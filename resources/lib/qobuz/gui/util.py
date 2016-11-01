@@ -195,22 +195,3 @@ def containerSortMethod():
 
 def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
-
-
-# def setSetting(key, value):
-#     config.app.registry.set(key, value)
-#
-# def getSetting(key, default='', to='raw', sep=' ', asList=False):
-#     """Helper to access xbmcaddon.getSetting
-#     @param_pos key: Key to retrieve from setting
-#     @param_kwa default: When vlaue from addon is None or ''
-#     @param_kwa to='raw': convert value (raw is returning value unchanged)
-#     @param_kwa asList : Return value splited with sep keyword
-#     @param_kwa sep    : Separator field for asList
-#     """
-#     value = config.app.registry.get(key, to=to, default=None) #addon.getSetting(key)
-#     if value is None:
-#          return default
-#     if asList is True and value is not None:
-#         value = value.split(sep)
-#     return value
