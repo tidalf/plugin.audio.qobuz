@@ -11,7 +11,7 @@ from qobuz import debug
 from qobuz.gui.util import getImage, runPlugin, containerUpdate, lang
 from qobuz.api import api
 from qobuz.node import getNode, Flag
-
+from qobuz.api.user import current as user
 
 class Node_friends(INode):
     '''@class Node_friend_list:
@@ -40,8 +40,8 @@ class Node_friends(INode):
 
     def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
         user_data = api.get('/user/login',
-                            username=api.username,
-                            password=api.password)
+                            username=user.username,
+                            password=user.password)
         if not 'user' in user_data:
             return False
         friend_data = user_data['user']['player_settings']['friends']
@@ -52,7 +52,7 @@ class Node_friends(INode):
                            type='last-created')
         else:
             data = api.get('/playlist/getUserPlaylists',
-                           user_id=api.user_id,
+                           user_id=user.get_id(),
                            limit=self.limit, offset=self.offset,
                            type='last-created')
         if data is None:

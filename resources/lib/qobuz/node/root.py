@@ -29,7 +29,7 @@ class Node_root(INode):
         super(Node_root, self).__init__(parent=parent, parameters=parameters,
                                         data=data)
         self.nt = Flag.ROOT
-        self.content_type = 'files'
+        self.content_type = 'artists'
         self.label = 'Qobuz'
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

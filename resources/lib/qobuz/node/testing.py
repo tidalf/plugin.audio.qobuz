@@ -29,27 +29,41 @@ class Node_testing(INode):
             host=config.app.registry.get('httpd_host'),
             port=config.app.registry.get('httpd_port'))
 
-    def add_text(self, text='n/a'):
-        self.add_child(getNode(Flag.TEXT, {'label': text}))
+    def get_label(self):
+        return self.message()
 
-    def window_httpd(self):
-        def test():
-            res = None
-            try:
-                res = requests.get('%s/qobuz/ping' % self.api_url)
-            except requests.ConnectionError as e:
-                debug.error(self, 'HTTPD service not running? {}', e)
-                return False
-            if res is None:
-                return False
-            if res.status_code != 200:
-                return False
-            return True
+    def add_text(self, text='n/a'):
+        self.add_child(getNode(Flag.TEXT, parameters={'label': text}))
+
+    def fetch(self, *a, **ka):
+        res = None
+        try:
+            res = requests.get('%s/qobuz/ping' % self.api_url)
+        except requests.ConnectionError as e:
+            debug.error(self, 'HTTPD service not running? {}', e)
+        return res
+
+    def message(self):
+        out = ''
+        if config.app.registry.get('enable_scan_feature', to='bool'):
+            out += '''Web Service ({url})
+- running: {is_alive}
+Tip: You can disable/enable Qobuz addon to restart web service
+        '''.format(url=self.api_url, is_alive=self.is_alive())
+        return out
+
+    def is_alive(self):
+        if self.data is None:
+            return False
+        if self.data.status_code != 200:
+            return False
+        return True
+
+    def show_dialog(self):
         d = xbmcgui.Dialog()
-        d.ok('Web service / Kooli',
-             'Testing web service: %s' % self.api_url,
-             '- running: %s' % test(),
-             'Tip: You can disable/enable Qobuz addon to restart web service')
+        d.ok('Web service / Kooli', self.message())
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        #self._httpd_running()
+        self.add_child(getNode(Flag.TEXT,
+                               parameters={'label': self.message()}))
         return True

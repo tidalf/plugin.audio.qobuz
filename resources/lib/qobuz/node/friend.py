@@ -10,16 +10,14 @@ import json
 from qobuz.node.inode import INode
 from qobuz import debug
 from qobuz.gui.util import color, getImage, runPlugin, containerRefresh, \
-    containerUpdate, notifyH, executeBuiltin, getSetting, lang
+    containerUpdate, notifyH, executeBuiltin, lang
 from qobuz.api import api
+from qobuz.api.user import current as user
 from qobuz.cache import cache
-
 from qobuz.node import Flag, getNode
-
+from qobuz.theme import theme
 
 class Node_friend(INode):
-    '''@class Node_friend:
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_friend, self).__init__(parent=parent,
@@ -28,11 +26,9 @@ class Node_friend(INode):
         self.nt = Flag.FRIEND
         self.image = getImage('artist')
         self.set_name(self.get_parameter('query'))
-        #self.url = None
 
     def set_label(self, label):
-        colorItem = getSetting('color_item')
-        self.label = color(colorItem, label)
+        self.label = color(theme.get('item/default/color'), label)
 
     def set_name(self, name):
         self.name = name or ''
@@ -64,19 +60,18 @@ class Node_friend(INode):
         return True
 
     def create(self, name=None):
-        username = api.username
-        password = api.password
         friendpl = api.get('/playlist/getUserPlaylists',
                            username=name,
                            type='last-created')
         if not friendpl:
             return False
-        user = api.get('/user/login', username=username, password=password)
-        if user['user']['login'] == name:
+        data = api.get('/user/login', username=user.username,
+                       password=user.password)
+        if not data:
             return False
-        if not user:
+        if data['user']['login'] == name:
             return False
-        friends = user['user']['player_settings']
+        friends = data['user']['player_settings']
         if not 'friends' in friends:
             friends = []
         else:
@@ -149,7 +144,7 @@ class Node_friend(INode):
         return result
 
     def attach_context_menu(self, item, menu):
-        colorWarn = getSetting('item_caution_color')
+        colorWarn = theme.get('item/caution/color')
         url = self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
         cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm='remove'))

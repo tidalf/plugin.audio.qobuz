@@ -543,8 +543,7 @@ class INode(object):
         menu.add(path='qobuz/big_dir',
                  label=lang(30158), cmd=cmd)
         if config.app.registry.get('enable_scan_feature', to='bool'):
-            ''' SCAN
-            '''
+            ''' SCAN'''
             query = urllib.quote_plus(self.make_url(mode=Mode.SCAN,
                                                     asLocalUrl=True))
             url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan',
@@ -552,19 +551,18 @@ class INode(object):
             menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
         if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK
                       & ~Flag.PLAYLIST):
-            ''' ERASE CACHE
-            '''
+            ''' ERASE CACHE '''
             cmd = runPlugin(self.make_url(nt=Flag.ROOT, nm="cache_remove",
                                           mode=Mode.VIEW))
             menu.add(path='qobuz/erase_cache',
                           label=lang(30117), cmd=cmd,
                           color=colorCaution, pos=10)
-            ''' HTTP / Kooli
-            '''
-            cmd = runPlugin(self.make_url(nt=Flag.TESTING, nm="window_httpd",
-                                          mode=Mode.VIEW))
-            menu.add(path='qobuz/test httpd',
-                          label='Test web service', cmd=cmd, pos=11)
+            if config.app.registry.get('enable_scan_feature', to='bool'):
+                ''' HTTP / Kooli '''
+                cmd = runPlugin(self.make_url(nt=Flag.TESTING, nm="show_dialog",
+                                              mode=Mode.VIEW))
+                menu.add(path='qobuz/test httpd',
+                              label='Test web service', cmd=cmd, pos=11)
 
     def get_user_storage(self):
         if self.user_storage is not None:

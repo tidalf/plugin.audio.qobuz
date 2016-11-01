@@ -23,21 +23,41 @@ class Node_user(INode):
                                          data=data)
         self.nt = Flag.USER
         self.content_type = 'artists'
-        self.is_folder = False
+        self.is_folder = True
+        self.data = self.fetch()
 
-    def get_label(self, fmt=''):
-        return u'[{login} - {subscription}]'.format(
+    def get_label(self):
+        return u'[{subscription} - {login}]'.format(
             login=user.get_property('user/login', default='Demo'),
             country=user.get_property('user/country_code'),
             lang=user.get_property('user/language_code'),
-            subscription=user.get_property('user/credential/label', default='Free')
+            subscription=user.get_property('user/credential/description', default='Free')
         )
 
     def get_image(self):
         return user.get_property('user/avatar')
 
     def fetch(self, *a, **ka):
+        debug.info(self, 'user {}', user.data)
         return user.data
+
+    def populate(self, *a, **ka):
+        self.add_child(getNode(Flag.TESTING))
+
+    def get_description(self):
+        return u'''[{credential_description}]
+- label: {credential_label}
+- lossy_streaming: {lossy_streaming}
+- offline streaming: {offline_streaming}
+- mobile streaming: {mobile_streaming}
+- lossless streaming: {lossless_streaming}
+'''.format(credential_label=color(self.get_property('user/credential/parameters/color_scheme/logo', default='#0000FF00', to='color'),
+                                  self.get_property('user/credential/label')),
+           credential_description=self.get_property('user/credential/description'),
+           lossy_streaming=self.get_property('user/credential/parameters/lossy_streaming'),
+           offline_streaming=self.get_property('user/credential/parameters/offline_streaming'),
+           mobile_streaming=self.get_property('user/credential/parameters/mobile_streaming'),
+           lossless_streaming=self.get_property('user/credential/parameters/lossless_streaming'))
 
     def makeListItem(self, replaceItems=False):
         import xbmcgui  # @UnresolvedImport
@@ -51,9 +71,10 @@ class Node_user(INode):
             return None
         #item.setPath(self.make_url())
         item.setInfo('Music', infoLabels={
-            'Artist': user.get_property('user/login'),
-            'description': user.get_property('user/credential/description')
+            'artist': user.get_property('user/login'),
+            #'artist_description': self.get_description()
         })
+        item.setProperty('artist_description', self.get_description())
         #ctxMenu = contextMenu()
         #self.attach_context_menu(item, ctxMenu)
         #item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
