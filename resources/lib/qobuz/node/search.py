@@ -43,52 +43,40 @@ class Node_search(INode):
                                           parameters=parameters,
                                           data=data)
         self.nt = Flag.SEARCH
-        self.set_search_type(self.get_parameter('search-type'))
         self.content_type = 'albums'
+        self.search_type = self.get_parameter('search-type', default='albums')
+        self.set_parameter('search-type', self.search_type)
 
-    def get_description(self):
-        return self.get_label()
+    def make_url(self, *a, **ka):
+        ka['search-type'] = self.search_type
+        return super(Node_search, self).make_url(*a, **ka)
 
     def get_label(self):
         query = self.get_parameter('query', to='unquote')
         if query is not None:
-            return 'search %s: %s' % (self.get_parameter('search-type'),
-                                      self.get_parameter('query'))
-        return super(Node_search, self).get_label()
+            return 'search %s: %s [%s/%s]' % (self.search_type,
+                                      self.get_parameter('query'),
+                                      self.offset, self.limit)
+        return data_search_type[self.search_type]['label']
 
-    def set_search_type(self, search_type):
-        if search_type is None:
-            self.set_parameter('search-type', 'albums')
-            search_type = self.get_parameter('search-type')
-        if search_type in data_search_type:
-            self.label = data_search_type[search_type]['label']
-            self.content_type = data_search_type[search_type]['content_type']
-            self.image = data_search_type[search_type]['image']
-        else:
-            raise exception.InvalidSearchType(search_type)
+    def get_image(self):
+        return data_search_type[self.search_type]['image']
 
-    # def makeListItem(self, **ka):
-    #     #query = self.get_parameter('query', to='unquote')
-    #     #if query is not None:
-    #     #    ka['query'] = query
-    #     item = super(Node_search, self).makeListItem(**ka)
-    #     return item
-
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, *a, **ka):
         query = self.get_parameter('query', to='unquote')
         if query is None:
             from qobuz.gui.util import Keyboard
-            k = Keyboard('', self.get_parameter('search-type'))
+            k = Keyboard('', self.search_type)
             k.doModal()
             if not k.isConfirmed():
                 return None
             query = k.getText().strip()
             if query is None or query == '':
                 return None
-        self.set_parameter('query', query, quote=True)
+            self.set_parameter('query', query, quote=True)
         return api.get('/search/getResults',
                        query=query,
-                       type=self.get_parameter('search-type'),
+                       type=self.search_type,
                        limit=self.limit,
                        offset=self.offset)
 
@@ -96,29 +84,30 @@ class Node_search(INode):
     def _get_parameters(self):
         return {
             'query': self.get_parameter('query'),
-            'search-type': self.get_parameter('search-type')
+            'search-type': self.search_type
         }
 
-    def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
-        for album in self.data['albums']['items']:
+    def _populate_albums(self, *a, **ka):
+        for album in self.data[self.search_type]['items']:
             self.add_child(getNode(Flag.ALBUM,
                                    parameters=self._get_parameters(),
                                    data=album))
-        return True if len(self.data['albums']['items']) > 0 else False
+        return True if len(self.data[self.search_type]['items']) > 0 else False
 
-    def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
-        for track in self.data['tracks']['items']:
+    def _populate_tracks(self, *a, **ka):
+        for track in self.data[self.search_type]['items']:
             self.add_child(getNode(Flag.TRACK,
                                    parameters=self._get_parameters(),
                                    data=track))
-        return True if len(self.data['tracks']['items']) > 0 else False
+        return True if len(self.data[self.search_type]['items']) > 0 else False
 
-    def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
-        for artist in self.data['artists']['items']:
+    def _populate_artists(self, *a, **ka):
+        for artist in self.data[self.search_type]['items']:
             self.add_child(getNode(Flag.ARTIST,
                                    parameters=self._get_parameters(),
                                    data=artist))
-        return True if len(self.data['artists']['items']) > 0 else False
+        return True if len(self.data[self.search_type]['items']) > 0 else False
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        return getattr(self, '_populate_%s' % self.get_parameter('search-type'))(Dir, lvl, whiteFlag, blackFlag)
+    def populate(self, *a, **ka):
+        self.content_type = data_search_type[self.search_type]['content_type']
+        return getattr(self, '_populate_%s' % self.search_type)(*a, **ka)

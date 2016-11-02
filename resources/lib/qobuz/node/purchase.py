@@ -59,6 +59,9 @@ class Node_purchase(INode):
         self.content_type = 'albums'
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
+            cache = node.fetch(noRemote=True)
+            if cache is not None:
+                node.data = cache
             node.data['purchased'] = True
             self.add_child(node)
         return True if len(self.data['albums']['items']) > 0 else False

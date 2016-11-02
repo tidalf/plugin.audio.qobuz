@@ -21,8 +21,8 @@ try:
     """
     class Keyboard(xbmc.Keyboard):
 
-        def __init__(self, default, heading, hidden=True):
-            self.setHeading('Qobuz / ' + heading)
+        def __init__(self, default, heading='', hidden=True):
+            self.setHeading('Qobuz / %s' % heading)
 
 except:
     print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"

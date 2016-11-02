@@ -93,13 +93,17 @@ class Node_favorite(INode):
 
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:
-            self.add_child(getNode(Flag.ALBUM, data=album))
+            node = getNode(Flag.ALBUM, data=album)
+            cache = node.fetch(noRemote=True)
+            if cache is not None:
+                node.data = cache
+            self.add_child(node)
         return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
-            node.fetch(None, -1, None, Flag.ALL)
+            node.data = node.fetch(noRemote=True)
             self.add_child(node)
         return True if len(self.data['artists']['items']) > 0 else False
 

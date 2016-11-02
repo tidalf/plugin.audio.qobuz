@@ -14,9 +14,9 @@ from qobuz.api import api
 from qobuz.node import getNode, Flag
 
 
-def helper_album_list_genre(data):
+def helper_album_list_genre(data, default=[]):
     if 'albums' not in data:
-        return None
+        return default
     genres = {}
     for album in data['albums']['items']:
         if 'genre' not in album:
@@ -40,12 +40,16 @@ class Node_artist(INode):
         self.image = self.get_image()
         self.label = self.name
 
-    def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None):
+    def fetch(self, *a, **ka):
         return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        node_artist = getNode(Flag.ARTIST, data=self.data)
-        node_artist.label = '[ %s ]' % (node_artist.label)
+        # node = getNode(Flag.ARTIST, data=self.data)
+        # cache = node.fetch(noRemote=True)
+        # if cache is not None:
+        #     node.data = cache
+        #     self.hook_post_data()
+        # node.label = '[ %s ]' % (node.label)
         if 'albums' not in self.data:
             return False
         self.content_type = 'albums'
@@ -93,10 +97,8 @@ class Node_artist(INode):
         return self.get_property('biography/content')
 
     def makeListItem(self, replaceItems=False):
-        debug.info(self, 'data {}', self.data)
         genre = self.get_genre()
-        debug.info(self, 'genre {}', genre.encode('utf8', errors='ignore'))
-        import xbmcgui  # @UnresolvedImport
+        import xbmcgui
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),
                                 self.get_image(),
@@ -110,8 +112,6 @@ class Node_artist(INode):
             'artist': self.get_artist(),
             'genre': genre
         })
-        #item.setProperty('AlbumArtist', self.get_artist())
-        #debug.info(self, u'GENRE {}', self.get_genre())
         item.setProperty('artist_genre', genre)
         item.setProperty('artist_description', self.get_description())
         ctxMenu = contextMenu()
