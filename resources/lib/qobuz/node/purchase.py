@@ -67,7 +67,7 @@ class Node_purchase(INode):
         return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
-        self.content_type = 'songs'
+        self.content_type = 'albums'
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, data=track)
             node.data['purchased'] = True

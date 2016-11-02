@@ -41,7 +41,7 @@ class Node_favorite(INode):
         elif self.search_type == 'albums':
             pass #self.content_type = 'files'
         elif self.search_type == 'tracks':
-            self.content_type = 'songs'
+            self.content_type = 'albums'
         elif self.search_type == 'artists':
             self.content_type = 'artists'
         if self.search_type is None:
@@ -86,12 +86,12 @@ class Node_favorite(INode):
                 result = True
         return result
 
-    def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
+    def _populate_tracks(self, *a, **ka):
         for track in self.data['tracks']['items']:
             self.add_child(getNode(Flag.TRACK, data=track))
         return True if len(self.data['tracks']['items']) > 0 else False
 
-    def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
+    def _populate_albums(self, *a, **ka):
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
             cache = node.fetch(noRemote=True)
@@ -100,7 +100,7 @@ class Node_favorite(INode):
             self.add_child(node)
         return True if len(self.data['albums']['items']) > 0 else False
 
-    def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
+    def _populate_artists(self, *a, **ka):
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
             node.data = node.fetch(noRemote=True)
