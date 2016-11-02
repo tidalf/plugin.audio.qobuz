@@ -9,9 +9,20 @@
 from qobuz.node.inode import INode
 from qobuz import debug
 from qobuz.gui.contextmenu import contextMenu
+from qobuz.gui.util import getImage
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 
+
+def helper_album_list_genre(data):
+    if 'albums' not in data:
+        return None
+    genres = {}
+    for album in data['albums']['items']:
+        if 'genre' not in album:
+            continue
+        genres[album['genre']['name']] = 1
+    return genres.keys()
 
 class Node_artist(INode):
 
@@ -36,24 +47,26 @@ class Node_artist(INode):
         node_artist = getNode(Flag.ARTIST, data=self.data)
         node_artist.label = '[ %s ]' % (node_artist.label)
         if 'albums' not in self.data:
-            return True
+            return False
+        self.content_type = 'albums'
         for data in self.data['albums']['items']:
-            self.add_child(getNode(Flag.ALBUM, data=data))
+            album = getNode(Flag.ALBUM, data=data)
+            cache = album.fetch(noRemote=True)
+            if cache is not None:
+                album.data = cache
+            self.add_child(album)
         return True if len(self.data['albums']['items']) > 0 else False
 
     def get_artist_id(self):
         return self.nid
 
     def get_image(self):
-        image = self.get_property(['image/extralarge',
+        return self.get_property(['image/extralarge',
                                    'image/mega',
                                    'image/large',
                                    'image/medium',
                                    'image/small',
-                                   'picture'])
-        if image:
-            image = image.replace('126s', '_')
-        return image
+                                   'picture'], default=getImage('artist'))
 
     def get_label(self, fmt='%a (%C)'):
         fmt = fmt.replace('%a', self.get_artist())
@@ -71,15 +84,18 @@ class Node_artist(INode):
         return self.get_property('name')
 
     def get_genre(self):
-        return self.get_property('genre/name', default='n/a')
+        return ', '.join(helper_album_list_genre(self.data))
 
     def get_owner(self):
         return self.get_property('owner/name')
 
     def get_description(self):
-        return self.get_property('description')
+        return self.get_property('biography/content')
 
     def makeListItem(self, replaceItems=False):
+        debug.info(self, 'data {}', self.data)
+        genre = self.get_genre()
+        debug.info(self, 'genre {}', genre.encode('utf8', errors='ignore'))
         import xbmcgui  # @UnresolvedImport
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),
@@ -91,11 +107,13 @@ class Node_artist(INode):
             return None
         item.setPath(self.make_url())
         item.setInfo('Music', infoLabels={
-            'Artist': self.get_artist(),
-            'comment': self.get_description()
+            'artist': self.get_artist(),
+            'genre': genre
         })
-        item.setProperty('AlbumArtist', self.get_artist())
-        item.setProperty('Album_Genre', self.get_genre())
+        #item.setProperty('AlbumArtist', self.get_artist())
+        #debug.info(self, u'GENRE {}', self.get_genre())
+        item.setProperty('artist_genre', genre)
+        item.setProperty('artist_description', self.get_description())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
