@@ -137,14 +137,15 @@ class QobuzXbmcRenderer(IRenderer):
 
         tracks.update({track.nid: track for track in list_track(self.root)})
         if len(tracks.keys()) == 0:
-            return False
-        import xbmcgui
-        ret = xbmcgui.Dialog().select('Add to library?', [
-            node.get_label('%a - %t (%A)') for nid, node in tracks.items()
-        ])
-        if ret == -1:
             progress.close()
             return False
+        # import xbmcgui
+        # ret = xbmcgui.Dialog().select('Add to library?', [
+        #     node.get_label('%a - %t (%A)') for nid, node in tracks.items()
+        # ])
+        # if ret == -1:
+        #     progress.close()
+        #     return False
         for nid, track in tracks.items():
             Dir.add_node(track)
         Dir.set_content(self.root.content_type)

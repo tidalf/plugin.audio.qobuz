@@ -57,7 +57,6 @@ class Node_user_playlists(INode):
                        type='last-created')
 
     def populate(self, *a, **ka):
-        login = config.app.registry.get('username')
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
             node = getNode(Flag.PLAYLIST, data=data)

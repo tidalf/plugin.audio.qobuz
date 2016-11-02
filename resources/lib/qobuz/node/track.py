@@ -316,7 +316,7 @@ class Node_track(INode):
             'icon': self.get_image(type='thumbnail')
         })
         comment = u'''{description}
-- Label: {label}
+- label: {label}
 - duration: {duration} mn
 - awards: {awards}
 - articles: {articles}

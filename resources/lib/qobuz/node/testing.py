@@ -46,13 +46,14 @@ class Node_testing(INode):
     def message(self):
         out = ''
         if config.app.registry.get('enable_scan_feature', to='bool'):
-            out += '''Web Service ({url})
+            out += '''- endPoint: {url}
 - running: {is_alive}
 Tip: You can disable/enable Qobuz addon to restart web service
         '''.format(url=self.api_url, is_alive=self.is_alive())
         return out
 
     def is_alive(self):
+        self.data = self.fetch()
         if self.data is None:
             return False
         if self.data.status_code != 200:
@@ -61,7 +62,7 @@ Tip: You can disable/enable Qobuz addon to restart web service
 
     def show_dialog(self):
         d = xbmcgui.Dialog()
-        d.ok('Web service / Kooli', self.message())
+        d.ok('Web service', self.message())
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         self.add_child(getNode(Flag.TEXT,

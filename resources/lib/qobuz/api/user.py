@@ -59,7 +59,7 @@ class User(object):
         data = self.api.get('/user/login', username=self.username,
                        password=self.password)
         if data is None:
-            self.code = self.api.code
+            self.code = self.api.status_code
             self.error = self.api.error
             return False
         self.data = data

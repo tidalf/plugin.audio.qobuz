@@ -32,8 +32,6 @@ class RawApi(object):
         self.appid = '285473059'  # XBMC
         self.version = '0.2'
         self.baseUrl = 'http://www.qobuz.com/api.json'
-        #self.user_auth_token = None
-        #self.user_id = None
         self.error = None
         self.status_code = None
         self.status = None
@@ -155,25 +153,10 @@ class RawApi(object):
             return None
         return response_json
 
-    # def set_user_data(self, user_id, user_auth_token):
-    #     if not (user_id and user_auth_token):
-    #         raise exception.MissingArgument('uid|token')
-    #     self.user_auth_token = user_auth_token
-    #     self.user_id = user_id
-    #     self.logged_on = time()
-
-    # def logout(self):
-    #     self.user_auth_token = None
-    #     self.user_id = None
-    #     self.logged_on = None
-
     def user_login(self, **ka):
         data = self._user_login(**ka)
         if not data:
-            self.logout()
             return None
-        #self.set_user_data(data['user_auth_token'],
-                               #data['user']['id'])
         return data
 
     def _user_login(self, **ka):

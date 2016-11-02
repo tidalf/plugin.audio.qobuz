@@ -138,11 +138,11 @@ class Node_playlist(INode):
         item.setArt({'icon': self.get_image(),
                      'thumb': self.get_image()})
         description = u'''{description}
-- Owner: {owner}
-- Tracks: {tracks_count}
-- Public: {is_public}
-- Published: {is_published}
-- Duration : {duration} mn'''.format(
+- owner: {owner}
+- tracks: {tracks_count}
+- public: {is_public}
+- published: {is_published}
+- duration : {duration} mn'''.format(
             description=self.get_property('description', default=self.get_property('name')),
             owner=self.get_property('owner/name', default='n/a'),
             tracks_count=self.get_property('tracks_count'),
@@ -160,6 +160,8 @@ class Node_playlist(INode):
         return item
 
     def toggle_privacy(self):
+        if self.data is None:
+            self.data = self.fetch()
         privacy = not self.get_property('is_public', to='bool')
         res = api.playlist_update(playlist_id=self.nid, is_public=str(privacy).lower())
         if res is None:

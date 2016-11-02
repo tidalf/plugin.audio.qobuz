@@ -8,7 +8,6 @@
 '''
 app = None
 addon = None
-#debug = None
 path = None
 boot = None
 rpc = None
