@@ -40,6 +40,10 @@ class BaseCache(object):
         self.cached_function_name = f.__name__
 
         def wrapped_function(self, *a, **ka):
+            noRemote = False
+            if 'noRemote' in ka:
+                noRemote = bool(ka['noRemote'])
+                del ka['noRemote']
             that.error = 0
             key = that.make_key(*a, **ka)
             data = that.load(key, *a, **ka)
@@ -52,6 +56,8 @@ class BaseCache(object):
                     return data['data']
                 if not that.delete(key):
                     that.error = DeleteError
+            if noRemote:
+                return None
             data = f(self, *a, **ka)
             if data is None:
                 that.error &= NoData
