@@ -24,6 +24,7 @@ from qobuz.constants import Mode
 from qobuz.util import common as util
 from qobuz.theme import theme
 from qobuz import config
+from qobuz import image
 
 dialogHeading = 'Qobuz playlist'
 
@@ -116,7 +117,8 @@ class Node_playlist(INode):
                                    default=None)
         if not images:
             return None
-        return images[random.randint(0, len(images) - 1)]
+        return image.combine(self.nid, images)
+        #return images[random.randint(0, len(images) - 1)]
 
     def makeListItem(self, replaceItems=False):
         privacy_color = theme.get('item/public/color') if self.get_property('is_public', to='bool') else theme.get('item/private/color')

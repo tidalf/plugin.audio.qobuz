@@ -13,7 +13,6 @@ from qobuz.gui.util import getImage
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 
-
 def helper_album_list_genre(data, default=[]):
     if 'albums' not in data:
         return default
@@ -23,6 +22,7 @@ def helper_album_list_genre(data, default=[]):
             continue
         genres[album['genre']['name']] = 1
     return genres.keys()
+
 
 class Node_artist(INode):
 
@@ -35,7 +35,8 @@ class Node_artist(INode):
         self.content_type = 'artists'
 
     def hook_post_data(self):
-        self.nid = self.get_parameter('nid', default=None) or self.get_property('id', default=None)
+        self.nid = self.get_parameter('nid', default=None) or \
+            self.get_property('id', default=None)
         self.name = self.get_property('name')
         self.image = self.get_image()
         self.label = self.name
@@ -44,12 +45,6 @@ class Node_artist(INode):
         return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        # node = getNode(Flag.ARTIST, data=self.data)
-        # cache = node.fetch(noRemote=True)
-        # if cache is not None:
-        #     node.data = cache
-        #     self.hook_post_data()
-        # node.label = '[ %s ]' % (node.label)
         if 'albums' not in self.data:
             return False
         self.content_type = 'albums'
@@ -75,7 +70,8 @@ class Node_artist(INode):
     def get_label(self, fmt='%a (%C)'):
         fmt = fmt.replace('%a', self.get_artist())
         fmt = fmt.replace('%G', self.get_genre())
-        fmt = fmt.replace('%C', str(self.get_property('albums_count', default=0)))
+        fmt = fmt.replace('%C', str(self.get_property('albums_count',
+                                                      default=0)))
         return fmt
 
     def get_title(self):

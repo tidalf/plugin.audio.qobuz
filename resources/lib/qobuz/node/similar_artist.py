@@ -36,6 +36,8 @@ class Node_similar_artist(INode):
             if data['albums_count'] <= 0 and not config.app.registry.get('display_artist_without_album', to='bool'):
                 continue
             artist = getNode(Flag.ARTIST, data=data)
-            artist.data = artist.fetch()
+            cache = artist.fetch(noRemote=True)
+            if cache is not None:
+                artist.data = cache
             self.add_child(artist)
         return True

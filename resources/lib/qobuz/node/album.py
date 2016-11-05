@@ -7,6 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
+import xbmcgui  # @UnresolvedImport
+
 from qobuz.node.inode import INode
 from qobuz import debug
 from qobuz.gui.util import getImage, color
@@ -76,7 +78,6 @@ class Node_album(INode):
         return super(Node_album, self).make_url(**ka)
 
     def makeListItem(self, replaceItems=False):
-        import xbmcgui  # @UnresolvedImport
         image = self.get_image()
         item = xbmcgui.ListItem(
             label=self.get_label(),
@@ -102,8 +103,18 @@ class Node_album(INode):
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
+    def get_articles(self):
+        return ['%s (%s%s)' % (a['label'], a['price'], a['currency'])
+                for a in self.get_property('articles', default=[])]
+
+    def get_awards(self):
+        return ['%s (%s%s)' % (a['label'], a['price'], a['currency'])
+                for a in self.get_property('awards', default=[])]
+
     def get_information(self):
         return u'''{description}
+- awards: {awards}
+- articles: {articles}
 - popularity: {popularity}
 - duration: {duration} mn
 - previewable: {previewable}
@@ -117,9 +128,7 @@ class Node_album(INode):
 - downloadable: {downloadable}
 - hires: {hires}
 - sampleable: {sampleable}
-- awards: {awards}
 - genre: {genre}
-- articles: {articles}
 - artist: {artist}
 - maximum_sampling_rate: {maximum_sampling_rate}
         '''.format(popularity=self.get_property('popularity'),
@@ -138,7 +147,7 @@ class Node_album(INode):
                    sampleable=self.get_property('sampleable'),
                    awards=','.join([a['name'] for a in self.get_property('awards', default=[])]),
                    genre=self.get_property('genre/name'),
-                   articles='|'.join(['%s (%s%s)' % (a['label'], a['price'], a['currency']) for a in self.get_property('articles', default=[])]),
+                   articles='|'.join(self.get_articles()),
                    artist=self.get_artist(),
                    maximum_sampling_rate=self.get_property('maximum_sampling_rate'))
 

@@ -8,6 +8,7 @@
 '''
 import sys
 import os
+import xbmc
 
 from qobuz.constants import Mode
 from qobuz import debug
@@ -21,8 +22,8 @@ from qobuz.cache import cache
 from qobuz.renderer import renderer
 
 def get_checked_parameters():
-    """Parse parameters passed to xbmc plugin as sys.argv
-    """
+    '''Parse parameters passed to xbmc plugin as sys.argv
+    '''
     d = dog()
     rparam = {}
     if len(sys.argv) <= 1:
@@ -42,7 +43,7 @@ def get_checked_parameters():
                 if d.kv_is_ok(splitparams[0], splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
-                    debug.warn('[DOG]', "--- Invalid key: %s / value: %s" %
+                    debug.warn('[DOG]', '--- Invalid key: %s / value: %s' %
                          (splitparams[0], splitparams[1]))
     return rparam
 
@@ -74,8 +75,6 @@ class MinimalBootstrap(object):
             raise exception.InvalidLogin(None)
 
     def bootstrap_directories(self):
-        import xbmc  # @UnresolvedImport
-
         class PathObject ():
 
             def __init__(self):
@@ -122,10 +121,10 @@ class MinimalBootstrap(object):
         try:
             self.MODE = int(self.params['mode'])
         except:
-            debug.warn(self, "No 'mode' parameter")
+            debug.warn(self, 'No \"mode\" parameter')
         if config.app.registry.get('debug', to='bool'):
             for name in self.params:
-                debug.info(self, "Param: %s = %s (%s)" % (name,
+                debug.info(self, 'Param: %s = %s (%s)' % (name,
                                 str(self.params[name]),
                                 Flag.to_s(self.params['nt'])))
 
@@ -141,15 +140,17 @@ class MinimalBootstrap(object):
             r = renderer(self.nodeType, self.params)
             return r.run()
         elif self.MODE == Mode.VIEW_BIG_DIR:
-            r = renderer(self.nodeType, self.params)
-            r.whiteFlag = Flag.TRACK | Flag.ALBUM
-            r.depth = -1
+            r = renderer(self.nodeType,
+                         parameters=self.params,
+                         whiteFlag=Flag.TRACK|Flag.ALBUM,
+                         depth=-1)
             return r.run()
         elif self.MODE == Mode.SCAN:
-            r = renderer(self.nodeType, self.params, self.MODE)
-            r.enable_progress = False
-            r.whiteFlag = Flag.TRACK
-            r.depth = -1
+            r = renderer(self.nodeType,
+                         parameters=self.params,
+                         mode=self.MODE,
+                         whiteFlag=Flag.TRACK,
+                         depth=-1)
             return r.scan()
         else:
             raise exception.UnknownMode(self.MODE)
@@ -157,16 +158,14 @@ class MinimalBootstrap(object):
 
 
 class Bootstrap(MinimalBootstrap):
-    """Set some boot properties
+    '''Set some boot properties
     and route query based on parameters
-    """
-
+    '''
     def __init__(self, application):
         super(Bootstrap, self).__init__(application)
 
     def init_app(self):
-        """General bootstrap
-        """
+        '''General bootstrap'''
         super(Bootstrap, self).init_app()
         self.bootstrap_registry()
         self.bootstrap_sys_args()

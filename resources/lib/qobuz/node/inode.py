@@ -374,8 +374,8 @@ class INode(object):
 
     def populating(self, Dir, lvl=1, whiteFlag=Flag.ALL, blackFlag=Flag.NONE,
                    data={}):
-        if Dir.Progress.iscanceled():
-            return False
+        # if Dir.Progress.iscanceled():
+        #     return False
         if lvl != -1 and lvl < 1:
             return False
         if not (self.nt & blackFlag == self.nt):
@@ -392,8 +392,8 @@ class INode(object):
         label = self.get_label()
         self.__add_pagination_node(Dir, lvl, whiteFlag)
         for child in self.childs:
-            if Dir.is_canceled():
-                return False
+            # if Dir.is_canceled():
+            #     return False
             if child.nt & whiteFlag == child.nt:
                 if not Dir.add_node(child):
                     debug.error(self, "Could not add node")

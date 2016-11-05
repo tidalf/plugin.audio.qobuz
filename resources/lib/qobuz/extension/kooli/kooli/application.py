@@ -108,6 +108,8 @@ def route_nfo_album(album_id=None, track_id=None):
     if not response['description']:
         response['description'] = ''
     response['image_default_size'] = qobuzApp.registry.get('image_default_size')
+    if 'duration' in response:
+        response['duration'] = round(response['duration'])
     return render_template('album.nfo.tpl', **response)
 
 

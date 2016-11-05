@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
-import qobuz  # @UnresolvedImport
+import qobuz
 from qobuz import debug
 from qobuz.renderer.irenderer import IRenderer
 from qobuz.gui.util import notifyH
@@ -19,36 +19,42 @@ from qobuz.node import getNode
 from qobuz.gui.directory import Directory
 from qobuz.alarm import Notifier
 from qobuz.gui.bg_progress import Progress
+
 notifier = Notifier(title='Scanning progress')
 
 class QobuzXbmcRenderer(IRenderer):
-    """Specific renderer for Xbmc
+    '''Specific renderer for Xbmc
         Parameter:
             node_type: int, node type (node.NodeFlag)
             params: dictionary, parameters passed to our plugin
         * You can set parameter after init (see renderer.Irenderer)
-    """
+    '''
 
-    def __init__(self, node_type, params={}, mode=None, whiteFlag=Flag.ALL,
-                 blackFlag=Flag.STOPBUILD):
-        super(QobuzXbmcRenderer, self).__init__(node_type, params, mode,
+    def __init__(self, node_type,
+                 parameters={},
+                 mode=None,
+                 whiteFlag=Flag.ALL,
+                 blackFlag=Flag.STOPBUILD,
+                 depth=1):
+        super(QobuzXbmcRenderer, self).__init__(node_type,
+                                                parameters=parameters,
+                                                mode=mode,
                                                 whiteFlag=whiteFlag,
-                                                blackFlag=blackFlag)
+                                                blackFlag=blackFlag,
+                                                depth=depth)
 
     def run(self):
         '''Building our tree, creating root node based on our node_type
         '''
         if not self.set_root_node():
-            debug.warn(self, ("Cannot set root node ({}, {})") %
-                (str(self.node_type), str(self.root.get_parameter('nid'))))
+            debug.warn(self, 'Cannot set root node ({}, {})',
+                str(self.node_type),
+                str(self.root.get_parameter('nid')))
             return False
-        if self.root.hasWidget:
-            return self.root.displayWidget()
         if self.has_method_parameter():
             return self.execute_method_parameter()
-        from qobuz.gui.directory import Directory
         Dir = Directory(self.root, self.nodes, handle=config.app.handle,
-                        withProgress=self.enable_progress, asList=self.asList)
+                        withProgress=False, asList=self.asList)
         if config.app.registry.get('contextmenu_replaceitems', to='bool'):
             Dir.replaceItems = True
         try:
@@ -60,10 +66,10 @@ class QobuzXbmcRenderer(IRenderer):
             Dir.end_of_directory(False)
             Dir = None
             debug.warn(self,
-                       "Error while populating our directory: %s" % (repr(e)))
+                       'Error while populating our directory: %s' % (repr(e)))
             return False
         if not self.asList:
-            import xbmcplugin  # @UnresolvedImport
+            import xbmcplugin
             Dir.set_content(self.root.content_type)
             methods = [
                 xbmcplugin.SORT_METHOD_UNSORTED,
@@ -85,7 +91,7 @@ class QobuzXbmcRenderer(IRenderer):
         feature
         '''
         if not self.set_root_node():
-            debug.warn(self, "Cannot set root node ('{}')",
+            debug.warn(self, 'Cannot set root node ({})',
                        str(self.node_type))
             return False
         progress = Progress(heading='Qobuz Scan', message=self.root.get_label())
@@ -120,7 +126,9 @@ class QobuzXbmcRenderer(IRenderer):
                     if album_id is None or album_id == '':
                         debug.error(self,
                                     'Track without album_id: {}, label: {}',
-                                    node, node.get_label().encode('ascii', errors='ignore'))
+                                    node,
+                                    node.get_label().encode('ascii',
+                                                            errors='ignore'))
                         continue
                     if album_id in seen:
                         continue
@@ -139,13 +147,6 @@ class QobuzXbmcRenderer(IRenderer):
         if len(tracks.keys()) == 0:
             progress.close()
             return False
-        # import xbmcgui
-        # ret = xbmcgui.Dialog().select('Add to library?', [
-        #     node.get_label('%a - %t (%A)') for nid, node in tracks.items()
-        # ])
-        # if ret == -1:
-        #     progress.close()
-        #     return False
         for nid, track in tracks.items():
             Dir.add_node(track)
         Dir.set_content(self.root.content_type)

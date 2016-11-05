@@ -8,8 +8,13 @@
 '''
 from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
 from qobuz.node import Flag
+from qobuz.constants import Mode
 
-def renderer(nType, params=None, mode=None, whiteFlag=Flag.ALL,
-             blackFlag=Flag.STOPBUILD):
-    return OurRenderer(nType, params, mode, whiteFlag=whiteFlag,
-                       blackFlag=blackFlag)
+def renderer(nType,
+             parameters={},
+             mode=Mode.VIEW,
+             whiteFlag=Flag.ALL,
+             blackFlag=Flag.STOPBUILD,
+             depth=1):
+    return OurRenderer(nType, parameters=parameters, mode=mode, whiteFlag=whiteFlag,
+                       blackFlag=blackFlag, depth=depth)

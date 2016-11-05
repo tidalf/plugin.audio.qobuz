@@ -7,6 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
+import xbmcgui  # @UnresolvedImport
+
 from qobuz.constants import Mode
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node.inode import INode
@@ -17,7 +19,6 @@ from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.theme import theme
 from qobuz import config
-import math
 
 class Node_track(INode):
 
@@ -61,7 +62,8 @@ class Node_track(INode):
                                                 **ka)
 
     def get_label(self, fmt="%a - %t", default=None):
-        fmt = fmt.replace("%a", self.get_album_artist()) if '%a' in fmt else fmt
+        fmt = fmt.replace("%a", self.get_artist()) if '%a' in fmt else fmt
+        fmt = fmt.replace("%A", self.get_album_artist()) if '%A' in fmt else fmt
         fmt = fmt.replace("%t", self.get_title()) if '%t' in fmt else fmt
         #fmt = fmt.replace("%A", self.get_album())
         fmt = fmt.replace("%n", str(self.get_track_number())) if '%n' in fmt else fmt
@@ -301,7 +303,6 @@ class Node_track(INode):
                                            default=default), 1.0) * 5.0)
 
     def makeListItem(self, replaceItems=False):
-        import xbmcgui  # @UnresolvedImport
         isplayable = 'true'
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label2(),
@@ -359,6 +360,7 @@ class Node_track(INode):
                      'year': self.get_year(),
                      'rating': str(self.get_popularity()),
         })
+        #item.setProperty('artist_description', 'FOO')
         item.setProperty('album_artist', self.get_album_artist())
         item.setProperty('album_description', comment)
         item.setProperty('album_style', self.get_genre())
