@@ -60,6 +60,7 @@ class Node_recommendation(INode):
         self.genre_id = self.get_parameter('genre-id', default=None)
         self.genre_type = self.get_parameter('genre-type', default=None)
         self.set_label(lang(30084))
+        self.image = getImage('album')
         self.content_type = 'files'
 
     def make_url(self, **ka):
@@ -88,7 +89,8 @@ class Node_recommendation(INode):
         '''
         for genre_type_id in RECOS_TYPE_IDS:
             node = getNode(Flag.RECOMMENDATION, {'genre-type': genre_type_id})
-            node.label = self.label + ' - ' + RECOS_TYPES[genre_type_id]
+            node.label2 = self.label
+            node.label = RECOS_TYPES[genre_type_id]
             self.add_child(node)
         return True
 
@@ -100,9 +102,8 @@ class Node_recommendation(INode):
                 'genre-type': self.genre_type,
                 'genre-id': genre_id
             })
-            node.label = '%s - %s / %s' % (self.label,
-                                      RECOS_TYPES[int(self.genre_type)],
-                                      RECOS_GENRES[genre_id])
+            node.label = RECOS_GENRES[genre_id]
+            node.label2 = RECOS_TYPES[int(self.genre_type)]
             self.add_child(node)
         return True
 

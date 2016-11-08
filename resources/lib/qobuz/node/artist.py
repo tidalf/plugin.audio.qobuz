@@ -90,7 +90,7 @@ class Node_artist(INode):
         return self.get_property('owner/name')
 
     def get_description(self):
-        return self.get_property('biography/content')
+        return self.get_property('biography/content', to='strip_html')
 
     def makeListItem(self, replaceItems=False):
         genre = self.get_genre()

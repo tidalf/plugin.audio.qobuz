@@ -36,19 +36,15 @@ class Node_favorite(INode):
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
         self.content_type = 'albums'
-        if self.search_type == 'all':
-            self.search_type = None
-        elif self.search_type == 'albums':
-            pass #self.content_type = 'files'
-        elif self.search_type == 'tracks':
-            self.content_type = 'albums'
-        elif self.search_type == 'artists':
-            self.content_type = 'artists'
         if self.search_type is None:
-            self.label = '%s - %s' % (lang(30081), lang(30098))
+            self.label = lang(30081)
+            self.label2 = lang(30098)
         else:
-            self.label = '%s - %s' % (lang(30081),
-                                      self.search_type.capitalize())
+            self.label2 = lang(30081)
+            self.label = self.search_type.capitalize()
+        if self.search_type == 'artists':
+            self.content_type = 'artists'
+
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type != 'all':
@@ -73,7 +69,7 @@ class Node_favorite(INode):
         result = False
         all_kind = ('artists', 'albums', 'tracks')
         search_for = (self.search_type, )
-        if self.search_type is None:
+        if self.search_type == 'all':
             search_for = all_kind
         for kind in search_for:
             if not kind in self.data:
@@ -108,7 +104,7 @@ class Node_favorite(INode):
         return True if len(self.data['artists']['items']) > 0 else False
 
     def get_description(self):
-        return self.get_property('description')
+        return self.get_property('description', to='strip_html')
 
     def gui_add_albums(self):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')

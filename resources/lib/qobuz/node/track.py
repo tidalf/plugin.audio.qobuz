@@ -222,6 +222,10 @@ class Node_track(INode):
         return self.get_property('purchased')
 
     def get_description(self, default='n/a'):
+        description = self.get_property('album/description', default=None,
+                                        to='strip_html')
+        if description is not None:
+            return description
         if self.parent and self.parent.nt & Flag.ALBUM == Flag.ALBUM:
             return self.parent.get_description(default=default)
         return default
@@ -307,9 +311,8 @@ class Node_track(INode):
                 for a in self.get_property('album/articles', default=default)]
 
     def get_awards(self, default=[]):
-        debug.info(self, 'DATA {}', self.data)
-        return [a['name']
-                for a in self.get_property('album/awards', default=default)]
+        return [a['name'] for a in self.get_property('album/awards',
+                                                     default=default)]
 
     def makeListItem(self, replaceItems=False):
         isplayable = 'true'

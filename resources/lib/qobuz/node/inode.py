@@ -161,10 +161,15 @@ class INode(object):
         '''
         if isinstance(pathList, basestring):
             res = self.__get_property(pathList)
-            return res if res is not None else default
+            return getattr(converter, to)(res) if res is not None else default
         for path in pathList:
             data = self.__get_property(path)
             if data is not None:
+                if path == 'description':
+                    try:
+                        debug.info(self, 'Convert to: {}\n{}', to, data.encode('ascii', errors='ignore'))
+                    except:
+                        pass
                 return getattr(converter, to)(data)
         return getattr(converter, to)(default)
 

@@ -12,8 +12,6 @@ from qobuz.node import getNode, Flag
 
 
 class Node_favorites(INode):
-    '''Our root node, we are displaying all qobuz nodes from here
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_favorites, self).__init__(parent=parent,
@@ -22,6 +20,7 @@ class Node_favorites(INode):
         self.nt = Flag.FAVORITES
         self.label = lang(30081)
         self.image = getImage('album')
+        self.content_type = 'albums'
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for kind in ['all', 'albums', 'tracks', 'artists']:

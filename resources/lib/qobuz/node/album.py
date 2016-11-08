@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-import xbmcgui  # @UnresolvedImport
+import xbmcgui
 
 from qobuz.node.inode import INode
 from qobuz import debug
@@ -17,10 +17,7 @@ from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz import config
 from qobuz.theme import color
-
-SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
-                     '0000020120221']
-
+from qobuz.util.converter import converter
 
 class Node_album(INode):
 
@@ -31,7 +28,6 @@ class Node_album(INode):
         self.nt = Flag.ALBUM
         self.image = getImage('album')
         self.content_type = 'albums'
-        self.is_special_purchase = False
         self.imageDefaultSize = config.app.registry.get('image_default_size')
 
     def get_nid(self):
@@ -39,8 +35,6 @@ class Node_album(INode):
 
     def set_nid(self, value):
         super(Node_album, self).set_nid(value)
-        if value in SPECIAL_PURCHASES:
-            self.is_special_purchase = True
 
     nid = property(get_nid, set_nid)
 
@@ -128,7 +122,7 @@ class Node_album(INode):
             articles = u'\n- articles %s' % ', '.join(articles)
         else:
             articles = u''
-
+        description = self.get_description(default=self.get_label())
         return u'''{description}{awards}{articles}
 - popularity: {popularity}
 - duration: {duration} mn
@@ -147,7 +141,7 @@ class Node_album(INode):
 - artist: {artist}
 - maximum_sampling_rate: {maximum_sampling_rate}
         '''.format(popularity=self.get_property('popularity'),
-                   description=self.get_property('description', default=self.get_label()),
+                   description=description,
                    duration=round(self.get_property('duration', default=0.0) / 60.0, 2),
                    previewable=self.get_property('previewable'),
                    streamable=self.get_property('streamable'),
@@ -215,7 +209,8 @@ class Node_album(INode):
         return year
 
     def get_description(self, default='n/a'):
-        return self.get_property('description', default=default, to='htm2xbmc')
+        return self.get_property('description', default=default,
+                                 to='strip_html')
 
     def get_duration(self, default=None):
         return self.get_property('duration', default=default, to='math_floor')
