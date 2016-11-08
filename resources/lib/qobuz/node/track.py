@@ -302,6 +302,15 @@ class Node_track(INode):
         return round(min(self.get_property('popularity', to='float',
                                            default=default), 1.0) * 5.0)
 
+    def get_articles(self, default=[]):
+        return ['%s (%s%s)' % (a['label'], a['price'], a['currency'])
+                for a in self.get_property('album/articles', default=default)]
+
+    def get_awards(self, default=[]):
+        debug.info(self, 'DATA {}', self.data)
+        return [a['name']
+                for a in self.get_property('album/awards', default=default)]
+
     def makeListItem(self, replaceItems=False):
         isplayable = 'true'
         item = xbmcgui.ListItem(self.get_label(),
@@ -319,8 +328,6 @@ class Node_track(INode):
         comment = u'''{description}
 - label: {label}
 - duration: {duration} mn
-- awards: {awards}
-- articles: {articles}
 - purchasable: {purchasable} / Purchased: {purchased}
 - copyright: {copyright}
 - popularity: {popularity}
@@ -345,9 +352,8 @@ class Node_track(INode):
             previewable=self.get_property('previewable'),
             streamable=self.get_property('streamable'),
             hires_purchased=self.get_property('hires_purchased', default=False),
-            awards=','.join([a['name'] for a in self.get_property('awards', default=[])]),
-            articles='|'.join(['%s (%s%s)' % (a['label'], a['price'], a['currency']) for a in self.get_property('articles', default=[])]),
-            )
+            awards=','.join(self.get_awards()),
+            articles=', '.join(self.get_articles()))
 
         item.setInfo(type='Music', infoLabels={
                      'count': self.nid,

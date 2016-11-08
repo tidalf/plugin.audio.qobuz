@@ -104,18 +104,32 @@ class Node_album(INode):
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
-    def get_articles(self):
-        return ['%s (%s%s)' % (a['label'], a['price'], a['currency'])
-                for a in self.get_property('articles', default=[])]
+    def get_articles(self, default=[]):
+        articles = self.get_property('articles', default=None)
+        if articles is None:
+            return default
+        return ['%s (%s %s)' % (a['label'], a['price'], a['currency'])
+                for a in articles]
 
-    def get_awards(self):
-        return ['%s (%s%s)' % (a['label'], a['price'], a['currency'])
-                for a in self.get_property('awards', default=[])]
+    def get_awards(self, default=[]):
+        awards = self.get_property('awards', default=None)
+        if awards is None:
+            return default
+        return [a['name'] for a in awards]
 
     def get_information(self):
-        return u'''{description}
-- awards: {awards}
-- articles: {articles}
+        awards = self.get_awards(default=None)
+        if awards is not None:
+            awards = u'\n- awards: %s' % ', '.join(awards)
+        else:
+            awards = u''
+        articles = self.get_articles(default=None)
+        if articles is not None:
+            articles = u'\n- articles %s' % ', '.join(articles)
+        else:
+            articles = u''
+
+        return u'''{description}{awards}{articles}
 - popularity: {popularity}
 - duration: {duration} mn
 - previewable: {previewable}
@@ -146,9 +160,9 @@ class Node_album(INode):
                    downloadable=self.get_property('downloadable'),
                    hires=self.get_property('hires'),
                    sampleable=self.get_property('sampleable'),
-                   awards=','.join([a['name'] for a in self.get_property('awards', default=[])]),
+                   awards=awards,
                    genre=self.get_property('genre/name'),
-                   articles='|'.join(self.get_articles()),
+                   articles=articles,
                    artist=self.get_artist(),
                    maximum_sampling_rate=self.get_property('maximum_sampling_rate'))
 
@@ -201,7 +215,7 @@ class Node_album(INode):
         return year
 
     def get_description(self, default='n/a'):
-        return self.get_property('description', default=None, to='htm2xbmc')
+        return self.get_property('description', default=default, to='htm2xbmc')
 
-    def get_duration(self):
-        return self.get_property('duration', default=None, to='math_floor')
+    def get_duration(self, default=None):
+        return self.get_property('duration', default=default, to='math_floor')
