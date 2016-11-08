@@ -165,11 +165,6 @@ class INode(object):
         for path in pathList:
             data = self.__get_property(path)
             if data is not None:
-                if path == 'description':
-                    try:
-                        debug.info(self, 'Convert to: {}\n{}', to, data.encode('ascii', errors='ignore'))
-                    except:
-                        pass
                 return getattr(converter, to)(data)
         return getattr(converter, to)(default)
 
