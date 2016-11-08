@@ -3,3 +3,4 @@
 *DS_store*
 *.pydevproject
 *.log
+resources/lib/qobuz/__data__/*.jpg
