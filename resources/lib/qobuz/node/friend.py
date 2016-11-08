@@ -9,13 +9,13 @@
 import json
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import color, getImage, runPlugin, containerRefresh, \
+from qobuz.gui.util import getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, lang
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz.node import Flag, getNode
-from qobuz.theme import theme
+from qobuz.theme import theme, color
 
 class Node_friend(INode):
 

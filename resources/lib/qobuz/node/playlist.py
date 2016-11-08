@@ -17,12 +17,12 @@ from qobuz.cache import cache
 from qobuz import debug
 from qobuz.renderer import renderer
 from qobuz.gui.util import notify_warn, notify_error, notify_log
-from qobuz.gui.util import color, lang, getImage, runPlugin, executeBuiltin
+from qobuz.gui.util import lang, getImage, runPlugin, executeBuiltin
 from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
 from qobuz.util import common as util
-from qobuz.theme import theme
+from qobuz.theme import theme, color
 from qobuz import config
 from qobuz import image
 

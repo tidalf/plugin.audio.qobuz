@@ -134,15 +134,6 @@ def executeJSONRPC(json):
     return xbmc.executeJSONRPC(json)
 
 
-def convert_color(color):
-    if color.startswith('#'):
-        return '%sFF' % color[1:]
-    return color
-
-def color(color, msg):
-    return '[COLOR=%s]%s[/COLOR]' % (convert_color(color), msg)
-
-
 def lang(langId):
     s = config.app.addon.getLocalizedString(langId)
     if not s:

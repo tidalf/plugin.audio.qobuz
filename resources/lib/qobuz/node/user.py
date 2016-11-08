@@ -9,12 +9,13 @@
 import time
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import getImage, color
+from qobuz.gui.util import getImage
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.api.user import current as user
 from qobuz import config
+from qobuz.theme import color
 
 class Node_user(INode):
     def __init__(self, parent=None, parameters={}, data=None):

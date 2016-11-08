@@ -7,8 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz import exception
-from qobuz.gui.util import color
-from qobuz.theme import theme
+from qobuz.theme import theme, color
 from qobuz import config
 
 class contextMenu():

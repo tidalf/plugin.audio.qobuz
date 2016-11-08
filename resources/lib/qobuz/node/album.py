@@ -11,11 +11,12 @@ import xbmcgui  # @UnresolvedImport
 
 from qobuz.node.inode import INode
 from qobuz import debug
-from qobuz.gui.util import getImage, color
+from qobuz.gui.util import getImage
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz import config
+from qobuz.theme import color
 
 SPECIAL_PURCHASES = ['0000020110926', '0000201011300', '0000020120220',
                      '0000020120221']

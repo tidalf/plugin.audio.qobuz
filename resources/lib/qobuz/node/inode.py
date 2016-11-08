@@ -20,7 +20,7 @@ from qobuz.constants import Mode
 from qobuz import debug
 from qobuz import exception
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import color, lang, runPlugin, containerUpdate
+from qobuz.gui.util import lang, runPlugin, containerUpdate
 from qobuz.gui.util import getImage
 from qobuz.node import Flag
 from qobuz.node import getNode
@@ -30,7 +30,7 @@ from qobuz.storage import _Storage
 from qobuz import config
 from qobuz.util import data as dataUtil
 from qobuz.util import common
-from qobuz.theme import theme
+from qobuz.theme import theme, color
 from qobuz.util.converter import converter
 from qobuz import config
 
