@@ -43,9 +43,9 @@ def http_error(name):
 def get_format_id(default=3):
     stream_type = config.app.registry.get('streamtype')
     if stream_type == 'flac':
-        return 5
+        return 6
     elif stream_type == 'mp3':
-        return 3
+        return 5
     return default
 
 def shutdown_server():
