@@ -36,7 +36,7 @@
 {%- if description -%}
   {{description|striptags}}
 {% endif %}
-Duration : {{duration / 60}}mn
+Duration : {{(duration / 60)|round}} mn
 Tracks   : {{tracks_count}}
 Media    : {{media_count}}
 HiRes    : {{hires}}
