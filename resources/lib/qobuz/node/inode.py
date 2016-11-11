@@ -24,7 +24,7 @@ from qobuz.gui.util import lang, runPlugin, containerUpdate
 from qobuz.gui.util import getImage
 from qobuz.node import Flag
 from qobuz.node import getNode
-import qobuz  # @UnresolvedImport
+import qobuz
 from qobuz.renderer import renderer
 from qobuz.storage import _Storage
 from qobuz import config
@@ -372,33 +372,29 @@ class INode(object):
         '''
         return {}
 
-    def populating(self, Dir, lvl=1, whiteFlag=Flag.ALL, blackFlag=Flag.NONE,
+    def populating(self, xdir, lvl=1, whiteFlag=Flag.ALL, blackFlag=Flag.NONE,
                    data={}):
-        # if Dir.Progress.iscanceled():
-        #     return False
         if lvl != -1 and lvl < 1:
             return False
-        if not (self.nt & blackFlag == self.nt):
-            new_data = self.fetch(Dir, lvl, whiteFlag, blackFlag)
+        if self.nt & blackFlag != self.nt:
+            new_data = self.fetch(xdir, lvl, whiteFlag, blackFlag)
             if new_data is None:
                 return False
             else:
                 data.update(new_data)
                 self.data = data
                 self.__add_pagination(self.data)
-        self.populate(Dir, lvl, whiteFlag, blackFlag)
+        self.populate(xdir, lvl, whiteFlag, blackFlag)
         if lvl != -1:
             lvl -= 1
-        label = self.get_label()
-        self.__add_pagination_node(Dir, lvl, whiteFlag)
+        #label = self.get_label()
+        self.__add_pagination_node(xdir, lvl, whiteFlag)
         for child in self.childs:
-            # if Dir.is_canceled():
-            #     return False
             if child.nt & whiteFlag == child.nt:
-                if not Dir.add_node(child):
+                if not xdir.add_node(child):
                     debug.error(self, "Could not add node")
                     raise exception.BuildCanceled('down')
-            child.populating(Dir, lvl, whiteFlag, blackFlag)
+            child.populating(xdir, lvl, whiteFlag, blackFlag)
 
     def populate(self, xbmc_directory=None, lvl=-1, whiteFlag=Flag.ALL,
                  blackFlag=Flag.STOPBUILD):

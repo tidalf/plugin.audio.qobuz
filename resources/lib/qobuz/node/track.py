@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-import xbmcgui  # @UnresolvedImport
+import xbmcgui
 
 from qobuz.constants import Mode
 from qobuz.node import Flag, ErrorNoData
@@ -331,10 +331,15 @@ class Node_track(INode):
         comment = u'''{description}
 - label: {label}
 - duration: {duration} mn
+- track number: {track_number}
+- year: {year}
+- composer: {composer}
+- performer: {performer}
 - purchasable: {purchasable} / Purchased: {purchased}
 - copyright: {copyright}
 - popularity: {popularity}
 - maximum sampling rate: {maximum_sampling_rate}
+- maximum_bit_depth: {maximum_bit_depth}
 - HiRes: {hires} / HiRes purchased: {hires_purchased}
 - streamable: {streamable}
 - previewable: {previewable}
@@ -344,8 +349,15 @@ class Node_track(INode):
 '''.format(popularity=self.get_property('popularity', default='n/a'),
            duration=self.get_duration(),
            label=self.get_album_label(),
+           year=self.get_property('album/year'),
+           performers=self.get_property('performers'),
+           track_number=self.get_property('track_number'),
+           version=self.get_property('version'),
+            performer=self.get_property('performer/name'),
+            composer=self.get_property('composer/name'),
             copyright=self.get_property('copyright', default='n/a'),
             maximum_sampling_rate=self.get_property('maximum_sampling_rate'),
+            maximum_bit_depth=self.get_property('maximum_bit_depth'),
             description=self.get_description(default=self.get_label()),
             hires=self.get_property('hires'),
             sampleable=self.get_property('sampleable'),
@@ -369,12 +381,10 @@ class Node_track(INode):
                      'year': self.get_year(),
                      'rating': str(self.get_popularity()),
         })
-        #item.setProperty('artist_description', 'FOO')
         item.setProperty('album_artist', self.get_album_artist())
         item.setProperty('album_description', comment)
-        item.setProperty('album_style', self.get_genre())
         item.setProperty('album_label', self.get_property('album/label/name'))
-        item.setProperty('Role.Composer', self.get_property('album/composer/name'))
+        item.setProperty('Role.Composer', self.get_property('composer/name'))
         item.setProperty('DiscNumber', str(self.get_media_number(default=1)))
         item.setProperty('IsPlayable', isplayable)
         item.setProperty('IsInternetStream', isplayable)

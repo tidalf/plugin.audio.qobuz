@@ -27,14 +27,18 @@ class Node_collection(INode):
         self.nt = Flag.COLLECTION
         self.url = None
         self.image = getImage('songs')
-        self.search_type = self.get_parameter('search-type', default='tracks')
+        self.search_type = self.get_parameter('search-type')
         self.query = self.get_parameter('query', to='unquote')
         self.source = self.get_parameter('source')
-        self.seen_artist = {}
-        self.seen_album = {}
-        self.seen_track = {}
-        self.label = '%s - %s' % (lang(30194),  self.search_type.capitalize())
-        self.content_type = 'files'
+        self.content_type = 'albums'
+
+    def get_label(self):
+        if self.search_type is None:
+            return lang(30194)
+        return '%s - %s' % (lang(30194),  self.search_type.capitalize())
+
+    def get_image(self):
+        return getImage('album')
 
     def make_url(self, **ka):
         if self.search_type is not None:
@@ -46,6 +50,8 @@ class Node_collection(INode):
 
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+        if self.search_type is None:
+            return {}
         query = self.get_parameter('query', to='unquote')
         if not query:
             from qobuz.gui.util import Keyboard
@@ -82,6 +88,11 @@ class Node_collection(INode):
         return getNode(Flag.ARTIST, data=data, parameters=parameters)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
+        if self.search_type is None:
+            for search_type in ['albums', 'tracks', 'artists']:
+                self.add_child(getNode(Flag.COLLECTION,
+                                       parameters={'search-type': search_type}))
+            return True
         if self.data is None:
             return False
         method = getattr(self, '_populate_%s' % self.search_type)

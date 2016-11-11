@@ -1,18 +1,19 @@
 '''
-    qobuz.node.collections
-    ~~~~~~~~~~~~~~~~~~~~
+    qobuz.node.testing
+    ~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import requests
+import xbmcgui
+
 from qobuz.node.inode import INode
 from qobuz import config
 from qobuz.node import getNode, Flag
 from qobuz import debug
-import requests
 
-import xbmcgui
 class Window(xbmcgui.Window):
     pass
 

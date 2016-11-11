@@ -20,6 +20,7 @@ from qobuz.api.user import current as user
 
 dialogHeading = lang(30083)
 
+all_kinds = ['albums', 'tracks', 'artists']
 
 class Node_favorite(INode):
     '''Displaying user favorites (track and album)
@@ -47,6 +48,8 @@ class Node_favorite(INode):
 
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+        if self.search_type is None:
+            return {}
         if self.search_type != 'all':
             return api.get('/favorite/getUserFavorites',
                            user_id=user.get_id(),
@@ -59,18 +62,22 @@ class Node_favorite(INode):
                         offset=self.offset)
 
     def make_url(self, **ka):
-        if self.search_type:
+        if self.search_type is not  None:
             ka['search-type'] = self.search_type
         return super(Node_favorite, self).make_url(**ka)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         if self.method is not None:
             return True
+        if self.search_type is None:
+            for kind in all_kinds:
+                self.add_child(getNode(Flag.FAVORITE, parameters={'search-type': kind}))
+            self.add_child(getNode(Flag.FAVORITE, parameters={'search-type': 'all'}))
+            return True
         result = False
-        all_kind = ('artists', 'albums', 'tracks')
         search_for = (self.search_type, )
         if self.search_type == 'all':
-            search_for = all_kind
+            search_for = all_kinds
         for kind in search_for:
             if not kind in self.data:
                 continue
@@ -78,7 +85,7 @@ class Node_favorite(INode):
             if not hasattr(self, method):
                 debug.warn(self, 'No method named %s' % method)
                 continue
-            if getattr(self, method)(Dir, lvl, whiteFlag, blackFlag):
+            if getattr(self, method)(*a, **ka):
                 result = True
         return result
 

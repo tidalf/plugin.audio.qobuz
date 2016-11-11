@@ -14,9 +14,6 @@ from qobuz.api import api
 
 
 class Node_label(INode):
-    '''
-    @class Node_label:
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_label, self).__init__(parent=parent,

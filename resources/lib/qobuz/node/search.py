@@ -29,11 +29,11 @@ data_search_type = {
         'content_type' : 'albums',
         'image' : getImage('song'),
     },
-    'collection': {
-        'label' : lang(30018),
-        'content_type' : 'albums',
-        'image' : getImage('song')
-    }
+    # 'collection': {
+    #     'label' : lang(30018),
+    #     'content_type' : 'albums',
+    #     'image' : getImage('song')
+    # }
 }
 
 class Node_search(INode):
@@ -44,14 +44,15 @@ class Node_search(INode):
                                           data=data)
         self.nt = Flag.SEARCH
         self.content_type = 'albums'
-        self.search_type = self.get_parameter('search-type', default='albums')
-        self.set_parameter('search-type', self.search_type)
+        self.search_type = self.get_parameter('search-type', default=None)
 
     def make_url(self, *a, **ka):
         ka['search-type'] = self.search_type
         return super(Node_search, self).make_url(*a, **ka)
 
     def get_label(self):
+        if self.search_type is None:
+            return 'Search (i8n)'
         query = self.get_parameter('query', to='unquote')
         if query is not None:
             return 'search %s: %s [%s/%s]' % (self.search_type,
@@ -60,9 +61,13 @@ class Node_search(INode):
         return data_search_type[self.search_type]['label']
 
     def get_image(self):
+        if self.search_type is None:
+            return getImage('songs')
         return data_search_type[self.search_type]['image']
 
     def fetch(self, *a, **ka):
+        if self.search_type is None:
+            return {}
         query = self.get_parameter('query', to='unquote')
         if query is None:
             from qobuz.gui.util import Keyboard
@@ -109,5 +114,10 @@ class Node_search(INode):
         return True if len(self.data[self.search_type]['items']) > 0 else False
 
     def populate(self, *a, **ka):
+        if self.search_type is None:
+            for search_type in data_search_type.keys():
+                self.add_child(getNode(Flag.SEARCH, parameters={
+                    'search-type': search_type}))
+            return True
         self.content_type = data_search_type[self.search_type]['content_type']
         return getattr(self, '_populate_%s' % self.search_type)(*a, **ka)
