@@ -42,13 +42,10 @@ class Node_root(INode):
         if config.app.registry.get('show_recommendations', to='bool'):
             self.add_child(getNode(Flag.RECOMMENDATION))
         if not free:
-            self.add_child(getNode(Flag.PURCHASES))
+            self.add_child(getNode(Flag.PURCHASE))
             self.add_child(getNode(Flag.FAVORITE))
         if config.app.registry.get('search_enabled', to='bool'):
             self.add_child(getNode(Flag.SEARCH))
-            #self.add_child(getNode(Flag.SEARCH, parameters={'search-type': 'albums'}))
-            #self.add_child(getNode(Flag.SEARCH, parameters={'search-type': 'tracks'}))
-            #self.add_child(getNode(Flag.SEARCH, parameters={'search-type': 'artists'}))
         if not free:
             self.add_child(getNode(Flag.COLLECTION))
             self.add_child(getNode(Flag.FRIENDS))

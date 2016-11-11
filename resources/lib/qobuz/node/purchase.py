@@ -24,12 +24,15 @@ class Node_purchase(INode):
         self.nt = Flag.PURCHASE
         self.image = getImage('album')
         self.content_type = 'albums'
-        self.search_type = self.get_parameter('search-type') or 'all'
-        if self.search_type == 'all':
-            self.label = '%s - %s' % (lang(30101), lang(30098))
-        else:
-            self.label = '%s - %s' % (lang(30101),
-                                      self.search_type.capitalize())
+        self.search_type = self.get_parameter('search-type')
+
+    def get_label(self):
+        if self.search_type is None:
+            return lang(30101)
+        elif self.search_type == 'all':
+            return  '%s - %s' % (lang(30101), lang(30098))
+        return '%s - %s' % (lang(30101),
+                                  self.search_type.capitalize())
 
     def make_url(self, **ka):
         if self.search_type:
@@ -38,10 +41,17 @@ class Node_purchase(INode):
         return super(Node_purchase, self).make_url(**ka)
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+        if self.search_type is None:
+            return {}
         return api.get('/purchase/getUserPurchases', limit=self.limit,
                        offset=self.offset, user_id=user.get_id())
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
+        if self.search_type is None:
+            for search_type in ['all', 'albums', 'tracks']:
+                self.add_child(getNode(Flag.PURCHASE,
+                                       parameters={'search-type': search_type}))
+            return True
         wanted = ['albums', 'tracks']
         if self.search_type != 'all':
             wanted = [self.search_type]

@@ -18,35 +18,31 @@ class FlagEnum(object):
     RECOMMENDATION = 1 << 5
     ROOT = 1 << 6
     ALBUM = 1 << 7
-    PURCHASES = 1 << 8
-    SEARCH = 1 << 9
-    ARTIST = 1 << 10
-    SIMILAR_ARTIST = 1 << 11
-    FAVORITES = 1 << 12
-    FRIEND = 1 << 13
-    FRIENDS = 1 << 14
-    GENRE = 1 << 15
-    LABEL = 1 << 16
-    ALBUMS = 1 << 17
-    ARTICLES = 1 << 18
-    ARTICLE = 1 << 19
-    ARTICLE_RUBRICS = 1 << 20
-    ALBUMS_BY_ARTIST = 1 << 21
-    PUBLIC_PLAYLISTS = 1 << 22
-    COLLECTION = 1 << 23
-    COLLECTIONS = 1 << 24
-    FAVORITE = 1 << 25
-    PURCHASE = 1 << 26
-    TESTING = 1 << 27
-    TEXT = 1 << 28
-    SEARCH_RESULT = 1 << 29
-    USER = 1 << 30
+    SEARCH = 1 << 8
+    ARTIST = 1 << 9
+    SIMILAR_ARTIST = 1 << 10
+    FRIEND = 1 << 11
+    FRIENDS = 1 << 12
+    GENRE = 1 << 13
+    LABEL = 1 << 14
+    ALBUMS = 1 << 15
+    ARTICLES = 1 << 16
+    ARTICLE = 1 << 17
+    ARTICLE_RUBRICS = 1 << 18
+    ALBUMS_BY_ARTIST = 1 << 19
+    PUBLIC_PLAYLISTS = 1 << 20
+    COLLECTION = 1 << 21
+    FAVORITE = 1 << 22
+    PURCHASE = 1 << 23
+    TESTING = 1 << 24
+    TEXT = 1 << 25
+    USER = 1 << 26
 
     STOPBUILD = 1 << 100
     NONE = 1 << 101
 
     def __init__(self):
-        self.totalFlag = 30
+        self.totalFlag = 26
         self.ALL = 0
         for i in range(1, self.totalFlag + 1):
             self.ALL |= (1 << i)
@@ -69,18 +65,12 @@ class FlagEnum(object):
             return 'root'
         elif flag & cls.ALBUM == cls.ALBUM:
             return 'album'
-        elif flag & cls.PURCHASES == cls.PURCHASES:
-            return 'purchases'
         elif flag & cls.PURCHASE == cls.PURCHASE:
             return 'purchase'
-        elif flag & cls.FAVORITES == cls.FAVORITES:
-            return 'favorites'
         elif flag & cls.FAVORITE == cls.FAVORITE:
             return 'favorite'
         elif flag & cls.SEARCH == cls.SEARCH:
             return 'search'
-        elif flag & cls.SEARCH_RESULT == cls.SEARCH_RESULT:
-            return 'search_result'
         elif flag & cls.ARTIST == cls.ARTIST:
             return 'artist'
         elif flag & cls.SIMILAR_ARTIST == cls.SIMILAR_ARTIST:
@@ -109,8 +99,6 @@ class FlagEnum(object):
             return 'albums_by_artist'
         elif flag & cls.COLLECTION == cls.COLLECTION:
             return 'collection'
-        elif flag & cls.COLLECTIONS == cls.COLLECTIONS:
-            return 'collections'
         elif flag & cls.TESTING == cls.TESTING:
             return 'testing'
         elif flag & cls.TEXT == cls.TEXT:
