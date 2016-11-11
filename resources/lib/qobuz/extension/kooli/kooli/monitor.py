@@ -1,6 +1,8 @@
 import time
 import xbmc
 
+from qobuz import debug
+
 class ServiceItem(object):
     def __init__(self, service, on_idle=False):
         self.service = service
@@ -17,6 +19,9 @@ class Monitor(xbmc.Monitor):
         self.garbage_refresh = 60
         self.last_garbage_on = time.time() - (self.garbage_refresh + 1)
         self.service = {}
+
+    def onSettingsChanged(self):
+        debug.info(self, 'Setting changed') # @wip
 
     def onAbortRequested(self):
         self.abortRequested = True

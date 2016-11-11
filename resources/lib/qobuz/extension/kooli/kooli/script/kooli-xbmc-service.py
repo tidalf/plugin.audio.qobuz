@@ -84,15 +84,16 @@ class KooliService(threading.Thread):
                         application.run(port=self.port, threaded=True)
                     except Exception as e:
                         debug.error(self, 'KooliService port: {} Error: {}', self.port, e)
-            xbmc.sleep(1000)
+            time.sleep(1)
 
 
 if __name__ == '__main__':
-    if not is_service_enable():
-        notify_warn('Qobuz service / HTTPD', 'Service is disabled from configuration')
-        sys.exit(0)
     monitor = Monitor()
-    monitor.add_service(KooliService())
+    if is_service_enable():
+        monitor.add_service(KooliService())
+    else:
+        notify_warn('Qobuz service / HTTPD',
+                    'Service is disabled from configuration')
     monitor.start_all_service()
     alive = True
     while alive:
