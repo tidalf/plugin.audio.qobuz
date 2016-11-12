@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <addon id="plugin.audio.qobuz" name="Qobuz" version="1.3.0" provider-name="d@corp">
 	<requires>
-		<import addon="xbmc.python" version="2.1.0" />
+		<import addon="xbmc.python" version="2.23.0" />
 		<import addon="script.module.requests" version="1.0.4" />
 		<import addon="script.module.flask" version="0.11.1" />
 	</requires>
@@ -50,7 +50,7 @@
 
 <extension point="kodi.context.item">
   <menu id="kodi.core.main">
-    <item library="contextitem.py">
+    <item library="resources/lib/qobuz/context/item.py">
       <label>hello</label>
       <visible>true</visible>
     </item>
