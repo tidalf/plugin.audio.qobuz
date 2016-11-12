@@ -89,9 +89,9 @@ def route_track_head(album_id=None, track_id=None):
     else:
        intent = "stream"
     response = api.get('/track/getFileUrl',
-                    format_id=format_id,
-                    track_id=track_id,
-                    intent=intent)
+                        format_id=format_id,
+                        track_id=track_id,
+                        intent=intent)
     if response is None or 'url' not in response:
         return 'NotFound', 404 #http_error('NotFound')
     return 'ok', 200
