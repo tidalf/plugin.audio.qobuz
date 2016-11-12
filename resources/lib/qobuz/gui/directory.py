@@ -109,7 +109,7 @@ class Directory(object):
         success = True
         if forceStatus != None:
             success = forceStatus
-        if not self.put_item_ok or (self.total_put == 0):
+        if not self.put_item_ok or self.total_put == 0:
             success = False
         if not self.asList:
             xbmcplugin.setContent(handle=self.handle,
