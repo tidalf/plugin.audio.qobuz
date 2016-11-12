@@ -79,9 +79,19 @@ def route_root():
 @nocache
 @application.route('/qobuz/<string:album_id>/<string:track_id>/file.mpc', methods=['HEAD'])
 def route_track_head(album_id=None, track_id=None):
+    hires = config.app.registry.get('hires_enabled', to='bool')
+    if hires and self.get_hires():
+        format_id = 27
+    else: 
+        format_id = get_format_id()
+    if (self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased) and hires:
+       intent = "download"
+    else:
+       intent = "stream"
     response = api.get('/track/getFileUrl',
-                       format_id=get_format_id(),
-                       track_id=track_id)
+                    format_id=format_id,
+                    track_id=track_id,
+                    intent=intent)
     if response is None or 'url' not in response:
         return 'NotFound', 404 #http_error('NotFound')
     return 'ok', 200

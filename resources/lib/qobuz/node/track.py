@@ -231,13 +231,11 @@ class Node_track(INode):
 
     def __getFileUrl(self):
         hires = config.app.registry.get('hires_enabled', to='bool')
-        if hires and self.get_hires():
-            format_id = 27
-        else: 
-	    format_id = user.stream_format()
-        if (self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased) and hires:
+        if (self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased) and hires and self.get_hires():
             intent = "download"
+            format_id = 27
         else:
+	    format_id = user.stream_format()
             intent = "stream"
         data = api.get('/track/getFileUrl', format_id=format_id,
                        track_id=self.nid, user_id=user.get_id(), intent=intent)
