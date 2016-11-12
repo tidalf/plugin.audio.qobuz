@@ -233,11 +233,13 @@ class Node_track(INode):
         hires = config.app.registry.get('hires_enabled', to='bool')
         if hires and self.get_hires():
             format_id = 27
-        if self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased:
+        else: 
+	    format_id = user.stream_format()
+        if (self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased) and hires:
             intent = "download"
         else:
             intent = "stream"
-        data = api.get('/track/getFileUrl', format_id=user.stream_format(),
+        data = api.get('/track/getFileUrl', format_id=format_id,
                        track_id=self.nid, user_id=user.get_id(), intent=intent)
         if not data:
             debug.warn(self, "Cannot get stream type for track (network problem?)")
