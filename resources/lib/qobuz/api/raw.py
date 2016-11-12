@@ -309,9 +309,9 @@ class RawApi(object):
     def playlist_create(self, **ka):
         self._check_ka(ka, ['name'], ['is_public',
                                       'is_collaborative', 'tracks_id', 'album_id'])
-        if not 'is_public' in ka:
+        if 'is_public' not in ka:
             ka['is_public'] = True
-        if not 'is_collaborative' in ka:
+        if 'is_collaborative' not in ka:
             ka['is_collaborative'] = False
         return self._api_request(ka, '/playlist/create')
 
