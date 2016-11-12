@@ -35,13 +35,13 @@ class QobuzXbmcRenderer(IRenderer):
                  mode=None,
                  whiteFlag=Flag.ALL,
                  blackFlag=Flag.STOPBUILD,
-                 depth=1):
+                 depth=1, asList=False):
         super(QobuzXbmcRenderer, self).__init__(node_type,
                                                 parameters=parameters,
                                                 mode=mode,
                                                 whiteFlag=whiteFlag,
                                                 blackFlag=blackFlag,
-                                                depth=depth)
+                                                depth=depth, asList=False)
 
     def run(self):
         '''Building our tree, creating root node based on our node_type
@@ -53,24 +53,23 @@ class QobuzXbmcRenderer(IRenderer):
             return False
         if self.has_method_parameter():
             return self.execute_method_parameter()
-        Dir = Directory(self.root, self.nodes, handle=config.app.handle,
+        xdir = Directory(self.root, self.nodes, handle=config.app.handle,
                         withProgress=False, asList=self.asList)
         if config.app.registry.get('contextmenu_replaceitems', to='bool'):
-            Dir.replaceItems = True
+            xdir.replaceItems = True
         try:
-            ret = self.root.populating(Dir,
+            ret = self.root.populating(xdir,
                                        self.depth,
                                        self.whiteFlag,
                                        self.blackFlag)
         except exception.QobuzError as e:
-            Dir.end_of_directory(False)
-            Dir = None
-            debug.warn(self,
-                       'Error while populating our directory: %s' % (repr(e)))
+            xdir.end_of_directory(False)
+            xdir = None
+            debug.warn(self, 'Error while populating our directory: %s' % (repr(e)))
             return False
         if not self.asList:
             import xbmcplugin
-            Dir.set_content(self.root.content_type)
+            xdir.set_content(self.root.content_type)
             methods = [
                 xbmcplugin.SORT_METHOD_UNSORTED,
                 xbmcplugin.SORT_METHOD_LABEL,
@@ -84,7 +83,7 @@ class QobuzXbmcRenderer(IRenderer):
                 xbmcplugin.SORT_METHOD_TRACKNUM, ]
             [xbmcplugin.addSortMethod(handle=config.app.handle,
                                       sortMethod=method) for method in methods]
-        return Dir.end_of_directory()
+        return xdir.end_of_directory()
 
     def scan(self):
         '''Building tree when using Xbmc library scanning

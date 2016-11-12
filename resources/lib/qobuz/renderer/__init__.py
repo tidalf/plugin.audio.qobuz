@@ -15,6 +15,6 @@ def renderer(nType,
              mode=Mode.VIEW,
              whiteFlag=Flag.ALL,
              blackFlag=Flag.STOPBUILD,
-             depth=1):
+             depth=1, asList=False):
     return OurRenderer(nType, parameters=parameters, mode=mode, whiteFlag=whiteFlag,
-                       blackFlag=blackFlag, depth=depth)
+                       blackFlag=blackFlag, depth=depth, asList=asList)

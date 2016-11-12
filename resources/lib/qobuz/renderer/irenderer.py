@@ -23,14 +23,14 @@ class IRenderer(object):
                  mode=None,
                  whiteFlag=Flag.ALL,
                  blackFlag=Flag.STOPBUILD,
-                 depth=1):
+                 depth=1, asList=False):
         self.node_type = node_type
         self.parameters = parameters
         self.root = None
         self.whiteFlag = whiteFlag
         self.blackFlag = blackFlag
         self.depth = depth
-        self.asList = False
+        self.asList = asList
         self.nodes = []
         self.mode = mode
 
