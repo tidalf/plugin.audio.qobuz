@@ -25,6 +25,7 @@ from qobuz.util import common as util
 from qobuz.theme import theme, color
 from qobuz import config
 from qobuz import image
+from qobuz.util.converter import converter
 
 dialogHeading = 'Qobuz playlist'
 
@@ -115,10 +116,9 @@ class Node_playlist(INode):
     def get_image(self):
         images = self.get_property(['images300', 'images150', 'images'],
                                    default=None)
-        if not images:
+        if images is None:
             return None
         return image.combine(self.nid, images)
-        #return images[random.randint(0, len(images) - 1)]
 
     def makeListItem(self, replaceItems=False):
         privacy_color = theme.get('item/public/color') if self.get_property('is_public', to='bool') else theme.get('item/private/color')
@@ -235,14 +235,12 @@ class Node_playlist(INode):
         if qnt & Flag.SEARCH == Flag.SEARCH:
             self.del_parameter('query')
         if qnt & Flag.TRACK == Flag.TRACK:
-            node = getNode(qnt, {'nid': qid})
-            node.fetch(None, None, None, Flag.NONE)
+            node = getNode(qnt, parameters={'nid': qid})
+            node.data = node.fetch()
             nodes.append(node)
         else:
-            render = renderer(qnt, self.parameters)
-            render.depth = -1
-            render.whiteFlag = Flag.TRACK
-            render.asList = True
+            render = renderer(qnt, parameters=self.parameters, depth=-1,
+                              whiteFlag=Flag.TRACK, asList=True)
             render.run()
             nodes = render.nodes
         ret = xbmcgui.Dialog().select('Add to current playlist', [
@@ -279,8 +277,9 @@ class Node_playlist(INode):
                     debug.warn(self, 'Not a Node_track node')
                     continue
                 str_tracks += '%s,' % (str(node.nid))
-            if not api.playlist_addTracks(
-                    playlist_id=self.nid, track_ids=str_tracks):
+            debug.info(self, 'ADDING TRACKS {}', str_tracks)
+            if not api.playlist_addTracks(playlist_id=playlist_id,
+                                          track_ids=str_tracks):
                 return False
             start += step
         return True
@@ -292,16 +291,16 @@ class Node_playlist(INode):
         if qnt & Flag.SEARCH:
             self.del_parameter('query')
         if qnt & Flag.TRACK == Flag.TRACK:
-            node = getNode(qnt, {'nid': qid})
-            node.fetch(None, None, None, Flag.NONE)
+            node = getNode(qnt, parameters={'nid': qid})
+            node.data = node.fetch()
             nodes.append(node)
         else:
-            render = renderer(qnt, self.parameters)
-            render.depth = -1
-            render.whiteFlag = Flag.TRACK
-            render.asList = True
+            debug.info(self, 'Listing for node: {}', Flag.to_s(qnt))
+            render = renderer(qnt, parameters=self.parameters, depth=-1,
+                              whiteFlag=Flag.TRACK, asList=True)
             render.run()
             nodes = render.nodes
+            debug.info(self, 'Nodes {}', nodes)
 
         if name is None:
             name = self.get_parameter('query', to='unquote', default=None) \
@@ -376,10 +375,10 @@ class Node_playlist(INode):
         executeBuiltin(containerRefresh())
         return True
 
-    def create(self, name, isPublic='true', isCollaborative='false'):
+    def create(self, name, isPublic=True, isCollaborative=False):
         return api.playlist_create(name=name,
-                                   is_public=isPublic,
-                                   is_collaborative=isCollaborative)
+                                   is_public=converter.bool2str(isPublic),
+                                   is_collaborative=converter.bool2str(isCollaborative))
 
     def gui_create(self):
         query = self.get_parameter('query', to='unquote')

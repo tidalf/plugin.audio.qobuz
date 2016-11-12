@@ -34,7 +34,7 @@ class Node_track(INode):
         self.image = getImage('song')
         self.purchased = False
 
-    def fetch(self, xdir, lvl, whiteFlag, blackFlag):
+    def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None):
         if blackFlag is not None and blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
             return None
         return api.get('/track/get', track_id=self.nid)
@@ -102,7 +102,6 @@ class Node_track(INode):
 
     def get_album_label_id(self, default=None):
         return self.get_property('album/label/id', default=default)
-
 
     def get_image(self, size=None, type='front', default=None):
         if size is None:

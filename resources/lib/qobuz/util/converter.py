@@ -46,6 +46,11 @@ class Converter(object):
     def bool(self, data, default=None):
         return common.input2bool(data)
 
+    def bool2str(self, data, default='false'):
+        if data is None:
+            return default
+        return str(data).lower()
+
     def unquote(self, data, default=None):
         if common.is_empty(data):
             return default

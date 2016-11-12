@@ -379,6 +379,7 @@ class INode(object):
         if self.nt & blackFlag != self.nt:
             new_data = self.fetch(xdir, lvl, whiteFlag, blackFlag)
             if new_data is None:
+                debug.warn(self, 'NoData nt: {nt}, nid: {nid}', nt=Flag.to_s(self.nt), nid=self.nid)
                 return False
             else:
                 data.update(new_data)
@@ -387,7 +388,6 @@ class INode(object):
         self.populate(xdir, lvl, whiteFlag, blackFlag)
         if lvl != -1:
             lvl -= 1
-        #label = self.get_label()
         self.__add_pagination_node(xdir, lvl, whiteFlag)
         for child in self.childs:
             if child.nt & whiteFlag == child.nt:
