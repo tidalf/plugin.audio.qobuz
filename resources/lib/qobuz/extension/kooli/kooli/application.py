@@ -18,7 +18,7 @@ kooli_tpl = P.join(kooli_path, 'tpl')
 application = Flask(__name__, template_folder=kooli_tpl)
 
 from werkzeug import exceptions
-from flask import make_response, render_template
+from flask import make_response, render_template, request
 from functools import wraps, update_wrapper
 from datetime import datetime
 from qobuz.node import getNode, Flag
@@ -38,7 +38,8 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 def http_error(name):
-    return getattr(exceptions, name)()
+    return 'error', 500
+    #return getattr(exceptions, name)()
 
 def get_format_id(default=3):
     stream_type = config.app.registry.get('streamtype')
@@ -82,7 +83,7 @@ def route_track_head(album_id=None, track_id=None):
                        format_id=get_format_id(),
                        track_id=track_id)
     if response is None or 'url' not in response:
-        return http_error('NotFound')
+        return 'NotFound', 404 #http_error('NotFound')
     return 'ok', 200
 
 
@@ -93,7 +94,7 @@ def route_track(album_id=None, track_id=None):
                        format_id=get_format_id(),
                        track_id=track_id)
     if response is None or 'url' not in response:
-        return http_error('NotFound')
+        return 'NotFound', 404#http_error('NotFound')
     return redirect(response['url'], code=302)
 
 
@@ -104,12 +105,15 @@ def route_nfo_album(album_id=None, track_id=None):
     if response is None:
         response = api.get('/track/get', track_id=track_id)
         if response is None:
-            return http_error('NotFound')
+            return 'NotFound', 404 #http_error('NotFound')
+    if request.method == 'HEAD':
+        return 'ok', 200
     if not response['description']:
         response['description'] = ''
     response['image_default_size'] = qobuzApp.registry.get('image_default_size')
     if 'duration' in response:
         response['duration'] = round(response['duration'])
+    debug.info(__name__, 'ALBUMNFO {}', response)
     return render_template('album.nfo.tpl', **response)
 
 
@@ -119,9 +123,12 @@ def route_nfo_album(album_id=None, track_id=None):
 def route_nfo_artist(album_id=None):
     album = api.get('/album/get', album_id=album_id)
     if album is None:
-        return http_error('NotFound')
+        return 'NotFound', 404#http_error('NotFound')
     response = api.get('/artist/get', artist_id=album['artist']['id'])
     if response is None:
-        return http_error('NotFound')
+        return 'NotFound', 404 #http_error('NotFound')
+    if request.method == 'HEAD':
+        return 'ok', 200
+    debug.info(__name__, 'ARTISTNFO {}', response)
     response['image_default_size'] = qobuzApp.registry.get('image_default_size')
     return render_template('artist.nfo.tpl', **response)
