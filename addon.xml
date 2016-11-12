@@ -47,4 +47,14 @@
 	</extension>
   <extension point="xbmc.service"
 		library="resources/lib/qobuz/extension/kooli/kooli/script/kooli-xbmc-service.py" start="login" />
+
+<extension point="kodi.context.item">
+  <menu id="kodi.core.main">
+    <item library="contextitem.py">
+      <label>hello</label>
+      <visible>true</visible>
+    </item>
+  </menu>
+</extension>
+
 </addon>
