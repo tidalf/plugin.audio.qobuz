@@ -1,15 +1,15 @@
 '''
     qobuz.plugin
-    ~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcaddon  # @UnresolvedImport
-import xbmc  # @UnresolvedImport
 import os
 import sys
+import xbmcaddon
+import xbmc
 
 class Plugin(object):
 
