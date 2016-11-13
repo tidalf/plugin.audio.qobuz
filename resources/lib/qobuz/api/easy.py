@@ -41,7 +41,7 @@ class EasyApi(RawApi):
         ::example
         from qobuz.api import api
         from qobuz.cache import cache
-        cace.base_path = '/srv/qobuz/cache/'
+        cache.base_path = '/srv/qobuz/cache/'
         data = api.get('/artist/get')
         data = api.get('/user/login',
                         username=api.username,

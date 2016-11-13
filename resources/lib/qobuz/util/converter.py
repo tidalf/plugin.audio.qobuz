@@ -49,7 +49,7 @@ class Converter(object):
     def bool2str(self, data, default='false'):
         if data is None:
             return default
-        return str(data).lower()
+        return str(bool(data)).lower()
 
     def unquote(self, data, default=None):
         if common.is_empty(data):

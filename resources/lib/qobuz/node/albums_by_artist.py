@@ -12,7 +12,7 @@ from qobuz import debug
 import weakref
 from qobuz.api import api
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import getSetting
+#from qobuz.gui.util import getSetting
 from qobuz.node import getNode, Flag
 
 
@@ -47,9 +47,10 @@ class Node_albums_by_artist(INode):
     def get_artist_id(self):
         return self.nid
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        return api.get('/artist/getSimilarArtist', artist_id=self.nid,
-                       limit=self.limit, offset=self.offset, extra='albums')
+    def fetch(self, *a, **ka):
+        return api.get('/artist/get', artist_id=self.nid,
+                       #limit=self.limit, offset=self.offset,
+                       extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for album in self.data['albums']['items']:

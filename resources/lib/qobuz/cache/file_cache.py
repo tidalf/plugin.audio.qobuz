@@ -39,10 +39,7 @@ class FileCache(BaseCache):
         return hashit(argstr)
 
     def _make_path(self, key):
-        xpath = []
-        xpath.append(self.base_path)
-        fileName = key + '.dat'
-        return os.path.join(os.path.join(*xpath), fileName)
+        return os.path.join(self.base_path, '%s.data' % key)
 
     def sync(self, key, data):
         filename = self._make_path(key)
