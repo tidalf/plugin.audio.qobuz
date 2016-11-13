@@ -29,6 +29,9 @@ class Node_similar_artist(INode):
         return api.get('/artist/getSimilarArtists', artist_id=self.nid,
                        offset=self.offset, limit=self.limit)
 
+    def _count(self):
+        return len(self.data['artists']['items'])
+
     def populate(self, Dir, lvl, whiteflag, blackFlag):
         for data in self.data['artists']['items']:
             if data['albums_count'] <= 0 and not config.app.registry.get('display_artist_without_album', to='bool'):

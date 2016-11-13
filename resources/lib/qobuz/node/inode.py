@@ -637,3 +637,10 @@ class INode(object):
             else:
                 debug.error(self, 'Cannot get node storage')
         return None
+
+    def count(self):
+        if self.data is None:
+            raise exception.NodeHasNoData(Flag.to_s(self.nt))
+        if not hasattr(self, '_count'):
+            raise exception.NodeHasNoCountMethod(Flag.to_s(self.nt))
+        return getattr(self, '_count')()

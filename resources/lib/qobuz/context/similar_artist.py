@@ -36,5 +36,8 @@ if __name__ == '__main__':
     if artist is None:
         sys.exit(0)
     node = getNode(Flag.SIMILAR_ARTIST, parameters={'nid': int(artist['id'])})
+    node.data = node.fetch()
+    if node.data is None or node.count() == 0:
+        sys.exit(0)
     url = 'plugin://plugin.audio.qobuz/%s' % node.make_url()
-    executeBuiltin(containerUpdate(url, True))
+    executeBuiltin(containerUpdate(url, False))

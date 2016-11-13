@@ -45,3 +45,9 @@ class InvalidDebugPath(QobuzError):
 
 class DirectoryNotWritable(QobuzError):
     pass
+
+class NodeHasNoData(QobuzError):
+    pass
+
+class NodeHasNoCountMethod(QobuzError):
+    pass
