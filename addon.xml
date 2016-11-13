@@ -50,10 +50,17 @@
 
 <extension point="kodi.context.item">
   <menu id="kodi.core.main">
-    <item library="resources/lib/qobuz/context/item.py">
-      <label>hello</label>
-      <visible>true</visible>
-    </item>
+		<menu>
+			<label>Qobuz</label>
+	    <item library="resources/lib/qobuz/context/albums_by_artist.py">
+	      <label>30030</label>
+	      <visible>true</visible>
+	    </item>
+			<item library="resources/lib/qobuz/context/similar_artist.py">
+	      <label>30160</label>
+	      <visible>true</visible>
+	    </item>
+		</menu>
   </menu>
 </extension>
 

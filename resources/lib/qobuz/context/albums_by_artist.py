@@ -17,11 +17,9 @@ if __name__ == '__main__':
     app = Application(Plugin('plugin.audio.qobuz'))
     app.bootstrap.init_app()
     tag = sys.listitem.getMusicInfoTag()
-    message = "Clicked on '%s'" % sys.listitem.getLabel()
     query = converter.quote(tag.getArtist())
-    node = getNode(Flag.SEARCH,
-                   parameters={'search-type': 'artists',
-                               'query': query})
+    node = getNode(Flag.SEARCH, parameters={'search-type': 'artists',
+                                'query': query})
     node.data = node.fetch()
     if node.data is None:
         sys.exit(0)
@@ -35,4 +33,4 @@ if __name__ == '__main__':
         sys.exit(0)
     node = getNode(Flag.ALBUMS_BY_ARTIST, parameters={'nid': artist['id']})
     url = 'plugin://plugin.audio.qobuz/%s' % node.make_url()
-    executeBuiltin(containerUpdate(url, True))
+    executeBuiltin(containerUpdate(url, False))

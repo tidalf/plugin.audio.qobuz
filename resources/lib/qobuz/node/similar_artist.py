@@ -11,11 +11,9 @@ from qobuz.node import getNode, Flag
 from qobuz.gui.util import lang
 from qobuz.api import api
 from qobuz import config
-
+from qobuz import debug
 
 class Node_similar_artist(INode):
-    """NODE ARTIST
-    """
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_similar_artist, self).__init__(parent=parent,
@@ -27,7 +25,7 @@ class Node_similar_artist(INode):
     def get_label(self, default=None):
         return lang(30156)
 
-    def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None):
+    def fetch(self, *a, **ka):
         return api.get('/artist/getSimilarArtists', artist_id=self.nid,
                        offset=self.offset, limit=self.limit)
 
@@ -40,4 +38,4 @@ class Node_similar_artist(INode):
             if cache is not None:
                 artist.data = cache
             self.add_child(artist)
-        return True
+        return True if len(self.data['artists']['items']) > 0 else False

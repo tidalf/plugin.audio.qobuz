@@ -331,9 +331,11 @@ class RawApi(object):
         return self._api_request(ka, '/playlist/getPublicPlaylists')
 
     def artist_getSimilarArtists(self, **ka):
+        debug.info(self, 'Similar {}', ka)
         limit_max = 100 # @note: when limit > 100 server respond 40x
-        if 'limit' in ka and ka['limit'] > limit_max:
-            ka['limit'] = limit_max
+        #if 'limit' in ka and ka['limit'] > limit_max:
+        #    ka['limit'] = limit_max
+        ka['limit'] = 10
         self._check_ka(ka, ['artist_id'], ['limit', 'offset'])
         return self._api_request(ka, '/artist/getSimilarArtists')
 
