@@ -29,6 +29,7 @@ if __name__ == '__main__':
         a = _artist['name'].lower().strip()
         if a == query:
             artist = _artist
+            break
     if artist is None:
         sys.exit(0)
     node = getNode(Flag.SIMILAR_ARTIST, parameters={'nid': int(artist['id'])})
