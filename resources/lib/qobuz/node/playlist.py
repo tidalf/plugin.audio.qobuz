@@ -41,13 +41,13 @@ class Node_playlist(INode):
         self.b_is_current = False
         self.is_my_playlist = False
         self.content_type = 'albums'
+        self._items_path = 'tracks/items'
 
     def get_is_folder(self):
         count = self.get_property('tracks_count')
         if count is not None and count > 0:
             return True
-        items = self.get_property('tracks/items')
-        if items is not None and len(items) > 0:
+        if self.count() > 0:
             return True
         return False
 
@@ -77,10 +77,15 @@ class Node_playlist(INode):
         return api.get('/playlist/get', playlist_id=self.nid,
                        offset=self.offset, limit=self.limit, extra='tracks')
 
+    def _count(self):
+        return len(self.get_property(self._items_path, default=[]))
+
     def populate(self, *a, **ka):
-        for track in self.data['tracks']['items']:
+        if self.count() == 0:
+            return False
+        for track in self.get_property(self._items_path):
             self.add_child(getNode(Flag.TRACK, data=track))
-        return True if len(self.data['tracks']['items']) > 0 else False
+        return True
 
     def get_name(self):
         return self.get_property(['name', 'title'])

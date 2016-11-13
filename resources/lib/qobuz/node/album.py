@@ -29,6 +29,7 @@ class Node_album(INode):
         self.image = getImage('album')
         self.content_type = 'albums'
         self.imageDefaultSize = config.app.registry.get('image_default_size')
+        self._items_path = 'tracks/items'
 
     def get_nid(self):
         return super(Node_album, self).get_nid()
@@ -38,11 +39,16 @@ class Node_album(INode):
 
     nid = property(get_nid, set_nid)
 
+    def _count(self):
+        return len(self.get_property(self._items_path, default=[]))
+
     def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None, noRemote=False):
         return api.get('/album/get', album_id=self.nid, noRemote=noRemote)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        for track in self.data['tracks']['items']:
+        if self.count() == 0:
+            return False
+        for track in self.get_property(self._items_path):
             track.update({
                 'album': {
                     'title': self.get_title(),
@@ -61,7 +67,7 @@ class Node_album(INode):
                 }
             })
             self.add_child(getNode(Flag.TRACK, data=track))
-        return True if len(self.data['tracks']['items']) > 0 else False
+        return True
 
     def make_url(self, asLocalUrl=False, **ka):
         purchased = self.get_parameter('purchased')

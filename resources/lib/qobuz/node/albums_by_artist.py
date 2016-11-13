@@ -26,6 +26,7 @@ class Node_albums_by_artist(INode):
                                                     data=data)
         self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
+        self._items_path = 'albums/items'
 
     def get_label(self, default=None):
         return self.get_artist()
@@ -47,13 +48,18 @@ class Node_albums_by_artist(INode):
     def get_artist_id(self):
         return self.nid
 
+    def _count(self):
+        return len(self.get_property(self._items_path, default=[]))
+
     def fetch(self, *a, **ka):
         return api.get('/artist/get', artist_id=self.nid,
-                       #limit=self.limit, offset=self.offset,
+                       limit=self.limit, offset=self.offset,
                        extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        for album in self.data['albums']['items']:
+        if self.count() == 0:
+            return False
+        for album in self.get_property(self._items_path):
             for k in ['artist', 'interpreter', 'composer', 'performer']:
                 try:
                     if k in self.data['artist']:
@@ -62,7 +68,7 @@ class Node_albums_by_artist(INode):
                     debug.warn(self, "Strange thing happen")
                     pass
             self.add_child(getNode(Flag.ALBUM, data=album))
-        return len(self.data['albums']['items'])
+        return True
 
     def makeListItem(self, replaceItems=False):
         item = xbmcgui.ListItem(self.get_label(),

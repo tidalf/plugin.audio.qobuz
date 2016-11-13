@@ -33,6 +33,7 @@ class Node_artist(INode):
         self.nt = Flag.ARTIST
         self.set_label(self.get_name())
         self.content_type = 'artists'
+        self._items_path = 'albums/items'
 
     def hook_post_data(self):
         self.nid = self.get_parameter('nid', default=None) or \
@@ -41,20 +42,22 @@ class Node_artist(INode):
         self.image = self.get_image()
         self.label = self.name
 
+    def _count(self):
+        return len(self.get_property(self._items_path, default=[]))
+
     def fetch(self, *a, **ka):
         return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        if 'albums' not in self.data:
+        if self.count() == 0:
             return False
-        self.content_type = 'albums'
-        for data in self.data['albums']['items']:
+        for data in self.get_property(self._items_path):
             album = getNode(Flag.ALBUM, data=data)
             cache = album.fetch(noRemote=True)
             if cache is not None:
                 album.data = cache
             self.add_child(album)
-        return True if len(self.data['albums']['items']) > 0 else False
+        return True
 
     def get_artist_id(self):
         return self.nid
