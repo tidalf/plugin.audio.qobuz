@@ -1,17 +1,12 @@
 import sys
 from os import path as P
-import xbmc
-from xbmc import log
-base_dir = P.abspath(P.join(P.dirname(__file__),P.pardir))
+base_dir = P.abspath(P.join(P.dirname(__file__), P.pardir))
 sys.path.append(P.join(base_dir, P.pardir))
 from qobuz.node import getNode, Flag
 from qobuz.util.converter import converter
 from qobuz.plugin import Plugin
 from qobuz.application import Application
-from qobuz import debug
-from qobuz.renderer.xbmc import QobuzXbmcRenderer as renderer
-from qobuz.gui.util import runPlugin, containerUpdate, executeBuiltin
-from qobuz import config
+from qobuz.gui.util import containerUpdate, executeBuiltin
 
 if __name__ == '__main__':
     app = Application(Plugin('plugin.audio.qobuz'))
@@ -26,8 +21,8 @@ if __name__ == '__main__':
     query = tag.getArtist().lower().strip()
     artist = None
     for _artist in node.data['artists']['items']:
-        a = _artist['name'].lower().strip()
-        if a == query:
+        name = _artist['name'].lower().strip()
+        if name == query:
             artist = _artist
             break
     if artist is None:
