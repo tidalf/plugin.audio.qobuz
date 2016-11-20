@@ -1,7 +1,6 @@
-
 <album>
   <title>{{title}}</title>
-  {% if artist.name %}
+  {% if artist is defined %}
     <artist>{{artist.name}}</artist>
   {% endif %}
   {% for genre in genres_list %}

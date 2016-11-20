@@ -61,6 +61,7 @@ class KooliService(threading.Thread):
     name = 'httpd'
     def __init__(self, port=33574):
         threading.Thread.__init__(self)
+        self.daemon = True
         self.port = port
         self.running = False
         self.threaded = True
@@ -74,7 +75,8 @@ class KooliService(threading.Thread):
     def run(self):
         while self.alive:
             if not is_authentication_set():
-                gui.notify_warn('Authentication not set', 'You need to enter credentials')
+                gui.notify_warn('Authentication not set',
+                                'You need to enter credentials')
             elif not user.logged:
                 if not api.login(username=qobuzApp.registry.get('username'),
                     password=qobuzApp.registry.get('password')):
@@ -83,7 +85,8 @@ class KooliService(threading.Thread):
                     try:
                         application.run(port=self.port, threaded=True)
                     except Exception as e:
-                        debug.error(self, 'KooliService port: {} Error: {}', self.port, e)
+                        debug.error(self, 'KooliService port: {} Error: {}',
+                                    self.port, e)
             time.sleep(1)
 
 
