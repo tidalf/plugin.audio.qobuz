@@ -117,6 +117,18 @@ class Node_album(INode):
             return default
         return [a['name'] for a in awards]
 
+    def get_hires(self):
+        return self.get_property('hires', to='bool', default=False)
+
+    def get_hires_purchased(self):
+        return self.get_property('hires_purchased', to='bool', default=False)
+
+    def get_purchased(self):
+        return self.get_property('purchased', to='bool', default=False)
+
+    def get_displayable(self):
+        return self.get_property('displayable', to='bool', default=False)
+
     def get_information(self):
         awards = self.get_awards(default=None)
         if awards is not None:
@@ -129,20 +141,23 @@ class Node_album(INode):
         else:
             articles = u''
         description = self.get_description(default=self.get_label())
-        return u'''{description}{awards}{articles}
-- popularity: {popularity}
-- duration: {duration} mn
+        return u'''- downloadable: {downloadable}
+- hires: {hires}
 - previewable: {previewable}
 - streamable: {streamable}
-- media_count: {media_count}
+- sampleable: {sampleable}
+- displayable: {displayable}
 - purchasable: {purchasable}
+- purchased: {purchased}
+- purchasable_at: {purchasable_at}
+- hires_purchased: {hires_purchased}
+{description}{awards}{articles}
+- popularity: {popularity}
+- duration: {duration} mn
+- media_count: {media_count}
 - released_at: {released_at}
 - tracks_count: {tracks_count}
-- displayable: {displayable}
 - label: {label}
-- downloadable: {downloadable}
-- hires: {hires}
-- sampleable: {sampleable}
 - genre: {genre}
 - artist: {artist}
 - maximum_sampling_rate: {maximum_sampling_rate}
@@ -152,13 +167,16 @@ class Node_album(INode):
                    previewable=self.get_property('previewable'),
                    streamable=self.get_property('streamable'),
                    media_count=self.get_property('media_count'),
+                   purchased=self.get_purchased(),
                    purchasable=self.get_property('purchasable'),
+                   purchasable_at=self.get_property('purchasable_at'),
                    released_at=self.get_property('released_at'),
                    tracks_count=self.get_property('tracks_count'),
                    displayable=self.get_property('displayable'),
                    label=self.get_property('label/name'),
                    downloadable=self.get_property('downloadable'),
                    hires=self.get_property('hires'),
+                   hires_purchased=self.get_hires_purchased(),
                    sampleable=self.get_property('sampleable'),
                    awards=awards,
                    genre=self.get_property('genre/name'),
@@ -200,7 +218,7 @@ class Node_album(INode):
         rgb = self.get_property('genre/color', default='#00000')
         genre = self.get_property('genre/name', default='n/a')
         artist = self.get_artist() or 'VA'
-        return '%s - %s' % (artist, self.get_title()) #, color(rgb, genre))
+        return '%s - %s' % (artist, self.get_title())
 
     def get_genre(self, default=u''):
         return self.get_property('genre/name', default=default)
