@@ -61,7 +61,7 @@ class Node_recommendation(INode):
         self.genre_type = self.get_parameter('genre-type', default=None)
         self.set_label(lang(30084))
         self.image = getImage('album')
-        self.content_type = 'files'
+        self.content_type = 'albums'
 
     def make_url(self, **ka):
         if self.genre_type is not None:
