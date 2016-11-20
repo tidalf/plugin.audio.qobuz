@@ -20,17 +20,13 @@ def is_purchased(track):
                         parameters={'search-type': 'all'})
     purchases.data = purchases.fetch()
     if search(purchases, track):
-        debug.info(__name__, 'Track in purchase {}', track.get_label())
         return True
     album = getNode(Flag.ALBUM, parameters={'nid': track.get_property('album/id')})
     album.data = album.fetch()
     if album.data is None:
-        debug.info(__name__, 'No album with track id {}', track.nid)
         return False
     if search(purchases, album, kind='albums'):
-        debug.info(__name__, 'Track in album purchase {}', track.get_label().encode('utf8'))
         return True
-    debug.info(__name__, 'Track not purchased {}', track.get_label().encode('utf8'))
     return False
 
 class User(object):
