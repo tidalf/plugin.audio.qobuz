@@ -145,8 +145,13 @@ class QobuzXbmcRenderer(IRenderer):
         tracks.update({track.nid: track for track in list_track(self.root)})
         if len(tracks.keys()) == 0:
             progress.close()
+            Dir.end_of_directory()
             return False
         for nid, track in tracks.items():
+            if track.nt & Flag.TRACK != Flag.TRACK:
+                continue
+            if not track.get_displayable():
+                continue
             Dir.add_node(track)
         Dir.set_content(self.root.content_type)
         Dir.end_of_directory()
