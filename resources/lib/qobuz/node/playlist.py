@@ -84,7 +84,13 @@ class Node_playlist(INode):
         if self.count() == 0:
             return False
         for track in self.get_property(self._items_path):
-            self.add_child(getNode(Flag.TRACK, data=track))
+            node = getNode(Flag.TRACK, data=track)
+            if not node.get_displayable():
+                debug.warn(self, u'Track not displayable: {} ({})',
+                           node.get_label().encode('ascii', errors='ignore'),
+                           node.nid)
+                continue
+            self.add_child(node)
         return True
 
     def get_name(self):
@@ -282,7 +288,6 @@ class Node_playlist(INode):
                     debug.warn(self, 'Not a Node_track node')
                     continue
                 str_tracks += '%s,' % (str(node.nid))
-            debug.info(self, 'ADDING TRACKS {}', str_tracks)
             if not api.playlist_addTracks(playlist_id=playlist_id,
                                           track_ids=str_tracks):
                 return False
@@ -300,12 +305,10 @@ class Node_playlist(INode):
             node.data = node.fetch()
             nodes.append(node)
         else:
-            debug.info(self, 'Listing for node: {}', Flag.to_s(qnt))
             render = renderer(qnt, parameters=self.parameters, depth=-1,
                               whiteFlag=Flag.TRACK, asList=True)
             render.run()
             nodes = render.nodes
-            debug.info(self, 'Nodes {}', nodes)
 
         if name is None:
             name = self.get_parameter('query', to='unquote', default=None) \
