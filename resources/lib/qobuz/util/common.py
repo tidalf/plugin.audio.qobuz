@@ -10,7 +10,7 @@
 def is_number(value):
     try:
         float(value)
-    except ValueError:
+    except:
         return False
     return True
 
