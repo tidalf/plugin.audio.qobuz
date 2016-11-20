@@ -37,20 +37,18 @@ class Node_purchase(INode):
     def make_url(self, **ka):
         if self.search_type:
             ka['search-type'] = str(self.search_type)
-            ka['purchased'] = 1
         return super(Node_purchase, self).make_url(**ka)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, *a, **ka):
         if self.search_type is None:
             return {}
         return api.get('/purchase/getUserPurchases', limit=self.limit,
                        offset=self.offset, user_id=user.get_id())
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, xdir, lvl, whiteFlag, blackFlag):
         if self.search_type is None:
             for search_type in ['all', 'albums', 'tracks']:
-                self.add_child(getNode(Flag.PURCHASE,
-                                       parameters={'search-type': search_type}))
+                self.add_child(getNode(Flag.PURCHASE, parameters={'search-type': search_type}))
             return True
         wanted = ['albums', 'tracks']
         if self.search_type != 'all':
@@ -61,7 +59,7 @@ class Node_purchase(INode):
             if not hasattr(self, method):
                 debug.warn(self, 'No method named %s' % method)
                 continue
-            if getattr(self, method)(Dir, lvl, whiteFlag, blackFlag):
+            if getattr(self, method)(xdir, lvl, whiteFlag, blackFlag):
                 ret = True
         return ret
 
@@ -72,7 +70,6 @@ class Node_purchase(INode):
             cache = node.fetch(noRemote=True)
             if cache is not None:
                 node.data = cache
-            node.data['purchased'] = True
             self.add_child(node)
         return True if len(self.data['albums']['items']) > 0 else False
 
@@ -80,7 +77,5 @@ class Node_purchase(INode):
         self.content_type = 'albums'
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, data=track)
-            node.data['purchased'] = True
             self.add_child(node)
-            ret = True
         return True if len(self.data['tracks']['items']) > 0 else False
