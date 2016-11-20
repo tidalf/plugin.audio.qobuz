@@ -136,7 +136,7 @@ def route_nfo_artist(album_id=None):
 
 @nocache
 @application.route('/qobuz/favorite/', methods=['GET', 'HEAD'])
-@application.route('/qobuz/favorite/<string:search_type>',
+@application.route('/qobuz/favorite/<string:search_type>/',
                    methods=['GET', 'HEAD'])
 @application.route('/qobuz/favorite/<string:search_type>/<string:nid>',
                    methods=['GET', 'HEAD'])
