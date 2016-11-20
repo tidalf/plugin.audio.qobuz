@@ -33,6 +33,7 @@ class Node_track(INode):
         self.status = None
         self.image = getImage('song')
         self.purchased = False
+        self._intent = None
 
     def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None):
         if blackFlag is not None and blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
@@ -214,11 +215,17 @@ class Node_track(INode):
             return False
         return True
 
+    def get_downloadable(self):
+        return self.get_property('downloadable', to='bool', default=False)
+
     def get_hires(self):
-        return self.get_property('hires')
+        return self.get_property('hires', to='bool', default=False)
 
     def get_purchased(self):
-        return self.get_property('purchased')
+        return self.get_property('purchased', to='bool', default=False)
+
+    def get_hires_purchased(self):
+        return self.get_property('purchased', to='bool', default=False)
 
     def get_description(self, default='n/a'):
         description = self.get_property('album/description', default=None,
@@ -230,13 +237,9 @@ class Node_track(INode):
         return default
 
     def __getFileUrl(self):
-        hires = config.app.registry.get('hires_enabled', to='bool')
-        if (self.get_property('purchased') or self.get_parameter('purchased') == '1' or self.purchased) and hires and self.get_hires():
-            intent = "download"
-            format_id = 27
-        else:
-	    format_id = user.stream_format()
-            intent = "stream"
+        if self._intent is None:
+            self._intent = user.stream_format(track=self)
+        format_id, intent, description = self._intent
         data = api.get('/track/getFileUrl', format_id=format_id,
                        track_id=self.nid, user_id=user.get_id(), intent=intent)
         if not data:
@@ -280,7 +283,7 @@ class Node_track(INode):
             return False
         formatId = int(data['format_id'])
         mime = ''
-        if formatId in [6, 27]:
+        if formatId in [6, 27, 7]:
             mime = 'audio/flac'
         elif formatId == 5:
             mime = 'audio/mpeg'
@@ -305,6 +308,9 @@ class Node_track(INode):
         return round(min(self.get_property('popularity', to='float',
                                            default=default), 1.0) * 5.0)
 
+    def get_streamable(self):
+        return self.get_property('streamable', to='bool', default=False)
+
     def get_articles(self, default=[]):
         return ['%s (%s%s)' % (a['label'], a['price'], a['currency'])
                 for a in self.get_property('album/articles', default=default)]
@@ -312,6 +318,9 @@ class Node_track(INode):
     def get_awards(self, default=[]):
         return [a['name'] for a in self.get_property('album/awards',
                                                      default=default)]
+
+    def get_displayable(self):
+        return self.get_property('displayable', to='bool', default=False)
 
     def makeListItem(self, replaceItems=False):
         isplayable = 'true'
@@ -327,24 +336,25 @@ class Node_track(INode):
             'thumb': self.get_image(),
             'icon': self.get_image(type='thumbnail')
         })
-        comment = u'''{description}
+        comment = u'''- HiRes: {hires}
+- HiRes purchased: {hires_purchased}
+- purchasable: {purchasable}
+- purchased: {purchased}
+- streamable: {streamable}
+- previewable: {previewable}
+- sampleable: {sampleable}
+- downloadable: {downloadable}
+{description}
 - label: {label}
 - duration: {duration} mn
 - track number: {track_number}
 - year: {year}
 - composer: {composer}
 - performer: {performer}
-- purchasable: {purchasable} / Purchased: {purchased}
 - copyright: {copyright}
 - popularity: {popularity}
 - maximum sampling rate: {maximum_sampling_rate}
 - maximum_bit_depth: {maximum_bit_depth}
-- HiRes: {hires} / HiRes purchased: {hires_purchased}
-- streamable: {streamable}
-- previewable: {previewable}
-- sampleable: {sampleable}
-- downloadable: {downloadable}
-
 '''.format(popularity=self.get_property('popularity', default='n/a'),
            duration=self.get_duration(),
            label=self.get_album_label(),
@@ -355,16 +365,16 @@ class Node_track(INode):
             performer=self.get_property('performer/name'),
             composer=self.get_property('composer/name'),
             copyright=self.get_property('copyright', default='n/a'),
-            maximum_sampling_rate=self.get_property('maximum_sampling_rate'),
+            maximum_sampling_rate=self.get_maximum_sampling_rate(),
             maximum_bit_depth=self.get_property('maximum_bit_depth'),
             description=self.get_description(default=self.get_label()),
             hires=self.get_property('hires'),
             sampleable=self.get_property('sampleable'),
-            downloadable=self.get_property('downloadable'),
+            downloadable=self.get_downloadable(),
             purchasable=self.get_property('purchasable'),
             purchased=self.get_property('purchased', default=False),
             previewable=self.get_property('previewable'),
-            streamable=self.get_property('streamable'),
+            streamable=self.get_streamable(),
             hires_purchased=self.get_property('hires_purchased', default=False),
             awards=','.join(self.get_awards()),
             articles=', '.join(self.get_articles()))
@@ -392,6 +402,9 @@ class Node_track(INode):
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
+
+    def get_maximum_sampling_rate(self):
+        return self.get_property('maximum_sampling_rate')
 
     def attach_context_menu(self, item, menu):
         if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
