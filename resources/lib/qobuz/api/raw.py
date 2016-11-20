@@ -337,7 +337,7 @@ class RawApi(object):
         return self._api_request(ka, '/artist/getSimilarArtists')
 
     def artist_get(self, **ka):
-        self._check_ka(ka, ['artist_id'], ['extra'])
+        self._check_ka(ka, ['artist_id'], ['extra', 'limit', 'offset'])
         return self._api_request(ka, '/artist/get')
 
     def genre_list(self, **ka):
