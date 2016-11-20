@@ -47,7 +47,7 @@ class Node_favorite(INode):
             self.content_type = 'artists'
 
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, *a, **ka):
         if self.search_type is None:
             return {}
         if self.search_type != 'all':
@@ -91,12 +91,23 @@ class Node_favorite(INode):
 
     def _populate_tracks(self, *a, **ka):
         for track in self.data['tracks']['items']:
-            self.add_child(getNode(Flag.TRACK, data=track))
+            node = getNode(Flag.TRACK, data=track)
+            if not node.get_displayable():
+                debug.warn(self, 'Track not displayable: {} ({})',
+                           node.get_label().encode('ascii', errors='ignore'),
+                           node.nid)
+                continue
+            self.add_child(node)
         return True if len(self.data['tracks']['items']) > 0 else False
 
     def _populate_albums(self, *a, **ka):
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
+            if not node.get_displayable():
+                debug.warn(self, 'Album not displayable: {} ({})',
+                           node.get_label().encode('ascii', errors='ignore'),
+                           node.nid)
+                continue
             cache = node.fetch(noRemote=True)
             if cache is not None:
                 node.data = cache
