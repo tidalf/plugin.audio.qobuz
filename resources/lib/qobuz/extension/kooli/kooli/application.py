@@ -21,7 +21,6 @@ from qobuz import debug
 from qobuz.node import getNode, Flag
 from qobuz.gui.directory import Directory
 from qobuz import config
-from qobuz.util.common import get_audio_format_id
 from kooli import kooli_path
 
 qobuzApp = QobuzApplication(Plugin('plugin.audio.qobuz'),
@@ -44,17 +43,6 @@ def nocache(view):
 
 def http_error(name):
     return 'error', 500
-    #return getattr(exceptions, name)()
-
-# def get_format_id(default=3):
-#     audio_format = {
-#         'flac': 6,
-#         'mp3': 5
-#     }
-#     stream_type = config.app.registry.get('streamtype')
-#     if stream_type in audio_format:
-#         return audio_format[stream_type]
-#     else return audio_format['mp3']
 
 def shutdown_server():
     try:
@@ -96,7 +84,6 @@ def route_track(album_id=None, track_id=None):
     if url is None:
         return 'Not Found', 404
     if request.method == 'HEAD':
-        debug.info(self, 'TRACK HEAD')
         return 'ok', 200
     return redirect(url, code=302)
 
