@@ -1,5 +1,37 @@
 from qobuz import debug
 from qobuz import config
+from qobuz.node import getNode, Flag
+
+audio_format = {
+    'mp3': (5, 'stream', 'MP3 320'),
+    'flac': (6, 'stream', 'FLAC Lossless'),
+    'hires': (7, 'stream', 'FLAC Hi-Res 24 bit =< 96kHz'),
+    'hires_hsr': (27, 'download', 'FLAC Hi-Res 24 bit >96 kHz & =< 192 kHz')
+}
+
+def search(src, node, kind='tracks'):
+    for n in src.data[kind]['items']:
+        if n['id'] == node.nid:
+            return True
+    return False
+
+def is_purchased(track):
+    purchases = getNode(Flag.PURCHASE,
+                        parameters={'search-type': 'all'})
+    purchases.data = purchases.fetch()
+    if search(purchases, track):
+        debug.info(__name__, 'Track in purchase {}', track.get_label())
+        return True
+    album = getNode(Flag.ALBUM, parameters={'nid': track.get_property('album/id')})
+    album.data = album.fetch()
+    if album.data is None:
+        debug.info(__name__, 'No album with track id {}', track.nid)
+        return False
+    if search(purchases, album, kind='albums'):
+        debug.info(__name__, 'Track in album purchase {}', track.get_label().encode('utf8'))
+        return True
+    debug.info(__name__, 'Track not purchased {}', track.get_label().encode('utf8'))
+    return False
 
 class User(object):
 
@@ -24,11 +56,16 @@ class User(object):
                  return False
         return True
 
-    def stream_format(self):
-        return 6 if config.app.registry.get('streamtype') == 'flac' else 5
-
-    def hires(self):
-        return config.app.registry.get('hires_enabled', to='bool')
+    def stream_format(self, track=None):
+        stream_type = config.app.registry.get('streamtype').lower()
+        if track is not None:
+            if stream_type == 'hires':
+                if is_purchased(track):
+                    #if track.get_maximum_sampling_rate() > 96:
+                    stream_type = 'hires_hsr'
+                else:
+                    stream_type = 'flac'
+        return audio_format[stream_type]
 
     def set_credentials(self, username, password):
         self.username = username
