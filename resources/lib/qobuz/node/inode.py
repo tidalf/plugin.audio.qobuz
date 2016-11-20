@@ -146,6 +146,16 @@ class INode(object):
         ''' Called after node data is set '''
         pass
 
+    def set_property(self, pathList, value):
+        if self.data is None:
+            raise KeyError('Node without data')
+        root = self.data
+        for part in pathList.split('/'):
+            if part not in root:
+                root[part] = {}
+            root = root[part]
+        root = value
+
     def get_property(self, pathList, default=u'', to='raw'):
         '''Property are just a easy way to access JSON data (self.data)
         @param pathList: a string or a list of string, each string can be
@@ -161,12 +171,14 @@ class INode(object):
         '''
         if isinstance(pathList, basestring):
             res = self.__get_property(pathList)
-            return getattr(converter, to)(res) if res is not None else default
+            if res is None:
+                return default
+            return getattr(converter, to)(res)
         for path in pathList:
             data = self.__get_property(path)
             if data is not None:
                 return getattr(converter, to)(data)
-        return getattr(converter, to)(default)
+        return default
 
     def __get_property(self, path):
         '''Helper used by get_property method
@@ -379,7 +391,6 @@ class INode(object):
         if self.nt & blackFlag != self.nt:
             new_data = self.fetch(xdir, lvl, whiteFlag, blackFlag)
             if new_data is None:
-                debug.warn(self, 'NoData nt: {nt}, nid: {nid}', nt=Flag.to_s(self.nt), nid=self.nid)
                 return False
             else:
                 data.update(new_data)
