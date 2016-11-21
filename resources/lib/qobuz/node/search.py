@@ -29,11 +29,6 @@ data_search_type = {
         'content_type' : 'albums',
         'image' : getImage('song'),
     },
-    # 'collection': {
-    #     'label' : lang(30018),
-    #     'content_type' : 'albums',
-    #     'image' : getImage('song')
-    # }
 }
 
 class Node_search(INode):
@@ -52,7 +47,7 @@ class Node_search(INode):
 
     def get_label(self):
         if self.search_type is None:
-            return 'Search (i8n)'
+            return lang(30022)
         query = self.get_parameter('query', to='unquote')
         if query is not None:
             return 'search %s: %s [%s/%s]' % (self.search_type,
