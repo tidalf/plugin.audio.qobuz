@@ -117,12 +117,12 @@ class RawApi(object):
         except Exception as e:
             self.status_code = 500
             self.error = 'Post request fail: %s' % e
-            debug.error(self, self.error)
+            debug.error(self, 'error: {}, content: {}', self.error, r.content)
             return None
         self.status_code = int(r.status_code)
         if self.status_code != 200:
             self.error = self._api_error_string(r, url, _copy_params)
-            debug.error(self, self.error)
+            debug.error(self, 'error: {}, content: {}', self.error, r.content)
             return None
         if not r.content:
             self.error = 'Request return no content'
@@ -326,9 +326,9 @@ class RawApi(object):
                                              'is_public', 'is_collaborative', 'tracks_id'])
         return self._api_request(ka, '/playlist/update')
 
-    def playlist_getPublicPlaylists(self, **ka):
+    def playlist_getFeatured(self, **ka):
         self._check_ka(ka, [], ['type', 'limit', 'offset'])
-        return self._api_request(ka, '/playlist/getPublicPlaylists')
+        return self._api_request(ka, '/playlist/getFeatured')
 
     def artist_getSimilarArtists(self, **ka):
         if 'limit' in ka and ka['limit'] > 100:

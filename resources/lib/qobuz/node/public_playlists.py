@@ -12,6 +12,8 @@ from qobuz.gui.util import lang, getImage
 from qobuz.api import api
 from qobuz import debug
 
+featured_type = ['editor-picks', 'last-created']
+
 class Node_public_playlists(INode):
 
     def __init__(self, parent=None, parameters={}, data=None):
@@ -19,17 +21,20 @@ class Node_public_playlists(INode):
                                                     parameters=parameters,
                                                     data=data)
         self.nt = Flag.PUBLIC_PLAYLISTS
-        self.set_label(lang(30190))
         self.image = getImage('userplaylists')
         self.content_type = 'albums'
+        self.type = self.get_parameter('type', default='last-created')
+        if self.type not in featured_type:
+            raise RuntimeError('InvalidFeaturedType: {}'.format(self.type))
+        self.label = '%s (%s)' % (lang(30190), self.type)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        return api.get('/playlist/getPublicPlaylists',
+    def fetch(self, *a, **ka):
+        return api.get('/playlist/getFeatured',
                        offset=self.offset,
                        limit=self.limit,
-                       type='last-created')
+                       type=self.type)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         for item in self.data['playlists']['items']:
             self.add_child(getNode(Flag.PLAYLIST, data=item))
         return True if len(self.data['playlists']['items']) > 0 else False
