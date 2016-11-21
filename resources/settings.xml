@@ -34,6 +34,9 @@
 		<setting type="sep" />
 		<setting id="image_default_size" type="labelenum" label="Image default size"
             default="large" values="thumbnail|small|large|xlarge" />
+		<setting id="image_create_mosaic" type="bool" label="Create mosaic from album cover"
+				            default="true" />
+
 	</category>
 
 	<category label="Library (beta)">
@@ -51,7 +54,6 @@
 		<setting id="show_recommendations" type="bool" default="true" label="30153" option="" />
 		<setting id="search_enabled" label="30135" type="bool" default="true" />
 		<setting id="display_artist_without_album" label="Display artist without album (i8n)" type="bool" default="false" />
-		<setting id="scan_stop" type="bool" default="true" option="hidden" />
 	</category>
 	<category label="Theme">
 		<setting id="colorize_items" label="Colorize items (i8n)" type="bool" default="true" />

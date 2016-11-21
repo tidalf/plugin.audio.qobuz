@@ -3,6 +3,7 @@ import requests
 from os import path as P
 from qobuz import debug
 from qobuz import data_path
+from qobuz import config
 available = False
 
 try:
@@ -12,6 +13,8 @@ except ImportError as e:
     debug.error(__name__, 'Cannot import PIL library')
 
 def combine(nid, images=[], count=4, prefix='cover'):
+    if not config.app.registry.get('image_create_mosaic', to='bool'):
+        available = False
     global available
     len_images = len(images)
     if  len_images == 0:
