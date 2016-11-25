@@ -21,9 +21,7 @@ class Node_similar_artist(INode):
                                                   data=data)
         self.nt = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
-
-    def get_label(self, default=None):
-        return lang(30156)
+        self.lang = lang(30156)
 
     def fetch(self, *a, **ka):
         return api.get('/artist/getSimilarArtists', artist_id=self.nid,
@@ -32,10 +30,12 @@ class Node_similar_artist(INode):
     def _count(self):
         return len(self.data['artists']['items'])
 
-    def populate(self, Dir, lvl, whiteflag, blackFlag):
+    def populate(self, *a, **ka):
         for data in self.data['artists']['items']:
-            if data['albums_count'] <= 0 and not config.app.registry.get('display_artist_without_album', to='bool'):
-                continue
+            if not config.app.registry.get('display_artist_without_album',
+                                           to='bool'):
+                if data['albums_count'] <= 0:
+                    continue
             artist = getNode(Flag.ARTIST, data=data)
             cache = artist.fetch(noRemote=True)
             if cache is not None:
