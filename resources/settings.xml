@@ -32,10 +32,13 @@
 		<setting id="cache_duration_middle" type="labelenum" label="30111"
 			default="770" values="0|5|10|30|60|770|1440|10080" />
 		<setting type="sep" />
-		<setting id="image_default_size" type="labelenum" label="Image default size"
+		<setting id="image_default_size" type="labelenum" label="Image default size (i8n)"
             default="large" values="thumbnail|small|large|xlarge" />
-		<setting id="image_create_mosaic" type="bool" label="Create mosaic from album cover"
+		<setting id="image_create_mosaic" type="bool" label="Create mosaic from album cover (i8n)"
 				            default="true" />
+		<setting id="show_experimental" type="bool" label="Show experimental (i8n)" default="false" />
+
+
 
 	</category>
 

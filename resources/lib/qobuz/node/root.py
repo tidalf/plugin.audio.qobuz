@@ -47,14 +47,16 @@ class Node_root(INode):
         if config.app.registry.get('search_enabled', to='bool'):
             self.add_child(getNode(Flag.SEARCH))
         if not free:
-            self.add_child(getNode(Flag.COLLECTION))
             self.add_child(getNode(Flag.FRIENDS))
-        self.add_child(getNode(Flag.GENRE))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS,
                                parameters={'type': 'editor-picks'}))
-        self.add_child(getNode(Flag.LABEL))
-        self.add_child(getNode(Flag.ARTICLE))
+        if config.app.registry.get('show_experimental', to='bool'):
+            self.add_child(getNode(Flag.LABEL))
+            self.add_child(getNode(Flag.ARTICLE))
+            self.add_child(getNode(Flag.GENRE))
+            if not free:
+                self.add_child(getNode(Flag.COLLECTION))
         if free:
             self.add_child(makeSubscriptionNode())
         return True
