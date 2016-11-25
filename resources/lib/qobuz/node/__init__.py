@@ -22,7 +22,7 @@ __cache__ = {}
 def module_import(path):
     '''From node.foo import Node_foo
     '''
-    name = 'Node_' + path
+    name = 'Node_%s' % path
     if name not in __cache__:
         __cache__[name] = getattr(__import__(path, globals(), locals(),
                                              [name], -1), name)

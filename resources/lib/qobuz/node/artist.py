@@ -31,7 +31,7 @@ class Node_artist(INode):
                                           parameters=parameters,
                                           data=data)
         self.nt = Flag.ARTIST
-        self.set_label(self.get_name())
+        self.label = self.get_name()
         self.content_type = 'artists'
         self._items_path = 'albums/items'
 
@@ -48,7 +48,7 @@ class Node_artist(INode):
     def fetch(self, *a, **ka):
         return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         if self.count() == 0:
             return False
         for data in self.get_property(self._items_path):
