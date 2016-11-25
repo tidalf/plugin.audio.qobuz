@@ -99,27 +99,16 @@ class INode(object):
         '''@getter parent'''
         if self._parent is None:
             return None
-        return self._parent()
+        return self._parent
 
     def set_parent(self, parent):
         '''@setter parent'''
         if parent is None:
             self._parent = None
             return
-        self._parent = weakref.ref(parent)
+        self._parent = parent
 
     parent = property(get_parent, set_parent)
-
-    def delete_tree(self):
-        '''Recursive delete
-        '''
-        if self.childs is not None:
-            for child in self.childs:
-                child.delete_tree()
-        self.childs = None
-        self.parent = None
-        self.parameters = None
-
 
     def get_content_type(self):
         '''@getter content_type'''
@@ -396,10 +385,9 @@ class INode(object):
             new_data = self.fetch(xdir, lvl, whiteFlag, blackFlag)
             if new_data is None:
                 return False
-            else:
-                data.update(new_data)
-                self.data = data
-                self.__add_pagination(self.data)
+            data.update(new_data)
+            self.data = data
+            self.__add_pagination(self.data)
         self.populate(xdir, lvl, whiteFlag, blackFlag)
         if lvl != -1:
             lvl -= 1
