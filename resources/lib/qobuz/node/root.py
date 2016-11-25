@@ -29,10 +29,10 @@ class Node_root(INode):
         super(Node_root, self).__init__(parent=parent, parameters=parameters,
                                         data=data)
         self.nt = Flag.ROOT
-        self.content_type = 'artists'
+        self.content_type = 'albums'
         self.label = 'Qobuz'
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         free = current_user.is_free_account()
         if free:
             self.add_child(makeSubscriptionNode())
@@ -51,7 +51,10 @@ class Node_root(INode):
             self.add_child(getNode(Flag.FRIENDS))
         self.add_child(getNode(Flag.GENRE))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
+        self.add_child(getNode(Flag.PUBLIC_PLAYLISTS,
+                               parameters={'type': 'editor-picks'}))
         self.add_child(getNode(Flag.LABEL))
+        self.add_child(getNode(Flag.ARTICLE))
         if free:
             self.add_child(makeSubscriptionNode())
         return True

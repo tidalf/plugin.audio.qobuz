@@ -36,6 +36,9 @@ from qobuz import config
 
 _paginated = ['albums', 'labels', 'tracks', 'artists',
                      'playlists', 'playlist', 'public_playlists', 'genres']
+def addint(*a):
+    return sum(int(s) for s in a)
+
 class INode(object):
     '''Our base node, every node must inherit or mimic is behaviour
 
@@ -132,11 +135,9 @@ class INode(object):
     content_type = property(get_content_type, set_content_type)
 
     def get_data(self):
-        '''@getter data'''
         return self._data
 
     def set_data(self, value):
-        '''@setter data'''
         self._data = value
         self.hook_post_data()
 
@@ -203,26 +204,25 @@ class INode(object):
         if not data:
             return False
         items = None
-        need_pagination = False
-        for p in _paginated:
-            if p not in data or data[p] is None:
-                continue
-            items = data[p]
-            if 'limit' not in items or 'total' not in items:
-                continue
-            if items['limit'] is None:
-                continue
-            if items['total'] > (items['offset'] + items['limit']):
-                need_pagination = True
+        for kind in _paginated:
+            if kind in data and data[kind]:
+                items = data[kind]
                 break
-        if need_pagination is False:
+        if items is None:
             return False
-        url = self.make_url(offset=items['offset'] + items['limit'])
+        if 'limit' not in items or 'total' not in items:
+            return False
+        if items['limit'] is None:
+            return False
+        newlimit = addint(items['offset'], items['limit'])
+        if items['total'] < newlimit:
+            return False
+        url = self.make_url(offset=newlimit)
         self.pagination_next = url
         self.pagination_total = items['total']
         self.pagination_offset = items['offset']
         self.pagination_limit = items['limit']
-        self.pagination_next_offset = items['offset'] + items['limit']
+        self.pagination_next_offset = newlimit
         return True
 
     '''
@@ -284,6 +284,8 @@ class INode(object):
             ka['nid'] = self.nid
         if 'offset' not in ka:
             ka['offset'] = self.offset
+        if 'asLocalUrl' in ka and not ka['asLocalUrl']:
+            del ka['asLocalUrl']
         for name in ['qnt', 'qid', 'query', 'search-type', 'mode']:
             if name in ka:
                 continue
@@ -318,6 +320,8 @@ class INode(object):
             ka['label2'] = self.get_label()
         if 'image' not in ka:
             ka['image'] = self.get_image()
+        if 'asLocalUrl' in ka and not ka['asLocalUrl']:
+            del ka['asLocalUrl']
         item = xbmcgui.ListItem(
             ka['label'],
             ka['label2'],
