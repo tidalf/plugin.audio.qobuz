@@ -30,9 +30,8 @@ class Node_purchase(INode):
         if self.search_type is None:
             return lang(30101)
         elif self.search_type == 'all':
-            return  '%s - %s' % (lang(30101), lang(30098))
-        return '%s - %s' % (lang(30101),
-                                  self.search_type.capitalize())
+            return  '%s' % lang(30098)
+        return '%s' % self.search_type.capitalize()
 
     def make_url(self, **ka):
         if self.search_type:
@@ -48,7 +47,8 @@ class Node_purchase(INode):
     def populate(self, xdir, lvl, whiteFlag, blackFlag):
         if self.search_type is None:
             for search_type in ['all', 'albums', 'tracks']:
-                self.add_child(getNode(Flag.PURCHASE, parameters={'search-type': search_type}))
+                self.add_child(getNode(Flag.PURCHASE,
+                                       parameters={'search-type': search_type}))
             return True
         wanted = ['albums', 'tracks']
         if self.search_type != 'all':
@@ -64,7 +64,6 @@ class Node_purchase(INode):
         return ret
 
     def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
-        self.content_type = 'albums'
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
             cache = node.fetch(noRemote=True)
@@ -74,8 +73,6 @@ class Node_purchase(INode):
         return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
-        self.content_type = 'albums'
         for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK, data=track)
-            self.add_child(node)
+            self.add_child(getNode(Flag.TRACK, data=track))
         return True if len(self.data['tracks']['items']) > 0 else False
