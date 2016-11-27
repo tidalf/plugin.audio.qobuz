@@ -40,7 +40,7 @@ class Node_track(INode):
             return None
         return api.get('/track/get', track_id=self.nid)
 
-    def populate(self, xdir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         return xdir.add_node(self)
 
     def make_local_url(self):
@@ -58,9 +58,7 @@ class Node_track(INode):
         if purchased:
             ka['purchased'] = purchased
             self.purchased = True
-        return super(Node_track, self).make_url(mode=mode,
-                                                asLocalUrl=asLocalUrl,
-                                                **ka)
+        return super(Node_track, self).make_url(mode=mode, **ka)
 
     def get_label(self, fmt="%a - %t", default=None):
         fmt = fmt.replace("%a", self.get_artist()) if '%a' in fmt else fmt
