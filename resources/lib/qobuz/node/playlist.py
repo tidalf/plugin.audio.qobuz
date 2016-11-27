@@ -8,7 +8,7 @@
 '''
 import os
 import random
-import xbmcgui  # @UnresolvedImport
+import xbmcgui
 from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.api import api
@@ -448,8 +448,7 @@ class Node_playlist(INode):
             return False
         self.delete_cache(playlist_id)
         notify_log(lang(30183), (lang(30184) + '%s' + lang(30185)) % (name))
-        url = self.make_url(nt=Flag.USERPLAYLISTS, mode=Mode.VIEW, nm='',
-                            nid='')
+        url = self.make_url(nt=Flag.USERPLAYLISTS, mode=Mode.VIEW)
         executeBuiltin(containerUpdate(url, True))
         return False
 
