@@ -24,7 +24,7 @@
 <string id="30018">Popular Qobuz songs for artist...</string>
 <string id="30019">Popular Qobuz songs</string>
 <string id="30020">My Qobuz favorites</string>
-<string id="30021">Show playlists</string>
+<string id="30021">Playlists</string>
 <string id="30022">Search</string>
 <string id="30023">No matching songs.</string>
 <string id="30024">Unused</string>
@@ -84,13 +84,13 @@
 <string id="30078">Make Qobuz playlist</string>
 <string id="30079">Delete Qobuz playlist</string>
 <string id="30080">Rename playlist</string>
-<string id="30081">Show favorites</string>
+<string id="30081">Favorites</string>
 <string id="30082">Add as new playlist</string>
 <string id="30083">Qobuz favorites</string>
-<string id="30194">Show collections</string>
+<string id="30194">Collections</string>
 
 <!-- Recommandation -->
-<string id="30084">Show recommendations</string>
+<string id="30084">Recommendations</string>
 <string id="30085">Press awards</string>
 <string id="30086">News</string>
 <string id="30087">Best sellers</string>
@@ -108,7 +108,7 @@
 <string id="30098">All of them</string>
 <string id="30099">Reggae</string>
 <string id="30100">Historical documents / Litterature / Humor</string>
-<string id="30101">Show purchases</string>
+<string id="30101">Purchases</string>
 <string id="30102">Show news</string>
 <string id="30103">Most featured</string>
 <string id="30104">Rap / HipHop / RB / Soul</string>
