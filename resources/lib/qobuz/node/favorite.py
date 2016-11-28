@@ -31,21 +31,21 @@ class Node_favorite(INode):
                                             parameters=parameters,
                                             data=data)
         self.nt = Flag.FAVORITE
-
         self.name = lang(30073)
         self.image = getImage('favorites')
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
-        self.content_type = 'albums'
-        if self.search_type is None:
-            self.label = lang(30081)
-            self.label2 = lang(30098)
-        else:
-            self.label2 = lang(30081)
-            self.label = self.search_type.capitalize()
         if self.search_type == 'artists':
             self.content_type = 'artists'
+        else:
+            self.content_type = 'albums'
 
+    def get_label(self):
+        if self.search_type is None:
+            return lang(30081)
+        elif self.search_type == 'all':
+            return lang(30098)
+        return self.search_type.capitalize()
 
     def fetch(self, *a, **ka):
         if self.search_type is None:
