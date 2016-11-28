@@ -30,8 +30,8 @@ class Node_purchase(INode):
         if self.search_type is None:
             return lang(30101)
         elif self.search_type == 'all':
-            return  '%s' % lang(30098)
-        return '%s' % self.search_type.capitalize()
+            return lang(30098)
+        return self.search_type.capitalize()
 
     def make_url(self, **ka):
         if self.search_type:
