@@ -7,6 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
+import xbmcplugin
 import qobuz
 from qobuz import debug
 from qobuz.renderer.irenderer import IRenderer
@@ -53,37 +54,36 @@ class QobuzXbmcRenderer(IRenderer):
             return False
         if self.has_method_parameter():
             return self.execute_method_parameter()
-        xdir = Directory(self.root, self.nodes, handle=config.app.handle,
-                        withProgress=False, asList=self.asList)
-        if config.app.registry.get('contextmenu_replaceitems', to='bool'):
-            xdir.replaceItems = True
-        try:
-            ret = self.root.populating(xdir,
-                                       self.depth,
-                                       self.whiteFlag,
-                                       self.blackFlag)
-        except exception.QobuzError as e:
-            xdir.end_of_directory(False)
-            xdir = None
-            debug.warn(self, 'Error while populating our directory: %s' % (repr(e)))
-            return False
-        if not self.asList:
-            import xbmcplugin
-            xdir.set_content(self.root.content_type)
-            methods = [
-                xbmcplugin.SORT_METHOD_UNSORTED,
-                xbmcplugin.SORT_METHOD_LABEL,
-                xbmcplugin.SORT_METHOD_DATE,
-                xbmcplugin.SORT_METHOD_TITLE,
-                xbmcplugin.SORT_METHOD_VIDEO_YEAR,
-                xbmcplugin.SORT_METHOD_GENRE,
-                xbmcplugin.SORT_METHOD_ARTIST,
-                xbmcplugin.SORT_METHOD_ALBUM,
-                xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
-                xbmcplugin.SORT_METHOD_TRACKNUM, ]
-            [xbmcplugin.addSortMethod(handle=config.app.handle,
-                                      sortMethod=method) for method in methods]
-        return xdir.end_of_directory()
+        with Directory(self.root, self.nodes, handle=config.app.handle,
+                        showProgress=True, asList=self.asList) as xdir:
+            if config.app.registry.get('contextmenu_replaceitems', to='bool'):
+                xdir.replaceItems = True
+            try:
+                ret = self.root.populating(xdir,
+                                           self.depth,
+                                           self.whiteFlag,
+                                           self.blackFlag)
+            except exception.QobuzError as e:
+                xdir.end_of_directory(False)
+                xdir = None
+                debug.warn(self, 'Error while populating our directory: %s' % (repr(e)))
+                return False
+            if not self.asList:
+                xdir.set_content(self.root.content_type)
+                methods = [
+                    xbmcplugin.SORT_METHOD_UNSORTED,
+                    xbmcplugin.SORT_METHOD_LABEL,
+                    xbmcplugin.SORT_METHOD_DATE,
+                    xbmcplugin.SORT_METHOD_TITLE,
+                    xbmcplugin.SORT_METHOD_VIDEO_YEAR,
+                    xbmcplugin.SORT_METHOD_GENRE,
+                    xbmcplugin.SORT_METHOD_ARTIST,
+                    xbmcplugin.SORT_METHOD_ALBUM,
+                    xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
+                    xbmcplugin.SORT_METHOD_TRACKNUM, ]
+                [xbmcplugin.addSortMethod(handle=config.app.handle,
+                                          sortMethod=method) for method in methods]
+            return xdir.end_of_directory()
 
     def scan(self):
         '''Building tree when using Xbmc library scanning
@@ -93,12 +93,9 @@ class QobuzXbmcRenderer(IRenderer):
             debug.warn(self, 'Cannot set root node ({})',
                        str(self.node_type))
             return False
-        progress = Progress(heading='Qobuz Scan', message=self.root.get_label())
-        progress.create()
-        Dir = Directory(self.root, nodes=self.nodes, withProgress=False,
-                        handle=config.app.handle, asLocalUrl=True)
-        tracks = {}
-        def list_track(root):
+
+        def list_track(scan):
+            root = scan.root
             total = 0
             predir = Directory(None, asList=True)
             findir = Directory(None, asList=True)
@@ -110,11 +107,11 @@ class QobuzXbmcRenderer(IRenderer):
             done = 0
             def percent():
                 return (done / total) * 100
-            progress.update(percent(), 'Begin')
+            scan.progress.update(message='Begin', percent=percent())
             seen = {}
             seen_tracks = {}
             for node in predir.nodes:
-                progress.update(percent(), 'Scanning', node.get_label())
+                scan.progress.update(percent(), 'Scanning', node.get_label().encode('ascii', errors='ignore'))
                 done += 1
                 node.set_parameter('mode', Mode.SCAN)
                 if node.nt & Flag.TRACK == Flag.TRACK:
@@ -142,21 +139,22 @@ class QobuzXbmcRenderer(IRenderer):
                     node.populating(findir, 1, Flag.TRACK, Flag.STOPBUILD)
             return findir.nodes
 
-        tracks.update({track.nid: track for track in list_track(self.root)})
-        if len(tracks.keys()) == 0:
-            progress.close()
-            Dir.end_of_directory()
-            return False
-        for nid, track in tracks.items():
-            if track.nt & Flag.TRACK != Flag.TRACK:
-                continue
-            if not track.get_displayable():
-                continue
-            Dir.add_node(track)
-        Dir.set_content(self.root.content_type)
-        Dir.end_of_directory()
-        notifyH('Scanning results',
-                '%s items where scanned' % str(Dir.total_put),
-                mstime=3000)
-        progress.close()
+        with Directory(self.root, nodes=self.nodes, handle=config.app.handle,
+                        asLocalUrl=True, showProgress=True) as xdir:
+            xdir.progress.heading = 'Scan (i8n)'
+            tracks = {}
+            tracks.update({track.nid: track for track in list_track(xdir)})
+            if len(tracks.keys()) == 0:
+                xdir.end_of_directory()
+                return False
+            for nid, track in tracks.items():
+                if track.nt & Flag.TRACK != Flag.TRACK:
+                    continue
+                if not track.get_displayable():
+                    continue
+                xdir.add_node(track)
+            xdir.set_content(self.root.content_type)
+            xdir.end_of_directory()
+            notifyH('Scanning results',
+                    '%s items where scanned' % str(Dir.total_put), mstime=3000)
         return True
