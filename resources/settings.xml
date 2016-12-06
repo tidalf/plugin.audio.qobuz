@@ -45,10 +45,8 @@
 	<category label="Library (beta)">
 				<setting id="enable_scan_feature" label="30154" type="bool" default="true" />
 				<setting id="scan_by_album" label="Scan by album (i8n)" type="bool" default="true" />
-				<!--<setting id="httpd_enable" label="enable" type="bool" default="true" />-->
 				<setting id="httpd_port" label="port" type="number" default="33574" />
 				<setting id="httpd_host" label="host" type="text" default="127.0.0.1" />
-				<!--<setting id="httpd_ssl" label="ssl" type="bool" default="false" option="hidden" />-->
 	</category>
 	<!-- Other -->
 	<category label="30152">
