@@ -12,6 +12,7 @@ from qobuz.api import api
 from qobuz import debug
 from qobuz.gui.util import getImage, lang
 
+from qobuz.util.converter import converter
 
 dialogHeading = 'Collection'
 
@@ -60,13 +61,14 @@ class Node_collection(INode):
             if not k.isConfirmed():
                 return None
             query = k.getText().strip()
-        source = self.source
+        if query == '':
+            return None
         kwargs = {
-            'query': query,
-            'limit': self.limit,
+            'query': converter.quote(query)
         }
-        if source is not None:
-            kwargs['source'] = source
+        if self.source is not None:
+            kwargs['source'] = self.source
+        debug.info(self, 'SEARCH {}', kwargs)
         if self.search_type == 'albums':
             return api.get('/collection/getAlbums', **kwargs)
         elif self.search_type == 'artists':
