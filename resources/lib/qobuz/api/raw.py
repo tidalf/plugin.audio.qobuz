@@ -117,12 +117,10 @@ class RawApi(object):
         except Exception as e:
             self.status_code = 500
             self.error = 'Post request fail: %s' % e
-            debug.error(self, 'error: {}, content: {}', self.error, r.content)
             return None
         self.status_code = int(r.status_code)
         if self.status_code != 200:
             self.error = self._api_error_string(r, url, _copy_params)
-            debug.error(self, 'error: {}, content: {}', self.error, r.content)
             return None
         if not r.content:
             self.error = 'Request return no content'
