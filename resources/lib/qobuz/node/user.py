@@ -6,6 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import xbmcgui
 import time
 from qobuz.node.inode import INode
 from qobuz import debug
@@ -60,7 +61,6 @@ class Node_user(INode):
            lossless_streaming=self.get_property('user/credential/parameters/lossless_streaming'))
 
     def makeListItem(self, replaceItems=False):
-        import xbmcgui  # @UnresolvedImport
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label2(),
                                 self.get_image(),
@@ -69,13 +69,8 @@ class Node_user(INode):
         if not item:
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
-        #item.setPath(self.make_url())
         item.setInfo('Music', infoLabels={
-            'artist': user.get_property('user/login'),
-            #'artist_description': self.get_description()
+            'artist': user.get_property('user/login')
         })
         item.setProperty('artist_description', self.get_description())
-        #ctxMenu = contextMenu()
-        #self.attach_context_menu(item, ctxMenu)
-        #item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
