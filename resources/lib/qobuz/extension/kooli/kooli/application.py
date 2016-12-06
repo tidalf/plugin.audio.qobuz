@@ -137,5 +137,4 @@ def route_favorite(search_type=None, nid=None):
         return redirect('/qobuz/favorite/%s' % search_type)
     if nid is None:
         return render_template('favorite.htm.tpl', **node.data)
-    debug.info(__name__, 'DATA {}', pprint.pformat(node.data))
     return render_template('%s.htm.tpl' % search_type, **node.data)
