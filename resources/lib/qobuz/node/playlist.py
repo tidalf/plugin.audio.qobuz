@@ -230,7 +230,6 @@ class Node_playlist(INode):
 
     def gui_remove_track(self):
         qid = self.get_parameter('qid')
-        print 'Removing track %s from playlist %s' % (qid, self.nid)
         if not self.remove_tracks(qid):
             notify_error(dialogHeading, 'Cannot remove track!')
             return False
@@ -317,7 +316,6 @@ class Node_playlist(INode):
             name = ask('Playlist name? (i8n)')
             if name is None:
                 return False
-        debug.info(self, 'Nodes {}', nodes)
         ret = xbmcgui.Dialog().select('Create playlist %s' % (name), [
             node.get_label() for node in nodes
         ])
@@ -461,7 +459,7 @@ class Node_playlist(INode):
         return False
 
     def delete_cache(self, playlist_id):
-        """Warning: Parameter must be the same has the fetch method"""
+        '''Warning: Parameter must be the same has the fetch method'''
         upkey = cache.make_key('/playlist/getUserPlaylists',
                                limit=self.limit,
                                offset=self.offset,
