@@ -53,14 +53,17 @@ class User(object):
         return True
 
     def stream_format(self, track=None):
-        stream_type = config.app.registry.get('streamtype').lower()
-        if track is not None:
-            if stream_type == 'hires':
-                if is_purchased(track):
-                    #if track.get_maximum_sampling_rate() > 96:
-                    stream_type = 'hires_hsr'
-                else:
-                    stream_type = 'flac'
+        stream_type = 'mp3'
+        if not self.is_free_account():
+            stream_type = config.app.registry.get('streamtype')
+            if track is not None:
+                if stream_type == 'hires':
+                    if is_purchased(track):
+                        #if track.get_maximum_sampling_rate() > 96:
+                        stream_type = 'hires_hsr'
+                    else:
+                        stream_type = 'flac'
+        debug.info(self, 'StreamType: {}', stream_type)
         return audio_format[stream_type]
 
     def set_credentials(self, username, password):
