@@ -22,6 +22,7 @@ from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
 from qobuz.util import common as util
+from qobuz.gui.util import Keyboard, ask
 from qobuz.theme import theme, color
 from qobuz import config
 from qobuz import image
@@ -298,6 +299,7 @@ class Node_playlist(INode):
         nodes = []
         qnt = int(self.get_parameter('qnt'))
         qid = self.get_parameter('qid')
+        name = self.get_parameter('query', to='unquote', default=None)
         if qnt & Flag.SEARCH:
             self.del_parameter('query')
         if qnt & Flag.TRACK == Flag.TRACK:
@@ -309,10 +311,13 @@ class Node_playlist(INode):
                               whiteFlag=Flag.TRACK, asList=True)
             render.run()
             nodes = render.nodes
-
+        if len(nodes) == 0:
+            return False
         if name is None:
-            name = self.get_parameter('query', to='unquote', default=None) \
-                or self.get_label()
+            name = ask('Playlist name? (i8n)')
+            if name is None:
+                return False
+        debug.info(self, 'Nodes {}', nodes)
         ret = xbmcgui.Dialog().select('Create playlist %s' % (name), [
             node.get_label() for node in nodes
         ])
@@ -356,20 +361,16 @@ class Node_playlist(INode):
         if not playlist_id:
             debug.warn(self, 'Can\'t rename playlist without id')
             return False
-        from qobuz.gui.util import Keyboard
         data = api.get('/playlist/get', playlist_id=playlist_id)
         if not data:
             debug.warn(self, 'Something went wrong while renaming playlist')
             return False
         self.data = data
         currentname = self.get_name()
-        k = Keyboard(currentname, lang(30080))
-        k.doModal()
-        if not k.isConfirmed():
+        newname = ask(currentname, lang(30080))
+        if newname is None:
             return False
-        newname = k.getText()
-        newname = newname.strip()
-        if not newname:
+        if newname == '':
             notify_error(dialogHeading, 'Don\'t u call ure child something?')
             return False
         if newname == currentname:
@@ -391,13 +392,13 @@ class Node_playlist(INode):
     def gui_create(self):
         query = self.get_parameter('query', to='unquote')
         if not query:
-            from qobuz.gui.util import Keyboard
-            k = Keyboard('', lang(30182))
-            k.doModal()
-            if not k.isConfirmed():
+            query = ask('', lang(30182))
+            if query is None:
                 debug.warn(self, 'Creating playlist aborted')
                 return None
-            query = k.getText()
+            if query == '':
+                debug.warn('Cannot create playlist without name')
+                return None
         ret = self.create(query)
         if not ret:
             debug.warn(self, 'Cannot create playlist named '' + query + ''')
