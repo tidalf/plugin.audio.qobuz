@@ -13,6 +13,7 @@ from qobuz.api import api
 from qobuz import debug
 
 featured_type = ['editor-picks', 'last-created']
+limit_max = 100
 
 class Node_public_playlists(INode):
 
@@ -29,9 +30,10 @@ class Node_public_playlists(INode):
         self.label = '%s (%s)' % (lang(30190), self.type)
 
     def fetch(self, *a, **ka):
+        limit = self.limit if self.limit < limit_max else limit_max
         return api.get('/playlist/getFeatured',
                        offset=self.offset,
-                       limit=self.limit,
+                       limit=limit,
                        type=self.type)
 
     def populate(self, *a, **ka):

@@ -15,6 +15,8 @@ from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz import config
 
+limit_max = 100
+
 class Node_user_playlists(INode):
 
     def __init__(self, parent=None, parameters={}, data=None):
@@ -50,8 +52,9 @@ class Node_user_playlists(INode):
         return int(userdata['current_playlist'])
 
     def fetch(self, *a, **ka):
+        limit = self.limit if self.limit < limit_max else limit_max
         return api.get('/playlist/getUserPlaylists',
-                       limit=self.limit,
+                       limit=limit,
                        offset=self.offset,
                        user_id=user.get_id(),
                        type='last-created')
