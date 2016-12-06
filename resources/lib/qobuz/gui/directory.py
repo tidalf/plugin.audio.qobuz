@@ -6,8 +6,8 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcplugin  # @UnresolvedImport
-import xbmcgui  # @UnresolvedImport
+import xbmcplugin
+import xbmcgui
 
 from qobuz.gui.progress import Progress
 import time
@@ -15,7 +15,7 @@ from qobuz.gui.util import lang
 from qobuz import exception
 from qobuz import debug
 from qobuz import config
-
+from qobuz.node import Flag
 
 class Directory(object):
     '''This class permit to add item to Xbmc directory or store nodes
@@ -53,7 +53,8 @@ class Directory(object):
         self.content_type = 'files'
         self.replaceItems = False
         self.asLocalUrl = asLocalUrl
-
+        self.filter_double = Flag.TRACK
+        self.seen_nodes = []
     def elapsed(self):
         '''Return elapsed time since directory has been created
         '''
@@ -64,6 +65,10 @@ class Directory(object):
         into Xbmc directory
         * @attention: broken, Raise exception if user has canceled progress
         '''
+        if self.filter_double is not None and self.filter_double & node.nt == node.nt:
+            if node.nid in self.seen_nodes:
+                return True
+            self.seen_nodes.append(node.nid)
         if self.asList is True:
             self.nodes.append(node)
             self.total_put += 1
