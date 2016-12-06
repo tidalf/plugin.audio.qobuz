@@ -11,23 +11,25 @@ import sys
 import re
 
 try:
-    """Dirty trick that permit to import this module outside of xbmc
-    All function using xbmc module will fail ...
-    """
-    import xbmc  # @UnresolvedImport
-    import xbmcgui  # @UnresolvedImport
-    import xbmcplugin  # @UnresolvedImport
-    """Keyboard
-    """
+    import xbmc
+    import xbmcgui
+    import xbmcplugin
     class Keyboard(xbmc.Keyboard):
 
         def __init__(self, default, heading='', hidden=True):
             self.setHeading('Qobuz / %s' % heading)
 
 except:
-    print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"
+    print 'QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken'
 
-import qobuz  # @UnresolvedImport
+def ask(current=None, heading='rename'):
+    w = Keyboard(current, heading)
+    w.doModal()
+    if not w.isConfirmed():
+        return None
+    return w.getText().strip()
+
+import qobuz
 from qobuz.xbmcrpc import showNotification, getInfoLabels
 from qobuz import config
 from qobuz import debug
@@ -44,8 +46,8 @@ def getImage(name):
 
 
 def notifyH(title, text, image=None, mstime=2000):
-    """Notify for human... not using localized string :p
-    """
+    '''Notify for human... not using localized string :p
+    '''
     if image is None:
         image = getImage('icon-default-256')
     else:
@@ -67,8 +69,8 @@ def notify_warn(title, text, **ka):
 
 
 def notify(title, text, image=None, mstime=2000):
-    """Notification that wrap title and text parameter into lang()
-    """
+    '''Notification that wrap title and text parameter into lang()
+    '''
     if image is None:
         image = getImage('icon-default-256')
     else:
@@ -80,8 +82,8 @@ def notify(title, text, image=None, mstime=2000):
 
 
 def dialogLoginFailure():
-    """Dialog to be shown when we can't login into Qobuz
-    """
+    '''Dialog to be shown when we can't login into Qobuz
+    '''
     dialog = xbmcgui.Dialog()
     if dialog.yesno(lang(30010), lang(30036), lang(30042)):
         qobuz.addon.openSettings()
@@ -93,8 +95,8 @@ def dialogLoginFailure():
 
 
 def dialogServiceTemporarilyUnavailable():
-    """Dialog to be shown when Qobuz is not available (Maintenance)
-    """
+    '''Dialog to be shown when Qobuz is not available (Maintenance)
+    '''
     dialog = xbmcgui.Dialog()
     dialog.ok('Qobuz Service Temporay Unavailable',
               'Qobuz service are down :/',
@@ -105,23 +107,15 @@ def dialogServiceTemporarilyUnavailable():
 
 
 def isFreeAccount():
-    """Check if account if it's a Qobuz paid account
-    """
+    '''Check if account if it's a Qobuz paid account
+    '''
     from qobuz.api.user import current
     return current.is_free_account()
-    # from qobuz.api import api
-    # data = api.get('/user/login', username=user.username,
-    #                password=user.password)
-    # if not data:
-    #     return True
-    # if not data['user']['credential']['id']:
-    #     return True
-    # return False
 
 
 def dialogFreeAccount():
-    """Show dialog when using free acccount
-    """
+    '''Show dialog when using free acccount
+    '''
     if qobuz.addon.getSetting('warn_free_account') != 'true':
         return
     dialog = xbmcgui.Dialog()
@@ -175,14 +169,12 @@ def containerViewMode():
         return data[label]
     return ''
 
-
 def containerSortMethod():
     label = 'Container.SortMethod'
     data = getInfoLabels(labels=[label])
     if data:
         return data[label]
     return ''
-
 
 def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
