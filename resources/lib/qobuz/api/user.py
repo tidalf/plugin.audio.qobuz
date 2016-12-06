@@ -63,7 +63,6 @@ class User(object):
                         stream_type = 'hires_hsr'
                     else:
                         stream_type = 'flac'
-        debug.info(self, 'StreamType: {}', stream_type)
         return audio_format[stream_type]
 
     def set_credentials(self, username, password):
