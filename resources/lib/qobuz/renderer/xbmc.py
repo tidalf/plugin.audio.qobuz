@@ -41,7 +41,7 @@ class QobuzXbmcRenderer(IRenderer):
                                                 mode=mode,
                                                 whiteFlag=whiteFlag,
                                                 blackFlag=blackFlag,
-                                                depth=depth, asList=False)
+                                                depth=depth, asList=asList)
 
     def run(self):
         '''Building our tree, creating root node based on our node_type
