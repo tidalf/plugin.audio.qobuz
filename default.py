@@ -16,9 +16,5 @@ from qobuz.plugin import Plugin
 from qobuz.application import Application
 from qobuz import debug
 
-try:
-    app = Application(Plugin('plugin.audio.qobuz'))
+with Application(Plugin('plugin.audio.qobuz')) as app:
     app.start()
-except Exception as e:
-    debug.error(__name__, 'Error: {}', e)
-    traceback.print_exc()
