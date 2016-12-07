@@ -67,15 +67,6 @@ def route_root():
     return render_template('root.htm.tpl', **response)
 
 @nocache
-@application.route('/qobuz/<string:album_id>/<string:track_id>/file.mpc', methods=['HEAD'])
-def route_track_head(album_id=None, track_id=None):
-    track = getNode(Flag.TRACK, parameters={'nid': track_id})
-    if not track.get_streaming_url():
-        return 'Not Found', 404
-    return 'Ok', 200
-
-
-@nocache
 @application.route('/qobuz/<string:album_id>/<string:track_id>/file.mpc', methods=['GET', 'HEAD'])
 def route_track(album_id=None, track_id=None):
     track = getNode(Flag.TRACK, parameters={'nid': track_id})
