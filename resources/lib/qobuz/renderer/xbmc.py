@@ -156,5 +156,5 @@ class QobuzXbmcRenderer(IRenderer):
             xdir.set_content(self.root.content_type)
             xdir.end_of_directory()
             notifyH('Scanning results',
-                    '%s items where scanned' % str(Dir.total_put), mstime=3000)
+                    '%s items where scanned' % str(xdir.total_put), mstime=3000)
         return True
