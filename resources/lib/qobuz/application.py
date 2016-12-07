@@ -24,6 +24,12 @@ class Application(object):
             self.handle = int(sys.argv[1])
         self.bootstrap = bootstrapClass(self)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a, **ka):
+        self.plugin = None
+
     def get_addon(self):
         if self.plugin is not None:
             return self.plugin.addon
