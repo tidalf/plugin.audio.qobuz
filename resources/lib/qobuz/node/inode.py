@@ -214,12 +214,6 @@ class INode(object):
         self.pagination_next_offset = newlimit
         return True
 
-    '''
-        Parameters
-        A hash for storing script parameter, each node have a copy of them.
-        TODO: each node don't need to copy parameter
-    '''
-
     def set_parameters(self, parameters):
         '''Setting parameters property
         @param parameters: Dictionary
