@@ -78,6 +78,20 @@ def route_track(album_id=None, track_id=None):
         return 'ok', 200
     return redirect(url, code=302)
 
+@nocache
+@application.route('/qobuz/<string:album_id>/<string:track_id>/disc.png', methods=['GET', 'HEAD'])
+def route_disc_image(album_id=None, track_id=None):
+    node = getNode(Flag.ALBUM, parameters={'nid': album_id})
+    node.data = node.fetch()
+    if node.data is None:
+        return 'Not Found', 404
+    image = node.get_image()
+    if image is None:
+        return 'Not Found', 404
+    if request.method == 'HEAD':
+        return 'Ok', 200
+    return redirect(image, code=302)
+
 
 @nocache
 @application.route('/qobuz/<string:album_id>/<string:track_id>/album.nfo', methods=['GET', 'HEAD'])
