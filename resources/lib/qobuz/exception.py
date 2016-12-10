@@ -25,9 +25,6 @@ class InvalidFlag(QobuzError):
 class InvalidKind(QobuzError):
     pass
 
-class BuildCanceled(QobuzError):
-    pass
-
 class InvalidNodeType(QobuzError):
     pass
 

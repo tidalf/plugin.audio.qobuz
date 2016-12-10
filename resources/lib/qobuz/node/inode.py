@@ -390,7 +390,7 @@ class INode(object):
             if child.nt & whiteFlag == child.nt:
                 if not xdir.add_node(child):
                     debug.error(self, "Could not add node")
-                    raise exception.BuildCanceled('down')
+                    continue
             child.populating(xdir, lvl, whiteFlag, blackFlag)
 
     def populate(self, xbmc_directory=None, lvl=-1, whiteFlag=Flag.ALL,
