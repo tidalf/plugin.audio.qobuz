@@ -11,6 +11,7 @@ from qobuz.node.inode import INode
 from qobuz.gui.util import lang, getImage
 from qobuz.api import api
 from qobuz import debug
+from qobuz.cache import cache
 
 featured_type = ['editor-picks', 'last-created']
 limit_max = 100
@@ -29,14 +30,17 @@ class Node_public_playlists(INode):
             raise RuntimeError('InvalidFeaturedType: {}'.format(self.type))
         self.label = '%s (%s)' % (lang(30190), self.type)
 
+    def _get_limit(self):
+        return self.limit if self.limit < limit_max else limit_max
+
     def fetch(self, *a, **ka):
-        limit = self.limit if self.limit < limit_max else limit_max
         return api.get('/playlist/getFeatured',
                        offset=self.offset,
-                       limit=limit,
+                       limit=self._get_limit(),
                        type=self.type)
 
     def populate(self, *a, **ka):
         for item in self.data['playlists']['items']:
-            self.add_child(getNode(Flag.PLAYLIST, data=item))
+            self.add_child(getNode(Flag.PLAYLIST, data=item,
+                                   parameters={'nt': self.nt}))
         return True if len(self.data['playlists']['items']) > 0 else False
