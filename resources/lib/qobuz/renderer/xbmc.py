@@ -23,6 +23,7 @@ from qobuz.gui.bg_progress import Progress
 
 notifier = Notifier(title='Scanning progress')
 
+
 class QobuzXbmcRenderer(IRenderer):
     '''Specific renderer for Xbmc
         Parameter:
@@ -31,42 +32,49 @@ class QobuzXbmcRenderer(IRenderer):
         * You can set parameter after init (see renderer.Irenderer)
     '''
 
-    def __init__(self, node_type,
+    def __init__(self,
+                 node_type,
                  parameters={},
                  mode=None,
                  whiteFlag=Flag.ALL,
                  blackFlag=Flag.STOPBUILD,
-                 depth=1, asList=False):
-        super(QobuzXbmcRenderer, self).__init__(node_type,
-                                                parameters=parameters,
-                                                mode=mode,
-                                                whiteFlag=whiteFlag,
-                                                blackFlag=blackFlag,
-                                                depth=depth, asList=asList)
+                 depth=1,
+                 asList=False):
+        super(QobuzXbmcRenderer, self).__init__(
+            node_type,
+            parameters=parameters,
+            mode=mode,
+            whiteFlag=whiteFlag,
+            blackFlag=blackFlag,
+            depth=depth,
+            asList=asList)
 
     def run(self):
         '''Building our tree, creating root node based on our node_type
         '''
         if not self.set_root_node():
             debug.warn(self, 'Cannot set root node ({}, {})',
-                str(self.node_type),
-                str(self.root.get_parameter('nid')))
+                       str(self.node_type),
+                       str(self.root.get_parameter('nid')))
             return False
         if self.has_method_parameter():
             return self.execute_method_parameter()
-        with Directory(self.root, self.nodes, handle=config.app.handle,
-                        showProgress=True, asList=self.asList) as xdir:
+        with Directory(
+                self.root,
+                self.nodes,
+                handle=config.app.handle,
+                showProgress=True,
+                asList=self.asList) as xdir:
             if config.app.registry.get('contextmenu_replaceitems', to='bool'):
                 xdir.replaceItems = True
             try:
-                ret = self.root.populating(xdir,
-                                           self.depth,
-                                           self.whiteFlag,
+                ret = self.root.populating(xdir, self.depth, self.whiteFlag,
                                            self.blackFlag)
             except exception.QobuzError as e:
                 xdir.end_of_directory(False)
                 xdir = None
-                debug.warn(self, 'Error while populating our directory: %s' % (repr(e)))
+                debug.warn(self, 'Error while populating our directory: %s' %
+                           (repr(e)))
                 return False
             if not self.asList:
                 xdir.set_content(self.root.content_type)
@@ -80,9 +88,13 @@ class QobuzXbmcRenderer(IRenderer):
                     xbmcplugin.SORT_METHOD_ARTIST,
                     xbmcplugin.SORT_METHOD_ALBUM,
                     xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
-                    xbmcplugin.SORT_METHOD_TRACKNUM, ]
-                [xbmcplugin.addSortMethod(handle=config.app.handle,
-                                          sortMethod=method) for method in methods]
+                    xbmcplugin.SORT_METHOD_TRACKNUM,
+                ]
+                [
+                    xbmcplugin.addSortMethod(
+                        handle=config.app.handle, sortMethod=method)
+                    for method in methods
+                ]
             return xdir.end_of_directory()
 
     def scan(self):
@@ -90,8 +102,7 @@ class QobuzXbmcRenderer(IRenderer):
         feature
         '''
         if not self.set_root_node():
-            debug.warn(self, 'Cannot set root node ({})',
-                       str(self.node_type))
+            debug.warn(self, 'Cannot set root node ({})', str(self.node_type))
             return False
 
         def list_track(scan):
@@ -104,14 +115,22 @@ class QobuzXbmcRenderer(IRenderer):
             else:
                 root.populating(predir, 3, Flag.ALL, Flag.STOPBUILD)
             total = len(predir.nodes)
+            if total == 0:
+                return []
             done = 0
+
             def percent():
                 return (done / total) * 100
+
             scan.progress.update(message='Begin', percent=percent())
             seen = {}
             seen_tracks = {}
             for node in predir.nodes:
-                scan.progress.update(percent(), 'Scanning', node.get_label().encode('ascii', errors='ignore'))
+                scan.progress.update(
+                    percent(),
+                    'Scanning',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'))
                 done += 1
                 node.set_parameter('mode', Mode.SCAN)
                 if node.nt & Flag.TRACK == Flag.TRACK:
@@ -120,27 +139,31 @@ class QobuzXbmcRenderer(IRenderer):
                     seen_tracks[node.nid] = 1
                     album_id = node.get_album_id()
                     if album_id is None or album_id == '':
-                        debug.error(self,
-                                    'Track without album_id: {}, label: {}',
-                                    node,
-                                    node.get_label().encode('ascii',
-                                                            errors='ignore'))
+                        debug.error(
+                            self,
+                            'Track without album_id: {}, label: {}',
+                            node,
+                            node.get_label().encode(
+                                'ascii', errors='ignore'))
                         continue
                     if album_id in seen:
                         continue
                     seen[album_id] = 1
-                    album = getNode(Flag.ALBUM,
-                                    parameters={
-                                        'nid': album_id,
-                                        'mode': Mode.SCAN
-                                    })
+                    album = getNode(
+                        Flag.ALBUM,
+                        parameters={'nid': album_id,
+                                    'mode': Mode.SCAN})
                     album.populating(findir, 1, Flag.TRACK, Flag.STOPBUILD)
                 else:
                     node.populating(findir, 1, Flag.TRACK, Flag.STOPBUILD)
             return findir.nodes
 
-        with Directory(self.root, nodes=self.nodes, handle=config.app.handle,
-                        asLocalUrl=True, showProgress=True) as xdir:
+        with Directory(
+                self.root,
+                nodes=self.nodes,
+                handle=config.app.handle,
+                asLocalUrl=True,
+                showProgress=True) as xdir:
             xdir.progress.heading = 'Scan (i8n)'
             tracks = {}
             tracks.update({track.nid: track for track in list_track(xdir)})
@@ -155,6 +178,8 @@ class QobuzXbmcRenderer(IRenderer):
                 xdir.add_node(track)
             xdir.set_content(self.root.content_type)
             xdir.end_of_directory()
-            notifyH('Scanning results',
-                    '%s items where scanned' % str(xdir.total_put), mstime=3000)
+            notifyH(
+                'Scanning results',
+                '%s items where scanned' % str(xdir.total_put),
+                mstime=3000)
         return True
