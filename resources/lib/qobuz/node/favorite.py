@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui  # @UnresolvedImport
+import xbmcgui
 from qobuz.node.inode import INode
 from qobuz import debug
 from qobuz.gui.util import lang
@@ -22,23 +22,20 @@ dialogHeading = lang(30083)
 
 all_kinds = ['albums', 'tracks', 'artists']
 
+
 class Node_favorite(INode):
     '''Displaying user favorites (track and album)
     '''
 
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_favorite, self).__init__(parent=parent,
-                                            parameters=parameters,
-                                            data=data)
+        super(Node_favorite, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.FAVORITE
         self.name = lang(30073)
         self.image = getImage('favorites')
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
-        if self.search_type == 'artists':
-            self.content_type = 'artists'
-        else:
-            self.content_type = 'albums'
+        self.content_type = 'songs'
 
     def get_label(self):
         if self.search_type is None:
@@ -57,12 +54,12 @@ class Node_favorite(INode):
                            limit=self.limit,
                            offset=self.offset)
         return api.get('/favorite/getUserFavorites',
-                        user_id=user.get_id(),
-                        limit=self.limit,
-                        offset=self.offset)
+                       user_id=user.get_id(),
+                       limit=self.limit,
+                       offset=self.offset)
 
     def make_url(self, **ka):
-        if self.search_type is not  None:
+        if self.search_type is not None:
             ka['search-type'] = self.search_type
         return super(Node_favorite, self).make_url(**ka)
 
@@ -71,8 +68,12 @@ class Node_favorite(INode):
             return True
         if self.search_type is None:
             for kind in all_kinds:
-                self.add_child(getNode(Flag.FAVORITE, parameters={'search-type': kind}))
-            self.add_child(getNode(Flag.FAVORITE, parameters={'search-type': 'all'}))
+                self.add_child(
+                    getNode(
+                        Flag.FAVORITE, parameters={'search-type': kind}))
+            self.add_child(
+                getNode(
+                    Flag.FAVORITE, parameters={'search-type': 'all'}))
             return True
         result = False
         search_for = (self.search_type, )
@@ -90,23 +91,31 @@ class Node_favorite(INode):
         return result
 
     def _populate_tracks(self, *a, **ka):
+        self.content_type = 'songs'
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, data=track)
             if not node.get_displayable():
-                debug.warn(self, 'Track not displayable: {} ({})',
-                           node.get_label().encode('ascii', errors='ignore'),
-                           node.nid)
+                debug.warn(
+                    self,
+                    'Track not displayable: {} ({})',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'),
+                    node.nid)
                 continue
             self.add_child(node)
         return True if len(self.data['tracks']['items']) > 0 else False
 
     def _populate_albums(self, *a, **ka):
+        self.content_type = 'albums'
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
             if not node.get_displayable():
-                debug.warn(self, 'Album not displayable: {} ({})',
-                           node.get_label().encode('ascii', errors='ignore'),
-                           node.nid)
+                debug.warn(
+                    self,
+                    'Album not displayable: {} ({})',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'),
+                    node.nid)
                 continue
             cache = node.fetch(noRemote=True)
             if cache is not None:
@@ -115,6 +124,7 @@ class Node_favorite(INode):
         return True if len(self.data['albums']['items']) > 0 else False
 
     def _populate_artists(self, *a, **ka):
+        self.content_type = 'artists'
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
             node.data = node.fetch(noRemote=True)
@@ -130,9 +140,8 @@ class Node_favorite(INode):
         if len(nodes) == 0:
             notifyH(dialogHeading, lang(30143))
             return False
-        ret = xbmcgui.Dialog().select(lang(30144), [
-            node.get_label() for node in nodes
-        ])
+        ret = xbmcgui.Dialog().select(
+            lang(30144), [node.get_label() for node in nodes])
         if ret == -1:
             return False
         album_ids = ','.join([node.nid for node in nodes])
@@ -149,9 +158,8 @@ class Node_favorite(INode):
         if len(nodes) == 0:
             notifyH(dialogHeading, lang(30143))
             return False
-        ret = xbmcgui.Dialog().select(lang(30146), [
-            node.get_label() for node in nodes
-        ])
+        ret = xbmcgui.Dialog().select(
+            lang(30146), [node.get_label() for node in nodes])
         if ret == -1:
             return False
         artist_ids = ','.join([str(node.nid) for node in nodes])
@@ -202,7 +210,8 @@ class Node_favorite(INode):
                     render.asList = True
                     render.run()
                     if len(render.nodes) > 0:
-                        newnode = getNode(Flag.ALBUM, data=render.nodes[0].data['album'])
+                        newnode = getNode(
+                            Flag.ALBUM, data=render.nodes[0].data['album'])
                         #newnode.data = render.nodes[0].data['album']
                         if not str(newnode.nid) in album_ids:
                             nodes.append(newnode)
@@ -238,8 +247,8 @@ class Node_favorite(INode):
                     label = label.encode('utf8', errors='ignore')
             except Exception as e:
                 debug.error(self, u'Error: {}', e)
-        dialog = DialogSelect(label=label,
-                              items=[node.get_label() for node in nodes])
+        dialog = DialogSelect(
+            label=label, items=[node.get_label() for node in nodes])
         if dialog.open() == -1:
             return False
         track_ids = ','.join([str(node.nid) for node in nodes])
@@ -303,16 +312,20 @@ class Node_favorite(INode):
 
     def _delete_cache(self):
         keys = []
-        keys.append(cache.make_key('/favorite/getUserFavorites',
-                                   user_id=user.get_id(),
-                                   limit=self.limit,
-                                   offset=self.offset))
+        keys.append(
+            cache.make_key(
+                '/favorite/getUserFavorites',
+                user_id=user.get_id(),
+                limit=self.limit,
+                offset=self.offset))
         for kind in ['artists', 'albums', 'tracks']:
-            keys.append(cache.make_key('/favorite/getUserFavorites',
-                                       user_id=user.get_id(),
-                                       limit=self.limit,
-                                       type=kind,
-                                       offset=self.offset))
+            keys.append(
+                cache.make_key(
+                    '/favorite/getUserFavorites',
+                    user_id=user.get_id(),
+                    limit=self.limit,
+                    type=kind,
+                    offset=self.offset))
         ret = False
         for key in keys:
             if cache.delete(key):
@@ -367,5 +380,4 @@ class Node_favorite(INode):
 
     def _get_node_storage_filename(self):
         return u'userdata-{user_id}-favorite-{nid}.local'.format(
-            user_id=user.get_id(),
-            nid=self.nid)
+            user_id=user.get_id(), nid=self.nid)
