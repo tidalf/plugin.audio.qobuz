@@ -32,17 +32,16 @@ dialogHeading = 'Qobuz playlist'
 
 
 class Node_playlist(INode):
-
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_playlist, self).__init__(parent=parent,
-                                            parameters=parameters,
-                                            data=data)
+        super(Node_playlist, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.PLAYLIST
         self.current_playlist_id = None
         self.b_is_current = False
         self.is_my_playlist = False
         self.content_type = 'albums'
         self._items_path = 'tracks/items'
+        self.target_nt = self.get_parameter('nt')
 
     def get_is_folder(self):
         count = self.get_property('tracks_count')
@@ -59,8 +58,7 @@ class Node_playlist(INode):
 
     def _get_node_storage_filename(self):
         return u'userdata-{user_id}-playlist-{nid}.local'.format(
-            user_id=user.get_id(),
-            nid=self.nid)
+            user_id=user.get_id(), nid=self.nid)
 
     def get_label(self, default=None):
         return self.label or self.get_name()
@@ -74,9 +72,17 @@ class Node_playlist(INode):
     def is_current(self):
         return self.b_is_current
 
+    def _fetch_args(self):
+        return ('/playlist/get', {
+            'playlist_id': self.nid,
+            'offset': self.offset,
+            'limit': self.limit,
+            'extra': 'tracks'
+        })
+
     def fetch(self, *a, **ka):
-        return api.get('/playlist/get', playlist_id=self.nid,
-                       offset=self.offset, limit=self.limit, extra='tracks')
+        method, args = self._fetch_args()
+        return api.get(method, **args)
 
     def _count(self):
         return len(self.get_property(self._items_path, default=[]))
@@ -87,9 +93,12 @@ class Node_playlist(INode):
         for track in self.get_property(self._items_path):
             node = getNode(Flag.TRACK, data=track)
             if not node.get_displayable():
-                debug.warn(self, u'Track not displayable: {} ({})',
-                           node.get_label().encode('ascii', errors='ignore'),
-                           node.nid)
+                debug.warn(
+                    self,
+                    u'Track not displayable: {} ({})',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'),
+                    node.nid)
                 continue
             self.add_child(node)
         return True
@@ -104,7 +113,10 @@ class Node_playlist(INode):
             elif a['percent'] > b['percent']:
                 return -1
             return 0
-        genres = [g['name'] for g in sorted(self.get_property('genres'), cmp_genre)]
+
+        genres = [
+            g['name'] for g in sorted(self.get_property('genres'), cmp_genre)
+        ]
         if len(genres) == 0:
             return default
         if first:
@@ -121,51 +133,54 @@ class Node_playlist(INode):
         return self.get_property('description')
 
     def get_tag(self):
-        return u' (tracks: %s, users: %s)' % (
-            self.get_property('tracks_count', to='int'),
-            self.get_property('users_count', to='int'))
+        return u' (tracks: %s, users: %s)' % (self.get_property(
+            'tracks_count', to='int'), self.get_property(
+                'users_count', to='int'))
 
     def get_image(self):
-        images = self.get_property(['images300', 'images150', 'images'],
-                                   default=None)
+        images = self.get_property(
+            ['images300', 'images150', 'images'], default=None)
         if images is None:
             return None
         return image.combine(self.nid, images)
 
     def makeListItem(self, replaceItems=False):
-        privacy_color = theme.get('item/public/color') if self.get_property('is_public', to='bool') else theme.get('item/private/color')
+        privacy_color = theme.get('item/public/color') if self.get_property(
+            'is_public', to='bool') else theme.get('item/private/color')
         tag = color(privacy_color, self.get_tag())
         label = '%s%s' % (self.get_label(), tag)
         if not self.is_my_playlist:
-            label = '%s - %s' % (color(theme.get('item/default/color'), self.get_owner()), label)
+            label = '%s - %s' % (color(
+                theme.get('item/default/color'), self.get_owner()), label)
         if self.b_is_current:
             fmt = config.app.registry.get('playlist_current_format')
             label = fmt % (color(theme.get('item/selected/color'), label))
         item = xbmcgui.ListItem(label,
                                 self.get_owner(),
                                 self.get_image(),
-                                self.get_image(),
-                                self.make_url())
+                                self.get_image(), self.make_url())
         if not item:
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
-        item.setArt({'icon': self.get_image(),
-                     'thumb': self.get_image()})
+        item.setArt({'icon': self.get_image(), 'thumb': self.get_image()})
         description = u'''{description}
 - owner: {owner}
 - tracks: {tracks_count}
 - public: {is_public}
 - published: {is_published}
 - duration : {duration} mn'''.format(
-            description=self.get_property('description', default=self.get_property('name')),
-            owner=self.get_property('owner/name', default='n/a'),
+            description=self.get_property(
+                'description', default=self.get_property('name')),
+            owner=self.get_property(
+                'owner/name', default='n/a'),
             tracks_count=self.get_property('tracks_count'),
             is_public=self.get_property('is_public'),
             is_published=self.get_property('is_published'),
-            duration=round(self.get_property('duration', default=0.0) / 60.0, 2))
-        item.setInfo(type='Music', infoLabels={
-            'genre': ', '.join(self.get_genre()),
-        })
+            duration=round(
+                self.get_property(
+                    'duration', default=0.0) / 60.0, 2))
+        item.setInfo(
+            type='Music', infoLabels={'genre': ', '.join(self.get_genre()), })
         item.setProperty('album_description', description)
         item.setPath(self.make_url())
         ctxMenu = contextMenu()
@@ -177,7 +192,8 @@ class Node_playlist(INode):
         if self.data is None:
             self.data = self.fetch()
         privacy = not self.get_property('is_public', to='bool')
-        res = api.playlist_update(playlist_id=self.nid, is_public=str(privacy).lower())
+        res = api.playlist_update(
+            playlist_id=self.nid, is_public=str(privacy).lower())
         if res is None:
             notify_error('Qobuz', 'Cannot toggle privacy')
             return False
@@ -188,43 +204,55 @@ class Node_playlist(INode):
 
     def attach_context_menu(self, item, menu):
         isOwner = True
+
         def c(txt):
             return color(theme.get('menu/playlist/color'), txt)
-        cmd = containerUpdate(self.make_url(nt=Flag.USERPLAYLISTS,
-                                            id='', mode=Mode.VIEW))
-        menu.add(path='playlist', pos=1,
-                 label='Playlist', cmd=cmd, mode=Mode.VIEW)
+
+        cmd = containerUpdate(
+            self.make_url(
+                nt=Flag.USERPLAYLISTS, id='', mode=Mode.VIEW))
+        menu.add(path='playlist',
+                 pos=1,
+                 label='Playlist',
+                 cmd=cmd,
+                 mode=Mode.VIEW)
 
         if user.username != self.get_property('owner/name'):
             isOwner = False
 
         if isOwner:
-            url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
-                                nm='set_as_current')
-            menu.add(path='playlist/set_as_current', label=c(lang(30163)),
+            url = self.make_url(
+                nt=Flag.PLAYLIST, mode=Mode.VIEW, nm='set_as_current')
+            menu.add(path='playlist/set_as_current',
+                     label=c(lang(30163)),
                      cmd=containerUpdate(url))
 
             url = self.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
-            menu.add(path='playlist/rename', label=c(lang(30165)),
+            menu.add(path='playlist/rename',
+                     label=c(lang(30165)),
                      cmd=runPlugin(url))
-            url = self.make_url(nt=Flag.PLAYLIST, mode=Mode.VIEW,
-                                    nm='toggle_privacy')
-            menu.add(path='playlist/toggle_privacy', post=2,
+            url = self.make_url(
+                nt=Flag.PLAYLIST, mode=Mode.VIEW, nm='toggle_privacy')
+            menu.add(path='playlist/toggle_privacy',
+                     post=2,
                      label=c('Toggle privacy'),
                      cmd=containerUpdate(url))
         elif self.parent and self.parent.nt & (Flag.ALL ^ Flag.USERPLAYLISTS):
-                url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
-                menu.add(path='playlist/subscribe', label=c(lang(30168)),
+            url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
+            menu.add(path='playlist/subscribe',
+                     label=c(lang(30168)),
                      cmd=runPlugin(url))
 
         url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
-        menu.add(path='playlist/remove', label=c(lang(30166)),
-                 cmd=runPlugin(url), color=theme.get('item/caution/color'))
+        menu.add(path='playlist/remove',
+                 label=c(lang(30166)),
+                 cmd=runPlugin(url),
+                 color=theme.get('item/caution/color'))
         super(Node_playlist, self).attach_context_menu(item, menu)
 
     def remove_tracks(self, tracks_id):
-        if not api.playlist_deleteTracks(playlist_id=self.nid,
-                                         playlist_track_ids=tracks_id):
+        if not api.playlist_deleteTracks(
+                playlist_id=self.nid, playlist_track_ids=tracks_id):
             return False
         return True
 
@@ -250,13 +278,16 @@ class Node_playlist(INode):
             node.data = node.fetch()
             nodes.append(node)
         else:
-            render = renderer(qnt, parameters=self.parameters, depth=-1,
-                              whiteFlag=Flag.TRACK, asList=True)
+            render = renderer(
+                qnt,
+                parameters=self.parameters,
+                depth=-1,
+                whiteFlag=Flag.TRACK,
+                asList=True)
             render.run()
             nodes = render.nodes
-        ret = xbmcgui.Dialog().select('Add to current playlist', [
-            node.get_label() for node in nodes
-        ])
+        ret = xbmcgui.Dialog().select('Add to current playlist',
+                                      [node.get_label() for node in nodes])
         if ret == -1:
             return False
         ret = self._add_tracks(cid, nodes)
@@ -288,8 +319,8 @@ class Node_playlist(INode):
                     debug.warn(self, 'Not a Node_track node')
                     continue
                 str_tracks += '%s,' % (str(node.nid))
-            if not api.playlist_addTracks(playlist_id=playlist_id,
-                                          track_ids=str_tracks):
+            if not api.playlist_addTracks(
+                    playlist_id=playlist_id, track_ids=str_tracks):
                 return False
             start += step
         return True
@@ -306,8 +337,12 @@ class Node_playlist(INode):
             node.data = node.fetch()
             nodes.append(node)
         else:
-            render = renderer(qnt, parameters=self.parameters, depth=-1,
-                              whiteFlag=Flag.TRACK, asList=True)
+            render = renderer(
+                qnt,
+                parameters=self.parameters,
+                depth=-1,
+                whiteFlag=Flag.TRACK,
+                asList=True)
             render.run()
             nodes = render.nodes
         if len(nodes) == 0:
@@ -316,9 +351,8 @@ class Node_playlist(INode):
             name = ask('Playlist name? (i8n)')
             if name is None:
                 return False
-        ret = xbmcgui.Dialog().select('Create playlist %s' % (name), [
-            node.get_label() for node in nodes
-        ])
+        ret = xbmcgui.Dialog().select('Create playlist %s' % (name),
+                                      [node.get_label() for node in nodes])
         if ret == -1:
             return False
         playlist = self.create(name)
@@ -359,7 +393,8 @@ class Node_playlist(INode):
         if not playlist_id:
             debug.warn(self, 'Can\'t rename playlist without id')
             return False
-        data = api.get('/playlist/get', playlist_id=playlist_id)
+        node = getNode(Flag.PLAYLIST, parameters={'nid': playlist_id})
+        data = node.fetch()
         if not data:
             debug.warn(self, 'Something went wrong while renaming playlist')
             return False
@@ -383,9 +418,10 @@ class Node_playlist(INode):
         return True
 
     def create(self, name, isPublic=True, isCollaborative=False):
-        return api.playlist_create(name=name,
-                                   is_public=converter.bool2str(isPublic),
-                                   is_collaborative=converter.bool2str(isCollaborative))
+        return api.playlist_create(
+            name=name,
+            is_public=converter.bool2str(isPublic),
+            is_collaborative=converter.bool2str(isCollaborative))
 
     def gui_create(self):
         query = self.get_parameter('query', to='unquote')
@@ -399,12 +435,13 @@ class Node_playlist(INode):
                 return None
         ret = self.create(query)
         if not ret:
-            debug.warn(self, 'Cannot create playlist named '' + query + ''')
+            debug.warn(self, 'Cannot create playlist named ' ' + query + ' '')
             return None
         self.set_as_current(ret['id'])
         self.delete_cache(ret['id'])
-        url = self.make_url(nt=Flag.USERPLAYLISTS)
-        executeBuiltin(containerUpdate(url))
+        self.containerUpdate()
+        #url = self.make_url(nt=Flag.USERPLAYLISTS)
+        #executeBuiltin(containerUpdate(url, True))
         return ret['id']
 
     def _get_playlist_id(self, playlist_id=None):
@@ -431,9 +468,8 @@ class Node_playlist(INode):
         name = ''
         if 'name' in data:
             name = data['name']
-        ok = xbmcgui.Dialog().yesno(lang(30166),
-                                    lang(30054),
-                                    color('FFFF0000', name))
+        ok = xbmcgui.Dialog().yesno(
+            lang(30166), lang(30054), color('FFFF0000', name))
         if not ok:
             return False
         res = False
@@ -442,14 +478,18 @@ class Node_playlist(INode):
         else:
             res = api.playlist_unsubscribe(playlist_id=playlist_id)
         if not res:
-            debug.warn(self, 'Cannot delete playlist with id ' + str(playlist_id))
+            debug.warn(self,
+                       'Cannot delete playlist with id ' + str(playlist_id))
             notify_error(lang(30183), lang(30186) + name)
             return False
         self.delete_cache(playlist_id)
         notify_log(lang(30183), (lang(30184) + '%s' + lang(30185)) % (name))
-        url = self.make_url(nt=Flag.USERPLAYLISTS, mode=Mode.VIEW)
-        executeBuiltin(containerUpdate(url, True))
+        self.containerUpdate()
         return False
+
+    def containerUpdate(self):
+        url = self.make_url(nt=self.target_nt, mode=Mode.VIEW)
+        executeBuiltin(containerUpdate(url, True))
 
     def subscribe(self):
         if api.playlist_subscribe(playlist_id=self.nid):
@@ -459,17 +499,7 @@ class Node_playlist(INode):
         return False
 
     def delete_cache(self, playlist_id):
-        '''Warning: Parameter must be the same has the fetch method'''
-        upkey = cache.make_key('/playlist/getUserPlaylists',
-                               limit=self.limit,
-                               offset=self.offset,
-                               user_id=user.get_id(),
-                               type='last-created')
-        pkey = cache.make_key('/playlist/get',
-                              playlist_id=playlist_id,
-                              offset=self.offset,
-                              limit=self.limit,
-                              extra='tracks')
-        cache.delete(upkey)
-        cache.delete(pkey)
+        method, args = self._fetch_args()
+        key = cache.make_key(method, **args)
+        cache.delete(key)
         self.remove_node_storage()
