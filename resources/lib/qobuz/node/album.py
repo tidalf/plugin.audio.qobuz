@@ -27,7 +27,7 @@ class Node_album(INode):
                                          data=data)
         self.nt = Flag.ALBUM
         self.image = getImage('album')
-        self.content_type = 'albums'
+        self.content_type = 'songs'
         self.imageDefaultSize = config.app.registry.get('image_default_size')
         self._items_path = 'tracks/items'
 
