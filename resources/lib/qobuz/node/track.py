@@ -39,7 +39,7 @@ class Node_track(INode):
             return None
         return api.get('/track/get', track_id=self.nid)
 
-    def populate(self, *a, **ka):
+    def populate(self, xdir=None, *a, **ka):
         return xdir.add_node(self)
 
     def make_local_url(self):
