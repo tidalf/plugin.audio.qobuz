@@ -8,21 +8,21 @@
 '''
 import requests
 import xbmcgui
-
+from time import time
 from qobuz.node.inode import INode
 from qobuz import config
 from qobuz.node import getNode, Flag
 from qobuz import debug
 
+
 class Window(xbmcgui.Window):
     pass
 
-class Node_testing(INode):
 
+class Node_testing(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_testing, self).__init__(parent=parent,
-                                               parameters=parameters,
-                                               data=data)
+        super(Node_testing, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.TESTING
         self.label = 'Testing'
         self.content_type = 'files'
@@ -37,12 +37,15 @@ class Node_testing(INode):
         self.add_child(getNode(Flag.TEXT, parameters={'label': text}))
 
     def fetch(self, *a, **ka):
-        res = None
+        start = time()
         try:
             res = requests.get('%s/qobuz/ping' % self.api_url)
-        except requests.ConnectionError as e:
-            debug.error(self, 'HTTPD service not running? {}', e)
-        return res
+        except Exception as e:
+            debug.error(self, 'Ping httpd fail: {}', e)
+            return None
+        if res is None or res.status_code != 200:
+            return None
+        return {'ping:': time() - start}
 
     def message(self):
         out = ''
@@ -50,14 +53,12 @@ class Node_testing(INode):
             out += '''- endPoint: {url}
 - running: {is_alive}
 Tip: You can disable/enable Qobuz addon to restart web service
-        '''.format(url=self.api_url, is_alive=self.is_alive())
+        '''.format(
+                url=self.api_url, is_alive=self.is_alive())
         return out
 
     def is_alive(self):
-        self.data = self.fetch()
-        if self.data is None:
-            return False
-        if self.data.status_code != 200:
+        if self.fetch() is None:
             return False
         return True
 
@@ -66,6 +67,7 @@ Tip: You can disable/enable Qobuz addon to restart web service
         d.ok('Web service', self.message())
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        self.add_child(getNode(Flag.TEXT,
-                               parameters={'label': self.message()}))
+        self.add_child(
+            getNode(
+                Flag.TEXT, parameters={'label': self.message()}))
         return True
