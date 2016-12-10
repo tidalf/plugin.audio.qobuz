@@ -14,13 +14,14 @@ try:
     import xbmc
     import xbmcgui
     import xbmcplugin
-    class Keyboard(xbmc.Keyboard):
 
+    class Keyboard(xbmc.Keyboard):
         def __init__(self, default, heading='', hidden=True):
             self.setHeading('Qobuz / %s' % heading)
 
 except:
     print 'QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken'
+
 
 def ask(current=None, heading='rename'):
     w = Keyboard(current, heading)
@@ -29,11 +30,13 @@ def ask(current=None, heading='rename'):
         return None
     return w.getText().strip()
 
+
 import qobuz
 from qobuz.xbmcrpc import showNotification, getInfoLabels
 from qobuz import config
 from qobuz import debug
 from qobuz.util import common as commonUtil
+
 
 def getImage(name):
     if name is None:
@@ -52,8 +55,8 @@ def notifyH(title, text, image=None, mstime=2000):
         image = getImage('icon-default-256')
     else:
         image = getImage(image)
-    return showNotification(title=title, message=text, image=image,
-                            displaytime=mstime)
+    return showNotification(
+        title=title, message=text, image=image, displaytime=mstime)
 
 
 def notify_log(title, text, **ka):
@@ -75,10 +78,8 @@ def notify(title, text, image=None, mstime=2000):
         image = getImage('icon-default-256')
     else:
         image = getImage(image)
-    return showNotification(title=lang(title),
-                            message=lang(text),
-                            image=image,
-                            displaytime=mstime)
+    return showNotification(
+        title=lang(title), message=lang(text), image=image, displaytime=mstime)
 
 
 def dialogLoginFailure():
@@ -87,8 +88,11 @@ def dialogLoginFailure():
     dialog = xbmcgui.Dialog()
     if dialog.yesno(lang(30010), lang(30036), lang(30042)):
         qobuz.addon.openSettings()
-        xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
-                                  updateListing=True, cacheToDisc=False)
+        xbmcplugin.endOfDirectory(
+            handle=int(sys.argv[1]),
+            succeeded=False,
+            updateListing=True,
+            cacheToDisc=False)
     else:
         xbmc.executebuiltin('ActivateWindow(home)')
         return False
@@ -99,10 +103,12 @@ def dialogServiceTemporarilyUnavailable():
     '''
     dialog = xbmcgui.Dialog()
     dialog.ok('Qobuz Service Temporay Unavailable',
-              'Qobuz service are down :/',
-              'Check it later')
-    xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
-                              updateListing=True, cacheToDisc=False)
+              'Qobuz service are down :/', 'Check it later')
+    xbmcplugin.endOfDirectory(
+        handle=int(sys.argv[1]),
+        succeeded=False,
+        updateListing=True,
+        cacheToDisc=False)
     return False
 
 
@@ -140,12 +146,10 @@ def runPlugin(url):
 
 
 def containerUpdate(url, replace=False):
-    if replace:
+    replace = ''
+    if replace is True:
         replace = ', "replace"'
-    else:
-        replace = ''
-    s = 'Container.Update("%s"%s)' % (url, replace)
-    return s
+    return 'Container.Update("%s"%s)' % (url, replace)
 
 
 def yesno(heading, line1, line2='', line3=''):
@@ -154,12 +158,11 @@ def yesno(heading, line1, line2='', line3=''):
 
 
 def containerRefresh():
-    return ('Container.Refresh')
+    return 'Container.Refresh'
 
 
 def executeBuiltin(cmd):
-    debug.warn('util', 'Executing builtin: {}', cmd)
-    xbmc.executebuiltin("%s" % (cmd))
+    xbmc.executebuiltin(cmd)
 
 
 def containerViewMode():
@@ -169,12 +172,14 @@ def containerViewMode():
         return data[label]
     return ''
 
+
 def containerSortMethod():
     label = 'Container.SortMethod'
     data = getInfoLabels(labels=[label])
     if data:
         return data[label]
     return ''
+
 
 def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
