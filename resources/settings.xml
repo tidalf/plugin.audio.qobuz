@@ -37,11 +37,7 @@
 		<setting id="image_create_mosaic" type="bool" label="Create mosaic from album cover (i8n)"
 				            default="true" />
 		<setting id="show_experimental" type="bool" label="Show experimental (i8n)" default="false" />
-
-
-
 	</category>
-
 	<category label="Library (beta)">
 				<setting id="enable_scan_feature" label="30154" type="bool" default="true" />
 				<setting id="scan_by_album" label="Scan by album (i8n)" type="bool" default="true" />
@@ -72,7 +68,7 @@
 	<category label="Notification">
 		<setting id="notification_playingsong" label="30142" type="bool" default="false" />
 		<setting id="warn_free_account" label="Warn free account (i8n)" type="bool" default="true" />
-		<setting id="notify_library_san_progress" label="Library scan progress (i8n)" type="bool" default="true" />
+		<setting id="notify_library_scan_progress" label="Library scan progress (i8n)" type="bool" default="true" />
 		<setting id="notify_api_error" label="Qobuz/API error (i8n)" type="bool" default="true" />
 	</category>
 </settings>
