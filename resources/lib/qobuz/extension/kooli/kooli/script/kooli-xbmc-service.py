@@ -8,7 +8,7 @@ import threading
 import requests
 base_path = P.abspath(P.dirname(__file__))
 try:
-  import kooli
+    import kooli
 except ImportError:
     sys.path.append(P.abspath(P.join(base_path, P.pardir, P.pardir)))
 from kooli import log
@@ -18,7 +18,8 @@ try:
     log.info('Flask loaded from kodi addon repository')
 except ImportError as e:
     log.warn('Flask not present, loading our own copy')
-    path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask', 'lib')
+    path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask',
+                  'lib')
     sys.path.append(path)
 from flask import request
 import xbmc
@@ -41,6 +42,7 @@ def is_empty(obj):
             return True
     return False
 
+
 def is_authentication_set():
     username = config.app.registry.get('username')
     password = config.app.registry.get('password')
@@ -48,8 +50,10 @@ def is_authentication_set():
         return True
     return False
 
+
 def is_service_enable():
     return config.app.registry.get('enable_scan_feature', to='bool')
+
 
 @application.before_request
 def shutdown_request():
@@ -57,8 +61,10 @@ def shutdown_request():
         shutdown_server()
     return None
 
+
 class KooliService(threading.Thread):
     name = 'httpd'
+
     def __init__(self, port=33574):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -69,8 +75,8 @@ class KooliService(threading.Thread):
         self.alive = True
 
     def stop(self):
-        self.alive = False
         shutdown_server()
+        self.alive = False
 
     def run(self):
         while self.alive:
@@ -78,15 +84,25 @@ class KooliService(threading.Thread):
                 gui.notify_warn('Authentication not set',
                                 'You need to enter credentials')
             elif not user.logged:
-                if not api.login(username=qobuzApp.registry.get('username'),
-                    password=qobuzApp.registry.get('password')):
+                if not api.login(
+                        username=qobuzApp.registry.get('username'),
+                        password=qobuzApp.registry.get('password')):
                     gui.notify_warn('Login failed', 'Invalid credentials')
                 else:
                     try:
-                        application.run(port=self.port, threaded=True)
+                        application.run(port=self.port,
+                                        threaded=False,
+                                        processes=0,
+                                        debug=False,
+                                        use_reloader=False,
+                                        use_debugger=False,
+                                        use_evalex=True,
+                                        passthrough_errors=False)
                     except Exception as e:
                         debug.error(self, 'KooliService port: {} Error: {}',
                                     self.port, e)
+                        raise e
+                        qobuzApp.plugin = None
             time.sleep(1)
 
 
