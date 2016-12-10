@@ -32,15 +32,14 @@ class Node_similar_artist(INode):
         return len(self.data['artists']['items'])
 
     def populate(self, *a, **ka):
+        skip_empty = not config.app.registry.get(
+            'display_artist_without_album', to='bool')
         for data in self.data['artists']['items']:
-            if not config.app.registry.get('display_artist_without_album',
-                                           to='bool'):
-                if data['albums_count'] <= 0:
-                    continue
+            if skip_empty and data['albums_count'] < 1:
+                continue
             artist = getNode(Flag.ARTIST, data=data)
             cache = artist.fetch(noRemote=True)
             if cache is not None:
-                #debug.info(self, 'From cache {}', cache)
                 artist.data = cache
             self.add_child(artist)
         return True if len(self.data['artists']['items']) > 0 else False
