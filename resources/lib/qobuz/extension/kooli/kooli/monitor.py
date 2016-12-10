@@ -1,18 +1,27 @@
+'''
+    qobuz.extension.kooli.monitor
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
 import time
 import xbmc
 
 from qobuz import debug
 
+
 class ServiceItem(object):
     def __init__(self, service, on_idle=False):
         self.service = service
-        self.on_idle=on_idle
+        self.on_idle = on_idle
 
     def __getattr__(self, name, *a, **ka):
         return getattr(self.service, name, *a, **ka)
 
-class Monitor(xbmc.Monitor):
 
+class Monitor(xbmc.Monitor):
     def __init__(self):
         super(Monitor, self).__init__()
         self.abortRequested = False
@@ -21,7 +30,7 @@ class Monitor(xbmc.Monitor):
         self.service = {}
 
     def onSettingsChanged(self):
-        debug.info(self, 'Setting changed') # @wip
+        debug.info(self, 'Setting changed')  # @wip
 
     def onAbortRequested(self):
         self.abortRequested = True
