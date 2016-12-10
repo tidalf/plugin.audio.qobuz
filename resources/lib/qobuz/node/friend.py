@@ -26,6 +26,7 @@ class Node_friend(INode):
         self.nt = Flag.FRIEND
         self.image = getImage('artist')
         self.set_name(self.get_parameter('query'))
+        self.content_type = 'files'
 
     def set_label(self, label):
         self.label = color(theme.get('item/default/color'), label)
