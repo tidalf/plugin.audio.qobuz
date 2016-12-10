@@ -8,7 +8,7 @@ from jinja2 import Undefined
 from flask import Flask
 from flask import request
 from flask import Response, redirect
-JINJA2_ENVIRONMENT_OPTIONS = { 'undefined' : Undefined }
+JINJA2_ENVIRONMENT_OPTIONS = {'undefined': Undefined}
 from flask import make_response, render_template, request
 
 from qobuz.api import api
@@ -23,26 +23,30 @@ from qobuz.gui.directory import Directory
 from qobuz import config
 from kooli import kooli_path
 
-qobuzApp = QobuzApplication(Plugin('plugin.audio.qobuz'),
-                            bootstrapClass=MinimalBootstrap)
+qobuzApp = QobuzApplication(
+    Plugin('plugin.audio.qobuz'), bootstrapClass=MinimalBootstrap)
 qobuzApp.bootstrap.init_app()
 kooli_tpl = P.join(kooli_path, 'tpl')
 application = Flask(__name__, template_folder=kooli_tpl)
+
 
 def nocache(view):
     @wraps(view)
     def no_cache(*args, **kwargs):
         response = make_response(view(*args, **kwargs))
         response.headers['Last-Modified'] = datetime.now()
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers[
+            'Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
         return response
 
     return update_wrapper(no_cache, view)
 
+
 def http_error(name):
     return 'error', 500
+
 
 def shutdown_server():
     try:
@@ -60,14 +64,18 @@ def shutdown_server():
 def route_ping():
     return 'pong', 200
 
+
 @nocache
 @application.route('/qobuz', methods=['HEAD', 'GET'])
 def route_root():
     response = {}
     return render_template('root.htm.tpl', **response)
 
+
 @nocache
-@application.route('/qobuz/<string:album_id>/<string:track_id>/file.mpc', methods=['GET', 'HEAD'])
+@application.route(
+    '/qobuz/<string:album_id>/<string:track_id>/file.mpc',
+    methods=['GET', 'HEAD'])
 def route_track(album_id=None, track_id=None):
     track = getNode(Flag.TRACK, parameters={'nid': track_id})
     track.data = track.fetch()
@@ -78,8 +86,11 @@ def route_track(album_id=None, track_id=None):
         return 'ok', 200
     return redirect(url, code=302)
 
+
 @nocache
-@application.route('/qobuz/<string:album_id>/<string:track_id>/disc.png', methods=['GET', 'HEAD'])
+@application.route(
+    '/qobuz/<string:album_id>/<string:track_id>/disc.png',
+    methods=['GET', 'HEAD'])
 def route_disc_image(album_id=None, track_id=None):
     node = getNode(Flag.ALBUM, parameters={'nid': album_id})
     node.data = node.fetch()
@@ -94,7 +105,9 @@ def route_disc_image(album_id=None, track_id=None):
 
 
 @nocache
-@application.route('/qobuz/<string:album_id>/<string:track_id>/album.nfo', methods=['GET', 'HEAD'])
+@application.route(
+    '/qobuz/<string:album_id>/<string:track_id>/album.nfo',
+    methods=['GET', 'HEAD'])
 def route_nfo_album(album_id=None, track_id=None):
     response = api.get('/album/get', album_id=album_id)
     if response is None:
@@ -105,15 +118,16 @@ def route_nfo_album(album_id=None, track_id=None):
         return 'ok', 200
     if not response['description']:
         response['description'] = ''
-    response['image_default_size'] = qobuzApp.registry.get('image_default_size')
+    response['image_default_size'] = qobuzApp.registry.get(
+        'image_default_size')
     if 'duration' in response:
         response['duration'] = round(response['duration'])
     return render_template('album.nfo.tpl', **response)
 
 
-
 @nocache
-@application.route('/qobuz/<string:album_id>/artist.nfo', methods=['GET', 'HEAD'])
+@application.route(
+    '/qobuz/<string:album_id>/artist.nfo', methods=['GET', 'HEAD'])
 def route_nfo_artist(album_id=None):
     album = api.get('/album/get', album_id=album_id)
     if album is None:
@@ -123,20 +137,24 @@ def route_nfo_artist(album_id=None):
         return 'NotFound', 404
     if request.method == 'HEAD':
         return 'ok', 200
-    response['image_default_size'] = qobuzApp.registry.get('image_default_size')
+    response['image_default_size'] = qobuzApp.registry.get(
+        'image_default_size')
     return render_template('artist.nfo.tpl', **response)
+
 
 @nocache
 @application.route('/qobuz/favorite/', methods=['GET', 'HEAD'])
-@application.route('/qobuz/favorite/<string:search_type>/',
-                   methods=['GET', 'HEAD'])
-@application.route('/qobuz/favorite/<string:search_type>/<string:nid>',
-                   methods=['GET', 'HEAD'])
+@application.route(
+    '/qobuz/favorite/<string:search_type>/', methods=['GET', 'HEAD'])
+@application.route(
+    '/qobuz/favorite/<string:search_type>/<string:nid>',
+    methods=['GET', 'HEAD'])
 def route_favorite(search_type=None, nid=None):
     if search_type is None:
         return render_template('favorite_index.htm.tpl')
-    node = getNode(Flag.FAVORITE, parameters={'search-type': search_type,
-                                              'nid': nid})
+    node = getNode(
+        Flag.FAVORITE, parameters={'search-type': search_type,
+                                   'nid': nid})
     node.data = node.fetch()
     if node.data is None:
         return redirect('/qobuz/favorite/%s' % search_type)
