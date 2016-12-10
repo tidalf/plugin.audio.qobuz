@@ -14,6 +14,7 @@ from qobuz.gui.util import lang, getImage
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz import config
+from qobuz.cache import cache
 
 limit_max = 100
 
@@ -51,10 +52,12 @@ class Node_user_playlists(INode):
             return None
         return int(userdata['current_playlist'])
 
+    def _get_limit(self):
+        return self.limit if self.limit < limit_max else limit_max
+
     def fetch(self, *a, **ka):
-        limit = self.limit if self.limit < limit_max else limit_max
         return api.get('/playlist/getUserPlaylists',
-                       limit=limit,
+                       limit=self._get_limit(),
                        offset=self.offset,
                        user_id=user.get_id(),
                        type='last-created')
@@ -62,7 +65,8 @@ class Node_user_playlists(INode):
     def populate(self, *a, **ka):
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST, data=data)
+            node = getNode(Flag.PLAYLIST, data=data,
+                           parameters={'nt': self.nt})
             if cid and cid == node.nid:
                 node.set_is_current(True)
             if node.get_owner() == user.username:
