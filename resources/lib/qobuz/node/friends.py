@@ -14,8 +14,6 @@ from qobuz.node import getNode, Flag
 from qobuz.api.user import current as user
 
 class Node_friends(INode):
-    '''@class Node_friend_list:
-    '''
 
     def __init__(self, parent=None, parameters={}, data=None):
         super(Node_friends, self).__init__(parent=parent,
@@ -26,7 +24,7 @@ class Node_friends(INode):
         self.image = getImage('artist')
         self.label = str(self.name) + lang(30179) if (self.name) else lang(30180)
         self.url = None
-        self.content_type = 'artists'
+        self.content_type = 'songs'
 
     def make_url(self, **ka):
         if self.name:
