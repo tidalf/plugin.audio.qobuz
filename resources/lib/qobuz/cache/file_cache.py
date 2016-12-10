@@ -9,9 +9,9 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 try:
-    """cPickle is a faster implementation of pickle, we are using it if
+    '''cPickle is a faster implementation of pickle, we are using it if
     present
-    """
+    '''
     import cPickle as pickle
 except ImportError:
     import pickle
@@ -22,8 +22,8 @@ from qobuz.util.file import RenamedTemporaryFile, unlink
 from qobuz.util.hash import hashit
 from qobuz import debug
 
-class FileCache(BaseCache):
 
+class FileCache(BaseCache):
     def __init__(self):
         self.base_path = None
         self.ventile = False
@@ -39,7 +39,7 @@ class FileCache(BaseCache):
         return hashit(argstr)
 
     def _make_path(self, key):
-        return os.path.join(self.base_path, '%s.data' % key)
+        return os.path.join(self.base_path, '%s.dat' % key)
 
     def sync(self, key, data):
         filename = self._make_path(key)
