@@ -18,19 +18,17 @@ from qobuz.cache import cache
 
 limit_max = 100
 
-class Node_user_playlists(INode):
 
+class Node_user_playlists(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_user_playlists, self).__init__(parent=parent,
-                                                  parameters=parameters,
-                                                  data=data)
+        super(Node_user_playlists, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.USERPLAYLISTS
         self.label = lang(30021)
         self.image = getImage('userplaylists')
         self.content_type = 'albums'
         self.display_product_cover = config.app.registry.get(
-            'userplaylists_display_cover',
-            to='bool')
+            'userplaylists_display_cover', to='bool')
 
     def set_display_by(self, dtype):
         vtype = ('product', 'songs')
@@ -65,8 +63,8 @@ class Node_user_playlists(INode):
     def populate(self, *a, **ka):
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST, data=data,
-                           parameters={'nt': self.nt})
+            node = getNode(
+                Flag.PLAYLIST, data=data, parameters={'nt': self.nt})
             if cid and cid == node.nid:
                 node.set_is_current(True)
             if node.get_owner() == user.username:
