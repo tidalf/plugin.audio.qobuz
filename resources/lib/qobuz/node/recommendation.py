@@ -49,13 +49,9 @@ RECOS_GENRES = {
 
 
 class Node_recommendation(INode):
-    '''Recommendation node, displaying music ordered by category and genre
-    '''
-
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_recommendation, self).__init__(parent=parent,
-                                                  parameters=parameters,
-                                                  data=data)
+        super(Node_recommendation, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.RECOMMENDATION
         self.genre_id = self.get_parameter('genre-id', default=None)
         self.genre_type = self.get_parameter('genre-type', default=None)
@@ -98,10 +94,12 @@ class Node_recommendation(INode):
         '''Populate genre, we have genre_type but no genre_id
         '''
         for genre_id in RECOS_GENRES:
-            node = getNode(Flag.RECOMMENDATION, parameters={
-                'genre-type': self.genre_type,
-                'genre-id': genre_id
-            })
+            node = getNode(
+                Flag.RECOMMENDATION,
+                parameters={
+                    'genre-type': self.genre_type,
+                    'genre-id': genre_id
+                })
             node.label = RECOS_GENRES[genre_id]
             node.label2 = RECOS_TYPES[int(self.genre_type)]
             self.add_child(node)
@@ -114,10 +112,12 @@ class Node_recommendation(INode):
         if self.data is None:
             return False
         if 'albums' not in self.data:
-            debug.warn(self, 'Recommendation data doesn\'t contain <albums> key')
+            debug.warn(self,
+                       'Recommendation data doesn\'t contain <albums> key')
             return False
         if self.data['albums'] is None or 'items' not in self.data['albums']:
-            debug.warn(self, 'Recommendation data[\'albums\'] doesn\'t contain items')
+            debug.warn(
+                self, 'Recommendation data[\'albums\'] doesn\'t contain items')
             return False
         for product in self.data['albums']['items']:
             self.add_child(getNode(Flag.ALBUM, data=product))

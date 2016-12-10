@@ -15,7 +15,6 @@ from qobuz import config
 
 
 class QobuzCache(FileCache):
-
     def __init__(self, *a, **ka):
         self.store = {}
         self.black_keys = ['password']
@@ -35,5 +34,6 @@ class QobuzCache(FileCache):
             if a[0] == '/track/getFileUrl':
                 return 60 * 15
         if 'user_id' in ka:
-            return config.app.registry.get('cache_duration_middle', to='int') * 60
+            return config.app.registry.get('cache_duration_middle',
+                                           to='int') * 60
         return config.app.registry.get('cache_duration_long', to='int') * 60

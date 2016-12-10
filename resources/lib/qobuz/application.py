@@ -13,8 +13,8 @@ from qobuz.bootstrap import Bootstrap
 from qobuz import config
 from qobuz.registry import Registry
 
-class Application(object):
 
+class Application(object):
     def __init__(self, plugin=None, bootstrapClass=Bootstrap):
         self.plugin = plugin
         self.registry = Registry(self)

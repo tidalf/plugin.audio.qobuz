@@ -16,7 +16,7 @@ __seed__ = __name__ + '0.0.1'
 __magic__ = 0
 pos = 0
 for i in [ord(c) for c in __seed__[:]]:
-    __magic__ += i * 2 ** pos
+    __magic__ += i * 2**pos
     pos += 1
 BadMagic = 1 << 1
 BadKey = 1 << 2
@@ -77,6 +77,7 @@ class BaseCache(object):
             if not that.sync(key, entry):
                 that.error &= StoreError
             return data
+
         return wrapped_function
 
     def is_fresh(self, key, data, *a, **ka):

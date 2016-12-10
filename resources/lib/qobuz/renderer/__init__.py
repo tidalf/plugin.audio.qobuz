@@ -10,12 +10,19 @@ from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
 from qobuz.node import Flag
 from qobuz.constants import Mode
 
+
 def renderer(nType,
              parameters={},
              mode=Mode.VIEW,
              whiteFlag=Flag.ALL,
              blackFlag=Flag.STOPBUILD,
-             depth=1, asList=False):
-    return OurRenderer(nType, parameters=parameters, mode=mode,
-                       whiteFlag=whiteFlag, blackFlag=blackFlag,
-                       depth=depth, asList=asList)
+             depth=1,
+             asList=False):
+    return OurRenderer(
+        nType,
+        parameters=parameters,
+        mode=mode,
+        whiteFlag=whiteFlag,
+        blackFlag=blackFlag,
+        depth=depth,
+        asList=asList)

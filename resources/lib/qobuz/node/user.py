@@ -18,11 +18,11 @@ from qobuz.api.user import current as user
 from qobuz import config
 from qobuz.theme import color
 
+
 class Node_user(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_user, self).__init__(parent=parent,
-                                         parameters=parameters,
-                                         data=data)
+        super(Node_user, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.USER
         self.content_type = 'artists'
         self.is_folder = True
@@ -30,11 +30,12 @@ class Node_user(INode):
 
     def get_label(self):
         return u'[{subscription} - {login}]'.format(
-            login=user.get_property('user/login', default='Demo'),
+            login=user.get_property(
+                'user/login', default='Demo'),
             country=user.get_property('user/country_code'),
             lang=user.get_property('user/language_code'),
-            subscription=user.get_property('user/credential/description', default='Free')
-        )
+            subscription=user.get_property(
+                'user/credential/description', default='Free'))
 
     def get_image(self):
         return user.get_property('user/avatar')
@@ -52,25 +53,32 @@ class Node_user(INode):
 - offline streaming: {offline_streaming}
 - mobile streaming: {mobile_streaming}
 - lossless streaming: {lossless_streaming}
-'''.format(credential_label=color(self.get_property('user/credential/parameters/color_scheme/logo', default='#0000FF00', to='color'),
-                                  self.get_property('user/credential/label')),
-           credential_description=self.get_property('user/credential/description'),
-           lossy_streaming=self.get_property('user/credential/parameters/lossy_streaming'),
-           offline_streaming=self.get_property('user/credential/parameters/offline_streaming'),
-           mobile_streaming=self.get_property('user/credential/parameters/mobile_streaming'),
-           lossless_streaming=self.get_property('user/credential/parameters/lossless_streaming'))
+'''.format(
+            credential_label=color(
+                self.get_property(
+                    'user/credential/parameters/color_scheme/logo',
+                    default='#0000FF00',
+                    to='color'),
+                self.get_property('user/credential/label')),
+            credential_description=self.get_property(
+                'user/credential/description'),
+            lossy_streaming=self.get_property(
+                'user/credential/parameters/lossy_streaming'),
+            offline_streaming=self.get_property(
+                'user/credential/parameters/offline_streaming'),
+            mobile_streaming=self.get_property(
+                'user/credential/parameters/mobile_streaming'),
+            lossless_streaming=self.get_property(
+                'user/credential/parameters/lossless_streaming'))
 
     def makeListItem(self, replaceItems=False):
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label2(),
-                                self.get_image(),
-                                self.get_image(),
-                                None)
+                                self.get_image(), self.get_image(), None)
         if not item:
             debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
-        item.setInfo('Music', infoLabels={
-            'artist': user.get_property('user/login')
-        })
+        item.setInfo(
+            'Music', infoLabels={'artist': user.get_property('user/login')})
         item.setProperty('artist_description', self.get_description())
         return item

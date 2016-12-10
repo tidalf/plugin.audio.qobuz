@@ -9,9 +9,9 @@
 import os
 import sys
 from time import time
-import xbmcaddon  # @UnresolvedImport
-import xbmcgui  # @UnresolvedImport
-import xbmc  # @UnresolvedImport
+import xbmcaddon
+import xbmcgui
+import xbmc
 
 pluginId = 'plugin.audio.qobuz'
 __addon__ = xbmcaddon.Addon(id=pluginId)
@@ -36,7 +36,6 @@ keyMonitoredTrackId = 'QobuzPlayerMonitoredTrackId'
 
 
 class MyPlayer(xbmc.Player):
-
     def __init__(self, *args, **kwargs):
         xbmc.Player.__init__(self)
         self.trackId = None
@@ -112,7 +111,6 @@ class MyPlayer(xbmc.Player):
 
 
 class Monitor(xbmc.Monitor):
-
     def __init__(self):
         super(Monitor, self).__init__()
         self.abortRequested = False
@@ -131,8 +129,8 @@ class Monitor(xbmc.Monitor):
             dbver = "MyMusic32.db"
         else:
             dbver = "MyMusic37.db"
-        dbfile = os.path.join(xbmc.translatePath('special://profile/'),
-                              "Database", dbver)
+        dbfile = os.path.join(
+            xbmc.translatePath('special://profile/'), "Database", dbver)
         try:
             con = lite.connect(dbfile)
             cur = con.cursor()
@@ -186,6 +184,7 @@ class Monitor(xbmc.Monitor):
 
     def onSettingsChanged(self):
         pass
+
 
 boot = QobuzBootstrap(__addon__, 0)
 logLabel = 'QobuzMonitor'

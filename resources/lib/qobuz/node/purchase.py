@@ -13,14 +13,11 @@ from qobuz.node import Flag, getNode
 from qobuz.gui.util import lang, getImage
 from qobuz.api.user import current as user
 
-class Node_purchase(INode):
-    '''Displaying product purchased by user (track and album)
-    '''
 
+class Node_purchase(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_purchase, self).__init__(parent=parent,
-                                            parameters=parameters,
-                                            data=data)
+        super(Node_purchase, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.PURCHASE
         self.image = getImage('album')
         self.content_type = 'albums'
@@ -41,14 +38,18 @@ class Node_purchase(INode):
     def fetch(self, *a, **ka):
         if self.search_type is None:
             return {}
-        return api.get('/purchase/getUserPurchases', limit=self.limit,
-                       offset=self.offset, user_id=user.get_id())
+        return api.get('/purchase/getUserPurchases',
+                       limit=self.limit,
+                       offset=self.offset,
+                       user_id=user.get_id())
 
     def populate(self, xdir, lvl, whiteFlag, blackFlag):
         if self.search_type is None:
             for search_type in ['all', 'albums', 'tracks']:
-                self.add_child(getNode(Flag.PURCHASE,
-                                       parameters={'search-type': search_type}))
+                self.add_child(
+                    getNode(
+                        Flag.PURCHASE, parameters={'search-type': search_type
+                                                   }))
             return True
         wanted = ['albums', 'tracks']
         if self.search_type != 'all':

@@ -16,18 +16,21 @@ from qobuz.gui.util import yesno, notifyH, getImage
 from qobuz.api.user import current as current_user
 from qobuz import config
 
+
 def makeSubscriptionNode():
-    return getNode(Flag.TEXT, parameters={
-                'label': '(Free Account / Subscribe on qobuz.com)',
-                'image': 'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'})
+    return getNode(
+        Flag.TEXT,
+        parameters={
+            'label': '(Free Account / Subscribe on qobuz.com)',
+            'image':
+            'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'
+        })
+
 
 class Node_root(INode):
-    '''Our root node, we are displaying all qobuz nodes from here
-    '''
-
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_root, self).__init__(parent=parent, parameters=parameters,
-                                        data=data)
+        super(Node_root, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ROOT
         self.content_type = 'albums'
         self.label = 'Qobuz'
@@ -49,8 +52,9 @@ class Node_root(INode):
         if not free:
             self.add_child(getNode(Flag.FRIENDS))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
-        self.add_child(getNode(Flag.PUBLIC_PLAYLISTS,
-                               parameters={'type': 'editor-picks'}))
+        self.add_child(
+            getNode(
+                Flag.PUBLIC_PLAYLISTS, parameters={'type': 'editor-picks'}))
         if config.app.registry.get('show_experimental', to='bool'):
             self.add_child(getNode(Flag.LABEL))
             self.add_child(getNode(Flag.ARTICLE))
@@ -70,12 +74,11 @@ class Node_root(INode):
         if clean_all(cache):
             notifyH(lang(30119), lang(30123))
         else:
-            notifyH(lang(30119), lang(30120),
-                    getImage('icon-error-256'))
+            notifyH(lang(30119), lang(30120), getImage('icon-error-256'))
         return True
 
     def gui_scan(self):
         '''Scanning directory specified in query parameter
         '''
-        executeBuiltin('UpdateLibrary("music", "%s")' % (
-            self.get_parameter('query', to='unquote')))
+        executeBuiltin('UpdateLibrary("music", "%s")' % (self.get_parameter(
+            'query', to='unquote')))

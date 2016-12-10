@@ -59,7 +59,6 @@ class JsonRequest:
 
 
 class JsonResponse:
-
     def __init__(self, raw_data):
         self.raw_data = None
         self.id = None
@@ -128,33 +127,18 @@ class XbmcRPC:
     def getSongDetails(self, sid):
         request = JsonRequest('AudioLibrary.GetSongDetails')
         request.id = 1
-        request.add_parameters({'songid': int(sid),
-                                "properties": ["title",
-                                               "artist",
-                                               "albumartist",
-                                               "genre",
-                                               "year",
-                                               "rating",
-                                               "album",
-                                               "track",
-                                               "duration",
-                                               "comment",
-                                               "lyrics",
-                                               "musicbrainztrackid",
-                                               "musicbrainzartistid",
-                                               "musicbrainzalbumid",
-                                               "musicbrainzalbumartistid",
-                                               "playcount",
-                                               "fanart",
-                                               "thumbnail",
-                                               "file",
-                                               "albumid",
-                                               "lastplayed",
-                                               "disc",
-                                               "genreid",
-                                               "artistid",
-                                               "displayartist",
-                                               "albumartistid"]})
+        request.add_parameters({
+            'songid': int(sid),
+            "properties": [
+                "title", "artist", "albumartist", "genre", "year", "rating",
+                "album", "track", "duration", "comment", "lyrics",
+                "musicbrainztrackid", "musicbrainzartistid",
+                "musicbrainzalbumid", "musicbrainzalbumartistid", "playcount",
+                "fanart", "thumbnail", "file", "albumid", "lastplayed", "disc",
+                "genreid", "artistid", "displayartist", "albumartistid"
+            ]
+        })
         return self.send(request)
+
 
 rpc = XbmcRPC()

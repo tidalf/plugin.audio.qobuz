@@ -6,13 +6,12 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui  # @UnresolvedImport
+import xbmcgui
 from qobuz.node.inode import INode
 from qobuz import debug
 import weakref
 from qobuz.api import api
 from qobuz.gui.contextmenu import contextMenu
-#from qobuz.gui.util import getSetting
 from qobuz.node import getNode, Flag
 
 
@@ -21,9 +20,8 @@ class Node_albums_by_artist(INode):
     '''
 
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_albums_by_artist, self).__init__(parent=parent,
-                                                    parameters=parameters,
-                                                    data=data)
+        super(Node_albums_by_artist, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
         self._items_path = 'albums/items'
@@ -33,9 +31,6 @@ class Node_albums_by_artist(INode):
 
     def get_image(self):
         image = self.get_property('picture')
-        # get max size image from lastfm
-        # Qobuz default is a crappy 126p large one
-        # perhaps we need a setting for low bw users
         image = image.replace('126s', '_')
         return image
 
@@ -52,8 +47,10 @@ class Node_albums_by_artist(INode):
         return len(self.get_property(self._items_path, default=[]))
 
     def fetch(self, *a, **ka):
-        return api.get('/artist/get', artist_id=self.nid,
-                       limit=self.limit, offset=self.offset,
+        return api.get('/artist/get',
+                       artist_id=self.nid,
+                       limit=self.limit,
+                       offset=self.offset,
                        extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
@@ -71,12 +68,12 @@ class Node_albums_by_artist(INode):
         return True
 
     def makeListItem(self, replaceItems=False):
-        item = xbmcgui.ListItem(self.get_label(),
-                                self.get_label(),
-                                self.get_image(),
-                                self.get_image(),
-                                self.make_url(),
-                                )
+        item = xbmcgui.ListItem(
+            self.get_label(),
+            self.get_label(),
+            self.get_image(),
+            self.get_image(),
+            self.make_url(), )
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)

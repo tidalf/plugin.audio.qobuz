@@ -20,12 +20,11 @@ from qobuz.api.user import current as user
 from qobuz.theme import theme
 from qobuz import config
 
-class Node_track(INode):
 
+class Node_track(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_track, self).__init__(parent=parent,
-                                         parameters=parameters,
-                                         data=data)
+        super(Node_track, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.TRACK
         self.content_type = 'files'
         self.qobuz_context_type = 'playlist'
@@ -45,11 +44,11 @@ class Node_track(INode):
 
     def make_local_url(self):
         return '{scheme}://{host}:{port}/qobuz/{album_id}/{nid}/file.mpc'.format(
-                scheme='http',
-                host=config.app.registry.get('httpd_host'),
-                port=config.app.registry.get('httpd_port'),
-                album_id=self.get_album_id(),
-                nid=str(self.nid))
+            scheme='http',
+            host=config.app.registry.get('httpd_host'),
+            port=config.app.registry.get('httpd_port'),
+            album_id=self.get_album_id(),
+            nid=str(self.nid))
 
     def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
         if asLocalUrl is True:
@@ -62,10 +61,12 @@ class Node_track(INode):
 
     def get_label(self, fmt="%a - %t", default=None):
         fmt = fmt.replace("%a", self.get_artist()) if '%a' in fmt else fmt
-        fmt = fmt.replace("%A", self.get_album_artist()) if '%A' in fmt else fmt
+        fmt = fmt.replace("%A",
+                          self.get_album_artist()) if '%A' in fmt else fmt
         fmt = fmt.replace("%t", self.get_title()) if '%t' in fmt else fmt
         #fmt = fmt.replace("%A", self.get_album())
-        fmt = fmt.replace("%n", str(self.get_track_number())) if '%n' in fmt else fmt
+        fmt = fmt.replace("%n",
+                          str(self.get_track_number())) if '%n' in fmt else fmt
         fmt = fmt.replace("%g", self.get_genre()) if '%g' in fmt else fmt
         return fmt
 
@@ -97,7 +98,8 @@ class Node_track(INode):
         label = self.get_property('album/label/name')
         if label is None:
             return default
-        return '%s (albums: %s)' % (label, self.get_property('album/label/albums_count', default=0))
+        return '%s (albums: %s)' % (label, self.get_property(
+            'album/label/albums_count', default=0))
 
     def get_album_label_id(self, default=None):
         return self.get_property('album/label/id', default=default)
@@ -113,10 +115,12 @@ class Node_track(INode):
             image = self.get_property('album/image/back', default=None)
             if image is not None:
                 return image
-        image = self.get_property(['album/image/%s' % (size),
-                                  'album/image/large',
-                                  'album/image/small',
-                                  'album/image/thumbnail'], default=None)
+        image = self.get_property(
+            [
+                'album/image/%s' % (size), 'album/image/large',
+                'album/image/small', 'album/image/thumbnail'
+            ],
+            default=None)
         if image is not None:
             return image
         if self.parent and self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
@@ -146,13 +150,13 @@ class Node_track(INode):
             return None
         if 'url' not in data:
             debug.warn(self, "streaming_url, no url returned\n"
-                 "API Error: %s" % (api.error))
+                       "API Error: %s" % (api.error))
             return None
         return data['url']
 
     def get_album_artist(self):
-        artist = self.get_property(['album/artist/name',
-                                    'album/performer/name'], default=None)
+        artist = self.get_property(
+            ['album/artist/name', 'album/performer/name'], default=None)
         if artist is not None:
             return artist
         if self.parent is not None:
@@ -160,20 +164,19 @@ class Node_track(INode):
         return 'n/a'
 
     def get_artist(self):
-        return self.get_property(['artist/name',
-                                  'composer/name',
-                                  'performer/name',
-                                  'interpreter/name',
-                                  'composer/name',
-                                  'album/artist/name'])
+        return self.get_property([
+            'artist/name', 'composer/name', 'performer/name',
+            'interpreter/name', 'composer/name', 'album/artist/name'
+        ])
 
     def get_artist_id(self):
-        return self.get_property(['artist/id',
-                                  'composer/id',
-                                  'performer/id',
-                                  'interpreter/id',
-                                  'composer/id',
-                                  'album/artist/id'], default=None, to='int')
+        return self.get_property(
+            [
+                'artist/id', 'composer/id', 'performer/id', 'interpreter/id',
+                'composer/id', 'album/artist/id'
+            ],
+            default=None,
+            to='int')
 
     def get_track_number(self, default=0):
         return self.get_property('track_number', default=default, to='int')
@@ -226,8 +229,8 @@ class Node_track(INode):
         return self.get_property('purchased', to='bool', default=False)
 
     def get_description(self, default='n/a'):
-        description = self.get_property('album/description', default=None,
-                                        to='strip_html')
+        description = self.get_property(
+            'album/description', default=None, to='strip_html')
         if description is not None:
             return description
         if self.parent and self.parent.nt & Flag.ALBUM == Flag.ALBUM:
@@ -238,10 +241,14 @@ class Node_track(INode):
         if self._intent is None:
             self._intent = user.stream_format(track=self)
         format_id, intent, description = self._intent
-        data = api.get('/track/getFileUrl', format_id=format_id,
-                       track_id=self.nid, user_id=user.get_id(), intent=intent)
+        data = api.get('/track/getFileUrl',
+                       format_id=format_id,
+                       track_id=self.nid,
+                       user_id=user.get_id(),
+                       intent=intent)
         if not data:
-            debug.warn(self, "Cannot get stream type for track (network problem?)")
+            debug.warn(self,
+                       "Cannot get stream type for track (network problem?)")
             return None
         return data
 
@@ -257,7 +264,9 @@ class Node_track(INode):
         return restrictions
 
     def is_uncredentialed(self):
-        for restriction in ['UserUncredentialed', 'TrackRestrictedByPurchaseCredentials']:
+        for restriction in [
+                'UserUncredentialed', 'TrackRestrictedByPurchaseCredentials'
+        ]:
             if restriction in self.get_restrictions():
                 return True
         return False
@@ -277,7 +286,8 @@ class Node_track(INode):
         if not data:
             return False
         if not 'format_id' in data:
-            debug.warn(self, "Cannot get mime/type for track (restricted track?)")
+            debug.warn(self,
+                       "Cannot get mime/type for track (restricted track?)")
             return False
         formatId = int(data['format_id'])
         mime = ''
@@ -303,30 +313,38 @@ class Node_track(INode):
         return True
 
     def get_popularity(self, default=0.0):
-        return round(min(self.get_property('popularity', to='float',
-                                           default=default), 1.0) * 5.0)
+        return round(
+            min(self.get_property(
+                'popularity', to='float', default=default),
+                1.0) * 5.0)
 
     def get_streamable(self):
         return self.get_property('streamable', to='bool', default=False)
 
     def get_articles(self, default=[]):
-        return ['%s (%s%s)' % (a['label'], a['price'], a['currency'])
-                for a in self.get_property('album/articles', default=default)]
+        return [
+            '%s (%s%s)' % (a['label'], a['price'], a['currency'])
+            for a in self.get_property(
+                'album/articles', default=default)
+        ]
 
     def get_awards(self, default=[]):
-        return [a['name'] for a in self.get_property('album/awards',
-                                                     default=default)]
+        return [
+            a['name'] for a in self.get_property(
+                'album/awards', default=default)
+        ]
 
     def get_displayable(self):
         return self.get_property('displayable', to='bool', default=False)
 
     def makeListItem(self, replaceItems=False):
         isplayable = 'true'
-        item = xbmcgui.ListItem(self.get_label(),
-                                self.get_label2(),
-                                self.get_image(),
-                                self.get_image(type='back'),
-                                self.make_url(mode=Mode.PLAY))
+        item = xbmcgui.ListItem(
+            self.get_label(),
+            self.get_label2(),
+            self.get_image(),
+            self.get_image(type='back'),
+            self.make_url(mode=Mode.PLAY))
         if not item:
             debug.warn(self, "Cannot create xbmc list item")
             return None
@@ -353,16 +371,19 @@ class Node_track(INode):
 - popularity: {popularity}
 - maximum sampling rate: {maximum_sampling_rate}
 - maximum_bit_depth: {maximum_bit_depth}
-'''.format(popularity=self.get_property('popularity', default='n/a'),
-           duration=self.get_duration(),
-           label=self.get_album_label(),
-           year=self.get_property('album/year'),
-           performers=self.get_property('performers'),
-           track_number=self.get_property('track_number'),
-           version=self.get_property('version'),
+'''.format(
+            popularity=self.get_property(
+                'popularity', default='n/a'),
+            duration=self.get_duration(),
+            label=self.get_album_label(),
+            year=self.get_property('album/year'),
+            performers=self.get_property('performers'),
+            track_number=self.get_property('track_number'),
+            version=self.get_property('version'),
             performer=self.get_property('performer/name'),
             composer=self.get_property('composer/name'),
-            copyright=self.get_property('copyright', default='n/a'),
+            copyright=self.get_property(
+                'copyright', default='n/a'),
             maximum_sampling_rate=self.get_maximum_sampling_rate(),
             maximum_bit_depth=self.get_property('maximum_bit_depth'),
             description=self.get_description(default=self.get_label()),
@@ -370,24 +391,28 @@ class Node_track(INode):
             sampleable=self.get_property('sampleable'),
             downloadable=self.get_downloadable(),
             purchasable=self.get_property('purchasable'),
-            purchased=self.get_property('purchased', default=False),
+            purchased=self.get_property(
+                'purchased', default=False),
             previewable=self.get_property('previewable'),
             streamable=self.get_streamable(),
-            hires_purchased=self.get_property('hires_purchased', default=False),
+            hires_purchased=self.get_property(
+                'hires_purchased', default=False),
             awards=','.join(self.get_awards()),
             articles=', '.join(self.get_articles()))
 
-        item.setInfo(type='Music', infoLabels={
-                     'count': self.nid,
-                     'title': self.get_title(),
-                     'album': self.get_album(),
-                     'genre': self.get_genre(),
-                     'artist': self.get_album_artist(),
-                     'tracknumber': self.get_track_number(default=0),
-                     'duration': self.get_property('duration'),
-                     'year': self.get_year(),
-                     'rating': str(self.get_popularity()),
-        })
+        item.setInfo(
+            type='Music',
+            infoLabels={
+                'count': self.nid,
+                'title': self.get_title(),
+                'album': self.get_album(),
+                'genre': self.get_genre(),
+                'artist': self.get_album_artist(),
+                'tracknumber': self.get_track_number(default=0),
+                'duration': self.get_property('duration'),
+                'year': self.get_year(),
+                'rating': str(self.get_popularity()),
+            })
         item.setProperty('album_artist', self.get_album_artist())
         item.setProperty('album_description', comment)
         item.setProperty('album_label', self.get_property('album/label/name'))
@@ -406,20 +431,23 @@ class Node_track(INode):
 
     def attach_context_menu(self, item, menu):
         if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
-            url = self.parent.make_url(nt=Flag.PLAYLIST,
-                                       nid=self.parent.nid,
-                                       qid=self.get_playlist_track_id(),
-                                       nm='gui_remove_track',
-                                       mode=Mode.VIEW)
+            url = self.parent.make_url(
+                nt=Flag.PLAYLIST,
+                nid=self.parent.nid,
+                qid=self.get_playlist_track_id(),
+                nm='gui_remove_track',
+                mode=Mode.VIEW)
             menu.add(path='playlist/remove',
                      label=lang(30075),
-                     cmd=runPlugin(url), color=theme.get('item/caution/color'))
+                     cmd=runPlugin(url),
+                     color=theme.get('item/caution/color'))
         label = self.get_album_label(default=None)
         if label is not None:
             label_id = self.get_album_label_id()
-            url = self.make_url(nt=Flag.LABEL, nid=self.get_album_label_id(),
-                                mode=Mode.VIEW)
-            menu.add(path='label/view', label='View label (i8n): %s' % label,
+            url = self.make_url(
+                nt=Flag.LABEL, nid=self.get_album_label_id(), mode=Mode.VIEW)
+            menu.add(path='label/view',
+                     label='View label (i8n): %s' % label,
                      cmd=containerUpdate(url))
         ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menu)

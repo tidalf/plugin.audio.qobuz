@@ -14,6 +14,7 @@ from qobuz.api import api
 from qobuz import debug
 from qobuz.node import getNode
 
+
 class WidgetArticle(xbmcgui.WindowDialog):
     def __init__(self, *a, **ka):
         super(WidgetArticle, self).__init__()
@@ -35,12 +36,11 @@ def dialog(heading='Article', txt=''):
     dialog = xbmcgui.Dialog()
     return dialog.ok(heading, txt)
 
-class Node_article(INode):
 
+class Node_article(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_article, self).__init__(parent=parent,
-                                           parameters=parameters,
-                                           data=data)
+        super(Node_article, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ARTICLE
         self.content_type = 'artists'
 
@@ -54,16 +54,15 @@ class Node_article(INode):
         return self.get_property('type')
 
     def makeListItem(self, **ka):
-        item = xbmcgui.ListItem(
-            self.get_label(),
-            self.get_property('source'),
-            self.get_image(),
-            self.get_image()
-        )
-        item.setInfo('Music', infoLabels={
-            'artist': self.get_author(),
-            'genre': self.get_genre()
-        })
+        item = xbmcgui.ListItem(self.get_label(),
+                                self.get_property('source'),
+                                self.get_image(), self.get_image())
+        item.setInfo(
+            'Music',
+            infoLabels={
+                'artist': self.get_author(),
+                'genre': self.get_genre()
+            })
         item.setProperty('artist_genre', self.get_genre())
         item.setProperty('artist_description', self.get_description())
         ctxMenu = contextMenu()
@@ -95,14 +94,15 @@ class Node_article(INode):
     def fetch(self, *a, **ka):
         if self.nid is None:
             return api.get('/article/listLastArticles',
-                           offset=self.offset, limit=self.limit)
+                           offset=self.offset,
+                           limit=self.limit)
         return api.get('/article/get', article_id=self.nid)
 
     def _populate_articles(self, *a, **ka):
         for item in self.data['articles']['items']:
-            self.add_child(getNode(Flag.ARTICLE,
-                                   parameters={'nid': item['id']},
-                                   data=item))
+            self.add_child(
+                getNode(
+                    Flag.ARTICLE, parameters={'nid': item['id']}, data=item))
         return True if len(self.data['articles']['items']) > 0 else False
 
     def _populate_one(self, *a, **ka):

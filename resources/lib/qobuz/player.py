@@ -6,10 +6,10 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmc  # @UnresolvedImport
-import xbmcgui  # @UnresolvedImport
+import xbmc
+import xbmcgui
 
-import qobuz  # @UnresolvedImport
+import qobuz
 from qobuz import debug
 from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
 from qobuz.node import Flag, getNode
@@ -59,10 +59,7 @@ class QobuzPlayer(xbmc.Player):
         returned, in that case we overwrite the song duration
         """
         if track.is_sample():
-            item.setInfo(
-                'Music', infoLabels={
-                    'duration': 60,
-                })
+            item.setInfo('Music', infoLabels={'duration': 60, })
             """Don't warn for free account (all songs except purchases are 60s
             limited)
             """
@@ -76,14 +73,12 @@ class QobuzPlayer(xbmc.Player):
         if config.app.registry.get('notification_playingsong', to='bool'):
             notify_restriction(track)
             notifyH(lang(30132), track.get_label(), image=track.get_image())
-
         """We are called from playlist...
         """
         if config.app.handle == -1:
-            super(QobuzPlayer, self).play(track.get_streaming_url(),
-                                          item, False)
+            super(QobuzPlayer, self).play(track.get_streaming_url(), item,
+                                          False)
         else:
-            setResolvedUrl(handle=config.app.handle,
-                           succeeded=True,
-                           listitem=item)
+            setResolvedUrl(
+                handle=config.app.handle, succeeded=True, listitem=item)
         return True

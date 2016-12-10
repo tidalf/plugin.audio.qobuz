@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import qobuz  # @UnresolvedImport
+import qobuz
 from qobuz.node.flag import Flag
 from qobuz.node.inode import INode
 from qobuz.node.articles import Node_articles
@@ -14,11 +14,9 @@ from qobuz.gui.util import getImage, getSetting
 
 
 class Node_article_rubrics(INode):
-
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_article_rubrics, self).__init__(parent=parent,
-                                                   parameters=parameters,
-                                                   data=data)
+        super(Node_article_rubrics, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ARTICLE_RUBRICS
         self.rubric_id = self.get_parameter('qid')
         self.image = getImage('album')
@@ -37,16 +35,17 @@ class Node_article_rubrics(INode):
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
-        data = qobuz.registry.get(
-            name='article_listrubrics',
-            id=self.nid, offset=self.offset,
-            limit=limit)
+        data = qobuz.registry.get(name='article_listrubrics',
+                                  id=self.nid,
+                                  offset=self.offset,
+                                  limit=limit)
         if data is None or not 'data' in data:
             return None
         return data['data']
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for rubric in self.data['rubrics']['items']:
-            self.add_child(Node_articles(self, {'nid': rubric['id']},
-                                         data=rubric))
+            self.add_child(
+                Node_articles(
+                    self, {'nid': rubric['id']}, data=rubric))
         return True

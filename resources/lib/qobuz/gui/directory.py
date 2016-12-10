@@ -17,6 +17,7 @@ from qobuz import debug
 from qobuz import config
 from qobuz.node import Flag
 
+
 class Directory(object):
     '''This class permit to add item to Xbmc directory or store nodes
         that we retrieve while building our tree
@@ -34,8 +35,13 @@ class Directory(object):
                 we are replacing Xbmc Default menu
     '''
 
-    def __init__(self, root=None, nodes=[], handle=None,
-                 asList=False, asLocalUrl=False, showProgress=False):
+    def __init__(self,
+                 root=None,
+                 nodes=[],
+                 handle=None,
+                 asList=False,
+                 asLocalUrl=False,
+                 showProgress=False):
         self.nodes = nodes
         self.label = '...'
         if root is not None:
@@ -51,9 +57,8 @@ class Directory(object):
         self.asLocalUrl = asLocalUrl
         self.filter_double = Flag.TRACK
         self.seen_nodes = {}
-        self.progress = Progress(heading='Qobuz',
-                                 message=self.label,
-                                 enable=showProgress)
+        self.progress = Progress(
+            heading='Qobuz', message=self.label, enable=showProgress)
 
     def __enter__(self, *a, **ka):
         return self
@@ -65,12 +70,12 @@ class Directory(object):
         if self.filter_double is not None:
             if self.filter_double & node.nt == node.nt:
                 if node.nid in self.seen_nodes:
-                    self.progress.update(
-                        message='Skip node type: {}'.format(Flag.to_s(node.nt)))
+                    self.progress.update(message='Skip node type: {}'.format(
+                        Flag.to_s(node.nt)))
                     return True
                 self.seen_nodes[node.nid] = 1
-        self.progress.update(message=node.get_label().encode('ascii',
-                                                             errors='replace'))
+        self.progress.update(message=node.get_label().encode(
+            'ascii', errors='replace'))
         if self.asList is True:
             self.nodes.append(node)
             self.total_put += 1
@@ -82,14 +87,14 @@ class Directory(object):
         if item is None:
             return False
         url = node.make_url(asLocalUrl=self.asLocalUrl)
-        if not self.add_to_xbmc_directory(url=url,
-                                          item=item,
-                                          is_folder=node.is_folder):
+        if not self.add_to_xbmc_directory(
+                url=url, item=item, is_folder=node.is_folder):
             self.put_item_ok = False
             return False
         return True
 
-    def add_to_xbmc_directory(self, is_folder=False, item=None, url=None, **ka):
+    def add_to_xbmc_directory(self, is_folder=False, item=None, url=None,
+                              **ka):
         if not xbmcplugin.addDirectoryItem(self.handle, url, item, is_folder,
                                            self.total_put):
             return False
@@ -105,12 +110,13 @@ class Directory(object):
         if not self.put_item_ok or self.total_put == 0:
             success = False
         if not self.asList:
-            xbmcplugin.setContent(handle=self.handle,
-                                  content=self.content_type)
-            xbmcplugin.endOfDirectory(handle=self.handle,
-                                      succeeded=success,
-                                      updateListing=False,
-                                      cacheToDisc=success)
+            xbmcplugin.setContent(
+                handle=self.handle, content=self.content_type)
+            xbmcplugin.endOfDirectory(
+                handle=self.handle,
+                succeeded=success,
+                updateListing=False,
+                cacheToDisc=success)
         return self.total_put
 
     def __exit__(self, *a, **ka):

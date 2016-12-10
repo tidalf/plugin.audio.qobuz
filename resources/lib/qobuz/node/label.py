@@ -14,11 +14,9 @@ from qobuz.api import api
 
 
 class Node_label(INode):
-
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_label, self).__init__(parent=parent,
-                                         parameters=parameters,
-                                         data=data)
+        super(Node_label, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.LABEL
         self.image = getImage('album')
         self.content_type = 'albums'
@@ -59,8 +57,9 @@ class Node_label(INode):
             xdir.add_node(self)
             supplier_id = self.get_property('supplier_id', default=None)
             if supplier_id is not None:
-                xdir.add_node(getNode(Flag.LABEL,
-                                  parameters={'nid': supplier_id},
-                                  data={'name': '[Supplier]'}
-            ))
+                xdir.add_node(
+                    getNode(
+                        Flag.LABEL,
+                        parameters={'nid': supplier_id},
+                        data={'name': '[Supplier]'}))
         return True

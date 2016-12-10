@@ -3,16 +3,16 @@ from qobuz import base_path, data_path
 from qobuz.util.converter import converter
 from qobuz import debug
 
-class IRegistryBackend(object):
 
+class IRegistryBackend(object):
     def __init__(self, application):
         self.application = application
 
     def get(self, key):
         raise NotImplementedError('get')
 
-class RegistryBackend(IRegistryBackend):
 
+class RegistryBackend(IRegistryBackend):
     def __init__(self, application):
         super(RegistryBackend, self).__init__(application)
         self._init()
@@ -34,8 +34,8 @@ class RegistryBackend(IRegistryBackend):
     def get(self, key):
         return self.conf.get('main', key)
 
-class XbmcRegistryBackend(IRegistryBackend):
 
+class XbmcRegistryBackend(IRegistryBackend):
     def __init__(self, application):
         super(XbmcRegistryBackend, self).__init__(application)
 
@@ -45,8 +45,8 @@ class XbmcRegistryBackend(IRegistryBackend):
     def set(self, key, value):
         self.application.addon.setSetting(key, str(value))
 
-class Registry(object):
 
+class Registry(object):
     def __init__(self, application):
         self.application = application
         try:

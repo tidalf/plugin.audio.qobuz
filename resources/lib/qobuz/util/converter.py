@@ -6,8 +6,8 @@ from qobuz.util import data as dataUtil
 from qobuz.util import common
 from qobuz import debug
 
-class MLStripper(HTMLParser):
 
+class MLStripper(HTMLParser):
     def __init__(self):
         self.reset()
         self.fed = []
@@ -18,13 +18,14 @@ class MLStripper(HTMLParser):
     def get_data(self):
         return ''.join(self.fed)
 
+
 def strip_tags(html):
     s = MLStripper()
     s.feed(html)
     return s.get_data()
 
-class Converter(object):
 
+class Converter(object):
     def raw(self, data, default=None):
         return data
 
@@ -77,5 +78,6 @@ class Converter(object):
         if data.startswith('#') and len(data) == 7:
             return '%sFF' % data
         return data
+
 
 converter = Converter()

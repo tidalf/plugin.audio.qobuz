@@ -10,13 +10,8 @@ from qobuz import exception
 from qobuz.theme import theme, color
 from qobuz import config
 
-class contextMenu():
-    """Creating context menu:
-        add(path='test', cmd='foo' ...)
-        add(path='test/test_one', cmd='bar', ...)
-        ...
-    """
 
+class contextMenu(object):
     def __init__(self):
         self.data = {}
         self.defaultSection = 'qobuz'
@@ -77,10 +72,12 @@ class contextMenu():
             root[section]['pos'] = pos
             root[section]['color'] = color
         else:
-            item = {'label': ka['label'],
-                    'cmd': cmd,
-                    'pos': pos,
-                    'color': color}
+            item = {
+                'label': ka['label'],
+                'cmd': cmd,
+                'pos': pos,
+                'color': color
+            }
             root[section]['childs'].append(item)
         return root
 
@@ -92,6 +89,7 @@ class contextMenu():
 
         def itemSort(item):
             return item['pos']
+
         for section in sorted(self.data, key=sectionSort):
             colorItem = self.color_section
             data = self.data[section]

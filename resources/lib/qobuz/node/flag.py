@@ -108,4 +108,5 @@ class FlagEnum(object):
         else:
             raise exception.InvalidFlag(repr(flag))
 
+
 Flag = FlagEnum()

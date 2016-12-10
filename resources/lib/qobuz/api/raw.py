@@ -26,8 +26,8 @@ from qobuz.api.user import current as user
 
 socket.timeout = 5
 
-class RawApi(object):
 
+class RawApi(object):
     def __init__(self):
         self.appid = '285473059'  # XBMC
         self.version = '0.2'
@@ -42,9 +42,10 @@ class RawApi(object):
         self.__set_s4()
 
     def _api_error_string(self, request, url='', params={}, json=''):
-        return '{reason} ({status_code}): {error}'.format(reason=request.reason,
-                                                          status_code=self.status_code,
-                                                          error=self.error)
+        return '{reason} ({status_code}): {error}'.format(
+            reason=request.reason,
+            status_code=self.status_code,
+            error=self.error)
 
     def _check_ka(self, ka, mandatory, allowed=[]):
         '''Checking parameters before sending our request
@@ -68,9 +69,8 @@ class RawApi(object):
         '''
         s3b = 'Bg8HAA5XAFBYV15UAlVVBAZYCw0MVwcKUVRaVlpWUQ8='
         s3s = binascii.a2b_base64(s3b)
-        self.s4 = ''.join(chr(ord(x) ^ ord(y))
-                          for (x, y) in izip(s3s,
-                                             cycle(self.appid)))
+        self.s4 = ''.join(
+            chr(ord(x) ^ ord(y)) for (x, y) in izip(s3s, cycle(self.appid)))
 
     def _api_request(self, params, uri, **opt):
         '''Qobuz API HTTP get request
@@ -132,7 +132,8 @@ class RawApi(object):
         try:
             response_json = r.json()
         except Exception as e:
-            debug.warn(self, 'Json loads failed to load... retrying!\n{}', repr(e))
+            debug.warn(self, 'Json loads failed to load... retrying!\n{}',
+                       repr(e))
             try:
                 response_json = r.json()
             except:
@@ -184,18 +185,17 @@ class RawApi(object):
     def track_getFileUrl(self, intent="stream", **ka):
         self._check_ka(ka, ['format_id', 'track_id'])
         ka['request_ts'] = time()
-        params = {'format_id': str(ka['format_id']),
-                  'intent': intent,
-                  'request_ts': ka['request_ts'],
-                  'request_sig': str(hashlib.md5('trackgetFileUrlformat_id'
-                                                 + str(ka['format_id'])
-                                                 + 'intent'+intent
-                                                 + 'track_id'
-                                                 + str(ka['track_id'])
-                                                 + str(ka['request_ts'])
-                                                 + self.s4).hexdigest()),
-                  'track_id': str(ka['track_id'])
-                  }
+        params = {
+            'format_id': str(ka['format_id']),
+            'intent': intent,
+            'request_ts': ka['request_ts'],
+            'request_sig': str(
+                hashlib.md5('trackgetFileUrlformat_id' + str(ka['format_id']) +
+                            'intent' + intent + 'track_id' + str(ka[
+                                'track_id']) + str(ka['request_ts']) + self.s4)
+                .hexdigest()),
+            'track_id': str(ka['track_id'])
+        }
         return self._api_request(params, '/track/getFileUrl')
 
     def track_search(self, **ka):
@@ -221,10 +221,11 @@ class RawApi(object):
         except:
             debug.warn(self, 'No authentification token')
             return None
-        params = {'user_id': self.user_id,
-                  'track_id': track_id,
-                  'duration': duration
-                  }
+        params = {
+            'user_id': self.user_id,
+            'track_id': track_id,
+            'duration': duration
+        }
         return self._api_request(params, '/track/reportStreamingEnd')
 
     def album_get(self, **ka):
@@ -236,8 +237,8 @@ class RawApi(object):
         return self._api_request(ka, '/album/getFeatured')
 
     def purchase_getUserPurchases(self, **ka):
-        self._check_ka(ka, [], ['order_id', 'order_line_id', 'flat', 'limit',
-                                'offset'])
+        self._check_ka(
+            ka, [], ['order_id', 'order_line_id', 'flat', 'limit', 'offset'])
         return self._api_request(ka, '/purchase/getUserPurchases')
 
     def search_getResults(self, **ka):
@@ -277,7 +278,8 @@ class RawApi(object):
         return self._api_request(ka, '/playlist/get')
 
     def playlist_getUserPlaylists(self, **ka):
-        self._check_ka(ka, ['type'], ['user_id', 'username', 'order', 'offset', 'limit'])
+        self._check_ka(ka, ['type'],
+                       ['user_id', 'username', 'order', 'offset', 'limit'])
         if not 'user_id' in ka and not 'username' in ka:
             ka['user_id'] = user.get_id()
         return self._api_request(ka, '/playlist/getUserPlaylists')
@@ -305,8 +307,9 @@ class RawApi(object):
         return self._api_request(ka, '/playlist/unsubscribe')
 
     def playlist_create(self, **ka):
-        self._check_ka(ka, ['name'], ['is_public',
-                                      'is_collaborative', 'tracks_id', 'album_id'])
+        self._check_ka(ka, ['name'], [
+            'is_public', 'is_collaborative', 'tracks_id', 'album_id'
+        ])
         if 'is_public' not in ka:
             ka['is_public'] = True
         if 'is_collaborative' not in ka:
@@ -320,8 +323,9 @@ class RawApi(object):
         return self._api_request(ka, '/playlist/delete')
 
     def playlist_update(self, **ka):
-        self._check_ka(ka, ['playlist_id'], ['name', 'description',
-                                             'is_public', 'is_collaborative', 'tracks_id'])
+        self._check_ka(ka, ['playlist_id'], [
+            'name', 'description', 'is_public', 'is_collaborative', 'tracks_id'
+        ])
         return self._api_request(ka, '/playlist/update')
 
     def playlist_getFeatured(self, **ka):
@@ -363,16 +367,16 @@ class RawApi(object):
         return self._api_request(ka, '/article/get')
 
     def collection_getAlbums(self, **ka):
-        self._check_ka(ka, [], ['source', 'artist_id', 'query',
-                                'limit', 'offset'])
+        self._check_ka(ka, [],
+                       ['source', 'artist_id', 'query', 'limit', 'offset'])
         return self._api_request(ka, '/collection/getAlbums')
 
     def collection_getArtists(self, **ka):
-        self._check_ka(ka, [], ['source', 'query',
-                                'limit', 'offset'])
+        self._check_ka(ka, [], ['source', 'query', 'limit', 'offset'])
         return self._api_request(ka, '/collection/getArtists')
 
     def collection_getTracks(self, **ka):
-        self._check_ka(ka, [], ['source', 'artist_id', 'album_id', 'query',
-                                'limit', 'offset'])
+        self._check_ka(ka, [], [
+            'source', 'artist_id', 'album_id', 'query', 'limit', 'offset'
+        ])
         return self._api_request(ka, '/collection/getTracks')

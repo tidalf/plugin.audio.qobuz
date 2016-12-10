@@ -18,13 +18,9 @@ dialogHeading = 'Collection'
 
 
 class Node_collection(INode):
-    '''@class Node_collection:
-    '''
-
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_collection, self).__init__(parent=parent,
-                                              parameters=parameters,
-                                              data=data)
+        super(Node_collection, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.COLLECTION
         self.url = None
         self.image = getImage('songs')
@@ -36,7 +32,7 @@ class Node_collection(INode):
     def get_label(self):
         if self.search_type is None:
             return lang(30194)
-        return '%s - %s' % (lang(30194),  self.search_type.capitalize())
+        return '%s - %s' % (lang(30194), self.search_type.capitalize())
 
     def get_image(self):
         return getImage('album')
@@ -48,7 +44,6 @@ class Node_collection(INode):
         if self.query is not None:
             ka['query'] = query
         return super(Node_collection, self).make_url(**ka)
-
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type is None:
@@ -63,9 +58,7 @@ class Node_collection(INode):
             query = k.getText().strip()
         if query == '':
             return None
-        kwargs = {
-            'query': converter.quote(query)
-        }
+        kwargs = {'query': converter.quote(query)}
         if self.source is not None:
             kwargs['source'] = self.source
         debug.info(self, 'SEARCH {}', kwargs)
@@ -92,12 +85,17 @@ class Node_collection(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         if self.search_type is None:
             for search_type in ['albums', 'tracks', 'artists']:
-                self.add_child(getNode(Flag.COLLECTION,
-                                       parameters={'search-type': search_type}))
+                self.add_child(
+                    getNode(
+                        Flag.COLLECTION,
+                        parameters={'search-type': search_type}))
             return True
         if self.data is None:
             return False
         method = getattr(self, '_populate_%s' % self.search_type)
         for item in self.data['items']:
-            self.add_child(method(data=item, parameters={'query': self.get_parameter('query')}))
+            self.add_child(
+                method(
+                    data=item,
+                    parameters={'query': self.get_parameter('query')}))
         return True

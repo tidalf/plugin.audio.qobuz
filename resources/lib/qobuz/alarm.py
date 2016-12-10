@@ -10,8 +10,8 @@ import time
 from qobuz import debug
 from qobuz.gui import util
 
-class Repeatable(object):
 
+class Repeatable(object):
     def __init__(self, callback=lambda elpased: None, duration=1):
         self.duration = duration
         self.updated = None
@@ -30,17 +30,19 @@ class Repeatable(object):
             return self.callback(elapsed)
         return None
 
-class Notifier(Repeatable):
 
+class Notifier(Repeatable):
     class Item(object):
         def __init__(self, text, level='info'):
             self.text = text.encode('ascii', errors='ignore')
             self.level = level
+
         def __str__(self):
             return '[%s] %s' % (self.level, self.text)
 
     def __init__(self, title='Notifier', duration=5, callback=None):
-        super(Notifier, self).__init__(duration=duration, callback=self._callback)
+        super(Notifier, self).__init__(
+            duration=duration, callback=self._callback)
         self.store = []
         self.title = title
         self.total = 0
@@ -55,8 +57,10 @@ class Notifier(Repeatable):
             title = self.title()
         else:
             title = self.title
-        util.notify_log('%s nodes: %s' % (title, self.total),
-                        '%s' % (msg), mstime=self.duration * 1000)
+        util.notify_log(
+            '%s nodes: %s' % (title, self.total),
+            '%s' % (msg),
+            mstime=self.duration * 1000)
         return True
 
     def notify(self, text, level='info', check=False):

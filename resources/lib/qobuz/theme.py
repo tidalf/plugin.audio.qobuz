@@ -1,10 +1,12 @@
 from qobuz import debug
 from qobuz import config
 
+
 def convert_color(color):
     if color.startswith('#'):
         return '%sFF' % color[1:]
     return color
+
 
 class Theme(object):
     data = {
@@ -39,6 +41,7 @@ class Theme(object):
         }
     }
     _cache = {}
+
     def get(self, path):
         if path in self._cache:
             return self._cache[path]
@@ -51,11 +54,14 @@ class Theme(object):
             self._cache[path] = root
         return root
 
+
 theme = Theme()
 
 if theme.get('colorize_items'):
+
     def color(color, msg):
         return u'[COLOR=%s]%s[/COLOR]' % (convert_color(color), msg)
 else:
+
     def color(color, msg):
         return msg

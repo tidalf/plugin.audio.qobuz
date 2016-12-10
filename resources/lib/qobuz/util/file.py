@@ -12,6 +12,7 @@ import tempfile
 
 from qobuz import debug
 
+
 def unlink(filename):
     if not os.path.exists(filename):
         return False
@@ -20,8 +21,11 @@ def unlink(filename):
         os.rename(filename, tmpfile)
         return os.unlink(tmpfile)
     except Exception as e:
-        debug.error(__name__, 'Unlinking fails: {filename}, error: {error}',
-                    filename=filename, error=e)
+        debug.error(
+            __name__,
+            'Unlinking fails: {filename}, error: {error}',
+            filename=filename,
+            error=e)
     return False
 
 
@@ -42,8 +46,8 @@ class RenamedTemporaryFile(object):
         if tmpfile_dir is None:
             tmpfile_dir = os.path.dirname(final_path)
 
-        self.tmpfile = tempfile.NamedTemporaryFile(dir=tmpfile_dir,
-                                                   delete=False, **kwargs)
+        self.tmpfile = tempfile.NamedTemporaryFile(
+            dir=tmpfile_dir, delete=False, **kwargs)
         self.final_path = final_path
 
     def __getattr__(self, attr):
@@ -80,7 +84,7 @@ def find(directory, pattern, callback=None, gData=None):
                             return None
                     except Exception as e:
                         debug.warn('[find]', 'Callback raise exception: '
-                             '' + repr(e))
+                                   '' + repr(e))
                         return None
                 flist.append(path)
     return flist

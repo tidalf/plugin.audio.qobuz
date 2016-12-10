@@ -1,12 +1,13 @@
 import xbmcgui
 from qobuz import debug
 
-class DialogSelect(object):
 
+class DialogSelect(object):
     def __init__(self, label='Select', items=[]):
         self.label = label
         self.ret = -1
         self.items = items
+
     def open(self):
         self.ret = -1
         try:

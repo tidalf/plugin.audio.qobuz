@@ -17,12 +17,11 @@ from qobuz.cache import cache
 from qobuz.node import Flag, getNode
 from qobuz.theme import theme, color
 
-class Node_friend(INode):
 
+class Node_friend(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_friend, self).__init__(parent=parent,
-                                          parameters=parameters,
-                                          data=data)
+        super(Node_friend, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.FRIEND
         self.image = getImage('artist')
         self.set_name(self.get_parameter('query'))
@@ -45,8 +44,7 @@ class Node_friend(INode):
         name = self.get_parameter('query')
         if not name:
             from qobuz.gui.util import Keyboard
-            kb = Keyboard('',
-                          str(lang(30181)))
+            kb = Keyboard('', str(lang(30181)))
             kb.doModal()
             name = ''
             if not kb.isConfirmed():
@@ -66,7 +64,8 @@ class Node_friend(INode):
                            type='last-created')
         if not friendpl:
             return False
-        data = api.get('/user/login', username=user.username,
+        data = api.get('/user/login',
+                       username=user.username,
                        password=user.password)
         if not data:
             return False
@@ -88,8 +87,8 @@ class Node_friend(INode):
         return True
 
     def delete_cache(self):
-        key = cache.make_key('/user/login', username=api.username,
-                             password=api.password)
+        key = cache.make_key(
+            '/user/login', username=api.username, password=api.password)
         cache.delete(key)
 
     def remove(self):
@@ -103,8 +102,7 @@ class Node_friend(INode):
             return False
         friends = user['player_settings']
         if not 'friends' in friends:
-            notifyH('Qobuz', 'You don\'t have friend',
-                    'icon-error-256')
+            notifyH('Qobuz', 'You don\'t have friend', 'icon-error-256')
             debug.warn(self, 'No friends in user/player_settings')
             return False
         friends = friends['friends']
@@ -149,6 +147,8 @@ class Node_friend(INode):
         url = self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
         cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm='remove'))
-        menu.add(path='friend/remove', label='Remove', cmd=cmd,
+        menu.add(path='friend/remove',
+                 label='Remove',
+                 cmd=cmd,
                  color=colorWarn)
         super(Node_friend, self).attach_context_menu(item, menu)

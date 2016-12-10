@@ -21,8 +21,9 @@ if __name__ == '__main__':
     app.bootstrap.init_app()
     tag = sys.listitem.getMusicInfoTag()
     query = converter.quote(tag.getArtist())
-    node = getNode(Flag.SEARCH, parameters={'search-type': 'artists',
-                                'query': query})
+    node = getNode(
+        Flag.SEARCH, parameters={'search-type': 'artists',
+                                 'query': query})
     node.data = node.fetch()
     if node.data is None:
         sys.exit(0)

@@ -17,11 +17,12 @@ from qobuz.api.user import current as current_user
 from qobuz.util import common
 from qobuz import config
 
+
 class InvalidQuery(Exception):
     pass
 
-class EasyApi(RawApi):
 
+class EasyApi(RawApi):
     def __init__(self):
         self.cache_base_path = None
         super(EasyApi, self).__init__()
@@ -80,13 +81,17 @@ class EasyApi(RawApi):
             del ka[label]
         response = getattr(self, methname)(**ka)
         if self.status_code != 200:
-            debug.warn(self, 'Method: {method}/{status_code}: {error}',
-                       method=methname, error=self.error,
-                       status_code=self.status_code)
+            debug.warn(
+                self,
+                'Method: {method}/{status_code}: {error}',
+                method=methname,
+                error=self.error,
+                status_code=self.status_code)
             if self.notify:
-                notify_error('API Error/{method} {status_code}'.format(method=methname,
-                                                                       status_code=self.status_code),
-                             '{error}'.format(error=self.error))
+                notify_error(
+                    'API Error/{method} {status_code}'.format(
+                        method=methname, status_code=self.status_code),
+                    '{error}'.format(error=self.error))
         return response
 
     def __clean_ka(self, endpoint, method, **ka):

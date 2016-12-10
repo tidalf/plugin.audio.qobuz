@@ -16,27 +16,26 @@ from qobuz.node import getNode, Flag
 data_search_type = {
     'artists': {
         'label': lang(30017),
-        'content_type' : 'artists',
-        'image' : getImage('artist'),
+        'content_type': 'artists',
+        'image': getImage('artist'),
     },
     'albums': {
-        'label' : lang(30016),
-        'content_type' : 'albums',
-        'image' : getImage('album'),
+        'label': lang(30016),
+        'content_type': 'albums',
+        'image': getImage('album'),
     },
     'tracks': {
-        'label' : lang(30015),
-        'content_type' : 'albums',
-        'image' : getImage('song'),
+        'label': lang(30015),
+        'content_type': 'albums',
+        'image': getImage('song'),
     },
 }
 
-class Node_search(INode):
 
+class Node_search(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_search, self).__init__(parent=parent,
-                                          parameters=parameters,
-                                          data=data)
+        super(Node_search, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.SEARCH
         self.content_type = 'albums'
         self.search_type = self.get_parameter('search-type', default=None)
@@ -51,8 +50,8 @@ class Node_search(INode):
         query = self.get_parameter('query', to='unquote')
         if query is not None:
             return 'search %s: %s [%s/%s]' % (self.search_type,
-                                      self.get_parameter('query'),
-                                      self.offset, self.limit)
+                                              self.get_parameter('query'),
+                                              self.offset, self.limit)
         return data_search_type[self.search_type]['label']
 
     def get_image(self):
@@ -80,7 +79,6 @@ class Node_search(INode):
                        limit=self.limit,
                        offset=self.offset)
 
-
     def _get_parameters(self):
         return {
             'query': self.get_parameter('query'),
@@ -89,30 +87,33 @@ class Node_search(INode):
 
     def _populate_albums(self, *a, **ka):
         for album in self.data[self.search_type]['items']:
-            self.add_child(getNode(Flag.ALBUM,
-                                   parameters=self._get_parameters(),
-                                   data=album))
+            self.add_child(
+                getNode(
+                    Flag.ALBUM, parameters=self._get_parameters(), data=album))
         return True if len(self.data[self.search_type]['items']) > 0 else False
 
     def _populate_tracks(self, *a, **ka):
         for track in self.data[self.search_type]['items']:
-            self.add_child(getNode(Flag.TRACK,
-                                   parameters=self._get_parameters(),
-                                   data=track))
+            self.add_child(
+                getNode(
+                    Flag.TRACK, parameters=self._get_parameters(), data=track))
         return True if len(self.data[self.search_type]['items']) > 0 else False
 
     def _populate_artists(self, *a, **ka):
         for artist in self.data[self.search_type]['items']:
-            self.add_child(getNode(Flag.ARTIST,
-                                   parameters=self._get_parameters(),
-                                   data=artist))
+            self.add_child(
+                getNode(
+                    Flag.ARTIST,
+                    parameters=self._get_parameters(),
+                    data=artist))
         return True if len(self.data[self.search_type]['items']) > 0 else False
 
     def populate(self, *a, **ka):
         if self.search_type is None:
             for search_type in data_search_type.keys():
-                self.add_child(getNode(Flag.SEARCH, parameters={
-                    'search-type': search_type}))
+                self.add_child(
+                    getNode(
+                        Flag.SEARCH, parameters={'search-type': search_type}))
             return True
         self.content_type = data_search_type[self.search_type]['content_type']
         return getattr(self, '_populate_%s' % self.search_type)(*a, **ka)

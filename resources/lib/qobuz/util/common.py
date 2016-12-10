@@ -7,12 +7,14 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 
+
 def is_number(value):
     try:
         float(value)
     except:
         return False
     return True
+
 
 def input2bool(value):
     if value in [False, True]:
@@ -26,6 +28,7 @@ def input2bool(value):
         if value in ['false', '0']:
             return False
         return True
+
 
 def is_empty(value):
     if value is None or value == '':

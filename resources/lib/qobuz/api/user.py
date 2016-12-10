@@ -9,19 +9,21 @@ audio_format = {
     'hires_hsr': (27, 'download', 'FLAC Hi-Res 24 bit >96 kHz & =< 192 kHz')
 }
 
+
 def search(src, node, kind='tracks'):
     for n in src.data[kind]['items']:
         if n['id'] == node.nid:
             return True
     return False
 
+
 def is_purchased(track):
-    purchases = getNode(Flag.PURCHASE,
-                        parameters={'search-type': 'all'})
+    purchases = getNode(Flag.PURCHASE, parameters={'search-type': 'all'})
     purchases.data = purchases.fetch()
     if search(purchases, track):
         return True
-    album = getNode(Flag.ALBUM, parameters={'nid': track.get_property('album/id')})
+    album = getNode(
+        Flag.ALBUM, parameters={'nid': track.get_property('album/id')})
     album.data = album.fetch()
     if album.data is None:
         return False
@@ -29,8 +31,8 @@ def is_purchased(track):
         return True
     return False
 
-class User(object):
 
+class User(object):
     def __init__(self, username=None, password=None):
         self.logged = False
         self.error = None
@@ -48,8 +50,8 @@ class User(object):
 
     def is_free_account(self):
         if self.logged:
-             if self.get_token() is not None:
-                 return False
+            if self.get_token() is not None:
+                return False
         return True
 
     def stream_format(self, track=None):
@@ -91,8 +93,9 @@ class User(object):
         self.init_states()
         if self.api is None:
             raise RuntimeError('Api is not set')
-        data = self.api.get('/user/login', username=self.username,
-                       password=self.password)
+        data = self.api.get('/user/login',
+                            username=self.username,
+                            password=self.password)
         if data is None:
             self.code = self.api.status_code
             self.error = self.api.error
@@ -100,5 +103,6 @@ class User(object):
         self.data = data
         self.logged = True
         return True
+
 
 current = User()

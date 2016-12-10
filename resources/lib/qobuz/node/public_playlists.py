@@ -16,12 +16,11 @@ from qobuz.cache import cache
 featured_type = ['editor-picks', 'last-created']
 limit_max = 100
 
-class Node_public_playlists(INode):
 
+class Node_public_playlists(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_public_playlists, self).__init__(parent=parent,
-                                                    parameters=parameters,
-                                                    data=data)
+        super(Node_public_playlists, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.PUBLIC_PLAYLISTS
         self.image = getImage('userplaylists')
         self.content_type = 'albums'
@@ -41,6 +40,7 @@ class Node_public_playlists(INode):
 
     def populate(self, *a, **ka):
         for item in self.data['playlists']['items']:
-            self.add_child(getNode(Flag.PLAYLIST, data=item,
-                                   parameters={'nt': self.nt}))
+            self.add_child(
+                getNode(
+                    Flag.PLAYLIST, data=item, parameters={'nt': self.nt}))
         return True if len(self.data['playlists']['items']) > 0 else False

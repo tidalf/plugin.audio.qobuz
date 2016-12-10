@@ -13,16 +13,16 @@ from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.api.user import current as user
 
-class Node_friends(INode):
 
+class Node_friends(INode):
     def __init__(self, parent=None, parameters={}, data=None):
-        super(Node_friends, self).__init__(parent=parent,
-                                           parameters=parameters,
-                                           data=data)
+        super(Node_friends, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.FRIENDS
         self.name = self.get_parameter('query')
         self.image = getImage('artist')
-        self.label = str(self.name) + lang(30179) if (self.name) else lang(30180)
+        self.label = str(self.name) + lang(30179) if (
+            self.name) else lang(30180)
         self.url = None
         self.content_type = 'songs'
 
@@ -46,17 +46,20 @@ class Node_friends(INode):
         if self.name is not None:
             data = api.get('/playlist/getUserPlaylists',
                            username=self.name,
-                           limit=self.limit, offset=self.offset,
+                           limit=self.limit,
+                           offset=self.offset,
                            type='last-created')
         else:
             data = api.get('/playlist/getUserPlaylists',
                            user_id=user.get_id(),
-                           limit=self.limit, offset=self.offset,
+                           limit=self.limit,
+                           offset=self.offset,
                            type='last-created')
         if data is None:
             debug.warn(self, 'No friend data')
             return False
         friend_list = {}
+
         def add_name(name):
             if name in friend_list:
                 return None
@@ -69,6 +72,7 @@ class Node_friends(INode):
             node.label = 'Friend / %s' % (node.label)
             self.add_child(node)
             return node
+
         for item in data['playlists']['items']:
             add_name(item['owner']['name'])
         for name in friend_data:

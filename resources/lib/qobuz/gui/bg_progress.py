@@ -2,8 +2,8 @@ import xbmcgui
 
 from qobuz import debug
 
-class Progress(xbmcgui.DialogProgressBG):
 
+class Progress(xbmcgui.DialogProgressBG):
     def __init__(self, heading='Qobuz', message=None, enable=True):
         xbmcgui.DialogProgressBG.__init__(self)
         self.heading = heading
@@ -27,9 +27,7 @@ class Progress(xbmcgui.DialogProgressBG):
         self.percent = percent if percent is not None else self.percent
         self.heading = heading if heading is not None else self.heading
         self.message = message
-        self.dialog.update(self.percent,
-                           self.heading,
-                           self.message)
+        self.dialog.update(self.percent, self.heading, self.message)
 
     def close(self):
         if self.dialog is not None:

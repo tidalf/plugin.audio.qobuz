@@ -17,7 +17,7 @@ LOGNOTICE = None
 LOGERROR = None
 LOGSEVERE = None
 LOGWARNING = None
-filename = None #'~/qobuz.log'
+filename = None  #'~/qobuz.log'
 
 if filename is not None:
     filename = P.abspath(P.expanduser(filename))
@@ -48,12 +48,15 @@ except Exception as e:
 
     def logfunc(msg, lvl):
         print('[%s] %s' % (lvl, msg))
+
     ourlog = logfunc
+
 
 def clear(msg='--- kodi/plugin/qobuz ---\n'):
     if filename is not None:
         with open(filename, 'a+') as fh:
             fh.write(msg)
+
 
 def _log(obj, lvl, *a, **ka):
     '''Base for all logging function, run in/out Xbmc
@@ -76,21 +79,25 @@ def _log(obj, lvl, *a, **ka):
         msg = a[0].format(lvl=lvl, **ka)
     elif num_argument > 1:
         msg = a[0].format(lvl=lvl, *a[1:], **ka)
-    msg = '[Qobuz/{name}][{level}] {msg}'.format(name=str(name),
-                                                 msg=msg, level=lvl)
+    msg = '[Qobuz/{name}][{level}] {msg}'.format(
+        name=str(name), msg=msg, level=lvl)
     if filename is not None:
         with open(filename, 'a+') as fh:
             fh.write('%s\n' % msg)
     ourlog(msg, lvl)
 
+
 def warn(obj, *a, **ka):
     _log(obj, LOGWARNING, *a, **ka)
+
 
 def info(obj, *a, **ka):
     _log(obj, LOGNOTICE, *a, **ka)
 
+
 def debug(obj, *a, **ka):
     _log(obj, LOGDEBUG, *a, **ka)
+
 
 def error(obj, *a, **ka):
     _log(obj, LOGERROR, *a, **ka)
