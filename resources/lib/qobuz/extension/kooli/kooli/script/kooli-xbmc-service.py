@@ -14,6 +14,9 @@ import errno
 import traceback
 import threading
 import requests
+import SocketServer
+import socket
+
 base_path = P.abspath(P.dirname(__file__))
 try:
     import kooli
@@ -32,7 +35,6 @@ except ImportError as e:
 from flask import request
 import xbmc
 from kooli.application import application, shutdown_server, qobuzApp
-
 from kooli.monitor import Monitor
 from qobuz.gui.util import notify_warn
 from qobuz.api import api
@@ -40,6 +42,23 @@ import qobuz.gui.util as gui
 from qobuz import config
 from qobuz import debug
 from qobuz.api.user import current as user
+
+
+def my_finish(self):
+    if not self.wfile.closed:
+        try:
+            self.wfile.flush()
+        except socket.error:
+            # A final socket error may have occurred here, such as
+            # the local error ECONNABORTED.
+            pass
+        try:
+            self.wfile.close()
+            self.rfile.close()
+        except socket.error as e:
+            pass
+
+SocketServer.StreamRequestHandler.finish = my_finish  # Ugly monkey patching
 
 
 def is_empty(obj):
@@ -99,7 +118,7 @@ class KooliService(threading.Thread):
                 else:
                     try:
                         application.run(port=self.port,
-                                        threaded=False,
+                                        threaded=True,
                                         processes=0,
                                         debug=False,
                                         use_reloader=False,
