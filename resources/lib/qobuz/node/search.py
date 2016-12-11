@@ -56,7 +56,7 @@ class Node_search(INode):
 
     def get_image(self):
         if self.search_type is None:
-            return getImage('songs')
+            return getImage('song')
         return data_search_type[self.search_type]['image']
 
     def fetch(self, *a, **ka):
