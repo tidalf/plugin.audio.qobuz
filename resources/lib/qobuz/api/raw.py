@@ -150,6 +150,8 @@ class RawApi(object):
             self.status_code = 500
             debug.warn(self, self.error)
             return None
+        if not response_json:
+            return None
         return response_json
 
     def user_login(self, **ka):
