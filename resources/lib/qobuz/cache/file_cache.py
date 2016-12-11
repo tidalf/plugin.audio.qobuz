@@ -50,6 +50,7 @@ class FileCache(BaseCache):
                 fo.flush()
                 os.fsync(fo)
         except Exception as e:
+            unlink(filename)
             print "Error: writing failed %s\nMessage %s" % (filename, e)
             return False
         return True
