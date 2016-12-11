@@ -12,6 +12,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from time import time
+from qobuz import debug
 __seed__ = __name__ + '0.0.1'
 __magic__ = 0
 pos = 0
@@ -59,7 +60,7 @@ class BaseCache(object):
             if noRemote:
                 return None
             data = f(self, *a, **ka)
-            if data is None:
+            if data is None or not data:
                 that.error &= NoData
                 return None
             for black_key in that.black_keys:
@@ -76,6 +77,7 @@ class BaseCache(object):
             }
             if not that.sync(key, entry):
                 that.error &= StoreError
+                return None
             return data
 
         return wrapped_function
