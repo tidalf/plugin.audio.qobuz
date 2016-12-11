@@ -35,8 +35,9 @@ class Node_track(INode):
         self._intent = None
 
     def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None):
-        if blackFlag is not None and blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
-            return None
+        if blackFlag is not None:
+            if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
+                return None
         return api.get('/track/get', track_id=self.nid)
 
     def populate(self, xdir=None, *a, **ka):
