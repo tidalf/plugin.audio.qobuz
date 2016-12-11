@@ -276,6 +276,8 @@ class INode(object):
             ka['offset'] = self.offset
         if 'asLocalUrl' in ka and not ka['asLocalUrl']:
             del ka['asLocalUrl']
+        if 'offset' in ka and ka['offset'] == 0:
+            del ka['offset']
         for name in ['qnt', 'qid', 'query', 'search-type', 'mode']:
             if name in ka:
                 continue
