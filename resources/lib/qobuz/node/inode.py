@@ -72,7 +72,7 @@ class INode(object):
         self.content_type = 'files'
         self.image = None
         self.childs = []
-        self.label = ''
+        self.label = None
         self.label2 = None
         self.is_folder = True
         self.pagination_next = None
@@ -432,8 +432,6 @@ class INode(object):
                 label=self.get_label(),
                 next_offset=self.pagination_next_offset,
                 pagination_total=self.pagination_total)
-            node.label2 = u'[ {} / {} ]'.format(self.pagination_next_offset,
-                                                self.pagination_total)
             self.add_child(node)
 
     def attach_context_menu(self, item, menu):
