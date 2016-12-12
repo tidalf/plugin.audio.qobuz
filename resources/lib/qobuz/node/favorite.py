@@ -34,6 +34,8 @@ class Node_favorite(INode):
         self.content_type = 'songs'
 
     def get_label(self):
+        if self.label is not None:
+            return self.label
         if self.search_type is None:
             return lang(30081)
         elif self.search_type == 'all':
