@@ -9,6 +9,7 @@
 import os
 from os import path as P
 import pprint
+import logging
 from functools import wraps, update_wrapper
 from datetime import datetime
 from werkzeug import exceptions
@@ -52,8 +53,13 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 
-def http_error(name):
-    return 'error', 500
+_http_error = {200: 'Ok', 404: 'Not Found', 500: 'Server Error'}
+
+
+def http_error(code):
+    if request.method == 'HEAD':
+        return '', code
+    return _http_error[code], code
 
 
 def shutdown_server():
@@ -93,9 +99,7 @@ def route_track(album_id=None, track_id=None):
     track.data = track.fetch()
     url = track.get_streaming_url()
     if url is None:
-        if request.method == 'HEAD':
-            return '', 200
-        return 'Not Found', 404
+        return http_error(404)
     return redirect(url, code=302)
 
 
@@ -151,9 +155,7 @@ def route_track(album_id=None, track_id=None):
 @application.route('/qobuz/banner.jpg', methods=['GET', 'HEAD'])
 @application.route('/qobuz/artist.nfo', methods=['GET', 'HEAD'])
 def route_null(album_id=None, track_id=None):
-    if request.method == 'HEAD':
-        return '', 404
-    return 'Not Found', 404
+    return http_error(404)
 
 
 @nocache
@@ -176,9 +178,7 @@ def route_disc_image(album_id=None, track_id=None):
     if node.data is not None:
         image = node.get_image()
     if image is None:
-        if request.method == 'HEAD':
-            return '', 404
-        return 'Not Found', 404
+        return http_error(404)
     return redirect(image, code=302)
 
 
@@ -191,10 +191,12 @@ def route_nfo_album(album_id=None, track_id=None):
     if response is None:
         response = api.get('/track/get', track_id=track_id)
     if response is None:
-        if request.method == 'HEAD':
-            return '', 404
-        return 'NotFound', 404
-    if response['description'] is None:
+        return http_error(404)
+    if request.method == 'HEAD':
+        return '', 200
+    if 'description' not in response:
+        response['description'] = ''
+    elif response['description'] is None:
         response['description'] = ''
     response['image_default_size'] = qobuzApp.registry.get(
         'image_default_size')
@@ -212,10 +214,7 @@ def route_nfo_artist(album_id=None):
     if album is not None:
         response = api.get('/artist/get', artist_id=album['artist']['id'])
     if response is None:
-        if request.method == 'HEAD':
-            return '', 404
-        else:
-            return 'NotFound', 404
+        return http_error(404)
     response['image_default_size'] = qobuzApp.registry.get(
         'image_default_size')
     return render_template('artist.nfo.tpl', **response)
