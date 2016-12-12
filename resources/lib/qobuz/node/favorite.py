@@ -28,7 +28,6 @@ class Node_favorite(INode):
         super(Node_favorite, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.FAVORITE
-        self.name = lang(30073)
         self.image = getImage('favorites')
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
