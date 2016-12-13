@@ -15,6 +15,7 @@ import traceback
 import threading
 import requests
 import SocketServer
+import socket
 
 base_path = P.abspath(P.dirname(__file__))
 try:
