@@ -15,7 +15,6 @@ import traceback
 import threading
 import requests
 import SocketServer
-import socket
 
 base_path = P.abspath(P.dirname(__file__))
 try:
@@ -57,6 +56,7 @@ def my_finish(self):
             self.rfile.close()
         except socket.error as e:
             pass
+
 
 SocketServer.StreamRequestHandler.finish = my_finish  # Ugly monkey patching
 
