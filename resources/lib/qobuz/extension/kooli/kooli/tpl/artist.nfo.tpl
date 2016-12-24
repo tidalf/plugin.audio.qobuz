@@ -1,9 +1,8 @@
 <artist>
 <name>{{name}}</name>
-<biography>{%- if biography -%}
-{{biography.content|striptags}}
+<biography>{%- if biography is defined-%}
+{{biography.content}}
 {% endif%}
-
 albums: {{albums_count}}
 </biography>
 {% if image[image_default_size] %}

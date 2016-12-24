@@ -1,7 +1,7 @@
 
 <album>
   <title>{{title}}</title>
-  {% if artist.name %}
+  {% if artist.name is defined %}
     <artist>{{artist.name}}</artist>
   {% endif %}
   {% for genre in genres_list %}
@@ -29,18 +29,20 @@
       <duration>{{track.duration}}</duration>
     </track>
   {% endfor %}
-<review>{%- if true -%}
+<review>
 {%- if catchline is defined -%}
-{{catchline|striptags}}
-{% endif %}
+{{catchline}}
+{%- endif -%}
 {%- if description is defined -%}
-{{description|striptags}}
-{% endif %}
+{{description}}
+{%- endif -%}
+{% if true %}
 Duration : {{(duration / 60)|round}} mn
 Tracks   : {{tracks_count}}
 Media    : {{media_count}}
 HiRes    : {{hires}}
 Sales factors (monthly/yearly): {{product_sales_factors_monthly}} / {{product_sales_factors_yearly}}
 Copyright: {{copyright}}
-{% endif %}</review>
+{% endif %}
+</review>
 </album>

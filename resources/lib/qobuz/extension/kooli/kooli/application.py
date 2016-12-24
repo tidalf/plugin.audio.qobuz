@@ -17,7 +17,7 @@ from jinja2 import Undefined
 from flask import Flask
 from flask import request
 from flask import Response, redirect
-JINJA2_ENVIRONMENT_OPTIONS = {'undefined': Undefined}
+#JINJA2_ENVIRONMENT_OPTIONS = {'undefined': Undefined}
 from flask import make_response, render_template, request
 
 from qobuz.api import api
@@ -30,6 +30,7 @@ from qobuz import debug
 from qobuz.node import getNode, Flag
 from qobuz.gui.directory import Directory
 from qobuz import config
+from qobuz.util.converter import converter
 from kooli import kooli_path
 
 qobuzApp = QobuzApplication(
@@ -194,10 +195,12 @@ def route_nfo_album(album_id=None, track_id=None):
         return http_error(404)
     if request.method == 'HEAD':
         return '', 200
-    if 'description' not in response:
-        response['description'] = ''
-    elif response['description'] is None:
-        response['description'] = ''
+    if 'description' in response:
+        response['description'] = converter.strip_html(
+            response['description'], default='')
+    if 'catchline' in response:
+        response['catchline'] = converter.strip_html(
+            response['catchline'], default='')
     response['image_default_size'] = qobuzApp.registry.get(
         'image_default_size')
     if 'duration' in response:
@@ -215,6 +218,9 @@ def route_nfo_artist(album_id=None):
         response = api.get('/artist/get', artist_id=album['artist']['id'])
     if response is None:
         return http_error(404)
+    if 'biography' in response:
+        response['biography']['content'] = converter.strip_html(
+            response['biography']['content'], default='')
     response['image_default_size'] = qobuzApp.registry.get(
         'image_default_size')
     return render_template('artist.nfo.tpl', **response)
