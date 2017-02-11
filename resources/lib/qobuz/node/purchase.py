@@ -45,7 +45,7 @@ class Node_purchase(INode):
 
     def populate(self, xdir, lvl, whiteFlag, blackFlag):
         if self.search_type is None:
-            for search_type in ['all', 'albums', 'tracks']:
+            for search_type in ['albums']: # 'all' , 'tracks']:
                 self.add_child(
                     getNode(
                         Flag.PURCHASE, parameters={'search-type': search_type
