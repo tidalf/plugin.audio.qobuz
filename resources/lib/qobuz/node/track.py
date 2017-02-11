@@ -160,8 +160,12 @@ class Node_track(INode):
             ['album/artist/name', 'album/performer/name'], default=None)
         if artist is not None:
             return artist
-        if self.parent is not None:
-            return self.parent.get_artist()
+        # sometimes there's no artist
+        try:
+          if self.parent is not None:
+              return self.parent.get_artist()
+        except:
+	  pass
         return 'n/a'
 
     def get_artist(self):
