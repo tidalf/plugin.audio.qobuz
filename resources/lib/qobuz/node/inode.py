@@ -499,16 +499,16 @@ class INode(object):
             menu.add(path='favorites/add_albums',
                      label=c_fav(lang(30167) + ' albums'),
                      cmd=runPlugin(url))
-            ''' ADD TO FAVORITES / Artists'''
-            url = self.make_url(
-                nt=Flag.FAVORITE,
-                nm='gui_add_artists',
-                qid=self.nid,
-                qnt=self.nt,
-                mode=Mode.VIEW)
-            menu.add(path='favorites/add_artists',
-                     label=c_fav(lang(30167) + ' artists'),
-                     cmd=runPlugin(url))
+            # ''' ADD TO FAVORITES / Artists'''
+            # url = self.make_url(
+            #     nt=Flag.FAVORITE,
+            #     nm='gui_add_artists',
+            #     qid=self.nid,
+            #     qnt=self.nt,
+            #     mode=Mode.VIEW)
+            # menu.add(path='favorites/add_artists',
+            #          label=c_fav(lang(30167) + ' artists'),
+            #          cmd=runPlugin(url))
 
         if self.parent and (self.parent.nt & Flag.FAVORITE):
             url = self.make_url(nt=Flag.FAVORITE, nm='', mode=Mode.VIEW)
