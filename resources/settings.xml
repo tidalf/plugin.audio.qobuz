@@ -47,7 +47,7 @@
 	<!-- Other -->
 	<category label="30152">
 		<setting id="debug" label="debug (xbmc.log, activated via system menu) (i8n)" type="bool" default="false" />
-		<setting id="contextmenu_replaceitems" label="Only qobuz context menu (i8n)" type="bool" default="false" />
+		<setting id="contextmenu_replaceitems" label="Only qobuz context menu (i8n)" type="bool" default="true" />
 		<setting id="show_recommendations" type="bool" default="true" label="30153" option="" />
 		<setting id="search_enabled" label="30135" type="bool" default="true" />
 		<setting id="display_artist_without_album" label="Display artist without album (i8n)" type="bool" default="false" />
@@ -67,8 +67,8 @@
 	</category>
 	<category label="Notification">
 		<setting id="notification_playingsong" label="30142" type="bool" default="false" />
-		<setting id="warn_free_account" label="Warn free account (i8n)" type="bool" default="true" />
-		<setting id="notify_library_scan_progress" label="Library scan progress (i8n)" type="bool" default="true" />
-		<setting id="notify_api_error" label="Qobuz/API error (i8n)" type="bool" default="true" />
+		<setting id="warn_free_account" label="Warn free account (i8n)" type="bool" default="false" />
+		<setting id="notify_library_scan_progress" label="Library scan progress (i8n)" type="bool" default="false" />
+		<setting id="notify_api_error" label="Qobuz/API error (i8n)" type="bool" default="false" />
 	</category>
 </settings>
