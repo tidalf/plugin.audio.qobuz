@@ -12,7 +12,7 @@ Main Features:
 - Integrate with xbmc gapless play
 - Support hires tracks, flac or mp3 play (using settings)
 - Show and manage favorites
-- musicdb support
+- Music Library bridge using flask
 - Add/Remove Friends & browse their public playlists
 - Browse by genre
 - Public playlists
