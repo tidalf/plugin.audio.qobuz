@@ -14,6 +14,7 @@ from qobuz.node import getNode, Flag
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.cache import cache
+from qobuz.cache.cache_util import clean_all
 from qobuz import debug
 from qobuz.renderer import renderer
 from qobuz.gui.util import notify_warn, notify_error, notify_log
@@ -502,4 +503,5 @@ class Node_playlist(INode):
         method, args = self._fetch_args()
         key = cache.make_key(method, **args)
         cache.delete(key)
+        clean_all(cache)
         self.remove_node_storage()
