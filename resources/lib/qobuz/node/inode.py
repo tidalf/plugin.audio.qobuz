@@ -577,14 +577,14 @@ class INode(object):
         # ''' VIEW BIG DIR '''
         # cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
         # menu.add(path='qobuz/big_dir', label=lang(30158), cmd=cmd)
-        # if config.app.registry.get('enable_scan_feature', to='bool'):
-        #     ''' SCAN'''
-        #     query = urllib.quote_plus(
-        #         self.make_url(
-        #             mode=Mode.SCAN, asLocalUrl=True))
-        #     url = self.make_url(
-        #         nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan', query=query)
-        #     menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
+        if config.app.registry.get('enable_scan_feature', to='bool'):
+             ''' SCAN'''
+             query = urllib.quote_plus(
+                 self.make_url(
+                     mode=Mode.SCAN, asLocalUrl=True))
+             url = self.make_url(
+                 nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan', query=query)
+             menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
         if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK & ~Flag.PLAYLIST):
             ''' ERASE CACHE '''
             cmd = runPlugin(
