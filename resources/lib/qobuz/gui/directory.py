@@ -74,8 +74,10 @@ class Directory(object):
                         Flag.to_s(node.nt)))
                     return True
                 self.seen_nodes[node.nid] = 1
-        self.progress.update(message=node.get_label().encode(
-            'ascii', errors='replace'))
+        try:
+           self.progress.update(message=node.get_label().encode('ascii'))
+        except:
+           pass
         if self.asList is True:
             self.nodes.append(node)
             self.total_put += 1

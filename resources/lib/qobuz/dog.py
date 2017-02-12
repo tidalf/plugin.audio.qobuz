@@ -27,12 +27,8 @@ _allowed_keys = {
     'source': r'^(all|playlists|purchases|favorites)$',
 }
 _allowed_boolean = ['asLocalUrl']
-
-_allowed_keys = {
-    key: re.compile(value)
-    for key, value in _allowed_keys.items()
-}
-
+for key, value in _allowed_keys.items():
+    _allowed_keys[key] = re.compile(value)
 
 class dog():
     '''Checking script parameter against regular expression

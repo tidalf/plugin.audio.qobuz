@@ -629,10 +629,10 @@ class INode(object):
         return self.__class__.__name__
 
     def as_dict(self):
-        return {
-            k: getattr(self, 'get_%s' % k)()
-            for k in ['class_name', 'nid', 'parent']
-        }
+        d = {}
+        for k in ['class_name', 'nid', 'parent']:
+            d[k] = getattr(self, 'get_%s' % k)()
+        return d
 
     def __str__(self):
         return '<{class_name} nid={nid}>'.format(**self.as_dict())

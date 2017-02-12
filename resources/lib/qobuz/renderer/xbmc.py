@@ -166,7 +166,10 @@ class QobuzXbmcRenderer(IRenderer):
                 showProgress=True) as xdir:
             xdir.progress.heading = 'Scan (i8n)'
             tracks = {}
-            tracks.update({track.nid: track for track in list_track(xdir)})
+            d = {}
+            for track in list_track(xdir):
+              d[track.nid] = track
+            tracks.update(d)
             if len(tracks.keys()) == 0:
                 xdir.end_of_directory()
                 return False
