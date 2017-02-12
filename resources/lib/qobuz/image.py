@@ -45,9 +45,13 @@ def combine(nid, images=[], count=4, prefix='cover'):
                 with open(tmp, 'wb') as wh:
                     wh.writelines(r.iter_content(1024))
                 path = tmp
-            part = Image.open(path)
-            part = part.resize((size, size), Image.ANTIALIAS)
-            new.paste(part, (i, j))
-            total += 1
+            # sometimes there's no image 
+	    try: 
+                part = Image.open(path)
+                part = part.resize((size, size), Image.ANTIALIAS)
+                new.paste(part, (i, j))
+                total += 1
+            except: 
+                pass
     new.save(final_path)
     return final_path
