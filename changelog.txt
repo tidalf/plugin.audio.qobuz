@@ -1,8 +1,8 @@
 1.3.0
 -----
 * Album/Track/Playlist: more tags
-* Playlist: covers, genre list
-* Feature: Music Library bridge using flask (try it using the scan context menu in qobuz!) (experimental)
+* Playlist: cover mosaics
+* Feature: Music Library and smart playlists bridge using flask (try it using the scan context menu in qobuz!) (experimental)
 * Feature: Context menu item from music library (show all albums from artist)
 * Feature: Preview mode when no login/password are filled
 
