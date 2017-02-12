@@ -22,6 +22,7 @@ from qobuz import exception
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import lang, runPlugin, containerUpdate
 from qobuz.gui.util import getImage
+from qobuz.api.user import current as user
 from qobuz.node import Flag
 from qobuz.node import getNode
 import qobuz
@@ -618,8 +619,8 @@ class INode(object):
 
     def get_user_data(self):
         data = api.get('/user/login',
-                       username=api.username,
-                       password=api.password)
+                       username=user.username,
+                       password=user.password)
         if not data:
             return None
         return data['user']

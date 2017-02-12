@@ -88,7 +88,7 @@ class Node_friend(INode):
 
     def delete_cache(self):
         key = cache.make_key(
-            '/user/login', username=api.username, password=api.password)
+            '/user/login', username=user.username, password=user.password)
         cache.delete(key)
 
     def remove(self):
