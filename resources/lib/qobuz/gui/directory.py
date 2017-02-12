@@ -70,8 +70,7 @@ class Directory(object):
         if self.filter_double is not None:
             if self.filter_double & node.nt == node.nt:
                 if node.nid in self.seen_nodes:
-                    self.progress.update(message='Skip node type: {}'.format(
-                        Flag.to_s(node.nt)))
+                    self.progress.update(message='Skip node type: %s' % Flag.to_s(node.nt) )
                     return True
                 self.seen_nodes[node.nid] = 1
         try:

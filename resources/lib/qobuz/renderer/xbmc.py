@@ -126,11 +126,13 @@ class QobuzXbmcRenderer(IRenderer):
             seen = {}
             seen_tracks = {}
             for node in predir.nodes:
-                scan.progress.update(
-                    percent(),
-                    'Scanning',
-                    node.get_label().encode(
-                        'ascii', errors='ignore'))
+                try:
+                   scan.progress.update( percent(),
+                                         'Scanning',
+                                         node.get_label().encode('ascii')
+                                       )
+                except:
+                       pass
                 done += 1
                 node.set_parameter('mode', Mode.SCAN)
                 if node.nt & Flag.TRACK == Flag.TRACK:
