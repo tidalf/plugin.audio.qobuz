@@ -3,43 +3,63 @@
     ~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from inode import INode
-from debug import warn
-from gui.util import getImage, getSetting, lang
-from node import Flag
-from api import api
+from qobuz.node.inode import INode, getNode
+from qobuz import debug
+from qobuz.gui.util import getImage, lang
+from qobuz.node import Flag
+from qobuz.api import api
 
 
 class Node_label(INode):
-    '''
-    @class Node_label:
-    '''
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_label, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_label, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.LABEL
-        self.set_label(lang(30188))
-        self.url = None
-        self.is_folder = True
         self.image = getImage('album')
+        self.content_type = 'albums'
 
-    def hook_post_data(self):
-        self.label = self.get_property('name')
-        self.nid = self.get_property('nid')
+    def get_label(self):
+        if self.nid is None:
+            return lang(30188)
+        return self.get_property('name')
 
-    def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
-        offset = self.get_parameter('offset') or 0
-        #@bug: Qobuz service seam do don't return total so pagination is broken
-        limit = getSetting('pagination_limit')
-        data = api.get('/label/list', limit=limit, offset=offset)
-        if not data:
-            warn(self, "No label data")
-            return False
-        for item in data['labels']['items']:
-            node = Node_label()
-            node.data = item
-            self.add_child(node)
+    def get_label2(self, default=None):
+        if self.nid is None:
+            return default
+        return self.get_property('albums_count')
+
+    def get_image(self):
+        if self.nid is None:
+            return getImage('album')
+        return self.get_property('image')
+
+    def makeListItem(self, **ka):
+        item = super(Node_label, self).makeListItem(**ka)
+        if self.nid is not None:
+            item.setIconImage(self.get_image())
+            item.setThumbnailImage(self.get_image())
+            item.setProperty('description', self.get_property('description'))
+        return item
+
+    def fetch(self, *a, **ka):
+        if self.nid is None:
+            return api.get('/label/list', limit=self.limit, offset=self.offset)
+        return api.get('/label/get', label_id=self.nid)
+
+    def populate(self, xdir, lvl, whiteFlag, blackFlag):
+        if self.nid is None:
+            for item in self.data['labels']['items']:
+                self.add_child(getNode(Flag.LABEL, data=item))
+        else:
+            xdir.add_node(self)
+            supplier_id = self.get_property('supplier_id', default=None)
+            if supplier_id is not None:
+                xdir.add_node(
+                    getNode(
+                        Flag.LABEL,
+                        parameters={'nid': supplier_id},
+                        data={'name': '[Supplier]'}))
         return True

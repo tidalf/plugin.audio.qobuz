@@ -1,19 +1,21 @@
 '''
-    default (XBMC addon entry point)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    default
+    ~~~~~~~
+    :note: Kodi addon entry point
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-
-import os
 import sys
-
-sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'resources', 'lib'))
+import os
+import traceback
+sys.path.append(
+    os.path.join(
+        os.path.abspath(os.path.dirname(__file__)), 'resources', 'lib'))
 
 from qobuz.plugin import Plugin
 from qobuz.application import Application
+from qobuz import debug
 
-app = Application(Plugin('plugin.audio.qobuz'))
-app.start()
+with Application(Plugin('plugin.audio.qobuz')) as app:
+    app.start()

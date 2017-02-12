@@ -3,43 +3,44 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
-from qobuz.gui.util import lang, getImage, getSetting
+from qobuz.gui.util import lang, getImage
 from qobuz.api import api
+from qobuz import debug
+from qobuz.cache import cache
+
+featured_type = ['editor-picks', 'last-created']
+limit_max = 100
 
 
 class Node_public_playlists(INode):
-    """@class Node_public_playlists
-    """
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_public_playlists, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_public_playlists, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.PUBLIC_PLAYLISTS
-        self.set_label(lang(30190))
-        self.is_folder = True
         self.image = getImage('userplaylists')
-        self.offset = self.get_parameter('offset') or 0
+        self.content_type = 'albums'
+        self.type = self.get_parameter('type', default='last-created')
+        if self.type not in featured_type:
+            raise RuntimeError('InvalidFeaturedType: {}'.format(self.type))
+        self.label = '%s (%s)' % (lang(30190), self.type)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/playlist/getPublicPlaylists', offset=self.offset,
-                       limit=limit, type='last-created')
-        if not data:
-            return False
-        # @bug: we use pagination_limit as limit for the search so we don't
-        # need offset... (Fixed if qobuz fix it :p)
-        if not 'total' in data['playlists']:
-            data['playlists']['total'] = data['playlists']['limit']
-        self.data = data
-        return True
+    def _get_limit(self):
+        return self.limit if self.limit < limit_max else limit_max
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, *a, **ka):
+        return api.get('/playlist/getFeatured',
+                       offset=self.offset,
+                       limit=self._get_limit(),
+                       type=self.type)
+
+    def populate(self, *a, **ka):
         for item in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST)
-            node.data = item
-            self.add_child(node)
-        return True
+            self.add_child(
+                getNode(
+                    Flag.PLAYLIST, data=item, parameters={'nt': self.nt}))
+        return True if len(self.data['playlists']['items']) > 0 else False

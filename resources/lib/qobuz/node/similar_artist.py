@@ -3,39 +3,43 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.inode import INode
+from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
-from qobuz.gui.util import lang, getSetting
+from qobuz.gui.util import lang
 from qobuz.api import api
+from qobuz import config
+from qobuz import debug
 
 
 class Node_similar_artist(INode):
-    """NODE ARTIST
-    """
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_similar_artist, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_similar_artist, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.SIMILAR_ARTIST
         self.content_type = 'artists'
+        self.lang = lang(30156)
 
-    def get_label(self):
-        return lang(30156)
+    def fetch(self, *a, **ka):
+        return api.get('/artist/getSimilarArtists',
+                       artist_id=self.nid,
+                       offset=self.offset,
+                       limit=self.limit)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/artist/getSimilarArtists', artist_id=self.nid,
-                       offset=self.offset, limit=limit)
-        if not data:
-            return False
-        self.data = data
-        return len(data['artists']['items'])
+    def _count(self):
+        return len(self.data['artists']['items'])
 
-    def populate(self, Dir, lvl, whiteflag, blackFlag):
-        for aData in self.data['artists']['items']:
-            artist = getNode(Flag.ARTIST)
-            artist.data = aData
+    def populate(self, *a, **ka):
+        skip_empty = not config.app.registry.get(
+            'display_artist_without_album', to='bool')
+        for data in self.data['artists']['items']:
+            if skip_empty and data['albums_count'] < 1:
+                continue
+            artist = getNode(Flag.ARTIST, data=data)
+            cache = artist.fetch(noRemote=True)
+            if cache is not None:
+                artist.data = cache
             self.add_child(artist)
-        return True
+        return True if len(self.data['artists']['items']) > 0 else False

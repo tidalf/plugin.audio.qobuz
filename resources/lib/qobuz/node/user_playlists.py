@@ -3,33 +3,32 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import os
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
-from qobuz.debug import warn, error, info
-from qobuz.gui.util import lang, getImage, getSetting
+from qobuz import debug
+from qobuz.gui.util import lang, getImage
 from qobuz.api import api
-import os
+from qobuz.api.user import current as user
+from qobuz import config
+from qobuz.cache import cache
+
+limit_max = 100
+
 
 class Node_user_playlists(INode):
-    """User playlists node
-        This node list playlist made by user and saved on Qobuz server
-    """
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_user_playlists, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_user_playlists, self).__init__(
+            parent=parent, parameters=parameters, data=data)
+        self.nt = Flag.USERPLAYLISTS
         self.label = lang(30021)
         self.image = getImage('userplaylists')
-        self.nt = Flag.USERPLAYLISTS
-        self.content_type = 'files'
-        display_by = self.get_parameter('display-by', default=None)
-        if display_by is None:
-            display_by = 'songs'
-        self.set_display_by(display_by)
-        display_cover = getSetting('userplaylists_display_cover', asBool=True)
-        self.display_product_cover = display_cover
+        self.content_type = 'albums'
+        self.display_product_cover = config.app.registry.get(
+            'userplaylists_display_cover', to='bool')
 
     def set_display_by(self, dtype):
         vtype = ('product', 'songs')
@@ -51,28 +50,24 @@ class Node_user_playlists(INode):
             return None
         return int(userdata['current_playlist'])
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/playlist/getUserPlaylists',
-                       limit=limit,
-                       offset=self.offset,
-                       user_id=api.user_id)
-        if data is None:
-            warn(self, "Build-down: Cannot fetch user playlists data")
-            return False
-        self.data = data
-        return True
+    def _get_limit(self):
+        return self.limit if self.limit < limit_max else limit_max
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        login = getSetting('username')
+    def fetch(self, *a, **ka):
+        return api.get('/playlist/getUserPlaylists',
+                       limit=self._get_limit(),
+                       offset=self.offset,
+                       user_id=user.get_id(),
+                       type='last-created')
+
+    def populate(self, *a, **ka):
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST, data=data)
-            #if self.display_product_cover:
-            #    pass
+            node = getNode(
+                Flag.PLAYLIST, data=data, parameters={'nt': self.nt})
             if cid and cid == node.nid:
                 node.set_is_current(True)
-            if node.get_owner() == login:
+            if node.get_owner() == user.username:
                 node.set_is_my_playlist(True)
             self.add_child(node)
-        return True
+        return True if len(self.data['playlists']['items']) > 0 else False

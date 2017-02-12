@@ -18,22 +18,22 @@
 <string id="30012">Please try again later</string>
 <string id="30013">New...</string>
 <string id="30014">Made</string>
-<string id="30015">Search for songs...</string>
-<string id="30016">Search for albums...</string>
-<string id="30017">Search for artists...</string>
+<string id="30015">Tracks</string>
+<string id="30016">Albums</string>
+<string id="30017">Artists</string>
 <string id="30018">Popular Qobuz songs for artist...</string>
 <string id="30019">Popular Qobuz songs</string>
 <string id="30020">My Qobuz favorites</string>
-<string id="30021">Show playlists</string>
-<string id="30022">Search for songs powered by Qobuz</string>
+<string id="30021">Playlists</string>
+<string id="30022">Search</string>
 <string id="30023">No matching songs.</string>
-<string id="30024">Search for albums powered by Qobuz</string>
+<string id="30024">Unused</string>
 <string id="30025">No matching albums.</string>
-<string id="30026">Search for artists powered by Qobuz</string>
+<string id="30026">Unused</string>
 <string id="30027">No matching artists.</string>
 <string id="30028">Username</string>
 <string id="30029">No Qobuz playlists found.</string>
-<string id="30030">Search for artist's albums powered by Qobuz</string>
+<string id="30030">Artist albums</string>
 <string id="30031">No matching albums.</string>
 <string id="30032">No matching artists.</string>
 <string id="30033">You have no favorites.</string>
@@ -84,13 +84,13 @@
 <string id="30078">Make Qobuz playlist</string>
 <string id="30079">Delete Qobuz playlist</string>
 <string id="30080">Rename playlist</string>
-<string id="30081">Show Favorites</string>
+<string id="30081">Favorites</string>
 <string id="30082">Add as new playlist</string>
 <string id="30083">Qobuz favorites</string>
-<string id="30194">Show Collections</string>
+<string id="30194">Collections</string>
 
 <!-- Recommandation -->
-<string id="30084">Show recommendations</string>
+<string id="30084">Recommendations</string>
 <string id="30085">Press awards</string>
 <string id="30086">News</string>
 <string id="30087">Best sellers</string>
@@ -100,16 +100,16 @@
 <string id="30090">Electro</string>
 <string id="30091">Jazz</string>
 <string id="30092">Chanson Française</string>
-<string id="30093">Soul / Funk/Rap</string>
+<string id="30093">Soul / Funk / Rap</string>
 <string id="30094">World Music</string>
-<string id="30095">Blues / Country/Folk</string>
+<string id="30095">Blues / Country / Folk</string>
 <string id="30096">Movie Soundtracks</string>
 <string id="30097">Classical</string>
 <string id="30098">All of them</string>
 <string id="30099">Reggae</string>
 <string id="30100">Historical documents / Litterature / Humor</string>
-<string id="30101">Show Purchases</string>
-<string id="30102">Show News</string>
+<string id="30101">Purchases</string>
+<string id="30102">Show news</string>
 <string id="30103">Most featured</string>
 <string id="30104">Rap / HipHop / RB / Soul</string>
 <string id="30105">Childs / Karakoke / Ambiance</string>
@@ -200,6 +200,7 @@
 <string id="30166">Remove</string>
 <string id="30167">Add to favorites</string>
 <string id="30168">Subscribe</string>
+<string id="30196">Unsubscribe</string>
 
 <!-- Progress bar -->
 <string id="30169">Starting</string>

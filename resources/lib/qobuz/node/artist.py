@@ -3,71 +3,78 @@
     ~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import xbmcgui
 from qobuz.node.inode import INode
-from qobuz.debug import warn
-from qobuz.gui.util import getSetting
+from qobuz import debug
 from qobuz.gui.contextmenu import contextMenu
+from qobuz.gui.util import getImage
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 
 
+def helper_album_list_genre(data, default=[]):
+    if data is None or 'albums' not in data:
+        return default
+    genres = {}
+    for album in data['albums']['items']:
+        if 'genre' not in album:
+            continue
+        genres[album['genre']['name']] = 1
+    return genres.keys()
+
+
 class Node_artist(INode):
-    """@class Node_artist(Inode): Artist
-    """
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_artist, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_artist, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ARTIST
-        self.set_label(self.get_name())
-        self.is_folder = True
-        self.slug = ''
-        self.content_type = 'artists'
+        self.content_type = 'albums'
+        self.nid = self.get_parameter('nid', default=None)
 
-    def hook_post_data(self):
-        self.nid = self.get_property('id')
-        self.name = self.get_property('name')
-        self.image = self.get_image()
-        self.slug = self.get_property('slug')
-        self.label = self.name
+    def fetch(self, *a, **ka):
+        return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/artist/get', artist_id=self.nid, limit=limit,
-                       offset=self.offset, extra='albums')
-        if not data:
-            warn(self, "Build-down: Cannot fetch artist data")
+    def populate(self, *a, **ka):
+        albums = self.get_property('albums/items')
+        if len(albums) == 0:
             return False
-        self.data = data
+        for data in albums:
+            album = getNode(Flag.ALBUM, data=data)
+            cache = album.fetch(noRemote=True)
+            if cache is not None:
+                album.data = cache
+            self.add_child(album)
         return True
-
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        node_artist = getNode(Flag.ARTIST, data=self.data)
-        node_artist.label = '[ %s ]' % (node_artist.label)
-        if not 'albums' in self.data:
-            return True
-        for data in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM, data=data)
-            self.add_child(node)
-        return True
-
-        del self._data['tracks']
 
     def get_artist_id(self):
         return self.nid
 
     def get_image(self):
-        image = self.get_property(['image/extralarge',
-                                   'image/mega',
-                                   'image/large',
-                                   'image/medium',
-                                   'image/small',
-                                   'picture'])
-        if image:
-            image = image.replace('126s', '_')
-        return image
+        return self.get_property(
+            [
+                'image/extralarge', 'image/mega', 'image/large',
+                'image/medium', 'image/small', 'picture'
+            ],
+            default=getImage('artist'))
+
+    def get_label(self, fmt='%a (%C)'):
+        fmt = fmt.replace(
+            '%Cc',
+            self.get_property(
+                'albums_as_primary_composer_count', default='0', to='string'))
+        fmt = fmt.replace(
+            '%Ca',
+            self.get_property(
+                'albums_as_primary_artist_count', default='0', to='string'))
+        fmt = fmt.replace('%a', self.get_artist())
+        fmt = fmt.replace('%G', self.get_genre())
+        fmt = fmt.replace(
+            '%C', str(self.get_property(
+                'albums_count', default=0)))
+        return fmt
 
     def get_title(self):
         return self.get_name()
@@ -78,30 +85,40 @@ class Node_artist(INode):
     def get_name(self):
         return self.get_property('name')
 
+    def get_genre(self):
+        return ', '.join(helper_album_list_genre(self.data))
+
     def get_owner(self):
         return self.get_property('owner/name')
 
     def get_description(self):
-        return self.get_property('description')
+        return self.get_property(
+            'biography/content', default='', to='strip_html')
 
     def makeListItem(self, replaceItems=False):
-        import xbmcgui  # @UnresolvedImport
-        image = self.get_image()
-        url = self.make_url()
-        name = self.get_label()
-        item = xbmcgui.ListItem(name,
-                                name,
-                                image,
-                                image,
-                                url)
+        debug.info(
+            self,
+            '{}',
+            self.get_description().encode(
+                'ascii', errors='ignore'))
+        genre = self.get_genre()
+        item = xbmcgui.ListItem(self.get_label(),
+                                self.get_label(),
+                                self.get_image(),
+                                self.get_image(), self.make_url())
         if not item:
-            warn(self, "Error: Cannot make xbmc list item")
+            debug.warn(self, 'Error: Cannot make xbmc list item')
             return None
-        item.setPath(url)
-        item.setInfo('music', infoLabels={
-            'artist': self.get_artist(),
-            'comment': self.get_description()
-        })
+        item.setPath(self.make_url())
+        item.setInfo(
+            'Music',
+            infoLabels={
+                'artist': self.get_artist(),
+                'genre': genre,
+                'comment': self.get_description()
+            })
+        #item.setProperty('artist_genre', genre)
+        #item.setProperty('artist_description', self.get_description())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)

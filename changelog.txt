@@ -1,3 +1,10 @@
+1.3.0
+-----
+* Kodi 17.0-Krypton compatible
+* Album/Track/Playlist: more tags
+* Playlist: covers, genre list
+* Feature: Library, experimental scanning
+
 1.2.1
 -----
 * Feature: Playing HiRes purchased tracks (setting and hires property on track)
@@ -23,7 +30,7 @@
 -----
 * fixes and covers
 
-0.11.0 
+0.11.0
 -----
 * Add "friends" feature
 * add http-resolver for musicdb support (experimental)
@@ -33,7 +40,7 @@
 * improve favorite support (add albums & artists & remove)
 * lots of cleanup & cosmetics
 * use requests 1.0.4
- 
+
 0.10.2
 -----
 * update language files from Transifex
@@ -118,7 +125,7 @@ lots of things
 -----
 * [added features] search by artists and albums
 
-0.0.1 
+0.0.1
 -----
 * Where it all began (Support favorite playlists, track search, recommendations)
 

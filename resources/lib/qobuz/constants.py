@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 
@@ -19,6 +19,7 @@ class ModeEnum(object):
     @classmethod
     def to_s(cls, mode):
         return cls._code_to_human[mode]
+
 
 ModeEnum._code_to_human = {
     ModeEnum.VIEW: 'view',

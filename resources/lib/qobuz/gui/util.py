@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
@@ -11,31 +11,31 @@ import sys
 import re
 
 try:
-    """Dirty trick that permit to import this module outside of xbmc
-    All function using xbmc module will fail ...
-    """
-    import xbmc  # @UnresolvedImport
-    import xbmcgui  # @UnresolvedImport
-    import xbmcplugin  # @UnresolvedImport
-    """Keyboard
-    """
-    class Keyboard(xbmc.Keyboard):
+    import xbmc
+    import xbmcgui
+    import xbmcplugin
 
-        def __init__(self, default, heading, hidden=True):
-            self.setHeading('Qobuz / ' + heading)
+    class Keyboard(xbmc.Keyboard):
+        def __init__(self, default, heading='', hidden=True):
+            self.setHeading('Qobuz / %s' % heading)
 
 except:
-    print "QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken"
+    print 'QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken'
 
-import qobuz  # @UnresolvedImport
+
+def ask(current=None, heading='rename'):
+    w = Keyboard(current, heading)
+    w.doModal()
+    if not w.isConfirmed():
+        return None
+    return w.getText().strip()
+
+
+import qobuz
 from qobuz.xbmcrpc import showNotification, getInfoLabels
 from qobuz import config
-from qobuz.debug import info
+from qobuz import debug
 from qobuz.util import common as commonUtil
-def htm2xbmc(htm):
-    def replace(m):
-        return '[' + m.group(1) + m.group(2).upper() + ']'
-    return re.sub('<(/?)(i|b)>', replace, htm, re.IGNORECASE)
 
 
 def getImage(name):
@@ -49,14 +49,14 @@ def getImage(name):
 
 
 def notifyH(title, text, image=None, mstime=2000):
-    """Notify for human... not using localized string :p
-    """
+    '''Notify for human... not using localized string :p
+    '''
     if image is None:
         image = getImage('icon-default-256')
     else:
         image = getImage(image)
-    return showNotification(title=title, message=text, image=image,
-                            displaytime=mstime)
+    return showNotification(
+        title=title, message=text, image=image, displaytime=mstime)
 
 
 def notify_log(title, text, **ka):
@@ -72,59 +72,56 @@ def notify_warn(title, text, **ka):
 
 
 def notify(title, text, image=None, mstime=2000):
-    """Notification that wrap title and text parameter into lang()
-    """
+    '''Notification that wrap title and text parameter into lang()
+    '''
     if image is None:
         image = getImage('icon-default-256')
     else:
         image = getImage(image)
-    return showNotification(title=lang(title),
-                            message=lang(text),
-                            image=image,
-                            displaytime=mstime)
+    return showNotification(
+        title=lang(title), message=lang(text), image=image, displaytime=mstime)
 
 
 def dialogLoginFailure():
-    """Dialog to be shown when we can't login into Qobuz
-    """
+    '''Dialog to be shown when we can't login into Qobuz
+    '''
     dialog = xbmcgui.Dialog()
     if dialog.yesno(lang(30010), lang(30036), lang(30042)):
         qobuz.addon.openSettings()
-        xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
-                                  updateListing=True, cacheToDisc=False)
+        xbmcplugin.endOfDirectory(
+            handle=int(sys.argv[1]),
+            succeeded=False,
+            updateListing=True,
+            cacheToDisc=False)
     else:
         xbmc.executebuiltin('ActivateWindow(home)')
         return False
 
 
 def dialogServiceTemporarilyUnavailable():
-    """Dialog to be shown when Qobuz is not available (Maintenance)
-    """
+    '''Dialog to be shown when Qobuz is not available (Maintenance)
+    '''
     dialog = xbmcgui.Dialog()
     dialog.ok('Qobuz Service Temporay Unavailable',
-              'Qobuz service are down :/',
-              'Check it later')
-    xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=False,
-                              updateListing=True, cacheToDisc=False)
+              'Qobuz service are down :/', 'Check it later')
+    xbmcplugin.endOfDirectory(
+        handle=int(sys.argv[1]),
+        succeeded=False,
+        updateListing=True,
+        cacheToDisc=False)
     return False
 
 
 def isFreeAccount():
-    """Check if account if it's a Qobuz paid account
-    """
-    from qobuz.api import api
-    data = api.get('/user/login', username=api.username,
-                   password=api.password)
-    if not data:
-        return True
-    if not data['user']['credential']['id']:
-        return True
-    return False
+    '''Check if account if it's a Qobuz paid account
+    '''
+    from qobuz.api.user import current
+    return current.is_free_account()
 
 
 def dialogFreeAccount():
-    """Show dialog when using free acccount
-    """
+    '''Show dialog when using free acccount
+    '''
     if qobuz.addon.getSetting('warn_free_account') != 'true':
         return
     dialog = xbmcgui.Dialog()
@@ -135,14 +132,6 @@ def dialogFreeAccount():
 
 def executeJSONRPC(json):
     return xbmc.executeJSONRPC(json)
-
-
-def color(colorItem, msg):
-    if not msg:
-        return ''
-    if not colorItem:
-        return msg
-    return '[COLOR=%s]%s[/COLOR]' % (colorItem, msg)
 
 
 def lang(langId):
@@ -157,12 +146,10 @@ def runPlugin(url):
 
 
 def containerUpdate(url, replace=False):
-    if replace:
+    replace = ''
+    if replace is True:
         replace = ', "replace"'
-    else:
-        replace = ''
-    s = 'Container.Update("%s"%s)' % (url, replace)
-    return s
+    return 'Container.Update("%s"%s)' % (url, replace)
 
 
 def yesno(heading, line1, line2='', line3=''):
@@ -171,11 +158,11 @@ def yesno(heading, line1, line2='', line3=''):
 
 
 def containerRefresh():
-    return ('Container.Refresh')
+    return 'Container.Refresh'
 
 
 def executeBuiltin(cmd):
-    xbmc.executebuiltin("%s" % (cmd))
+    xbmc.executebuiltin(cmd)
 
 
 def containerViewMode():
@@ -196,26 +183,3 @@ def containerSortMethod():
 
 def setResolvedUrl(**ka):
     return xbmcplugin.setResolvedUrl(**ka)
-
-
-def getSetting(key, default='', asInt=False, asBool=False, asList=False, sep=' '):
-    """Helper to access xbmcaddon.getSetting
-    @param_pos key: Key to retrieve from setting
-    @param_kwa default: When vlaue from addon is None or ''
-    @param_kwa asBool : Return value converted to bool
-    @param_kwa asInt  : Return value converted to int
-    @param_kwa asList : Return value splited with sep keyword
-    @param_kwa sep    : Separator field for asList
-    """
-    value = config.app.addon.getSetting(key)
-    if value is None or value == '':
-        return default
-    if asBool is True:
-        value = commonUtil.input2bool(value)
-    elif asInt is True:
-        value = int(value)
-    elif asList is True:
-        value = value.split(sep)
-    if value is None or value == '':
-         return default
-    return value

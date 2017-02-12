@@ -3,125 +3,134 @@
     ~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui  # @UnresolvedImport
+import xbmcgui
 from qobuz.node.inode import INode
-from qobuz.debug import warn
-from qobuz.gui.util import lang, getSetting
+from qobuz import debug
+from qobuz.gui.util import lang
 from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
 from qobuz.node import getNode, Flag
 from qobuz.renderer import renderer
 from qobuz.api import api
-from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import exception
 from qobuz.cache import cache
+from qobuz.api.user import current as user
 
 dialogHeading = lang(30083)
 
+all_kinds = ['albums', 'tracks', 'artists']
+
 
 class Node_favorite(INode):
-    """Displaying user favorites (track and album)
-    """
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_favorite, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_favorite, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.FAVORITE
-
-        self.name = lang(30073)
         self.image = getImage('favorites')
         self.method = self.get_parameter('nm')
         self.search_type = self.get_parameter('search-type')
-        self.content_type = 'files'
-        if self.search_type == 'all':
-            self.search_type = None
-        elif self.search_type == 'albums':
-            self.content_type = 'albums'
-        elif self.search_type == 'tracks':
-            self.content_type = 'files'
-        elif self.search_type == 'artists':
-            self.content_type = 'artists'
-        if self.search_type is None:
-            self.label = '%s - %s' % (lang(30081), lang(30098))
-        else:
-            self.label = '%s - %s' % (lang(30081),
-                                      self.search_type.capitalize())
+        self.content_type = 'songs'
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = None
+    def get_label(self):
+        if self.label is not None:
+            return self.label
+        if self.search_type is None:
+            return lang(30081)
+        elif self.search_type == 'all':
+            return lang(30098)
+        return self.search_type.capitalize()
+
+    def fetch(self, *a, **ka):
+        if self.search_type is None:
+            return {}
         if self.search_type != 'all':
-            data = api.get('/favorite/getUserFavorites',
-                           user_id=api.user_id,
+            return api.get('/favorite/getUserFavorites',
+                           user_id=user.get_id(),
                            type=self.search_type,
-                           limit=limit,
+                           limit=self.limit,
                            offset=self.offset)
-        else:
-            data = api.get('/favorite/getUserFavorites',
-                           user_id=api.user_id,
-                           limit=limit,
-                           offset=self.offset)
-        if not data:
-            warn(self, "Build-down: Cannot fetch favorites data")
-            return False
-        self.data = data
-        return True
+        return api.get('/favorite/getUserFavorites',
+                       user_id=user.get_id(),
+                       limit=self.limit,
+                       offset=self.offset)
 
     def make_url(self, **ka):
-        if self.search_type:
+        if self.search_type is not None:
             ka['search-type'] = self.search_type
         return super(Node_favorite, self).make_url(**ka)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, *a, **ka):
         if self.method is not None:
             return True
-        ret = False
-        all_kind = ('artists', 'albums', 'tracks')
-        search_for = (self.search_type, )
         if self.search_type is None:
-            search_for = all_kind
+            for kind in all_kinds:
+                self.add_child(
+                    getNode(
+                        Flag.FAVORITE, parameters={'search-type': kind}))
+            self.add_child(
+                getNode(
+                    Flag.FAVORITE, parameters={'search-type': 'all'}))
+            return True
+        result = False
+        search_for = (self.search_type, )
+        if self.search_type == 'all':
+            search_for = all_kinds
         for kind in search_for:
+            if not kind in self.data:
+                continue
             method = '_populate_%s' % kind
             if not hasattr(self, method):
-                warn(self, 'No method named %s' % method)
+                debug.warn(self, 'No method named %s' % method)
                 continue
-            if getattr(self, method)(Dir, lvl, whiteFlag, blackFlag):
-                ret = True
-        return ret
+            if getattr(self, method)(*a, **ka):
+                result = True
+        return result
 
-    def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
-        if not 'tracks' in self.data:
-            return False
+    def _populate_tracks(self, *a, **ka):
+        self.content_type = 'songs'
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, data=track)
+            if not node.get_displayable():
+                debug.warn(
+                    self,
+                    'Track not displayable: {} ({})',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'),
+                    node.nid)
+                continue
             self.add_child(node)
-            ret = True
-        return ret
+        return True if len(self.data['tracks']['items']) > 0 else False
 
-    def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
-        if not 'albums' in self.data:
-            return False
+    def _populate_albums(self, *a, **ka):
+        self.content_type = 'albums'
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
+            if not node.get_displayable():
+                debug.warn(
+                    self,
+                    'Album not displayable: {} ({})',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'),
+                    node.nid)
+                continue
+            cache = node.fetch(noRemote=True)
+            if cache is not None:
+                node.data = cache
             self.add_child(node)
-            ret = True
-        return ret
+        return True if len(self.data['albums']['items']) > 0 else False
 
-    def _populate_artists(self, Dir, lvl, whiteFlag, blackFlag):
-        ret = False
-        if not 'artists' in self.data:
-            return False
+    def _populate_artists(self, *a, **ka):
+        self.content_type = 'artists'
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
-            node.fetch(None, None, None, Flag.NONE)
+            node.data = node.fetch(noRemote=True)
             self.add_child(node)
-            ret = True
-        return ret
+        return True if len(self.data['artists']['items']) > 0 else False
 
     def get_description(self):
-        return self.get_property('description')
+        return self.get_property('description', to='strip_html')
 
     def gui_add_albums(self):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
@@ -129,9 +138,8 @@ class Node_favorite(INode):
         if len(nodes) == 0:
             notifyH(dialogHeading, lang(30143))
             return False
-        ret = xbmcgui.Dialog().select(lang(30144), [
-            node.get_label() for node in nodes
-        ])
+        ret = xbmcgui.Dialog().select(
+            lang(30144), [node.get_label() for node in nodes])
         if ret == -1:
             return False
         album_ids = ','.join([node.nid for node in nodes])
@@ -148,9 +156,8 @@ class Node_favorite(INode):
         if len(nodes) == 0:
             notifyH(dialogHeading, lang(30143))
             return False
-        ret = xbmcgui.Dialog().select(lang(30146), [
-            node.get_label() for node in nodes
-        ])
+        ret = xbmcgui.Dialog().select(
+            lang(30146), [node.get_label() for node in nodes])
         if ret == -1:
             return False
         artist_ids = ','.join([str(node.nid) for node in nodes])
@@ -166,7 +173,7 @@ class Node_favorite(INode):
         nodes = []
         if qnt & Flag.ALBUM == Flag.ALBUM:
             node = getNode(Flag.ALBUM, {'nid': qid})
-            node.fetch(None, None, None, None)
+            node.data = node.fetch(None, None, None, None)
             album_ids[str(node.nid)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
@@ -201,8 +208,9 @@ class Node_favorite(INode):
                     render.asList = True
                     render.run()
                     if len(render.nodes) > 0:
-                        newnode = getNode(Flag.ALBUM)
-                        newnode.data = render.nodes[0].data['album']
+                        newnode = getNode(
+                            Flag.ALBUM, data=render.nodes[0].data['album'])
+                        #newnode.data = render.nodes[0].data['album']
                         if not str(newnode.nid) in album_ids:
                             nodes.append(newnode)
                             album_ids[str(newnode.nid)] = 1
@@ -226,13 +234,20 @@ class Node_favorite(INode):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_tracks(qnt, qid)
         if len(nodes) == 0:
-            # ERROR: Missing translation for 3600
             notifyH(dialogHeading, lang(3600))
             return False
-        ret = xbmcgui.Dialog().select(lang(30145), [
-            node.get_label() for node in nodes
-        ])
-        if ret == -1:
+        label = lang(30145)
+        from qobuz.gui.dialog import DialogSelect
+        for node in nodes:
+            try:
+                label = node.get_label()
+                if label is not None:
+                    label = label.encode('utf8', errors='ignore')
+            except Exception as e:
+                debug.error(self, u'Error: {}', e)
+        dialog = DialogSelect(
+            label=label, items=[node.get_label() for node in nodes])
+        if dialog.open() == -1:
             return False
         track_ids = ','.join([str(node.nid) for node in nodes])
         if not self.add_tracks(track_ids):
@@ -246,8 +261,8 @@ class Node_favorite(INode):
         track_ids = {}
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
-            node = getNode(Flag.TRACK, {'nid': qid})
-            node.fetch(None, None, None, Flag.NONE)
+            node = getNode(Flag.TRACK, parameters={'nid': qid})
+            node.data = node.fetch(None, None, None, Flag.NONE)
             track_ids[str(node.nid)] = 1
             nodes.append(node)
         else:
@@ -294,18 +309,21 @@ class Node_favorite(INode):
         return True
 
     def _delete_cache(self):
-        limit = getSetting('pagination_limit')
         keys = []
-        keys.append(cache.make_key('/favorite/getUserFavorites',
-                                   user_id=api.user_id,
-                                   limit=limit,
-                                   offset=self.offset))
+        keys.append(
+            cache.make_key(
+                '/favorite/getUserFavorites',
+                user_id=user.get_id(),
+                limit=self.limit,
+                offset=self.offset))
         for kind in ['artists', 'albums', 'tracks']:
-            keys.append(cache.make_key('/favorite/getUserFavorites',
-                                       user_id=api.user_id,
-                                       limit=limit,
-                                       type=kind,
-                                       offset=self.offset))
+            keys.append(
+                cache.make_key(
+                    '/favorite/getUserFavorites',
+                    user_id=user.get_id(),
+                    limit=self.limit,
+                    type=kind,
+                    offset=self.offset))
         ret = False
         for key in keys:
             if cache.delete(key):
@@ -341,8 +359,7 @@ class Node_favorite(INode):
         elif qnt & Flag.ARTIST == Flag.ARTIST:
             ret = self.del_artist(node.nid)
         else:
-            raise Qerror(who=self, what='invalid_node_type',
-                         additional=self.nt)
+            raise exception.InvalidNodeType(self.nt)
         if not ret:
             notifyH(dialogHeading,
                     'Cannot remove item: %s' % (node.get_label()))
@@ -352,3 +369,13 @@ class Node_favorite(INode):
         url = self.make_url(nt=self.nt, nid=None, nm=None)
         executeBuiltin(containerUpdate(url, True))
         return True
+
+    def get_image(self):
+        image = self.get_image_from_storage()
+        if image is None:
+            image = super(Node_favorite, self).get_image()
+        return image
+
+    def _get_node_storage_filename(self):
+        return u'userdata-{user_id}-favorite-{nid}.local'.format(
+            user_id=user.get_id(), nid=self.nid)

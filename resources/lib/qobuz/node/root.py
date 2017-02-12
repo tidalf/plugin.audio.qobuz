@@ -3,66 +3,82 @@
     ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz.gui.util import getSetting, executeBuiltin, lang
+from qobuz.gui.util import executeBuiltin, lang
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
 from qobuz.node import getNode, Flag
+from qobuz import debug
+from qobuz.gui.util import yesno, notifyH, getImage
+from qobuz.api.user import current as current_user
+from qobuz import config
+
+
+def makeSubscriptionNode():
+    return getNode(
+        Flag.TEXT,
+        parameters={
+            'label': '(Free Account / Subscribe on qobuz.com)',
+            'image':
+            'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'
+        })
 
 
 class Node_root(INode):
-    """Our root node, we are displaying all qobuz nodes from here
-    """
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_root, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_root, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ROOT
-        self.content_type = 'files'
-        self.label = "Qobuz"
+        self.content_type = 'albums'
+        self.label = 'Qobuz'
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        self.add_child(getNode(Flag.USERPLAYLISTS))
-        if getSetting('show_recommendations', asBool=True):
+    def populate(self, *a, **ka):
+        free = current_user.is_free_account()
+        if free:
+            self.add_child(makeSubscriptionNode())
+        if not free:
+            self.add_child(getNode(Flag.USER))
+            self.add_child(getNode(Flag.USERPLAYLISTS))
+        if config.app.registry.get('show_recommendations', to='bool'):
             self.add_child(getNode(Flag.RECOMMENDATION))
-        self.add_child(getNode(Flag.PURCHASES))
-        self.add_child(getNode(Flag.FAVORITES))
-        if getSetting('search_enabled', asBool=True):
-            search = getNode(Flag.SEARCH)
-            search.search_type = 'albums'
-            self.add_child(search)
-            search = getNode(Flag.SEARCH)
-            search.search_type = 'tracks'
-            self.add_child(search)
-            search = getNode(Flag.SEARCH)
-            search.search_type = 'artists'
-            self.add_child(search)
-            collections = getNode(Flag.COLLECTIONS)
-            self.add_child(collections)
-        self.add_child(getNode(Flag.FRIENDS))
-        self.add_child(getNode(Flag.GENRE))
+        if not free:
+            self.add_child(getNode(Flag.PURCHASE))
+            self.add_child(getNode(Flag.FAVORITE))
+        if config.app.registry.get('search_enabled', to='bool'):
+            self.add_child(getNode(Flag.SEARCH))
+        if not free:
+            self.add_child(getNode(Flag.FRIENDS))
         self.add_child(getNode(Flag.PUBLIC_PLAYLISTS))
+        self.add_child(
+            getNode(
+                Flag.PUBLIC_PLAYLISTS, parameters={'type': 'editor-picks'}))
+        if config.app.registry.get('show_experimental', to='bool'):
+            self.add_child(getNode(Flag.LABEL))
+            self.add_child(getNode(Flag.ARTICLE))
+            self.add_child(getNode(Flag.GENRE))
+            if not free:
+                self.add_child(getNode(Flag.COLLECTION))
+        if free:
+            self.add_child(makeSubscriptionNode())
         return True
 
     def cache_remove(self):
-        """GUI/Removing all cached data
-        """
-        from qobuz.gui.util import yesno, notifyH, getImage
-        from qobuz.debug import log
+        '''GUI/Removing all cached data
+        '''
         if not yesno(lang(30121), lang(30122)):
-            log(self, "Deleting cached data aborted")
+            debug.warn(self, 'Deleting cached data aborted')
             return False
         if clean_all(cache):
             notifyH(lang(30119), lang(30123))
         else:
-            notifyH(lang(30119), lang(30120),
-                    getImage('icon-error-256'))
+            notifyH(lang(30119), lang(30120), getImage('icon-error-256'))
         return True
 
     def gui_scan(self):
-        """Scanning directory specified in query parameter
-        """
-        query = self.get_parameter('query', unQuote=True)
-        executeBuiltin('XBMC.UpdateLibrary("music", "%s")' % (query))
+        '''Scanning directory specified in query parameter
+        '''
+        executeBuiltin('UpdateLibrary("music", "%s")' % (self.get_parameter(
+            'query', to='unquote')))

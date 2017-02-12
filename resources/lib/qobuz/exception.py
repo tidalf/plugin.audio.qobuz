@@ -3,28 +3,62 @@
     ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import pprint
-import traceback
 
 
-class QobuzXbmcError(Exception):
+class QobuzError(Exception):
+    pass
 
-    def __init__(self, **ka):
-        if not 'additional' in ka or ka['additional'] is None:
-            ka['additional'] = ''
-        if (not 'who' in ka) or (not 'what' in ka):
-            raise Exception(
-                'QobuzXbmcError', 'Missing constructor arguments (who|what)')
-        nl = "\n"
-        msg = "[QobuzXbmcError]" + nl
-        msg += " - who        : " + pprint.pformat(ka['who']) + nl
-        msg += " - what       : " + ka['what'] + nl
-        msg += " - additional : " + repr(ka['additional']) + nl
-#        msg += " - type       : " + self.exc_type + nl
-#        msg += " - value      : " + self.exc_value + nl
-        msg += " - Stack      : " + nl
-        print msg
-        print traceback.print_exc(10)
+
+class InvalidParameter(QobuzError):
+    pass
+
+
+class MissingParameter(QobuzError):
+    pass
+
+
+class MissingArgument(QobuzError):
+    pass
+
+
+class InvalidFlag(QobuzError):
+    pass
+
+
+class InvalidKind(QobuzError):
+    pass
+
+
+class InvalidNodeType(QobuzError):
+    pass
+
+
+class InvalidLogin(QobuzError):
+    pass
+
+
+class UnknownMode(QobuzError):
+    pass
+
+
+class InvalidSearchType(QobuzError):
+    pass
+
+
+class InvalidDebugPath(QobuzError):
+    pass
+
+
+class DirectoryNotWritable(QobuzError):
+    pass
+
+
+class NodeHasNoData(QobuzError):
+    pass
+
+
+class NodeHasNoCountMethod(QobuzError):
+    pass

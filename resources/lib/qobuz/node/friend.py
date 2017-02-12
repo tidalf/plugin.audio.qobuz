@@ -3,36 +3,32 @@
     ~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import json
 from qobuz.node.inode import INode
-from qobuz.debug import warn
-from qobuz.gui.util import color, getImage, runPlugin, containerRefresh, \
-    containerUpdate, notifyH, executeBuiltin, getSetting, lang
+from qobuz import debug
+from qobuz.gui.util import getImage, runPlugin, containerRefresh, \
+    containerUpdate, notifyH, executeBuiltin, lang
 from qobuz.api import api
+from qobuz.api.user import current as user
 from qobuz.cache import cache
-
 from qobuz.node import Flag, getNode
+from qobuz.theme import theme, color
 
 
 class Node_friend(INode):
-    """@class Node_friend:
-    """
-
-    def __init__(self, parent=None, parameters=None):
-        super(Node_friend, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_friend, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.FRIEND
         self.image = getImage('artist')
         self.set_name(self.get_parameter('query'))
-        self.set_label(self.name)
-        self.url = None
-        self.is_folder = True
+        self.content_type = 'files'
 
     def set_label(self, label):
-        colorItem = getSetting('color_item')
-        self.label = color(colorItem, label)
+        self.label = color(theme.get('item/default/color'), label)
 
     def set_name(self, name):
         self.name = name or ''
@@ -47,9 +43,8 @@ class Node_friend(INode):
     def gui_create(self):
         name = self.get_parameter('query')
         if not name:
-            from gui.util import Keyboard
-            kb = Keyboard('',
-                          str(lang(30181)))
+            from qobuz.gui.util import Keyboard
+            kb = Keyboard('', str(lang(30181)))
             kb.doModal()
             name = ''
             if not kb.isConfirmed():
@@ -64,17 +59,19 @@ class Node_friend(INode):
         return True
 
     def create(self, name=None):
-        username = api.username
-        password = api.password
-        friendpl = api.get('/playlist/getUserPlaylists', username=name)
+        friendpl = api.get('/playlist/getUserPlaylists',
+                           username=name,
+                           type='last-created')
         if not friendpl:
             return False
-        user = api.get('/user/login', username=username, password=password)
-        if user['user']['login'] == name:
+        data = api.get('/user/login',
+                       username=user.username,
+                       password=user.password)
+        if not data:
             return False
-        if not user:
+        if data['user']['login'] == name:
             return False
-        friends = user['user']['player_settings']
+        friends = data['user']['player_settings']
         if not 'friends' in friends:
             friends = []
         else:
@@ -85,12 +82,13 @@ class Node_friend(INode):
         newdata = {'friends': friends}
         if not api.user_update(player_settings=json.dumps(newdata)):
             return False
+        self.delete_cache()
         executeBuiltin(containerRefresh())
         return True
 
     def delete_cache(self):
-        key = cache.make_key('/user/login', username=api.username,
-                             password=api.password)
+        key = cache.make_key(
+            '/user/login', username=user.username, password=user.password)
         cache.delete(key)
 
     def remove(self):
@@ -104,21 +102,20 @@ class Node_friend(INode):
             return False
         friends = user['player_settings']
         if not 'friends' in friends:
-            notifyH('Qobuz', "You don't have friend",
-                    'icon-error-256')
-            warn(self, "No friends in user/player_settings")
+            notifyH('Qobuz', 'You don\'t have friend', 'icon-error-256')
+            debug.warn(self, 'No friends in user/player_settings')
             return False
         friends = friends['friends']
         if not name in friends:
-            notifyH('Qobuz', "You're not friend with %s" % (name),
+            notifyH('Qobuz', 'You\'re not friend with %s' % (name),
                     'icon-error-256')
-            warn(self, "Friend " + repr(name) + " not in friends data")
+            debug.warn(self, 'Friend ' + repr(name) + ' not in friends data')
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
         if not api.user_update(player_settings=json.dumps(newdata)):
             notifyH('Qobuz', 'Friend %s added' % (name))
-            notifyH('Qobuz', "Cannot updata friend's list...",
+            notifyH('Qobuz', 'Cannot updata friend\'s list...',
                     'icon-error-256')
             return False
         notifyH('Qobuz', 'Friend %s removed' % (name))
@@ -126,28 +123,32 @@ class Node_friend(INode):
         executeBuiltin(containerRefresh())
         return True
 
+    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+        node = getNode(Flag.FRIEND)
+        node.create('qobuz.com')
+        return api.get('/playlist/getUserPlaylists',
+                       type='last-created',
+                       username=self.name)
+
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        data = api.get('/playlist/getUserPlaylists', username=self.name)
-        if not data:
-            warn(self, "No friend data")
-            return False
+        result = False
         if lvl != -1:
-            self.add_child(getNode(Flag.FRIENDS, self.parameters))
-        for pl in data['playlists']['items']:
-            node = getNode(Flag.PLAYLIST)
-            node.data = pl
+            self.add_child(getNode(Flag.FRIENDS, parameters=self.parameters))
+        for playlist in self.data['playlists']['items']:
+            node = getNode(Flag.PLAYLIST, data=playlist)
             if node.get_owner() == self.label:
                 self.nid = node.get_owner_id()
             self.add_child(node)
-        return True
+            result = True
+        return result
 
     def attach_context_menu(self, item, menu):
-        colorWarn = getSetting('item_caution_color')
+        colorWarn = theme.get('item/caution/color')
         url = self.make_url()
         menu.add(path='friend', label=self.name, cmd=containerUpdate(url))
-        cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm="remove"))
-        menu.add(path='friend/remove', label='Remove', cmd=cmd,
+        cmd = runPlugin(self.make_url(nt=Flag.FRIEND, nm='remove'))
+        menu.add(path='friend/remove',
+                 label='Remove',
+                 cmd=cmd,
                  color=colorWarn)
-
-        ''' Calling base class '''
         super(Node_friend, self).attach_context_menu(item, menu)

@@ -3,16 +3,15 @@
     ~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmc  # @UnresolvedImport
-import xbmcgui  # @UnresolvedImport
+import xbmc
+import xbmcgui
 
-import qobuz  # @UnresolvedImport
-from qobuz.debug import warn
+import qobuz
+from qobuz import debug
 from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
-from qobuz.gui.util import getSetting
 from qobuz.node import Flag, getNode
 from qobuz import config
 
@@ -24,7 +23,7 @@ def notify_restriction(track):
     for restriction in track.get_restrictions():
         restrictions += '%s\n' % restriction
     if restrictions != '':
-        notify_warn("Restriction", restrictions)
+        notify_warn("Restriction", restrictions, mstime=5000)
 
 
 class QobuzPlayer(xbmc.Player):
@@ -44,43 +43,42 @@ class QobuzPlayer(xbmc.Player):
         """Playing track given a track id
         """
         track = getNode(Flag.TRACK, {'nid': track_id})
-        if not track.fetch(None, 1, Flag.TRACK, Flag.NONE):
-            warn(self, "Cannot get track data")
+        data = track.fetch(None, 1, Flag.TRACK, Flag.NONE)
+        if data is None:
+            debug.warn(self, "Cannot get track data")
             return False
+        track.data = data
         if not track.is_playable():
-            warn(self, "Cannot get streaming URL")
+            debug.warn(self, "Cannot get streaming URL")
             return False
         if 'purchased' in params:
-            track.parameters['purchased']= True
+            track.parameters['purchased'] = True
         item = track.makeListItem()
         track.item_add_playing_property(item)
         """Some tracks are not authorized for stream and a 60s sample is
         returned, in that case we overwrite the song duration
         """
         if track.is_sample():
-            item.setInfo(
-                'music', infoLabels={
-                    'duration': 60,
-                })
+            item.setInfo('Music', infoLabels={'duration': 60, })
             """Don't warn for free account (all songs except purchases are 60s
             limited)
             """
             if not isFreeAccount():
-                notify_warn("Qobuz", "Sample returned")
+                notify_warn("Qobuz / Free Account", "Sample returned")
+            if track.is_uncredentialed():
+                notify_warn("Qobuz / Uncredentialed", "Sample returned")
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id)
         """Notify
         """
-        if getSetting('notification_playingsong', asBool=True):
+        if config.app.registry.get('notification_playingsong', to='bool'):
             notify_restriction(track)
             notifyH(lang(30132), track.get_label(), image=track.get_image())
-
         """We are called from playlist...
         """
         if config.app.handle == -1:
-            super(QobuzPlayer, self).play(track.get_streaming_url(),
-                                          item, False)
+            super(QobuzPlayer, self).play(track.get_streaming_url(), item,
+                                          False)
         else:
-            setResolvedUrl(handle=config.app.handle,
-                           succeeded=True,
-                           listitem=item)
+            setResolvedUrl(
+                handle=config.app.handle, succeeded=True, listitem=item)
         return True

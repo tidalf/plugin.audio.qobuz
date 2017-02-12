@@ -3,20 +3,23 @@
     ~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcplugin  # @UnresolvedImport
-import xbmcgui  # @UnresolvedImport
+import xbmcplugin
+import xbmcgui
 
-from qobuz.gui.progress import Progress
+from qobuz.gui.bg_progress import Progress
 import time
 from qobuz.gui.util import lang
-from qobuz.exception import QobuzXbmcError as Qerror
+from qobuz import exception
+from qobuz import debug
+from qobuz import config
+from qobuz.node import Flag
 
 
-class Directory():
-    """This class permit to add item to Xbmc directory or store nodes
+class Directory(object):
+    '''This class permit to add item to Xbmc directory or store nodes
         that we retrieve while building our tree
 
         Parameters:
@@ -30,178 +33,95 @@ class Directory():
             asList: Don't put item to Xbmc Directory
             replaceItem: When attaching context menu to item, control if
                 we are replacing Xbmc Default menu
-    """
+    '''
 
-    def __init__(self, root, nodeList=[], **ka):
-        self.nodes = []
-        self.label = "Qobuz Progress / "
+    def __init__(self,
+                 root=None,
+                 nodes=[],
+                 handle=None,
+                 asList=False,
+                 asLocalUrl=False,
+                 showProgress=False):
+        self.nodes = nodes
+        self.label = '...'
+        if root is not None:
+            self.label = '%s' % root.get_label()
         self.root = root
-        self.asList = False
-        self.handle = None
+        self.asList = asList
+        self.handle = handle
         self.put_item_ok = True
-        withProgress = True
-        if 'withProgress' in ka:
-            if ka['withProgress']:
-                withProgress = True
-            else:
-                withProgress = False
-        self.Progress = Progress(withProgress)
         self.total_put = 0
         self.started_on = time.time()
-        self.Progress.create(self.label + root.get_label())
-        self.update({'count': 0, 'total': 100}, lang(30169))
-        self.line1 = ''
-        self.line2 = ''
-        self.line3 = ''
-        self.percent = 0
         self.content_type = 'files'
-        self.nodes = nodeList
         self.replaceItems = False
-        self.asLocalURL = False
+        self.asLocalUrl = asLocalUrl
+        self.filter_double = Flag.TRACK
+        self.seen_nodes = {}
+        self.progress = Progress(
+            heading='Qobuz', message=self.label, enable=showProgress)
 
-    def __del__(self):
-        """Cleaning our tree on delete
-            @attention: may be useless
-        """
-        try:
-            for node in self.nodes:
-                node.delete_tree()
-            self.nodes = None
-            self.root.delete_tree()
-            self.root = None
-        except:
-            print "Something went wrong while deleting tree"
+    def __enter__(self, *a, **ka):
+        return self
 
     def elapsed(self):
-        """Return elapsed time since directory has been created
-        """
         return time.time() - self.started_on
 
     def add_node(self, node):
-        """Adding node to node list if asList=True or putting item
-        into Xbmc directory
-        * @attention: broken, Raise exception if user has canceled progress
-        """
-        if self.Progress.iscanceled():
-            raise Qerror(who=self, what="build_down_canceled")
-            return False
-        if self.asList:
+        if self.filter_double is not None:
+            if self.filter_double & node.nt == node.nt:
+                if node.nid in self.seen_nodes:
+                    self.progress.update(message='Skip node type: {}'.format(
+                        Flag.to_s(node.nt)))
+                    return True
+                self.seen_nodes[node.nid] = 1
+        self.progress.update(message=node.get_label().encode(
+            'ascii', errors='replace'))
+        if self.asList is True:
             self.nodes.append(node)
             self.total_put += 1
             return True
         return self.__add_node(node)
 
     def __add_node(self, node):
-        """Helper: Add node to xbmc.Directory
-            Parameter:
-            node: node, node to add
-        """
-        if self.is_canceled():
-            return False
         item = node.makeListItem(replaceItems=self.replaceItems)
-        if not item:
+        if item is None:
             return False
-        url = node.make_url(asLocalURL=self.asLocalURL)
-        if not self.add_to_xbmc_directory(url=url,
-                                          item=item,
-                                          is_folder=node.is_folder):
+        url = node.make_url(asLocalUrl=self.asLocalUrl)
+        if not self.add_to_xbmc_directory(
+                url=url, item=item, is_folder=node.is_folder):
             self.put_item_ok = False
             return False
         return True
 
-    def update(self, gData, line1='', line2='', line3=''):
-        """Update progress bar associated with this directory
-
-            Parameters:
-            gData: Dictionary object that keep information across call
-            line1: progress line 1
-            line2: progress line 2
-            line3: progress line 3
-        """
-        percent = 100
-        total = gData['total']
-        count = gData['count']
-        if total and count:
-            percent = count * (1 + 100 / total)
-        else:
-            percent = count
-            if percent > 100:
-                percent = 100
-        labstat = '[%05i]' % (self.total_put)
-        self.line1 = labstat
-        self.line2 = line2
-        self.line3 = line3
-        self.percent = percent
-        line1 = "[%05i] %s" % (self.total_put, line1)
-        self.Progress.update(percent, line1, line2, line3)
-        return True
-
-    def is_canceled(self):
-        """Return is_canceled value from our progress dialog
-        """
-        return self.Progress.iscanceled()
-
-    def _xbmc_item(self, **ka):
-        """Make xbmc item
-            Named parameters:
-                label: string, label for this item
-                image: string, image for this item
-                url  : string, url for this item
-        """
-        return xbmcgui.ListItem(
-            ka['label'],
-            ka['label'],
-            ka['image'],
-            ka['image'],
-            ka['url'])
-
-    def add_to_xbmc_directory(self, **ka):
-        """Add item to Xbmc Directory
-            Named parameters:
-                url: string
-                item: xbmc.ListItem
-                is_folder: bool
-        """
-        if not xbmcplugin.addDirectoryItem(self.handle,
-                                           ka['url'],
-                                           ka['item'],
-                                           ka['is_folder'],
+    def add_to_xbmc_directory(self, is_folder=False, item=None, url=None,
+                              **ka):
+        if not xbmcplugin.addDirectoryItem(self.handle, url, item, is_folder,
                                            self.total_put):
             return False
         self.total_put += 1
         return True
 
-    def close(self):
-        """Close our directory
-            * close progress dialog ...
-        """
-        if self.Progress:
-            self.Progress.close()
-            self.Progress = None
-
     def end_of_directory(self, forceStatus=None):
-        """This will tell xbmc that our plugin has finished, and that
-        he can display our items
-        """
+        if self.seen_nodes:
+            self.seen_nodes = {}
         success = True
         if forceStatus != None:
             success = forceStatus
-        if not self.put_item_ok or (self.total_put == 0):
+        if not self.put_item_ok or self.total_put == 0:
             success = False
         if not self.asList:
             xbmcplugin.setContent(
+                handle=self.handle, content=self.content_type)
+            xbmcplugin.endOfDirectory(
                 handle=self.handle,
-                content=self.content_type)
-            xbmcplugin.endOfDirectory(handle=self.handle,
-                                      succeeded=success,
-                                      updateListing=False,
-                                      cacheToDisc=success)
-        self.update({'count': 100, 'total': 100}, lang(30172),
-                    "%s : %s items" % (lang(30171), str(self.total_put)))
-        self.close()
+                succeeded=success,
+                updateListing=False,
+                cacheToDisc=success)
         return self.total_put
 
+    def __exit__(self, *a, **ka):
+        self.progress.update(percent=100, message='finished')
+        self.progress.close()
+
     def set_content(self, content):
-        """Set Xbmc directory content
-        """
         self.content_type = content

@@ -5,13 +5,13 @@
     Class that implement caching to disk
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 try:
-    """cPickle is a faster implementation of pickle, we are using it if
+    '''cPickle is a faster implementation of pickle, we are using it if
     present
-    """
+    '''
     import cPickle as pickle
 except ImportError:
     import pickle
@@ -20,10 +20,10 @@ import os
 from qobuz.cache.base_cache import BaseCache
 from qobuz.util.file import RenamedTemporaryFile, unlink
 from qobuz.util.hash import hashit
+from qobuz import debug
 
 
 class FileCache(BaseCache):
-
     def __init__(self):
         self.base_path = None
         self.ventile = False
@@ -39,10 +39,7 @@ class FileCache(BaseCache):
         return hashit(argstr)
 
     def _make_path(self, key):
-        xpath = []
-        xpath.append(self.base_path)
-        fileName = key + '.dat'
-        return os.path.join(os.path.join(*xpath), fileName)
+        return os.path.join(self.base_path, '%s.dat' % key)
 
     def sync(self, key, data):
         filename = self._make_path(key)
@@ -53,6 +50,7 @@ class FileCache(BaseCache):
                 fo.flush()
                 os.fsync(fo)
         except Exception as e:
+            unlink(filename)
             print "Error: writing failed %s\nMessage %s" % (filename, e)
             return False
         return True
@@ -61,7 +59,7 @@ class FileCache(BaseCache):
         path = os.path.join(self.base_path, filename)
         if not os.path.exists(path):
             return None
-        with open(filename, 'rb') as f:
+        with open(path, 'rb') as f:
             return pickle.load(f)
         return None
 
@@ -71,6 +69,5 @@ class FileCache(BaseCache):
     def delete(self, key, *a, **ka):
         filename = self._make_path(key)
         if not os.path.exists(filename):
-            print "Cache file doesn't exist %s" % (filename)
             return False
         return unlink(filename)

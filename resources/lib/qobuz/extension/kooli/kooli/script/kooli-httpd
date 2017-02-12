@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+'''
+    qobuz.extension.kooli.script.kooli-httpd
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :part_of: xbmc-qobuz
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
+    :license: GPLv3, see LICENSE for more details.
+'''
+import sys
+import os
+from os import path as P
+base_path = P.abspath(P.dirname(__file__))
+import requests
+
+try:
+    import kooli
+except ImportError:
+    sys.path.append(P.abspath(P.join(base_path, P.pardir, P.pardir)))
+
+from kooli.application import app
+
+if __name__ == '__main__':
+    try:
+        app.run(port=33574)
+    except KeyboardInterrupt:
+        pass
+    print('Bye!')

@@ -8,15 +8,16 @@
     positional and named parameter
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from time import time
+from qobuz import debug
 __seed__ = __name__ + '0.0.1'
 __magic__ = 0
 pos = 0
 for i in [ord(c) for c in __seed__[:]]:
-    __magic__ += i * 2 ** pos
+    __magic__ += i * 2**pos
     pos += 1
 BadMagic = 1 << 1
 BadKey = 1 << 2
@@ -40,6 +41,10 @@ class BaseCache(object):
         self.cached_function_name = f.__name__
 
         def wrapped_function(self, *a, **ka):
+            noRemote = False
+            if 'noRemote' in ka:
+                noRemote = bool(ka['noRemote'])
+                del ka['noRemote']
             that.error = 0
             key = that.make_key(*a, **ka)
             data = that.load(key, *a, **ka)
@@ -52,8 +57,10 @@ class BaseCache(object):
                     return data['data']
                 if not that.delete(key):
                     that.error = DeleteError
+            if noRemote:
+                return None
             data = f(self, *a, **ka)
-            if data is None:
+            if data is None or not data:
                 that.error &= NoData
                 return None
             for black_key in that.black_keys:
@@ -70,7 +77,9 @@ class BaseCache(object):
             }
             if not that.sync(key, entry):
                 that.error &= StoreError
+                return None
             return data
+
         return wrapped_function
 
     def is_fresh(self, key, data, *a, **ka):

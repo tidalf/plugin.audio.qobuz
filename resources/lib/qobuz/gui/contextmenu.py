@@ -3,26 +3,21 @@
     ~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.exception import QobuzXbmcError as Qerror
-from qobuz.gui.util import color, getSetting
+from qobuz import exception
+from qobuz.theme import theme, color
+from qobuz import config
 
 
-class contextMenu():
-    """Creating context menu:
-        add(path='test', cmd='foo' ...)
-        add(path='test/test_one', cmd='bar', ...)
-        ...
-    """
-
+class contextMenu(object):
     def __init__(self):
         self.data = {}
         self.defaultSection = 'qobuz'
-        self.color_default = getSetting('item_default_color')
-        self.color_section = getSetting('item_section_color')
-        formatStr = getSetting('item_section_format')
+        self.color_default = theme.get('item/default/color')
+        self.color_section = theme.get('item/section/color')
+        formatStr = config.app.registry.get('item_section_format')
         try:
             test = formatStr % ('plop')
         except:
@@ -51,8 +46,7 @@ class contextMenu():
         """
         for key in ['label', 'cmd']:
             if not key in ka:
-                raise Qerror(who=self,
-                             what='missing_parameter', additional=key)
+                raise exception.MissingParameter(key)
         section, path = self.get_section_path(**ka)
         root = self.data
         pos = 0
@@ -78,10 +72,12 @@ class contextMenu():
             root[section]['pos'] = pos
             root[section]['color'] = color
         else:
-            item = {'label': ka['label'],
-                    'cmd': cmd,
-                    'pos': pos,
-                    'color': color}
+            item = {
+                'label': ka['label'],
+                'cmd': cmd,
+                'pos': pos,
+                'color': color
+            }
             root[section]['childs'].append(item)
         return root
 
@@ -93,6 +89,7 @@ class contextMenu():
 
         def itemSort(item):
             return item['pos']
+
         for section in sorted(self.data, key=sectionSort):
             colorItem = self.color_section
             data = self.data[section]

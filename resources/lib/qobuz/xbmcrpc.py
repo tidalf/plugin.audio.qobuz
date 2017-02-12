@@ -3,18 +3,18 @@
     ~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import json
-try:
-    import xbmc  # @UnresolvedImport
-except:
-    print "Outsided xbmc"
-
-from qobuz.exception import QobuzXbmcError
 import pprint
-from qobuz.debug import log
+try:
+    import xbmc
+except ImportError as e:
+    print "ImportError(Outside XBMC): %s" % e
+
+from qobuz import exception
+from qobuz import debug
 
 
 def showNotification(**ka):
@@ -59,7 +59,6 @@ class JsonRequest:
 
 
 class JsonResponse:
-
     def __init__(self, raw_data):
         self.raw_data = None
         self.id = None
@@ -99,8 +98,7 @@ class XbmcRPC:
 
     def send(self, request):
         if not request:
-            raise QobuzXbmcError(
-                who=self, what='missing_parameter', additional='request')
+            raise exception.MissingParameter('equest')
         return JsonResponse(xbmc.executeJSONRPC(request.to_json()))
 
     def ping(self):
@@ -129,33 +127,18 @@ class XbmcRPC:
     def getSongDetails(self, sid):
         request = JsonRequest('AudioLibrary.GetSongDetails')
         request.id = 1
-        request.add_parameters({'songid': int(sid),
-                                "properties": ["title",
-                                               "artist",
-                                               "albumartist",
-                                               "genre",
-                                               "year",
-                                               "rating",
-                                               "album",
-                                               "track",
-                                               "duration",
-                                               "comment",
-                                               "lyrics",
-                                               "musicbrainztrackid",
-                                               "musicbrainzartistid",
-                                               "musicbrainzalbumid",
-                                               "musicbrainzalbumartistid",
-                                               "playcount",
-                                               "fanart",
-                                               "thumbnail",
-                                               "file",
-                                               "albumid",
-                                               "lastplayed",
-                                               "disc",
-                                               "genreid",
-                                               "artistid",
-                                               "displayartist",
-                                               "albumartistid"]})
+        request.add_parameters({
+            'songid': int(sid),
+            "properties": [
+                "title", "artist", "albumartist", "genre", "year", "rating",
+                "album", "track", "duration", "comment", "lyrics",
+                "musicbrainztrackid", "musicbrainzartistid",
+                "musicbrainzalbumid", "musicbrainzalbumartistid", "playcount",
+                "fanart", "thumbnail", "file", "albumid", "lastplayed", "disc",
+                "genreid", "artistid", "displayartist", "albumartistid"
+            ]
+        })
         return self.send(request)
+
 
 rpc = XbmcRPC()

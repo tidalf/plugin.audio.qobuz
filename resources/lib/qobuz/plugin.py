@@ -1,18 +1,18 @@
 '''
     qobuz.plugin
-    ~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcaddon  # @UnresolvedImport
-import xbmc  # @UnresolvedImport
 import os
 import sys
+import xbmcaddon
+import xbmc
+
 
 class Plugin(object):
-
     def __init__(self, plugin_id):
         self.plugin_id = plugin_id
         self.addon = xbmcaddon.Addon(id=self.plugin_id)
@@ -27,8 +27,9 @@ class Plugin(object):
         return self.addon.getAddonInfo('path')
 
     def get_lib_path(self):
-        return xbmc.translatePath(os.path.join(self.get_addon_path(),
-                                               'resources', 'lib'))
+        return xbmc.translatePath(
+            os.path.join(self.get_addon_path(), 'resources', 'lib'))
+
     def get_qobuz_path(self):
         return xbmc.translatePath(os.path.join(self.get_lib_path(), 'qobuz'))
 

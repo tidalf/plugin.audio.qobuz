@@ -3,22 +3,30 @@
     ~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
 import re
 import tempfile
 
-from qobuz.debug import warn
+from qobuz import debug
 
 
 def unlink(filename):
     if not os.path.exists(filename):
         return False
     tmpfile = tempfile.mktemp('.dat', 'invalid-', os.path.dirname(filename))
-    os.rename(filename, tmpfile)
-    return os.unlink(tmpfile)
+    try:
+        os.rename(filename, tmpfile)
+        return os.unlink(tmpfile)
+    except Exception as e:
+        debug.error(
+            __name__,
+            'Unlinking fails: {filename}, error: {error}',
+            filename=filename,
+            error=e)
+    return False
 
 
 class RenamedTemporaryFile(object):
@@ -38,8 +46,8 @@ class RenamedTemporaryFile(object):
         if tmpfile_dir is None:
             tmpfile_dir = os.path.dirname(final_path)
 
-        self.tmpfile = tempfile.NamedTemporaryFile(dir=tmpfile_dir,
-                                                   delete=False, **kwargs)
+        self.tmpfile = tempfile.NamedTemporaryFile(
+            dir=tmpfile_dir, delete=False, **kwargs)
         self.final_path = final_path
 
     def __getattr__(self, attr):
@@ -75,8 +83,8 @@ def find(directory, pattern, callback=None, gData=None):
                         if not callback(path, gData):
                             return None
                     except Exception as e:
-                        warn('[find]', 'Callback raise exception: '
-                             '' + repr(e))
+                        debug.warn('[find]', 'Callback raise exception: '
+                                   '' + repr(e))
                         return None
                 flist.append(path)
     return flist

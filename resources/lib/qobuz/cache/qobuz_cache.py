@@ -7,15 +7,14 @@
     the same key return data from memory.
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.cache.file_cache import FileCache
-from qobuz.gui.util import getSetting
+from qobuz import config
 
 
 class QobuzCache(FileCache):
-
     def __init__(self, *a, **ka):
         self.store = {}
         self.black_keys = ['password']
@@ -35,5 +34,6 @@ class QobuzCache(FileCache):
             if a[0] == '/track/getFileUrl':
                 return 60 * 15
         if 'user_id' in ka:
-            return getSetting('cache_duration_middle', asInt=True) * 60
-        return getSetting('cache_duration_long', asInt=True) * 60
+            return config.app.registry.get('cache_duration_middle',
+                                           to='int') * 60
+        return config.app.registry.get('cache_duration_long', to='int') * 60

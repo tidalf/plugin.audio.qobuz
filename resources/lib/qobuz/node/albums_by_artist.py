@@ -3,36 +3,34 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui  # @UnresolvedImport
+import xbmcgui
 from qobuz.node.inode import INode
-from qobuz.debug import warn
+from qobuz import debug
 import weakref
 from qobuz.api import api
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import getSetting
 from qobuz.node import getNode, Flag
 
 
 class Node_albums_by_artist(INode):
-    """@class Node_product_by_artist:
-    """
+    '''@class Node_product_by_artist:
+    '''
 
-    def __init__(self, parent=None, parameters=None):
-        super(Node_albums_by_artist, self).__init__(parent, parameters)
+    def __init__(self, parent=None, parameters={}, data=None):
+        super(Node_albums_by_artist, self).__init__(
+            parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ALBUMS_BY_ARTIST
         self.content_type = 'albums'
+        self._items_path = 'albums/items'
 
-    def get_label(self):
+    def get_label(self, default=None):
         return self.get_artist()
 
     def get_image(self):
         image = self.get_property('picture')
-        # get max size image from lastfm
-        # Qobuz default is a crappy 126p large one
-        # perhaps we need a setting for low bw users
         image = image.replace('126s', '_')
         return image
 
@@ -45,41 +43,37 @@ class Node_albums_by_artist(INode):
     def get_artist_id(self):
         return self.nid
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
-        data = api.get('/artist/getSimilarArtist', artist_id=self.nid,
-                       limit=limit, offset=self.offset, extra='albums')
-        if not data:
-            warn(self, "Cannot fetch albums for artist: " + self.get_label())
-            return False
-        self.data = data
-        return True
+    def _count(self):
+        return len(self.get_property(self._items_path, default=[]))
+
+    def fetch(self, *a, **ka):
+        return api.get('/artist/get',
+                       artist_id=self.nid,
+                       limit=self.limit,
+                       offset=self.offset,
+                       extra='albums')
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
-        count = 0
-        total = len(self.data['albums']['items'])
-        for album in self.data['albums']['items']:
-            keys = ['artist', 'interpreter', 'composer', 'performer']
-            for k in keys:
+        if self.count() == 0:
+            return False
+        for album in self.get_property(self._items_path):
+            for k in ['artist', 'interpreter', 'composer', 'performer']:
                 try:
                     if k in self.data['artist']:
                         album[k] = weakref.proxy(self.data['artist'][k])
                 except:
-                    warn(self, "Strange thing happen")
+                    debug.warn(self, "Strange thing happen")
                     pass
-            node = getNode(Flag.ALBUM, data=album)
-            count += 1
-            Dir.update(count, total, "Add album:" + node.get_label(), '')
-            self.add_child(node)
+            self.add_child(getNode(Flag.ALBUM, data=album))
         return True
 
     def makeListItem(self, replaceItems=False):
-        item = xbmcgui.ListItem(self.get_label(),
-                                self.get_label(),
-                                self.get_image(),
-                                self.get_image(),
-                                self.make_url(),
-                                )
+        item = xbmcgui.ListItem(
+            self.get_label(),
+            self.get_label(),
+            self.get_image(),
+            self.get_image(),
+            self.make_url(), )
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)

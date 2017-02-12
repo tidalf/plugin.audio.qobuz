@@ -17,12 +17,11 @@
 			default="" />
 		<setting type="sep" />
 		<setting id="streamtype" label="30124" type="labelenum"
-			values="flac|mp3" default="flac" />
-		<setting id="hires_enabled" label="30193" type="bool" default="false" />
+			values="flac|mp3|hires" default="flac" />
+		<!--<setting id="hires_enabled" label="30193" type="bool" default="false" />-->
 		<setting type="sep"/>
 		<setting id="pagination_limit" type="labelenum" label="30155"
 			default="100" values="6|12|25|50|100|500|1000|5000|10000" />
-
 	</category>
 
 	<!-- Options -->
@@ -33,29 +32,43 @@
 		<setting id="cache_duration_middle" type="labelenum" label="30111"
 			default="770" values="0|5|10|30|60|770|1440|10080" />
 		<setting type="sep" />
-		<setting id="image_default_size" type="labelenum"
-		    label="Image default size"
+		<setting id="image_default_size" type="labelenum" label="Image default size (i8n)"
             default="large" values="thumbnail|small|large|xlarge" />
-        <setting id="notification_playingsong" label="30142" type="bool"
-			default="false" />
+		<setting id="image_create_mosaic" type="bool" label="Create mosaic from album cover (i8n)"
+				            default="true" />
+		<setting id="show_experimental" type="bool" label="Show experimental (i8n)" default="false" />
 	</category>
-
+	<category label="Library (beta)">
+				<setting id="enable_scan_feature" label="30154" type="bool" default="true" />
+				<setting id="scan_by_album" label="Scan by album (i8n)" type="bool" default="true" />
+				<setting id="httpd_port" label="port" type="number" default="33574" />
+				<setting id="httpd_host" label="host" type="text" default="127.0.0.1" />
+	</category>
 	<!-- Other -->
 	<category label="30152">
-		<setting id="enable_scan_feature" label="30154" type="bool" default="true" />
-		<!-- <setting id="resolver_enabled" label="33000" type="bool" default="true"/> -->
-		<setting id="debug" label="debug (xbmc.log, activated via system menu)" type="bool" default="false" />
-		<setting id="contextmenu_replaceitems" label="Only qobuz context menu" type="bool" default="false" />
-		<!-- <setting id="userplaylists_display_cover" label="(i8n) Playlist - show cover" type="bool" default="true" /> -->
+		<setting id="debug" label="debug (xbmc.log, activated via system menu) (i8n)" type="bool" default="false" />
+		<setting id="contextmenu_replaceitems" label="Only qobuz context menu (i8n)" type="bool" default="true" />
 		<setting id="show_recommendations" type="bool" default="true" label="30153" option="" />
 		<setting id="search_enabled" label="30135" type="bool" default="true" />
-    <setting id="item_default_color" label="30128" type="text" default="FFDB7656" />
-    <setting id="item_section_color" label="30130" type="text" default="FF56BBDB" />
-    <setting id="item_section_format" label="30131" type="text" default=".o[ %s ]o." />
-		<setting id="playlist_current_format" label="30195" type="text" default="> %s <" />
-    <setting id="item_caution_color" label="30129" type="text" default="FFDBB956" />
+		<setting id="display_artist_without_album" label="Display artist without album (i8n)" type="bool" default="false" />
 	</category>
-	<setting id="warn_free_account" type="bool" default="true"
-		option="hidden" />
-
+	<category label="Theme">
+		<setting id="colorize_items" label="Colorize items (i8n)" type="bool" default="true" />
+		<setting id="item_default_color" label="30128" type="text" default="FFDB7656" />
+		<setting id="item_section_color" label="30130" type="text" default="FF56BBDB" />
+		<setting id="item_public_color" label="item public color (i8n)" type="text" default="5500FF00" />
+		<setting id="item_private_color" label="item private color (i8n)" type="text" default="55FF0000" />
+		<setting id="item_selected_color" label="item selected color (i8n)" type="text" default="AAFFAA00" />
+		<setting id="item_caution_color" label="30129" type="text" default="FFDBB956" />
+		<setting id="item_section_format" label="30131" type="text" default=".o[ %s ]o." />
+		<setting id="menu_playlist_color" label="Menu playlist color" type="text" default="FFDD0677" />
+		<setting id="menu_favorite_color" label="Menu favorite color" type="text" default="FFA00677" />
+		<setting id="playlist_current_format" label="30195" type="text" default="[ %s ]" />
+	</category>
+	<category label="Notification">
+		<setting id="notification_playingsong" label="30142" type="bool" default="false" />
+		<setting id="warn_free_account" label="Warn free account (i8n)" type="bool" default="false" />
+		<setting id="notify_library_scan_progress" label="Library scan progress (i8n)" type="bool" default="false" />
+		<setting id="notify_api_error" label="Qobuz/API error (i8n)" type="bool" default="false" />
+	</category>
 </settings>

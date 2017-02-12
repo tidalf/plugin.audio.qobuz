@@ -6,11 +6,16 @@
     cached (see qobuz.cache.qobuz)
 
     :part_of: xbmc-qobuz
-    :copyright: (c) 2012 by Joachim Basmaison, Cyril Leclerc
+    :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.cache import cache
 from qobuz.api.raw import RawApi
+from qobuz import debug
+from qobuz.gui.util import notify_error, notify_warn
+from qobuz.api.user import current as current_user
+from qobuz.util import common
+from qobuz import config
 
 
 class InvalidQuery(Exception):
@@ -18,14 +23,14 @@ class InvalidQuery(Exception):
 
 
 class EasyApi(RawApi):
-
     def __init__(self):
         self.cache_base_path = None
         super(EasyApi, self).__init__()
-        self.is_logged = False
-        """Setting default stream format to mp3
-        """
-        self.stream_format = 5
+
+    def get_notify(self):
+        return config.app.registry.get('notify_api_error', to='bool')
+
+    notify = property(get_notify)
 
     @cache.cached
     def get(self, *a, **ka):
@@ -37,7 +42,7 @@ class EasyApi(RawApi):
         ::example
         from qobuz.api import api
         from qobuz.cache import cache
-        cace.base_path = '/srv/qobuz/cache/'
+        cache.base_path = '/srv/qobuz/cache/'
         data = api.get('/artist/get')
         data = api.get('/user/login',
                         username=api.username,
@@ -74,7 +79,20 @@ class EasyApi(RawApi):
         """
         for label in self.__clean_ka(xpath[0], xpath[1], **ka):
             del ka[label]
-        return getattr(self, methname)(**ka)
+        response = getattr(self, methname)(**ka)
+        if self.status_code != 200:
+            debug.warn(
+                self,
+                'Method: {method}/{status_code}: {error}',
+                method=methname,
+                error=self.error,
+                status_code=self.status_code)
+            if self.notify:
+                notify_error(
+                    'API Error/{method} {status_code}'.format(
+                        method=methname, status_code=self.status_code),
+                    '{error}'.format(error=self.error))
+        return response
 
     def __clean_ka(self, endpoint, method, **ka):
         """We are removing some key that are not needed by our raw api but
@@ -96,12 +114,10 @@ class EasyApi(RawApi):
         ::return
             True on success, else False
         """
-        self.username = username
-        self.password = password
-        data = self.get('/user/login', username=username, password=password)
-        if not data:
+        if common.is_empty(username) and common.is_empty(password):
+            return True
+        current_user.set_credentials(username, password)
+        if not current_user.login(api=self):
+            debug.error(self, 'Cannot login with current credentials')
             return False
-        user = data['user']
-        self.set_user_data(user['id'], data['user_auth_token'])
-        self.is_logged = True
         return True
