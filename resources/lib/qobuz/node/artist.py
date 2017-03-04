@@ -96,11 +96,6 @@ class Node_artist(INode):
             'biography/content', default='', to='strip_html')
 
     def makeListItem(self, replaceItems=False):
-        debug.info(
-            self,
-            '{}',
-            self.get_description().encode(
-                'ascii', errors='ignore'))
         genre = self.get_genre()
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),
@@ -117,8 +112,6 @@ class Node_artist(INode):
                 'genre': genre,
                 'comment': self.get_description()
             })
-        #item.setProperty('artist_genre', genre)
-        #item.setProperty('artist_description', self.get_description())
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
