@@ -6,7 +6,7 @@ audio_format = {
     'mp3': (5, 'stream', 'MP3 320'),
     'flac': (6, 'stream', 'FLAC Lossless'),
     'hires': (7, 'stream', 'FLAC Hi-Res 24 bit =< 96kHz'),
-    'hires_hsr': (27, 'download', 'FLAC Hi-Res 24 bit >96 kHz & =< 192 kHz')
+    'hires_hsr': (27, 'stream', 'FLAC Hi-Res 24 bit >96 kHz & =< 192 kHz')
 }
 
 
@@ -60,10 +60,14 @@ class User(object):
             stream_type = config.app.registry.get('streamtype')
             if track is not None:
                 if stream_type == 'hires':
-                    if is_purchased(track):
-                        #if track.get_maximum_sampling_rate() > 96:
+                    # if is_purchased(track):
+                    if track.get_maximum_sampling_rate() > 96:
                         stream_type = 'hires_hsr'
+                    elif track.get_maximum_sampling_rate() > 45:
+                        stream_type = 'hires'
                     else:
+                        stream_type = 'flac'
+                else:
                         stream_type = 'flac'
         return audio_format[stream_type]
 
