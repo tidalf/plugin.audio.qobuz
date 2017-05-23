@@ -23,7 +23,7 @@ Configuration:
 - Just enter some valid Qobuz credentials using addon settings
 notes: 
 - you need Hifi subscription to stream flac files or premium subscription to play full mp3. 
-- create your Qobuz account there : http://www.qobuz.com/inscription (you can use the translate button for your language)
+- create your Qobuz account there : http://www.qobuz.com/kodi (you'll get 1 free month !) 
 
 This application uses the Qobuz API but is not certified by Qobuz.
 Any use of the API implies your full acceptance of the Qobuz General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
