@@ -63,7 +63,7 @@ class User(object):
                     # if is_purchased(track):
                     if track.get_maximum_sampling_rate() > 96:
                         stream_type = 'hires_hsr'
-                    elif track.get_maximum_sampling_rate() > 45:
+                    elif track.get_maximum_sampling_rate() > 45 or track.get_property('maximum_bit_depth') == 24:
                         stream_type = 'hires'
                     else:
                         stream_type = 'flac'
