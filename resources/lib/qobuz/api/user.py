@@ -55,22 +55,20 @@ class User(object):
         return True
 
     def stream_format(self, track=None):
-        stream_type = 'mp3'
-        if not self.is_free_account() :
-            stream_type = config.app.registry.get('streamtype')
-            if track is not None:
-                if stream_type == 'hires':
-                    if self.get_property('user/credential/parameters/hires_streaming') == True or (is_purchased(track) and self.get_property('user/credential/parameters/hires_purchases_streaming') == True):
-                        if track.get_maximum_sampling_rate() > 96:
-                            stream_type = 'hires_hsr'
-                        elif track.get_maximum_sampling_rate() > 45 or track.get_property('maximum_bit_depth') == 24:
-                            stream_type = 'hires'
-                        else:
-                            stream_type = 'flac'
-                    else: 
-                        stream_tye = 'flac'
-                else:
-                   stream_type = 'flac'
+        if self.is_free_account():
+            return audio_format['mp3']
+        stream_type = config.app.registry.get('streamtype')
+        if track is not None:
+            if stream_type == 'hires':
+                if self.get_property('user/credential/parameters/hires_streaming') == True or (is_purchased(track) and self.get_property('user/credential/parameters/hires_purchases_streaming') == True):
+                    if track.get_maximum_sampling_rate() > 96:
+                        stream_type = 'hires_hsr'
+                    elif track.get_maximum_sampling_rate() > 45 or track.get_property('maximum_bit_depth') == 24:
+                        stream_type = 'hires'
+                    else:
+                        stream_type = 'flac'
+                else: 
+                    stream_tye = 'flac'
         return audio_format[stream_type]
 
     def set_credentials(self, username, password):
