@@ -10,10 +10,10 @@ import re
 
 _allowed_keys = {
     'mode': r'^\d{1,10}$',  # Mode View/Scan/BigDir ...
-    'nid': r'^\d{1,14}$',  # Node id (node.nid)
+    'nid': r'^\w{1,14}$',  # Node id (node.nid)
     'nt': r'^\d{1,10}$',  # Node type (node.type)
     'qnt': r'^\d{1,20}$',  # Node type in query
-    'qid': r'^\d{1,14}$',  # Node id in query
+    'qid': r'^\w{1,14}$',  # Node id in query
     'purchased': r'^\d{1,10}$',
     'nm': r'^[\w\d_]+$',  # Method to be called on node
     'genre-type': r'^(\d+|null)$',  # Reco params
@@ -21,8 +21,8 @@ _allowed_keys = {
     'search-type': r'^(artists|tracks|albums|articles|all)$',
     'depth': r'^(-)?\d+$',
     'query': r'^.*$',
-    'track-id': r'^\d{1,10}$',
-    'parent-id': r'^\d{1,10}$',
+    'track-id': r'^\w{1,10}$',
+    'parent-id': r'^\w{1,10}$',
     'offset': r'^\d{1,10}$',
     'source': r'^(all|playlists|purchases|favorites)$',
 }
