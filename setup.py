@@ -1,5 +1,5 @@
 '''
-    settup.py
+    setup.py
     ~~~~~~~~~
 
     :part_of: xbmc-qobuz
@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="xbmc-qobuz",
-    version="1.2.1",
+    version="1.3.1",
     packages=find_packages(),
     scripts=[],
     install_requires=['requests'],
