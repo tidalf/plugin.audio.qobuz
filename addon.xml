@@ -44,6 +44,9 @@
 		<description lang="sv">Qobuz tillägg för Kodi&#10; Det ger &#10;»»»åtkomst till Qobuz musikströmningstjänst.&#10;»»»Du måste ange ditt Qobuz användarnamn och lösenord i tilläggs-&#10;»»»inställningarna och du behöver en giltig prenumeration.&#10;»»»(Denna applikation använder Qobuz API, men är inte certifierad av Qobuz.)</description>
 		<language>en fr</language>
 		<platform>all</platform>
+                <forum>http://forum.kodi.tv/showthread.php?tid=146568</forum>
+                <source>https://github.com/tidalf/plugin.audio.qobuz</source>
+
 	</extension>
   <extension point="xbmc.service"
 		library="resources/lib/qobuz/extension/kooli/kooli/script/kooli-xbmc-service.py" start="login" />
