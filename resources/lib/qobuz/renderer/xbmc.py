@@ -173,9 +173,10 @@ class QobuzXbmcRenderer(IRenderer):
               d[track.nid] = track
             tracks.update(d)
             if len(tracks.keys()) == 0:
+                debug.warn(self, 'NoTrackScannedError')
                 xdir.end_of_directory()
                 return False
-            for nid, track in tracks.items():
+            for _nid, track in tracks.items():
                 if track.nt & Flag.TRACK != Flag.TRACK:
                     continue
                 if not track.get_displayable():
