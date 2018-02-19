@@ -1,0 +1,15 @@
+<html><head><title>Directory listing for /</title>
+</head><body>
+<h2>Directory listing for /</h2>
+<hr>
+<ul>
+{% for track in tracks['items'] %}
+<li>
+  <a href="/qobuz/{{album_id}}/{{track.id}}.mpc">{{title}} - {{track.title}}</a>
+  </li>
+{% endfor %}
+<li><a href="/qobuz/{{album_id}}/album.nfo">album.nfo</a></li>
+</ul>
+<hr>
+</body></html>
+

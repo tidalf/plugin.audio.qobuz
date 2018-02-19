@@ -19,7 +19,7 @@ from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.theme import theme
 from qobuz import config
-
+from qobuz.node import helper
 
 class Node_track(INode):
     def __init__(self, parent=None, parameters={}, data=None):
@@ -44,12 +44,7 @@ class Node_track(INode):
         return xdir.add_node(self)
 
     def make_local_url(self):
-        return '{scheme}://{host}:{port}/qobuz/{album_id}/{nid}/file.mpc'.format(
-            scheme='http',
-            host=config.app.registry.get('httpd_host'),
-            port=config.app.registry.get('httpd_port'),
-            album_id=self.get_album_id(),
-            nid=str(self.nid))
+        return helper.make_local_track_url(config, self)
 
     def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
         if asLocalUrl is True:
@@ -65,7 +60,6 @@ class Node_track(INode):
         fmt = fmt.replace("%A",
                           self.get_album_artist()) if '%A' in fmt else fmt
         fmt = fmt.replace("%t", self.get_title()) if '%t' in fmt else fmt
-        #fmt = fmt.replace("%A", self.get_album())
         fmt = fmt.replace("%n",
                           str(self.get_track_number())) if '%n' in fmt else fmt
         fmt = fmt.replace("%g", self.get_genre()) if '%g' in fmt else fmt
@@ -92,6 +86,7 @@ class Node_track(INode):
     def get_album_id(self):
         aid = self.get_property('album/id')
         if not aid and self.parent:
+            debug.warn('using album id from parent' % aid)
             return self.parent.nid
         return aid
 
@@ -245,7 +240,7 @@ class Node_track(INode):
     def __getFileUrl(self):
         if self._intent is None:
             self._intent = user.stream_format(track=self)
-        format_id, intent, description = self._intent
+        format_id, intent, _description = self._intent
         data = api.get('/track/getFileUrl',
                        format_id=format_id,
                        track_id=self.nid,
