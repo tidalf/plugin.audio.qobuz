@@ -8,7 +8,6 @@
 '''
 import sys
 import os
-import traceback
 sys.path.append(
     os.path.join(
         os.path.abspath(os.path.dirname(__file__)), 'resources', 'lib'))

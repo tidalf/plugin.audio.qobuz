@@ -17,7 +17,6 @@ from jinja2 import Undefined
 from flask import Flask
 from flask import request
 from flask import Response, redirect
-#JINJA2_ENVIRONMENT_OPTIONS = {'undefined': Undefined}
 from flask import make_response, render_template, request
 
 from qobuz.api import api
@@ -34,10 +33,13 @@ from qobuz.util.converter import converter
 from kooli import kooli_path
 
 qobuzApp = QobuzApplication(
-    Plugin('plugin.audio.qobuz'), bootstrapClass=MinimalBootstrap)
+    Plugin('plugin.audio.qobuz'),
+    bootstrapClass=MinimalBootstrap)
 qobuzApp.bootstrap.init_app()
 kooli_tpl = P.join(kooli_path, 'tpl')
 application = Flask(__name__, template_folder=kooli_tpl)
+
+HEADGET = ['HEAD', 'GET']
 
 
 def nocache(view):
@@ -75,7 +77,7 @@ def shutdown_server():
 
 
 @nocache
-@application.route('/qobuz/ping', methods=['HEAD', 'GET'])
+@application.route('/qobuz/ping', methods=HEADGET)
 def route_ping():
     if request.method == 'HEAD':
         return '', 200
@@ -83,18 +85,16 @@ def route_ping():
 
 
 @nocache
-@application.route('/qobuz', methods=['HEAD', 'GET'])
+@application.route('/qobuz', methods=HEADGET)
 def route_root():
     response = {}
     if request.method == 'HEAD':
         return '', 200
-    return render_template('root.htm.tpl', **response)
+    return render_template('root.htm.j2', **response)
 
 
 @nocache
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/file.mpc',
-    methods=['GET', 'HEAD'])
+@application.route('/qobuz/<string:album_id>/<string:track_id>.mpc', methods=HEADGET)
 def route_track(album_id=None, track_id=None):
     track = getNode(Flag.TRACK, parameters={'nid': track_id})
     track.data = track.fetch()
@@ -105,73 +105,25 @@ def route_track(album_id=None, track_id=None):
 
 
 @nocache
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/extrafanart/',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/cdart.png',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/channellogo.png',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/characterart.png',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/clearart.png',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/logo.png',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/landscape.jpg',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/banner.jpg',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/poster.jpg',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/fanart.jpg',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/fanart.jpg', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/poster.jpg', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/thumb.jpg', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/landscape.jpg', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/logo.png', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/cdart.png', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/extrafanart/', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/characterart.png', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/clearart.png', methods=['GET', 'HEAD'])
-@application.route('/qobuz/banner.jpg', methods=['GET', 'HEAD'])
-@application.route('/qobuz/artist.nfo', methods=['GET', 'HEAD'])
+@application.route('/qobuz/<string:album_id>/fanart.jpg', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/poster.jpg', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/thumb.jpg', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/landscape.jpg', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/logo.png', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/cdart.png', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/extrafanart/', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/characterart.png', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/clearart.png', methods=HEADGET)
+@application.route('/qobuz/banner.jpg', methods=HEADGET)
+@application.route('/qobuz/artist.nfo', methods=HEADGET)
 def route_null(album_id=None, track_id=None):
     return http_error(404)
 
 
 @nocache
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/disc.png',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/disc.png', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/folder.jpg',
-    methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/folder.jpg', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/<string:album_id>/thumb.jpg', methods=['GET', 'HEAD'])
+@application.route('/qobuz/<string:album_id>/disc.png', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/folder.jpg', methods=HEADGET)
+@application.route('/qobuz/<string:album_id>/thumb.jpg', methods=HEADGET)
 def route_disc_image(album_id=None, track_id=None):
     node = getNode(Flag.ALBUM, parameters={'nid': album_id})
     node.data = node.fetch()
@@ -184,15 +136,14 @@ def route_disc_image(album_id=None, track_id=None):
 
 
 @nocache
-@application.route(
-    '/qobuz/<string:album_id>/<string:track_id>/album.nfo',
-    methods=['GET', 'HEAD'])
+@application.route('/qobuz/<string:album_id>/album.nfo', methods=HEADGET)
 def route_nfo_album(album_id=None, track_id=None):
     response = api.get('/album/get', album_id=album_id)
     if response is None:
         response = api.get('/track/get', track_id=track_id)
     if response is None:
         return http_error(404)
+    response['album_id'] = album_id
     if request.method == 'HEAD':
         return '', 200
     if 'description' in response:
@@ -205,12 +156,35 @@ def route_nfo_album(album_id=None, track_id=None):
         'image_default_size')
     if 'duration' in response:
         response['duration'] = round(response['duration'])
-    return render_template('album.nfo.tpl', **response)
+    return render_template('album.nfo.j2', **response)
 
 
 @nocache
-@application.route(
-    '/qobuz/<string:album_id>/artist.nfo', methods=['GET', 'HEAD'])
+@application.route('/qobuz/<string:album_id>/', methods=HEADGET)
+def route_album(album_id=None, track_id=None):
+    response = api.get('/album/get', album_id=album_id)
+    if response is None:
+        response = api.get('/track/get', track_id=track_id)
+    if response is None:
+        return http_error(404)
+    response['album_id'] = album_id
+    if request.method == 'HEAD':
+        return '', 200
+    if 'description' in response:
+        response['description'] = converter.strip_html(
+            response['description'], default='')
+    if 'catchline' in response:
+        response['catchline'] = converter.strip_html(
+            response['catchline'], default='')
+    response['image_default_size'] = qobuzApp.registry.get(
+        'image_default_size')
+    if 'duration' in response:
+        response['duration'] = round(response['duration'])
+    return render_template('dir.j2', **response)
+
+
+@nocache
+@application.route('/qobuz/<string:album_id>/artist.nfo', methods=HEADGET)
 def route_nfo_artist(album_id=None):
     album = api.get('/album/get', album_id=album_id)
     response = None
@@ -223,21 +197,18 @@ def route_nfo_artist(album_id=None):
             response['biography']['content'], default='')
     response['image_default_size'] = qobuzApp.registry.get(
         'image_default_size')
-    return render_template('artist.nfo.tpl', **response)
+    return render_template('artist.nfo.j2', **response)
 
 
 @nocache
-@application.route('/qobuz/favorite/', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/favorite/<string:search_type>/', methods=['GET', 'HEAD'])
-@application.route(
-    '/qobuz/favorite/<string:search_type>/<string:nid>',
-    methods=['GET', 'HEAD'])
+@application.route('/qobuz/favorite/', methods=HEADGET)
+@application.route('/qobuz/favorite/<string:search_type>/', methods=HEADGET)
+@application.route('/qobuz/favorite/<string:search_type>/<string:nid>', methods=HEADGET)
 def route_favorite(search_type=None, nid=None):
     if search_type is None:
         if request.method == 'HEAD':
             return '', 200
-        return render_template('favorite_index.htm.tpl')
+        return render_template('favorite_index.htm.j2')
     node = getNode(
         Flag.FAVORITE, parameters={'search-type': search_type,
                                    'nid': nid})
@@ -245,5 +216,5 @@ def route_favorite(search_type=None, nid=None):
     if node.data is None:
         return redirect('/qobuz/favorite/%s' % search_type)
     if nid is None:
-        return render_template('favorite.htm.tpl', **node.data)
-    return render_template('%s.htm.tpl' % search_type, **node.data)
+        return render_template('favorite.htm.j2', **node.data)
+    return render_template('%s.htm.j2' % search_type, **node.data)

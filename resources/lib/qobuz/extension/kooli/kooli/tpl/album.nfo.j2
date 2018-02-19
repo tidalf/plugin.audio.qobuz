@@ -1,4 +1,5 @@
 
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <album>
   <title>{{title}}</title>
   {% if artist.name is defined %}
@@ -10,16 +11,16 @@
   <releasedate>{{released_at}}</releasedate>
   <type>{{type}}</type>
   {% if image[image_default_size] %}
-    <thumb>{{image[image_default_size]}}</thumb>
+    <thumb preview="path">{{image[image_default_size]}}</thumb>
   {% endif %}
   {% if image.large %}
-    <thumb>{{image.large}}</thumb>
+    <thumb preview="path">{{image.large}}</thumb>
   {% endif %}
   {% if image.small %}
-    <thumb>{{image.small}}</thumb>
+    <thumb preview="path">{{image.small}}</thumb>
   {% endif %}
   {% if image.thumbnail %}
-    <thumb>{{image.thumbnail}}</thumb>
+    <thumb preview="path">{{image.thumbnail}}</thumb>
   {% endif %}
   <label>{{label.name}}</label>
   {% for track in tracks['items'] %}

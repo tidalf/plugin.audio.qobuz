@@ -18,6 +18,7 @@ from qobuz.node import getNode, Flag
 from qobuz import config
 from qobuz.theme import color
 from qobuz.util.converter import converter
+from qobuz.node import helper
 
 
 class Node_album(INode):
@@ -73,6 +74,9 @@ class Node_album(INode):
             self.add_child(getNode(Flag.TRACK, data=track))
         return True
 
+    def make_local_url(self):
+        return helper.make_local_album_url(config, self)
+
     def make_url(self, asLocalUrl=False, **ka):
         purchased = self.get_parameter('purchased')
         if purchased is not None:
@@ -80,8 +84,9 @@ class Node_album(INode):
         if asLocalUrl is True:
             from qobuz.constants import Mode
             ka['mode'] = Mode.SCAN
+            # return self.make_local_url()
         return super(Node_album, self).make_url(**ka)
-
+    
     def makeListItem(self, replaceItems=False):
         image = self.get_image()
         item = xbmcgui.ListItem(
@@ -223,8 +228,8 @@ class Node_album(INode):
         return self.get_title()
 
     def get_label(self, default=None):
-        rgb = self.get_property('genre/color', default='#00000')
-        genre = self.get_property('genre/name', default='n/a')
+        # rgb = self.get_property('genre/color', default='#00000')
+        # genre = self.get_property('genre/name', default='n/a')
         artist = self.get_artist() or 'VA'
         return '%s - %s' % (artist, self.get_title())
 
