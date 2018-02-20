@@ -89,13 +89,15 @@ def route_ping():
 def route_root():
     response = {}
     if request.method == 'HEAD':
-        return '', 200
+        return 'ok', 200
     return render_template('root.htm.j2', **response)
 
 
 @nocache
 @application.route('/qobuz/<string:album_id>/<string:track_id>.mpc', methods=HEADGET)
 def route_track(album_id=None, track_id=None):
+    if request.method == 'HEAD':
+        return 'ok', 200
     track = getNode(Flag.TRACK, parameters={'nid': track_id})
     track.data = track.fetch()
     url = track.get_streaming_url()
@@ -137,10 +139,8 @@ def route_disc_image(album_id=None, track_id=None):
 
 @nocache
 @application.route('/qobuz/<string:album_id>/album.nfo', methods=HEADGET)
-def route_nfo_album(album_id=None, track_id=None):
+def route_nfo_album(album_id=None):
     response = api.get('/album/get', album_id=album_id)
-    if response is None:
-        response = api.get('/track/get', track_id=track_id)
     if response is None:
         return http_error(404)
     response['album_id'] = album_id
