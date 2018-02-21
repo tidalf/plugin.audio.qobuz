@@ -19,7 +19,7 @@ class contextMenu(object):
         self.color_section = theme.get('item/section/color')
         formatStr = config.app.registry.get('item_section_format')
         try:
-            test = formatStr % ('plop')
+            _test = formatStr % ('plop')
         except:
             formatStr = '[ %s ]'
         self.format_section = formatStr

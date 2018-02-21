@@ -8,7 +8,7 @@
 '''
 from qobuz.node.inode import INode
 from qobuz.gui.util import lang, getImage
-from qobuz.node import getNode, Flag
+from qobuz.node import Flag
 
 
 class Node_text(INode):

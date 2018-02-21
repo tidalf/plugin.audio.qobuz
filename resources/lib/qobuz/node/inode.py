@@ -32,7 +32,6 @@ from qobuz.util import data as dataUtil
 from qobuz.util import common
 from qobuz.theme import theme, color
 from qobuz.util.converter import converter
-from qobuz import config
 from qobuz.debug import getLogger
 logger = getLogger(__name__)
 
@@ -557,7 +556,7 @@ class INode(object):
                 logger.warn('Cannot set query... %s', repr(label))
                 label = ''
             label = urllib.quote_plus(label)
-            ''' ADD AS NEW '''
+            # ADD AS NEW
             cmd = runPlugin(
                 self.make_url(
                     nt=Flag.PLAYLIST,
@@ -569,18 +568,18 @@ class INode(object):
             menu.add(path='playlist/add_as_new',
                      label=c_pl(lang(30082)),
                      cmd=cmd)
-        ''' PLAYLIST / CREATE '''
+        # PLAYLIST / CREATE
         cFlag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
         if self.nt | cFlag == cFlag:
             cmd = runPlugin(
                 self.make_url(
                     nt=Flag.PLAYLIST, nm="gui_create", mode=Mode.VIEW))
             menu.add(path='playlist/create', label=c_pl(lang(30164)), cmd=cmd)
-        # ''' VIEW BIG DIR '''
+        # VIEW BIG DIR
         # cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
         # menu.add(path='qobuz/big_dir', label=lang(30158), cmd=cmd)
         if config.app.registry.get('enable_scan_feature', to='bool'):
-             ''' SCAN'''
+             # SCAN
              query = urllib.quote_plus(
                  self.make_url(
                      mode=Mode.SCAN, asLocalUrl=True))
@@ -588,7 +587,7 @@ class INode(object):
                  nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan', query=query)
              menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
         if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK & ~Flag.PLAYLIST):
-            ''' ERASE CACHE '''
+            # ERASE CACHE
             cmd = runPlugin(
                 self.make_url(
                     nt=Flag.ROOT, nm="cache_remove", mode=Mode.VIEW))
@@ -598,7 +597,7 @@ class INode(object):
                      color=colorCaution,
                      pos=10)
             if config.app.registry.get('enable_scan_feature', to='bool'):
-                ''' HTTP / Kooli '''
+                # HTTP / Kooli / Ping
                 cmd = runPlugin(
                     self.make_url(
                         nt=Flag.TESTING, nm="show_dialog", mode=Mode.VIEW))

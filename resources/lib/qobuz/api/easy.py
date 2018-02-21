@@ -11,7 +11,7 @@
 '''
 from qobuz.cache import cache
 from qobuz.api.raw import RawApi
-from qobuz.gui.util import notify_error, notify_warn
+from qobuz.gui.util import notify_error
 from qobuz.api.user import current as current_user
 from qobuz.util import common
 from qobuz import config

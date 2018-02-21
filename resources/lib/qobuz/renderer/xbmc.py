@@ -8,7 +8,6 @@
 '''
 import sys
 import xbmcplugin
-import qobuz
 from qobuz.renderer.irenderer import IRenderer
 from qobuz.gui.util import notifyH
 from qobuz import exception

@@ -14,7 +14,6 @@ except ImportError as e:
     print "ImportError(Outside XBMC): %s" % e
 
 from qobuz import exception
-from qobuz import debug
 
 
 def showNotification(**ka):
