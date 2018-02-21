@@ -7,8 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz import exception
-from qobuz import debug
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class FlagEnum(object):
     NODE = 1 << 1
@@ -50,7 +50,7 @@ class FlagEnum(object):
     @classmethod
     def to_s(cls, flag):
         if not flag:
-            debug.warn(cls, 'Missing flag parameter')
+            logger.warn(cls, 'Missing flag parameter')
             return ''
         flag = int(flag)
         if flag & cls.TRACK == cls.TRACK:

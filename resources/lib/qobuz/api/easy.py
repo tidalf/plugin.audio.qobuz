@@ -11,11 +11,12 @@
 '''
 from qobuz.cache import cache
 from qobuz.api.raw import RawApi
-from qobuz import debug
 from qobuz.gui.util import notify_error, notify_warn
 from qobuz.api.user import current as current_user
 from qobuz.util import common
 from qobuz import config
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 
 class InvalidQuery(Exception):
@@ -81,12 +82,10 @@ class EasyApi(RawApi):
             del ka[label]
         response = getattr(self, methname)(**ka)
         if self.status_code != 200:
-            debug.warn(
-                self,
-                'Method: {method}/{status_code}: {error}',
-                method=methname,
-                error=self.error,
-                status_code=self.status_code)
+            logger.warn('Method: %s/%s: %s',
+                        methname,
+                        self.error,
+                        self.status_code)
             if self.notify:
                 notify_error(
                     'API Error/{method} {status_code}'.format(
@@ -118,6 +117,6 @@ class EasyApi(RawApi):
             return True
         current_user.set_credentials(username, password)
         if not current_user.login(api=self):
-            debug.error(self, 'Cannot login with current credentials')
+            logger.error('Cannot login with current credentials')
             return False
         return True

@@ -1,7 +1,6 @@
 from os import path as P
 from qobuz import base_path, data_path
 from qobuz.util.converter import converter
-from qobuz import debug
 
 
 class IRegistryBackend(object):
@@ -50,7 +49,7 @@ class Registry(object):
     def __init__(self, application):
         self.application = application
         try:
-            import xbmc
+            import xbmc # pylint: disable=W0612
             self.backend = XbmcRegistryBackend(application)
         except ImportError:
             self.backend = RegistryBackend(application)

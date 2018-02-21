@@ -11,11 +11,11 @@ from qobuz.gui.util import executeBuiltin, lang
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
 from qobuz.node import getNode, Flag
-from qobuz import debug
 from qobuz.gui.util import yesno, notifyH, getImage
 from qobuz.api.user import current as current_user
 from qobuz import config
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 def makeSubscriptionNode():
     return getNode(
@@ -69,7 +69,7 @@ class Node_root(INode):
         '''GUI/Removing all cached data
         '''
         if not yesno(lang(30121), lang(30122)):
-            debug.warn(self, 'Deleting cached data aborted')
+            logger.warn('Deleting cached data aborted')
             return False
         if clean_all(cache):
             notifyH(lang(30119), lang(30123))

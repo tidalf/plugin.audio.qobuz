@@ -21,8 +21,9 @@ import requests
 import copy
 
 from qobuz import exception
-from qobuz import debug
 from qobuz.api.user import current as user
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 socket.timeout = 5
 
@@ -125,20 +126,19 @@ class RawApi(object):
         if not r.content:
             self.error = 'Request return no content'
             self.status_code = 500
-            debug.error(self, self.error)
+            logger.error('%s', self.error)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
         '''Retry get if connexion fail'''
         try:
             response_json = r.json()
         except Exception as e:
-            debug.warn(self, 'Json loads failed to load... retrying!\n{}',
-                       repr(e))
+            logger.warn('Json loads failed to load... retrying!\n %s', repr(e))
             try:
                 response_json = r.json()
             except:
                 self.error = "Failed to load json two times...abort"
-                debug.warn(self, self.error)
+                logger.warn('%s', self.error)
                 return None
         try:
             self.status = response_json['status']
@@ -148,7 +148,7 @@ class RawApi(object):
             self.error = self._api_error_string(r, url, _copy_params,
                                                 response_json)
             self.status_code = 500
-            debug.warn(self, self.error)
+            logger.warn('%s', self.error)
             return None
         if not response_json:
             return None
@@ -214,14 +214,14 @@ class RawApi(object):
     def track_resportStreamingEnd(self, track_id, duration):
         duration = math.floor(int(duration))
         if duration < 5:
-            debug.warn(self, 'Duration lesser than 5s, abort reporting')
+            logger.warn('Duration lesser than 5s, abort reporting')
             return None
         # @todo ???
         user_auth_token = ''  # @UnusedVariable
         try:
             user_auth_token = self.user_auth_token  # @UnusedVariable
         except:
-            debug.warn(self, 'No authentification token')
+            logger.warn('No authentification token')
             return None
         params = {
             'user_id': self.user_id,
@@ -321,7 +321,7 @@ class RawApi(object):
     def playlist_delete(self, **ka):
         self._check_ka(ka, ['playlist_id'])
         if not 'playlist_id' in ka:
-            raise exception.MissingParamter('playlist_id')
+            raise exception.MissingParameter('playlist_id')
         return self._api_request(ka, '/playlist/delete')
 
     def playlist_update(self, **ka):

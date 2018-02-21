@@ -8,7 +8,6 @@
 '''
 import json
 from qobuz.node.inode import INode
-from qobuz import debug
 from qobuz.gui.util import getImage, runPlugin, containerRefresh, \
     containerUpdate, notifyH, executeBuiltin, lang
 from qobuz.api import api
@@ -16,7 +15,8 @@ from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz.node import Flag, getNode
 from qobuz.theme import theme, color
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class Node_friend(INode):
     def __init__(self, parent=None, parameters={}, data=None):
@@ -103,13 +103,13 @@ class Node_friend(INode):
         friends = user['player_settings']
         if not 'friends' in friends:
             notifyH('Qobuz', 'You don\'t have friend', 'icon-error-256')
-            debug.warn(self, 'No friends in user/player_settings')
+            logger.warn('No friends in user/player_settings')
             return False
         friends = friends['friends']
         if not name in friends:
             notifyH('Qobuz', 'You\'re not friend with %s' % (name),
                     'icon-error-256')
-            debug.warn(self, 'Friend ' + repr(name) + ' not in friends data')
+            logger.warn('Friend ' + repr(name) + ' not in friends data')
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}

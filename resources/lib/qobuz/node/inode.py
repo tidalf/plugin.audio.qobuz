@@ -17,7 +17,6 @@ from qobuz.api import api
 from qobuz.api.user import current as current_user
 from qobuz.cache import cache
 from qobuz.constants import Mode
-from qobuz import debug
 from qobuz import exception
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import lang, runPlugin, containerUpdate
@@ -34,6 +33,8 @@ from qobuz.util import common
 from qobuz.theme import theme, color
 from qobuz.util.converter import converter
 from qobuz import config
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 _paginated = [
     'albums', 'labels', 'tracks', 'artists', 'playlists', 'playlist',
@@ -402,7 +403,7 @@ class INode(object):
         for child in self.childs:
             if child.nt & whiteFlag == child.nt:
                 if not xdir.add_node(child):
-                    debug.error(self, "Could not add node")
+                    logger.error('Could not add node')
                     continue
             child.populating(xdir, lvl, whiteFlag, blackFlag)
 
@@ -553,7 +554,7 @@ class INode(object):
             try:
                 label = label.encode('utf8', 'replace')
             except:
-                debug.warn(self, "Cannot set query..." + repr(label))
+                logger.warn('Cannot set query... %s', repr(label))
                 label = ''
             label = urllib.quote_plus(label)
             ''' ADD AS NEW '''
@@ -680,7 +681,7 @@ class INode(object):
                 if images_len > 0:
                     return images[random.randrange(0, images_len, 1)]
             else:
-                debug.error(self, 'Cannot get node storage')
+                logger.error('Cannot get node storage')
         return None
 
     def count(self):

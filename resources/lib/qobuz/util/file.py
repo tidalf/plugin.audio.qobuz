@@ -9,8 +9,8 @@
 import os
 import re
 import tempfile
-
-from qobuz import debug
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 
 def unlink(filename):
@@ -21,11 +21,7 @@ def unlink(filename):
         os.rename(filename, tmpfile)
         return os.unlink(tmpfile)
     except Exception as e:
-        debug.error(
-            __name__,
-            'Unlinking fails: {filename}, error: {error}',
-            filename=filename,
-            error=e)
+        logger.error('Unlinking fails: %s, error: %s', filename, e)
     return False
 
 
@@ -83,8 +79,7 @@ def find(directory, pattern, callback=None, gData=None):
                         if not callback(path, gData):
                             return None
                     except Exception as e:
-                        debug.warn('[find]', 'Callback raise exception: '
-                                   '' + repr(e))
+                        logger.warn('Callback raise exception %s', repr(e))
                         return None
                 flist.append(path)
     return flist

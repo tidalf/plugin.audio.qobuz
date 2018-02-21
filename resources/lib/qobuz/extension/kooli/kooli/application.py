@@ -25,7 +25,7 @@ from qobuz.cache import cache
 from qobuz import base_path
 from qobuz.plugin import Plugin
 from qobuz.bootstrap import MinimalBootstrap
-from qobuz import debug
+from qobuz.debug import logger
 from qobuz.node import getNode, Flag
 from qobuz.gui.directory import Directory
 from qobuz import config
@@ -72,7 +72,7 @@ def shutdown_server():
             raise RuntimeError('Not running with the Werkzeug Server')
         return func()
     except Exception as e:
-        debug.error(__name__, 'shutdown server error {}', e)
+        logger.error('shutdown server error %s', e)
     return True
 
 

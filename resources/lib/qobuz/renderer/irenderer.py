@@ -65,4 +65,4 @@ class IRenderer(object):
             return False
 
     def run(self):
-        raise NotImplemented()
+        raise NotImplementedError()

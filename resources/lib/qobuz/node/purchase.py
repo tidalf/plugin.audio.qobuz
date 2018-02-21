@@ -12,7 +12,8 @@ from qobuz.api import api
 from qobuz.node import Flag, getNode
 from qobuz.gui.util import lang, getImage
 from qobuz.api.user import current as user
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class Node_purchase(INode):
     def __init__(self, parent=None, parameters={}, data=None):
@@ -58,7 +59,7 @@ class Node_purchase(INode):
         for kind in wanted:
             method = '_populate_%s' % kind
             if not hasattr(self, method):
-                debug.warn(self, 'No method named %s' % method)
+                logger.warn('No method named %s', method)
                 continue
             if getattr(self, method)(xdir, lvl, whiteFlag, blackFlag):
                 ret = True

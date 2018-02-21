@@ -19,8 +19,8 @@ except ImportError:
 import shutil
 import collections
 from datetime import datetime
-from qobuz import debug
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class _PersistentDictMixin(object):
     '''Persistent dictionary with an API compatible with shelve and anydbm.
@@ -61,7 +61,7 @@ class _PersistentDictMixin(object):
         finally:
             fileobj.close()
         if not os.path.exists(tempname):
-            debug.error(self, 'Temporary file does not exists {}', tempname)
+            logger.error('Temporary file does not exists %s', tempname)
             return False
         shutil.move(tempname, self.filename)  # atomic commit
         if self.mode is not None:
@@ -143,6 +143,8 @@ class _Storage(collections.MutableMapping, _PersistentDictMixin):
         return iter(self._items)
 
     def __len__(self):
+        if self._items is None:
+            return -1
         return self._items.__len__
 
     def raw_dict(self):

@@ -12,7 +12,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from time import time
-from qobuz import debug
+
 __seed__ = __name__ + '0.0.1'
 __magic__ = 0
 pos = 0
@@ -32,6 +32,8 @@ class BaseCache(object):
 
     def __init__(self, *a, **ka):
         self.cached_function_name = __name__
+        if 'black_keys' not in self.__dict__:
+            self.black_keys = []
 
     def cached(self, f, *a, **ka):
         """Decorator
@@ -113,19 +115,19 @@ class BaseCache(object):
             Status: Bool
             Data: Arbitrary data
         """
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def load_from_store(self, *a, **ka):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def sync(self, key, data, *a, **ka):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def delete(self, key, *a, **ka):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def make_key(self, key, *a, **ka):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def get_ttl(self, key, *a, **ka):
-        raise NotImplemented
+        raise NotImplementedError()

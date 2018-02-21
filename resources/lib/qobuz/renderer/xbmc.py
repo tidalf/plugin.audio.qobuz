@@ -9,7 +9,6 @@
 import sys
 import xbmcplugin
 import qobuz
-from qobuz import debug
 from qobuz.renderer.irenderer import IRenderer
 from qobuz.gui.util import notifyH
 from qobuz import exception
@@ -20,6 +19,8 @@ from qobuz.node import getNode
 from qobuz.gui.directory import Directory
 from qobuz.alarm import Notifier
 from qobuz.gui.bg_progress import Progress
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 notifier = Notifier(title='Scanning progress')
 
@@ -53,9 +54,9 @@ class QobuzXbmcRenderer(IRenderer):
         '''Building our tree, creating root node based on our node_type
         '''
         if not self.set_root_node():
-            debug.warn(self, 'Cannot set root node ({}, {})',
-                       str(self.node_type),
-                       str(self.root.get_parameter('nid')))
+            logger.warn('Cannot set root node (%s, %s)',
+                        str(self.node_type),
+                        str(self.root.get_parameter('nid')))
             return False
         if self.has_method_parameter():
             return self.execute_method_parameter()
@@ -68,13 +69,13 @@ class QobuzXbmcRenderer(IRenderer):
             if config.app.registry.get('contextmenu_replaceitems', to='bool'):
                 xdir.replaceItems = True
             try:
-                ret = self.root.populating(xdir, self.depth, self.whiteFlag,
-                                           self.blackFlag)
+                _ret = self.root.populating(xdir, self.depth, self.whiteFlag,
+                                            self.blackFlag)
             except exception.QobuzError as e:
                 xdir.end_of_directory(False)
                 xdir = None
-                debug.warn(self, 'Error while populating our directory: %s' %
-                           (repr(e)))
+                logger.warn(
+                    'Error while populating our directory: %s', repr(e))
                 return False
             if not self.asList:
                 xdir.set_content(self.root.content_type)
@@ -102,7 +103,7 @@ class QobuzXbmcRenderer(IRenderer):
         feature
         '''
         if not self.set_root_node():
-            debug.warn(self, 'Cannot set root node ({})', str(self.node_type))
+            logger.warn('Cannot set root node (%s)', self.node_type)
             return False
 
         def list_track(scan):
@@ -127,12 +128,12 @@ class QobuzXbmcRenderer(IRenderer):
             seen_tracks = {}
             for node in predir.nodes:
                 try:
-                   scan.progress.update( percent(),
+                    scan.progress.update(percent(),
                                          'Scanning',
                                          node.get_label().encode('ascii')
-                                       )
+                                         )
                 except:
-                       pass
+                    pass
                 done += 1
                 node.set_parameter('mode', Mode.SCAN)
                 if node.nt & Flag.TRACK == Flag.TRACK:
@@ -141,12 +142,10 @@ class QobuzXbmcRenderer(IRenderer):
                     seen_tracks[node.nid] = 1
                     album_id = node.get_album_id()
                     if album_id is None or album_id == '':
-                        debug.error(
-                            self,
-                            'Track without album_id: {}, label: {}',
-                            node,
-                            node.get_label().encode(
-                                'ascii', errors='ignore'))
+                        logger.error('Track without album_id: %s, label: %s',
+                                     node,
+                                     node.get_label().encode(
+                                         'ascii', errors='ignore'))
                         continue
                     if album_id in seen:
                         continue
@@ -170,10 +169,10 @@ class QobuzXbmcRenderer(IRenderer):
             tracks = {}
             d = {}
             for track in list_track(xdir):
-              d[track.nid] = track
+                d[track.nid] = track
             tracks.update(d)
             if len(tracks.keys()) == 0:
-                debug.warn(self, 'NoTrackScannedError')
+                logger.warn('NoTrackScannedError')
                 xdir.end_of_directory()
                 return False
             for _nid, track in tracks.items():

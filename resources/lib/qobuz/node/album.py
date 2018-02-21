@@ -10,7 +10,6 @@ import time
 import xbmcgui
 
 from qobuz.node.inode import INode
-from qobuz import debug
 from qobuz.gui.util import getImage
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
@@ -19,6 +18,8 @@ from qobuz import config
 from qobuz.theme import color
 from qobuz.util.converter import converter
 from qobuz.node import helper
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 
 class Node_album(INode):
@@ -242,7 +243,7 @@ class Node_album(INode):
         try:
             year = time.strftime("%Y", time.localtime(date))
         except Exception:
-            debug.warn(self, 'Invalid date format %s', date)
+            logger.warn('Invalid date format %s', date)
         return year
 
     def get_description(self, default='n/a'):

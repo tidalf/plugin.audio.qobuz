@@ -9,10 +9,10 @@
 from qobuz.node.inode import INode
 from qobuz.node import Flag, getNode
 from qobuz.api import api
-from qobuz import debug
 from qobuz.gui.util import getImage, lang
-
 from qobuz.util.converter import converter
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 dialogHeading = 'Collection'
 
@@ -61,7 +61,7 @@ class Node_collection(INode):
         kwargs = {'query': converter.quote(query)}
         if self.source is not None:
             kwargs['source'] = self.source
-        debug.info(self, 'SEARCH {}', kwargs)
+        logger.info('SEARCH %s', kwargs)
         if self.search_type == 'albums':
             return api.get('/collection/getAlbums', **kwargs)
         elif self.search_type == 'artists':

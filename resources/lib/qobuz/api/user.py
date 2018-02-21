@@ -1,4 +1,3 @@
-from qobuz import debug
 from qobuz import config
 from qobuz.node import getNode, Flag
 
@@ -60,6 +59,7 @@ class User(object):
         stream_type = config.app.registry.get('streamtype')
         if track is not None:
             if stream_type == 'hires':
+                stream_type = 'flac'
                 if self.get_property('user/credential/parameters/hires_streaming') == True or (is_purchased(track) and self.get_property('user/credential/parameters/hires_purchases_streaming') == True):
                     if track.get_maximum_sampling_rate() > 96:
                         stream_type = 'hires_hsr'
@@ -67,8 +67,7 @@ class User(object):
                         stream_type = 'hires'
                     else:
                         stream_type = 'flac'
-                else: 
-                    stream_tye = 'flac'
+
         return audio_format[stream_type]
 
     def set_credentials(self, username, password):

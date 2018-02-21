@@ -9,7 +9,6 @@
 import xbmcgui
 import time
 from qobuz.node.inode import INode
-from qobuz import debug
 from qobuz.gui.util import getImage
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
@@ -17,7 +16,8 @@ from qobuz.node import getNode, Flag
 from qobuz.api.user import current as user
 from qobuz import config
 from qobuz.theme import color
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class Node_user(INode):
     def __init__(self, parent=None, parameters={}, data=None):
@@ -76,7 +76,7 @@ class Node_user(INode):
                                 self.get_label2(),
                                 self.get_image(), self.get_image(), None)
         if not item:
-            debug.warn(self, 'Error: Cannot make xbmc list item')
+            logger.warn('Error: Cannot make xbmc list item')
             return None
         item.setInfo(
             'Music', infoLabels={'artist': user.get_property('user/login')})
