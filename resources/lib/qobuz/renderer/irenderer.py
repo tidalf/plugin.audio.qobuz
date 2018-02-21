@@ -6,7 +6,6 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz import debug
 from qobuz.node import Flag
 from qobuz.node import getNode
 

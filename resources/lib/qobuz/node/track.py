@@ -443,10 +443,8 @@ class Node_track(INode):
         label = self.get_album_label(default=None)
         if label is not None:
             label_id = self.get_album_label_id()
-            url = self.make_url(
-                nt=Flag.LABEL, nid=self.get_album_label_id(), mode=Mode.VIEW)
+            url = self.make_url(nt=Flag.LABEL, nid=label_id, mode=Mode.VIEW)
             menu.add(path='label/view',
                      label='View label (i8n): %s' % label,
                      cmd=containerUpdate(url))
-        ''' Calling base class '''
         super(Node_track, self).attach_context_menu(item, menu)

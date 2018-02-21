@@ -56,9 +56,8 @@ class QobuzPlayer(xbmc.Player):
             track.parameters['purchased'] = True
         item = track.makeListItem()
         track.item_add_playing_property(item)
-        """Some tracks are not authorized for stream and a 60s sample is
-        returned, in that case we overwrite the song duration
-        """
+        # Some tracks are not authorized for stream and a 60s sample is
+        # returned, in that case we overwrite the song duration
         if track.is_sample():
             item.setInfo('Music', infoLabels={'duration': 60, })
             """Don't warn for free account (all songs except purchases are 60s

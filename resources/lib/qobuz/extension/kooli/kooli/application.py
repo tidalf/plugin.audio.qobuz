@@ -8,7 +8,6 @@
 '''
 import os
 from os import path as P
-import pprint
 import logging
 from functools import wraps, update_wrapper
 from datetime import datetime
@@ -22,13 +21,11 @@ from flask import make_response, render_template, request
 from qobuz.api import api
 from qobuz.application import Application as QobuzApplication
 from qobuz.cache import cache
-from qobuz import base_path
 from qobuz.plugin import Plugin
 from qobuz.bootstrap import MinimalBootstrap
 from qobuz.debug import logger
 from qobuz.node import getNode, Flag
 from qobuz.gui.directory import Directory
-from qobuz import config
 from qobuz.util.converter import converter
 from kooli import kooli_path
 

@@ -12,9 +12,7 @@ import xbmcgui
 from qobuz.gui.bg_progress import Progress
 import time
 from qobuz.gui.util import lang
-from qobuz import exception
 from qobuz import debug
-from qobuz import config
 from qobuz.node import Flag
 
 

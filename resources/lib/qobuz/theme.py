@@ -1,4 +1,3 @@
-from qobuz import debug
 from qobuz import config
 
 
