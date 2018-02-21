@@ -26,53 +26,65 @@ def strip_tags(html):
 
 
 class Converter(object):
-    def raw(self, data, default=None):
+
+    @classmethod
+    def raw(cls, data, default=None):
         return data
 
-    def string(self, data, default=None):
+    @classmethod
+    def string(cls, data, default=None):
         if common.is_empty(data):
             return default
         return str(data)
 
-    def int(self, data, default=None):
+    @classmethod
+    def int(cls, data, default=None):
         if common.is_empty(data):
             return default
         return int(data)
 
-    def float(self, data, default=None):
+    @classmethod
+    def float(cls, data, default=None):
         if common.is_empty(data):
             return default
         return float(data)
 
-    def bool(self, data, default=None):
+    @classmethod
+    def bool(cls, data, default=None):
         return common.input2bool(data)
 
-    def bool2str(self, data, default='false'):
+    @classmethod
+    def bool2str(cls, data, default='false'):
         if data is None:
             return default
         return str(bool(data)).lower()
 
-    def unquote(self, data, default=None):
+    @classmethod
+    def unquote(cls, data, default=None):
         if common.is_empty(data):
             return default
         return urllib.unquote_plus(data)
 
-    def quote(self, data, default=None):
+    @classmethod
+    def quote(cls, data, default=None):
         if common.is_empty(data):
             return default
         return urllib.quote_plus(data)
 
-    def math_floor(self, data, default=None):
+    @classmethod
+    def math_floor(cls, data, default=None):
         if common.is_empty(data):
             return default
         return math.floor(data)
 
-    def strip_html(self, data, default=None):
+    @classmethod
+    def strip_html(cls, data, default=None):
         if common.is_empty(data):
             return default
         return strip_tags(data)
 
-    def color(self, data, default=None):
+    @classmethod
+    def color(cls, data, default=None):
         if common.is_empty(data):
             return default
         if data.startswith('#') and len(data) == 7:

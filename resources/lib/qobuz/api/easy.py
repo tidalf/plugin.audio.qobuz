@@ -28,7 +28,8 @@ class EasyApi(RawApi):
         self.cache_base_path = None
         super(EasyApi, self).__init__()
 
-    def get_notify(self):
+    @classmethod
+    def get_notify(cls):
         return config.app.registry.get('notify_api_error', to='bool')
 
     notify = property(get_notify)
@@ -93,7 +94,8 @@ class EasyApi(RawApi):
                     '{error}'.format(error=self.error))
         return response
 
-    def __clean_ka(self, endpoint, method, **ka):
+    @classmethod
+    def __clean_ka(cls, endpoint, method, **ka):
         """We are removing some key that are not needed by our raw api but
         generate different cache entry (Data bound to specific user...)
         """

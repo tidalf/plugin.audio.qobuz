@@ -65,7 +65,8 @@ class Node_root(INode):
             self.add_child(makeSubscriptionNode())
         return True
 
-    def cache_remove(self):
+    @classmethod
+    def cache_remove(cls):
         '''GUI/Removing all cached data
         '''
         if not yesno(lang(30121), lang(30122)):

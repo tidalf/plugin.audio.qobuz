@@ -37,7 +37,8 @@ class dog():
     def __init__(self):
         pass
 
-    def kv_is_ok(self, key, value):
+    @classmethod
+    def kv_is_ok(cls, key, value):
         if key in _allowed_boolean:
             if value not in ['True', 'False']:
                 return False

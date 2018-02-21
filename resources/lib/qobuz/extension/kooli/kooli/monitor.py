@@ -10,6 +10,7 @@ import time
 import xbmc
 
 from qobuz.debug import getLogger
+from qobuz.cache import cache_util
 logger = getLogger(__name__)
 
 
@@ -31,7 +32,7 @@ class Monitor(xbmc.Monitor):
         self.service = {}
 
     def onSettingsChanged(self):
-        logger.info('Setting changed')  # @wip
+        logger.info('Setting changed: %s', self.__name__)  # @todo Do Something
 
     def onAbortRequested(self):
         self.abortRequested = True
@@ -44,7 +45,8 @@ class Monitor(xbmc.Monitor):
             return True
         return False
 
-    def isIdle(self, since=1):
+    @classmethod
+    def isIdle(cls, since=1):
         try:
             if xbmc.getGlobalIdleTime() >= since:
                 return True
@@ -54,10 +56,7 @@ class Monitor(xbmc.Monitor):
 
     def cache_remove_old(self, **ka):
         self.last_garbage_on = time.time()
-        clean_old(cache)
-
-    def onSettingsChanged(self):
-        pass
+        cache_util.clean_old(self)
 
     def start_all_service(self):
         [s.start() for s in self.service.values()]

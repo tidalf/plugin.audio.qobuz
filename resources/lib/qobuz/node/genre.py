@@ -31,7 +31,8 @@ class Node_genre(INode):
     def get_label2(self):
         return self.get_label()
 
-    def populate_reco(self, xdir, lvl, whiteFlag, blackFlag, genre_id):
+    @classmethod
+    def populate_reco(cls, xdir, lvl, whiteFlag, blackFlag, genre_id):
         for genre_type in RECOS_TYPE_IDS:
             node = getNode(Flag.RECOMMENDATION,
                            {'genre-id': genre_id,

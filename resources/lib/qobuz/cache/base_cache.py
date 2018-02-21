@@ -84,7 +84,8 @@ class BaseCache(object):
 
         return wrapped_function
 
-    def is_fresh(self, key, data, *a, **ka):
+    @classmethod
+    def is_fresh(cls, key, data, *a, **ka):
         if not 'updated_on' in data:
             return False
         updated_on = data['updated_on']
@@ -96,14 +97,16 @@ class BaseCache(object):
             return 0
         return diff
 
-    def check_magic(self, data, *a, **ka):
+    @classmethod
+    def check_magic(cls, data, *a, **ka):
         if not 'magic' in data:
             return False
         if data['magic'] != __magic__:
             return False
         return True
 
-    def check_key(self, data, key, *a, **ka):
+    @classmethod
+    def check_key(cls, data, key, *a, **ka):
         if not 'key' in data:
             return False
         if data['key'] != key:
@@ -129,5 +132,6 @@ class BaseCache(object):
     def make_key(self, key, *a, **ka):
         raise NotImplementedError()
 
-    def get_ttl(self, key, *a, **ka):
+    @classmethod
+    def get_ttl(cls, *a, **ka):
         raise NotImplementedError()

@@ -48,13 +48,16 @@ class RawApi(object):
             status_code=self.status_code,
             error=self.error)
 
-    def _check_ka(self, ka, mandatory, allowed=[]):
+    @classmethod
+    def _check_ka(cls, ka, mandatory, allowed=None):
         '''Checking parameters before sending our request
         - if mandatory parameter is missing raise error
         - if a given parameter is neither in mandatory or allowed
         raise error (Creating exception class like MissingParameter
         may be a good idea)
         '''
+        if allowed is None:
+            allowed = []
         for label in mandatory:
             if not label in ka:
                 raise exception.MissingParameter(label)
