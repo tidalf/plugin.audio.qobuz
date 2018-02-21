@@ -16,7 +16,8 @@ class RegistryBackend(IRegistryBackend):
         super(RegistryBackend, self).__init__(application)
         self._init()
 
-    def _get_setting_path(self):
+    @classmethod
+    def _get_setting_path(cls):
         return P.abspath(P.join(base_path, P.pardir, 'settings.xml'))
 
     def _init(self):

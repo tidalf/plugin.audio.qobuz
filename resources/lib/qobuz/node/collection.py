@@ -70,16 +70,23 @@ class Node_collection(INode):
             return api.get('/collection/getTracks', **kwargs)
         return None
 
-    def get_description(self):
+    @classmethod
+    def get_description(cls):
         return None
 
-    def _populate_albums(self, data=None, parameters={}):
+    @classmethod
+    def _populate_albums(cls, data=None, parameters=None):
+        parameters = {} if parameters is None else parameters
         return getNode(Flag.ALBUM, data=data, parameters=parameters)
 
-    def _populate_tracks(self, data=None, parameters={}):
+    @classmethod
+    def _populate_tracks(cls, data=None, parameters=None):
+        parameters = {} if parameters is None else parameters
         return getNode(Flag.TRACK, data=data, parameters=parameters)
 
-    def _populate_artists(self, data=None, parameters={}):
+    @classmethod
+    def _populate_artists(cls, data=None, parameters=None):
+        parameters = {} if parameters is None else parameters
         return getNode(Flag.ARTIST, data=data, parameters=parameters)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):

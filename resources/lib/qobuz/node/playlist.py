@@ -300,7 +300,8 @@ class Node_playlist(INode):
         notify_log('Qobuz / Tracks added', '%s added' % (len(nodes)))
         return True
 
-    def _add_tracks(self, playlist_id, nodes):
+    @classmethod
+    def _add_tracks(cls, playlist_id, nodes):
         if len(nodes) < 1:
             logger.warn('Empty list...')
             return False
@@ -419,7 +420,8 @@ class Node_playlist(INode):
         executeBuiltin(containerRefresh())
         return True
 
-    def create(self, name, isPublic=True, isCollaborative=False):
+    @classmethod
+    def create(cls, name, isPublic=True, isCollaborative=False):
         return api.playlist_create(
             name=name,
             is_public=converter.bool2str(isPublic),

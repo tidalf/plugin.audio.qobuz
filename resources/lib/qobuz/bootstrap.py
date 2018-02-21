@@ -38,7 +38,7 @@ def get_checked_parameters():
             params = params[0:len(params) - 2]
         pairsofparams = cleanedparams.split('&')
 
-        for i in range(len(pairsofparams)):
+        for i, _item in enumerate(pairsofparams):
             splitparams = {}
             splitparams = pairsofparams[i].split('=')
             if (len(splitparams)) == 2:
@@ -62,10 +62,12 @@ class MinimalBootstrap(object):
         self.bootstrap_directories()
         self.init_cache()
 
-    def init_cache(self):
+    @classmethod
+    def init_cache(cls):
         cache.base_path = config.path.cache
 
-    def bootstrap_registry(self):
+    @classmethod
+    def bootstrap_registry(cls):
         from qobuz.api import api
         if not api.login(
                 config.app.registry.get('username'),
@@ -77,7 +79,8 @@ class MinimalBootstrap(object):
             containerRefresh()
             raise exception.InvalidLogin(None)
 
-    def bootstrap_directories(self):
+    @classmethod
+    def bootstrap_directories(cls):
         class PathObject():
             def __init__(self):
                 self.base = config.addon.getAddonInfo('path')
@@ -100,7 +103,8 @@ class MinimalBootstrap(object):
                 out += 'image   : ' + self.image + "\n"
                 return out
 
-            def mkdir(self, path):
+            @classmethod
+            def mkdir(cls, path):
                 if not os.path.isdir(path):
                     try:
                         os.makedirs(path)

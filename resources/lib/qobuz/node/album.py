@@ -87,7 +87,7 @@ class Node_album(INode):
             ka['mode'] = Mode.SCAN
             # return self.make_local_url()
         return super(Node_album, self).make_url(**ka)
-    
+
     def makeListItem(self, replaceItems=False):
         image = self.get_image()
         item = xbmcgui.ListItem(

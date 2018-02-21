@@ -86,7 +86,8 @@ class Node_friend(INode):
         executeBuiltin(containerRefresh())
         return True
 
-    def delete_cache(self):
+    @classmethod
+    def delete_cache(cls):
         key = cache.make_key(
             '/user/login', username=user.username, password=user.password)
         cache.delete(key)

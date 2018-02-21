@@ -361,7 +361,8 @@ class INode(object):
     def get_label2(self):
         return self.label2
 
-    def render_nodes(self,
+    @classmethod
+    def render_nodes(cls,
                      nt,
                      parameters,
                      lvl=1,
@@ -614,10 +615,12 @@ class INode(object):
         self.user_storage = _Storage(filename)
         return self.user_storage
 
-    def get_user_path(self):
+    @classmethod
+    def get_user_path(cls):
         return os.path.join(cache.base_path)
 
-    def get_user_data(self):
+    @classmethod
+    def get_user_data(cls):
         data = api.get('/user/login',
                        username=user.username,
                        password=user.password)
@@ -652,9 +655,9 @@ class INode(object):
             os.unlink(filename)
 
     def _get_node_storage_filename(self):
-        raise NotImplmentedError()
+        raise NotImplementedError(self)
 
-    def remove_playlist_storage():
+    def remove_playlist_storage(self):
         path = os.path.join(cache.base_path, self._get_node_storage_filename())
         if os.path.exists(path):
             os.unlink(path)

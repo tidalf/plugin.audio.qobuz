@@ -64,7 +64,8 @@ class FileCache(BaseCache):
             return pickle.load(f)
         return None
 
-    def get_ttl(self, *a, **ka):
+    @classmethod
+    def get_ttl(cls, *a, **ka):
         return 3600
 
     def delete(self, key, *a, **ka):

@@ -31,7 +31,7 @@ def getInfoLabels(**ka):
     return rpc.getInfoLabels(**ka).result()
 
 
-class JsonRequest:
+class JsonRequest(object):
     """@class: JsonRequest
     """
 
@@ -88,14 +88,15 @@ class JsonResponse:
         return True
 
 
-class XbmcRPC:
+class XbmcRPC(object):
     """@class: XbmcRPC
     """
 
     def __init__(self):
         pass
 
-    def send(self, request):
+    @classmethod
+    def send(cls, request):
         if not request:
             raise exception.MissingParameter('equest')
         return JsonResponse(xbmc.executeJSONRPC(request.to_json()))

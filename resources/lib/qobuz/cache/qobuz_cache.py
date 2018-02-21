@@ -29,7 +29,8 @@ class QobuzCache(FileCache):
         self.store[key] = data
         return data
 
-    def get_ttl(self, key, *a, **ka):
+    @classmethod
+    def get_ttl(cls, *a, **ka):
         if len(a) > 0:
             if a[0] == '/track/getFileUrl':
                 return 60 * 15

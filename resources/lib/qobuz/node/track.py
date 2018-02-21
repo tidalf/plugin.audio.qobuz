@@ -101,14 +101,14 @@ class Node_track(INode):
     def get_album_label_id(self, default=None):
         return self.get_property('album/label/id', default=default)
 
-    def get_image(self, size=None, type='front', default=None):
+    def get_image(self, size=None, img_type='front', default=None):
         if size is None:
             size = config.app.registry.get('image_default_size')
-        if type == 'thumbnail':
+        if img_type == 'thumbnail':
             image = self.get_property('album/image/thumbnail', default=None)
             if image is not None:
                 return image
-        elif type == 'back':
+        elif img_type == 'back':
             image = self.get_property('album/image/back', default=None)
             if image is not None:
                 return image
@@ -342,14 +342,14 @@ class Node_track(INode):
             self.get_label(),
             self.get_label2(),
             self.get_image(),
-            self.get_image(type='back'),
+            self.get_image(img_type='back'),
             self.make_url(mode=Mode.PLAY))
         if not item:
             logger.warn('Cannot create xbmc list item')
             return None
         item.setArt({
             'thumb': self.get_image(),
-            'icon': self.get_image(type='thumbnail')
+            'icon': self.get_image(img_type='thumbnail')
         })
         comment = u'''- HiRes: {hires}
 - HiRes purchased: {hires_purchased}

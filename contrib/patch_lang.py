@@ -16,7 +16,7 @@ pat_string_id = re.compile(r'^\s*'
 pat_lang = re.compile(r'lang\((\d+?)\)', re.S)
 
 
-for line in fileinput.input('strings.xml', inplace=True): 
+for line in fileinput.input('strings.xml', inplace=True):
     m = pat_string_id.match(line)
     if not m:
         print line.strip()
@@ -33,10 +33,10 @@ for line in fileinput.input('strings.xml', inplace=True):
     ID += 1
 
 for root, dirs, files in os.walk(os.path.join(os.path.pardir)):
-    for file in files:
-        if file != 'strings.xml':
+    for fn in files:
+        if fn != 'strings.xml':
             continue
-        path = os.path.join(root, file)
+        path = os.path.join(root, fn)
         if path.endswith(os.path.join('English', 'strings.xml')):
             continue
         for line in fileinput.input(path, inplace=True):
@@ -50,7 +50,7 @@ for root, dirs, files in os.walk(os.path.join(os.path.pardir)):
                 line = line.replace(str(fid), str(seed_id[fid]))
             print line,
 
-for root, dirs, files in os.walk(os.path.join(os.path.pardir, 
+for root, dirs, files in os.walk(os.path.join(os.path.pardir,
                                                os.path.pardir, 'lib', 'qobuz')):
     for file in files:
         if not file.endswith('.py'):
