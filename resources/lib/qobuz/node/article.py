@@ -11,9 +11,9 @@ from qobuz.node.inode import INode
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.node import Flag
 from qobuz.api import api
-from qobuz import debug
 from qobuz.node import getNode
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class WidgetArticle(xbmcgui.WindowDialog):
     def __init__(self, *a, **ka):
@@ -106,7 +106,7 @@ class Node_article(INode):
         return True if len(self.data['articles']['items']) > 0 else False
 
     def _populate_one(self, *a, **ka):
-        debug.info(self, 'ONE: {}', self.data)
+        logger.info('ONE: %s', self.data)
         dialog(self.get_title(), self.get_description())
         return True
 
@@ -114,12 +114,3 @@ class Node_article(INode):
         if self.nid is None:
             return self._populate_articles(*a, **ka)
         return self._populate_one(*a, **ka)
-
-    # def displayWidget(self):
-    #     w = xbmcgui.WindowXMLDialog('plugin.audio.qobuz-article.xml',
-    #                                 qobuz.path.base)
-    #     w.show()
-    #     w.doModal()
-    #     w.close()
-    #     del w
-    #     return True

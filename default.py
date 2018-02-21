@@ -7,14 +7,11 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
-import os
-sys.path.append(
-    os.path.join(
-        os.path.abspath(os.path.dirname(__file__)), 'resources', 'lib'))
+from os import path as P
+sys.path.append(P.join(P.abspath(P.dirname(__file__)), 'resources', 'lib'))
 
-from qobuz.plugin import Plugin
-from qobuz.application import Application
-from qobuz import debug
+from qobuz.plugin import Plugin  # pylint: disable=C0413
+from qobuz.application import Application  # pylint: disable=C0413
 
 with Application(Plugin('plugin.audio.qobuz')) as app:
     app.start()

@@ -20,7 +20,8 @@ import os
 from qobuz.cache.base_cache import BaseCache
 from qobuz.util.file import RenamedTemporaryFile, unlink
 from qobuz.util.hash import hashit
-from qobuz import debug
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 
 class FileCache(BaseCache):
@@ -51,7 +52,7 @@ class FileCache(BaseCache):
                 os.fsync(fo)
         except Exception as e:
             unlink(filename)
-            print "Error: writing failed %s\nMessage %s" % (filename, e)
+            logger.error('Error: writing failed %s\nMessage %s', filename, e)
             return False
         return True
 

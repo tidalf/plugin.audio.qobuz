@@ -11,7 +11,6 @@ import os
 import xbmc
 
 from qobuz.constants import Mode
-from qobuz import debug
 from qobuz.dog import dog
 from qobuz.node import Flag
 from qobuz import exception
@@ -20,6 +19,8 @@ from qobuz.gui.util import dialogServiceTemporarilyUnavailable
 import qobuz.config as config
 from qobuz.cache import cache
 from qobuz.renderer import renderer
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 
 def get_checked_parameters():
@@ -44,8 +45,8 @@ def get_checked_parameters():
                 if d.kv_is_ok(splitparams[0], splitparams[1]):
                     rparam[splitparams[0]] = splitparams[1]
                 else:
-                    debug.warn('[DOG]', '--- Invalid key: %s / value: %s' %
-                               (splitparams[0], splitparams[1]))
+                    logger.warn('--- Invalid key: %s / value: %s' %
+                                (splitparams[0], splitparams[1]))
     return rparam
 
 
@@ -55,6 +56,7 @@ class MinimalBootstrap(object):
         self.application = application
         self.handle = application.handle
         config.boot = self
+        logger.info('---')
 
     def init_app(self):
         self.bootstrap_directories()
@@ -103,7 +105,7 @@ class MinimalBootstrap(object):
                     try:
                         os.makedirs(path)
                     except:
-                        debug.warn(self, "Cannot create directory: " + path)
+                        logger.warn('Cannot create directory: %s', path)
                         exit(2)
 
         config.path = PathObject()
@@ -121,12 +123,11 @@ class MinimalBootstrap(object):
         try:
             self.MODE = int(self.params['mode'])
         except:
-            debug.warn(self, 'No \"mode\" parameter')
+            logger.warn('No \"mode\" parameter')
         if config.app.registry.get('debug', to='bool'):
             for name in self.params:
-                debug.info(self, 'Param: %s = %s (%s)' %
-                           (name, str(self.params[name]),
-                            Flag.to_s(self.params['nt'])))
+                logger.info('Param: %s = %s (%s)', name, str(
+                    self.params[name]), Flag.to_s(self.params['nt']))
 
     def dispatch(self):
         '''Routing'''

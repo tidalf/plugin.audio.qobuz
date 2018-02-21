@@ -1,5 +1,6 @@
 import xbmcgui
-from qobuz import debug
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 
 class DialogSelect(object):
@@ -13,5 +14,5 @@ class DialogSelect(object):
         try:
             self.ret = xbmcgui.Dialog().select(self.label, self.items)
         except Exception as e:
-            debug.error(self, 'Error: {}', e)
+            logger.error('Error: %s', e)
         return self.ret

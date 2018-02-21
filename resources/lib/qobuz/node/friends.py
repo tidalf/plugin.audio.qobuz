@@ -7,12 +7,12 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.node.inode import INode
-from qobuz import debug
 from qobuz.gui.util import getImage, runPlugin, containerUpdate, lang
 from qobuz.api import api
 from qobuz.node import getNode, Flag
 from qobuz.api.user import current as user
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class Node_friends(INode):
     def __init__(self, parent=None, parameters={}, data=None):
@@ -56,7 +56,7 @@ class Node_friends(INode):
                            offset=self.offset,
                            type='last-created')
         if data is None:
-            debug.warn(self, 'No friend data')
+            logger.warn('No friend data')
             return False
         friend_list = {}
 

@@ -1,16 +1,18 @@
 import random
 import requests
 from os import path as P
-from qobuz import debug
 from qobuz import data_path
 from qobuz import config
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
+
 available = False
 
 try:
     from PIL import Image
     available = True
 except ImportError as e:
-    debug.error(__name__, 'Cannot import PIL library')
+    logger.error('Cannot import PIL library')
 
 
 def combine(nid, images=[], count=4, prefix='cover'):

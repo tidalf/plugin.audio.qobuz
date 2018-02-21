@@ -12,8 +12,8 @@ from time import time
 from qobuz.node.inode import INode
 from qobuz import config
 from qobuz.node import getNode, Flag
-from qobuz import debug
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class Window(xbmcgui.Window):
     pass
@@ -41,7 +41,7 @@ class Node_testing(INode):
         try:
             res = requests.get('%s/qobuz/ping' % self.api_url)
         except Exception as e:
-            debug.error(self, 'Ping httpd fail: {}', e)
+            logger.error('Ping httpd fail: %s', e)
             return None
         if res is None or res.status_code != 200:
             return None

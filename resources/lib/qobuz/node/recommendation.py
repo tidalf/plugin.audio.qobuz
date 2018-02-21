@@ -11,7 +11,8 @@ from qobuz.api import api
 from qobuz.node.inode import INode
 from qobuz.node import getNode, Flag
 from qobuz.gui.util import lang, getImage
-from qobuz import debug
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 RECOS_TYPE_IDS = {
     1: 'new-releases',
@@ -112,12 +113,10 @@ class Node_recommendation(INode):
         if self.data is None:
             return False
         if 'albums' not in self.data:
-            debug.warn(self,
-                       'Recommendation data doesn\'t contain <albums> key')
+            logger.warn('Recommendation data doesn\'t contain <albums> key')
             return False
         if self.data['albums'] is None or 'items' not in self.data['albums']:
-            debug.warn(
-                self, 'Recommendation data[\'albums\'] doesn\'t contain items')
+            logger.warn('Recommendation data[\'albums\'] doesn\'t contain items')
             return False
         for product in self.data['albums']['items']:
             self.add_child(getNode(Flag.ALBUM, data=product))

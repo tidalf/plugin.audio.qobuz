@@ -40,9 +40,9 @@ from qobuz.gui.util import notify_warn
 from qobuz.api import api
 import qobuz.gui.util as gui
 from qobuz import config
-from qobuz import debug
 from qobuz.api.user import current as user
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 def my_finish(self):
     if not self.wfile.closed:
@@ -55,7 +55,7 @@ def my_finish(self):
         try:
             self.wfile.close()
             self.rfile.close()
-        except socket.error as e:
+        except socket.error:
             pass
 
 
@@ -127,10 +127,9 @@ class KooliService(threading.Thread):
                                         use_evalex=True,
                                         passthrough_errors=False)
                     except Exception as e:
-                        debug.error(self, 'KooliService port: {} Error: {}',
+                        logger.error('KooliService port: %s Error: %s',
                                     self.port, e)
                         raise e
-                        qobuzApp.plugin = None
             time.sleep(1)
 
 
@@ -148,7 +147,7 @@ if __name__ == '__main__':
         try:
             abort = monitor.abortRequested
         except Exception as e:
-            debug.error(__name__, 'Error while getting abortRequested {}', e)
+            logger.error('Error while getting abortRequested %s', e)
         if abort:
             alive = False
             continue

@@ -10,10 +10,11 @@ import xbmc
 import xbmcgui
 
 import qobuz
-from qobuz import debug
 from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
 from qobuz.node import Flag, getNode
 from qobuz import config
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 keyTrackId = 'QobuzPlayerTrackId'
 
@@ -45,11 +46,11 @@ class QobuzPlayer(xbmc.Player):
         track = getNode(Flag.TRACK, {'nid': track_id})
         data = track.fetch(None, 1, Flag.TRACK, Flag.NONE)
         if data is None:
-            debug.warn(self, "Cannot get track data")
+            logger.warn('Cannot get track data')
             return False
         track.data = data
         if not track.is_playable():
-            debug.warn(self, "Cannot get streaming URL")
+            logger.warn('Cannot get streaming URL')
             return False
         if 'purchased' in params:
             track.parameters['purchased'] = True

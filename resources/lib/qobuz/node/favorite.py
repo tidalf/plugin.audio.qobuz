@@ -8,7 +8,6 @@
 '''
 import xbmcgui
 from qobuz.node.inode import INode
-from qobuz import debug
 from qobuz.gui.util import lang
 from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
 from qobuz.node import getNode, Flag
@@ -17,6 +16,8 @@ from qobuz.api import api
 from qobuz import exception
 from qobuz.cache import cache
 from qobuz.api.user import current as user
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 dialogHeading = lang(30083)
 
@@ -82,7 +83,7 @@ class Node_favorite(INode):
                 continue
             method = '_populate_%s' % kind
             if not hasattr(self, method):
-                debug.warn(self, 'No method named %s' % method)
+                logger.warn('No method named %s', method)
                 continue
             if getattr(self, method)(*a, **ka):
                 result = True
@@ -93,9 +94,8 @@ class Node_favorite(INode):
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, data=track)
             if not node.get_displayable():
-                debug.warn(
-                    self,
-                    'Track not displayable: {} ({})',
+                logger.warn(
+                    'Track not displayable: %s (%s)',
                     node.get_label().encode(
                         'ascii', errors='ignore'),
                     node.nid)
@@ -108,9 +108,8 @@ class Node_favorite(INode):
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
             if not node.get_displayable():
-                debug.warn(
-                    self,
-                    'Album not displayable: {} ({})',
+                logger.warn(
+                    'Album not displayable: %s (%s)',
                     node.get_label().encode(
                         'ascii', errors='ignore'),
                     node.nid)
@@ -244,7 +243,7 @@ class Node_favorite(INode):
                 if label is not None:
                     label = label.encode('utf8', errors='ignore')
             except Exception as e:
-                debug.error(self, u'Error: {}', e)
+                logger.error(u'Error: %s', e)
         dialog = DialogSelect(
             label=label, items=[node.get_label() for node in nodes])
         if dialog.open() == -1:

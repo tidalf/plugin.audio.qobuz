@@ -12,7 +12,6 @@ import xbmcgui
 from qobuz.constants import Mode
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node.inode import INode
-from qobuz import debug
 from qobuz.gui.util import lang, getImage, runPlugin, containerUpdate
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.api import api
@@ -20,6 +19,8 @@ from qobuz.api.user import current as user
 from qobuz.theme import theme
 from qobuz import config
 from qobuz.node import helper
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class Node_track(INode):
     def __init__(self, parent=None, parameters={}, data=None):
@@ -80,13 +81,13 @@ class Node_track(INode):
             return album
         if self.parent is not None and self.parent.nt & Flag.ALBUM == Flag.ALBUM:
             return self.parent.get_title(default=u'')
-        debug.warn(self, 'Track without album name: {}', self.get_label())
+        logger.warn('Track without album name: %s', self.get_label())
         return u''
 
     def get_album_id(self):
         aid = self.get_property('album/id')
         if not aid and self.parent:
-            debug.warn('using album id from parent' % aid)
+            logger.warn('using album id from parent %s', aid)
             return self.parent.nid
         return aid
 
@@ -145,8 +146,8 @@ class Node_track(INode):
         if not data:
             return None
         if 'url' not in data:
-            debug.warn(self, "streaming_url, no url returned\n"
-                       "API Error: %s" % (api.error))
+            logger.warn('streaming_url, no url returned\n'
+                       'API Error: %s' % (api.error))
             return None
         return data['url']
 
@@ -199,7 +200,7 @@ class Node_track(INode):
         try:
             year = time.strftime("%Y", time.localtime(date))
         except Exception as e:
-            debug.warn(self, 'Invalid date format %s', date)
+            logger.warn('Invalid date format %s', date)
         return year
 
     def is_playable(self):
@@ -247,8 +248,7 @@ class Node_track(INode):
                        user_id=user.get_id(),
                        intent=intent)
         if not data:
-            debug.warn(self,
-                       "Cannot get stream type for track (network problem?)")
+            logger.warn('Cannot get stream type for track (network problem?)')
             return None
         return data
 
@@ -286,8 +286,7 @@ class Node_track(INode):
         if not data:
             return False
         if not 'format_id' in data:
-            debug.warn(self,
-                       "Cannot get mime/type for track (restricted track?)")
+            logger.warn('Cannot get mime/type for track (restricted track?)')
             return False
         formatId = int(data['format_id'])
         mime = ''
@@ -296,7 +295,7 @@ class Node_track(INode):
         elif formatId == 5:
             mime = 'audio/mpeg'
         else:
-            debug.warn(self, "Unknow format " + str(formatId))
+            logger.warn('Unknow format %s', formatId)
             mime = 'audio/mpeg'
         return mime
 
@@ -306,7 +305,7 @@ class Node_track(INode):
         """
         mime = self.get_mimetype()
         if not mime:
-            debug.warn(self, "Cannot set item streaming url")
+            logger.warn('Cannot set item streaming url')
             return False
         item.setProperty('mimetype', mime)
         item.setPath(self.get_streaming_url())
@@ -346,7 +345,7 @@ class Node_track(INode):
             self.get_image(type='back'),
             self.make_url(mode=Mode.PLAY))
         if not item:
-            debug.warn(self, "Cannot create xbmc list item")
+            logger.warn('Cannot create xbmc list item')
             return None
         item.setArt({
             'thumb': self.get_image(),

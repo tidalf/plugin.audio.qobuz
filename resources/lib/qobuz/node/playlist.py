@@ -15,7 +15,6 @@ from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
-from qobuz import debug
 from qobuz.renderer import renderer
 from qobuz.gui.util import notify_warn, notify_error, notify_log
 from qobuz.gui.util import lang, getImage, runPlugin, executeBuiltin
@@ -28,6 +27,8 @@ from qobuz.theme import theme, color
 from qobuz import config
 from qobuz import image
 from qobuz.util.converter import converter
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 dialogHeading = 'Qobuz playlist'
 
@@ -95,14 +96,11 @@ class Node_playlist(INode):
             node = getNode(Flag.TRACK, data=track)
             if not node.get_displayable():
                 try:
-                   debug.warn(
-                    self,
-                    u'Track not displayable: {} ({})',
-                    node.get_label().encode(
-                        'ascii'),
-                    node.nid)
+                    logger.warn(u'Track not displayable: %s (%s)',
+                                node.get_label().encode('ascii'),
+                                node.nid)
                 except:
-                   pass
+                    pass
                 continue
             self.add_child(node)
         return True
@@ -164,7 +162,7 @@ class Node_playlist(INode):
                                 self.get_image(),
                                 self.get_image(), self.make_url())
         if not item:
-            debug.warn(self, 'Error: Cannot make xbmc list item')
+            logger.warn('Error: Cannot make xbmc list item')
             return None
         item.setArt({'icon': self.get_image(), 'thumb': self.get_image()})
         description = u'''{description}
@@ -304,7 +302,7 @@ class Node_playlist(INode):
 
     def _add_tracks(self, playlist_id, nodes):
         if len(nodes) < 1:
-            debug.warn(self, 'Empty list...')
+            logger.warn('Empty list...')
             return False
         step = 50
         start = 0
@@ -320,7 +318,7 @@ class Node_playlist(INode):
             for i in range(start, start + step):
                 node = nodes[i]
                 if node.nt != Flag.TRACK:
-                    debug.warn(self, 'Not a Node_track node')
+                    logger.warn('Not a Node_track node')
                     continue
                 str_tracks += '%s,' % (str(node.nid))
             if not api.playlist_addTracks(
@@ -362,7 +360,7 @@ class Node_playlist(INode):
         playlist = self.create(name)
         if not playlist:
             notify_error('Qobuz', 'Playlist creationg failed')
-            debug.warn(self, 'Cannot create playlist...')
+            logger.warn('Cannot create playlist...')
             return False
         if not self._add_tracks(playlist['id'], nodes):
             notify_error('Qobuz / Cannot add tracks', '%s' % (name))
@@ -376,7 +374,7 @@ class Node_playlist(INode):
         if playlist_id is None:
             playlist_id = self.nid
         if playlist_id is None:
-            debug.warn(self, 'Cannot set current playlist without id')
+            logger.warn('Cannot set current playlist without id')
             return False
         userdata = self.get_user_storage()
         userdata['current_playlist'] = int(playlist_id)
@@ -395,12 +393,12 @@ class Node_playlist(INode):
         if not playlist_id:
             playlist_id = self.nid
         if not playlist_id:
-            debug.warn(self, 'Can\'t rename playlist without id')
+            logger.warn('Can\'t rename playlist without id')
             return False
         node = getNode(Flag.PLAYLIST, parameters={'nid': playlist_id})
         data = node.fetch()
         if not data:
-            debug.warn(self, 'Something went wrong while renaming playlist')
+            logger.warn('Something went wrong while renaming playlist')
             return False
         self.data = data
         currentname = self.get_name()
@@ -414,7 +412,7 @@ class Node_playlist(INode):
             return True
         res = api.playlist_update(playlist_id=playlist_id, name=newname)
         if not res:
-            debug.warn(self, 'Cannot rename playlist with name %s' % (newname))
+            logger.warn('Cannot rename playlist with name %s' % (newname))
             return False
         self.delete_cache(playlist_id)
         notify_log(lang(30080), (u'%s: %s') % (lang(30165), currentname))
@@ -432,14 +430,14 @@ class Node_playlist(INode):
         if not query:
             query = ask('', lang(30182))
             if query is None:
-                debug.warn(self, 'Creating playlist aborted')
+                logger.warn('Creating playlist aborted')
                 return None
             if query == '':
-                debug.warn('Cannot create playlist without name')
+                logger.warn('Cannot create playlist without name')
                 return None
         ret = self.create(query)
         if not ret:
-            debug.warn(self, 'Cannot create playlist named ' ' + query + ' '')
+            logger.warn('Cannot create playlist named ' ' + query + ' '')
             return None
         self.set_as_current(ret['id'])
         self.delete_cache(ret['id'])
@@ -467,7 +465,7 @@ class Node_playlist(INode):
                        limit=self.limit,
                        offset=self.offset)
         if data is None:
-            debug.error(self, 'Cannot get playlist with id {}', playlist_id)
+            logger.error('Cannot get playlist with id %s', playlist_id)
             return False
         name = ''
         if 'name' in data:
@@ -482,8 +480,7 @@ class Node_playlist(INode):
         else:
             res = api.playlist_unsubscribe(playlist_id=playlist_id)
         if not res:
-            debug.warn(self,
-                       'Cannot delete playlist with id ' + str(playlist_id))
+            logger.warn('Cannot delete playlist with id ' + str(playlist_id))
             notify_error(lang(30183), lang(30186) + name)
             return False
         self.delete_cache(playlist_id)

@@ -9,7 +9,8 @@
 import time
 import xbmc
 
-from qobuz import debug
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 
 class ServiceItem(object):
@@ -30,7 +31,7 @@ class Monitor(xbmc.Monitor):
         self.service = {}
 
     def onSettingsChanged(self):
-        debug.info(self, 'Setting changed')  # @wip
+        logger.info('Setting changed')  # @wip
 
     def onAbortRequested(self):
         self.abortRequested = True

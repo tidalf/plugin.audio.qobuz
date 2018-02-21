@@ -8,12 +8,12 @@
 '''
 import xbmcgui
 from qobuz.node.inode import INode
-from qobuz import debug
 import weakref
 from qobuz.api import api
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.node import getNode, Flag
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 class Node_albums_by_artist(INode):
     '''@class Node_product_by_artist:
@@ -62,7 +62,7 @@ class Node_albums_by_artist(INode):
                     if k in self.data['artist']:
                         album[k] = weakref.proxy(self.data['artist'][k])
                 except:
-                    debug.warn(self, "Strange thing happen")
+                    logger.warn("Strange thing happen")
                     pass
             self.add_child(getNode(Flag.ALBUM, data=album))
         return True

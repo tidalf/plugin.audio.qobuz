@@ -8,12 +8,12 @@
 '''
 import xbmcgui
 from qobuz.node.inode import INode
-from qobuz import debug
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import getImage
 from qobuz.api import api
 from qobuz.node import getNode, Flag
-
+from qobuz.debug import getLogger
+logger = getLogger(__name__)
 
 def helper_album_list_genre(data, default=[]):
     if data is None or 'albums' not in data:
@@ -31,7 +31,7 @@ class Node_artist(INode):
         super(Node_artist, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ARTIST
-        self.content_type = 'albums'
+        self.content_type = 'artists'
         self.nid = self.get_parameter('nid', default=None)
 
     def fetch(self, *a, **ka):
@@ -102,7 +102,7 @@ class Node_artist(INode):
                                 self.get_image(),
                                 self.get_image(), self.make_url())
         if not item:
-            debug.warn(self, 'Error: Cannot make xbmc list item')
+            logger.warn('Error: Cannot make xbmc list item')
             return None
         item.setPath(self.make_url())
         item.setInfo(
