@@ -461,10 +461,6 @@ class INode(object):
             artist_name = self.get_artist()
             urlArtist = self.make_url(
                 nt=Flag.ARTIST, nid=artist_id, mode=Mode.VIEW)
-            menu.add(path='artist/all_album',
-                     label="%s %s" % (lang(30157), artist_name),
-                     cmd=containerUpdate(urlArtist),
-                     pos=-10)
             ''' Similar artist '''
             url = self.make_url(
                 nt=Flag.SIMILAR_ARTIST, nid=artist_id, mode=Mode.VIEW)
