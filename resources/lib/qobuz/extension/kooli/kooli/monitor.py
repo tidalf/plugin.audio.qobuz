@@ -32,7 +32,7 @@ class Monitor(xbmc.Monitor):
         self.service = {}
 
     def onSettingsChanged(self):
-        logger.info('Setting changed: %s', self.__name__)  # @todo Do Something
+        logger.info('Setting changed: %s')  # @todo Do Something
 
     def onAbortRequested(self):
         self.abortRequested = True
