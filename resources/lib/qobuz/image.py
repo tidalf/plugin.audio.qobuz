@@ -18,6 +18,8 @@ def combineFactory(available):
     def combine(nid, images=[], count=4, prefix='cover'):
         if not config.app.registry.get('image_create_mosaic', to='bool'):
             available = False
+        else:
+            available = True
         len_images = len(images)
         if len_images == 0:
             return None
