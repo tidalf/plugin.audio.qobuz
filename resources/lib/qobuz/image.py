@@ -57,4 +57,4 @@ def combineFactory(available, nid, images=[], count=4, prefix='cover'):
     new.save(final_path)
     return final_path
 
-combine = combineFactory(available)
+combine = functools.partial(combineFactory, available)
