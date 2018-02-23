@@ -4,6 +4,7 @@ from os import path as P
 from qobuz import data_path
 from qobuz import config
 from qobuz.debug import getLogger
+import functools
 logger = getLogger(__name__)
 
 available = False
@@ -15,11 +16,9 @@ except ImportError as e:
     logger.error('Cannot import PIL library')
 
 def combineFactory(available):
-    def combine(nid, images=[], count=4, prefix='cover'):
+    def combine(available, nid, images=[], count=4, prefix='cover'):
         if not config.app.registry.get('image_create_mosaic', to='bool'):
             available = False
-        else:
-            available = True
         len_images = len(images)
         if len_images == 0:
             return None
@@ -58,6 +57,6 @@ def combineFactory(available):
                     logger.error(error)
         new.save(final_path)
         return final_path
-    return combine
+    return functools.partial(combine, available)
 
 combine = combineFactory(available)
