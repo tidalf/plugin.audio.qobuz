@@ -10,9 +10,17 @@ class Window(object):
 class ControlImage(object):
     pass
 
+
 class Dialog(object):
     def select(self, *a, **ka):
         pass
+
+    def ok(self, *a, **ka):
+        pass
+
+    def yesno(self, *a, **ka):
+        pass
+
 
 class ListItem(object):
     def setPath(self, *a, **ka):
