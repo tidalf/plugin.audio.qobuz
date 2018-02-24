@@ -1,5 +1,12 @@
 class WindowDialog(object):
-    pass
+    def onClick(self, *a, **ka):
+        pass
+
+    def onAction(self, *a, **ka):
+        pass
+
+    def onFocus(self, *a, **ka):
+        pass
 
 
 class Window(object):
@@ -21,6 +28,15 @@ class Dialog(object):
     def yesno(self, *a, **ka):
         pass
 
+class DialogProgressBG(object):
+    def create(self, *a, **ka):
+        pass
+
+    def update(self, *a, **ka):
+        pass
+
+    def close(self, *a, **ka):
+        pass
 
 class ListItem(object):
     def setPath(self, *a, **ka):
@@ -36,4 +52,10 @@ class ListItem(object):
         pass
 
     def setProperty(self, *a, **ka):
+        pass
+
+    def setIconImage(self, *a, **ka):
+        pass
+
+    def setThumbnailImage(self, *a, **ka):
         pass
