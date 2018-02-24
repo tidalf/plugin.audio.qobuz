@@ -1,8 +1,8 @@
 
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <album>
-  <title>{{title}}</title>
   {% if artist.name is defined %}
+  <title>{{title}}</title>
     <artist>{{artist.name}}</artist>
   {% endif %}
   {% for genre in genres_list %}
