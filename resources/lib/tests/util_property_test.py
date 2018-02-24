@@ -28,19 +28,19 @@ data = {
 class TestUtilProperties(object):
     def test_get(self):
         from qobuz.util import properties
-        _path, value = properties.deepGet(data, 'foo')
+        _path, value = properties.deep_get(data, 'foo')
         assert value == {'bar': 'baz'}
-        _path, value = properties.deepGet(data, 'bar/baz/erf/long')
+        _path, value = properties.deep_get(data, 'bar/baz/erf/long')
         assert value == 'FINALY'
 
     def test_get_invalid_key(self):
         from qobuz.util import properties
         with pytest.raises(KeyError):
-            properties.deepGet(data, 'BADKEY')
+            properties.deep_get(data, 'BADKEY')
 
     def test_string_converter(self):
         from qobuz.util import properties
-        _path, value = properties.deepGet(data, 'foo', to=str)
+        _path, value = properties.deep_get(data, 'foo', to=str)
         assert value == str({'bar': 'baz'})
 
     def test_get_mapped(self):
@@ -53,10 +53,5 @@ class TestUtilProperties(object):
                 'map': ['pof', 'pif', 'bar/baz/erf']
             }
         }
-        _path, value = properties.getMapped(data, props, 'boom', to=str)
-        assert value == str({'long': 'FINALY'})
-        _path, value = properties.getMapped(data, props, 'boom', to=json.dumps)
-        assert value == '{"long": "FINALY"}'
-        _path, value = properties.getMapped(
-            data, props, 'boom', to=properties.bool_converter)
+        _path, value = properties.get_mapped(data, props, 'boom')
         assert value == True

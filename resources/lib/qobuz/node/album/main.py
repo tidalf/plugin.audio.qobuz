@@ -9,13 +9,13 @@
 import time
 import xbmcgui
 
+from .props import propsMap, informationTemplate
 from qobuz import config
 from qobuz.api import api
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import getImage
-from qobuz.node import getNode, Flag
-from qobuz.node import helper
+from qobuz.node import getNode, Flag, helper
 from qobuz.node.inode import INode
 from qobuz.theme import color
 from qobuz.util.converter import converter
@@ -24,32 +24,24 @@ logger = getLogger(__name__)
 
 
 class Node_album(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+
+    def __init__(self,
+                 parent=None,
+                 parameters=None,
+                 data=None):
+        parameters = parameters if parameters is not None else {}
         super(Node_album, self).__init__(
-            parent=parent, parameters=parameters, data=data)
-        self.nt = Flag.ALBUM
-        self.image = getImage('album')
-        self.content_type = 'songs'
+            parent=parent,
+            parameters=parameters,
+            data=data)
         self.imageDefaultSize = config.app.registry.get('image_default_size')
         self._items_path = 'tracks/items'
-
-    def get_nid(self):
-        return super(Node_album, self).get_nid()
-
-    def set_nid(self, value):
-        super(Node_album, self).set_nid(value)
-
-    nid = property(get_nid, set_nid)
+        self.propsMap = propsMap
 
     def _count(self):
         return len(self.get_property(self._items_path, default=[]))
 
-    def fetch(self,
-              Dir=None,
-              lvl=-1,
-              whiteFlag=None,
-              blackFlag=None,
-              noRemote=False):
+    def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None, noRemote=False):
         return api.get('/album/get', album_id=self.nid, noRemote=noRemote)
 
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
@@ -64,8 +56,8 @@ class Node_album(INode):
                         'name': self.get_genre()
                     },
                     'label': {
-                        'name': self.get_album_label(),
-                        'albums_count': self.get_property('label/albums_count')
+                        'name': self.get_label(),
+                        'albums_count': self.get_label_albums_count()
                     },
                     'year': self.get_year(),
                     'artist': {
@@ -86,11 +78,9 @@ class Node_album(INode):
         if asLocalUrl is True:
             from qobuz.constants import Mode
             ka['mode'] = Mode.SCAN
-            # return self.make_local_url()
         return super(Node_album, self).make_url(**ka)
 
     def makeListItem(self, replaceItems=False):
-        image = self.get_image()
         item = xbmcgui.ListItem(
             label=self.get_label(),
             label2=self.get_label2(),
@@ -107,7 +97,7 @@ class Node_album(INode):
                 'album': self.get_album(),
                 'comment': self.get_description(default=None),
                 'duration': self.get_duration(),
-                'discnumber': self.get_property('media_count')
+                'discnumber': self.get_media_count()
             })
         item.setProperty('album_description', self.get_information())
         item.setProperty('album_label', self.get_album_label())
@@ -131,18 +121,6 @@ class Node_album(INode):
             return default
         return [a['name'] for a in awards]
 
-    def get_hires(self):
-        return self.get_property('hires', to='bool', default=False)
-
-    def get_hires_purchased(self):
-        return self.get_property('hires_purchased', to='bool', default=False)
-
-    def get_purchased(self):
-        return self.get_property('purchased', to='bool', default=False)
-
-    def get_displayable(self):
-        return self.get_property('displayable', to='bool', default=False)
-
     def get_information(self):
         awards = self.get_awards(default=None)
         if awards is not None:
@@ -154,69 +132,31 @@ class Node_album(INode):
             articles = u'\n- articles %s' % ', '.join(articles)
         else:
             articles = u''
+        duration = round(self.get_property('duration', default=0.0) / 60.0, 2)
         description = self.get_description(default=self.get_label())
-        return u'''- downloadable: {downloadable}
-- hires: {hires}
-- previewable: {previewable}
-- streamable: {streamable}
-- sampleable: {sampleable}
-- displayable: {displayable}
-- purchasable: {purchasable}
-- purchased: {purchased}
-- purchasable_at: {purchasable_at}
-- hires_purchased: {hires_purchased}
-{description}{awards}{articles}
-- popularity: {popularity}
-- duration: {duration} mn
-- media_count: {media_count}
-- released_at: {released_at}
-- tracks_count: {tracks_count}
-- label: {label}
-- genre: {genre}
-- artist: {artist}
-- maximum_sampling_rate: {maximum_sampling_rate}
-        '''.format(
-            popularity=self.get_property('popularity'),
+        return informationTemplate.format(
+            popularity=self.get_popularity(),
             description=description,
-            duration=round(
-                self.get_property(
-                    'duration', default=0.0) / 60.0, 2),
-            previewable=self.get_property('previewable'),
-            streamable=self.get_property('streamable'),
-            media_count=self.get_property('media_count'),
+            duration=duration,
+            previewable=self.get_previewable(),
+            streamable=self.get_streamable(),
+            media_count=self.get_media_count(),
             purchased=self.get_purchased(),
-            purchasable=self.get_property('purchasable'),
-            purchasable_at=self.get_property('purchasable_at'),
-            released_at=self.get_property('released_at'),
-            tracks_count=self.get_property('tracks_count'),
-            displayable=self.get_property('displayable'),
-            label=self.get_property('label/name'),
-            downloadable=self.get_property('downloadable'),
-            hires=self.get_property('hires'),
+            purchasable=self.get_purchasable(),
+            purchasable_at=self.get_purchasable_at(),
+            released_at=self.get_released_at(),
+            tracks_count=self.get_tracks_count(),
+            displayable=self.get_displayable(),
+            label=self.get_label(),
+            downloadable=self.get_downloadable(),
+            hires=self.get_hires(),
             hires_purchased=self.get_hires_purchased(),
-            sampleable=self.get_property('sampleable'),
+            sampleable=self.get_sampleable(),
             awards=awards,
-            genre=self.get_property('genre/name'),
+            genre=self.get_genre(),
             articles=articles,
             artist=self.get_artist(),
-            maximum_sampling_rate=self.get_property('maximum_sampling_rate'))
-
-    def get_artist(self):
-        return self.get_property(
-            ['artist/name', 'interpreter/name', 'composer/name'])
-
-    def get_album(self):
-        return self.get_property('title')
-
-    def get_album_label(self):
-        return self.get_property('label/name')
-
-    def get_artist_id(self):
-        return self.get_property(
-            ['artist/id', 'interpreter/id', 'composer/id'])
-
-    def get_title(self, default=None):
-        return self.get_property('title', default=default)
+            maximum_sampling_rate=self.get_maximum_sampling_rate())
 
     def get_image(self, size=None):
         if not size:
@@ -230,13 +170,8 @@ class Node_album(INode):
         return self.get_title()
 
     def get_label(self, default=None):
-        # rgb = self.get_property('genre/color', default='#00000')
-        # genre = self.get_property('genre/name', default='n/a')
         artist = self.get_artist() or 'VA'
         return '%s - %s' % (artist, self.get_title())
-
-    def get_genre(self, default=u''):
-        return self.get_property('genre/name', default=default)
 
     def get_year(self):
         date = self.get_property('released_at', default=None)
@@ -246,10 +181,3 @@ class Node_album(INode):
         except Exception:
             logger.warn('Invalid date format %s', date)
         return year
-
-    def get_description(self, default='n/a'):
-        return self.get_property(
-            'description', default=default, to='strip_html')
-
-    def get_duration(self, default=None):
-        return self.get_property('duration', default=default, to='math_floor')

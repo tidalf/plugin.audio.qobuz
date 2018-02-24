@@ -6,42 +6,33 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from time import time
 import os
-import random
 import sys
 import urllib
 import weakref
+import random
 
+from .context_menu import attach_context_menu
+from .pagination import add_pagination
+from .props import node_type_from_class, node_image_from_class, node_contenttype_from_class
 from qobuz import config
 from qobuz import exception
 from qobuz.api import api
 from qobuz.api.user import current as current_user
-from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import lang, runPlugin, containerUpdate
-from qobuz.node import getNode, Flag
+from qobuz.node import Flag, getNode
 from qobuz.renderer import renderer
 from qobuz.storage import _Storage
 from qobuz.theme import theme, color
-from qobuz.util import common
 from qobuz.util import data as dataUtil
+from qobuz.util import properties
 from qobuz.util.converter import converter
-import qobuz
 
 logger = getLogger(__name__)
-
-_paginated = [
-    'albums', 'labels', 'tracks', 'artists', 'playlists', 'playlist',
-    'public_playlists', 'genres'
-]
-
-
-def addint(*a):
-    return sum(int(s) for s in a)
 
 
 class INode(object):
@@ -61,32 +52,36 @@ class INode(object):
         @param parent=None: Parent node if not None
         @param parameters={}: dictionary
         '''
-        self._nid = None
-        self._parent = None
         self._content_type = None
         self._data = None
         self._label = None
+        self._nid = None
+        self._parent = None
+
+        self.data = data
         self.parameters = parameters
-        self.nt = None
         self.parent = parent
-        self.content_type = 'files'
-        self.image = None
+
+        self.content_type = node_contenttype_from_class(
+            self.__class__) or 'files'
+        self.image = node_image_from_class(self.__class__)
+        self.nt = node_type_from_class(self.__class__)
+
         self.childs = []
+        self.hasWidget = False
+        self.is_folder = True
         self.label = None
         self.label2 = None
-        self.is_folder = True
-        self.pagination_next = None
-        self.pagination_prev = None
-        self.offset = self.get_parameter('offset', default=0)
-        self.hasWidget = False
-        self.user_storage = None
-        self.nid = self.get_parameter('nid', default=None) \
-            or self.get_property('id', default=None)
-        self.data = data
-        self.node_storage = None
-        self.user_storage = None
         self.limit = config.app.registry.get('pagination_limit', to='int')
         self.mode = self.get_parameter('mode', to='int')
+        self.nid = self.get_parameter(
+            'nid', default=None) or self.get_property('id', default=None)
+        self.node_storage = None
+        self.offset = self.get_parameter('offset', default=0)
+        self.pagination_next = None
+        self.pagination_prev = None
+        self.user_storage = None
+        self.user_storage = None
 
     def set_nid(self, value):
         '''@setter nid'''
@@ -166,60 +161,40 @@ class INode(object):
                                    'image/mega',
                                    'picture'])
         '''
+        if self.data is None:
+            return default
         if isinstance(pathList, basestring):
-            res = self.__get_property(pathList)
-            if res is None:
-                return default
-            return getattr(converter, to)(res)
+            pathList = [pathList]
         for path in pathList:
-            data = self.__get_property(path)
-            if data is not None:
-                return getattr(converter, to)(data)
+            try:
+                _path, value = properties.deep_get(self.data, path)
+                return getattr(converter, to)(value)
+            except KeyError:
+                pass
         return default
 
-    def __get_property(self, path):
-        '''Helper used by get_property method
-        '''
-        if self.data is None:
-            return None
-        xPath = path.split('/')
-        root = self.data
-        for i in range(0, len(xPath)):
-            if not xPath[i] in root:
-                return None
-            root = root[xPath[i]]
-            if common.is_empty(root):
-                return None
-        if root is not None and root != 'None':
-            return root
-        return None
+    def __getattr__(self, attr):
+        if attr.startswith('get_') and hasattr(self, 'propsMap'):
+            key = attr[4:]
+            if key in self.propsMap:
+                prop = self.propsMap.get(key)
+                default = prop.get('default') if hasattr(
+                    prop, 'default') else None
+                if self.data is None:
+                    return lambda *a, **ka: default
+                try:
+                    _path, value = properties.get_mapped(
+                        self.data,
+                        self.propsMap,
+                        key,
+                        default=default)
+                    return lambda *a, **ka: value
+                except KeyError:
+                    pass
+        raise AttributeError(attr)
 
     def __add_pagination(self, data):
-        '''build_down helper: Add pagination data when needed
-        '''
-        if not data:
-            return False
-        items = None
-        for kind in _paginated:
-            if kind in data and data[kind]:
-                items = data[kind]
-                break
-        if items is None:
-            return False
-        if 'limit' not in items or 'total' not in items:
-            return False
-        if items['limit'] is None:
-            return False
-        newlimit = addint(items['offset'], items['limit'])
-        if items['total'] < newlimit:
-            return False
-        url = self.make_url(offset=newlimit)
-        self.pagination_next = url
-        self.pagination_total = items['total']
-        self.pagination_offset = items['offset']
-        self.pagination_limit = items['limit']
-        self.pagination_next_offset = newlimit
-        return True
+        return add_pagination(self, data)
 
     def set_parameters(self, parameters):
         '''Setting parameters property
@@ -375,9 +350,10 @@ class INode(object):
         render.run()
         return render
 
-    def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None):
+    def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None, noRemote=False):
         '''When returning None we are not displaying directory content
         '''
+        logger.warning('base class fetch: %s', self)
         return {}
 
     def populating(self,
@@ -423,7 +399,6 @@ class INode(object):
         required
         """
         if self.pagination_next:
-            colorItem = theme.get('item/default/color')
             params = config.app.bootstrap.params
             params['offset'] = self.pagination_next_offset
             params['nid'] = self.nid
@@ -436,171 +411,7 @@ class INode(object):
             self.add_child(node)
 
     def attach_context_menu(self, item, menu):
-        '''Note: Url made with make_url must set mode (like mode=Mode.VIEW)
-            else we are copying current mode (for track it's Mode.PLAY ...)
-        '''
-        ''' HOME '''
-        colorCaution = theme.get('item/caution/color')
-
-        def c_pl(txt):
-            return color(theme.get('menu/playlist/color'), txt)
-
-        def c_fav(txt):
-            return color(theme.get('menu/favorite/color'), txt)
-
-        url = self.make_url(nt=Flag.ROOT, mode=Mode.VIEW, nm='')
-        menu.add(path='qobuz',
-                 label="Qobuz",
-                 cmd=containerUpdate(url, False),
-                 id='',
-                 pos=-5)
-        ''' ARTIST '''
-        if self.nt & (Flag.ALBUM | Flag.TRACK | Flag.ARTIST):
-            artist_id = self.get_artist_id()
-            artist_name = self.get_artist()
-            urlArtist = self.make_url(
-                nt=Flag.ARTIST, nid=artist_id, mode=Mode.VIEW)
-            ''' Similar artist '''
-            url = self.make_url(
-                nt=Flag.SIMILAR_ARTIST, nid=artist_id, mode=Mode.VIEW)
-            menu.add(path='artist/similar',
-                     label=lang(30160),
-                     cmd=containerUpdate(url))
-        ''' FAVORITES '''
-        wf = self.nt & (~Flag.FAVORITE)
-        if self.parent:
-            wf = wf and self.parent.nt & ~Flag.FAVORITE
-        if wf:
-            ''' ADD TO FAVORITES / TRACKS'''
-            url = self.make_url(nt=Flag.FAVORITE, nm='', mode=Mode.VIEW)
-            menu.add(path='favorites',
-                     label=c_fav("Favorites"),
-                     cmd=containerUpdate(url, True),
-                     pos=-9)
-            url = self.make_url(
-                nt=Flag.FAVORITE,
-                nm='gui_add_tracks',
-                qid=self.nid,
-                qnt=self.nt,
-                mode=Mode.VIEW)
-            menu.add(path='favorites/add_tracks',
-                     label=c_fav(lang(30167) + ' tracks'),
-                     cmd=runPlugin(url))
-            ''' ADD TO FAVORITES / Albums'''
-            url = self.make_url(
-                nt=Flag.FAVORITE,
-                nm='gui_add_albums',
-                qid=self.nid,
-                qnt=self.nt,
-                mode=Mode.VIEW)
-            menu.add(path='favorites/add_albums',
-                     label=c_fav(lang(30167) + ' albums'),
-                     cmd=runPlugin(url))
-            # ''' ADD TO FAVORITES / Artists'''
-            # url = self.make_url(
-            #     nt=Flag.FAVORITE,
-            #     nm='gui_add_artists',
-            #     qid=self.nid,
-            #     qnt=self.nt,
-            #     mode=Mode.VIEW)
-            # menu.add(path='favorites/add_artists',
-            #          label=c_fav(lang(30167) + ' artists'),
-            #          cmd=runPlugin(url))
-
-        if self.parent and (self.parent.nt & Flag.FAVORITE):
-            url = self.make_url(nt=Flag.FAVORITE, nm='', mode=Mode.VIEW)
-            menu.add(path='favorites',
-                     label="Favorites",
-                     cmd=containerUpdate(url, True),
-                     pos=-9)
-            url = self.make_url(
-                nt=Flag.FAVORITE,
-                nm='gui_remove',
-                qid=self.nid,
-                qnt=self.nt,
-                mode=Mode.VIEW)
-            menu.add(path='favorites/remove',
-                     label=c_fav('Remove %s' % (self.get_label())),
-                     cmd=runPlugin(url),
-                     color=colorCaution)
-        wf = ~Flag.USERPLAYLISTS
-        if wf:
-            ''' PLAYLIST '''
-            cmd = containerUpdate(
-                self.make_url(
-                    nt=Flag.USERPLAYLISTS, nid='', mode=Mode.VIEW))
-            menu.add(path='playlist',
-                     pos=1,
-                     label=c_pl("Playlist"),
-                     cmd=cmd,
-                     mode=Mode.VIEW)
-            ''' ADD TO CURRENT PLAYLIST '''
-            cmd = runPlugin(
-                self.make_url(
-                    nt=Flag.PLAYLIST,
-                    nm='gui_add_to_current',
-                    qnt=self.nt,
-                    mode=Mode.VIEW,
-                    qid=self.nid))
-            menu.add(path='playlist/add_to_current',
-                     label=c_pl(lang(30161)),
-                     cmd=cmd)
-            label = self.get_label()
-            try:
-                label = label.encode('utf8', 'replace')
-            except:
-                logger.warn('Cannot set query... %s', repr(label))
-                label = ''
-            label = urllib.quote_plus(label)
-            # ADD AS NEW
-            cmd = runPlugin(
-                self.make_url(
-                    nt=Flag.PLAYLIST,
-                    nm='gui_add_as_new',
-                    qnt=self.nt,
-                    query=label,
-                    mode=Mode.VIEW,
-                    qid=self.nid))
-            menu.add(path='playlist/add_as_new',
-                     label=c_pl(lang(30082)),
-                     cmd=cmd)
-        # PLAYLIST / CREATE
-        cFlag = (Flag.PLAYLIST | Flag.USERPLAYLISTS)
-        if self.nt | cFlag == cFlag:
-            cmd = runPlugin(
-                self.make_url(
-                    nt=Flag.PLAYLIST, nm="gui_create", mode=Mode.VIEW))
-            menu.add(path='playlist/create', label=c_pl(lang(30164)), cmd=cmd)
-        # VIEW BIG DIR
-        # cmd = containerUpdate(self.make_url(mode=Mode.VIEW_BIG_DIR))
-        # menu.add(path='qobuz/big_dir', label=lang(30158), cmd=cmd)
-        if config.app.registry.get('enable_scan_feature', to='bool'):
-             # SCAN
-             query = urllib.quote_plus(
-                 self.make_url(
-                     mode=Mode.SCAN, asLocalUrl=True))
-             url = self.make_url(
-                 nt=Flag.ROOT, mode=Mode.VIEW, nm='gui_scan', query=query)
-             menu.add(path='qobuz/scan', cmd=runPlugin(url), label='scan')
-        if self.nt & (Flag.ALL & ~Flag.ALBUM & ~Flag.TRACK & ~Flag.PLAYLIST):
-            # ERASE CACHE
-            cmd = runPlugin(
-                self.make_url(
-                    nt=Flag.ROOT, nm="cache_remove", mode=Mode.VIEW))
-            menu.add(path='qobuz/erase_cache',
-                     label=lang(30117),
-                     cmd=cmd,
-                     color=colorCaution,
-                     pos=10)
-            if config.app.registry.get('enable_scan_feature', to='bool'):
-                # HTTP / Kooli / Ping
-                cmd = runPlugin(
-                    self.make_url(
-                        nt=Flag.TESTING, nm="show_dialog", mode=Mode.VIEW))
-                menu.add(path='qobuz/test httpd',
-                         label='Test web service',
-                         cmd=cmd,
-                         pos=11)
+        return attach_context_menu(self, item, menu)
 
     def get_user_storage(self):
         if self.user_storage is not None:
@@ -617,8 +428,8 @@ class INode(object):
     @classmethod
     def get_user_data(cls):
         data = api.get('/user/login',
-                       username=user.username,
-                       password=user.password)
+                       username=current_user.username,
+                       password=current_user.password)
         if not data:
             return None
         return data['user']
