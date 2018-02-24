@@ -1,10 +1,9 @@
-import urllib
 from HTMLParser import HTMLParser
 import math
+import urllib
 
-from qobuz.util import data as dataUtil
-from qobuz.util import common
 from qobuz import debug
+from qobuz.util import common
 
 
 class MLStripper(HTMLParser):

@@ -7,11 +7,11 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz import debug
-from qobuz.node.inode import INode
 from qobuz import exception
-from qobuz.gui.util import lang, getImage
 from qobuz.api import api
+from qobuz.gui.util import lang, getImage
 from qobuz.node import getNode, Flag
+from qobuz.node.inode import INode
 
 data_search_type = {
     'artists': {

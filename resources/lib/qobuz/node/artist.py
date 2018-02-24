@@ -7,13 +7,16 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui
-from qobuz.node.inode import INode
+
+from qobuz.api import api
+from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import getImage
-from qobuz.api import api
 from qobuz.node import getNode, Flag
-from qobuz.debug import getLogger
+from qobuz.node.inode import INode
+
 logger = getLogger(__name__)
+
 
 def helper_album_list_genre(data, default=[]):
     if data is None or 'albums' not in data:

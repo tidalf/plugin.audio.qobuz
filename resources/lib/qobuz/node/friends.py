@@ -6,13 +6,15 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.node.inode import INode
-from qobuz.gui.util import getImage, runPlugin, containerUpdate, lang
 from qobuz.api import api
-from qobuz.node import getNode, Flag
 from qobuz.api.user import current as user
 from qobuz.debug import getLogger
+from qobuz.gui.util import getImage, runPlugin, containerUpdate, lang
+from qobuz.node import getNode, Flag
+from qobuz.node.inode import INode
+
 logger = getLogger(__name__)
+
 
 class Node_friends(INode):
     def __init__(self, parent=None, parameters={}, data=None):

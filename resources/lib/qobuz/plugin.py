@@ -8,8 +8,8 @@
 '''
 import os
 import sys
-import xbmcaddon
 import xbmc
+import xbmcaddon
 
 
 class Plugin(object):

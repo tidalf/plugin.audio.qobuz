@@ -7,16 +7,19 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import json
-from qobuz.node.inode import INode
-from qobuz.gui.util import getImage, runPlugin, containerRefresh, \
-    containerUpdate, notifyH, executeBuiltin, lang
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.cache import cache
-from qobuz.node import Flag, getNode
-from qobuz.theme import theme, color
 from qobuz.debug import getLogger
+from qobuz.gui.util import getImage, runPlugin
+from qobuz.gui.util import containerRefresh, containerUpdate
+from qobuz.gui.util import notifyH, executeBuiltin, lang
+from qobuz.node import Flag, getNode
+from qobuz.node.inode import INode
+from qobuz.theme import theme, color
+
 logger = getLogger(__name__)
+
 
 class Node_friend(INode):
     def __init__(self, parent=None, parameters={}, data=None):

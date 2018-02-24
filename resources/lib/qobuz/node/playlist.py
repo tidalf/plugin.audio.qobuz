@@ -9,27 +9,28 @@
 import os
 import random
 import xbmcgui
-from qobuz.node.inode import INode
-from qobuz.node import getNode, Flag
+
+from qobuz import config
+from qobuz import image
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
-from qobuz.renderer import renderer
-from qobuz.gui.util import notify_warn, notify_error, notify_log
-from qobuz.gui.util import lang, getImage, runPlugin, executeBuiltin
-from qobuz.gui.util import containerRefresh, containerUpdate
-from qobuz.gui.contextmenu import contextMenu
 from qobuz.constants import Mode
-from qobuz.util import common as util
-from qobuz.gui.util import Keyboard, ask
-from qobuz.theme import theme, color
-from qobuz import config
-from qobuz import image
-from qobuz.util.converter import converter
 from qobuz.debug import getLogger
-logger = getLogger(__name__)
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.gui.util import Keyboard, ask
+from qobuz.gui.util import containerRefresh, containerUpdate
+from qobuz.gui.util import lang, getImage, runPlugin, executeBuiltin
+from qobuz.gui.util import notify_warn, notify_error, notify_log
+from qobuz.node import getNode, Flag
+from qobuz.node.inode import INode
+from qobuz.renderer import renderer
+from qobuz.theme import theme, color
+from qobuz.util import common as util
+from qobuz.util.converter import converter
 
+logger = getLogger(__name__)
 dialogHeading = 'Qobuz playlist'
 
 

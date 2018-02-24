@@ -7,13 +7,16 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui
-from qobuz.node.inode import INode
+
+from qobuz.api import api
+from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.node import Flag
-from qobuz.api import api
 from qobuz.node import getNode
-from qobuz.debug import getLogger
+from qobuz.node.inode import INode
+
 logger = getLogger(__name__)
+
 
 class WidgetArticle(xbmcgui.WindowDialog):
     def __init__(self, *a, **ka):

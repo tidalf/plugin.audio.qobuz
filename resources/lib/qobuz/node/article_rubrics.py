@@ -6,11 +6,11 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import qobuz
+from qobuz.gui.util import getImage, getSetting
+from qobuz.node.articles import Node_articles
 from qobuz.node.flag import Flag
 from qobuz.node.inode import INode
-from qobuz.node.articles import Node_articles
-from qobuz.gui.util import getImage, getSetting
+import qobuz
 
 
 class Node_article_rubrics(INode):

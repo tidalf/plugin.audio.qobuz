@@ -6,26 +6,25 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os
-from os import path as P
-import logging
-from functools import wraps, update_wrapper
 from datetime import datetime
-from werkzeug import exceptions
-from jinja2 import Undefined
-from flask import Flask
-from flask import request
+from flask import Flask, request
 from flask import Response, redirect
-from flask import make_response, render_template, request
+from flask import make_response, render_template
+from functools import wraps, update_wrapper
+from jinja2 import Undefined
+from os import path as P
+from werkzeug import exceptions
+import logging
+import os
 
 from qobuz.api import api
 from qobuz.application import Application as QobuzApplication
-from qobuz.cache import cache
-from qobuz.plugin import Plugin
 from qobuz.bootstrap import MinimalBootstrap
+from qobuz.cache import cache
 from qobuz.debug import logger
-from qobuz.node import getNode, Flag
 from qobuz.gui.directory import Directory
+from qobuz.node import getNode, Flag
+from qobuz.plugin import Plugin
 from qobuz.util.converter import converter
 from kooli import kooli_path
 

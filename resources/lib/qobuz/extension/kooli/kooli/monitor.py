@@ -9,8 +9,9 @@
 import time
 import xbmc
 
-from qobuz.debug import getLogger
 from qobuz.cache import cache_util
+from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
 
 

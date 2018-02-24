@@ -6,11 +6,11 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.node.inode import INode, getNode
 from qobuz import debug
+from qobuz.api import api
 from qobuz.gui.util import getImage, lang
 from qobuz.node import Flag
-from qobuz.api import api
+from qobuz.node.inode import INode, getNode
 
 
 class Node_label(INode):

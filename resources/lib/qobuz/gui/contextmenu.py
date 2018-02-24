@@ -6,9 +6,9 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+from qobuz import config
 from qobuz import exception
 from qobuz.theme import theme, color
-from qobuz import config
 
 
 class contextMenu(object):

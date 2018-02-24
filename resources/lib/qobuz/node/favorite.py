@@ -7,20 +7,20 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import xbmcgui
-from qobuz.node.inode import INode
-from qobuz.gui.util import lang
-from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
-from qobuz.node import getNode, Flag
-from qobuz.renderer import renderer
-from qobuz.api import api
+
 from qobuz import exception
-from qobuz.cache import cache
+from qobuz.api import api
 from qobuz.api.user import current as user
+from qobuz.cache import cache
 from qobuz.debug import getLogger
+from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
+from qobuz.gui.util import lang
+from qobuz.node import getNode, Flag
+from qobuz.node.inode import INode
+from qobuz.renderer import renderer
+
 logger = getLogger(__name__)
-
 dialogHeading = lang(30083)
-
 all_kinds = ['albums', 'tracks', 'artists']
 
 

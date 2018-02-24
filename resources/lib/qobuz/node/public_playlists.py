@@ -6,12 +6,12 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+from qobuz import debug
+from qobuz.api import api
+from qobuz.cache import cache
+from qobuz.gui.util import lang, getImage
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
-from qobuz.gui.util import lang, getImage
-from qobuz.api import api
-from qobuz import debug
-from qobuz.cache import cache
 
 featured_type = ['editor-picks', 'last-created']
 limit_max = 100

@@ -6,16 +6,16 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import sys
-import os
 from os import path as P
-import time
-import errno
-import traceback
-import threading
-import requests
 import SocketServer
+import errno
+import os
+import requests
 import socket
+import sys
+import threading
+import time
+import traceback
 
 base_path = P.abspath(P.dirname(__file__))
 try:
@@ -32,16 +32,17 @@ except ImportError as e:
     path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask',
                   'lib')
     sys.path.append(path)
-from flask import request
 import xbmc
+from flask import request
 from kooli.application import application, shutdown_server, qobuzApp
 from kooli.monitor import Monitor
-from qobuz.gui.util import notify_warn
-from qobuz.api import api
-import qobuz.gui.util as gui
 from qobuz import config
+from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.debug import getLogger
+from qobuz.gui.util import notify_warn
+import qobuz.gui.util as gui
+
 logger = getLogger(__name__)
 
 def my_finish(self):

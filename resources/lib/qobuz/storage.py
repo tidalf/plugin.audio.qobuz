@@ -8,19 +8,22 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os
+from datetime import datetime
+import collections
 import csv
 import json
+import os
+import shutil
 import time
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
-import shutil
-import collections
-from datetime import datetime
+
 from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
+
 
 class _PersistentDictMixin(object):
     '''Persistent dictionary with an API compatible with shelve and anydbm.

@@ -8,19 +8,20 @@
 '''
 import sys
 import xbmcplugin
-from qobuz.renderer.irenderer import IRenderer
-from qobuz.gui.util import notifyH
-from qobuz import exception
-from qobuz import config
-from qobuz.node.flag import Flag
-from qobuz.constants import Mode
-from qobuz.node import getNode
-from qobuz.gui.directory import Directory
-from qobuz.alarm import Notifier
-from qobuz.gui.bg_progress import Progress
-from qobuz.debug import getLogger
-logger = getLogger(__name__)
 
+from qobuz import config
+from qobuz import exception
+from qobuz.alarm import Notifier
+from qobuz.constants import Mode
+from qobuz.debug import getLogger
+from qobuz.gui.bg_progress import Progress
+from qobuz.gui.directory import Directory
+from qobuz.gui.util import notifyH
+from qobuz.node import getNode
+from qobuz.node.flag import Flag
+from qobuz.renderer.irenderer import IRenderer
+
+logger = getLogger(__name__)
 notifier = Notifier(title='Scanning progress')
 
 

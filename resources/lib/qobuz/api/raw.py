@@ -9,22 +9,22 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import sys
-import pprint
-from time import time
-import math
-import hashlib
-import socket
-import binascii
 from itertools import izip, cycle
-import requests
+from time import time
+import binascii
 import copy
+import hashlib
+import math
+import pprint
+import requests
+import socket
+import sys
 
 from qobuz import exception
 from qobuz.api.user import current as user
 from qobuz.debug import getLogger
-logger = getLogger(__name__)
 
+logger = getLogger(__name__)
 socket.timeout = 5
 
 

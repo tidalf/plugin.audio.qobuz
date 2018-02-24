@@ -1,5 +1,7 @@
 import xbmcgui
+
 from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
 
 

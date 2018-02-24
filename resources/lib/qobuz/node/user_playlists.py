@@ -7,14 +7,15 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
-from qobuz.node import Flag, getNode
-from qobuz.node.inode import INode
+
+from qobuz import config
 from qobuz import debug
-from qobuz.gui.util import lang, getImage
 from qobuz.api import api
 from qobuz.api.user import current as user
-from qobuz import config
 from qobuz.cache import cache
+from qobuz.gui.util import lang, getImage
+from qobuz.node import Flag, getNode
+from qobuz.node.inode import INode
 
 limit_max = 100
 
