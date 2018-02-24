@@ -44,6 +44,7 @@ jobs:
       # other common Python testing frameworks include pytest and nose
       # https://pytest.org
       # https://nose.readthedocs.io
-      - test:
-         override:
-            - py.test
+      - run:
+          command: |
+            . venv/bin/activate
+            py.test
