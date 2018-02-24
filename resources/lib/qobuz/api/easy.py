@@ -23,16 +23,16 @@ class InvalidQuery(Exception):
     pass
 
 
+def is_notification_enabled(_self):
+    return config.app.registry.get('notify_api_error', to='bool')
+
+
 class EasyApi(RawApi):
     def __init__(self):
         self.cache_base_path = None
         super(EasyApi, self).__init__()
 
-    @classmethod
-    def get_notify(cls):
-        return config.app.registry.get('notify_api_error', to='bool')
-
-    notify = property(get_notify)
+    notify = property(is_notification_enabled)
 
     @cache.cached
     def get(self, *a, **ka):
