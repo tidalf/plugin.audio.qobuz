@@ -30,7 +30,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
+            python2 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
 
@@ -44,12 +44,6 @@ jobs:
       # other common Python testing frameworks include pytest and nose
       # https://pytest.org
       # https://nose.readthedocs.io
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            pytest
-
-      - store_artifacts:
-          path: test-reports
-          destination: test-reports
+      - test:
+         override:
+            - py.test
