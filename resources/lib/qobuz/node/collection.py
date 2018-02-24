@@ -6,14 +6,14 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.node.inode import INode
-from qobuz.node import Flag, getNode
 from qobuz.api import api
-from qobuz.gui.util import getImage, lang
-from qobuz.util.converter import converter
 from qobuz.debug import getLogger
-logger = getLogger(__name__)
+from qobuz.gui.util import getImage, lang
+from qobuz.node import Flag, getNode
+from qobuz.node.inode import INode
+from qobuz.util.converter import converter
 
+logger = getLogger(__name__)
 dialogHeading = 'Collection'
 
 

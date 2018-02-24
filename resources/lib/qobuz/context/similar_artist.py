@@ -8,13 +8,15 @@
 '''
 import sys
 from os import path as P
+
 base_dir = P.abspath(P.join(P.dirname(__file__), P.pardir))
 sys.path.append(P.join(base_dir, P.pardir))
-from qobuz.node import getNode, Flag
-from qobuz.util.converter import converter
-from qobuz.plugin import Plugin
+
 from qobuz.application import Application
 from qobuz.gui.util import containerUpdate, executeBuiltin
+from qobuz.node import getNode, Flag
+from qobuz.plugin import Plugin
+from qobuz.util.converter import converter
 
 if __name__ == '__main__':
     app = Application(Plugin('plugin.audio.qobuz'))

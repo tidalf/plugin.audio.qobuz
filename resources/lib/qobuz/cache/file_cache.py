@@ -18,9 +18,10 @@ except ImportError:
 import os
 
 from qobuz.cache.base_cache import BaseCache
+from qobuz.debug import getLogger
 from qobuz.util.file import RenamedTemporaryFile, unlink
 from qobuz.util.hash import hashit
-from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
 
 

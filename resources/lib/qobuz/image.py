@@ -1,12 +1,13 @@
+from os import path as P
+import functools
 import random
 import requests
-from os import path as P
-from qobuz import data_path
-from qobuz import config
-from qobuz.debug import getLogger
-import functools
-logger = getLogger(__name__)
 
+from qobuz import config
+from qobuz import data_path
+from qobuz.debug import getLogger
+
+logger = getLogger(__name__)
 available = False
 
 try:

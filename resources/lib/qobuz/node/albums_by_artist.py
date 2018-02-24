@@ -6,13 +6,15 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui
-from qobuz.node.inode import INode
 import weakref
+import xbmcgui
+
 from qobuz.api import api
+from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.node import getNode, Flag
-from qobuz.debug import getLogger
+from qobuz.node.inode import INode
+
 logger = getLogger(__name__)
 
 class Node_albums_by_artist(INode):

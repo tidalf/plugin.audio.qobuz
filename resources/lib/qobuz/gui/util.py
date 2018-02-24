@@ -7,8 +7,8 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
-import sys
 import re
+import sys
 
 try:
     import xbmc
@@ -31,11 +31,11 @@ def ask(current=None, heading='rename'):
     return w.getText().strip()
 
 
-import qobuz
-from qobuz.xbmcrpc import showNotification, getInfoLabels
 from qobuz import config
 from qobuz import debug
 from qobuz.util import common as commonUtil
+from qobuz.xbmcrpc import showNotification, getInfoLabels
+import qobuz
 
 
 def getImage(name):

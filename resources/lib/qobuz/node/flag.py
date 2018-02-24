@@ -8,7 +8,9 @@
 '''
 from qobuz import exception
 from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
+
 
 class FlagEnum(object):
     NODE = 1 << 1

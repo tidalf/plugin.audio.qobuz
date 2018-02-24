@@ -6,9 +6,9 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
-from qobuz.node import Flag
 from qobuz.constants import Mode
+from qobuz.node import Flag
+from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
 
 
 def renderer(nType,

@@ -9,7 +9,9 @@
 import os
 import re
 import tempfile
+
 from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
 
 

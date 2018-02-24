@@ -9,8 +9,10 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
-from qobuz.util.file import find
+
 from qobuz.debug import getLogger
+from qobuz.util.file import find
+
 logger = getLogger(__name__)
 
 

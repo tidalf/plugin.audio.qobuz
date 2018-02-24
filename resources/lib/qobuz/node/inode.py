@@ -6,33 +6,32 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os
-import sys
 from time import time
+import os
+import random
+import sys
 import urllib
 import weakref
-import random
 
+from qobuz import config
+from qobuz import exception
 from qobuz.api import api
 from qobuz.api.user import current as current_user
+from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz.constants import Mode
-from qobuz import exception
+from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import lang, runPlugin, containerUpdate
-from qobuz.gui.util import getImage
-from qobuz.api.user import current as user
-from qobuz.node import Flag
-from qobuz.node import getNode
-import qobuz
+from qobuz.node import getNode, Flag
 from qobuz.renderer import renderer
 from qobuz.storage import _Storage
-from qobuz import config
-from qobuz.util import data as dataUtil
-from qobuz.util import common
 from qobuz.theme import theme, color
+from qobuz.util import common
+from qobuz.util import data as dataUtil
 from qobuz.util.converter import converter
-from qobuz.debug import getLogger
+import qobuz
+
 logger = getLogger(__name__)
 
 _paginated = [

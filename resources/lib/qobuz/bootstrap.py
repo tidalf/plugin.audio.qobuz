@@ -6,20 +6,21 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import sys
 import os
+import sys
 import xbmc
 
-from qobuz.constants import Mode
-from qobuz.dog import dog
-from qobuz.node import Flag
 from qobuz import exception
+from qobuz.cache import cache
+from qobuz.constants import Mode
+from qobuz.debug import getLogger
+from qobuz.dog import dog
 from qobuz.gui.util import dialogLoginFailure, containerRefresh
 from qobuz.gui.util import dialogServiceTemporarilyUnavailable
-import qobuz.config as config
-from qobuz.cache import cache
+from qobuz.node import Flag
 from qobuz.renderer import renderer
-from qobuz.debug import getLogger
+import qobuz.config as config
+
 logger = getLogger(__name__)
 
 

@@ -9,18 +9,20 @@
 import time
 import xbmcgui
 
-from qobuz.constants import Mode
-from qobuz.node import Flag, ErrorNoData
-from qobuz.node.inode import INode
-from qobuz.gui.util import lang, getImage, runPlugin, containerUpdate
-from qobuz.gui.contextmenu import contextMenu
+from qobuz import config
 from qobuz.api import api
 from qobuz.api.user import current as user
-from qobuz.theme import theme
-from qobuz import config
-from qobuz.node import helper
+from qobuz.constants import Mode
 from qobuz.debug import getLogger
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.gui.util import lang, getImage, runPlugin, containerUpdate
+from qobuz.node import Flag, ErrorNoData
+from qobuz.node import helper
+from qobuz.node.inode import INode
+from qobuz.theme import theme
+
 logger = getLogger(__name__)
+
 
 class Node_track(INode):
     def __init__(self, parent=None, parameters={}, data=None):

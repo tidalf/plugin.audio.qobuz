@@ -1,4 +1,5 @@
 from os import path as P
+
 from qobuz import base_path, data_path
 from qobuz.util.converter import converter
 

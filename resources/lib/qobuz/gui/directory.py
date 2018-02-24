@@ -6,13 +6,14 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcplugin
-import xbmcgui
-
-from qobuz.gui.bg_progress import Progress
 import time
-from qobuz.gui.util import lang
+
+import xbmcgui
+import xbmcplugin
+
 from qobuz import debug
+from qobuz.gui.bg_progress import Progress
+from qobuz.gui.util import lang
 from qobuz.node import Flag
 
 

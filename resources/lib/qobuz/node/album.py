@@ -9,16 +9,17 @@
 import time
 import xbmcgui
 
-from qobuz.node.inode import INode
-from qobuz.gui.util import getImage
-from qobuz.gui.contextmenu import contextMenu
-from qobuz.api import api
-from qobuz.node import getNode, Flag
 from qobuz import config
+from qobuz.api import api
+from qobuz.debug import getLogger
+from qobuz.gui.contextmenu import contextMenu
+from qobuz.gui.util import getImage
+from qobuz.node import getNode, Flag
+from qobuz.node import helper
+from qobuz.node.inode import INode
 from qobuz.theme import color
 from qobuz.util.converter import converter
-from qobuz.node import helper
-from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
 
 

@@ -7,10 +7,11 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
-from qobuz import exception
-from qobuz import debug
-from qobuz.bootstrap import Bootstrap
+
 from qobuz import config
+from qobuz import debug
+from qobuz import exception
+from qobuz.bootstrap import Bootstrap
 from qobuz.registry import Registry
 
 

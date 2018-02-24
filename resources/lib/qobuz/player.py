@@ -9,13 +9,13 @@
 import xbmc
 import xbmcgui
 
-import qobuz
-from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
-from qobuz.node import Flag, getNode
 from qobuz import config
 from qobuz.debug import getLogger
-logger = getLogger(__name__)
+from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
+from qobuz.node import Flag, getNode
+import qobuz
 
+logger = getLogger(__name__)
 keyTrackId = 'QobuzPlayerTrackId'
 
 

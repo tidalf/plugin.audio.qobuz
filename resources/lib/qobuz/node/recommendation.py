@@ -8,10 +8,11 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz.api import api
-from qobuz.node.inode import INode
-from qobuz.node import getNode, Flag
-from qobuz.gui.util import lang, getImage
 from qobuz.debug import getLogger
+from qobuz.gui.util import lang, getImage
+from qobuz.node import getNode, Flag
+from qobuz.node.inode import INode
+
 logger = getLogger(__name__)
 
 RECOS_TYPE_IDS = {

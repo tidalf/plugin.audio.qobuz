@@ -10,8 +10,8 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.cache.file_cache import FileCache
 from qobuz import config
+from qobuz.cache.file_cache import FileCache
 
 
 class QobuzCache(FileCache):

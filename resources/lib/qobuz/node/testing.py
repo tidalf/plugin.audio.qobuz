@@ -6,14 +6,16 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+from qobuz import config
+from qobuz.debug import getLogger
+from qobuz.node import getNode, Flag
+from qobuz.node.inode import INode
+from time import time
 import requests
 import xbmcgui
-from time import time
-from qobuz.node.inode import INode
-from qobuz import config
-from qobuz.node import getNode, Flag
-from qobuz.debug import getLogger
+
 logger = getLogger(__name__)
+
 
 class Window(xbmcgui.Window):
     pass

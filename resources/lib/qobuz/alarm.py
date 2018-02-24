@@ -7,6 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
+
 from qobuz import debug
 from qobuz.gui import util
 

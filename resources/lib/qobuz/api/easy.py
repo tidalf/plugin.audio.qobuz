@@ -9,13 +9,14 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.cache import cache
-from qobuz.api.raw import RawApi
-from qobuz.gui.util import notify_error
-from qobuz.api.user import current as current_user
-from qobuz.util import common
 from qobuz import config
+from qobuz.api.raw import RawApi
+from qobuz.api.user import current as current_user
+from qobuz.cache import cache
 from qobuz.debug import getLogger
+from qobuz.gui.util import notify_error
+from qobuz.util import common
+
 logger = getLogger(__name__)
 
 

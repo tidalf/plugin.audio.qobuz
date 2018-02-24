@@ -6,9 +6,9 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os
 from os import path as P
 import logging
+import os
 
 FORMAT = "%(levelname)s:%(name)s: %(message)s"
 FORMAT_KODI = "[%(name)s] %(message)s"
