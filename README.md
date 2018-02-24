@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/cd58a99fe4f54d24b9bfe7276938a21d)](https://www.codacy.com/app/tidalf/plugin.audio.qobuz?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tidalf/plugin.audio.qobuz&amp;utm_campaign=Badge_Grade)
+
 This is a Qobuz plugin for Kodi
 -------------------------------
 It enables access to Qobuz music streaming service directly from Kodi (http://kodi.tv)
