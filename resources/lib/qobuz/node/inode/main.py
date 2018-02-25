@@ -1,6 +1,6 @@
 '''
-    qobuz.node.inode
-    ~~~~~~~~~~~~~~~~
+    qobuz.node.inode.main
+    ~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
@@ -356,8 +356,7 @@ class INode(object):
         logger.warning('base class fetch: %s', self)
         return {}
 
-    def populating(self,
-                   xdir,
+    def populating(self, xdir,
                    lvl=1,
                    whiteFlag=Flag.ALL,
                    blackFlag=Flag.NONE,

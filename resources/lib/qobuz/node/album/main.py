@@ -1,6 +1,6 @@
 '''
-    qobuz.node.album
-    ~~~~~~~~~~~~~~~~
+    qobuz.node.album.main
+    ~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
