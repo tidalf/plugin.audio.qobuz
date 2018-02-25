@@ -3,4 +3,3 @@ language: python
 script:
           - pytest --cov=. --cov-report=xml
           - python-codacy-coverage -r coverage.xml
-          - ./update_require
