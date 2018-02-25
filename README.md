@@ -11,7 +11,7 @@ Main Features:
 
 - Manage playlists (show/add/remove/create/rename/delete)
 - purchased items
-- recommended/most played/features  albums by genre and type 
+- recommended/most played/featured  albums by genre and type 
 - Search by track, album or artist
 - Gapless hires play
 - favorites support
