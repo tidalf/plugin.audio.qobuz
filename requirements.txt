@@ -6,3 +6,4 @@ Flask>=0.12.2
 Pillow>=5.0.0
 codacy-coverage
 pytest-cov
+requires.io
