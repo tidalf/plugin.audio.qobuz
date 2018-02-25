@@ -9,13 +9,12 @@ It enables access to Qobuz music streaming service directly from Kodi (http://ko
 Main Features: 
 --------------
 
+- Gapless hires play of all the available qobuz library and your purchased items
 - Manage playlists (show/add/remove/create/rename/delete)
-- purchased items
-- recommended/most played/featured  albums by genre and type 
+- Browse the recommended/most played/featured albums by genre and type 
 - Search by track, album or artist
-- Gapless hires play
 - favorites support
-- Music Library bridge using flask
+- Music Library bridge using flask (allows you to cleanly scan your items into the kodi library)
 - Friends support (browse their public playlists)
 - Genre browsing
 - Public playlists
