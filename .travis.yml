@@ -1,6 +1,5 @@
 language: python
 
 script:
-          - pytest
-          - py.test --cov=. --cov-report=xml
+          - pytest --cov=. --cov-report=xml
           - python-codacy-coverage -r coverage.xml
