@@ -10,14 +10,13 @@ Main Features:
 --------------
 
 - Manage playlists (show/add/remove/create/rename/delete)
-- Show purchased products
-- Show recommended/most played/features  albums by genre and type 
-- Search by track name, album name and artist name
-- Gapless play
-- Hires tracks, flac or mp3 play (using settings)
-- Show and manage favorites
+- purchased items
+- recommended/most played/features  albums by genre and type 
+- Search by track, album or artist
+- Gapless hires play
+- favorites support
 - Music Library bridge using flask
-- Add/Remove Friends & browse their public playlists
+- Friends support (browse their public playlists)
 - Genre browsing
 - Public playlists
 - Preview (1 min by track) without account 
