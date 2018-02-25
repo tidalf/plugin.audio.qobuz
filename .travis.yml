@@ -3,4 +3,4 @@ language: python
 script:
           - pytest --cov=. --cov-report=xml
           - python-codacy-coverage -r coverage.xml
-          - requires.io update-site -t $REQUIRES_IO_KEY -r plugin.audio.qobuz
+          - requires.io update-site -t ${REQUIRES_IO_KEY} -r plugin.audio.qobuz
