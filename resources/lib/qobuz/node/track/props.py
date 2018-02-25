@@ -122,25 +122,3 @@ propsMap = {
         'map': ['previewable']
     }
 }
-
-
-trackTemplate = u'''- HiRes: {hires}
-- HiRes purchased: {hires_purchased}
-- purchasable: {purchasable}
-- purchased: {purchased}
-- streamable: {streamable}
-- previewable: {previewable}
-- sampleable: {sampleable}
-- downloadable: {downloadable}
-{description}
-- label: {label}
-- duration: {duration} mn
-- track number: {track_number}
-- year: {year}
-- composer: {composer}
-- performer: {performer}
-- copyright: {copyright}
-- popularity: {popularity}
-- maximum sampling rate: {maximum_sampling_rate}
-- maximum_bit_depth: {maximum_bit_depth}
-'''

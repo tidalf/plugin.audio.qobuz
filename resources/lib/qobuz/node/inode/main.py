@@ -356,8 +356,7 @@ class INode(object):
         logger.warning('base class fetch: %s', self)
         return {}
 
-    def populating(self,
-                   xdir,
+    def populating(self, xdir,
                    lvl=1,
                    whiteFlag=Flag.ALL,
                    blackFlag=Flag.NONE,

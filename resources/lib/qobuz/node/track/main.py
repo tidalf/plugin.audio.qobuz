@@ -9,14 +9,15 @@
 import time
 import xbmcgui
 
-from .props import propsMap, trackTemplate
+from .props import propsMap
+from .context_menu import attach_context_menu
+from .list_item import make_list_item
+
 from qobuz import config
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.constants import Mode
 from qobuz.debug import getLogger
-from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import lang, runPlugin, containerUpdate
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node import helper
 from qobuz.node.inode import INode
@@ -28,14 +29,15 @@ logger = getLogger(__name__)
 class Node_track(INode):
     def __init__(self, parent=None, parameters=None, data=None):
         parameters = {} if parameters is None else parameters
-        super(Node_track, self).__init__(
-            parent=parent, parameters=parameters, data=data)
-        self.qobuz_context_type = 'playlist'
-        self.is_folder = False
-        self.status = None
-        self.purchased = False
+        super(Node_track, self).__init__(parent=parent,
+                                         parameters=parameters,
+                                         data=data)
         self._intent = None
+        self.is_folder = False
         self.propsMap = propsMap
+        self.purchased = False
+        self.qobuz_context_type = 'playlist'
+        self.status = None
 
     def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None):
         if blackFlag is not None:
@@ -140,7 +142,6 @@ class Node_track(INode):
             ['album/artist/name', 'album/performer/name'], default=None)
         if artist is not None:
             return artist
-        # sometimes there's no artist
         try:
             if self.parent is not None:
                 return self.parent.get_artist()
@@ -284,91 +285,8 @@ class Node_track(INode):
         ]
 
     def makeListItem(self, **ka):
-        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
-        isplayable = 'true'
-        item = xbmcgui.ListItem(
-            self.get_label(),
-            self.get_label2(),
-            self.get_image(),
-            self.get_image(img_type='back'),
-            self.make_url(mode=Mode.PLAY))
-        if not item:
-            logger.warn('Cannot create xbmc list item')
-            return None
-        item.setArt({
-            'thumb': self.get_image(),
-            'icon': self.get_image(img_type='thumbnail')
-        })
-        comment = trackTemplate.format(
-            popularity=self.get_property(
-                'popularity', default='n/a'),
-            duration=self.get_duration(),
-            label=self.get_album_label(),
-            year=self.get_property('album/year'),
-            performers=self.get_property('performers'),
-            track_number=self.get_property('track_number'),
-            version=self.get_property('version'),
-            performer=self.get_property('performer/name'),
-            composer=self.get_property('composer/name'),
-            copyright=self.get_property(
-                'copyright', default='n/a'),
-            maximum_sampling_rate=self.get_maximum_sampling_rate(),
-            maximum_bit_depth=self.get_maximum_bit_depth(),
-            description=self.get_description(default=self.get_label()),
-            hires=self.get_hires(),
-            sampleable=self.get_sampleable(),
-            downloadable=self.get_downloadable(),
-            purchasable=self.get_purchasable(),
-            purchased=self.get_purchased(),
-            previewable=self.get_previewable(),
-            streamable=self.get_streamable(),
-            hires_purchased=self.get_hires_purchased(),
-            awards=','.join(self.get_awards()),
-            articles=', '.join(self.get_articles()))
-
-        item.setInfo(
-            type='Music',
-            infoLabels={
-                'count': self.nid,
-                'title': self.get_title(),
-                'album': self.get_album(),
-                'genre': self.get_genre(),
-                'artist': self.get_album_artist(),
-                'tracknumber': self.get_track_number(default=0),
-                'duration': self.get_property('duration'),
-                'year': self.get_year(),
-                'rating': str(self.get_popularity()),
-            })
-        item.setProperty('album_artist', self.get_album_artist())
-        item.setProperty('album_description', comment)
-        item.setProperty('album_label', self.get_property('album/label/name'))
-        item.setProperty('Role.Composer', self.get_property('composer/name'))
-        item.setProperty('DiscNumber', str(self.get_media_number(default=1)))
-        item.setProperty('IsPlayable', isplayable)
-        item.setProperty('IsInternetStream', isplayable)
-        item.setProperty('Music', isplayable)
-        ctxMenu = contextMenu()
-        self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
-        return item
+        return make_list_item(self, **ka)
 
     def attach_context_menu(self, item, menu):
-        if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
-            url = self.parent.make_url(
-                nt=Flag.PLAYLIST,
-                nid=self.parent.nid,
-                qid=self.get_playlist_track_id(),
-                nm='gui_remove_track',
-                mode=Mode.VIEW)
-            menu.add(path='playlist/remove',
-                     label=lang(30075),
-                     cmd=runPlugin(url),
-                     color=theme.get('item/caution/color'))
-        label = self.get_album_label(default=None)
-        if label is not None:
-            label_id = self.get_album_label_id()
-            url = self.make_url(nt=Flag.LABEL, nid=label_id, mode=Mode.VIEW)
-            menu.add(path='label/view',
-                     label='View label (i8n): %s' % label,
-                     cmd=containerUpdate(url))
+        menu = attach_context_menu(self, item, menu)
         super(Node_track, self).attach_context_menu(item, menu)
