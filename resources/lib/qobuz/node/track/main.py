@@ -288,5 +288,5 @@ class Node_track(INode):
         return make_list_item(self, **ka)
 
     def attach_context_menu(self, item, menu):
-        menu = attach_context_menu(self, item, menu)
+        attach_context_menu(self, item, menu)
         super(Node_track, self).attach_context_menu(item, menu)
