@@ -1,5 +1,5 @@
 '''
-    qobuz.node.album_props
+    qobuz.node.album.props
     ~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz

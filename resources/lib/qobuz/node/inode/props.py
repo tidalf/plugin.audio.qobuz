@@ -1,5 +1,5 @@
 '''
-    qobuz.node.inode_props
+    qobuz.node.inode.props
     ~~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
@@ -18,11 +18,13 @@ nodeflag_map = {
 }
 
 nodeimage_map = {
-    'album': 'album'
+    'album': 'album',
+    'image': 'song'
 }
 
 nodecontenttype_map = {
-    'album': 'songs'
+    'album': 'songs',
+    'track': 'files',
 }
 
 

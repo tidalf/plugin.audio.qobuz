@@ -1,6 +1,6 @@
 '''
-    qobuz.node.track
-    ~~~~~~~~~~~~~~~~
+    qobuz.node.track.main
+    ~~~~~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
@@ -9,13 +9,14 @@
 import time
 import xbmcgui
 
+from .props import propsMap, trackTemplate
 from qobuz import config
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import lang, getImage, runPlugin, containerUpdate
+from qobuz.gui.util import lang, runPlugin, containerUpdate
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node import helper
 from qobuz.node.inode import INode
@@ -25,17 +26,16 @@ logger = getLogger(__name__)
 
 
 class Node_track(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
+        parameters = {} if parameters is None else parameters
         super(Node_track, self).__init__(
             parent=parent, parameters=parameters, data=data)
-        self.nt = Flag.TRACK
-        self.content_type = 'files'
         self.qobuz_context_type = 'playlist'
         self.is_folder = False
         self.status = None
-        self.image = getImage('song')
         self.purchased = False
         self._intent = None
+        self.propsMap = propsMap
 
     def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None):
         if blackFlag is not None:
@@ -71,19 +71,15 @@ class Node_track(INode):
     def get_label2(self):
         return self.get_artist()
 
-    def get_composer(self):
-        return self.get_property('composer/name', default=-1)
-
-    def get_interpreter(self):
-        return self.get_property('performer/name', default=-1)
-
     def get_album(self):
         album = self.get_property('album/title', default=None)
         if album is not None:
             return album
-        if self.parent is not None and self.parent.nt & Flag.ALBUM == Flag.ALBUM:
-            return self.parent.get_title(default=u'')
-        logger.warn('Track without album name: %s', self.get_label())
+        if self.parent is not None:
+            if self.parent.nt & Flag.ALBUM == Flag.ALBUM:
+                return self.parent.get_title(default=u'')
+        logger.warn('Track without album name: %s',
+                    self.get_label())
         return u''
 
     def get_album_id(self):
@@ -100,9 +96,6 @@ class Node_track(INode):
         return '%s (albums: %s)' % (label, self.get_property(
             'album/label/albums_count', default=0))
 
-    def get_album_label_id(self, default=None):
-        return self.get_property('album/label/id', default=default)
-
     def get_image(self, size=None, img_type='front', default=None):
         if size is None:
             size = config.app.registry.get('image_default_size')
@@ -114,26 +107,15 @@ class Node_track(INode):
             image = self.get_property('album/image/back', default=None)
             if image is not None:
                 return image
-        image = self.get_property(
-            [
-                'album/image/%s' % (size), 'album/image/large',
-                'album/image/small', 'album/image/thumbnail'
-            ],
-            default=None)
+        image = self.get_property([
+            'album/image/%s' % (size), 'album/image/large',
+            'album/image/small', 'album/image/thumbnail'
+        ], default=None)
         if image is not None:
             return image
         if self.parent and self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
             return self.parent.get_image()
         return default
-
-    def get_playlist_track_id(self):
-        return self.get_property('playlist_track_id')
-
-    def get_position(self):
-        return self.get_property('position')
-
-    def get_title(self):
-        return self.get_property('title')
 
     def get_genre(self):
         genre = self.get_property('album/genre/name', default=None)
@@ -149,7 +131,7 @@ class Node_track(INode):
             return None
         if 'url' not in data:
             logger.warn('streaming_url, no url returned\n'
-                       'API Error: %s' % (api.error))
+                        'API Error: %s' % (api.error))
             return None
         return data['url']
 
@@ -160,32 +142,11 @@ class Node_track(INode):
             return artist
         # sometimes there's no artist
         try:
-          if self.parent is not None:
-              return self.parent.get_artist()
-        except:
-	  pass
+            if self.parent is not None:
+                return self.parent.get_artist()
+        except Exception as e:
+            logger.error('NoAlbumArtist: %s', e)
         return 'n/a'
-
-    def get_artist(self):
-        return self.get_property([
-            'artist/name', 'composer/name', 'performer/name',
-            'interpreter/name', 'composer/name', 'album/artist/name'
-        ])
-
-    def get_artist_id(self):
-        return self.get_property(
-            [
-                'artist/id', 'composer/id', 'performer/id', 'interpreter/id',
-                'composer/id', 'album/artist/id'
-            ],
-            default=None,
-            to='int')
-
-    def get_track_number(self, default=0):
-        return self.get_property('track_number', default=default, to='int')
-
-    def get_media_number(self, default=0):
-        return self.get_property('media_number', default=default, to='int')
 
     def get_duration(self):
         return round(self.get_property('duration', default=0.0) / 60.0, 2)
@@ -202,7 +163,7 @@ class Node_track(INode):
         try:
             year = time.strftime("%Y", time.localtime(date))
         except Exception as e:
-            logger.warn('Invalid date format %s', date)
+            logger.warn('Invalid date format %s, %s', date, e)
         return year
 
     def is_playable(self):
@@ -218,18 +179,6 @@ class Node_track(INode):
         if 'AlbumUnavailable' in restrictions:
             return False
         return True
-
-    def get_downloadable(self):
-        return self.get_property('downloadable', to='bool', default=False)
-
-    def get_hires(self):
-        return self.get_property('hires', to='bool', default=False)
-
-    def get_purchased(self):
-        return self.get_property('purchased', to='bool', default=False)
-
-    def get_hires_purchased(self):
-        return self.get_property('purchased', to='bool', default=False)
 
     def get_description(self, default='n/a'):
         description = self.get_property(
@@ -259,7 +208,7 @@ class Node_track(INode):
         if not data:
             raise ErrorNoData('Cannot get track restrictions')
         restrictions = []
-        if not 'restrictions' in data:
+        if 'restrictions' not in data:
             return restrictions
         for restriction in data['restrictions']:
             restrictions.append(restriction['code'])
@@ -287,7 +236,7 @@ class Node_track(INode):
         data = self.__getFileUrl()
         if not data:
             return False
-        if not 'format_id' in data:
+        if 'format_id' not in data:
             logger.warn('Cannot get mime/type for track (restricted track?)')
             return False
         formatId = int(data['format_id'])
@@ -319,26 +268,23 @@ class Node_track(INode):
                 'popularity', to='float', default=default),
                 1.0) * 5.0)
 
-    def get_streamable(self):
-        return self.get_property('streamable', to='bool', default=False)
-
-    def get_articles(self, default=[]):
+    def get_articles(self, default=None):
+        default = [] if default is None else default
         return [
             '%s (%s%s)' % (a['label'], a['price'], a['currency'])
             for a in self.get_property(
                 'album/articles', default=default)
         ]
 
-    def get_awards(self, default=[]):
+    def get_awards(self, default=None):
+        default = [] if default is None else default
         return [
             a['name'] for a in self.get_property(
                 'album/awards', default=default)
         ]
 
-    def get_displayable(self):
-        return self.get_property('displayable', to='bool', default=False)
-
-    def makeListItem(self, replaceItems=False):
+    def makeListItem(self, **ka):
+        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
         isplayable = 'true'
         item = xbmcgui.ListItem(
             self.get_label(),
@@ -353,26 +299,7 @@ class Node_track(INode):
             'thumb': self.get_image(),
             'icon': self.get_image(img_type='thumbnail')
         })
-        comment = u'''- HiRes: {hires}
-- HiRes purchased: {hires_purchased}
-- purchasable: {purchasable}
-- purchased: {purchased}
-- streamable: {streamable}
-- previewable: {previewable}
-- sampleable: {sampleable}
-- downloadable: {downloadable}
-{description}
-- label: {label}
-- duration: {duration} mn
-- track number: {track_number}
-- year: {year}
-- composer: {composer}
-- performer: {performer}
-- copyright: {copyright}
-- popularity: {popularity}
-- maximum sampling rate: {maximum_sampling_rate}
-- maximum_bit_depth: {maximum_bit_depth}
-'''.format(
+        comment = trackTemplate.format(
             popularity=self.get_property(
                 'popularity', default='n/a'),
             duration=self.get_duration(),
@@ -386,18 +313,16 @@ class Node_track(INode):
             copyright=self.get_property(
                 'copyright', default='n/a'),
             maximum_sampling_rate=self.get_maximum_sampling_rate(),
-            maximum_bit_depth=self.get_property('maximum_bit_depth'),
+            maximum_bit_depth=self.get_maximum_bit_depth(),
             description=self.get_description(default=self.get_label()),
-            hires=self.get_property('hires'),
-            sampleable=self.get_property('sampleable'),
+            hires=self.get_hires(),
+            sampleable=self.get_sampleable(),
             downloadable=self.get_downloadable(),
-            purchasable=self.get_property('purchasable'),
-            purchased=self.get_property(
-                'purchased', default=False),
-            previewable=self.get_property('previewable'),
+            purchasable=self.get_purchasable(),
+            purchased=self.get_purchased(),
+            previewable=self.get_previewable(),
             streamable=self.get_streamable(),
-            hires_purchased=self.get_property(
-                'hires_purchased', default=False),
+            hires_purchased=self.get_hires_purchased(),
             awards=','.join(self.get_awards()),
             articles=', '.join(self.get_articles()))
 
@@ -426,9 +351,6 @@ class Node_track(INode):
         self.attach_context_menu(item, ctxMenu)
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
-
-    def get_maximum_sampling_rate(self):
-        return self.get_property('maximum_sampling_rate')
 
     def attach_context_menu(self, item, menu):
         if self.parent and (self.parent.nt & Flag.PLAYLIST == Flag.PLAYLIST):
