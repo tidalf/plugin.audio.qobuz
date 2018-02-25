@@ -6,3 +6,4 @@
 resources/lib/qobuz/__data__/*.jpg
 .pylintrc
 pytest_cache/*
+tests/*
