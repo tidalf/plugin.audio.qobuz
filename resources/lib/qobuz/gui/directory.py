@@ -8,7 +8,7 @@
 '''
 import time
 
-from kodi_six import xbmcgui, xbmcplugin
+from kodi_six import xbmcplugin
 
 from qobuz import debug
 from qobuz.gui.bg_progress import Progress
