@@ -104,7 +104,7 @@ class Node_playlist(INode):
             node = getNode(Flag.TRACK, data=track)
             if not node.get_displayable():
                 logger.warn(u'Track not displayable: %s (%s)',
-                            node.get_label().encode('ascii'),
+                            node.get_label().encode('ascii', errors='ignore'),
                             node.nid)
                 continue
             self.add_child(node)
