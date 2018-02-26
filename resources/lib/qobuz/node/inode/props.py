@@ -14,7 +14,8 @@ logger = getLogger(__name__)
 nodeflag_map = {
     'album': Flag.ALBUM,
     'favorite': Flag.FAVORITE,
-    'track': Flag.TRACK
+    'track': Flag.TRACK,
+    'playlist': Flag.PLAYLIST
 }
 
 nodeimage_map = {
@@ -25,6 +26,7 @@ nodeimage_map = {
 nodecontenttype_map = {
     'album': 'songs',
     'track': 'files',
+    'playlist': 'albums',
 }
 
 

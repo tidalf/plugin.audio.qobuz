@@ -6,10 +6,10 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os
-import random
 import xbmcgui
 
+from .context_menu import attach_context_menu
+from .props import propsMap
 from qobuz import config
 from qobuz import image
 from qobuz.api import api
@@ -19,15 +19,14 @@ from qobuz.cache.cache_util import clean_all
 from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import Keyboard, ask
+from qobuz.gui.util import ask
 from qobuz.gui.util import containerRefresh, containerUpdate
-from qobuz.gui.util import lang, getImage, runPlugin, executeBuiltin
+from qobuz.gui.util import lang, executeBuiltin
 from qobuz.gui.util import notify_warn, notify_error, notify_log
 from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode
 from qobuz.renderer import renderer
 from qobuz.theme import theme, color
-from qobuz.util import common as util
 from qobuz.util.converter import converter
 
 logger = getLogger(__name__)
@@ -47,12 +46,11 @@ class Node_playlist(INode):
         parameters = {} if parameters is None else parameters
         super(Node_playlist, self).__init__(
             parent=parent, parameters=parameters, data=data)
-        self.nt = Flag.PLAYLIST
-        self.current_playlist_id = None
-        self.b_is_current = False
-        self.is_my_playlist = False
-        self.content_type = 'albums'
         self._items_path = 'tracks/items'
+        self.b_is_current = False
+        self.current_playlist_id = None
+        self.is_my_playlist = False
+        self.propsMap = propsMap
         self.target_nt = self.get_parameter('nt')
 
     def get_is_folder(self):
@@ -92,31 +90,25 @@ class Node_playlist(INode):
             'extra': 'tracks'
         })
 
-    def fetch(self, *a, **ka):
+    def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None, noRemote=False):
         method, args = self._fetch_args()
         return api.get(method, **args)
 
     def _count(self):
         return len(self.get_property(self._items_path, default=[]))
 
-    def populate(self, *a, **ka):
+    def populate(self, xbmc_directory=None, lvl=-1, whiteFlag=Flag.ALL, blackFlag=Flag.STOPBUILD):
         if self.count() == 0:
             return False
         for track in self.get_property(self._items_path):
             node = getNode(Flag.TRACK, data=track)
             if not node.get_displayable():
-                try:
-                    logger.warn(u'Track not displayable: %s (%s)',
-                                node.get_label().encode('ascii'),
-                                node.nid)
-                except:
-                    pass
+                logger.warn(u'Track not displayable: %s (%s)',
+                            node.get_label().encode('ascii'),
+                            node.nid)
                 continue
             self.add_child(node)
         return True
-
-    def get_name(self):
-        return self.get_property(['name', 'title'])
 
     def get_genre(self, first=False, default=None):
         default = [] if default is None else default
@@ -128,15 +120,6 @@ class Node_playlist(INode):
         if first:
             return genres[0]
         return genres
-
-    def get_owner(self):
-        return self.get_property('owner/name')
-
-    def get_owner_id(self):
-        return self.get_property('owner/id')
-
-    def get_description(self):
-        return self.get_property('description')
 
     def get_tag(self):
         return u' (tracks: %s, users: %s)' % (self.get_property(
@@ -150,7 +133,8 @@ class Node_playlist(INode):
             return None
         return image.combine(self.nid, images)
 
-    def makeListItem(self, replaceItems=False):
+    def makeListItem(self, **ka):
+        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
         privacy_color = theme.get('item/public/color') if self.get_property(
             'is_public', to='bool') else theme.get('item/private/color')
         tag = color(privacy_color, self.get_tag())
@@ -209,51 +193,7 @@ class Node_playlist(INode):
         return True
 
     def attach_context_menu(self, item, menu):
-        isOwner = True
-
-        def c(txt):
-            return color(theme.get('menu/playlist/color'), txt)
-
-        cmd = containerUpdate(
-            self.make_url(
-                nt=Flag.USERPLAYLISTS, id='', mode=Mode.VIEW))
-        menu.add(path='playlist',
-                 pos=1,
-                 label='Playlist',
-                 cmd=cmd,
-                 mode=Mode.VIEW)
-
-        if user.username != self.get_property('owner/name'):
-            isOwner = False
-
-        if isOwner:
-            url = self.make_url(
-                nt=Flag.PLAYLIST, mode=Mode.VIEW, nm='set_as_current')
-            menu.add(path='playlist/set_as_current',
-                     label=c(lang(30163)),
-                     cmd=containerUpdate(url))
-
-            url = self.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
-            menu.add(path='playlist/rename',
-                     label=c(lang(30165)),
-                     cmd=runPlugin(url))
-            url = self.make_url(
-                nt=Flag.PLAYLIST, mode=Mode.VIEW, nm='toggle_privacy')
-            menu.add(path='playlist/toggle_privacy',
-                     post=2,
-                     label=c('Toggle privacy'),
-                     cmd=containerUpdate(url))
-        elif self.parent and self.parent.nt & (Flag.ALL ^ Flag.USERPLAYLISTS):
-            url = self.make_url(nt=Flag.PLAYLIST, nm='subscribe')
-            menu.add(path='playlist/subscribe',
-                     label=c(lang(30168)),
-                     cmd=runPlugin(url))
-
-        url = self.make_url(nt=Flag.PLAYLIST, nm='gui_remove')
-        menu.add(path='playlist/remove',
-                 label=c(lang(30166)),
-                 cmd=runPlugin(url),
-                 color=theme.get('item/caution/color'))
+        attach_context_menu(self, item, menu)
         super(Node_playlist, self).attach_context_menu(item, menu)
 
     def remove_tracks(self, tracks_id):
@@ -326,8 +266,8 @@ class Node_playlist(INode):
                     logger.warn('Not a Node_track node')
                     continue
                 str_tracks += '%s,' % (str(node.nid))
-            if not api.playlist_addTracks(
-                    playlist_id=playlist_id, track_ids=str_tracks):
+            if not api.playlist_addTracks(playlist_id=playlist_id,
+                    track_ids=str_tracks):
                 return False
             start += step
         return True
