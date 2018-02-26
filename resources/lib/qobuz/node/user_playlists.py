@@ -21,7 +21,8 @@ limit_max = 100
 
 
 class Node_user_playlists(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
+        parameters = {} if parameters is None else parameters
         super(Node_user_playlists, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.USERPLAYLISTS

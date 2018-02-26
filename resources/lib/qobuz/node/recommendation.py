@@ -51,7 +51,8 @@ RECOS_GENRES = {
 
 
 class Node_recommendation(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
+        parameters = {} if parameters is None else parameters
         super(Node_recommendation, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.RECOMMENDATION

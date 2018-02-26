@@ -16,7 +16,8 @@ try:
 except ImportError as e:
     logger.error('Cannot import PIL library')
 
-def combineFactory(available, nid, images=[], count=4, prefix='cover'):
+def combineFactory(available, nid, images=None, count=4, prefix='cover'):
+    images = [] if images is None else images
     if not config.app.registry.get('image_create_mosaic', to='bool'):
         available = False
     len_images = len(images)

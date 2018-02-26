@@ -36,12 +36,12 @@ class Directory(object):
 
     def __init__(self,
                  root=None,
-                 nodes=[],
+                 nodes=None,
                  handle=None,
                  asList=False,
                  asLocalUrl=False,
                  showProgress=False):
-        self.nodes = nodes
+        self.nodes = [] if nodes is None else nodes
         self.label = '...'
         if root is not None:
             self.label = '%s' % root.get_label()

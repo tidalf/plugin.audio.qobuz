@@ -42,7 +42,8 @@ class RawApi(object):
         self.statTotalRequest = 0
         self.__set_s4()
 
-    def _api_error_string(self, request, url='', params={}, json=''):
+    def _api_error_string(self, request, url='', params=None, json=''):
+        params = {} if params is None else params
         return '{reason} ({status_code}): {error}'.format(
             reason=request.reason,
             status_code=self.status_code,

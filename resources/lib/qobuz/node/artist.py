@@ -18,7 +18,8 @@ from qobuz.node.inode import INode
 logger = getLogger(__name__)
 
 
-def helper_album_list_genre(data, default=[]):
+def helper_album_list_genre(data, default=None):
+    default = [] if default is None else default
     if data is None or 'albums' not in data:
         return default
     genres = {}
@@ -30,7 +31,8 @@ def helper_album_list_genre(data, default=[]):
 
 
 class Node_artist(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
+        parameters = {} if parameters is None else parameters
         super(Node_artist, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.ARTIST

@@ -47,7 +47,7 @@ class INode(object):
         (recursive, depth, whiteFlag, blackFlag...)
     '''
 
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
         '''Constructor
         @param parent=None: Parent node if not None
         @param parameters={}: dictionary
@@ -59,7 +59,7 @@ class INode(object):
         self._parent = None
 
         self.data = data
-        self.parameters = parameters
+        self.parameters = {} if parameters is None else parameters
         self.parent = parent
 
         self.content_type = node_contenttype_from_class(
@@ -360,7 +360,8 @@ class INode(object):
                    lvl=1,
                    whiteFlag=Flag.ALL,
                    blackFlag=Flag.NONE,
-                   data={}):
+                   data=None):
+        data = {} if data is None else data
         if lvl != -1 and lvl < 1:
             return False
         if self.nt & blackFlag != self.nt:
