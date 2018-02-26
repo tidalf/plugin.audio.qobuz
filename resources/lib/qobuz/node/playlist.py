@@ -34,6 +34,14 @@ logger = getLogger(__name__)
 dialogHeading = 'Qobuz playlist'
 
 
+def cmp_genre(a, b):
+    if a['percent'] < b['percent']:
+        return 1
+    elif a['percent'] > b['percent']:
+        return -1
+    return 0
+
+
 class Node_playlist(INode):
     def __init__(self, parent=None, parameters=None, data=None):
         parameters = {} if parameters is None else parameters
@@ -112,13 +120,6 @@ class Node_playlist(INode):
 
     def get_genre(self, first=False, default=None):
         default = [] if default is None else default
-        def cmp_genre(a, b):
-            if a['percent'] < b['percent']:
-                return 1
-            elif a['percent'] > b['percent']:
-                return -1
-            return 0
-
         genres = [
             g['name'] for g in sorted(self.get_property('genres'), cmp_genre)
         ]
