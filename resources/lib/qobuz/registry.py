@@ -51,7 +51,6 @@ class Registry(object):
     def __init__(self, application):
         self.application = application
         try:
-            from kodi_six import xbmc
             self.backend = XbmcRegistryBackend(application)
         except ImportError:
             self.backend = RegistryBackend(application)
