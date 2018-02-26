@@ -1,3 +1,0 @@
-#!/bin/bash
-echo ${REQUIRES_IO_KEY}
-requires.io update-site -t ${REQUIRES_IO_KEY} -r plugin.audio.qobuz

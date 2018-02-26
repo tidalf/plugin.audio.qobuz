@@ -6,8 +6,8 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmc
-import xbmcgui
+
+from kodi_six import xbmc, xbmcgui
 
 from qobuz import config
 from qobuz.debug import getLogger

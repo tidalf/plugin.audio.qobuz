@@ -32,7 +32,8 @@ except ImportError as e:
     path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask',
                   'lib')
     sys.path.append(path)
-import xbmc
+from kodi_six import xbmc
+
 from flask import request
 from kooli.application import application, shutdown_server, qobuzApp
 from kooli.monitor import Monitor

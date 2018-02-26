@@ -10,7 +10,7 @@ import json
 import pprint
 
 try:
-    import xbmc
+    from kodi_six import xbmc
 except ImportError as e:
     print "ImportError(Outside XBMC): %s" % e
 

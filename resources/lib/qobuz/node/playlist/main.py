@@ -6,7 +6,9 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui
+import os
+import random
+from kodi_six import xbmcgui
 
 from .context_menu import attach_context_menu
 from .props import propsMap

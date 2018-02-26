@@ -1,4 +1,4 @@
-import xbmcgui
+from kodi_six import xbmcgui
 
 from qobuz.constants import Mode
 from qobuz.debug import getLogger

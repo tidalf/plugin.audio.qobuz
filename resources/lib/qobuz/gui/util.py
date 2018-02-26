@@ -11,9 +11,7 @@ import re
 import sys
 
 try:
-    import xbmc
-    import xbmcgui
-    import xbmcplugin
+    from kodi_six import xbmc, xbmcgui, xbmcplugin
 
     class Keyboard(xbmc.Keyboard):
         def __init__(self, default, heading='', hidden=True):

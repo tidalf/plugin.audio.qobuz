@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-import xbmc
+from kodi_six import xbmc
 
 from qobuz.cache import cache_util
 from qobuz.debug import getLogger

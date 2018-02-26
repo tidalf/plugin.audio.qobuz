@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import sys
-import xbmcplugin
+from kodi_six import xbmcplugin
 
 from qobuz import config
 from qobuz import exception

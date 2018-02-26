@@ -8,7 +8,7 @@
 '''
 import os
 import sys
-import xbmc
+from kodi_six import xbmc
 
 from qobuz import exception
 from qobuz.cache import cache

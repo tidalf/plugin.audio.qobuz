@@ -51,7 +51,7 @@ class Registry(object):
     def __init__(self, application):
         self.application = application
         try:
-            import xbmc  # pylint: disable=W0612
+            from kodi_six import xbmc
             self.backend = XbmcRegistryBackend(application)
         except ImportError:
             self.backend = RegistryBackend(application)
