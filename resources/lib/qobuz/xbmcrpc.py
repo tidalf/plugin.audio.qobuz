@@ -75,10 +75,10 @@ class JsonResponse:
     def result(self):
         error = self.error()
         if error:
-            log(self, "Error: %s" % (error))
+            log(self, "Error: %s" % error)
         if not self.raw_data:
             return {}
-        if not 'result' in self.raw_data:
+        if 'result' not in self.raw_data:
             return {}
         return self.raw_data['result']
 

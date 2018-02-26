@@ -18,13 +18,14 @@ from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
 
+
 def makeSubscriptionNode():
     return getNode(
         Flag.TEXT,
         parameters={
             'label': '(Free Account / Subscribe on qobuz.com)',
             'image':
-            'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'
+                'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'
         })
 
 

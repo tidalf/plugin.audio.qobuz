@@ -32,7 +32,8 @@ class Monitor(xbmc.Monitor):
         self.last_garbage_on = time.time() - (self.garbage_refresh + 1)
         self.service = {}
 
-    def onSettingsChanged(self):
+    @staticmethod
+    def onSettingsChanged():
         logger.info('Setting changed: %s')  # @todo Do Something
 
     def onAbortRequested(self):

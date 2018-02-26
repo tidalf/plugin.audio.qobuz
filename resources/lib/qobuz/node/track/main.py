@@ -109,7 +109,7 @@ class Node_track(INode):
             if image is not None:
                 return image
         image = self.get_property([
-            'album/image/%s' % (size), 'album/image/large',
+            'album/image/%s' % size, 'album/image/large',
             'album/image/small', 'album/image/thumbnail'
         ], default=None)
         if image is not None:
@@ -132,7 +132,7 @@ class Node_track(INode):
             return None
         if 'url' not in data:
             logger.warn('streaming_url, no url returned\n'
-                        'API Error: %s' % (api.error))
+                        'API Error: %s' % api.error)
             return None
         return data['url']
 
