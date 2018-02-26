@@ -35,12 +35,13 @@ class QobuzXbmcRenderer(IRenderer):
 
     def __init__(self,
                  node_type,
-                 parameters={},
+                 parameters=None,
                  mode=None,
                  whiteFlag=Flag.ALL,
                  blackFlag=Flag.STOPBUILD,
                  depth=1,
                  asList=False):
+        parameters = {} if parameters is None else parameters
         super(QobuzXbmcRenderer, self).__init__(
             node_type,
             parameters=parameters,

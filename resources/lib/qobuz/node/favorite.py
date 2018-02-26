@@ -25,7 +25,8 @@ all_kinds = ['albums', 'tracks', 'artists']
 
 
 class Node_favorite(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
+        parameters = {} if parameters is None else parameters
         super(Node_favorite, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.FAVORITE

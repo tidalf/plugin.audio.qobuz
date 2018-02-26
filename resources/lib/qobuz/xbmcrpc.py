@@ -8,6 +8,7 @@
 '''
 import json
 import pprint
+
 try:
     import xbmc
 except ImportError as e:

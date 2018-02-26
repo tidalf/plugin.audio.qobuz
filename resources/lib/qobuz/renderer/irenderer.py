@@ -19,14 +19,14 @@ class IRenderer(object):
 
     def __init__(self,
                  node_type,
-                 parameters={},
+                 parameters=None,
                  mode=None,
                  whiteFlag=Flag.ALL,
                  blackFlag=Flag.STOPBUILD,
                  depth=1,
                  asList=False):
         self.node_type = node_type
-        self.parameters = parameters
+        self.parameters = {} if parameters is None else parameters
         self.root = None
         self.whiteFlag = whiteFlag
         self.blackFlag = blackFlag

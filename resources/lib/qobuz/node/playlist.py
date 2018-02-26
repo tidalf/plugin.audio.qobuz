@@ -35,7 +35,8 @@ dialogHeading = 'Qobuz playlist'
 
 
 class Node_playlist(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
+        parameters = {} if parameters is None else parameters
         super(Node_playlist, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.PLAYLIST
@@ -109,7 +110,8 @@ class Node_playlist(INode):
     def get_name(self):
         return self.get_property(['name', 'title'])
 
-    def get_genre(self, first=False, default=[]):
+    def get_genre(self, first=False, default=None):
+        default = [] if default is None else default
         def cmp_genre(a, b):
             if a['percent'] < b['percent']:
                 return 1

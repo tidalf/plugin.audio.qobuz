@@ -40,9 +40,10 @@ class QobuzPlayer(xbmc.Player):
         self.total = None
         self.elapsed = None
 
-    def play(self, track_id, params={}):
+    def play(self, track_id, params=None):
         """Playing track given a track id
         """
+        params = {} if params is None else params
         track = getNode(Flag.TRACK, {'nid': track_id})
         data = track.fetch(None, 1, Flag.TRACK, Flag.NONE)
         if data is None:

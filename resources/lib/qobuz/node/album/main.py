@@ -106,7 +106,8 @@ class Node_album(INode):
         item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
         return item
 
-    def get_articles(self, default=[]):
+    def get_articles(self, default=None):
+        default = [] if default is None else default
         articles = self.get_property('articles', default=None)
         if articles is None:
             return default
@@ -116,6 +117,7 @@ class Node_album(INode):
         ]
 
     def get_awards(self, default=[]):
+        default = [] if default is None else default
         awards = self.get_property('awards', default=None)
         if awards is None:
             return default

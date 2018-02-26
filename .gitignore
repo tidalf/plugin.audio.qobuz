@@ -8,3 +8,4 @@ resources/lib/qobuz/__data__/*.jpg
 pytest_cache/*
 tests/*
 coverage.xml
+venv/*

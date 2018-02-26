@@ -12,12 +12,13 @@ from qobuz.renderer.xbmc import QobuzXbmcRenderer as OurRenderer
 
 
 def renderer(nType,
-             parameters={},
+             parameters=None,
              mode=Mode.VIEW,
              whiteFlag=Flag.ALL,
              blackFlag=Flag.STOPBUILD,
              depth=1,
              asList=False):
+    parameters = {} if parameters is None else parameters
     return OurRenderer(
         nType,
         parameters=parameters,

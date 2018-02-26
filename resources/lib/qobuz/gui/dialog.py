@@ -6,7 +6,8 @@ logger = getLogger(__name__)
 
 
 class DialogSelect(object):
-    def __init__(self, label='Select', items=[]):
+    def __init__(self, label='Select', items=None):
+        items = [] if items is None else items
         self.label = label
         self.ret = -1
         self.items = items

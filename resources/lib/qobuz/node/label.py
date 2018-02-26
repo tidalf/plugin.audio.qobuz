@@ -14,7 +14,8 @@ from qobuz.node.inode import INode, getNode
 
 
 class Node_label(INode):
-    def __init__(self, parent=None, parameters={}, data=None):
+    def __init__(self, parent=None, parameters=None, data=None):
+        parameters = {} if parameters is None else parameters
         super(Node_label, self).__init__(
             parent=parent, parameters=parameters, data=data)
         self.nt = Flag.LABEL

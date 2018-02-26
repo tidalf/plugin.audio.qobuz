@@ -10,7 +10,8 @@
 from qobuz.node.flag import Flag
 
 
-def getNode(qnt, parameters={}, data=None, parent=None, **ka):
+def getNode(qnt, parameters=None, data=None, parent=None, **ka):
+    parameters = {} if parameters is None else parameters
     return module_import(Flag.to_s(qnt))(parent=parent,
                                          parameters=parameters,
                                          data=data,
