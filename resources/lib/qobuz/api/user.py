@@ -60,7 +60,7 @@ class User(object):
         if track is not None:
             if stream_type == 'hires':
                 stream_type = 'flac'
-                if self.get_property('user/credential/parameters/hires_streaming') == True or (is_purchased(track) and self.get_property('user/credential/parameters/hires_purchases_streaming') == True):
+                if self.get_property('user/credential/parameters/hires_streaming') is True or (is_purchased(track) and self.get_property('user/credential/parameters/hires_purchases_streaming') is True):
                     if track.get_maximum_sampling_rate() > 96:
                         stream_type = 'hires_hsr'
                     elif track.get_maximum_sampling_rate() > 45 or track.get_property('maximum_bit_depth') == 24:

@@ -86,7 +86,7 @@ class BaseCache(object):
 
     @classmethod
     def is_fresh(cls, key, data, *a, **ka):
-        if not 'updated_on' in data:
+        if 'updated_on' not in data:
             return False
         updated_on = data['updated_on']
         ttl = data['ttl']
@@ -99,7 +99,7 @@ class BaseCache(object):
 
     @classmethod
     def check_magic(cls, data, *a, **ka):
-        if not 'magic' in data:
+        if 'magic' not in data:
             return False
         if data['magic'] != __magic__:
             return False
@@ -107,7 +107,7 @@ class BaseCache(object):
 
     @classmethod
     def check_key(cls, data, key, *a, **ka):
-        if not 'key' in data:
+        if 'key' not in data:
             return False
         if data['key'] != key:
             return False

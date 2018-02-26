@@ -17,6 +17,7 @@ LOGPATH = P.expanduser(P.join('~', 'plugin.audio.qobuz.log'))
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+
 def attach_file_logger(logger):
     handler = logging.FileHandler(LOGPATH)
     logger.addHandler(handler)
@@ -24,6 +25,7 @@ def attach_file_logger(logger):
 
 try:
     from kodi_six import xbmc, xbmcaddon
+
 
     class XbmcLogger(logging.Handler):
 
@@ -45,6 +47,7 @@ try:
             else:
                 xbmc.log(self.fmt.format(record), xbmc.LOGNOTICE)
 
+
     if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         logger.addHandler(XbmcLogger())
 
@@ -57,6 +60,7 @@ def get_logger_factory(logger):
     def getLogger(name='main'):
         mylogger = logger.getChild(name)
         return mylogger
+
     return getLogger
 
 

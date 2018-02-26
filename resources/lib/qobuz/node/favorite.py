@@ -80,7 +80,7 @@ class Node_favorite(INode):
         if self.search_type == 'all':
             search_for = all_kinds
         for kind in search_for:
-            if not kind in self.data:
+            if kind not in self.data:
                 continue
             method = '_populate_%s' % kind
             if not hasattr(self, method):
@@ -210,7 +210,7 @@ class Node_favorite(INode):
                     if len(render.nodes) > 0:
                         newnode = getNode(
                             Flag.ALBUM, data=render.nodes[0].data['album'])
-                        #newnode.data = render.nodes[0].data['album']
+                        # newnode.data = render.nodes[0].data['album']
                         if not str(newnode.nid) in album_ids:
                             nodes.append(newnode)
                             album_ids[str(newnode.nid)] = 1
@@ -309,13 +309,11 @@ class Node_favorite(INode):
         return True
 
     def _delete_cache(self):
-        keys = []
-        keys.append(
-            cache.make_key(
-                '/favorite/getUserFavorites',
-                user_id=user.get_id(),
-                limit=self.limit,
-                offset=self.offset))
+        keys = [cache.make_key(
+            '/favorite/getUserFavorites',
+            user_id=user.get_id(),
+            limit=self.limit,
+            offset=self.offset)]
         for kind in ['artists', 'albums', 'tracks']:
             keys.append(
                 cache.make_key(

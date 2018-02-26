@@ -17,6 +17,7 @@ from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
 
+
 class Node_albums_by_artist(INode):
     '''@class Node_product_by_artist:
     '''

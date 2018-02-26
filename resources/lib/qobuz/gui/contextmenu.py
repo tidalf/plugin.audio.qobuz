@@ -19,7 +19,7 @@ class contextMenu(object):
         self.color_section = theme.get('item/section/color')
         formatStr = config.app.registry.get('item_section_format')
         try:
-            _test = formatStr % ('plop')
+            _test = formatStr % 'plop'
         except:
             formatStr = '[ %s ]'
         self.format_section = formatStr
@@ -45,7 +45,7 @@ class contextMenu(object):
                 pos: int, position in menu
         """
         for key in ['label', 'cmd']:
-            if not key in ka:
+            if key not in ka:
                 raise exception.MissingParameter(key)
         section, path = self.get_section_path(**ka)
         root = self.data
@@ -58,7 +58,7 @@ class contextMenu(object):
         color = ''
         if 'color' in ka:
             color = ka['color']
-        if not section in root:
+        if section not in root:
             root[section] = {
                 'label': section,
                 'childs': [],
@@ -96,7 +96,7 @@ class contextMenu(object):
             if 'color' in data and data['color']:
                 colorItem = data['color']
             label = self.format_section % (color(colorItem, data['label']))
-            #menuItems.append((label, data['cmd']))
+            # menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
                 colorItem = self.color_default
                 if 'color' in item and item['color']:

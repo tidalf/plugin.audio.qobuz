@@ -28,6 +28,7 @@ class Dialog(object):
     def yesno(self, *a, **ka):
         pass
 
+
 class DialogProgressBG(object):
     def create(self, *a, **ka):
         pass
@@ -37,6 +38,7 @@ class DialogProgressBG(object):
 
     def close(self, *a, **ka):
         pass
+
 
 class ListItem(object):
     def setPath(self, *a, **ka):
