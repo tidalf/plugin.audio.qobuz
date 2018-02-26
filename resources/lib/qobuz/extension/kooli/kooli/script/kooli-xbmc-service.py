@@ -24,15 +24,18 @@ except ImportError:
     sys.path.append(P.abspath(P.join(base_path, P.pardir, P.pardir)))
 from kooli import log
 from kooli import qobuz_lib_path
+
 try:
     import flask
+
     log.info('Flask loaded from kodi addon repository')
 except ImportError as e:
     log.warn('Flask not present, loading our own copy')
     path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask',
                   'lib')
     sys.path.append(path)
-import xbmc
+from kodi_six import xbmc
+
 from flask import request
 from kooli.application import application, shutdown_server, qobuzApp
 from kooli.monitor import Monitor
@@ -44,6 +47,7 @@ from qobuz.gui.util import notify_warn
 import qobuz.gui.util as gui
 
 logger = getLogger(__name__)
+
 
 def my_finish(self):
     if not self.wfile.closed:
@@ -129,7 +133,7 @@ class KooliService(threading.Thread):
                                         passthrough_errors=False)
                     except Exception as e:
                         logger.error('KooliService port: %s Error: %s',
-                                    self.port, e)
+                                     self.port, e)
                         raise e
             time.sleep(1)
 

@@ -51,7 +51,7 @@ class Registry(object):
     def __init__(self, application):
         self.application = application
         try:
-            import xbmc  # pylint: disable=W0612
+            import xbmc as _
             self.backend = XbmcRegistryBackend(application)
         except ImportError:
             self.backend = RegistryBackend(application)

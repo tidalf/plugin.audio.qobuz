@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import weakref
-import xbmcgui
+from kodi_six import xbmcgui
 
 from qobuz.api import api
 from qobuz.debug import getLogger
@@ -16,6 +16,7 @@ from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
+
 
 class Node_albums_by_artist(INode):
     '''@class Node_product_by_artist:

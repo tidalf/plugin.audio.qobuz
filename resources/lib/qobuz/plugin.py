@@ -8,8 +8,8 @@
 '''
 import os
 import sys
-import xbmc
-import xbmcaddon
+
+from kodi_six import xbmc, xbmcaddon
 
 
 class Plugin(object):

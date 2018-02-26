@@ -8,7 +8,7 @@
 '''
 import os
 import sys
-import xbmc
+from kodi_six import xbmc
 
 from qobuz import exception
 from qobuz.cache import cache
@@ -35,7 +35,7 @@ def get_checked_parameters():
     if len(paramstring) >= 2:
         params = sys.argv[2]
         cleanedparams = params.replace('?', '')
-        if (params[len(params) - 1] == '/'):
+        if params[len(params) - 1] == '/':
             params = params[0:len(params) - 2]
         pairsofparams = cleanedparams.split('&')
 
@@ -82,7 +82,7 @@ class MinimalBootstrap(object):
 
     @classmethod
     def bootstrap_directories(cls):
-        class PathObject():
+        class PathObject:
             def __init__(self):
                 self.base = config.addon.getAddonInfo('path')
 

@@ -8,8 +8,7 @@
 '''
 import time
 
-import xbmcgui
-import xbmcplugin
+from kodi_six import xbmcplugin
 
 from qobuz import debug
 from qobuz.gui.bg_progress import Progress
@@ -69,13 +68,13 @@ class Directory(object):
         if self.filter_double is not None:
             if self.filter_double & node.nt == node.nt:
                 if node.nid in self.seen_nodes:
-                    self.progress.update(message='Skip node type: %s' % Flag.to_s(node.nt) )
+                    self.progress.update(message='Skip node type: %s' % Flag.to_s(node.nt))
                     return True
                 self.seen_nodes[node.nid] = 1
         try:
-           self.progress.update(message=node.get_label().encode('ascii'))
+            self.progress.update(message=node.get_label().encode('ascii'))
         except:
-           pass
+            pass
         if self.asList is True:
             self.nodes.append(node)
             self.total_put += 1
@@ -105,7 +104,7 @@ class Directory(object):
         if self.seen_nodes:
             self.seen_nodes = {}
         success = True
-        if forceStatus != None:
+        if forceStatus is not None:
             success = forceStatus
         if not self.put_item_ok or self.total_put == 0:
             success = False

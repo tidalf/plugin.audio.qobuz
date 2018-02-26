@@ -34,7 +34,7 @@ class Node_user_playlists(INode):
 
     def set_display_by(self, dtype):
         vtype = ('product', 'songs')
-        if not dtype in vtype:
+        if dtype not in vtype:
             error(self, "Invalid display by: " + dtype)
         self.display_by = dtype
 

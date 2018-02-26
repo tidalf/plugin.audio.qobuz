@@ -12,7 +12,7 @@ from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode
 from time import time
 import requests
-import xbmcgui
+from kodi_six import xbmcgui
 
 logger = getLogger(__name__)
 

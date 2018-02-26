@@ -10,7 +10,7 @@ import json
 import pprint
 
 try:
-    import xbmc
+    from kodi_six import xbmc
 except ImportError as e:
     print "ImportError(Outside XBMC): %s" % e
 
@@ -75,10 +75,10 @@ class JsonResponse:
     def result(self):
         error = self.error()
         if error:
-            log(self, "Error: %s" % (error))
+            log(self, "Error: %s" % error)
         if not self.raw_data:
             return {}
-        if not 'result' in self.raw_data:
+        if 'result' not in self.raw_data:
             return {}
         return self.raw_data['result']
 

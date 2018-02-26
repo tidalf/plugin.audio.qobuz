@@ -31,7 +31,7 @@ for key, value in _allowed_keys.items():
     _allowed_keys[key] = re.compile(value)
 
 
-class dog():
+class dog:
     '''Checking script parameter against regular expression
     '''
 

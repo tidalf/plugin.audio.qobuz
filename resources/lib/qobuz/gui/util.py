@@ -9,11 +9,12 @@
 import os
 import re
 import sys
+from qobuz import config
+from qobuz.xbmcrpc import showNotification, getInfoLabels
+import qobuz
 
 try:
-    import xbmc
-    import xbmcgui
-    import xbmcplugin
+    from kodi_six import xbmc, xbmcgui, xbmcplugin
 
     class Keyboard(xbmc.Keyboard):
         def __init__(self, default, heading='', hidden=True):
@@ -29,13 +30,6 @@ def ask(current=None, heading='rename'):
     if not w.isConfirmed():
         return None
     return w.getText().strip()
-
-
-from qobuz import config
-from qobuz import debug
-from qobuz.util import common as commonUtil
-from qobuz.xbmcrpc import showNotification, getInfoLabels
-import qobuz
 
 
 def getImage(name):
@@ -142,7 +136,7 @@ def lang(langId):
 
 
 def runPlugin(url):
-    return 'XBMC.RunPlugin("%s")' % (url)
+    return 'XBMC.RunPlugin("%s")' % url
 
 
 def containerUpdate(url, replace=False):
