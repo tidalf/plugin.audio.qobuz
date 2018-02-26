@@ -11,6 +11,7 @@ import sys
 
 from kodi_six import xbmc, xbmcaddon
 
+
 class Plugin(object):
     def __init__(self, plugin_id):
         self.plugin_id = plugin_id
