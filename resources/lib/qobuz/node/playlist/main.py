@@ -124,7 +124,7 @@ class Node_playlist(INode):
     def get_tag(self):
         return u' (tracks: %s, users: %s)' % (self.get_property(
             'tracks_count', to='int'), self.get_property(
-                'users_count', to='int'))
+            'users_count', to='int'))
 
     def get_image(self):
         images = self.get_property(
@@ -254,7 +254,7 @@ class Node_playlist(INode):
         numtracks = len(nodes)
         if numtracks > 1000:
             notify_error('Qobuz', 'Max tracks per playlist reached (1000)'
-                         '\nSkipping %s tracks' % (numtracks - 1000))
+                                  '\nSkipping %s tracks' % (numtracks - 1000))
             numtracks = 1000
         while start < numtracks:
             if (start + step) > numtracks:
@@ -267,7 +267,7 @@ class Node_playlist(INode):
                     continue
                 str_tracks += '%s,' % (str(node.nid))
             if not api.playlist_addTracks(playlist_id=playlist_id,
-                    track_ids=str_tracks):
+                                          track_ids=str_tracks):
                 return False
             start += step
         return True
@@ -298,7 +298,7 @@ class Node_playlist(INode):
             name = ask('Playlist name? (i8n)')
             if name is None:
                 return False
-        ret = xbmcgui.Dialog().select('Create playlist %s' % (name),
+        ret = xbmcgui.Dialog().select('Create playlist %s' % name,
                                       [node.get_label() for node in nodes])
         if ret == -1:
             return False
@@ -308,7 +308,7 @@ class Node_playlist(INode):
             logger.warn('Cannot create playlist...')
             return False
         if not self._add_tracks(playlist['id'], nodes):
-            notify_error('Qobuz / Cannot add tracks', '%s' % (name))
+            notify_error('Qobuz / Cannot add tracks', '%s' % name)
             return False
         self.delete_cache(playlist['id'])
         notify_log('Qobuz / Playlist added', '[%s] %s' % (len(nodes), name))
@@ -330,7 +330,7 @@ class Node_playlist(INode):
 
     def get_current_playlist(self):
         userdata = self.get_user_storage()
-        if not 'current_playlist' in userdata:
+        if 'current_playlist' not in userdata:
             return None
         return int(userdata['current_playlist'])
 
@@ -357,10 +357,10 @@ class Node_playlist(INode):
             return True
         res = api.playlist_update(playlist_id=playlist_id, name=newname)
         if not res:
-            logger.warn('Cannot rename playlist with name %s' % (newname))
+            logger.warn('Cannot rename playlist with name %s' % newname)
             return False
         self.delete_cache(playlist_id)
-        notify_log(lang(30080), (u'%s: %s') % (lang(30165), currentname))
+        notify_log(lang(30080), u'%s: %s' % (lang(30165), currentname))
         executeBuiltin(containerRefresh())
         return True
 
@@ -388,8 +388,8 @@ class Node_playlist(INode):
         self.set_as_current(ret['id'])
         self.delete_cache(ret['id'])
         self.containerUpdate()
-        #url = self.make_url(nt=Flag.USERPLAYLISTS)
-        #executeBuiltin(containerUpdate(url, True))
+        # url = self.make_url(nt=Flag.USERPLAYLISTS)
+        # executeBuiltin(containerUpdate(url, True))
         return ret['id']
 
     def _get_playlist_id(self, playlist_id=None):
@@ -430,7 +430,7 @@ class Node_playlist(INode):
             notify_error(lang(30183), lang(30186) + name)
             return False
         self.delete_cache(playlist_id)
-        notify_log(lang(30183), (lang(30184) + '%s' + lang(30185)) % (name))
+        notify_log(lang(30183), (lang(30184) + '%s' + lang(30185)) % name)
         self.containerUpdate()
         return False
 

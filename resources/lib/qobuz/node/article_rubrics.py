@@ -29,10 +29,10 @@ class Node_article_rubrics(INode):
         return url
 
     def get_label(self):
-        l = self.get_property('title')
-        if not l:
+        title = self.get_property('title')
+        if not title:
             return 'Articles'
-        return l
+        return title
 
     def fetch(self, Dir, lvl, whiteFlag, blackFlag):
         limit = getSetting('pagination_limit')
@@ -40,7 +40,7 @@ class Node_article_rubrics(INode):
                                   id=self.nid,
                                   offset=self.offset,
                                   limit=limit)
-        if data is None or not 'data' in data:
+        if data is None or 'data' not in data:
             return None
         return data['data']
 

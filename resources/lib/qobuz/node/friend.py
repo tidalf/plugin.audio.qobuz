@@ -57,9 +57,9 @@ class Node_friend(INode):
         if not name:
             return False
         if not self.create(name):
-            notifyH('Qobuz', 'Cannot add friend %s' % (name))
+            notifyH('Qobuz', 'Cannot add friend %s' % name)
             return False
-        notifyH('Qobuz', 'Friend %s added' % (name))
+        notifyH('Qobuz', 'Friend %s added' % name)
         return True
 
     def create(self, name=None):
@@ -76,7 +76,7 @@ class Node_friend(INode):
         if data['user']['login'] == name:
             return False
         friends = data['user']['player_settings']
-        if not 'friends' in friends:
+        if 'friends' not in friends:
             friends = []
         else:
             friends = friends['friends']
@@ -106,24 +106,24 @@ class Node_friend(INode):
         if not user:
             return False
         friends = user['player_settings']
-        if not 'friends' in friends:
+        if 'friends' not in friends:
             notifyH('Qobuz', 'You don\'t have friend', 'icon-error-256')
             logger.warn('No friends in user/player_settings')
             return False
         friends = friends['friends']
-        if not name in friends:
-            notifyH('Qobuz', 'You\'re not friend with %s' % (name),
+        if name not in friends:
+            notifyH('Qobuz', 'You\'re not friend with %s' % name,
                     'icon-error-256')
             logger.warn('Friend ' + repr(name) + ' not in friends data')
             return False
         del friends[friends.index(name)]
         newdata = {'friends': friends}
         if not api.user_update(player_settings=json.dumps(newdata)):
-            notifyH('Qobuz', 'Friend %s added' % (name))
+            notifyH('Qobuz', 'Friend %s added' % name)
             notifyH('Qobuz', 'Cannot updata friend\'s list...',
                     'icon-error-256')
             return False
-        notifyH('Qobuz', 'Friend %s removed' % (name))
+        notifyH('Qobuz', 'Friend %s removed' % name)
         self.delete_cache()
         executeBuiltin(containerRefresh())
         return True

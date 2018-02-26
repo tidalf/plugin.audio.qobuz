@@ -18,13 +18,13 @@ from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
 
-def makeSubscriptionNode():
+
+def make_subscription_node():
     return getNode(
         Flag.TEXT,
         parameters={
             'label': '(Free Account / Subscribe on qobuz.com)',
-            'image':
-            'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'
+            'image': 'http://static-www.qobuz.com/img/sprite/sprite-plans-option-2015.png'
         })
 
 
@@ -40,7 +40,7 @@ class Node_root(INode):
     def populate(self, *a, **ka):
         free = current_user.is_free_account()
         if free:
-            self.add_child(makeSubscriptionNode())
+            self.add_child(make_subscription_node())
         if not free:
             self.add_child(getNode(Flag.USER))
             self.add_child(getNode(Flag.USERPLAYLISTS))
@@ -64,7 +64,7 @@ class Node_root(INode):
             if not free:
                 self.add_child(getNode(Flag.COLLECTION))
         if free:
-            self.add_child(makeSubscriptionNode())
+            self.add_child(make_subscription_node())
         return True
 
     @classmethod

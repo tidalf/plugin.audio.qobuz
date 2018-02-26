@@ -60,7 +60,7 @@ class Notifier(Repeatable):
             title = self.title
         util.notify_log(
             '%s nodes: %s' % (title, self.total),
-            '%s' % (msg),
+            '%s' % msg,
             mstime=self.duration * 1000)
         return True
 
