@@ -33,7 +33,7 @@ class Node_albums_by_artist(INode):
         return self.get_artist()
 
     def get_image(self):
-        image = self.get_property('picture')
+        image = self.get_property('picture', default=u'')
         image = image.replace('126s', '_')
         return image
 
