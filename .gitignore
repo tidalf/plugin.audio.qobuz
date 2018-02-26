@@ -9,3 +9,4 @@ pytest_cache/*
 tests/*
 coverage.xml
 venv/*
+.idea/*
