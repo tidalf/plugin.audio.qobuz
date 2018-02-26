@@ -12,9 +12,11 @@ available = False
 
 try:
     from PIL import Image
+
     available = True
 except ImportError as e:
     logger.error('Cannot import PIL library')
+
 
 def combineFactory(available, nid, images=None, count=4, prefix='cover'):
     images = [] if images is None else images
@@ -58,5 +60,6 @@ def combineFactory(available, nid, images=None, count=4, prefix='cover'):
                 logger.error(error)
     new.save(final_path)
     return final_path
+
 
 combine = functools.partial(combineFactory, available)

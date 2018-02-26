@@ -43,7 +43,7 @@ class Node_friends(INode):
         user_data = api.get('/user/login',
                             username=user.username,
                             password=user.password)
-        if not 'user' in user_data:
+        if 'user' not in user_data:
             return False
         friend_data = user_data['user']['player_settings']['friends']
         if self.name is not None:
@@ -72,7 +72,7 @@ class Node_friends(INode):
                 return None
             friend_list[name] = 1
             node = getNode(Flag.FRIEND, {'query': str(name)})
-            node.label = 'Friend / %s' % (node.label)
+            node.label = 'Friend / %s' % node.label
             self.add_child(node)
             return node
 

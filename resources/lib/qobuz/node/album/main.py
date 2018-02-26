@@ -116,7 +116,7 @@ class Node_album(INode):
             for a in articles
         ]
 
-    def get_awards(self, default=[]):
+    def get_awards(self, default=None):
         default = [] if default is None else default
         awards = self.get_property('awards', default=None)
         if awards is None:
@@ -164,7 +164,7 @@ class Node_album(INode):
         if not size:
             size = self.imageDefaultSize
         return self.get_property([
-            'image/%s' % (size), 'image/large', 'image/small',
+            'image/%s' % size, 'image/large', 'image/small',
             'image/thumbnail'
         ])
 

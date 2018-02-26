@@ -9,16 +9,16 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from itertools import izip, cycle
-from time import time
 import binascii
 import copy
 import hashlib
 import math
-import pprint
-import requests
 import socket
 import sys
+from itertools import izip, cycle
+from time import time
+
+import requests
 
 from qobuz import exception
 from qobuz.api.user import current as user
@@ -60,7 +60,7 @@ class RawApi(object):
         if allowed is None:
             allowed = []
         for label in mandatory:
-            if not label in ka:
+            if label not in ka:
                 raise exception.MissingParameter(label)
         for label in ka:
             if label not in mandatory and label not in allowed:
@@ -169,9 +169,9 @@ class RawApi(object):
         data = self._api_request(ka, '/user/login', noToken=True)
         if not data:
             return None
-        if not 'user' in data:
+        if 'user' not in data:
             return None
-        if not 'id' in data['user']:
+        if 'id' not in data['user']:
             return None
         if not data['user']['id']:
             return None
@@ -197,8 +197,7 @@ class RawApi(object):
             'request_ts': ka['request_ts'],
             'request_sig': str(
                 hashlib.md5('trackgetFileUrlformat_id' + str(ka['format_id']) +
-                            'intent' + intent + 'track_id' + str(ka[
-                                'track_id']) + str(ka['request_ts']) + self.s4)
+                            'intent' + intent + 'track_id' + str(ka['track_id']) + str(ka['request_ts']) + self.s4)
                 .hexdigest()),
             'track_id': str(ka['track_id'])
         }
@@ -251,7 +250,7 @@ class RawApi(object):
         self._check_ka(ka, ['query'], ['type', 'limit', 'offset'])
         mandatory = ['query', 'type']
         for label in mandatory:
-            if not label in ka:
+            if label not in ka:
                 raise exception.MissingParameter(label)
         return self._api_request(ka, '/search/getResults')
 
@@ -286,7 +285,7 @@ class RawApi(object):
     def playlist_getUserPlaylists(self, **ka):
         self._check_ka(ka, ['type'],
                        ['user_id', 'username', 'order', 'offset', 'limit'])
-        if not 'user_id' in ka and not 'username' in ka:
+        if 'user_id' not in ka and not 'username' in ka:
             ka['user_id'] = user.get_id()
         return self._api_request(ka, '/playlist/getUserPlaylists')
 
@@ -324,7 +323,7 @@ class RawApi(object):
 
     def playlist_delete(self, **ka):
         self._check_ka(ka, ['playlist_id'])
-        if not 'playlist_id' in ka:
+        if 'playlist_id' not in ka:
             raise exception.MissingParameter('playlist_id')
         return self._api_request(ka, '/playlist/delete')
 

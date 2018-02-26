@@ -17,6 +17,7 @@ LOGPATH = P.expanduser(P.join('~', 'plugin.audio.qobuz.log'))
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
+
 def attach_file_logger(logger):
     handler = logging.FileHandler(LOGPATH)
     logger.addHandler(handler)
@@ -59,6 +60,7 @@ def get_logger_factory(logger):
     def getLogger(name='main'):
         mylogger = logger.getChild(name)
         return mylogger
+
     return getLogger
 
 
