@@ -47,6 +47,8 @@ try:
 
     if xbmcaddon.Addon(id='plugin.audio.qobuz').getSetting('debug') == 'true':
         logger.addHandler(XbmcLogger())
+    else:
+        logger.addHandler(logging.NullHandler(level=logging.NOTSET))
 
 except Exception as e:
     print('Exception %s' % e)  # pylint: disable=E1601

@@ -35,6 +35,16 @@ from qobuz.util.converter import converter
 logger = getLogger(__name__)
 
 
+def get_property_helper(data, path, to):
+    try:
+        _path, value = properties.deep_get(data, path)
+    except KeyError:
+        return None
+    if value is None:
+        return None
+    return getattr(converter, to)(value)
+
+
 class INode(object):
     '''Our base node, every node must inherit or mimic is behaviour
 
@@ -166,11 +176,9 @@ class INode(object):
         if isinstance(pathList, basestring):
             pathList = [pathList]
         for path in pathList:
-            try:
-                _path, value = properties.deep_get(self.data, path)
-                return getattr(converter, to)(value)
-            except KeyError:
-                pass
+            value = get_property_helper(self.data, path, to)
+            if value is not None:
+                return value
         return default
 
     def __getattr__(self, attr):
