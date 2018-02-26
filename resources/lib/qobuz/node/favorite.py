@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import xbmcgui
+from kodi_six import xbmcgui
 
 from qobuz import exception
 from qobuz.api import api

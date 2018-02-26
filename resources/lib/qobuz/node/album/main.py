@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-import xbmcgui
+from kodi_six import xbmcgui
 
 from .props import propsMap, informationTemplate
 from qobuz import config

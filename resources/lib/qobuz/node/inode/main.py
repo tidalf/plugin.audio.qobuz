@@ -286,7 +286,7 @@ class INode(object):
             return  a xbml list item
             Class can overload this method
         '''
-        import xbmcgui  # @UnresolvedImport
+        from kodi_six import xbmcgui  # @UnresolvedImport
         if 'url' not in ka:
             ka['url'] = self.make_url()
         if 'label' not in ka:
