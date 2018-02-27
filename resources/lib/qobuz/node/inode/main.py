@@ -361,7 +361,6 @@ class INode(object):
     def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None, noRemote=False):
         '''When returning None we are not displaying directory content
         '''
-        logger.warning('base class fetch: %s', self)
         return {}
 
     def populating(self, xdir,
