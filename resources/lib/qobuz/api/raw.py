@@ -42,8 +42,8 @@ class RawApi(object):
         self.statTotalRequest = 0
         self.__set_s4()
 
-    def _api_error_string(self, request, url='', params=None, json=''):
-        params = {} if params is None else params
+    def _api_error_string(self, request, _url='', _params=None, _json=''):
+        # params = {} if params is None else params
         return '{reason} ({status_code}): {error}'.format(
             reason=request.reason,
             status_code=self.status_code,
@@ -116,7 +116,7 @@ class RawApi(object):
         if 'password' in _copy_params:
             _copy_params['password'] = '***'
         '''END / DEBUG'''
-        r = None
+
         try:
             r = self.session.post(url, data=params, headers=headers)
         except Exception as e:
@@ -220,10 +220,9 @@ class RawApi(object):
             logger.warn('Duration lesser than 5s, abort reporting')
             return None
         # @todo ???
-        user_auth_token = ''  # @UnusedVariable
         try:
-            user_auth_token = self.user_auth_token  # @UnusedVariable
-        except:
+            _ = self.user_auth_token  # @UnusedVariable
+        except Exception:
             logger.warn('No authentification token')
             return None
         params = {
@@ -285,7 +284,7 @@ class RawApi(object):
     def playlist_getUserPlaylists(self, **ka):
         self._check_ka(ka, ['type'],
                        ['user_id', 'username', 'order', 'offset', 'limit'])
-        if 'user_id' not in ka and not 'username' in ka:
+        if 'user_id' not in ka and 'username' not in ka:
             ka['user_id'] = user.get_id()
         return self._api_request(ka, '/playlist/getUserPlaylists')
 

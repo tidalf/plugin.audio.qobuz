@@ -62,5 +62,5 @@ if theme.get('colorize_items'):
         return u'[COLOR=%s]%s[/COLOR]' % (convert_color(color), msg)
 else:
 
-    def color(color, msg):
+    def color(_, msg):
         return msg

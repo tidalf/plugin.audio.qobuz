@@ -17,7 +17,7 @@ try:
     from kodi_six import xbmc, xbmcgui, xbmcplugin
 
     class Keyboard(xbmc.Keyboard):
-        def __init__(self, default, heading='', hidden=True):
+        def __init__(self, _default, heading='', _hidden=True):
             self.setHeading('Qobuz / %s' % heading)
 
 except:
@@ -140,7 +140,7 @@ def runPlugin(url):
 
 
 def containerUpdate(url, replace=False):
-    replace = ''
+    # replace = ''
     if replace is True:
         replace = ', "replace"'
     return 'Container.Update("%s"%s)' % (url, replace)

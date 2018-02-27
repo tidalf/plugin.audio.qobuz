@@ -35,12 +35,9 @@ def get_checked_parameters():
     if len(paramstring) >= 2:
         params = sys.argv[2]
         cleanedparams = params.replace('?', '')
-        if params[len(params) - 1] == '/':
-            params = params[0:len(params) - 2]
         pairsofparams = cleanedparams.split('&')
 
         for i, _item in enumerate(pairsofparams):
-            splitparams = {}
             splitparams = pairsofparams[i].split('=')
             if (len(splitparams)) == 2:
                 if d.kv_is_ok(splitparams[0], splitparams[1]):
@@ -162,7 +159,6 @@ class MinimalBootstrap(object):
             return r.scan()
         else:
             raise exception.UnknownMode(self.MODE)
-        return True
 
 
 class Bootstrap(MinimalBootstrap):
