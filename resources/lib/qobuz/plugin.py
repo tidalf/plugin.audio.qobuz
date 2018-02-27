@@ -7,7 +7,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import os
-import sys
 
 from kodi_six import xbmc, xbmcaddon
 

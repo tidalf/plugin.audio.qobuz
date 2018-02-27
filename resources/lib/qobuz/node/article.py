@@ -81,7 +81,7 @@ class Node_article(INode):
         return '%s - %s' % (self.get_property('source'),
                             self.get_property('category'))
 
-    def get_description(self, abstract=True):
+    def get_description(self, _abstract=True):
         if self.nid is None:
             return self.get_property('abstract', to='strip_html')
         return self.get_property('content', to='strip_html')

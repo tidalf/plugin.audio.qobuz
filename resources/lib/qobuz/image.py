@@ -27,8 +27,8 @@ def combineFactory(available, nid, images=None, count=4, prefix='cover'):
         return None
     if len_images == 1:
         return images[0]
-    if count > len_images:
-        count = len_images
+    # if count > len_images:
+    #    count = len_images
     if available is False:
         return images[random.randint(0, len_images - 1)]
     final_path = P.join(

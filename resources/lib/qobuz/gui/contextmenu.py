@@ -19,7 +19,7 @@ class contextMenu(object):
         self.color_section = theme.get('item/section/color')
         formatStr = config.app.registry.get('item_section_format')
         try:
-            _test = formatStr % 'plop'
+            _ = formatStr % 'plop'
         except:
             formatStr = '[ %s ]'
         self.format_section = formatStr
@@ -95,7 +95,7 @@ class contextMenu(object):
             data = self.data[section]
             if 'color' in data and data['color']:
                 colorItem = data['color']
-            label = self.format_section % (color(colorItem, data['label']))
+            # label = self.format_section % (color(colorItem, data['label']))
             # menuItems.append((label, data['cmd']))
             for item in sorted(data['childs'], key=itemSort):
                 colorItem = self.color_default
