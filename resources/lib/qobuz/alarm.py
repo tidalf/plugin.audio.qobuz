@@ -41,14 +41,14 @@ class Notifier(Repeatable):
         def __str__(self):
             return '[%s] %s' % (self.level, self.text)
 
-    def __init__(self, title='Notifier', duration=5, callback=None):
+    def __init__(self, title='Notifier', duration=5, _callback=None):
         super(Notifier, self).__init__(
             duration=duration, callback=self._callback)
         self.store = []
         self.title = title
         self.total = 0
 
-    def _callback(self, elapsed):
+    def _callback(self, _elapsed):
         msg = u', '.join([str(n.text) for n in self.store])
         msg = msg[:-2]
         visited = len(self.store)

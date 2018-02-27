@@ -63,7 +63,6 @@ class FileCache(BaseCache):
             return None
         with open(path, 'rb') as f:
             return pickle.load(f)
-        return None
 
     @classmethod
     def get_ttl(cls, *a, **ka):
