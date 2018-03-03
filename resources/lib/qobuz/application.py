@@ -11,12 +11,15 @@ import sys
 from qobuz import config
 from qobuz import debug
 from qobuz import exception
-from qobuz.bootstrap import Bootstrap
 from qobuz.registry import Registry
 
 
 class Application(object):
-    def __init__(self, plugin=None, bootstrapClass=Bootstrap):
+    def __init__(self, plugin=None, bootstrapClass=None):
+        if plugin is None:
+            raise RuntimeError('MissingPluginParameter')
+        if bootstrapClass is None:
+            raise RuntimeError('MissingBootrapClassParameter')
         self.plugin = plugin
         self.registry = Registry(self)
         config.app = self
@@ -32,7 +35,7 @@ class Application(object):
         self.plugin = None
 
     def get_addon(self):
-        if self.plugin is not None:
+        if self.plugin is not None and hasattr(self.plugin, 'addon'):
             return self.plugin.addon
         return None
 

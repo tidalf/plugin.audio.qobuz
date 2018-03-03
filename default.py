@@ -11,8 +11,9 @@ from os import path as P
 
 sys.path.append(P.join(P.abspath(P.dirname(__file__)), 'resources', 'lib'))
 
-from qobuz.plugin import Plugin  # pylint: disable=C0413
+from qobuz.plugin.kodi import KodiPlugin  # pylint: disable=C0413
 from qobuz.application import Application  # pylint: disable=C0413
+from qobuz.bootstrap.kodi import KodiBootstrap  # pylint: disable=C0413
 
-with Application(Plugin('plugin.audio.qobuz')) as app:
+with Application(plugin=KodiPlugin('plugin.audio.qobuz'), bootstrapClass=KodiBootstrap) as app:
     app.start()

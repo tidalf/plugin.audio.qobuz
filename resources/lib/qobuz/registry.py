@@ -35,6 +35,11 @@ class RegistryBackend(IRegistryBackend):
     def get(self, key):
         return self.conf.get('main', key)
 
+    def __iter__(self):
+        for section in self.conf.sections():
+            for key in self.conf._sections[section]:
+                yield section, key, self.conf.get(section, key)
+
 
 class XbmcRegistryBackend(IRegistryBackend):
     def __init__(self, application):
@@ -45,6 +50,9 @@ class XbmcRegistryBackend(IRegistryBackend):
 
     def set(self, key, value):
         self.application.addon.setSetting(key, str(value))
+
+    def __iter__(self):
+        raise NotImplementedError()
 
 
 class Registry(object):
@@ -64,3 +72,7 @@ class Registry(object):
 
     def __getitem__(self, key):
         return self.backend.get(key)
+
+    def __iter__(self):
+        for section, key, value in self.backend.__iter__():
+            yield section, key, value

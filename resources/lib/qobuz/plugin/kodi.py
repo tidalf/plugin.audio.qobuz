@@ -1,19 +1,20 @@
 '''
-    qobuz.plugin
-    ~~~~~~~~~~~~
+    qobuz.plugin.kodi
+    ~~~~~~~~~~~~~~~~~
 
     :part_of: xbmc-qobuz
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+from kodi_six import xbmc, xbmcaddon
 import os
 
-from kodi_six import xbmc, xbmcaddon
+from .base import PluginBase
 
 
-class Plugin(object):
+class KodiPlugin(PluginBase):
     def __init__(self, plugin_id):
-        self.plugin_id = plugin_id
+        super(KodiPlugin, self).__init__(plugin_id=plugin_id)
         self.addon = xbmcaddon.Addon(id=self.plugin_id)
 
     def get_version(self):
@@ -31,9 +32,3 @@ class Plugin(object):
 
     def get_qobuz_path(self):
         return xbmc.translatePath(os.path.join(self.get_lib_path(), 'qobuz'))
-
-    def __str__(self):
-        return '<Plugin id={plugin_id} addon_id={addon_id} version={version}>'\
-            .format(plugin_id=self.plugin_id,
-                    addon_id=self.get_addon_id(),
-                    version=self.get_version())
