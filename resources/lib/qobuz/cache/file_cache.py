@@ -8,13 +8,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-try:
-    '''cPickle is a faster implementation of pickle, we are using it if
-    present
-    '''
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import json
 import os
 
 from qobuz.cache.base_cache import BaseCache
@@ -48,7 +42,7 @@ class FileCache(BaseCache):
         unlink(filename)
         try:
             with RenamedTemporaryFile(filename) as fo:
-                pickle.dump(data, fo, protocol=pickle.HIGHEST_PROTOCOL)
+                json.dump(data, fo)
                 fo.flush()
                 os.fsync(fo)
         except Exception as e:
@@ -61,8 +55,15 @@ class FileCache(BaseCache):
         path = os.path.join(self.base_path, filename)
         if not os.path.exists(path):
             return None
+        do_unlink = False
         with open(path, 'rb') as f:
-            return pickle.load(f)
+            try:
+                return json.load(f)
+            except Exception as e:
+                logger.error('Loading item fail %s', e)
+                do_unlink = True
+        if do_unlink:
+            unlink(path)
 
     @classmethod
     def get_ttl(cls, *a, **ka):
