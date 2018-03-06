@@ -14,7 +14,7 @@ from qobuz.debug import getLogger
 from qobuz.gui.util import getImage, runPlugin
 from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.util import notifyH, executeBuiltin, lang
-from qobuz.node import Flag, getNode
+from qobuz.node import Flag, getNode, helper
 from qobuz.node.inode import INode
 from qobuz.theme import theme, color
 
@@ -128,16 +128,17 @@ class Node_friend(INode):
         executeBuiltin(containerRefresh())
         return True
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, options=None):
         node = getNode(Flag.FRIEND)
         node.create('qobuz.com')
         return api.get('/playlist/getUserPlaylists',
                        type='last-created',
                        username=self.name)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
+        options = helper.get_tree_traverse_opts(options)
         result = False
-        if lvl != -1:
+        if options.lvl != -1:
             self.add_child(getNode(Flag.FRIENDS, parameters=self.parameters))
         for playlist in self.data['playlists']['items']:
             node = getNode(Flag.PLAYLIST, data=playlist)

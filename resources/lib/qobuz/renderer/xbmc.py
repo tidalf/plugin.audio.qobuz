@@ -15,7 +15,7 @@ from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.directory import Directory
 from qobuz.gui.util import notifyH
-from qobuz.node import getNode
+from qobuz.node import getNode, helper
 from qobuz.node.flag import Flag
 from qobuz.renderer.irenderer import IRenderer
 
@@ -68,8 +68,11 @@ class QobuzXbmcRenderer(IRenderer):
             if config.app.registry.get('contextmenu_replaceitems', to='bool'):
                 xdir.replaceItems = True
             try:
-                _ret = self.root.populating(xdir, self.depth, self.whiteFlag,
-                                            self.blackFlag)
+                _ret = self.root.populating(helper.TreeTraverseOpts(
+                    xdir=xdir,
+                    lvl=self.depth,
+                    whiteFlag=self.whiteFlag,
+                    blackFlag=self.blackFlag))
             except exception.QobuzError as e:
                 xdir.end_of_directory(False)
                 xdir = None
@@ -113,7 +116,11 @@ class QobuzXbmcRenderer(IRenderer):
             if root.nt & Flag.TRACK == Flag.TRACK:
                 predir.add_node(root)
             else:
-                root.populating(predir, 3, Flag.ALL, Flag.STOPBUILD)
+                root.populating(helper.TreeTraverseOpts(
+                    xdir=predir,
+                    lvl=3,
+                    whiteFlag=Flag.ALL,
+                    blackFlag=Flag.STOPBUILD))
             total = len(predir.nodes)
             if total == 0:
                 return []
@@ -153,9 +160,17 @@ class QobuzXbmcRenderer(IRenderer):
                         Flag.ALBUM,
                         parameters={'nid': album_id,
                                     'mode': Mode.SCAN})
-                    album.populating(findir, 1, Flag.TRACK, Flag.STOPBUILD)
+                    album.populating(helper.TreeTraverseOpts(
+                        xdir=findir,
+                        lvl=1,
+                        blackFlag=Flag.TRACK,
+                        whiteFlag=Flag.STOPBUILD))
                 else:
-                    node.populating(findir, 1, Flag.TRACK, Flag.STOPBUILD)
+                    node.populating(helper.TreeTraverseOpts(
+                        xdir=findir,
+                        lvl=1,
+                        blackFlag=Flag.TRACK,
+                        whiteFlag=Flag.STOPBUILD))
             return findir.nodes
 
         with Directory(

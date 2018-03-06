@@ -74,7 +74,7 @@ class Node_recommendation(INode):
             return None
         return str(self.genre_type) + '-' + str(self.genre_id)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, options=None):
         if self.genre_type is None or self.genre_id is None:
             return {}
         return api.get('/album/getFeatured',
@@ -83,7 +83,7 @@ class Node_recommendation(INode):
                        limit=self.limit,
                        offset=self.offset)
 
-    def __populate_type(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_type(self, options=None):
         '''Populate type, we don't have genre_type nor genre_id
         '''
         for genre_type_id in RECOS_TYPE_IDS:
@@ -93,7 +93,7 @@ class Node_recommendation(INode):
             self.add_child(node)
         return True
 
-    def __populate_genre(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_genre(self, options=None):
         '''Populate genre, we have genre_type but no genre_id
         '''
         for genre_id in RECOS_GENRES:
@@ -108,7 +108,7 @@ class Node_recommendation(INode):
             self.add_child(node)
         return True
 
-    def __populate_type_genre(self, Dir, lvl, whiteFlag, blackFlag):
+    def __populate_type_genre(self, options=None):
         '''Populate album selected by genre_type and genre_id
         '''
         self.content_type = 'albums'
@@ -124,11 +124,11 @@ class Node_recommendation(INode):
             self.add_child(getNode(Flag.ALBUM, data=product))
         return True
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         '''We are populating our node based on genre_type and genre_id
         '''
         if not self.genre_type:
-            return self.__populate_type(Dir, lvl, whiteFlag, blackFlag)
+            return self.__populate_type(options)
         elif not self.genre_id:
-            return self.__populate_genre(Dir, lvl, whiteFlag, blackFlag)
-        return self.__populate_type_genre(Dir, lvl, whiteFlag, blackFlag)
+            return self.__populate_genre(options)
+        return self.__populate_type_genre(options)

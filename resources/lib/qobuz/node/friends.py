@@ -34,12 +34,12 @@ class Node_friends(INode):
             ka['query'] = self.name
         return super(Node_friends, self).make_url(**ka)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, options=None):
         node = getNode(Flag.FRIEND)
         node.create('qobuz.com')
         return {}
 
-    def populate(self, xbmc_directory, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         user_data = api.get('/user/login',
                             username=user.username,
                             password=user.password)

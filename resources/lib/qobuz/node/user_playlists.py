@@ -51,14 +51,14 @@ class Node_user_playlists(INode):
     def _get_limit(self):
         return self.limit if self.limit < limit_max else limit_max
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         return api.get('/playlist/getUserPlaylists',
                        limit=self._get_limit(),
                        offset=self.offset,
                        user_id=user.get_id(),
                        type='last-created')
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         cid = self.get_current_playlist_id()
         for data in self.data['playlists']['items']:
             node = getNode(

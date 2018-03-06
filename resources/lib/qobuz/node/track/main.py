@@ -43,8 +43,9 @@ class Node_track(INode):
                 return None
         return api.get('/track/get', track_id=self.nid)
 
-    def populate(self, xdir=None, *a, **ka):
-        return xdir.add_node(self)
+    def populate(self, options=None):
+        options = options if options is not None else helper.TreeTraverseOpts()
+        return options.xdir.add_node(self)
 
     def make_local_url(self):
         return helper.make_local_track_url(config, self)

@@ -37,7 +37,7 @@ class Node_root(INode):
         self.content_type = 'albums'
         self.label = 'Qobuz'
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         free = current_user.is_free_account()
         if free:
             self.add_child(make_subscription_node())

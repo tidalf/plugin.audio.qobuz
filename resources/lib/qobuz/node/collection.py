@@ -30,7 +30,7 @@ class Node_collection(INode):
         self.source = self.get_parameter('source')
         self.content_type = 'albums'
 
-    def get_label(self):
+    def get_label(self, default=None):
         if self.search_type is None:
             return lang(30194)
         return '%s - %s' % (lang(30194), self.search_type.capitalize())
@@ -46,7 +46,7 @@ class Node_collection(INode):
             ka['query'] = query
         return super(Node_collection, self).make_url(**ka)
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
+    def fetch(self, xdir, lvl, whiteFlag, blackFlag, noRemote=True):
         if self.search_type is None:
             return {}
         query = self.get_parameter('query', to='unquote')
@@ -90,7 +90,7 @@ class Node_collection(INode):
         parameters = {} if parameters is None else parameters
         return getNode(Flag.ARTIST, data=data, parameters=parameters)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         if self.search_type is None:
             for search_type in ['albums', 'tracks', 'artists']:
                 self.add_child(

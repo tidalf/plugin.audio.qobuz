@@ -90,14 +90,14 @@ class Node_playlist(INode):
             'extra': 'tracks'
         })
 
-    def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None, noRemote=False):
+    def fetch(self, options=None):
         method, args = self._fetch_args()
         return api.get(method, **args)
 
     def _count(self):
         return len(self.get_property(self._items_path, default=[]))
 
-    def populate(self, xbmc_directory=None, lvl=-1, whiteFlag=Flag.ALL, blackFlag=Flag.STOPBUILD):
+    def populate(self, options=None):
         if self.count() == 0:
             return False
         for track in self.get_property(self._items_path):

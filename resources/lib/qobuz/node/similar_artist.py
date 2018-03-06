@@ -32,7 +32,7 @@ class Node_similar_artist(INode):
     def _count(self):
         return len(self.data['artists']['items'])
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         skip_empty = not config.app.registry.get(
             'display_artist_without_album', to='bool')
         for data in self.data['artists']['items']:

@@ -107,7 +107,7 @@ class Node_search(INode):
                     data=artist))
         return True if len(self.data[self.search_type]['items']) > 0 else False
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         if self.search_type is None:
             for search_type in data_search_type.keys():
                 self.add_child(

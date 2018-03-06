@@ -55,19 +55,19 @@ class FileCache(BaseCache):
             return False
         return True
 
-    def load_from_store(self, filename):
-        path = os.path.join(self.base_path, filename)
-        if not os.path.exists(path):
+    def load_from_store(self, path):
+        item_path = os.path.join(self.base_path, path)
+        if not os.path.exists(item_path):
             return None
         do_unlink = False
-        with open(path, 'rb') as rh:
+        with open(item_path, 'rb') as rh:
             try:
                 return json.loads(zlib.decompress(rh.read()))
             except Exception as e:
                 logger.error('Loading item fail %s', e)
                 do_unlink = True
         if do_unlink:
-            unlink(path)
+            unlink(item_path)
 
     @classmethod
     def get_ttl(cls, *a, **ka):

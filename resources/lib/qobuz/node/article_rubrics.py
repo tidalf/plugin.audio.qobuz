@@ -25,16 +25,16 @@ class Node_article_rubrics(INode):
     def make_url(self, **ka):
         url = super(Node_article_rubrics, self).make_url(**ka)
         if self.rubric_id:
-            url += '&qid=' + str(self.rubric_id)
+            url += '&qid={}'.format(self.rubric_id)
         return url
 
-    def get_label(self):
+    def get_label(self, default=None):
         title = self.get_property('title')
         if not title:
             return 'Articles'
         return title
 
-    def fetch(self, xdir, lvl, whiteFlag, blackFlag, norRemote):
+    def fetch(self, options=None):
         limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='article_listrubrics',
                                   id=self.nid,
@@ -44,7 +44,7 @@ class Node_article_rubrics(INode):
             return None
         return data['data']
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         for rubric in self.data['rubrics']['items']:
             self.add_child(
                 Node_article(

@@ -50,14 +50,14 @@ class Node_albums_by_artist(INode):
     def _count(self):
         return len(self.get_property(self._items_path, default=[]))
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         return api.get('/artist/get',
                        artist_id=self.nid,
                        limit=self.limit,
                        offset=self.offset,
                        extra='albums')
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         if self.count() == 0:
             return False
         for album in self.get_property(self._items_path):

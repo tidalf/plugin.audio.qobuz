@@ -39,10 +39,10 @@ class Node_user(INode):
     def get_image(self):
         return user.get_property('user/avatar')
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         return user.data
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         self.add_child(getNode(Flag.TESTING))
 
     def get_description(self):

@@ -23,7 +23,7 @@ from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import runPlugin, containerUpdate
-from qobuz.node import Flag, getNode
+from qobuz.node import Flag, getNode, helper
 from qobuz.renderer import renderer
 from qobuz.storage import _Storage
 from qobuz.theme import color
@@ -357,43 +357,38 @@ class INode(object):
         render.run()
         return render
 
-    def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None,
-              noRemote=False):
+    def fetch(self, options=None):
         '''When returning None we are not displaying directory content
         '''
         return {}
 
-    def populating(self, xdir,
-                   lvl=1,
-                   whiteFlag=Flag.ALL,
-                   blackFlag=Flag.NONE,
-                   data=None):
-        data = {} if data is None else data
-        if lvl != -1 and lvl < 1:
+    def populating(self, options=None):
+        options = options if options is not None else helper.TreeTraverseOpts()
+        data = {} if options.data is None else options.data
+        if options.lvl != -1 and options.lvl < 1:
             return False
-        if self.nt & blackFlag != self.nt:
-            new_data = self.fetch(xdir, lvl, whiteFlag, blackFlag)
+        if self.nt & options.blackFlag != self.nt:
+            new_data = self.fetch(options)
             if new_data is None:
                 return False
             data.update(new_data)
             self.data = data
             self.__add_pagination(self.data)
-        self.populate(xdir, lvl, whiteFlag, blackFlag)
-        if lvl != -1:
-            lvl -= 1
-        self.__add_pagination_node(xdir, lvl, whiteFlag)
+        self.populate(options)
+        new_options = options.clone()
+        if options.lvl != -1:
+            new_options.lvl -= 1
+        self.__add_pagination_node(options.xdir,
+                                   options.lvl,
+                                   options.whiteFlag)
         for child in self.childs:
-            if child.nt & whiteFlag == child.nt:
-                if not xdir.add_node(child):
-                    logger.error('Could not add node')
-                    continue
-            child.populating(xdir, lvl, whiteFlag, blackFlag)
+            if (child.nt & options.whiteFlag == child.nt) and not (
+                    options.xdir.add_node(child)):
+                logger.error('Could not add node')
+                continue
+            child.populating(new_options)
 
-    def populate(self,
-                 xdir=None,
-                 lvl=-1,
-                 whiteFlag=Flag.ALL,
-                 blackFlag=Flag.STOPBUILD):
+    def populate(self, options=None):
         '''Hook / _build_down:
         This method is called by build_down, each object who
         inherit from Inode can overide it. Lot of object

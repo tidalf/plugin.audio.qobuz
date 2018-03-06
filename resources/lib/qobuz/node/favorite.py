@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from kodi_six import xbmcgui
+from kodi_six import xbmcgui  # pylint:disable=E0401
 
 from qobuz import exception
 from qobuz.api import api
@@ -15,7 +15,7 @@ from qobuz.cache import cache
 from qobuz.debug import getLogger
 from qobuz.gui.util import getImage, notifyH, executeBuiltin, containerUpdate
 from qobuz.gui.util import lang
-from qobuz.node import getNode, Flag
+from qobuz.node import getNode, Flag, helper
 from qobuz.node.inode import INode
 from qobuz.renderer import renderer
 
@@ -44,7 +44,7 @@ class Node_favorite(INode):
             return lang(30098)
         return self.search_type.capitalize()
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         if self.search_type is None:
             return {}
         if self.search_type != 'all':
@@ -63,7 +63,7 @@ class Node_favorite(INode):
             ka['search-type'] = self.search_type
         return super(Node_favorite, self).make_url(**ka)
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         if self.method is not None:
             return True
         if self.search_type is None:
@@ -86,11 +86,11 @@ class Node_favorite(INode):
             if not hasattr(self, method):
                 logger.warn('No method named %s', method)
                 continue
-            if getattr(self, method)(*a, **ka):
+            if getattr(self, method)(options):
                 result = True
         return result
 
-    def _populate_tracks(self, *a, **ka):
+    def _populate_tracks(self, options):
         self.content_type = 'songs'
         for track in self.data['tracks']['items']:
             node = getNode(Flag.TRACK, data=track)
@@ -104,7 +104,7 @@ class Node_favorite(INode):
             self.add_child(node)
         return True if len(self.data['tracks']['items']) > 0 else False
 
-    def _populate_albums(self, *a, **ka):
+    def _populate_albums(self, options):
         self.content_type = 'albums'
         for album in self.data['albums']['items']:
             node = getNode(Flag.ALBUM, data=album)
@@ -115,17 +115,17 @@ class Node_favorite(INode):
                         'ascii', errors='ignore'),
                     node.nid)
                 continue
-            cache = node.fetch(noRemote=True)
+            cache = node.fetch(helper.TreeTraverseOpts(noRemote=True))
             if cache is not None:
                 node.data = cache
             self.add_child(node)
         return True if len(self.data['albums']['items']) > 0 else False
 
-    def _populate_artists(self, *a, **ka):
+    def _populate_artists(self, options):
         self.content_type = 'artists'
         for artist in self.data['artists']['items']:
             node = getNode(Flag.ARTIST, data=artist)
-            node.data = node.fetch(noRemote=True)
+            node.data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
             self.add_child(node)
         return True if len(self.data['artists']['items']) > 0 else False
 

@@ -69,7 +69,7 @@ Tip: You can disable/enable Qobuz addon to restart web service
         d = xbmcgui.Dialog()
         d.ok('Web service', self.message())
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         self.add_child(
             getNode(
                 Flag.TEXT, parameters={'label': self.message()}))

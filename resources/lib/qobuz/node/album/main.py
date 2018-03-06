@@ -39,10 +39,13 @@ class Node_album(INode):
     def _count(self):
         return len(self.get_property(self._items_path, default=[]))
 
-    def fetch(self, Dir=None, lvl=-1, whiteFlag=None, blackFlag=None, noRemote=False):
-        return api.get('/album/get', album_id=self.nid, noRemote=noRemote)
+    def fetch(self, options=None):
+        options = helper.get_tree_traverse_opts(options)
+        return api.get('/album/get',
+                       album_id=self.nid,
+                       noRemote=options.noRemote)
 
-    def populate(self, Dir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         if self.count() == 0:
             return False
         for track in self.get_property(self._items_path):
