@@ -6,6 +6,8 @@
     :copyright: (c) 2015 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import json
+import functools
 
 
 def is_number(value):
@@ -34,3 +36,8 @@ def is_empty(value):
     if value is None or value == '':
         return True
     return False
+
+
+separators = (',', ':')
+json_dumps = functools.partial(json.dumps, separators=separators)
+json_dump = functools.partial(json.dump, separators=separators)
