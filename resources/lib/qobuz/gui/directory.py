@@ -10,8 +10,11 @@ import time
 
 from kodi_six import xbmcplugin  # pylint:disable=E0401
 
+from qobuz.debug import getLogger
 from qobuz.gui.bg_progress import Progress
 from qobuz.node import Flag
+
+logger = getLogger(__name__)
 
 
 class Directory(object):
@@ -70,9 +73,9 @@ class Directory(object):
                     return True
                 self.seen_nodes[node.nid] = 1
         try:
-            self.progress.update(message=node.get_label().encode('ascii'))
-        except:
-            pass
+            self.progress.update(message=node.get_label())
+        except Exception as e:
+            logger.warn('ProgressUpdateError %s', e)
         if self.asList is True:
             self.nodes.append(node)
             self.total_put += 1

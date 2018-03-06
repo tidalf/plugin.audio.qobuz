@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-from kodi_six import xbmc
+from kodi_six import xbmc  # pylint:disable=E0401
 
 from qobuz.cache import cache_util
 from qobuz.debug import getLogger
@@ -53,7 +53,8 @@ class Monitor(xbmc.Monitor):
             if xbmc.getGlobalIdleTime() >= since:
                 return True
             return False
-        except:
+        except Exception as e:
+            logger.warn('getGlobalIdleTimeException %s', e)
             return False
 
     def cache_remove_old(self, **ka):
@@ -68,6 +69,6 @@ class Monitor(xbmc.Monitor):
 
     def step(self):
         if self.isIdle():
-            [s.step() for s in self.service.values() if s.on_idle]
+            _ = [s.step() for s in self.service.values() if s.on_idle]
         else:
-            [s.step() for s in self.service.values() if not s.on_idle]
+            _ = [s.step() for s in self.service.values() if not s.on_idle]

@@ -6,8 +6,8 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz.gui.util import getImage, getSetting
-from qobuz.node.articles import Node_articles
+from qobuz.gui.util import getImage
+from qobuz.node.article import Node_article
 from qobuz.node.flag import Flag
 from qobuz.node.inode import INode
 import qobuz
@@ -34,8 +34,8 @@ class Node_article_rubrics(INode):
             return 'Articles'
         return title
 
-    def fetch(self, Dir, lvl, whiteFlag, blackFlag):
-        limit = getSetting('pagination_limit')
+    def fetch(self, xdir, lvl, whiteFlag, blackFlag, norRemote):
+        limit = qobuz.addon.getSetting('pagination_limit')
         data = qobuz.registry.get(name='article_listrubrics',
                                   id=self.nid,
                                   offset=self.offset,
@@ -47,6 +47,6 @@ class Node_article_rubrics(INode):
     def populate(self, Dir, lvl, whiteFlag, blackFlag):
         for rubric in self.data['rubrics']['items']:
             self.add_child(
-                Node_articles(
+                Node_article(
                     self, {'nid': rubric['id']}, data=rubric))
         return True
