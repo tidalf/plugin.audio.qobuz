@@ -120,7 +120,7 @@ class BaseCache(object):
         """
         raise NotImplementedError()
 
-    def load_from_store(self, *a, **ka):
+    def load_from_store(self, path):
         raise NotImplementedError()
 
     def sync(self, key, data, *a, **ka):

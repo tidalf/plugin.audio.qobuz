@@ -6,13 +6,13 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from kodi_six import xbmcgui
+from kodi_six import xbmcgui  # pylint:disable=E0401
 
 from qobuz.api import api
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import getImage
-from qobuz.node import getNode, Flag
+from qobuz.node import Flag, helper
 from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
@@ -39,19 +39,16 @@ class Node_artist(INode):
         self.content_type = 'artists'
         self.nid = self.get_parameter('nid', default=None)
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         albums = self.get_property('albums/items')
         if len(albums) == 0:
             return False
-        for data in albums:
-            album = getNode(Flag.ALBUM, data=data)
-            cache = album.fetch(noRemote=True)
-            if cache is not None:
-                album.data = cache
-            self.add_child(album)
+        for album in albums:
+            node = helper.get_node_album(album)
+            self.add_child(node)
         return True
 
     def get_artist_id(self):
@@ -65,7 +62,8 @@ class Node_artist(INode):
             ],
             default=getImage('artist'))
 
-    def get_label(self, fmt='%a (%C)'):
+    def get_label(self, default=None):
+        fmt = '%a (%C)'
         fmt = fmt.replace(
             '%Cc',
             self.get_property(

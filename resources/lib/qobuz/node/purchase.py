@@ -10,10 +10,16 @@ from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.debug import getLogger
 from qobuz.gui.util import lang, getImage
-from qobuz.node import Flag, getNode
+from qobuz.node import Flag, getNode, helper
 from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
+
+
+def populate_return_helper(array):
+    if len(array) > 0:
+        return True
+    return False
 
 
 class Node_purchase(INode):
@@ -38,7 +44,7 @@ class Node_purchase(INode):
             ka['search-type'] = str(self.search_type)
         return super(Node_purchase, self).make_url(**ka)
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         if self.search_type is None:
             return {}
         return api.get('/purchase/getUserPurchases',
@@ -46,7 +52,7 @@ class Node_purchase(INode):
                        offset=self.offset,
                        user_id=user.get_id())
 
-    def populate(self, xdir, lvl, whiteFlag, blackFlag):
+    def populate(self, options=None):
         if self.search_type is None:
             for search_type in ['albums']:  # 'all' , 'tracks']:
                 self.add_child(
@@ -63,20 +69,18 @@ class Node_purchase(INode):
             if not hasattr(self, method):
                 logger.warn('No method named %s', method)
                 continue
-            if getattr(self, method)(xdir, lvl, whiteFlag, blackFlag):
+            if getattr(self, method)(options):
                 ret = True
         return ret
 
-    def _populate_albums(self, Dir, lvl, whiteFlag, blackFlag):
+    def _populate_albums(self, options=None):
+        options = helper.get_tree_traverse_opts(options)
         for album in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM, data=album)
-            cache = node.fetch(noRemote=True)
-            if cache is not None:
-                node.data = cache
+            node = helper.get_node_album(album)
             self.add_child(node)
-        return True if len(self.data['albums']['items']) > 0 else False
+        return populate_return_helper(self.data['albums']['items'])
 
-    def _populate_tracks(self, Dir, lvl, whiteFlag, blackFlag):
+    def _populate_tracks(self, options=None):
         for track in self.data['tracks']['items']:
             self.add_child(getNode(Flag.TRACK, data=track))
-        return True if len(self.data['tracks']['items']) > 0 else False
+        return populate_return_helper(self.data['tracks']['items'])
