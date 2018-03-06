@@ -6,15 +6,13 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import sys
-from kodi_six import xbmcplugin
+from kodi_six import xbmcplugin  # pylint:disable=E0401
 
 from qobuz import config
 from qobuz import exception
 from qobuz.alarm import Notifier
 from qobuz.constants import Mode
 from qobuz.debug import getLogger
-from qobuz.gui.bg_progress import Progress
 from qobuz.gui.directory import Directory
 from qobuz.gui.util import notifyH
 from qobuz.node import getNode

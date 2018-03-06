@@ -8,25 +8,21 @@
 '''
 from os import path as P
 import SocketServer
-import errno
-import os
-import requests
 import socket
 import sys
 import threading
 import time
-import traceback
 
 base_path = P.abspath(P.dirname(__file__))
 try:
-    import kooli
+    import kooli  # pylint:disable=E0401
 except ImportError:
     sys.path.append(P.abspath(P.join(base_path, P.pardir, P.pardir)))
 from kooli import log
 from kooli import qobuz_lib_path
 
 try:
-    import flask
+    import flask  # pylint:disable=E0401
 
     log.info('Flask loaded from kodi addon repository')
 except ImportError as e:
@@ -34,9 +30,8 @@ except ImportError as e:
     path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask',
                   'lib')
     sys.path.append(path)
-from kodi_six import xbmc
 
-from flask import request
+from kodi_six import xbmc  # pylint:disable=E0401
 from kooli.application import application, shutdown_server, qobuzApp
 from kooli.monitor import Monitor
 from qobuz import config

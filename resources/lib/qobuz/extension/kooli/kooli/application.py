@@ -8,19 +8,15 @@
 '''
 from datetime import datetime
 from flask import Flask, request
-from flask import Response, redirect
+from flask import redirect
 from flask import make_response, render_template
 from functools import wraps, update_wrapper
 from jinja2 import Undefined
 from os import path as P
-from werkzeug import exceptions
-import logging
-import os
 
 from qobuz.api import api
 from qobuz.application import Application as QobuzApplication
 from qobuz.bootstrap import MinimalBootstrap
-from qobuz.cache import cache
 from qobuz.debug import logger
 from qobuz.gui.directory import Directory
 from qobuz.node import getNode, Flag

@@ -1,7 +1,5 @@
 import pytest
 
-import fixtures
-
 data = {
     'baz': 'OK',
     'foo': {
@@ -44,7 +42,6 @@ class TestUtilProperties(object):
         assert value == str({'bar': 'baz'})
 
     def test_get_mapped(self):
-        import json
         from qobuz.util import properties
         props = {
             'boom': {

@@ -8,11 +8,9 @@
 '''
 import time
 
-from kodi_six import xbmcplugin
+from kodi_six import xbmcplugin  # pylint:disable=E0401
 
-from qobuz import debug
 from qobuz.gui.bg_progress import Progress
-from qobuz.gui.util import lang
 from qobuz.node import Flag
 
 

@@ -20,7 +20,6 @@ from qobuz.debug import getLogger
 from qobuz.node import Flag, ErrorNoData
 from qobuz.node import helper
 from qobuz.node.inode import INode
-from qobuz.theme import theme
 
 logger = getLogger(__name__)
 

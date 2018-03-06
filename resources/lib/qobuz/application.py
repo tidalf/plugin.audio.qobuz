@@ -9,8 +9,6 @@
 import sys
 
 from qobuz import config
-from qobuz import debug
-from qobuz import exception
 from qobuz.bootstrap import Bootstrap
 from qobuz.registry import Registry
 

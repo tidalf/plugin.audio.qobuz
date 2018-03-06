@@ -6,22 +6,24 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os
-import re
-import sys
 from qobuz import config
+from qobuz.debug import getLogger
 from qobuz.xbmcrpc import showNotification, getInfoLabels
+import os
 import qobuz
+import sys
+
+logger = getLogger(__name__)
 
 try:
-    from kodi_six import xbmc, xbmcgui, xbmcplugin
+    from kodi_six import xbmc, xbmcgui, xbmcplugin  # pylint:disable=E0401
 
     class Keyboard(xbmc.Keyboard):
         def __init__(self, _default, heading='', _hidden=True):
             self.setHeading('Qobuz / %s' % heading)
 
 except:
-    print 'QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken'
+    logger.warn('QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken')
 
 
 def ask(current=None, heading='rename'):

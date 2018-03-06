@@ -78,8 +78,7 @@ class EasyApi(RawApi):
         methname = '%s_%s' % (xpath[0], xpath[1])
         if not hasattr(self, methname):
             raise InvalidQuery(path)
-        """Passing user_id create different key for the cache...
-        """
+        # Passing user_id create different key for the cache...
         for label in self.__clean_ka(xpath[0], xpath[1], **ka):
             del ka[label]
         response = getattr(self, methname)(**ka)

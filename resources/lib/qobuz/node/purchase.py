@@ -6,7 +6,6 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from qobuz import debug
 from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.debug import getLogger
