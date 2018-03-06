@@ -26,9 +26,9 @@ class Node_label(INode):
             return lang(30188)
         return self.get_property('name')
 
-    def get_label2(self, default=None):
+    def get_label2(self):
         if self.nid is None:
-            return default
+            return None
         return self.get_property('albums_count')
 
     def get_image(self):

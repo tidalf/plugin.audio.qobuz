@@ -285,7 +285,7 @@ class INode(object):
             return  a xbml list item
             Class can overload this method
         '''
-        from kodi_six import xbmcgui  # @UnresolvedImport
+        from kodi_six import xbmcgui  # pylint:disable=E0401
         if 'url' not in ka:
             ka['url'] = self.make_url()
         if 'label' not in ka:
@@ -357,7 +357,8 @@ class INode(object):
         render.run()
         return render
 
-    def fetch(self, Dir=None, lvl=1, whiteFlag=None, blackFlag=None, noRemote=False):
+    def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None,
+              noRemote=False):
         '''When returning None we are not displaying directory content
         '''
         return {}
@@ -389,7 +390,7 @@ class INode(object):
             child.populating(xdir, lvl, whiteFlag, blackFlag)
 
     def populate(self,
-                 xbmc_directory=None,
+                 xdir=None,
                  lvl=-1,
                  whiteFlag=Flag.ALL,
                  blackFlag=Flag.STOPBUILD):

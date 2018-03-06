@@ -140,14 +140,14 @@ class RawApi(object):
             logger.warn('Json loads failed to load... retrying!\n %s', repr(e))
             try:
                 response_json = r.json()
-            except:
+            except Exception as e:
                 self.error = "Failed to load json two times...abort"
-                logger.warn('%s', self.error)
+                logger.warn('%s (%s)', self.error, e)
                 return None
         try:
             self.status = response_json['status']
-        except:
-            pass
+        except Exception as e:
+            logger.info('No status %s', e)
         if self.status == 'error':
             self.error = self._api_error_string(r, url, _copy_params,
                                                 response_json)
