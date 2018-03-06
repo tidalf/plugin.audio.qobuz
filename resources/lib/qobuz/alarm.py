@@ -8,7 +8,6 @@
 '''
 import time
 
-from qobuz import debug
 from qobuz.gui import util
 
 

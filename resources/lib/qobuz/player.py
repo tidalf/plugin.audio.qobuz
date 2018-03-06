@@ -7,13 +7,12 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 
-from kodi_six import xbmc, xbmcgui
+from kodi_six import xbmc, xbmcgui  # pylint:disable=E0401
 
 from qobuz import config
 from qobuz.debug import getLogger
-from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn, notify_log
+from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn
 from qobuz.node import Flag, getNode
-import qobuz
 
 logger = getLogger(__name__)
 keyTrackId = 'QobuzPlayerTrackId'
@@ -33,7 +32,7 @@ class QobuzPlayer(xbmc.Player):
     """
 
     def __init__(self, **ka):
-        """Constructor"""
+        """ Constructor"""
         ka['type'] = 0
         super(QobuzPlayer, self).__init__()
         self.track_id = None
@@ -41,8 +40,7 @@ class QobuzPlayer(xbmc.Player):
         self.elapsed = None
 
     def play(self, track_id, params=None):
-        """Playing track given a track id
-        """
+        """ Playing track given a track id """
         params = {} if params is None else params
         track = getNode(Flag.TRACK, {'nid': track_id})
         data = track.fetch(None, 1, Flag.TRACK, Flag.NONE)
@@ -61,21 +59,19 @@ class QobuzPlayer(xbmc.Player):
         # returned, in that case we overwrite the song duration
         if track.is_sample():
             item.setInfo('Music', infoLabels={'duration': 60, })
-            """Don't warn for free account (all songs except purchases are 60s
-            limited)
-            """
+            # Don't warn for free account (all songs except purchases are 60s
+            # limited)
+
             if not isFreeAccount():
                 notify_warn("Qobuz / Free Account", "Sample returned")
             if track.is_uncredentialed():
                 notify_warn("Qobuz / Uncredentialed", "Sample returned")
         xbmcgui.Window(10000).setProperty(keyTrackId, track_id)
-        """Notify
-        """
+        # Notify
         if config.app.registry.get('notification_playingsong', to='bool'):
             notify_restriction(track)
             notifyH(lang(30132), track.get_label(), image=track.get_image())
-        """We are called from playlist...
-        """
+        # We are called from playlist...
         if config.app.handle == -1:
             super(QobuzPlayer, self).play(track.get_streaming_url(), item,
                                           False)

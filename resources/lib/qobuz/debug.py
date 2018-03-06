@@ -8,7 +8,6 @@
 '''
 from os import path as P
 import logging
-import os
 
 FORMAT = "%(levelname)s:%(name)s: %(message)s"
 FORMAT_KODI = "[%(name)s] %(message)s"

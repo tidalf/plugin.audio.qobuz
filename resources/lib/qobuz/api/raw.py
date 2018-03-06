@@ -111,11 +111,11 @@ class RawApi(object):
         if useToken and user.get_token():
             headers['x-user-auth-token'] = user.get_token()
         headers['x-app-id'] = self.appid
-        '''DEBUG'''
+        # DEBUG
         _copy_params = copy.deepcopy(params)
         if 'password' in _copy_params:
             _copy_params['password'] = '***'
-        '''END / DEBUG'''
+        # END / DEBUG
 
         try:
             r = self.session.post(url, data=params, headers=headers)
@@ -133,7 +133,7 @@ class RawApi(object):
             logger.error('%s', self.error)
             return None
         self.statContentSizeTotal += sys.getsizeof(r.content)
-        '''Retry get if connexion fail'''
+        # Retry get if connexion fail
         try:
             response_json = r.json()
         except Exception as e:

@@ -1,5 +1,4 @@
-from kodi_six import xbmcgui
-from qobuz import debug
+from kodi_six import xbmcgui  # pylint:disable=E0401
 
 
 class Progress(xbmcgui.DialogProgressBG):

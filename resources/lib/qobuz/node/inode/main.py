@@ -9,7 +9,6 @@
 import os
 import sys
 import urllib
-import weakref
 import random
 
 from .context_menu import attach_context_menu
@@ -23,11 +22,11 @@ from qobuz.cache import cache
 from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import lang, runPlugin, containerUpdate
+from qobuz.gui.util import runPlugin, containerUpdate
 from qobuz.node import Flag, getNode
 from qobuz.renderer import renderer
 from qobuz.storage import _Storage
-from qobuz.theme import theme, color
+from qobuz.theme import color
 from qobuz.util import data as dataUtil
 from qobuz.util import properties
 from qobuz.util.converter import converter

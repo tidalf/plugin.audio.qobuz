@@ -2,7 +2,6 @@ from HTMLParser import HTMLParser
 import math
 import urllib
 
-from qobuz import debug
 from qobuz.util import common
 
 
