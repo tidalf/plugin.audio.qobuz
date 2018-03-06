@@ -11,14 +11,12 @@ from flask import Flask, request
 from flask import redirect
 from flask import make_response, render_template
 from functools import wraps, update_wrapper
-from jinja2 import Undefined
 from os import path as P
 
 from qobuz.api import api
 from qobuz.application import Application as QobuzApplication
 from qobuz.bootstrap import MinimalBootstrap
 from qobuz.debug import logger
-from qobuz.gui.directory import Directory
 from qobuz.node import getNode, Flag
 from qobuz.plugin import Plugin
 from qobuz.util.converter import converter

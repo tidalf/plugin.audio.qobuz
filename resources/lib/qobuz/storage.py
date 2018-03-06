@@ -15,11 +15,6 @@ import json
 import os
 import shutil
 import time
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 from qobuz.debug import getLogger
 
 logger = getLogger(__name__)
@@ -89,8 +84,6 @@ class _PersistentDictMixin(object):
             csv.writer(fileobj).writerows(self.raw_dict().items())
         elif self.file_format == 'json':
             json.dump(self.raw_dict(), fileobj, separators=(',', ':'))
-        elif self.file_format == 'pickle':
-            pickle.dump(dict(self.raw_dict()), fileobj, 2)
         else:
             raise NotImplementedError('Unknown format: ' + repr(
                 self.file_format))
@@ -98,12 +91,12 @@ class _PersistentDictMixin(object):
     def load(self, fileobj):
         '''Load the dict from the file object
         '''
-        for loader in (pickle.load, json.load, csv.reader):
+        for loader in (json.load, csv.reader):
             fileobj.seek(0)
             try:
                 return self.initial_update(loader(fileobj))
             except Exception as e:
-                pass
+                logger.warn('LoadDictError %s', e)
         raise ValueError('File not in a supported format, %s', e)
 
     def raw_dict(self):
