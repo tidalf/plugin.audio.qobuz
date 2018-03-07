@@ -5,4 +5,8 @@ script:
           - python-codacy-coverage -r coverage.xml
 
 notifications:
-        webhooks: https://chat.boobox.xyz/hooks/rXZwMz3GisouL3awa/vDTDgYT4iLoYryaSGyjCThFWsYeCkjsst9SLnu4Ma4Yz4Eza
+    webhooks: https://chat.boobox.xyz/hooks/rXZwMz3GisouL3awa/vDTDgYT4iLoYryaSGyjCThFWsYeCkjsst9SLnu4Ma4Yz4Eza
+    template:
+      - "%{repository_slug}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
+      - "Change view : %{compare_url}"
+      - "Build details : %{build_url}"
