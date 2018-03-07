@@ -1,4 +1,4 @@
-This is a Qobuz plugin for Kodi
+Qobuz for Kodi
 -------------------------------
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d8a3887cb465415bb71cbec8c41ac375)](https://app.codacy.com/app/tidalf/plugin.audio.qobuz?utm_source=github.com&utm_medium=referral&utm_content=tidalf/plugin.audio.qobuz&utm_campaign=badger)
@@ -7,7 +7,7 @@ This is a Qobuz plugin for Kodi
 [![Maintainability](https://api.codeclimate.com/v1/badges/86d27b112ea8595a18a5/maintainability)](https://codeclimate.com/github/tidalf/plugin.audio.qobuz/maintainability)
 [![Requirements Status](https://requires.io/github/tidalf/plugin.audio.qobuz/requirements.svg?branch=master)](https://requires.io/github/tidalf/plugin.audio.qobuz/requirements/?branch=master)
 
-It enables access to Qobuz music streaming service directly from Kodi (http://kodi.tv)
+This is a Qobuz plugin for Kodi, it enables access to Qobuz music streaming service directly from Kodi (http://kodi.tv)
 
 Main Features: 
 --------------
