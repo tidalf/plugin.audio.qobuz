@@ -7,7 +7,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from qobuz import config
-from qobuz import debug
 from qobuz.api import api
 from qobuz.gui.util import lang
 from qobuz.node import getNode, Flag
