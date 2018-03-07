@@ -1,8 +1,6 @@
-from os import path as P
 import functools
-import random
-import requests
 
+import requests
 from qobuz import config
 from qobuz import data_path
 from qobuz.debug import getLogger
@@ -19,6 +17,8 @@ except ImportError as e:
 
 
 def combineFactory(available, nid, images=None, count=4, prefix='cover'):
+    from os import path
+    from os import urandom
     images = [] if images is None else images
     if not config.app.registry.get('image_create_mosaic', to='bool'):
         available = False
@@ -30,11 +30,14 @@ def combineFactory(available, nid, images=None, count=4, prefix='cover'):
     # if count > len_images:
     #    count = len_images
     if available is False:
-        return images[random.randint(0, len_images - 1)]
-    final_path = P.join(
+        index = urandom()
+        while index >= len_images - 1:
+            index = urandom()
+        return images[index]
+    final_path = path.join(
         data_path, '{prefix}-{nid}-combine.jpg'.format(
             prefix=prefix, nid=nid))
-    if P.exists(final_path):
+    if path.exists(final_path):
         return final_path
     full_size = 600
     new = Image.new('RGB', (full_size, full_size))
@@ -45,7 +48,7 @@ def combineFactory(available, nid, images=None, count=4, prefix='cover'):
         for j in range(0, full_size, size):
             path = images[total]
             if path.startswith('http'):
-                tmp = P.join(data_path, 'tmp-img.jpg')
+                tmp = path.join(data_path, 'tmp-img.jpg')
                 r = requests.get(path, stream=True)
                 with open(tmp, 'wb') as wh:
                     wh.writelines(r.iter_content(1024))
