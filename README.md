@@ -21,7 +21,7 @@ Main Features
 - Friends support (browse their public playlists)
 - Genre browsing
 - Public playlists
-- Preview (1 min by track) without account 
+- Preview (30 seconds by track) without account 
 
 Configuration
 --------------
