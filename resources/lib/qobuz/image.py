@@ -1,5 +1,5 @@
 import functools
-from os import urandom
+import os
 import requests
 
 from qobuz import config
@@ -20,6 +20,7 @@ except ImportError as e:
 
 
 def combineFactory(available, nid, images=None, count=4, prefix='cover'):
+
     images = [] if images is None else images
     if not config.app.registry.get('image_create_mosaic', to='bool'):
         available = False
