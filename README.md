@@ -33,4 +33,4 @@ notes:
 Disclaimer
 -----------
 *This application uses the Qobuz API but is not certified by Qobuz.
-Any use of the API implies your full acceptance of the Qobuz General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)*
+Any use of the API implies your full acceptance of the Qobuz General Terms and Conditions (http://static.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)*
