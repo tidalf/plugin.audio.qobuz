@@ -1,4 +1,4 @@
-# Contributing to _fastlane_
+# Contributing to plugin.audio.qobuz
 
 ## I want to report a problem or ask a question
 
