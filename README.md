@@ -1,4 +1,4 @@
-This is a Qobuz plugin for Kodi
+Qobuz for Kodi
 -------------------------------
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d8a3887cb465415bb71cbec8c41ac375)](https://app.codacy.com/app/tidalf/plugin.audio.qobuz?utm_source=github.com&utm_medium=referral&utm_content=tidalf/plugin.audio.qobuz&utm_campaign=badger)
@@ -7,9 +7,9 @@ This is a Qobuz plugin for Kodi
 [![Maintainability](https://api.codeclimate.com/v1/badges/86d27b112ea8595a18a5/maintainability)](https://codeclimate.com/github/tidalf/plugin.audio.qobuz/maintainability)
 [![Requirements Status](https://requires.io/github/tidalf/plugin.audio.qobuz/requirements.svg?branch=master)](https://requires.io/github/tidalf/plugin.audio.qobuz/requirements/?branch=master)
 
-It enables access to Qobuz music streaming service directly from Kodi (http://kodi.tv)
+This is a Qobuz plugin for Kodi, it enables access to Qobuz music streaming service directly from Kodi (http://kodi.tv)
 
-Main Features: 
+Main Features 
 --------------
 
 - Gapless hires play of all the available qobuz library and your purchased items
@@ -23,12 +23,14 @@ Main Features:
 - Public playlists
 - Preview (1 min by track) without account 
 
-Configuration:
+Configuration
 --------------
 - Just enter some valid Qobuz credentials using addon settings
 notes: 
 - you need Hifi subscription to stream flac files or premium subscription to play full mp3. 
 - create your Qobuz account there : http://www.qobuz.com/kodi (you'll get 1 free month !) 
 
-This application uses the Qobuz API but is not certified by Qobuz.
-Any use of the API implies your full acceptance of the Qobuz General Terms and Conditions (http://www.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)
+Disclaimer
+-----------
+*This application uses the Qobuz API but is not certified by Qobuz.
+Any use of the API implies your full acceptance of the Qobuz General Terms and Conditions (http://static.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf)*
