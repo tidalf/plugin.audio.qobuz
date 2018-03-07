@@ -138,8 +138,8 @@ class QobuzXbmcRenderer(IRenderer):
                                          'Scanning',
                                          node.get_label().encode('ascii')
                                          )
-                except:
-                    pass
+                except Exception as e:
+                    logger.warn('ScanProgressError %s', e)
                 done += 1
                 node.set_parameter('mode', Mode.SCAN)
                 if node.nt & Flag.TRACK == Flag.TRACK:

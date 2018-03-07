@@ -98,7 +98,7 @@ class _PersistentDictMixin(object):
             try:
                 return self.initial_update(loader(fileobj))
             except Exception as e:
-                pass
+                logger.warn('StorageLoadError %s', e)
         raise ValueError('File not in a supported format, %s', e)
 
     def raw_dict(self):
