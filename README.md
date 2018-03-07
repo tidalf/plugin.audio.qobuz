@@ -31,7 +31,7 @@ Notes
 --------------
 - you need Hifi subscription to stream flac files or premium subscription to play full mp3. 
 - With Sublime+, you can stream files up to 192khz/24bits
-- create your Qobuz account there : http://www.qobuz.com/kodi (you'll get 1 free month !) 
+- create your Qobuz account there : http://www.qobuz.com/kodi (you'll get 1 free month) 
 
 Disclaimer
 -----------
