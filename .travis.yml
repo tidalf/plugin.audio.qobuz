@@ -3,3 +3,6 @@ language: python
 script:
           - pytest --cov=. --cov-report=xml
           - python-codacy-coverage -r coverage.xml
+
+notifications:
+        webhooks: https://chat.boobox.xyz/hooks/rXZwMz3GisouL3awa/vDTDgYT4iLoYryaSGyjCThFWsYeCkjsst9SLnu4Ma4Yz4Eza
