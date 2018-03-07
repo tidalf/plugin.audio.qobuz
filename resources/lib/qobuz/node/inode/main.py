@@ -9,7 +9,6 @@
 import os
 import sys
 import urllib
-import random
 
 from .context_menu import attach_context_menu
 from .pagination import add_pagination
@@ -30,6 +29,7 @@ from qobuz.theme import color
 from qobuz.util import data as dataUtil
 from qobuz.util import properties
 from qobuz.util.converter import converter
+from qobuz.util.random import randrange
 
 logger = getLogger(__name__)
 
@@ -331,8 +331,8 @@ class INode(object):
         if self.data is not None:
             for name in ['images300', 'images150', 'images']:
                 if name in self.data and len(self.data[name]) > 0:
-                    return self.data[name][random.randrange(
-                        len(self.data[name]))]
+                    return self.data[name][randrange(0,
+                                                     len(self.data[name]))]
         return self.get_property('image')
 
     def set_image(self, image):
@@ -489,7 +489,7 @@ class INode(object):
                     images = storage['image']
                 images_len = len(images)
                 if images_len > 0:
-                    return images[random.randrange(0, images_len, 1)]
+                    return images[randrange(0, images_len)]
             else:
                 logger.error('Cannot get node storage')
         return None

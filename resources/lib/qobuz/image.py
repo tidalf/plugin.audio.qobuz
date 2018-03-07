@@ -1,9 +1,12 @@
 import functools
-
+import os
 import requests
+
 from qobuz import config
 from qobuz import data_path
 from qobuz.debug import getLogger
+from qobuz.util.random import randrange
+
 
 logger = getLogger(__name__)
 available = False
@@ -17,8 +20,7 @@ except ImportError as e:
 
 
 def combineFactory(available, nid, images=None, count=4, prefix='cover'):
-    from os import path
-    from os import urandom
+
     images = [] if images is None else images
     if not config.app.registry.get('image_create_mosaic', to='bool'):
         available = False
@@ -27,17 +29,12 @@ def combineFactory(available, nid, images=None, count=4, prefix='cover'):
         return None
     if len_images == 1:
         return images[0]
-    # if count > len_images:
-    #    count = len_images
     if available is False:
-        index = urandom()
-        while index >= len_images - 1:
-            index = urandom()
-        return images[index]
-    final_path = path.join(
+        return images[randrange(0, len_images)]
+    final_path = os.path.join(
         data_path, '{prefix}-{nid}-combine.jpg'.format(
             prefix=prefix, nid=nid))
-    if path.exists(final_path):
+    if os.path.exists(final_path):
         return final_path
     full_size = 600
     new = Image.new('RGB', (full_size, full_size))
@@ -46,10 +43,10 @@ def combineFactory(available, nid, images=None, count=4, prefix='cover'):
     size = full_size / demi_count
     for i in range(0, full_size, size):
         for j in range(0, full_size, size):
-            path = images[total]
-            if path.startswith('http'):
-                tmp = path.join(data_path, 'tmp-img.jpg')
-                r = requests.get(path, stream=True)
+            img_path = images[total]
+            if img_path.startswith('http'):
+                tmp = os.path.join(data_path, 'tmp-img.jpg')
+                r = requests.get(img_path, stream=True)
                 with open(tmp, 'wb') as wh:
                     wh.writelines(r.iter_content(1024))
                 path = tmp
