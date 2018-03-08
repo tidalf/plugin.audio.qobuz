@@ -27,7 +27,7 @@ class Node_user(INode):
         self.is_folder = True
         self.data = self.fetch()
 
-    def get_label(self):
+    def get_label(self, default=None):
         return u'[{subscription} - {login}]'.format(
             login=user.get_property(
                 'user/login', default='Demo'),
@@ -70,7 +70,7 @@ class Node_user(INode):
             lossless_streaming=self.get_property(
                 'user/credential/parameters/lossless_streaming'))
 
-    def makeListItem(self, replaceItems=False):
+    def makeListItem(self, **ka):
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label2(),
                                 self.get_image(), self.get_image(), None)

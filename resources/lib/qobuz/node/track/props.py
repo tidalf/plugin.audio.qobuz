@@ -42,7 +42,7 @@ propsMap = {
     },
     'artist': {
         'to': properties.identity_converter,
-        'default': None,
+        'default': 'n/a',
         'map': [
             'artist/name', 'composer/name', 'performer/name',
             'interpreter/name', 'composer/name', 'album/artist/name'

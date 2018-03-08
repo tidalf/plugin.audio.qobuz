@@ -98,7 +98,8 @@ class Node_artist(INode):
         return self.get_property(
             'biography/content', default='', to='strip_html')
 
-    def makeListItem(self, replaceItems=False):
+    def makeListItem(self, **ka):
+        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
         genre = self.get_genre()
         item = xbmcgui.ListItem(self.get_label(),
                                 self.get_label(),

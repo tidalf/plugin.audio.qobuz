@@ -31,13 +31,13 @@ class Node_public_playlists(INode):
     def _get_limit(self):
         return self.limit if self.limit < limit_max else limit_max
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         return api.get('/playlist/getFeatured',
                        offset=self.offset,
                        limit=self._get_limit(),
                        type=self.type)
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         for item in self.data['playlists']['items']:
             self.add_child(
                 getNode(

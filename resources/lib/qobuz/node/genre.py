@@ -22,7 +22,7 @@ class Node_genre(INode):
         self.image = getImage('album')
         self.content_type = 'albums'
 
-    def get_label(self):
+    def get_label(self, default=None):
         label = self.get_property('name', default=None)
         if label is not None:
             return label

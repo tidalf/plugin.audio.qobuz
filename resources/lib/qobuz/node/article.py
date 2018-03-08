@@ -48,7 +48,7 @@ class Node_article(INode):
         self.nt = Flag.ARTICLE
         self.content_type = 'artists'
 
-    def get_label(self):
+    def get_label(self, default=None):
         if self.nid is None:
             return 'Articles (i8n)'
         return '%s (%s)' % (self.get_property('title'),
@@ -95,7 +95,7 @@ class Node_article(INode):
             image = image.replace('http://player.', 'http://www.')
         return image
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         if self.nid is None:
             return api.get('/article/listLastArticles',
                            offset=self.offset,
@@ -114,7 +114,7 @@ class Node_article(INode):
         dialog(self.get_title(), self.get_description())
         return True
 
-    def populate(self, *a, **ka):
+    def populate(self, options=None):
         if self.nid is None:
             return self._populate_articles(*a, **ka)
         return self._populate_one(*a, **ka)

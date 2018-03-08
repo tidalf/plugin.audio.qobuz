@@ -46,7 +46,7 @@ class Node_collection(INode):
             ka['query'] = query
         return super(Node_collection, self).make_url(**ka)
 
-    def fetch(self, xdir, lvl, whiteFlag, blackFlag, noRemote=True):
+    def fetch(self, options=None):
         if self.search_type is None:
             return {}
         query = self.get_parameter('query', to='unquote')

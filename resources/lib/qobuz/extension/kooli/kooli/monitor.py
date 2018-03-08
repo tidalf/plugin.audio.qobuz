@@ -62,10 +62,10 @@ class Monitor(xbmc.Monitor):
         cache_util.clean_old(self)
 
     def start_all_service(self):
-        [s.start() for s in self.service.values()]
+        _ = [s.start() for s in self.service.values()]
 
     def stop_all_service(self):
-        [s.stop() for s in self.service.values()]
+        _ = [s.stop() for s in self.service.values()]
 
     def step(self):
         if self.isIdle():

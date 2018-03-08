@@ -12,7 +12,7 @@ from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode
 from time import time
 import requests
-from kodi_six import xbmcgui
+from kodi_six import xbmcgui  # pylint:disable=E0401
 
 logger = getLogger(__name__)
 
@@ -33,13 +33,13 @@ class Node_testing(INode):
             host=config.app.registry.get('httpd_host'),
             port=config.app.registry.get('httpd_port'))
 
-    def get_label(self):
+    def get_label(self, default=None):
         return self.message()
 
     def add_text(self, text='n/a'):
         self.add_child(getNode(Flag.TEXT, parameters={'label': text}))
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         start = time()
         try:
             res = requests.get('%s/qobuz/ping' % self.api_url)

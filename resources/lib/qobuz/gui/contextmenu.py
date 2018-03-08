@@ -20,7 +20,7 @@ class contextMenu(object):
         formatStr = config.app.registry.get('item_section_format')
         try:
             _ = formatStr % 'plop'
-        except:
+        except Exception as _:
             formatStr = '[ %s ]'
         self.format_section = formatStr
 

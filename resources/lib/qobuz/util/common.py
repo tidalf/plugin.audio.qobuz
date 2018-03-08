@@ -13,7 +13,7 @@ import functools
 def is_number(value):
     try:
         float(value)
-    except:
+    except Exception as _:
         return False
     return True
 
