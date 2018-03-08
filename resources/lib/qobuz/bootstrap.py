@@ -125,8 +125,8 @@ class MinimalBootstrap(object):
         self.nodeType = int(self.params['nt'])
         try:
             self.MODE = int(self.params['mode'])
-        except:
-            logger.warn('No \"mode\" parameter')
+        except Exception as e:
+            logger.warn('No \"mode\" parameter %s', e)
         if config.app.registry.get('debug', to='bool'):
             for name in self.params:
                 logger.info('Param: %s = %s (%s)', name, str(
