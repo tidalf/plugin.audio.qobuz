@@ -16,9 +16,11 @@ logger = getLogger(__name__)
 
 
 def unlink(filename):
+    logger.info('unlink %s', filename)
     if not os.path.exists(filename):
         return False
-    tmpfile = tempfile.mkstemp(u'.dat', u'invalid-', os.path.dirname(filename))
+    _, tmpfile = tempfile.mkstemp(
+        u'.dat', u'invalid-', os.path.dirname(filename))
     try:
         os.rename(filename, tmpfile)
         return os.unlink(tmpfile)
