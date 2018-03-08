@@ -4,6 +4,7 @@ import fixtures
 
 data = fixtures.util_property_data
 
+
 class TestUtilProperties(unittest.TestCase):
     def test_get(self):
         from qobuz.util import properties
@@ -12,7 +13,8 @@ class TestUtilProperties(unittest.TestCase):
         _path, value = properties.deep_get(data, 'bar/baz/erf/long')
         self.assertEqual(value, 'FINALY')
 
-    def test_get_invalid_key(self):
+    @classmethod
+    def test_get_invalid_key(cls):
         from qobuz.util import properties
         with pytest.raises(KeyError):
             properties.deep_get(data, 'BADKEY')

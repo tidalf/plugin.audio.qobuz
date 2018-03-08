@@ -9,12 +9,15 @@
 import json
 import pprint
 
+from qobuz import exception
+from qobuz.debug import getLogger
+
+logger = getLogger(__name__)
+
 try:
     from kodi_six import xbmc
 except ImportError as e:
-    print "ImportError(Outside XBMC): %s" % e
-
-from qobuz import exception
+    logger.warn('ImportError(Outside XBMC): %s', e)
 
 
 def showNotification(**ka):
@@ -58,7 +61,7 @@ class JsonRequest(object):
         return data
 
 
-class JsonResponse:
+class JsonResponse(object):
     def __init__(self, raw_data):
         self.raw_data = None
         self.id = None
@@ -75,7 +78,7 @@ class JsonResponse:
     def result(self):
         error = self.error()
         if error:
-            log(self, "Error: %s" % error)
+            logger.error('Error: %s', error)
         if not self.raw_data:
             return {}
         if 'result' not in self.raw_data:
