@@ -15,15 +15,14 @@ import time
 
 base_path = P.abspath(P.dirname(__file__))
 try:
-    import kooli  # pylint:disable=E0401
+    import kooli as _  # pylint:disable=E0401
 except ImportError:
     sys.path.append(P.abspath(P.join(base_path, P.pardir, P.pardir)))
 from kooli import log
 from kooli import qobuz_lib_path
 
 try:
-    import flask  # pylint:disable=E0401
-
+    import flask as _  # pylint:disable=E0401
     log.info('Flask loaded from kodi addon repository')
 except ImportError as e:
     log.warn('Flask not present, loading our own copy')

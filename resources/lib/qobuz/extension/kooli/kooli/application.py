@@ -8,21 +8,19 @@
 '''
 from datetime import datetime
 from flask import Flask, request
-from flask import redirect
 from flask import make_response, render_template
+from flask import redirect
 from functools import wraps, update_wrapper
-from jinja2 import Undefined
 from os import path as P
 
+from kooli import kooli_path
 from qobuz.api import api
 from qobuz.application import Application as QobuzApplication
 from qobuz.bootstrap import MinimalBootstrap
 from qobuz.debug import logger
-from qobuz.gui.directory import Directory
 from qobuz.node import getNode, Flag
 from qobuz.plugin import Plugin
 from qobuz.util.converter import converter
-from kooli import kooli_path
 
 qobuzApp = QobuzApplication(
     Plugin('plugin.audio.qobuz'),
