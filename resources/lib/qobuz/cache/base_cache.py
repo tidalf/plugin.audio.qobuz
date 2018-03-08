@@ -129,7 +129,7 @@ class BaseCache(object):
     def delete(self, key, *a, **ka):
         raise NotImplementedError()
 
-    def make_key(self, key, *a, **ka):
+    def make_key(self, *a, **ka):
         raise NotImplementedError()
 
     @classmethod

@@ -39,11 +39,11 @@ class Node_search(INode):
         self.content_type = 'albums'
         self.search_type = self.get_parameter('search-type', default=None)
 
-    def make_url(self, *a, **ka):
+    def make_url(self, **ka):
         ka['search-type'] = self.search_type
-        return super(Node_search, self).make_url(*a, **ka)
+        return super(Node_search, self).make_url(**ka)
 
-    def get_label(self):
+    def get_label(self, default=None):
         if self.search_type is None:
             return lang(30022)
         query = self.get_parameter('query', to='unquote')
@@ -58,7 +58,7 @@ class Node_search(INode):
             return getImage('song')
         return data_search_type[self.search_type]['image']
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         if self.search_type is None:
             return {}
         query = self.get_parameter('query', to='unquote')
@@ -115,4 +115,4 @@ class Node_search(INode):
                         Flag.SEARCH, parameters={'search-type': search_type}))
             return True
         self.content_type = data_search_type[self.search_type]['content_type']
-        return getattr(self, '_populate_%s' % self.search_type)(*a, **ka)
+        return getattr(self, '_populate_%s' % self.search_type)(options)

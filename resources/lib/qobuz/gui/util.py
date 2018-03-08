@@ -22,8 +22,9 @@ try:
         def __init__(self, _default, heading='', _hidden=True):
             self.setHeading('Qobuz / %s' % heading)
 
-except:
-    logger.warn('QobuzXBMC WARNING: Used outside of xbmc, lot of thing broken')
+except Exception as e:
+    logger.warn('QobuzXBMC WARNING: Used outside of xbmc, '
+                'lot of thing broken %s', e)
 
 
 def ask(current=None, heading='rename'):

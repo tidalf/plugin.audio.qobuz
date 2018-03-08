@@ -12,7 +12,7 @@ from kodi_six import xbmc, xbmcgui  # pylint:disable=E0401
 from qobuz import config
 from qobuz.debug import getLogger
 from qobuz.gui.util import notifyH, isFreeAccount, lang, setResolvedUrl, notify_warn
-from qobuz.node import Flag, getNode
+from qobuz.node import Flag, getNode, helper
 
 logger = getLogger(__name__)
 keyTrackId = 'QobuzPlayerTrackId'
@@ -43,7 +43,10 @@ class QobuzPlayer(xbmc.Player):
         """ Playing track given a track id """
         params = {} if params is None else params
         track = getNode(Flag.TRACK, {'nid': track_id})
-        data = track.fetch(None, 1, Flag.TRACK, Flag.NONE)
+        data = track.fetch(helper.TreeTraverseOpts(
+            lvl=1,
+            whiteFlag=Flag.TRACK,
+            blackFlag=Flag.NONE))
         if data is None:
             logger.warn('Cannot get track data')
             return False

@@ -37,10 +37,11 @@ class Node_track(INode):
         self.qobuz_context_type = 'playlist'
         self.status = None
 
-    def fetch(self, xdir=None, lvl=1, whiteFlag=None, blackFlag=None):
-        if blackFlag is not None:
-            if blackFlag & Flag.STOPBUILD == Flag.STOPBUILD:
-                return None
+    def fetch(self, options=None):
+        options = helper.get_tree_traverse_opts(options)
+        if (options.blackFlag is not None) and (
+                options.blackFlag & Flag.STOPBUILD == Flag.STOPBUILD):
+            return None
         return api.get('/track/get', track_id=self.nid)
 
     def populate(self, options=None):
@@ -50,16 +51,21 @@ class Node_track(INode):
     def make_local_url(self):
         return helper.make_local_track_url(config, self)
 
-    def make_url(self, mode=Mode.PLAY, asLocalUrl=False, **ka):
+    def make_url(self, **ka):
+        if 'mode' not in ka:
+            ka['mode'] = Mode.PLAY
+        asLocalUrl = ka['asLocalUrl'] if 'asLocalUrl' in ka else False
         if asLocalUrl is True:
             return self.make_local_url()
         purchased = self.get_parameter('purchased')
         if purchased:
             ka['purchased'] = purchased
             self.purchased = True
-        return super(Node_track, self).make_url(mode=mode, **ka)
+        return super(Node_track, self).make_url(**ka)
 
-    def get_label(self, fmt="%a - %t", default=None):
+    def get_label(self, default=None):
+        fmt = "%a - %t"
+        logger.info('artist %s', self.get_artist())
         fmt = fmt.replace("%a", self.get_artist()) if '%a' in fmt else fmt
         fmt = fmt.replace("%A",
                           self.get_album_artist()) if '%A' in fmt else fmt

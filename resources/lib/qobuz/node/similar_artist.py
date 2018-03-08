@@ -22,7 +22,7 @@ class Node_similar_artist(INode):
         self.content_type = 'artists'
         self.lang = lang(30156)
 
-    def fetch(self, *a, **ka):
+    def fetch(self, options=None):
         return api.get('/artist/getSimilarArtists',
                        artist_id=self.nid,
                        offset=self.offset,

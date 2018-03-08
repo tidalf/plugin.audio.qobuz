@@ -40,7 +40,7 @@ class FileCache(BaseCache):
     def _make_path(self, key):
         return os.path.join(self.base_path, '%s.dat' % key)
 
-    def sync(self, key, data):
+    def sync(self, key, data, *a, **ka):
         filename = self._make_path(key)
         unlink(filename)
         try:

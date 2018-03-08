@@ -71,7 +71,8 @@ class Node_album(INode):
     def make_local_url(self):
         return helper.make_local_album_url(config, self)
 
-    def make_url(self, asLocalUrl=False, **ka):
+    def make_url(self, **ka):
+        asLocalUrl = ka['asLocalUrl'] if 'asLocalUrl' in ka else False
         purchased = self.get_parameter('purchased')
         if purchased is not None:
             ka['purchased'] = self.get_parameter('purchased')
@@ -80,7 +81,8 @@ class Node_album(INode):
             ka['mode'] = Mode.SCAN
         return super(Node_album, self).make_url(**ka)
 
-    def makeListItem(self, replaceItems=False):
+    def makeListItem(self, **ka):
+        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
         item = xbmcgui.ListItem(
             label=self.get_label(),
             label2=self.get_label2(),
@@ -168,7 +170,7 @@ class Node_album(INode):
             'image/thumbnail'
         ])
 
-    def get_label2(self, default=None):
+    def get_label2(self):
         return self.get_title()
 
     def get_label(self, default=None):

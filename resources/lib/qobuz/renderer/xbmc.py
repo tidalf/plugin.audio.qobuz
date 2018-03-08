@@ -93,7 +93,7 @@ class QobuzXbmcRenderer(IRenderer):
                     xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
                     xbmcplugin.SORT_METHOD_TRACKNUM,
                 ]
-                [
+                _ = [
                     xbmcplugin.addSortMethod(
                         handle=config.app.handle, sortMethod=method)
                     for method in methods

@@ -10,7 +10,7 @@
 
 def list_image(data, desired_size='xlarge'):
     all_size = [desired_size]
-    [all_size.append(s) for s in ['xlarge', 'large', 'small', 'thumbnail']]
+    _ = [all_size.append(s) for s in ['xlarge', 'large', 'small', 'thumbnail']]
     result = []
 
     def append(url):

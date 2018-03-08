@@ -35,7 +35,7 @@ class Node_favorite(INode):
         self.search_type = self.get_parameter('search-type')
         self.content_type = 'songs'
 
-    def get_label(self):
+    def get_label(self, default=None):
         if self.label is not None:
             return self.label
         if self.search_type is None:

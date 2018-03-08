@@ -32,7 +32,7 @@ class Node_purchase(INode):
         self.content_type = 'albums'
         self.search_type = self.get_parameter('search-type')
 
-    def get_label(self):
+    def get_label(self, default=None):
         if self.search_type is None:
             return lang(30101)
         elif self.search_type == 'all':

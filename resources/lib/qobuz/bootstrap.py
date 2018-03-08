@@ -106,8 +106,9 @@ class MinimalBootstrap(object):
                 if not os.path.isdir(path):
                     try:
                         os.makedirs(path)
-                    except:
-                        logger.warn('Cannot create directory: %s', path)
+                    except Exception as e:
+                        logger.warn('Cannot create directory: %s (%s)',
+                                    path, e)
                         exit(2)
 
         config.path = PathObject()
