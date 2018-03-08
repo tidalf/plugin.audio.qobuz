@@ -14,7 +14,6 @@ from qobuz import config
 from qobuz.api import api
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import getImage
 from qobuz.node import getNode, Flag, helper
 from qobuz.node.inode import INode
 

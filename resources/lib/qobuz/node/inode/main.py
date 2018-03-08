@@ -21,7 +21,6 @@ from qobuz.cache import cache
 from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
-from qobuz.gui.util import containerUpdate
 from qobuz.node import Flag, getNode, helper
 from qobuz.renderer import renderer
 from qobuz.storage import _Storage
