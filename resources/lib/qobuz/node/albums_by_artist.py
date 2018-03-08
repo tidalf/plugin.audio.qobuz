@@ -65,13 +65,13 @@ class Node_albums_by_artist(INode):
                 try:
                     if k in self.data['artist']:
                         album[k] = weakref.proxy(self.data['artist'][k])
-                except:
-                    logger.warn("Strange thing happen")
-                    pass
+                except Exception as e:
+                    logger.warn('Strange thing happen %s', e)
             self.add_child(getNode(Flag.ALBUM, data=album))
         return True
 
-    def makeListItem(self, replaceItems=False):
+    def makeListItem(self, **ka):
+        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
         item = xbmcgui.ListItem(
             self.get_label(),
             self.get_label(),
