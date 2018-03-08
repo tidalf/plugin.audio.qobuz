@@ -8,7 +8,6 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import gzip
 import json
 import os
 import zlib
