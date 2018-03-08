@@ -355,7 +355,8 @@ class INode(object):
         render.run()
         return render
 
-    def fetch(self, options=None):
+    @classmethod
+    def fetch(cls, options=None):
         '''When returning None we are not displaying directory content
         '''
         return {}
