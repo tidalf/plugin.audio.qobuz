@@ -23,6 +23,76 @@ logger = getLogger(__name__)
 notifier = Notifier(title='Scanning progress')
 
 
+def percent(done, total):
+    return (done / total) * 100
+
+
+def progress_update(scan, heading, message, percent):
+    scan.progress.update(message=message, percent=percent)
+
+
+def _list_track_helper_populate_album(xdir, album_id):
+    album = getNode(
+        Flag.ALBUM,
+        parameters={'nid': album_id,
+                    'mode': Mode.SCAN})
+    album.populating(helper.TreeTraverseOpts(
+        xdir=xdir,
+        lvl=1,
+        whiteFlag=Flag.TRACK,
+        blackFlag=Flag.STOPBUILD))
+
+
+def list_track(xdir):
+    root = xdir.root
+    total = 0
+    predir = Directory(None, asList=True)
+    findir = Directory(None, asList=True)
+    if root.nt & Flag.TRACK == Flag.TRACK:
+        predir.add_node(root)
+    else:
+        root.populating(helper.TreeTraverseOpts(
+            xdir=predir,
+            lvl=3,
+            whiteFlag=Flag.ALL,
+            blackFlag=Flag.STOPBUILD))
+    total = len(predir.nodes)
+    if total == 0:
+        logger.info('NoTrack')
+        return []
+    done = 0
+
+    progress_update(xdir, 'Begin', '', percent(done, total))
+    seen = {}
+    seen_tracks = {}
+    for node in predir.nodes:
+        progress_update(xdir, u'Scanning', node.get_label(),
+                        percent(done, total))
+        done += 1
+        node.set_parameter('mode', Mode.SCAN)
+        if node.nt & Flag.TRACK == Flag.TRACK:
+            if node.nid in seen_tracks:
+                continue
+            seen_tracks[node.nid] = 1
+            album_id = node.get_album_id()
+            if album_id is None or album_id == '':
+                logger.error('Track without album_id: %s, label: %s',
+                             node,
+                             node.get_label())
+                continue
+            if album_id in seen:
+                continue
+            seen[album_id] = 1
+            _list_track_helper_populate_album(findir, album_id)
+        else:
+            node.populating(helper.TreeTraverseOpts(
+                xdir=findir,
+                lvl=1,
+                whiteFlag=Flag.TRACK,
+                blackFlag=Flag.STOPBUILD))
+    return findir.nodes
+
+
 class QobuzXbmcRenderer(IRenderer):
     '''Specific renderer for Xbmc
         Parameter:
@@ -93,11 +163,10 @@ class QobuzXbmcRenderer(IRenderer):
                     xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
                     xbmcplugin.SORT_METHOD_TRACKNUM,
                 ]
-                _ = [
-                    xbmcplugin.addSortMethod(
-                        handle=config.app.handle, sortMethod=method)
-                    for method in methods
-                ]
+                _ = [xbmcplugin.addSortMethod(
+                    handle=config.app.handle,
+                    sortMethod=method)
+                    for method in methods]
             return xdir.end_of_directory()
 
     def scan(self):
@@ -108,78 +177,13 @@ class QobuzXbmcRenderer(IRenderer):
             logger.warn('Cannot set root node (%s)', self.node_type)
             return False
 
-        def list_track(scan):
-            root = scan.root
-            total = 0
-            predir = Directory(None, asList=True)
-            findir = Directory(None, asList=True)
-            if root.nt & Flag.TRACK == Flag.TRACK:
-                predir.add_node(root)
-            else:
-                root.populating(helper.TreeTraverseOpts(
-                    xdir=predir,
-                    lvl=3,
-                    whiteFlag=Flag.ALL,
-                    blackFlag=Flag.STOPBUILD))
-            total = len(predir.nodes)
-            if total == 0:
-                return []
-            done = 0
-
-            def percent():
-                return (done / total) * 100
-
-            scan.progress.update(message='Begin', percent=percent())
-            seen = {}
-            seen_tracks = {}
-            for node in predir.nodes:
-                try:
-                    scan.progress.update(percent(),
-                                         'Scanning',
-                                         node.get_label().encode('ascii')
-                                         )
-                except Exception as e:
-                    logger.warn('ScanProgressError %s', e)
-                done += 1
-                node.set_parameter('mode', Mode.SCAN)
-                if node.nt & Flag.TRACK == Flag.TRACK:
-                    if node.nid in seen_tracks:
-                        continue
-                    seen_tracks[node.nid] = 1
-                    album_id = node.get_album_id()
-                    if album_id is None or album_id == '':
-                        logger.error('Track without album_id: %s, label: %s',
-                                     node,
-                                     node.get_label().encode(
-                                         'ascii', errors='ignore'))
-                        continue
-                    if album_id in seen:
-                        continue
-                    seen[album_id] = 1
-                    album = getNode(
-                        Flag.ALBUM,
-                        parameters={'nid': album_id,
-                                    'mode': Mode.SCAN})
-                    album.populating(helper.TreeTraverseOpts(
-                        xdir=findir,
-                        lvl=1,
-                        blackFlag=Flag.TRACK,
-                        whiteFlag=Flag.STOPBUILD))
-                else:
-                    node.populating(helper.TreeTraverseOpts(
-                        xdir=findir,
-                        lvl=1,
-                        blackFlag=Flag.TRACK,
-                        whiteFlag=Flag.STOPBUILD))
-            return findir.nodes
-
         with Directory(
                 self.root,
                 nodes=self.nodes,
                 handle=config.app.handle,
                 asLocalUrl=True,
                 showProgress=True) as xdir:
-            xdir.progress.heading = 'Scan (i8n)'
+            xdir.progress.heading = u'Scan'
             tracks = {}
             d = {}
             for track in list_track(xdir):
