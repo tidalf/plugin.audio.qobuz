@@ -65,7 +65,6 @@ class Node_track(INode):
 
     def get_label(self, default=None):
         fmt = "%a - %t"
-        logger.info('artist %s', self.get_artist())
         fmt = fmt.replace("%a", self.get_artist()) if '%a' in fmt else fmt
         fmt = fmt.replace("%A",
                           self.get_album_artist()) if '%A' in fmt else fmt
