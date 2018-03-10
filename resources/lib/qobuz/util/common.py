@@ -41,3 +41,8 @@ def is_empty(value):
 separators = (',', ':')
 json_dumps = functools.partial(json.dumps, separators=separators)
 json_dump = functools.partial(json.dump, separators=separators)
+
+
+class Struct(object):
+    def __init__(self, **entries):
+        self.__dict__.update(entries)

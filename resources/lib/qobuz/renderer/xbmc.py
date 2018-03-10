@@ -18,24 +18,58 @@ from qobuz.gui.util import notifyH
 from qobuz.node import getNode, helper
 from qobuz.node.flag import Flag
 from qobuz.renderer.irenderer import IRenderer
+from qobuz.util.common import Struct
 
 logger = getLogger(__name__)
 notifier = Notifier(title='Scanning progress')
 
+_kodi_directory_methods = [
+    xbmcplugin.SORT_METHOD_UNSORTED,
+    xbmcplugin.SORT_METHOD_LABEL,
+    xbmcplugin.SORT_METHOD_DATE,
+    xbmcplugin.SORT_METHOD_TITLE,
+    xbmcplugin.SORT_METHOD_VIDEO_YEAR,
+    xbmcplugin.SORT_METHOD_GENRE,
+    xbmcplugin.SORT_METHOD_ARTIST,
+    xbmcplugin.SORT_METHOD_ALBUM,
+    xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
+    xbmcplugin.SORT_METHOD_TRACKNUM,
+]
 
-def percent(done, total):
-    return (done / total) * 100
+
+def helper_kodi_directory_setup(kodi_directory, content_type):
+    kodi_directory.set_content(content_type)
+    for method in _kodi_directory_methods:
+        xbmcplugin.addSortMethod(handle=config.app.handle,
+                                 sortMethod=method)
+
+
+def cyclic_progress(opt):
+    opt.count += 1
+    if opt.count >= 100:
+        opt.count = 0
+    return opt.count
 
 
 def progress_update(scan, heading, message, percent):
-    scan.progress.update(message=message, percent=percent)
+    scan.progress.update(heading=heading, message=message, percent=percent)
+
+
+def is_track(node):
+    return node.nt & Flag.TRACK == Flag.TRACK
+
+
+def populate_node(node, options):
+    options = helper.get_tree_traverse_opts(options)
+    return node.populating(options)
 
 
 def _list_track_helper_populate_album(xdir, album_id):
-    album = getNode(
-        Flag.ALBUM,
-        parameters={'nid': album_id,
-                    'mode': Mode.SCAN})
+    album = getNode(Flag.ALBUM,
+                    parameters={
+                        'nid': album_id,
+                        'mode': Mode.SCAN
+                    })
     album.populating(helper.TreeTraverseOpts(
         xdir=xdir,
         lvl=1,
@@ -43,54 +77,66 @@ def _list_track_helper_populate_album(xdir, album_id):
         blackFlag=Flag.STOPBUILD))
 
 
-def list_track(xdir):
-    root = xdir.root
+def _list_track_process_node_other(final_directory, _seen, node):
+    options = helper.TreeTraverseOpts(xdir=final_directory,
+                                      lvl=1,
+                                      whiteFlag=Flag.TRACK,
+                                      blackFlag=Flag.STOPBUILD)
+    populate_node(node, options)
+
+
+def _list_track_process_node_track(final_directory, seen, node):
+    if node.nid in seen.tracks:
+        return
+    seen.tracks[node.nid] = 1
+    album_id = node.get_album_id()
+    if album_id is None or album_id == '':
+        logger.error('Track without album_id: %s, label: %s',
+                     node,
+                     node.get_label())
+        return
+    if album_id in seen.albums:
+        return
+    seen.albums[album_id] = 1
+    _list_track_helper_populate_album(final_directory, album_id)
+
+
+def list_track(kodi_directory, stats):
+    root = kodi_directory.root
     total = 0
-    predir = Directory(None, asList=True)
-    findir = Directory(None, asList=True)
-    if root.nt & Flag.TRACK == Flag.TRACK:
-        predir.add_node(root)
+    tmp_directory = Directory(None, asList=True)
+    final_directory = Directory(None, asList=True)
+    if is_track(root):
+        tmp_directory.add_node(root)
     else:
-        root.populating(helper.TreeTraverseOpts(
-            xdir=predir,
+        options = helper.TreeTraverseOpts(
+            xdir=tmp_directory,
             lvl=3,
             whiteFlag=Flag.ALL,
-            blackFlag=Flag.STOPBUILD))
-    total = len(predir.nodes)
-    if total == 0:
+            blackFlag=Flag.STOPBUILD)
+        populate_node(root, options)
+    total = len(tmp_directory.nodes)
+    if not total:
         logger.info('NoTrack')
         return []
-    done = 0
 
-    progress_update(xdir, 'Begin', '', percent(done, total))
-    seen = {}
-    seen_tracks = {}
-    for node in predir.nodes:
-        progress_update(xdir, u'Scanning', node.get_label(),
-                        percent(done, total))
-        done += 1
+    progress_update(kodi_directory, 'Begin', '', cyclic_progress(stats))
+    seen = Struct(**{
+        'albums': {},
+        'tracks': {}
+    })
+    for node in tmp_directory.nodes:
+        progress_update(kodi_directory,
+                        u'Scanning',
+                        node.get_label(),
+                        cyclic_progress(stats))
         node.set_parameter('mode', Mode.SCAN)
-        if node.nt & Flag.TRACK == Flag.TRACK:
-            if node.nid in seen_tracks:
-                continue
-            seen_tracks[node.nid] = 1
-            album_id = node.get_album_id()
-            if album_id is None or album_id == '':
-                logger.error('Track without album_id: %s, label: %s',
-                             node,
-                             node.get_label())
-                continue
-            if album_id in seen:
-                continue
-            seen[album_id] = 1
-            _list_track_helper_populate_album(findir, album_id)
+        if is_track(node):
+            _list_track_process_node_track(final_directory, seen, node)
         else:
-            node.populating(helper.TreeTraverseOpts(
-                xdir=findir,
-                lvl=1,
-                whiteFlag=Flag.TRACK,
-                blackFlag=Flag.STOPBUILD))
-    return findir.nodes
+            _list_track_process_node_other(final_directory, seen, node)
+
+    return final_directory.nodes
 
 
 class QobuzXbmcRenderer(IRenderer):
@@ -124,50 +170,32 @@ class QobuzXbmcRenderer(IRenderer):
         '''
         if not self.set_root_node():
             logger.warn('Cannot set root node (%s, %s)',
-                        str(self.node_type),
-                        str(self.root.get_parameter('nid')))
+                        self.node_type,
+                        self.root.get_parameter('nid'))
             return False
         if self.has_method_parameter():
             return self.execute_method_parameter()
-        with Directory(
-                self.root,
-                self.nodes,
-                handle=config.app.handle,
-                showProgress=True,
-                asList=self.asList) as xdir:
+        with Directory(self.root,
+                       self.nodes,
+                       handle=config.app.handle,
+                       showProgress=True,
+                       asList=self.asList) as kodi_directory:
             if config.app.registry.get('contextmenu_replaceitems', to='bool'):
-                xdir.replaceItems = True
+                kodi_directory.replaceItems = True
             try:
-                _ret = self.root.populating(helper.TreeTraverseOpts(
-                    xdir=xdir,
-                    lvl=self.depth,
-                    whiteFlag=self.whiteFlag,
-                    blackFlag=self.blackFlag))
+                options = helper.TreeTraverseOpts(xdir=kodi_directory,
+                                                  lvl=self.depth,
+                                                  whiteFlag=self.whiteFlag,
+                                                  blackFlag=self.blackFlag)
+                _ret = populate_node(self.root, options)
             except exception.QobuzError as e:
-                xdir.end_of_directory(False)
-                xdir = None
-                logger.warn(
-                    'Error while populating our directory: %s', repr(e))
+                kodi_directory.end_of_directory(False)
+                logger.warn('Error while populating our directory: %s', e)
                 return False
             if not self.asList:
-                xdir.set_content(self.root.content_type)
-                methods = [
-                    xbmcplugin.SORT_METHOD_UNSORTED,
-                    xbmcplugin.SORT_METHOD_LABEL,
-                    xbmcplugin.SORT_METHOD_DATE,
-                    xbmcplugin.SORT_METHOD_TITLE,
-                    xbmcplugin.SORT_METHOD_VIDEO_YEAR,
-                    xbmcplugin.SORT_METHOD_GENRE,
-                    xbmcplugin.SORT_METHOD_ARTIST,
-                    xbmcplugin.SORT_METHOD_ALBUM,
-                    xbmcplugin.SORT_METHOD_PLAYLIST_ORDER,
-                    xbmcplugin.SORT_METHOD_TRACKNUM,
-                ]
-                _ = [xbmcplugin.addSortMethod(
-                    handle=config.app.handle,
-                    sortMethod=method)
-                    for method in methods]
-            return xdir.end_of_directory()
+                helper_kodi_directory_setup(kodi_directory,
+                                            self.root.content_type)
+            return kodi_directory.end_of_directory()
 
     def scan(self):
         '''Building tree when using Xbmc library scanning
@@ -176,33 +204,35 @@ class QobuzXbmcRenderer(IRenderer):
         if not self.set_root_node():
             logger.warn('Cannot set root node (%s)', self.node_type)
             return False
-
-        with Directory(
-                self.root,
-                nodes=self.nodes,
-                handle=config.app.handle,
-                asLocalUrl=True,
-                showProgress=True) as xdir:
-            xdir.progress.heading = u'Scan'
+        stats = Struct(**{
+            'count': 0
+        })
+        with Directory(self.root,
+                       nodes=self.nodes,
+                       handle=config.app.handle,
+                       asLocalUrl=True,
+                       showProgress=True) as kodi_directory:
+            kodi_directory.progress.heading = u'Scan'
             tracks = {}
-            d = {}
-            for track in list_track(xdir):
-                d[track.nid] = track
-            tracks.update(d)
-            if len(tracks.keys()) == 0:
+            for track in list_track(kodi_directory, stats):
+                tracks.update({track.nid: track})
+            if not tracks.keys():
                 logger.warn('NoTrackScannedError')
-                xdir.end_of_directory()
+                kodi_directory.end_of_directory()
                 return False
             for _nid, track in tracks.items():
-                if track.nt & Flag.TRACK != Flag.TRACK:
+                if not is_track(track):
                     continue
                 if not track.get_displayable():
                     continue
-                xdir.add_node(track)
-            xdir.set_content(self.root.content_type)
-            xdir.end_of_directory()
-            notifyH(
-                'Scanning results',
-                '%s items where scanned' % str(xdir.total_put),
-                mstime=3000)
+                progress_update(kodi_directory,
+                                u'Add Track',
+                                track.get_label(default='Library scan'),
+                                cyclic_progress(stats))
+                kodi_directory.add_node(track)
+            kodi_directory.set_content(self.root.content_type)
+            kodi_directory.end_of_directory()
+            notifyH('Scanning results',
+                    '%s items where scanned' % str(kodi_directory.total_put),
+                    mstime=3000)
         return True
