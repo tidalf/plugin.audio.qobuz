@@ -153,7 +153,7 @@ class Node_favorite(INode):
     def gui_add_artists(self):
         qnt, qid = int(self.get_parameter('qnt')), self.get_parameter('qid')
         nodes = self.list_artists(qnt, qid)
-        if len(nodes) == 0:
+        if not nodes:
             notifyH(dialogHeading, lang(30143))
             return False
         ret = xbmcgui.Dialog().select(
@@ -169,11 +169,13 @@ class Node_favorite(INode):
         return True
 
     def list_albums(self, qnt, qid):
+        ''' List albums givent a node type and a node id
+        '''
         album_ids = {}
         nodes = []
         if qnt & Flag.ALBUM == Flag.ALBUM:
             node = getNode(Flag.ALBUM, {'nid': qid})
-            node.data = node.fetch(None, None, None, None)
+            node.data = node.fetch()
             album_ids[str(node.nid)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
@@ -183,7 +185,7 @@ class Node_favorite(INode):
             render.blackFlag = Flag.NONE
             render.asList = True
             render.run()
-            if len(render.nodes) > 0:
+            if not render.nodes:
                 node = getNode(Flag.ALBUM)
                 node.data = render.nodes[0].data['album']
                 album_ids[str(node.nid)] = 1
@@ -196,10 +198,9 @@ class Node_favorite(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if node.nt & Flag.ALBUM:
-                    if not str(node.nid) in album_ids:
-                        album_ids[str(node.nid)] = 1
-                        nodes.append(node)
+                if node.nt & Flag.ALBUM and str(node.nid) not in album_ids:
+                    album_ids[str(node.nid)] = 1
+                    nodes.append(node)
                 if node.nt & Flag.TRACK:
                     render = renderer(qnt, self.parameters)
                     render.depth = 1
@@ -207,10 +208,9 @@ class Node_favorite(INode):
                     render.blackFlag = Flag.NONE
                     render.asList = True
                     render.run()
-                    if len(render.nodes) > 0:
+                    if not render.nodes:
                         newnode = getNode(
                             Flag.ALBUM, data=render.nodes[0].data['album'])
-                        # newnode.data = render.nodes[0].data['album']
                         if not str(newnode.nid) in album_ids:
                             nodes.append(newnode)
                             album_ids[str(newnode.nid)] = 1
