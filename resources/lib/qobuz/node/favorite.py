@@ -258,11 +258,13 @@ class Node_favorite(INode):
         return True
 
     def list_tracks(self, qnt, qid):
+        '''List tracks given a node type and a node id
+        '''
         track_ids = {}
         nodes = []
         if qnt & Flag.TRACK == Flag.TRACK:
             node = getNode(Flag.TRACK, parameters={'nid': qid})
-            node.data = node.fetch(None, None, None, Flag.NONE)
+            node.data = node.fetch()
             track_ids[str(node.nid)] = 1
             nodes.append(node)
         else:
@@ -272,7 +274,7 @@ class Node_favorite(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if not str(node.nid) in track_ids:
+                if str(node.nid) not in track_ids:
                     nodes.append(node)
                     track_ids[str(node.nid)] = 1
         return nodes
