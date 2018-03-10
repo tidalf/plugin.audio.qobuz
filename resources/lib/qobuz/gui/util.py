@@ -6,12 +6,13 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
+import os
+import sys
+
 from qobuz import config
 from qobuz.debug import getLogger
 from qobuz.xbmcrpc import showNotification, getInfoLabels
-import os
 import qobuz
-import sys
 
 logger = getLogger(__name__)
 

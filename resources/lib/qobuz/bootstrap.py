@@ -93,6 +93,8 @@ class MinimalBootstrap(object):
                 self.image = xbmc.translatePath(
                     os.path.join(config.path.resources, 'img', 'theme',
                                  'default'))
+                self.combined_covers = os.path.join(self.profile,
+                                                    'combined_covers')
 
             def to_s(self):
                 out = 'profile : ' + self.profile + "\n"
@@ -114,6 +116,7 @@ class MinimalBootstrap(object):
         config.path = PathObject()
         config.path._set_dir()
         config.path.mkdir(config.path.cache)
+        config.path.mkdir(config.path.combined_covers)
 
     def bootstrap_sys_args(self):
         '''Store sys arguments'''

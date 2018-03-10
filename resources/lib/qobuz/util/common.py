@@ -8,6 +8,8 @@
 '''
 import json
 import functools
+from qobuz import config
+from qobuz import constants
 
 
 def is_number(value):
@@ -46,3 +48,8 @@ json_dump = functools.partial(json.dump, separators=separators)
 class Struct(object):
     def __init__(self, **entries):
         self.__dict__.update(entries)
+
+
+def get_default_image_size():
+    text_size = config.app.registry.get('image_default_size', default='small')
+    return constants.TEXT_IMAGE_TO_SIZE[text_size]
