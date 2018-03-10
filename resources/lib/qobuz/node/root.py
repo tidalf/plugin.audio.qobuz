@@ -14,6 +14,7 @@ from qobuz.debug import getLogger
 from qobuz.gui.util import executeBuiltin, lang
 from qobuz.gui.util import yesno, notifyH, getImage
 from qobuz.node import getNode, Flag
+from qobuz.image import cleanfs_combined_covers
 from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
@@ -74,6 +75,7 @@ class Node_root(INode):
         if not yesno(lang(30121), lang(30122)):
             logger.warn('Deleting cached data aborted')
             return False
+        cleanfs_combined_covers()
         if clean_all(cache):
             notifyH(lang(30119), lang(30123))
         else:

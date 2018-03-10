@@ -29,3 +29,10 @@ ModeEnum._code_to_human = {
 }
 
 Mode = ModeEnum
+
+TEXT_IMAGE_TO_SIZE = {
+    'xlarge': (1200, 1200),  # @todo remove, not in api
+    'large': (800, 800),
+    'small': (600, 600),
+    'thumbnail':  (100, 100)
+}

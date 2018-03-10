@@ -127,8 +127,22 @@ class Node_playlist(INode):
             'users_count', to='int'))
 
     def get_image(self):
-        images = self.get_property(
-            ['images300', 'images150', 'images'], default=None)
+        text_size = config.app.registry.get(
+            'image_default_size', default='small')
+        name = 'images'
+        if text_size in ['large', 'xlarge']:
+            name = 'images300'
+        elif text_size == 'small':
+            name = 'images150'
+        images = []
+        if name in self.data:
+            images = self.data.get(name)
+        else:  # fallback
+            images = self.get_property([
+                'images300',
+                'images150',
+                'images'
+            ], default=None)
         if images is None:
             return None
         return image.combine(self.nid, images)

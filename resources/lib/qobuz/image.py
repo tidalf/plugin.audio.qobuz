@@ -3,63 +3,149 @@ import os
 import requests
 
 from qobuz import config
-from qobuz import data_path
 from qobuz.debug import getLogger
+from qobuz.util.common import get_default_image_size
+from qobuz.util.file import unlink
+from qobuz.util.hash import hashit
 from qobuz.util.random import randrange
 
+COMBINED_COVER_FMT = 'cover-{nid}-{size_w}-{size_h}-{count}-combine.jpg'
+TMPIMG_FMT = 'tmp-img.jpg'
+HASHED_ALBUM_COVER_FMT = 'cache-album-cover-{}.jpg'
 
 logger = getLogger(__name__)
-available = False
+PIL_AVAILABLE = False
 
 try:
     from PIL import Image
-
-    available = True
+    PIL_AVAILABLE = True
 except ImportError as e:
     logger.error('Cannot import PIL library')
 
 
-def combineFactory(available, nid, images=None, count=4, prefix='cover'):
+def _mywalk(path):
+    for dirpath, _dirnames, filenames in os.walk(path):
+        for name in filenames:
+            yield name, os.path.join(dirpath, name)
 
-    images = [] if images is None else images
-    if not config.app.registry.get('image_create_mosaic', to='bool'):
-        available = False
-    len_images = len(images)
-    if len_images == 0:
-        return None
-    if len_images == 1:
-        return images[0]
-    if available is False:
-        return images[randrange(0, len_images)]
-    final_path = os.path.join(
-        data_path, '{prefix}-{nid}-combine.jpg'.format(
-            prefix=prefix, nid=nid))
-    if os.path.exists(final_path):
-        return final_path
-    full_size = 600
-    new = Image.new('RGB', (full_size, full_size))
-    total = 0
-    demi_count = int(len_images / 2)
-    size = full_size / demi_count
-    for i in range(0, full_size, size):
-        for j in range(0, full_size, size):
-            img_path = images[total]
-            if img_path.startswith('http'):
-                tmp = os.path.join(data_path, 'tmp-img.jpg')
-                r = requests.get(img_path, stream=True)
-                with open(tmp, 'wb') as wh:
-                    wh.writelines(r.iter_content(1024))
-                path = tmp
-            # sometimes there's no image
-            try:
-                part = Image.open(path)
-                part = part.resize((size, size), Image.ANTIALIAS)
-                new.paste(part, (i, j))
-                total += 1
-            except Exception as error:
-                logger.error(error)
-    new.save(final_path)
+
+def _find_all_combined_images(covers_path):
+    for name, full_path in _mywalk(covers_path):
+        if not name.endswith('.jpg'):
+            continue
+        yield full_path
+
+
+def cleanfs_combined_covers():
+    ''' Clean all images under __covers_path__
+    '''
+    covers_path = config.path.combined_covers
+    for filename in _find_all_combined_images(covers_path):
+        unlink(filename)
+
+
+def next_image_generator_factory(images):
+    ''' Yield image path from images array indefinitly (reset to 0)
+    '''
+    index = 0
+    size = len(images)
+    while True:
+        if index >= size:
+            index = 0
+        ret = images[index]
+        yield ret
+        index += 1
+
+
+def get_remote_image(url):
+    ''' get image from url and return path from local file'''
+    covers_path = config.path.combined_covers
+    hashed_filename = HASHED_ALBUM_COVER_FMT.format(
+        hashit(url))
+    new_path = os.path.join(covers_path, hashed_filename)
+
+    if not os.path.exists(new_path):
+        img_request = requests.get(url, stream=True)
+        if img_request.status_code != 200:
+            logger.warn('GetRemoteImageError %s', img_request.status_code)
+            return None
+        with open(new_path, 'wb') as write_handle:
+            write_handle.writelines(img_request.iter_content(1024))
+            write_handle.flush()
+    return new_path
+
+
+def _resized_image(img_path, thumb_size_w):
+    part = Image.open(img_path)
+    new_height = thumb_size_w * part.height / part.width
+    return part.resize((thumb_size_w, new_height), Image.ANTIALIAS)
+
+
+def _combine_factory_final_path(count, nid, img_size):
+    size_w, size_h = img_size
+    covers_path = config.path.combined_covers
+    filename = COMBINED_COVER_FMT.format(
+        count=count,
+        nid=nid,
+        size_h=size_h,
+        size_w=size_w
+    )
+    return os.path.join(covers_path, filename)
+
+
+def _combine_factory_build_one(thumb_size, image_path_generator):
+    img_path = next(image_path_generator)
+    if img_path.startswith('http'):
+        img_path = get_remote_image(img_path)
+    return _resized_image(img_path, thumb_size[0])
+
+
+def _combine_factory_build(final_path, img_size, count, image_path_generator):
+    new_image = Image.new('RGB', img_size)
+    demi_count = count / 2
+    thumb_size = (
+        int(img_size[0] / demi_count),
+        int(img_size[1] / demi_count)
+    )
+
+    for i in range(0, demi_count):
+        for j in range(0, demi_count):
+            image = _combine_factory_build_one(thumb_size,
+                                               image_path_generator)
+            new_image.paste(image,
+                            (i * thumb_size[0],
+                             j * thumb_size[1]))
+
+    new_image.save(final_path)
     return final_path
 
 
-combine = functools.partial(combineFactory, available)
+def _combine_nopil(_nid, images=None):
+    if not images:
+        return None
+    return images[randrange(0, len(images) - 1)]
+
+
+def _combine_pil(nid, images=None):
+    ''' Combine the first 4 images of images array into single image '''
+    count = 4
+    img_size = get_default_image_size()
+    image_path_generator = next_image_generator_factory(images)
+    final_path = _combine_factory_final_path(count, nid, img_size)
+    if os.path.exists(final_path):
+        return final_path
+    return _combine_factory_build(final_path,
+                                  img_size,
+                                  count,
+                                  image_path_generator)
+
+
+def combine_factory(pil_available, nid, images=None):
+    if not config.app.registry.get('image_create_mosaic', to='bool'):
+        pil_available = False
+    if pil_available is True and len(images) > 1:
+        return _combine_pil(nid, images=images)
+    return _combine_nopil(nid, images=images)
+
+
+combine = functools.partial(combine_factory, PIL_AVAILABLE)
