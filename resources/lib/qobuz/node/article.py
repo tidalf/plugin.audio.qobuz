@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from kodi_six import xbmcgui
+from kodi_six import xbmcgui  # pylint:disable=E0401
 
 from qobuz.api import api
 from qobuz.debug import getLogger
@@ -102,19 +102,18 @@ class Node_article(INode):
                            limit=self.limit)
         return api.get('/article/get', article_id=self.nid)
 
-    def _populate_articles(self, *a, **ka):
+    def _populate_articles(self, _options):
         for item in self.data['articles']['items']:
             self.add_child(
                 getNode(
                     Flag.ARTICLE, parameters={'nid': item['id']}, data=item))
-        return True if len(self.data['articles']['items']) > 0 else False
+        return True if self.data['articles']['items'] else False
 
-    def _populate_one(self, *a, **ka):
-        logger.info('ONE: %s', self.data)
+    def _populate_one(self, _options):
         dialog(self.get_title(), self.get_description())
         return True
 
     def populate(self, options=None):
         if self.nid is None:
-            return self._populate_articles(*a, **ka)
-        return self._populate_one(*a, **ka)
+            return self._populate_articles(options)
+        return self._populate_one(options)
