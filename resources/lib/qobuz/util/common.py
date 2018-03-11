@@ -49,6 +49,10 @@ class Struct(object):
     def __init__(self, **entries):
         self.__dict__.update(entries)
 
+    def __iter__(self):
+        for key, value in self.__dict__.items():
+            yield key, value
+
 
 def get_default_image_size():
     text_size = config.app.registry.get('image_default_size', default='small')
