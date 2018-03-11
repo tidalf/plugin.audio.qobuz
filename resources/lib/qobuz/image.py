@@ -75,10 +75,14 @@ def get_remote_image(url):
     return new_path
 
 
-def _resized_image(img_path, thumb_size_w):
-    part = Image.open(img_path)
-    new_height = thumb_size_w * part.height / part.width
-    return part.resize((thumb_size_w, new_height), Image.ANTIALIAS)
+def _resize_image(img_path, thumb_size_w):
+    try:
+        part = Image.open(img_path)
+        new_height = thumb_size_w * part.height / part.width
+        return part.resize((thumb_size_w, new_height), Image.ANTIALIAS)
+    except Exception as e:
+        logger.error('ResizeImageError %s', e)
+    return None
 
 
 def _combine_factory_final_path(count, nid, img_size):
@@ -93,11 +97,16 @@ def _combine_factory_final_path(count, nid, img_size):
     return os.path.join(covers_path, filename)
 
 
-def _combine_factory_build_one(thumb_size, image_path_generator):
+def _combine_factory_build_one(thumb_size,
+                               image_path_generator,
+                               new_image,
+                               rowcol):
     img_path = next(image_path_generator)
     if img_path.startswith('http'):
         img_path = get_remote_image(img_path)
-    return _resized_image(img_path, thumb_size[0])
+    image = _resize_image(img_path, thumb_size[0])
+    new_image.paste(image, (rowcol[0] * thumb_size[0],
+                            rowcol[1] * thumb_size[1]))
 
 
 def _combine_factory_build(final_path, img_size, count, image_path_generator):
@@ -110,11 +119,10 @@ def _combine_factory_build(final_path, img_size, count, image_path_generator):
 
     for i in range(0, demi_count):
         for j in range(0, demi_count):
-            image = _combine_factory_build_one(thumb_size,
-                                               image_path_generator)
-            new_image.paste(image,
-                            (i * thumb_size[0],
-                             j * thumb_size[1]))
+            _combine_factory_build_one(thumb_size,
+                                       image_path_generator,
+                                       new_image,
+                                       (i, j))
 
     new_image.save(final_path)
     return final_path
