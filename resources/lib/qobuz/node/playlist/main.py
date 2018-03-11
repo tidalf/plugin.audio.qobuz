@@ -443,7 +443,7 @@ class Node_playlist(INode):
             logger.warn('Cannot delete playlist with id ' + str(playlist_id))
             notify_error(lang(30183), lang(30186) + name)
             return False
-        self.delete_cache(playlist_id)
+        self.delete_cache(res['id'])
         notify_log(lang(30183), (lang(30184) + '%s' + lang(30185)) % name)
         self.containerUpdate()
         return False
