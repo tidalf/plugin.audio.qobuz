@@ -51,64 +51,58 @@ class FlagEnum(object):
 
     @classmethod
     def to_s(cls, flag):
-        if not flag:
-            logger.warn(cls, 'Missing flag parameter')
-            return ''
-        flag = int(flag)
-        if flag & cls.TRACK == cls.TRACK:
-            return 'track'
-        elif flag & cls.PLAYLIST == cls.PLAYLIST:
-            return 'playlist'
-        elif flag & cls.USERPLAYLISTS == cls.USERPLAYLISTS:
-            return 'user_playlists'
-        elif flag & cls.RECOMMENDATION == cls.RECOMMENDATION:
-            return 'recommendation'
-        elif flag & cls.ROOT == cls.ROOT:
-            return 'root'
-        elif flag & cls.ALBUM == cls.ALBUM:
-            return 'album'
-        elif flag & cls.PURCHASE == cls.PURCHASE:
-            return 'purchase'
-        elif flag & cls.FAVORITE == cls.FAVORITE:
-            return 'favorite'
-        elif flag & cls.SEARCH == cls.SEARCH:
-            return 'search'
-        elif flag & cls.ARTIST == cls.ARTIST:
-            return 'artist'
-        elif flag & cls.SIMILAR_ARTIST == cls.SIMILAR_ARTIST:
-            return 'similar_artist'
-        elif flag & cls.FRIEND == cls.FRIEND:
-            return 'friend'
-        elif flag & cls.FRIENDS == cls.FRIENDS:
-            return 'friends'
-        elif flag & cls.GENRE == cls.GENRE:
-            return 'genre'
-        elif flag & cls.LABEL == cls.LABEL:
-            return 'label'
-        elif flag & cls.NODE == cls.NODE:
-            return 'inode'
-        elif flag & cls.STOPBUILD == cls.STOPBUILD:
-            return 'stop_build_down'
-        elif flag & cls.ARTICLES == cls.ARTICLES:
-            return 'articles'
-        elif flag & cls.ARTICLE == cls.ARTICLE:
-            return 'article'
-        elif flag & cls.PUBLIC_PLAYLISTS == cls.PUBLIC_PLAYLISTS:
-            return 'public_playlists'
-        elif flag & cls.ARTICLE_RUBRICS == cls.ARTICLE_RUBRICS:
-            return 'article_rubrics'
-        elif flag & cls.ALBUMS_BY_ARTIST == cls.ALBUMS_BY_ARTIST:
-            return 'albums_by_artist'
-        elif flag & cls.COLLECTION == cls.COLLECTION:
-            return 'collection'
-        elif flag & cls.TESTING == cls.TESTING:
-            return 'testing'
-        elif flag & cls.TEXT == cls.TEXT:
-            return 'text'
-        elif flag & cls.USER == cls.USER:
-            return 'user'
-        else:
-            raise exception.InvalidFlag(repr(flag))
+        ''' Convert flag (int) to string '''
+        return flag_to_string(flag)
+
+    @classmethod
+    def flag_from_string(cls, text):
+        ''' Convert string to flag (int) '''
+        for flag, value in FLAG_STRING.items():
+            if value == text:
+                return flag
+        return None
+
+
+FLAG_STRING = {
+    FlagEnum.ALBUM: 'album',
+    FlagEnum.ALBUMS: 'albums',
+    FlagEnum.ALBUMS_BY_ARTIST: 'albums_by_artist',
+    FlagEnum.ARTICLE: 'article',
+    FlagEnum.ARTICLES: 'articles',
+    FlagEnum.ARTICLE_RUBRICS: 'article_rubrics',
+    FlagEnum.ARTIST: 'artist',
+    FlagEnum.COLLECTION: 'collection',
+    FlagEnum.FAVORITE: 'favorite',
+    FlagEnum.FRIEND: 'friend',
+    FlagEnum.FRIENDS: 'friends',
+    FlagEnum.GENRE: 'genre',
+    FlagEnum.LABEL: 'label',
+    FlagEnum.NODE: 'node',
+    FlagEnum.NONE: 'none',
+    FlagEnum.PLAYLIST: 'playlist',
+    FlagEnum.PUBLIC_PLAYLISTS: 'public_playlists',
+    FlagEnum.PURCHASE: 'purchase',
+    FlagEnum.RECOMMENDATION: 'recommendation',
+    FlagEnum.ROOT: 'root',
+    FlagEnum.SEARCH: 'search',
+    FlagEnum.SIMILAR_ARTIST: 'similar_artist',
+    FlagEnum.STOPBUILD: 'stop_build_down',
+    FlagEnum.TESTING: 'testing',
+    FlagEnum.TEXT: 'text',
+    FlagEnum.TRACK: 'track',
+    FlagEnum.USER: 'user',
+    FlagEnum.USERPLAYLISTS: 'user_playlists',
+}
+
+
+def flag_to_string(flag):
+    ''' Return string from integer flag '''
+    cls = FlagEnum
+    if not flag:
+        logger.warn(cls, 'Missing flag parameter')
+        return ''
+    flag = int(flag)
+    return FLAG_STRING[flag]
 
 
 Flag = FlagEnum()
