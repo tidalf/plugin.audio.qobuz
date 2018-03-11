@@ -13,10 +13,12 @@ from qobuz.gui.util import lang, getImage
 from qobuz.node import Flag, getNode
 from qobuz.node.inode import INode
 
-limit_max = 100
+LIMIT_MAX = 100
 
 
 class Node_user_playlists(INode):
+    '''Display user playlists'''
+
     def __init__(self, parent=None, parameters=None, data=None):
         parameters = {} if parameters is None else parameters
         super(Node_user_playlists, self).__init__(
@@ -28,28 +30,21 @@ class Node_user_playlists(INode):
         self.display_product_cover = config.app.registry.get(
             'userplaylists_display_cover', to='bool')
 
-    def set_display_by(self, dtype):
-        vtype = ('product', 'songs')
-        if dtype not in vtype:
-            error(self, "Invalid display by: " + dtype)
-        self.display_by = dtype
-
-    def get_display_by(self):
-        return self.display_by
-
     def set_current_playlist_id(self, playlist_id):
+        '''Set current playlist id in user data'''
         userdata = self.get_user_storage()
         userdata['current_playlist'] = int(playlist_id)
         userdata.sync()
 
     def get_current_playlist_id(self):
+        '''Get current playlist id from user data'''
         userdata = self.get_user_storage()
         if 'current_playlist' not in userdata:
             return None
         return int(userdata['current_playlist'])
 
     def _get_limit(self):
-        return self.limit if self.limit < limit_max else limit_max
+        return self.limit if self.limit < LIMIT_MAX else LIMIT_MAX
 
     def fetch(self, options=None):
         return api.get('/playlist/getUserPlaylists',
@@ -68,4 +63,4 @@ class Node_user_playlists(INode):
             if node.get_owner() == user.username:
                 node.set_is_my_playlist(True)
             self.add_child(node)
-        return True if len(self.data['playlists']['items']) > 0 else False
+        return True if self.data['playlists']['items'] else False
