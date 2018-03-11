@@ -11,6 +11,7 @@ import re
 import tempfile
 
 from qobuz.debug import getLogger
+from qobuz.util.common import Struct
 
 logger = getLogger(__name__)
 
@@ -18,12 +19,14 @@ logger = getLogger(__name__)
 def unlink(filename):
     logger.info('unlink %s', filename)
     if not os.path.exists(filename):
+        logger.warn('InvalidUnlinkPath %s', filename)
         return False
     _, tmpfile = tempfile.mkstemp(
         u'.dat', u'invalid-', os.path.dirname(filename))
     try:
         os.rename(filename, tmpfile)
-        return os.unlink(tmpfile)
+        os.unlink(tmpfile)
+        return True
     except Exception as e:
         logger.error('Unlinking fails: %s, error: %s', filename, e)
     return False
@@ -71,19 +74,26 @@ class RenamedTemporaryFile(object):
         return result
 
 
-def find(directory, pattern, callback=None, gData=None):
-    flist = []
-    fok = re.compile(pattern)
-    for dirname, _dirnames, filenames in os.walk(directory):
+def _find_walk(path):
+    for dirname, _dirnames, filenames in os.walk(path):
         for filename in filenames:
-            if fok.match(filename):
-                path = os.path.join(dirname, filename)
-                if callback:
-                    try:
-                        if not callback(path, gData):
-                            return None
-                    except Exception as e:
-                        logger.warn('Callback raise exception %s', repr(e))
-                        return None
-                flist.append(path)
+            yield Struct(**{
+                'filename': filename,
+                'full_path': os.path.join(dirname, filename)
+            })
+
+
+def _find_callback(callback, file_info):
+    if callback is None:
+        return True
+    return callback(file_info.full_path)
+
+
+def find(root_path, pattern, callback=None):
+    flist = []
+    pattern_ok = re.compile(pattern)
+    for file_info in _find_walk(root_path):
+        if pattern_ok.match(file_info.filename):
+            _find_callback(callback, file_info)
+            flist.append(file_info.full_path)
     return flist
