@@ -31,17 +31,17 @@ class _PersistentDictMixin(object):
     Write to disk is delayed until close or sync (similar to gdbm's fast mode).
 
     Input file format is automatically discovered.
-    Output file format is selectable between pickle, json, and csv.
+    Output file format is selectable between json, and csv.
     All three serialization formats are backed by fast C implementations.
     '''
 
-    def __init__(self, filename, flag='c', mode=None, file_format='pickle'):
+    def __init__(self, filename, flag='c', mode=None, file_format='json'):
         self.flag = flag  # r=readonly, c=create, or n=new
         self.mode = mode  # None or an octal triple like 0644
-        self.file_format = file_format  # 'csv', 'json', or 'pickle'
+        self.file_format = file_format  # 'csv', 'json'
         self.filename = filename
-        if flag != 'n' and os.access(filename, os.R_OK):
-            fileobj = open(filename, 'rb' if file_format == 'pickle' else 'r')
+        if flag is not 'n' and os.access(filename, os.R_OK):
+            fileobj = open(filename, 'rb')
             with fileobj:
                 self.load(fileobj)
 
@@ -52,7 +52,7 @@ class _PersistentDictMixin(object):
             return False
         filename = self.filename
         tempname = filename + '.tmp'
-        fileobj = open(tempname, 'wb' if self.file_format == 'pickle' else 'w')
+        fileobj = open(tempname, 'wb')
         try:
             self.dump(fileobj)
         except Exception as e:
@@ -113,7 +113,7 @@ class _Storage(collections.MutableMapping, _PersistentDictMixin):
     :param filename: An absolute filepath to reprsent the storage on disk. The
                      storage will loaded from this file if it already exists,
                      otherwise the file will be created.
-    :param file_format: 'pickle', 'json' or 'csv'. pickle is the default. Be
+    :param file_format: 'json' or 'csv'. json is the default. Be
                         aware that json and csv have limited support for python
                         objets.
 
@@ -122,8 +122,8 @@ class _Storage(collections.MutableMapping, _PersistentDictMixin):
                  periodically.
     '''
 
-    def __init__(self, filename, file_format='pickle'):
-        '''Acceptable formats are 'csv', 'json' and 'pickle'.
+    def __init__(self, filename, file_format='json'):
+        '''Acceptable formats are 'csv', 'json'
         '''
         self._items = {}
         _PersistentDictMixin.__init__(self, filename, file_format=file_format)
@@ -157,7 +157,7 @@ class TimedStorage(_Storage):
     '''A dict with the ability to persist to disk and TTL for items.
     '''
 
-    def __init__(self, filename, file_format='pickle', TTL=None):
+    def __init__(self, filename, file_format='json', TTL=None):
         '''TTL if provided should be a datetime.timedelta. Any entries
         older than the provided TTL will be removed upon load and upon item
         access.
