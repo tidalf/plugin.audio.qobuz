@@ -284,7 +284,7 @@ class Node_playlist(INode):
             start += step
         return True
 
-    def gui_add_as_new(self, name=None):
+    def gui_add_as_new(self, _=None):
         nodes = []
         qnt = int(self.get_parameter('qnt'))
         qid = self.get_parameter('qid')
