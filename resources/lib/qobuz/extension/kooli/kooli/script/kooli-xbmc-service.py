@@ -18,17 +18,14 @@ try:
     import kooli as _  # pylint:disable=E0401
 except ImportError:
     sys.path.append(P.abspath(P.join(base_path, P.pardir, P.pardir)))
-from kooli import log
 from kooli import qobuz_lib_path
 
 try:
     import flask as _  # pylint:disable=E0401
-    log.info('Flask loaded from kodi addon repository')
 except ImportError as e:
-    log.warn('Flask not present, loading our own copy')
-    path = P.join(qobuz_lib_path, 'qobuz', 'extension', 'script.module.flask',
-                  'lib')
-    sys.path.append(path)
+    lib_path = P.join(qobuz_lib_path,
+                      'qobuz', 'extension', 'script.module.flask', 'lib')
+    sys.path.append(lib_path)
 
 from kodi_six import xbmc  # pylint:disable=E0401
 from kooli.application import application, shutdown_server, qobuzApp

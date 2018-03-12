@@ -42,4 +42,4 @@ class Node_similar_artist(INode):
             if cache is not None:
                 artist.data = cache
             self.add_child(artist)
-        return True if len(self.data['artists']['items']) > 0 else False
+        return True if self.data['artists']['items'] else False

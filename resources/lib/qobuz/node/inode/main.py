@@ -184,8 +184,8 @@ class INode(object):
             key = attr[4:]
             if key in self.propsMap:
                 prop = self.propsMap.get(key)
-                default = prop.get('default') if hasattr(
-                    prop, 'default') else None
+                default = prop.get('default') if hasattr(prop,
+                                                         'default') else None
                 if self.data is None:
                     return lambda *a, **ka: default
                 try:
@@ -197,7 +197,7 @@ class INode(object):
                     return lambda *a, **ka: value
                 except KeyError:
                     pass
-        raise AttributeError(attr)
+        raise AttributeError('{}<{}>'.format(self.__class__.__name__, attr))
 
     def __add_pagination(self, data):
         return add_pagination(self, data)
@@ -322,17 +322,13 @@ class INode(object):
 
     label = property(get_label, set_label)
 
+    @classmethod
+    def get_displayable(cls):
+        ''' Can be overiden by child class for custom logic'''
+        return True
+
     def get_image(self):
-        if self.image:
-            return self.image
-        if self.parent:
-            return self.parent.get_image()
-        if self.data is not None:
-            for name in ['images300', 'images150', 'images']:
-                if name in self.data and len(self.data[name]) > 0:
-                    return self.data[name][randrange(0,
-                                                     len(self.data[name]))]
-        return self.get_property('image')
+        return self.image or ''
 
     def set_image(self, image):
         self.image = image
@@ -367,20 +363,19 @@ class INode(object):
         data = {} if options.data is None else options.data
         if options.lvl != -1 and options.lvl < 1:
             return False
-        if self.nt & options.blackFlag != self.nt:
-            new_data = self.fetch(options)
-            if new_data is None:
-                return False
-            data.update(new_data)
-            self.data = data
-            self.__add_pagination(self.data)
+        if self.nt & options.blackFlag == self.nt:
+            return False
+        new_data = self.fetch(options)
+        if new_data is None:
+            return False
+        data.update(new_data)
+        self.data = data
+        self.__add_pagination(self.data)
         self.populate(options)
         new_options = options.clone()
         if options.lvl != -1:
             new_options.lvl -= 1
-        self.__add_pagination_node(options.xdir,
-                                   options.lvl,
-                                   options.whiteFlag)
+        self.__add_pagination_node(options)
         for child in self.childs:
             if (child.nt & options.whiteFlag == child.nt) and not (
                     options.xdir.add_node(child)):
@@ -396,7 +391,7 @@ class INode(object):
         '''
         pass
 
-    def __add_pagination_node(self, Dir, lvl=1, whiteFlag=Flag.NODE):
+    def __add_pagination_node(self, options=None):
         """Helper/Called by build_down to add special node when pagination is
         required
         """

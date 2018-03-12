@@ -39,24 +39,25 @@ class Node_track(INode):
 
     def fetch(self, options=None):
         options = helper.get_tree_traverse_opts(options)
-        if (options.blackFlag is not None) and (
+        if options.noRemote or (
+                options.blackFlag and
                 options.blackFlag & Flag.STOPBUILD == Flag.STOPBUILD):
-            return None
+            return self.data
         return api.get('/track/get', track_id=self.nid)
 
     def populate(self, options=None):
         options = options if options is not None else helper.TreeTraverseOpts()
         return options.xdir.add_node(self)
 
-    def make_local_url(self):
+    def _make_local_url(self):
         return helper.make_local_track_url(config, self)
 
     def make_url(self, **ka):
         if 'mode' not in ka:
             ka['mode'] = Mode.PLAY
-        asLocalUrl = ka['asLocalUrl'] if 'asLocalUrl' in ka else False
-        if asLocalUrl is True:
-            return self.make_local_url()
+        as_local_url = ka['asLocalUrl'] if 'asLocalUrl' in ka else False
+        if as_local_url is True:
+            return self._make_local_url()
         purchased = self.get_parameter('purchased')
         if purchased:
             ka['purchased'] = purchased
@@ -244,14 +245,14 @@ class Node_track(INode):
         if 'format_id' not in data:
             logger.warn('Cannot get mime/type for track (restricted track?)')
             return False
-        formatId = int(data['format_id'])
+        format_id = int(data['format_id'])
         mime = ''
-        if formatId in [6, 27, 7]:
+        if format_id in [6, 27, 7]:
             mime = 'audio/flac'
-        elif formatId == 5:
+        elif format_id == 5:
             mime = 'audio/mpeg'
         else:
-            logger.warn('Unknow format %s', formatId)
+            logger.warn('Unknow format %s', format_id)
             mime = 'audio/mpeg'
         return mime
 

@@ -10,6 +10,7 @@ import json
 import functools
 from qobuz import config
 from qobuz import constants
+from qobuz.node.flag import Flag
 
 
 def is_number(value):
@@ -57,3 +58,11 @@ class Struct(object):
 def get_default_image_size():
     text_size = config.app.registry.get('image_default_size', default='small')
     return constants.TEXT_IMAGE_TO_SIZE[text_size]
+
+
+def is_track(node):
+    return node.nt & Flag.TRACK == Flag.TRACK
+
+
+def is_album(node):
+    return node.nt & Flag.ALBUM == Flag.ALBUM

@@ -68,12 +68,10 @@ class Node_favorite(INode):
             return True
         if self.search_type is None:
             for kind in all_kinds:
-                self.add_child(
-                    getNode(
-                        Flag.FAVORITE, parameters={'search-type': kind}))
-            self.add_child(
-                getNode(
-                    Flag.FAVORITE, parameters={'search-type': 'all'}))
+                self.add_child(getNode(Flag.FAVORITE,
+                                       parameters={'search-type': kind}))
+            self.add_child(getNode(Flag.FAVORITE,
+                                   parameters={'search-type': 'all'}))
             return True
         result = False
         search_for = (self.search_type, )
@@ -90,44 +88,35 @@ class Node_favorite(INode):
                 result = True
         return result
 
-    def _populate_tracks(self, options):
-        self.content_type = 'songs'
-        for track in self.data['tracks']['items']:
-            node = getNode(Flag.TRACK, data=track)
+    def _populate_helper(self, content_type, section, flag):
+        self.content_type = content_type
+        for data in self.data[section]['items']:
+            node = getNode(flag, data=data)
+            if not node:
+                logger.warn('Could not get node %s', Flag.to_s(flag))
+                return None
             if not node.get_displayable():
-                logger.warn(
-                    'Track not displayable: %s (%s)',
-                    node.get_label().encode(
-                        'ascii', errors='ignore'),
-                    node.nid)
+                logger.warn('%s not displayable: %s (%s)',
+                            Flag.to_s(flag),
+                            node.get_label(),
+                            node.nid)
+                return None
+            node_data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
+            if node_data:
+                node.data = node_data
+            if not node.get_displayable():
                 continue
             self.add_child(node)
-        return True if len(self.data['tracks']['items']) > 0 else False
+        return True if self.data[section]['items'] else False
 
-    def _populate_albums(self, options):
-        self.content_type = 'albums'
-        for album in self.data['albums']['items']:
-            node = getNode(Flag.ALBUM, data=album)
-            if not node.get_displayable():
-                logger.warn(
-                    'Album not displayable: %s (%s)',
-                    node.get_label().encode(
-                        'ascii', errors='ignore'),
-                    node.nid)
-                continue
-            cache = node.fetch(helper.TreeTraverseOpts(noRemote=True))
-            if cache is not None:
-                node.data = cache
-            self.add_child(node)
-        return True if len(self.data['albums']['items']) > 0 else False
+    def _populate_tracks(self, _options):
+        return self._populate_helper('songs', 'tracks', Flag.TRACK)
 
-    def _populate_artists(self, options):
-        self.content_type = 'artists'
-        for artist in self.data['artists']['items']:
-            node = getNode(Flag.ARTIST, data=artist)
-            node.data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
-            self.add_child(node)
-        return True if len(self.data['artists']['items']) > 0 else False
+    def _populate_albums(self, _options):
+        return self._populate_helper('albums', 'albums', Flag.ALBUM)
+
+    def _populate_artists(self, _options):
+        return self._populate_helper('artists', 'artists', Flag.ARTIST)
 
     def get_description(self):
         return self.get_property('description', to='strip_html')
