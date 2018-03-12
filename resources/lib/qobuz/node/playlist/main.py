@@ -68,7 +68,7 @@ class Node_playlist(INode):
         return u'userdata-{user_id}-playlist-{nid}.local'.format(
             user_id=user.get_id(), nid=self.nid)
 
-    def get_label(self, default=None):
+    def get_label(self, _=None):
         return self.label or self.get_name()
 
     def set_is_my_playlist(self, value):
