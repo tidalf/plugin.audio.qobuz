@@ -38,7 +38,8 @@ def nocache(view):
         response = make_response(view(*args, **kwargs))
         response.headers['Last-Modified'] = datetime.now()
         response.headers[
-            'Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+            'Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
+                               'post-check=0, pre-check=0, max-age=0'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
         return response
@@ -193,7 +194,8 @@ def route_nfo_artist(album_id=None):
 @nocache
 @application.route('/qobuz/favorite/', methods=HEADGET)
 @application.route('/qobuz/favorite/<string:search_type>/', methods=HEADGET)
-@application.route('/qobuz/favorite/<string:search_type>/<string:nid>', methods=HEADGET)
+@application.route('/qobuz/favorite/<string:search_type>/<string:nid>',
+                   methods=HEADGET)
 def route_favorite(search_type=None, nid=None):
     if search_type is None:
         if request.method == 'HEAD':
