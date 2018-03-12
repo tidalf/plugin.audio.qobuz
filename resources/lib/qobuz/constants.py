@@ -18,10 +18,10 @@ class ModeEnum(object):
 
     @classmethod
     def to_s(cls, mode):
-        return cls._code_to_human[mode]
+        return cls.code_to_human[mode]
 
 
-ModeEnum._code_to_human = {
+ModeEnum.code_to_human = {
     ModeEnum.VIEW: 'view',
     ModeEnum.PLAY: 'play',
     ModeEnum.SCAN: 'scan',

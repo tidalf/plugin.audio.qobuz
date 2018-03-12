@@ -27,7 +27,7 @@ class Node_user(INode):
         self.is_folder = True
         self.data = self.fetch()
 
-    def get_label(self, default=None):
+    def get_label(self):
         return u'[{subscription} - {login}]'.format(
             login=user.get_property(
                 'user/login', default='Demo'),
