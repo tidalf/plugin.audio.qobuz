@@ -16,11 +16,9 @@ from qobuz.api import api
 from qobuz.api.user import current as user
 from qobuz.cache import cache
 from qobuz.cache.cache_util import clean_all
-from qobuz.constants import Mode
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import ask
-from qobuz.gui.util import containerRefresh, containerUpdate
 from qobuz.gui.util import lang, executeBuiltin
 from qobuz.gui.util import notify_warn, notify_error, notify_log
 from qobuz.node import getNode, Flag
