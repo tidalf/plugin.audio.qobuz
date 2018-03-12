@@ -5,7 +5,7 @@
     Add 'get' to qobuz.api.raw, All requests made trough this method are
     cached (see qobuz.cache.qobuz)
 
-    :part_of: xbmc-qobuz
+    :part_of: kodi-qobuz
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
