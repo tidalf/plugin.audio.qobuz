@@ -8,7 +8,6 @@
     :copyright: (c) 2012-2018 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-import os
 
 from qobuz.debug import getLogger
 from qobuz.util.file import find, unlink
