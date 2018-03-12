@@ -12,7 +12,8 @@ import urllib
 
 from .context_menu import attach_context_menu
 from .pagination import add_pagination
-from .props import node_type_from_class, node_image_from_class, node_contenttype_from_class
+from .props import node_type_from_class, node_image_from_class
+from .props import node_contenttype_from_class
 from qobuz import config
 from qobuz import exception
 from qobuz.api import api
@@ -23,7 +24,7 @@ from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.node import Flag, getNode, helper
 from qobuz.renderer import renderer
-from qobuz.storage import _Storage
+from qobuz.storage import Storage
 from qobuz.util import data as dataUtil
 from qobuz.util import properties
 from qobuz.util.converter import converter
@@ -419,7 +420,7 @@ class INode(object):
             return self.user_storage
         filename = os.path.join(cache.base_path,
                                 'user-%s.local' % str(current_user.get_id()))
-        self.user_storage = _Storage(filename)
+        self.user_storage = Storage(filename)
         return self.user_storage
 
     @classmethod
@@ -453,7 +454,7 @@ class INode(object):
     def get_node_storage(self):
         if self.node_storage is not None:
             return self.node_storage
-        self.node_storage = _Storage(self.get_node_storage_path())
+        self.node_storage = Storage(self.get_node_storage_path())
         return self.node_storage
 
     def remove_node_storage(self):

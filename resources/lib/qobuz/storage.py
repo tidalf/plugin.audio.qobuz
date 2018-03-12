@@ -107,7 +107,7 @@ class _PersistentDictMixin(object):
         raise NotImplementedError
 
 
-class _Storage(collections.MutableMapping, _PersistentDictMixin):
+class Storage(collections.MutableMapping, _PersistentDictMixin):
     '''Storage that acts like a dict but also can persist to disk.
 
     :param filename: An absolute filepath to reprsent the storage on disk. The
@@ -118,7 +118,7 @@ class _Storage(collections.MutableMapping, _PersistentDictMixin):
                         objets.
 
     .. warning:: Currently there are no limitations on the size of the storage.
-                 Please be sure to call :meth:`~xbmcswift2._Storage.clear`
+                 Please be sure to call :meth:`Storage.clear`
                  periodically.
     '''
 
@@ -153,7 +153,7 @@ class _Storage(collections.MutableMapping, _PersistentDictMixin):
     initial_update = collections.MutableMapping.update
 
 
-class TimedStorage(_Storage):
+class TimedStorage(Storage):
     '''A dict with the ability to persist to disk and TTL for items.
     '''
 
@@ -163,7 +163,7 @@ class TimedStorage(_Storage):
         access.
         '''
         self.TTL = TTL
-        _Storage.__init__(self, filename, file_format=file_format)
+        Storage.__init__(self, filename, file_format=file_format)
 
     def __setitem__(self, key, val, raw=False):
         if raw:
