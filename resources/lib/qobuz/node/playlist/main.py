@@ -68,7 +68,7 @@ class Node_playlist(INode):
         return u'userdata-{user_id}-playlist-{nid}.local'.format(
             user_id=user.get_id(), nid=self.nid)
 
-    def get_label(self, default=None):
+    def get_label(self, _=None):
         return self.label or self.get_name()
 
     def set_is_my_playlist(self, value):
@@ -88,14 +88,14 @@ class Node_playlist(INode):
             'extra': 'tracks'
         })
 
-    def fetch(self, options=None):
+    def fetch(self, _=None):
         method, args = self._fetch_args()
         return api.get(method, **args)
 
     def _count(self):
         return len(self.get_property(self._items_path, default=[]))
 
-    def populate(self, options=None):
+    def populate(self, _=None):
         if self.count() == 0:
             return False
         for track in self.get_property(self._items_path):
@@ -132,7 +132,6 @@ class Node_playlist(INode):
             name = 'images300'
         elif text_size == 'small':
             name = 'images150'
-        images = []
         if name in self.data:
             images = self.data.get(name)
         else:  # fallback
@@ -430,7 +429,6 @@ class Node_playlist(INode):
             lang(30166), lang(30054), color('FFFF0000', name))
         if not ok:
             return False
-        res = False
         if data['owner']['name'] == user.username:
             res = api.playlist_delete(playlist_id=playlist_id)
         else:
