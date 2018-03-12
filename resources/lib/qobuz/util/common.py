@@ -2,7 +2,7 @@
     qobuz.util.common
     ~~~~~~~~~~~~~~~~~
 
-    :part_of: xbmc-qobuz
+    :part_of: kodi-qobuz
     :copyright: (c) 2015 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
