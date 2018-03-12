@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2016 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from kodi_six import xbmcgui
+from kodi_six import xbmcgui  # pylint:disable=E0401
 
 from .context_menu import attach_context_menu
 from .props import propsMap
@@ -401,9 +401,7 @@ class Node_playlist(INode):
             return None
         self.set_as_current(ret['id'])
         self.delete_cache(ret['id'])
-        self.containerUpdate()
-        # url = self.make_url(nt=Flag.USERPLAYLISTS)
-        # executeBuiltin(containerUpdate(url, True))
+        executeBuiltin(containerRefresh())
         return ret['id']
 
     def _get_playlist_id(self, playlist_id=None):
@@ -443,14 +441,10 @@ class Node_playlist(INode):
             logger.warn('Cannot delete playlist with id ' + str(playlist_id))
             notify_error(lang(30183), lang(30186) + name)
             return False
-        self.delete_cache(res['id'])
+        self.delete_cache(playlist_id)
+        executeBuiltin(containerRefresh())
         notify_log(lang(30183), (lang(30184) + '%s' + lang(30185)) % name)
-        self.containerUpdate()
-        return False
-
-    def containerUpdate(self):
-        url = self.make_url(nt=self.target_nt, mode=Mode.VIEW)
-        executeBuiltin(containerUpdate(url, True))
+        return True
 
     def subscribe(self):
         if api.playlist_subscribe(playlist_id=self.nid):
@@ -459,7 +453,7 @@ class Node_playlist(INode):
             return True
         return False
 
-    def delete_cache(self, playlist_id):
+    def delete_cache(self, _playlist_id):
         method, args = self._fetch_args()
         key = cache.make_key(method, **args)
         cache.delete(key)
