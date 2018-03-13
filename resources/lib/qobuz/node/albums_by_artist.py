@@ -71,14 +71,16 @@ class Node_albums_by_artist(INode):
         return True
 
     def makeListItem(self, **ka):
-        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
+        replace_items = ka['replaceItems'] if 'replaceItems' in ka else False
         item = xbmcgui.ListItem(
-            self.get_label(),
-            self.get_label(),
-            self.get_image(),
-            self.get_image(),
-            self.make_url(), )
+            self.get_label())
+        item.setPath(self.make_url())
+        image = self.get_image()
+        item.setArt({
+            'thumb': image,
+            'icon': image
+        })
         ctxMenu = contextMenu()
         self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
+        item.addContextMenuItems(ctxMenu.getTuples(), replace_items)
         return item

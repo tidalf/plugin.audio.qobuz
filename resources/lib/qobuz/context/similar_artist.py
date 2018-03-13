@@ -44,3 +44,4 @@ if __name__ == '__main__':
         sys.exit(0)
     url = 'plugin://plugin.audio.qobuz/%s' % node.make_url()
     executeBuiltin(containerUpdate(url, False))
+    sys.exit(0)

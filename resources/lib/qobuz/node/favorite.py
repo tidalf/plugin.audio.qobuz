@@ -18,6 +18,7 @@ from qobuz.gui.util import lang
 from qobuz.node import getNode, Flag, helper
 from qobuz.node.inode import INode
 from qobuz.renderer import renderer
+from qobuz.util.common import is_album, is_track
 
 logger = getLogger(__name__)
 dialogHeading = lang(30083)
@@ -32,6 +33,13 @@ def _populate_get_node(flag, data):
     if node_data:
         node.data = node_data
     return node
+
+
+def _default_node(seen, nodes, data):
+    node = getNode(Flag.ALBUM, data=data)
+    if node.nid not in seen:
+        nodes.append(node)
+        seen[node.nid] = True
 
 
 class Node_favorite(INode):
@@ -164,7 +172,7 @@ class Node_favorite(INode):
         if qnt & Flag.ALBUM == Flag.ALBUM:
             node = getNode(Flag.ALBUM, {'nid': qid})
             node.data = node.fetch()
-            album_ids[str(node.nid)] = 1
+            album_ids[node.nid] = True
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
             render = renderer(qnt, self.parameters)
@@ -174,34 +182,16 @@ class Node_favorite(INode):
             render.asList = True
             render.run()
             if not render.nodes:
-                node = getNode(Flag.ALBUM)
-                node.data = render.nodes[0].data['album']
-                album_ids[str(node.nid)] = 1
-                nodes.append(node)
+                _default_node(album_ids, nodes, render.nodes[0].data['album'])
         else:
             render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.ALBUM
-            render.blackFlag = Flag.STOPBUILD & Flag.TRACK
+            render.blackFlag = Flag.STOPBUILD
             render.asList = True
             render.run()
-            for node in render.nodes:
-                if node.nt & Flag.ALBUM and str(node.nid) not in album_ids:
-                    album_ids[str(node.nid)] = 1
-                    nodes.append(node)
-                if node.nt & Flag.TRACK:
-                    render = renderer(qnt, self.parameters)
-                    render.depth = 1
-                    render.whiteFlag = Flag.TRACK
-                    render.blackFlag = Flag.NONE
-                    render.asList = True
-                    render.run()
-                    if not render.nodes:
-                        newnode = getNode(
-                            Flag.ALBUM, data=render.nodes[0].data['album'])
-                        if str(newnode.nid) not in album_ids:
-                            nodes.append(newnode)
-                            album_ids[str(newnode.nid)] = 1
+            if not render.nodes:
+                _default_node(album_ids, nodes, render.nodes[0].data['album'])
         return nodes
 
     def add_albums(self, album_ids):
@@ -253,7 +243,7 @@ class Node_favorite(INode):
         if qnt & Flag.TRACK == Flag.TRACK:
             node = getNode(Flag.TRACK, parameters={'nid': qid})
             node.data = node.fetch()
-            track_ids[str(node.nid)] = 1
+            track_ids[node.nid] = 1
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
@@ -262,9 +252,9 @@ class Node_favorite(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if str(node.nid) not in track_ids:
+                if node.nid not in track_ids:
                     nodes.append(node)
-                    track_ids[str(node.nid)] = 1
+                    track_ids[node.nid] = 1
         return nodes
 
     def list_artists(self, qnt, qid):
@@ -273,22 +263,22 @@ class Node_favorite(INode):
         if qnt & Flag.ARTIST == Flag.ARTIST:
             node = getNode(Flag.ARTIST, {'nid': qid})
             node.fetch(None, None, None, Flag.NONE)
-            artist_ids[str(node.nid)] = 1
+            artist_ids[node.nid] = 1
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.ALBUM & Flag.TRACK
-            render.blackFlag = Flag.TRACK & Flag.STOPBUILD
+            render.blackFlag = Flag.STOPBUILD
             render.asList = True
             render.run()
             for node in render.nodes:
                 artist = getNode(Flag.ARTIST, {'nid': node.get_artist_id()})
                 if not artist.fetch(None, None, None, Flag.NONE):
                     continue
-                if not str(artist.nid) in artist_ids:
+                if artist.nid not in artist_ids:
                     nodes.append(artist)
-                    artist_ids[str(artist.nid)] = 1
+                    artist_ids[artist.nid] = 1
         return nodes
 
     def add_tracks(self, track_ids):

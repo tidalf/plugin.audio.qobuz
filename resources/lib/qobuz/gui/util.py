@@ -144,10 +144,10 @@ def runPlugin(url):
 
 
 def containerUpdate(url, replace=False):
-    # replace = ''
+    replace_string = ''
     if replace is True:
-        replace = ', "replace"'
-    return 'Container.Update("%s"%s)' % (url, replace)
+        replace_string = ', "replace"'
+    return 'Container.Update("%s"%s)' % (url, replace_string)
 
 
 def yesno(heading, line1, line2='', line3=''):

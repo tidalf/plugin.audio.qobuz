@@ -327,8 +327,8 @@ class INode(object):
         ''' Can be overiden by child class for custom logic'''
         return True
 
-    def get_image(self):
-        return self.image or ''
+    def get_image(self, default=None):
+        return self.image or default
 
     def set_image(self, image):
         self.image = image
