@@ -24,6 +24,16 @@ dialogHeading = lang(30083)
 all_kinds = ['albums', 'tracks', 'artists']
 
 
+def _populate_get_node(flag, data):
+    node = getNode(flag, data=data)
+    if not node.get_displayable():
+        return None
+    node_data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
+    if node_data:
+        node.data = node_data
+    return node
+
+
 class Node_favorite(INode):
     def __init__(self, parent=None, parameters=None, data=None):
         parameters = {} if parameters is None else parameters
@@ -91,13 +101,9 @@ class Node_favorite(INode):
     def _populate_helper(self, content_type, section, flag):
         self.content_type = content_type
         for data in self.data[section]['items']:
-            node = getNode(flag, data=data)
-            if not node.get_displayable():
-                continue
-            node_data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
-            if node_data:
-                node.data = node_data
-            self.add_child(node)
+            node = _populate_get_node(flag, data)
+            if node:
+                self.add_child(node)
         if not self.data[section]['items']:
             return False
         return True
@@ -193,7 +199,7 @@ class Node_favorite(INode):
                     if not render.nodes:
                         newnode = getNode(
                             Flag.ALBUM, data=render.nodes[0].data['album'])
-                        if not str(newnode.nid) in album_ids:
+                        if str(newnode.nid) not in album_ids:
                             nodes.append(newnode)
                             album_ids[str(newnode.nid)] = 1
         return nodes
