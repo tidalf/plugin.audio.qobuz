@@ -19,7 +19,7 @@ from qobuz.cache.cache_util import clean_all
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import ask
-from qobuz.gui.util import lang, executeBuiltin
+from qobuz.gui.util import lang, executeBuiltin, containerRefresh
 from qobuz.gui.util import notify_warn, notify_error, notify_log
 from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode

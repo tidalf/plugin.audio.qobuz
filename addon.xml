@@ -59,7 +59,7 @@
 	      <visible>Container.Content(songs)|Container.Content(albums)|Container.Content(artists)</visible>
 	    </item>
 		<item library="resources/lib/qobuz/context/similar_artist.py">
-	      <label>30156</label>
+	      <label>30160</label>
 	      <visible>Container.Content(songs)|Container.Content(albums)|Container.Content(artists)</visible>
 	    </item>
   </menu>
