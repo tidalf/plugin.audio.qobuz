@@ -161,13 +161,14 @@ class Node_album(INode):
             artist=self.get_artist(),
             maximum_sampling_rate=self.get_maximum_sampling_rate())
 
-    def get_image(self, size=None):
-        if not size:
-            size = self.imageDefaultSize
+    def get_image(self, default=''):
+        size = self.imageDefaultSize
         return self.get_property([
-            'image/%s' % size, 'image/large', 'image/small',
+            'image/%s' % size,
+            'image/large',
+            'image/small',
             'image/thumbnail'
-        ])
+        ], default)
 
     def get_label2(self):
         return self.get_title()

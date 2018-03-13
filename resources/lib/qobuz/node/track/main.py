@@ -103,9 +103,8 @@ class Node_track(INode):
         return '%s (albums: %s)' % (label, self.get_property(
             'album/label/albums_count', default=0))
 
-    def get_image(self, size=None, img_type='front', default=None):
-        if size is None:
-            size = config.app.registry.get('image_default_size')
+    def get_image(self, img_type='front', default=u'NoImage'):
+        size = config.app.registry.get('image_default_size')
         if img_type == 'thumbnail':
             image = self.get_property('album/image/thumbnail', default=None)
             if image is not None:
@@ -121,7 +120,7 @@ class Node_track(INode):
         if image is not None:
             return image
         if self.parent and self.parent.nt & (Flag.ALBUM | Flag.PLAYLIST):
-            return self.parent.get_image()
+            return self.parent.get_image(default=default)
         return default
 
     def get_genre(self):
