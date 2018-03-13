@@ -18,7 +18,7 @@ from qobuz.gui.util import notifyH
 from qobuz.node import getNode, helper
 from qobuz.node.flag import Flag
 from qobuz.renderer.irenderer import IRenderer
-from qobuz.util.common import Struct, is_track
+from qobuz.util.common import is_track
 
 logger = getLogger(__name__)
 notifier = Notifier(title='Scanning progress')

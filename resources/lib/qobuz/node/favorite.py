@@ -92,22 +92,15 @@ class Node_favorite(INode):
         self.content_type = content_type
         for data in self.data[section]['items']:
             node = getNode(flag, data=data)
-            if not node:
-                logger.warn('Could not get node %s', Flag.to_s(flag))
-                return None
             if not node.get_displayable():
-                logger.warn('%s not displayable: %s (%s)',
-                            Flag.to_s(flag),
-                            node.get_label(),
-                            node.nid)
-                return None
+                continue
             node_data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
             if node_data:
                 node.data = node_data
-            if not node.get_displayable():
-                continue
             self.add_child(node)
-        return True if self.data[section]['items'] else False
+        if not self.data[section]['items']:
+            return False
+        return True
 
     def _populate_tracks(self, _options):
         return self._populate_helper('songs', 'tracks', Flag.TRACK)
