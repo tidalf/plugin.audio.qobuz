@@ -1,8 +1,8 @@
 Qobuz for Kodi
 --------------
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d8a3887cb465415bb71cbec8c41ac375)](https://app.codacy.com/app/tidalf/plugin.audio.qobuz?utm_source=github.com&utm_medium=referral&utm_content=tidalf/plugin.audio.qobuz&utm_campaign=badger)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/cd58a99fe4f54d24b9bfe7276938a21d)](https://www.codacy.com/app/tidalf/plugin.audio.qobuz?utm_source=github.com&utm_medium=referral&utm_content=tidalf/plugin.audio.qobuz&utm_campaign=Badge_Coverage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b4cd7054aa97475f91b49b94148273e8)](https://www.codacy.com/app/dkorp/plugin.audio.qobuz?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tidalf/plugin.audio.qobuz&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/b4cd7054aa97475f91b49b94148273e8)](https://www.codacy.com/app/dkorp/plugin.audio.qobuz?utm_source=github.com&utm_medium=referral&utm_content=tidalf/plugin.audio.qobuz&utm_campaign=Badge_Coverage)
 [![Build Status](https://travis-ci.org/tidalf/plugin.audio.qobuz.svg?branch=master)](https://travis-ci.org/tidalf/plugin.audio.qobuz)
 [![Maintainability](https://api.codeclimate.com/v1/badges/86d27b112ea8595a18a5/maintainability)](https://codeclimate.com/github/tidalf/plugin.audio.qobuz/maintainability)
 [![Requirements Status](https://requires.io/github/tidalf/plugin.audio.qobuz/requirements.svg?branch=master)](https://requires.io/github/tidalf/plugin.audio.qobuz/requirements/?branch=master)
