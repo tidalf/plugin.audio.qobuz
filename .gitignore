@@ -10,3 +10,4 @@ tests/*
 coverage.xml
 venv/*
 .idea/*
+.vscode-upload.json
