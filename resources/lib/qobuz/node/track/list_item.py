@@ -29,12 +29,17 @@ trackTemplate = u'''- HiRes: {hires}
 
 
 def make_list_item(node, **ka):
-    replace_items = ka['replaceItems'] if 'replaceItems' in ka else False
+    replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
     isplayable = 'true'
     item = xbmcgui.ListItem(
         node.get_label(),
-        node.get_label2())
-    item.setPath(node.make_url(mode=Mode.PLAY))
+        node.get_label2(),
+        node.get_image(),
+        node.get_image(img_type='back'),
+        node.make_url(mode=Mode.PLAY))
+    if not item:
+        logger.warn('Cannot create xbmc list item')
+        return None
     item.setArt({
         'thumb': node.get_image(),
         'icon': node.get_image(img_type='thumbnail')
@@ -89,5 +94,5 @@ def make_list_item(node, **ka):
     item.setProperty('Music', isplayable)
     ctxMenu = contextMenu()
     node.attach_context_menu(item, ctxMenu)
-    item.addContextMenuItems(ctxMenu.getTuples(), replace_items)
+    item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
     return item
