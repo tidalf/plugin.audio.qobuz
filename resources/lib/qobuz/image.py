@@ -105,8 +105,11 @@ def _combine_factory_build_one(thumb_size,
     if img_path.startswith('http'):
         img_path = get_remote_image(img_path)
     image = _resize_image(img_path, thumb_size[0])
-    new_image.paste(image, (rowcol[0] * thumb_size[0],
+    try:
+        new_image.paste(image, (rowcol[0] * thumb_size[0],
                             rowcol[1] * thumb_size[1]))
+    except:
+        logger.warn("new_image paste failed")
 
 
 def _combine_factory_build(final_path, img_size, count, image_path_generator):
