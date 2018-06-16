@@ -42,4 +42,4 @@ class Node_public_playlists(INode):
             self.add_child(
                 getNode(
                     Flag.PLAYLIST, data=item, parameters={'nt': self.nt}))
-        return True if self.data['playlists']['items'] else False
+        return True if len(self.data['playlists']['items']) > 0 else False

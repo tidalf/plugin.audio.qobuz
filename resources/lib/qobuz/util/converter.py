@@ -18,11 +18,9 @@ class MLStripper(HTMLParser):
 
 
 def strip_tags(html):
-    if html is None:
-        return None
-    stripper = MLStripper()
-    stripper.feed(html)
-    return stripper.get_data()
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 
 class Converter(object):

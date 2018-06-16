@@ -8,26 +8,24 @@
 '''
 import sys
 from os import path as P
+
 base_dir = P.abspath(P.join(P.dirname(__file__), P.pardir))
 sys.path.append(P.join(base_dir, P.pardir))
+
 from qobuz.application import Application
 from qobuz.gui.util import containerUpdate, executeBuiltin
 from qobuz.node import getNode, Flag
 from qobuz.plugin import Plugin
 from qobuz.util.converter import converter
 
-
 if __name__ == '__main__':
-    from qobuz.debug import getLogger
-    logger = getLogger(__name__)
     app = Application(Plugin('plugin.audio.qobuz'))
     app.bootstrap.init_app()
-    tag = sys.listitem.getMusicInfoTag()  # pylint:disable=E1101
+    tag = sys.listitem.getMusicInfoTag()
     query = converter.quote(tag.getArtist())
-    node = getNode(Flag.SEARCH, parameters={
-        'search-type': 'artists',
-        'query': query
-    })
+    node = getNode(
+        Flag.SEARCH, parameters={'search-type': 'artists',
+                                 'query': query})
     node.data = node.fetch()
     if node.data is None:
         sys.exit(0)
@@ -35,15 +33,11 @@ if __name__ == '__main__':
     artist = None
     for _artist in node.data['artists']['items']:
         name = _artist['name'].lower().strip()
-        logger.info('compare %s %s', name, query)
         if name == query:
             artist = _artist
             break
     if artist is None:
-        sys.exit(1)
+        sys.exit(0)
     node = getNode(Flag.ALBUMS_BY_ARTIST, parameters={'nid': artist['id']})
-    logger.info('Node %s: %s', Flag.to_s(node.nt), node.make_url())
-    url = 'plugin://plugin.audio.qobuz/{}'.format(node.make_url())
-    logger.info('url %s', url)
-    executeBuiltin(containerUpdate(url))
-    sys.exit(0)
+    url = 'plugin://plugin.audio.qobuz/%s' % node.make_url()
+    executeBuiltin(containerUpdate(url, False))

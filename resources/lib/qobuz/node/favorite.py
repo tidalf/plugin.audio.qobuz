@@ -18,28 +18,10 @@ from qobuz.gui.util import lang
 from qobuz.node import getNode, Flag, helper
 from qobuz.node.inode import INode
 from qobuz.renderer import renderer
-from qobuz.util.common import is_album, is_track
 
 logger = getLogger(__name__)
 dialogHeading = lang(30083)
 all_kinds = ['albums', 'tracks', 'artists']
-
-
-def _populate_get_node(flag, data):
-    node = getNode(flag, data=data)
-    if not node.get_displayable():
-        return None
-    node_data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
-    if node_data:
-        node.data = node_data
-    return node
-
-
-def _default_node(seen, nodes, data):
-    node = getNode(Flag.ALBUM, data=data)
-    if node.nid not in seen:
-        nodes.append(node)
-        seen[node.nid] = True
 
 
 class Node_favorite(INode):
@@ -86,10 +68,12 @@ class Node_favorite(INode):
             return True
         if self.search_type is None:
             for kind in all_kinds:
-                self.add_child(getNode(Flag.FAVORITE,
-                                       parameters={'search-type': kind}))
-            self.add_child(getNode(Flag.FAVORITE,
-                                   parameters={'search-type': 'all'}))
+                self.add_child(
+                    getNode(
+                        Flag.FAVORITE, parameters={'search-type': kind}))
+            self.add_child(
+                getNode(
+                    Flag.FAVORITE, parameters={'search-type': 'all'}))
             return True
         result = False
         search_for = (self.search_type, )
@@ -106,24 +90,44 @@ class Node_favorite(INode):
                 result = True
         return result
 
-    def _populate_helper(self, content_type, section, flag):
-        self.content_type = content_type
-        for data in self.data[section]['items']:
-            node = _populate_get_node(flag, data)
-            if node:
-                self.add_child(node)
-        if not self.data[section]['items']:
-            return False
-        return True
+    def _populate_tracks(self, options):
+        self.content_type = 'songs'
+        for track in self.data['tracks']['items']:
+            node = getNode(Flag.TRACK, data=track)
+            if not node.get_displayable():
+                logger.warn(
+                    'Track not displayable: %s (%s)',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'),
+                    node.nid)
+                continue
+            self.add_child(node)
+        return True if len(self.data['tracks']['items']) > 0 else False
 
-    def _populate_tracks(self, _options):
-        return self._populate_helper('songs', 'tracks', Flag.TRACK)
+    def _populate_albums(self, options):
+        self.content_type = 'albums'
+        for album in self.data['albums']['items']:
+            node = getNode(Flag.ALBUM, data=album)
+            if not node.get_displayable():
+                logger.warn(
+                    'Album not displayable: %s (%s)',
+                    node.get_label().encode(
+                        'ascii', errors='ignore'),
+                    node.nid)
+                continue
+            cache = node.fetch(helper.TreeTraverseOpts(noRemote=True))
+            if cache is not None:
+                node.data = cache
+            self.add_child(node)
+        return True if len(self.data['albums']['items']) > 0 else False
 
-    def _populate_albums(self, _options):
-        return self._populate_helper('albums', 'albums', Flag.ALBUM)
-
-    def _populate_artists(self, _options):
-        return self._populate_helper('artists', 'artists', Flag.ARTIST)
+    def _populate_artists(self, options):
+        self.content_type = 'artists'
+        for artist in self.data['artists']['items']:
+            node = getNode(Flag.ARTIST, data=artist)
+            node.data = node.fetch(helper.TreeTraverseOpts(noRemote=True))
+            self.add_child(node)
+        return True if len(self.data['artists']['items']) > 0 else False
 
     def get_description(self):
         return self.get_property('description', to='strip_html')
@@ -172,7 +176,7 @@ class Node_favorite(INode):
         if qnt & Flag.ALBUM == Flag.ALBUM:
             node = getNode(Flag.ALBUM, {'nid': qid})
             node.data = node.fetch()
-            album_ids[node.nid] = True
+            album_ids[str(node.nid)] = 1
             nodes.append(node)
         elif qnt & Flag.TRACK == Flag.TRACK:
             render = renderer(qnt, self.parameters)
@@ -182,16 +186,34 @@ class Node_favorite(INode):
             render.asList = True
             render.run()
             if not render.nodes:
-                _default_node(album_ids, nodes, render.nodes[0].data['album'])
+                node = getNode(Flag.ALBUM)
+                node.data = render.nodes[0].data['album']
+                album_ids[str(node.nid)] = 1
+                nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.ALBUM
-            render.blackFlag = Flag.STOPBUILD
+            render.blackFlag = Flag.STOPBUILD & Flag.TRACK
             render.asList = True
             render.run()
-            if not render.nodes:
-                _default_node(album_ids, nodes, render.nodes[0].data['album'])
+            for node in render.nodes:
+                if node.nt & Flag.ALBUM and str(node.nid) not in album_ids:
+                    album_ids[str(node.nid)] = 1
+                    nodes.append(node)
+                if node.nt & Flag.TRACK:
+                    render = renderer(qnt, self.parameters)
+                    render.depth = 1
+                    render.whiteFlag = Flag.TRACK
+                    render.blackFlag = Flag.NONE
+                    render.asList = True
+                    render.run()
+                    if not render.nodes:
+                        newnode = getNode(
+                            Flag.ALBUM, data=render.nodes[0].data['album'])
+                        if not str(newnode.nid) in album_ids:
+                            nodes.append(newnode)
+                            album_ids[str(newnode.nid)] = 1
         return nodes
 
     def add_albums(self, album_ids):
@@ -243,7 +265,7 @@ class Node_favorite(INode):
         if qnt & Flag.TRACK == Flag.TRACK:
             node = getNode(Flag.TRACK, parameters={'nid': qid})
             node.data = node.fetch()
-            track_ids[node.nid] = 1
+            track_ids[str(node.nid)] = 1
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
@@ -252,9 +274,9 @@ class Node_favorite(INode):
             render.asList = True
             render.run()
             for node in render.nodes:
-                if node.nid not in track_ids:
+                if str(node.nid) not in track_ids:
                     nodes.append(node)
-                    track_ids[node.nid] = 1
+                    track_ids[str(node.nid)] = 1
         return nodes
 
     def list_artists(self, qnt, qid):
@@ -263,22 +285,22 @@ class Node_favorite(INode):
         if qnt & Flag.ARTIST == Flag.ARTIST:
             node = getNode(Flag.ARTIST, {'nid': qid})
             node.fetch(None, None, None, Flag.NONE)
-            artist_ids[node.nid] = 1
+            artist_ids[str(node.nid)] = 1
             nodes.append(node)
         else:
             render = renderer(qnt, self.parameters)
             render.depth = -1
             render.whiteFlag = Flag.ALBUM & Flag.TRACK
-            render.blackFlag = Flag.STOPBUILD
+            render.blackFlag = Flag.TRACK & Flag.STOPBUILD
             render.asList = True
             render.run()
             for node in render.nodes:
                 artist = getNode(Flag.ARTIST, {'nid': node.get_artist_id()})
                 if not artist.fetch(None, None, None, Flag.NONE):
                     continue
-                if artist.nid not in artist_ids:
+                if not str(artist.nid) in artist_ids:
                     nodes.append(artist)
-                    artist_ids[artist.nid] = 1
+                    artist_ids[str(artist.nid)] = 1
         return nodes
 
     def add_tracks(self, track_ids):

@@ -54,7 +54,7 @@ class Directory(object):
         self.content_type = 'files'
         self.replaceItems = False
         self.asLocalUrl = asLocalUrl
-        self.filter_double = Flag.TRACK | Flag.ALBUM
+        self.filter_double = Flag.TRACK
         self.seen_nodes = {}
         self.progress = Progress(
             heading='Qobuz', message=self.label, enable=showProgress)
@@ -69,28 +69,27 @@ class Directory(object):
         if self.filter_double is not None:
             if self.filter_double & node.nt == node.nt:
                 if node.nid in self.seen_nodes:
-                    self.progress.update(
-                        message='Skip node type: %s' % Flag.to_s(node.nt))
+                    self.progress.update(message='Skip node type: %s' % Flag.to_s(node.nt))
                     return True
                 self.seen_nodes[node.nid] = 1
         try:
             self.progress.update(message=node.get_label())
         except Exception as e:
             logger.warn('ProgressUpdateError %s', e)
-        self.nodes.append(node)
-        self.total_put += 1
-        return True
-
-    def _add_all_items(self):
-        self.put_item_ok = True
-        if self.asList:
+        if self.asList is True:
+            self.nodes.append(node)
+            self.total_put += 1
             return True
-        if not xbmcplugin.addDirectoryItems(self.handle, [(
-            node.make_url(),
-            node.makeListItem(
-                replaceItems=self.replaceItems),
-            node.is_folder
-        ) for node in self.nodes], False):
+        return self.__add_node(node)
+
+    def __add_node(self, node):
+        item = node.makeListItem(replaceItems=self.replaceItems)
+        if item is None:
+            return False
+        url = node.make_url(asLocalUrl=self.asLocalUrl)
+        if not self.add_to_xbmc_directory(
+                url=url, item=item, is_folder=node.is_folder):
+            self.put_item_ok = False
             return False
         return True
 
@@ -100,11 +99,9 @@ class Directory(object):
                                            self.total_put):
             return False
         self.total_put += 1
-        self.put_item_ok = True
         return True
 
     def end_of_directory(self, forceStatus=None):
-        self._add_all_items()
         if self.seen_nodes:
             self.seen_nodes = {}
         success = True

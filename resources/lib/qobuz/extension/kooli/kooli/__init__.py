@@ -7,6 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from os import path as P
+import logging
 import os
 import sys
 kooli_path = P.abspath(P.join(P.dirname(__file__)))
@@ -20,3 +21,5 @@ log_dir = P.join(qobuz_lib_path, 'qobuz', '__data__', 'log')
 if not P.exists(log_dir):
     os.makedirs(log_dir)
 log_file = P.join(log_dir, 'extension-kooli.log')
+logging.basicConfig(filename=log_file)
+log = logging.getLogger('kooli')
