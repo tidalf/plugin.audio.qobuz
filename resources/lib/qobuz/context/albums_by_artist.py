@@ -40,4 +40,4 @@ if __name__ == '__main__':
         sys.exit(0)
     node = getNode(Flag.ALBUMS_BY_ARTIST, parameters={'nid': artist['id']})
     url = 'plugin://plugin.audio.qobuz/%s' % node.make_url()
-    executeBuiltin(containerUpdate(url, False))
+    executeBuiltin(containerUpdate(url, True))
