@@ -21,14 +21,11 @@ def unlink(filename):
     if not os.path.exists(filename):
         logger.warn('InvalidUnlinkPath %s', filename)
         return False
-    #_, tmpfile = tempfile.mkstemp(
-    #    u'.dat', u'invalid-', os.path.dirname(filename))
     try:
-        #os.rename(filename, tmpfile)
         os.unlink(filename)
         return True
     except Exception as e:
-        logger.error('Unlinking fails: %s, error: %s', filename, e.__str__)
+        logger.error('Unlinking fails: %s, error: %s', filename, e.__str__ )
     return False
 
 

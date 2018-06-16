@@ -50,7 +50,7 @@ class FileCache(BaseCache):
                 os.fsync(wh)
         except Exception as e:
             unlink(filename)
-            logger.error('Error: writing failed %s\nMessage %s', filename, e)
+            logger.error('Error: writing failed %s\nMessage %s', filename, e.__str__)
             return False
         return True
 

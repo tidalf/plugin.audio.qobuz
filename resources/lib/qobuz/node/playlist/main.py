@@ -253,6 +253,7 @@ class Node_playlist(INode):
             return False
         self.delete_cache(cid)
         notify_log('Qobuz / Tracks added', '%s added' % (len(nodes)))
+        executeBuiltin(containerRefresh())
         return True
 
     @classmethod
