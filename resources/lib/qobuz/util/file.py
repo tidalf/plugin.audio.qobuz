@@ -17,9 +17,7 @@ logger = getLogger(__name__)
 
 
 def unlink(filename):
-    logger.info('unlink %s', filename)
     if not os.path.exists(filename):
-        logger.warn('InvalidUnlinkPath %s', filename)
         return False
     _, tmpfile = tempfile.mkstemp(
         u'.dat', u'invalid-', os.path.dirname(filename))

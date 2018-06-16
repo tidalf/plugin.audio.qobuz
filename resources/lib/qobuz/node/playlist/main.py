@@ -19,7 +19,7 @@ from qobuz.cache.cache_util import clean_all
 from qobuz.debug import getLogger
 from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import ask
-from qobuz.gui.util import lang, executeBuiltin
+from qobuz.gui.util import lang, executeBuiltin, containerRefresh
 from qobuz.gui.util import notify_warn, notify_error, notify_log
 from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode
@@ -102,7 +102,7 @@ class Node_playlist(INode):
             node = getNode(Flag.TRACK, data=track)
             if not node.get_displayable():
                 logger.warn(u'Track not displayable: %s (%s)',
-                            node.get_label().encode('ascii', errors='ignore'),
+                            node.get_label(),
                             node.nid)
                 continue
             self.add_child(node)
@@ -124,7 +124,7 @@ class Node_playlist(INode):
             'tracks_count', to='int'), self.get_property(
             'users_count', to='int'))
 
-    def get_image(self):
+    def get_image(self, default=''):
         text_size = config.app.registry.get(
             'image_default_size', default='small')
         name = 'images'
@@ -141,7 +141,7 @@ class Node_playlist(INode):
                 'images'
             ], default=None)
         if images is None:
-            return None
+            return default
         return image.combine(self.nid, images)
 
     def makeListItem(self, **ka):
@@ -156,14 +156,12 @@ class Node_playlist(INode):
         if self.b_is_current:
             fmt = config.app.registry.get('playlist_current_format')
             label = fmt % (color(theme.get('item/selected/color'), label))
-        item = xbmcgui.ListItem(label,
-                                self.get_owner(),
-                                self.get_image(),
-                                self.get_image(), self.make_url())
-        if not item:
-            logger.warn('Error: Cannot make xbmc list item')
-            return None
-        item.setArt({'icon': self.get_image(), 'thumb': self.get_image()})
+        item = xbmcgui.ListItem(label, self.get_owner())
+        item.setPath(self.make_url())
+        item.setArt({
+            'icon': self.get_image(),
+            'thumb': self.get_image()
+        })
         description = u'''{description}
 - owner: {owner}
 - tracks: {tracks_count}

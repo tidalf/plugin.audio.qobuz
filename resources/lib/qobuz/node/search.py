@@ -64,11 +64,11 @@ class Node_search(INode):
         query = self.get_parameter('query', to='unquote')
         if query is None:
             from qobuz.gui.util import Keyboard
-            k = Keyboard('', self.search_type)
-            k.doModal()
-            if not k.isConfirmed():
+            keyboard = Keyboard('', self.search_type)
+            keyboard.doModal()
+            if not keyboard.isConfirmed():
                 return None
-            query = k.getText().strip()
+            query = keyboard.getText().strip()
             if query is None or query == '':
                 return None
             self.set_parameter('query', query, quote=True)
@@ -84,35 +84,29 @@ class Node_search(INode):
             'search-type': self.search_type
         }
 
+    def _populate_helper(self, flag):
+        for data in self.data[self.search_type]['items']:
+            self.add_child(getNode(flag,
+                                   parameters=self._get_parameters(),
+                                   data=data))
+        return True if self.data[self.search_type]['items'] else False
+
     def _populate_albums(self, *a, **ka):
-        for album in self.data[self.search_type]['items']:
-            self.add_child(
-                getNode(
-                    Flag.ALBUM, parameters=self._get_parameters(), data=album))
-        return True if len(self.data[self.search_type]['items']) > 0 else False
+        return self._populate_helper(Flag.ALBUM)
 
     def _populate_tracks(self, *a, **ka):
-        for track in self.data[self.search_type]['items']:
-            self.add_child(
-                getNode(
-                    Flag.TRACK, parameters=self._get_parameters(), data=track))
-        return True if len(self.data[self.search_type]['items']) > 0 else False
+        return self._populate_helper(Flag.TRACK)
 
     def _populate_artists(self, *a, **ka):
-        for artist in self.data[self.search_type]['items']:
-            self.add_child(
-                getNode(
-                    Flag.ARTIST,
-                    parameters=self._get_parameters(),
-                    data=artist))
-        return True if len(self.data[self.search_type]['items']) > 0 else False
+        return self._populate_helper(Flag.ARTIST)
 
     def populate(self, options=None):
         if self.search_type is None:
-            for search_type in data_search_type.keys():
-                self.add_child(
-                    getNode(
-                        Flag.SEARCH, parameters={'search-type': search_type}))
+            for search_type in data_search_type:
+                self.add_child(getNode(Flag.SEARCH,
+                                       parameters={
+                                           'search-type': search_type
+                                       }))
             return True
         self.content_type = data_search_type[self.search_type]['content_type']
         return getattr(self, '_populate_%s' % self.search_type)(options)

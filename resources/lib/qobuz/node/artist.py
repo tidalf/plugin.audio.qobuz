@@ -14,8 +14,45 @@ from qobuz.gui.contextmenu import contextMenu
 from qobuz.gui.util import getImage
 from qobuz.node import Flag, helper
 from qobuz.node.inode import INode
-
+from qobuz.util import properties
 logger = getLogger(__name__)
+
+
+propsMap = {
+    'name': {
+        'to': properties.identity_converter,
+        'default': 'UnknownArtists',
+        'map': ['name']
+    },
+    'artist': {
+        'alias': 'name'
+    },
+    'title': {
+        'alias': 'name'
+    },
+    'image': {
+        'to': properties.identity_converter,
+        'default': getImage('artists'),
+        'map': [
+            'image/extralarge',
+            'image/mega',
+            'image/large',
+            'image/medium',
+            'image/small',
+            'picture'
+        ]
+    },
+    'owner': {
+        'to': properties.identity_converter,
+        'default': 'UnknownOwner',
+        'map': ['owner/name']
+    },
+    'description': {
+        'to': properties.strip_html_converter,
+        'default': '',
+        'map': ['biography/content']
+    }
+}
 
 
 def helper_album_list_genre(data, default=None):
@@ -33,18 +70,21 @@ def helper_album_list_genre(data, default=None):
 class Node_artist(INode):
     def __init__(self, parent=None, parameters=None, data=None):
         parameters = {} if parameters is None else parameters
-        super(Node_artist, self).__init__(
-            parent=parent, parameters=parameters, data=data)
+        super(Node_artist, self).__init__(parent=parent,
+                                          parameters=parameters,
+                                          data=data)
         self.nt = Flag.ARTIST
         self.content_type = 'artists'
-        self.nid = self.get_parameter('nid', default=None)
+        self.propsMap = propsMap
 
     def fetch(self, options=None):
+        if options and options.noRemote:
+            return self.data
         return api.get('/artist/get', artist_id=self.nid, extra='albums')
 
     def populate(self, options=None):
         albums = self.get_property('albums/items')
-        if len(albums) == 0:
+        if not albums:
             return False
         for album in albums:
             node = helper.get_node_album(album)
@@ -52,26 +92,24 @@ class Node_artist(INode):
         return True
 
     def get_artist_id(self):
+        ''' Return artist nid'''
         return self.nid
 
-    def get_image(self):
-        return self.get_property(
-            [
-                'image/extralarge', 'image/mega', 'image/large',
-                'image/medium', 'image/small', 'picture'
-            ],
-            default=getImage('artist'))
-
     def get_label(self, default=None):
+        if self.data is None:
+            return 'UnknownArtist'
         fmt = '%a (%C)'
         fmt = fmt.replace(
             '%Cc',
-            self.get_property(
-                'albums_as_primary_composer_count', default='0', to='string'))
+            self.get_property('albums_as_primary_composer_count',
+                              default='0',
+                              to='string'))
         fmt = fmt.replace(
             '%Ca',
             self.get_property(
-                'albums_as_primary_artist_count', default='0', to='string'))
+                'albums_as_primary_artist_count',
+                default='0',
+                to='string'))
         fmt = fmt.replace('%a', self.get_artist())
         fmt = fmt.replace('%G', self.get_genre())
         fmt = fmt.replace(
@@ -79,36 +117,22 @@ class Node_artist(INode):
                 'albums_count', default=0)))
         return fmt
 
-    def get_title(self):
-        return self.get_name()
-
-    def get_artist(self):
-        return self.get_name()
-
-    def get_name(self):
-        return self.get_property('name')
-
     def get_genre(self):
+        '''Return comma separated genres for this artist'''
         return ', '.join(helper_album_list_genre(self.data))
 
-    def get_owner(self):
-        return self.get_property('owner/name')
-
-    def get_description(self):
-        return self.get_property(
-            'biography/content', default='', to='strip_html')
-
     def makeListItem(self, **ka):
-        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
+        replace_items = ka['replaceItems'] if 'replaceItems' in ka else False
         genre = self.get_genre()
-        item = xbmcgui.ListItem(self.get_label(),
-                                self.get_label(),
-                                self.get_image(),
-                                self.get_image(), self.make_url())
-        if not item:
-            logger.warn('Error: Cannot make xbmc list item')
-            return None
+        image = str(self.get_image())
+        logger.info('image %s', image)
+        label = self.get_label()
+        item = xbmcgui.ListItem(label)
         item.setPath(self.make_url())
+        item.setArt({
+            'thumb': image,
+            'icon': image
+        })
         item.setInfo(
             'Music',
             infoLabels={
@@ -116,7 +140,7 @@ class Node_artist(INode):
                 'genre': genre,
                 'comment': self.get_description()
             })
-        ctxMenu = contextMenu()
-        self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
+        ctx_menu = contextMenu()
+        self.attach_context_menu(item, ctx_menu)
+        item.addContextMenuItems(ctx_menu.getTuples(), replace_items)
         return item

@@ -18,6 +18,7 @@ from qobuz.node import getNode, Flag, helper
 from qobuz.node.inode import INode
 
 logger = getLogger(__name__)
+ITEMS_PATH = 'tracks/items'
 
 
 class Node_album(INode):
@@ -32,11 +33,10 @@ class Node_album(INode):
             parameters=parameters,
             data=data)
         self.imageDefaultSize = config.app.registry.get('image_default_size')
-        self._items_path = 'tracks/items'
         self.propsMap = propsMap
 
     def _count(self):
-        return len(self.get_property(self._items_path, default=[]))
+        return len(self.get_property(ITEMS_PATH, default=[]))
 
     def fetch(self, options=None):
         options = helper.get_tree_traverse_opts(options)
@@ -47,7 +47,7 @@ class Node_album(INode):
     def populate(self, options=None):
         if self.count() == 0:
             return False
-        for track in self.get_property(self._items_path):
+        for track in self.get_property(ITEMS_PATH):
             track.update({
                 'album': {
                     'title': self.get_title(),
@@ -72,17 +72,16 @@ class Node_album(INode):
         return helper.make_local_album_url(config, self)
 
     def make_url(self, **ka):
-        asLocalUrl = ka['asLocalUrl'] if 'asLocalUrl' in ka else False
+        as_local_url = ka['asLocalUrl'] if 'asLocalUrl' in ka else False
         purchased = self.get_parameter('purchased')
         if purchased is not None:
             ka['purchased'] = self.get_parameter('purchased')
-        if asLocalUrl is True:
-            from qobuz.constants import Mode
-            ka['mode'] = Mode.SCAN
+        if as_local_url is True:
+            return self.make_local_url()
         return super(Node_album, self).make_url(**ka)
 
     def makeListItem(self, **ka):
-        replaceItems = ka['replaceItems'] if 'replaceItems' in ka else False
+        replace_items = ka['replaceItems'] if 'replaceItems' in ka else False
         item = xbmcgui.ListItem(
             label=self.get_label(),
             label2=self.get_label2(),
@@ -103,9 +102,9 @@ class Node_album(INode):
             })
         item.setProperty('album_description', self.get_information())
         item.setProperty('album_label', self.get_album_label())
-        ctxMenu = contextMenu()
-        self.attach_context_menu(item, ctxMenu)
-        item.addContextMenuItems(ctxMenu.getTuples(), replaceItems)
+        ctx_menu = contextMenu()
+        self.attach_context_menu(item, ctx_menu)
+        item.addContextMenuItems(ctx_menu.getTuples(), replace_items)
         return item
 
     def get_articles(self, default=None):
@@ -162,13 +161,14 @@ class Node_album(INode):
             artist=self.get_artist(),
             maximum_sampling_rate=self.get_maximum_sampling_rate())
 
-    def get_image(self, size=None):
-        if not size:
-            size = self.imageDefaultSize
+    def get_image(self, default=''):
+        size = self.imageDefaultSize
         return self.get_property([
-            'image/%s' % size, 'image/large', 'image/small',
+            'image/%s' % size,
+            'image/large',
+            'image/small',
             'image/thumbnail'
-        ])
+        ], default)
 
     def get_label2(self):
         return self.get_title()

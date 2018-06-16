@@ -9,7 +9,7 @@
 from qobuz import config
 from qobuz.api import api
 from qobuz.gui.util import lang
-from qobuz.node import getNode, Flag
+from qobuz.node import getNode, Flag, helper
 from qobuz.node.inode import INode
 
 
@@ -38,8 +38,8 @@ class Node_similar_artist(INode):
             if skip_empty and data['albums_count'] < 1:
                 continue
             artist = getNode(Flag.ARTIST, data=data)
-            cache = artist.fetch(noRemote=True)
+            cache = artist.fetch(helper.TreeTraverseOpts(noRemote=True))
             if cache is not None:
                 artist.data = cache
             self.add_child(artist)
-        return True if len(self.data['artists']['items']) > 0 else False
+        return True if self.data['artists']['items'] else False
