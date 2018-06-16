@@ -56,9 +56,10 @@ def deep_get(data, path, sep='/', to=identity_converter):
     if root is None:
         return path, None
     for _i, part in enumerate(parts):
-        if part not in root:
-            raise KeyError(part)
-        root = root[part]
+        try:
+           root = root[part]
+        except:
+           root = ""
     return path, to(root)
 
 
