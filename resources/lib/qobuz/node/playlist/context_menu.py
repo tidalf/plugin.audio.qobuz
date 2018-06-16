@@ -27,8 +27,7 @@ def attach_context_menu(node, item, menu):
         url = node.make_url(
             nt=Flag.PLAYLIST, mode=Mode.VIEW, nm='set_as_current')
         menu.add(path='playlist/set_as_current', label=color(lang(30163)),
-                 cmd=containerUpdate(url))
-
+                 cmd=runPlugin(url))
         url = node.make_url(nt=Flag.PLAYLIST, nm='gui_rename')
         menu.add(path='playlist/rename', label=color(lang(30165)),
                  cmd=runPlugin(url))

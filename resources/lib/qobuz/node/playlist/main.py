@@ -26,7 +26,7 @@ from qobuz.node.inode import INode
 from qobuz.renderer import renderer
 from qobuz.theme import theme, color
 from qobuz.util.converter import converter
-
+from qobuz.gui.util import containerRefresh, containerUpdate
 logger = getLogger(__name__)
 dialogHeading = 'Qobuz playlist'
 

@@ -56,6 +56,7 @@ class _PersistentDictMixin(object):
         try:
             self.dump(fileobj)
         except Exception as e:
+            fileobj.close()
             os.remove(tempname)
             raise e
         finally:
