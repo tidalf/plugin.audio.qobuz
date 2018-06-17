@@ -7,12 +7,13 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from datetime import datetime
-from flask import Flask, request
+from flask import Flask, request, stream_with_context
 from flask import make_response, render_template
 from flask import redirect
 from functools import wraps, update_wrapper
 from os import path as P
-
+from flask import request, Response
+import requests
 from kooli import kooli_path
 from qobuz.api import api
 from qobuz.application import Application as QobuzApplication
@@ -94,7 +95,11 @@ def route_track(album_id=None, track_id=None):
     url = track.get_streaming_url()
     if url is None:
         return http_error(404)
-    return redirect(url, code=302)
+    
+    req = requests.get(url, stream=True)
+    return Response(stream_with_context(req.iter_content(chunk_size=2048)), content_type=req.headers["content-type"])
+    
+    # return redirect(url, code=302)
 
 
 @nocache
