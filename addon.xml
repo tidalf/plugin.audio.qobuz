@@ -3,7 +3,7 @@
 	<requires>
 		<import addon="xbmc.python" version="2.14.0" />
 		<import addon="script.module.requests" version="1.0.4" />
-		<import addon="script.module.flask" version="0.12" />
+		<import addon="script.module.flask" version="0.0.12" />
                 <import addon="script.module.kodi-six" version="0.0.2" />
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
