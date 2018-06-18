@@ -9,6 +9,8 @@ Qobuz for Kodi
 
 This is a Qobuz plugin for Kodi, it enables access to Qobuz music streaming service directly from Kodi (http://kodi.tv)
 
+A repo with the current dev version is available here : https://github.com/tidalf/repo-qobuz/raw/master/repo.qobuz.zip
+
 Main Features 
 --------------
 
