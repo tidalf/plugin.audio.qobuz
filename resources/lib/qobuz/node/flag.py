@@ -38,6 +38,7 @@ class FlagEnum(object):
     TESTING = 1 << 24
     TEXT = 1 << 25
     USER = 1 << 26
+    SETTINGS = 1 << 27
 
     STOPBUILD = 1 << 100
     NONE = 1 << 101
@@ -87,6 +88,7 @@ FLAG_STRING = {
     FlagEnum.SIMILAR_ARTIST: 'similar_artist',
     FlagEnum.STOPBUILD: 'stop_build_down',
     FlagEnum.TESTING: 'testing',
+    FlagEnum.SETTINGS: 'settings',
     FlagEnum.TEXT: 'text',
     FlagEnum.TRACK: 'track',
     FlagEnum.USER: 'user',

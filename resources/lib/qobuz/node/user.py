@@ -13,9 +13,19 @@ from qobuz.debug import getLogger
 from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode
 from qobuz.theme import color
+from qobuz import config
+import os
 
 logger = getLogger(__name__)
 
+def getImage(name):
+    if name is None:
+        return ''
+    if name.startswith('http'):
+        return name
+    if not config.path:
+        return ''
+    return os.path.join(config.path.image, name + '.png')
 
 class Node_user(INode):
     def __init__(self, parent=None, parameters=None, data=None):
@@ -37,12 +47,16 @@ class Node_user(INode):
                 'user/credential/description', default='Free'))
 
     def get_image(self):
-        return user.get_property('user/avatar')
+        #if user.get_property('user/avatar') is not None:
+        #    return user.get_property('user/avatar')
+        #else:
+        return getImage('icon-default-256')
 
     def fetch(self, options=None):
         return user.data
 
     def populate(self, options=None):
+        # self.add_child(getNode(Flag.SETTINGS))
         self.add_child(getNode(Flag.TESTING))
 
     def get_description(self):

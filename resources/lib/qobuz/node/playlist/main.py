@@ -440,7 +440,7 @@ class Node_playlist(INode):
             return False
         self.delete_cache(playlist_id)
         executeBuiltin(containerRefresh())
-        notify_log(lang(30183), (lang(30184) + '%s' + lang(30185)) % name)
+        notify_log(lang(30183), (lang(30184) + ' %s ' + lang(30185)) % name)
         return True
 
     def subscribe(self):

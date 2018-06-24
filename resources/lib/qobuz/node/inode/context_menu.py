@@ -37,7 +37,7 @@ def attach_context_menu(node, item, menu):
             nt=Flag.SIMILAR_ARTIST, nid=artist_id, mode=Mode.VIEW)
         menu.add(path='artist/similar',
                  label=lang(30160),
-                 cmd=containerUpdate(url))
+                 cmd=containerUpdate(url, True))
     # FAVORITES
     wf = node.nt & (~Flag.FAVORITE)
     if node.parent:
