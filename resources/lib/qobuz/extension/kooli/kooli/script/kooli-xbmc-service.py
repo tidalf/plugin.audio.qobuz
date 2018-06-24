@@ -7,6 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from os import path as P
+import SocketServer
 import socket
 import sys
 import threading
@@ -31,6 +32,25 @@ from qobuz.gui.util import notify_warn
 import qobuz.gui.util as gui
 
 logger = getLogger(__name__)
+
+
+def my_finish(self):
+    if not self.wfile.closed:
+        try:
+            self.wfile.flush()
+        except socket.error:
+            # A final socket error may have occurred here, such as
+            # the local error ECONNABORTED.
+            pass
+        try:
+            self.wfile.close()
+            self.rfile.close()
+        except socket.error:
+            pass
+
+
+SocketServer.StreamRequestHandler.finish = my_finish  # Ugly monkey patching
+
 
 def is_empty(obj):
     if obj is None:
