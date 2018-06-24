@@ -164,12 +164,12 @@ def attach_context_menu(node, item, menu):
                  cmd=cmd,
                  color=colorCaution,
                  pos=10)
-        if config.app.registry.get('enable_scan_feature', to='bool'):
-            # HTTP / Kooli / Ping
-            cmd = runPlugin(
-                node.make_url(
-                    nt=Flag.TESTING, nm="show_dialog", mode=Mode.VIEW))
-            menu.add(path='qobuz/test httpd',
-                     label='Test web service',
-                     cmd=cmd,
-                     pos=11)
+#        if config.app.registry.get('enable_scan_feature', to='bool'):
+#            # HTTP / Kooli / Ping
+#            cmd = runPlugin(
+#                node.make_url(
+#                    nt=Flag.TESTING, nm="show_dialog", mode=Mode.VIEW))
+#            menu.add(path='qobuz/test httpd',
+#                     label='Test web service',
+#                     cmd=cmd,
+#                     pos=11)
