@@ -20,8 +20,6 @@ except ImportError:
 from kooli import log
 from kooli import qobuz_lib_path
 
-import flask
-
 from kodi_six import xbmc  # pylint:disable=E0401
 from kooli.application import application, shutdown_server, qobuzApp
 from kooli.monitor import Monitor
