@@ -15,7 +15,7 @@ from qobuz.debug import getLogger
 logger = getLogger(__name__)
 
 try:
-    from kodi_six import xbmc
+    import xbmc
 except ImportError as e:
     logger.warn('ImportError(Outside XBMC): %s', e)
 

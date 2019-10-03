@@ -115,6 +115,7 @@ class EasyApi(RawApi):
         ::return
             True on success, else False
         """
+        logger.info("LOGIN %s PASS %s" % (username, password))
         if common.is_empty(username) and common.is_empty(password):
             return True
         current_user.set_credentials(username, password)

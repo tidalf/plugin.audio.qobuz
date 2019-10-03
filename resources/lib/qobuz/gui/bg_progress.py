@@ -1,5 +1,4 @@
-from kodi_six import xbmcgui  # pylint:disable=E0401
-
+import xbmcgui  # pylint:disable=E0401
 
 class Progress(xbmcgui.DialogProgressBG):
     def __init__(self, heading='Qobuz', message=None, enable=True):

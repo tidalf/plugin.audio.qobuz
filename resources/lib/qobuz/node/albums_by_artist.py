@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import weakref
-from kodi_six import xbmcgui
+import xbmcgui
 
 from qobuz.api import api
 from qobuz.debug import getLogger

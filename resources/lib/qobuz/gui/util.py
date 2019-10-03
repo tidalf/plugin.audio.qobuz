@@ -17,7 +17,9 @@ import qobuz
 logger = getLogger(__name__)
 
 try:
-    from kodi_six import xbmc, xbmcgui, xbmcplugin  # pylint:disable=E0401
+    import xbmc
+    import xbmcgui
+    import xbmcplugin  # pylint:disable=E0401
 
     class Keyboard(xbmc.Keyboard):
         def __init__(self, _default, heading='', _hidden=True):
@@ -85,7 +87,7 @@ def dialogLoginFailure():
     '''
     dialog = xbmcgui.Dialog()
     if dialog.yesno(lang(30010), lang(30036), lang(30042)):
-        qobuz.addon.openSettings()
+        # qobuz.addon.openSettings()
         xbmcplugin.endOfDirectory(
             handle=int(sys.argv[1]),
             succeeded=False,
