@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-from kodi_six import xbmcgui  # pylint:disable=E0401
+import xbmcgui  # pylint:disable=E0401
 
 from .props import propsMap, informationTemplate
 from qobuz import config

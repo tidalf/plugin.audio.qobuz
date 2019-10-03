@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import time
-from kodi_six import xbmc  # pylint:disable=E0401
+import xbmc  # pylint:disable=E0401
 
 from qobuz.cache import cache_util
 from qobuz.debug import getLogger

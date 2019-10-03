@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2018 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from kodi_six import xbmcgui  # pylint:disable=E0401
+import xbmcgui  # pylint:disable=E0401
 
 from qobuz.api import api
 from qobuz.debug import getLogger

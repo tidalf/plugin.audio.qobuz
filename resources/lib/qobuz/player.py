@@ -7,7 +7,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 
-from kodi_six import xbmc, xbmcgui  # pylint:disable=E0401
+import xbmc, xbmcgui  # pylint:disable=E0401
 
 from qobuz import config
 from qobuz.debug import getLogger

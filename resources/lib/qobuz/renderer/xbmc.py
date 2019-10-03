@@ -6,7 +6,7 @@
     :copyright: (c) 2012-2018 by Joachim Basmaison, Cyril Leclerc
     :license: GPLv3, see LICENSE for more details.
 '''
-from kodi_six import xbmcplugin  # pylint:disable=E0401
+import xbmcplugin # pylint:disable=E0401
 
 from qobuz import config
 from qobuz import exception

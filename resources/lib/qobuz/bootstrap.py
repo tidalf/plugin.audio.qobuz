@@ -8,7 +8,7 @@
 '''
 import os
 import sys
-from kodi_six import xbmc
+import xbmc
 
 from qobuz import exception
 from qobuz.cache import cache
@@ -67,6 +67,7 @@ class MinimalBootstrap(object):
     @classmethod
     def bootstrap_registry(cls):
         from qobuz.api import api
+        logger.info('LOGIN %s' % config.app.registry.get('username'))
         if not api.login(
                 config.app.registry.get('username'),
                 config.app.registry.get('password')):

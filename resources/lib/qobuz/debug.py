@@ -23,7 +23,8 @@ def attach_file_logger(logger):
 
 
 try:
-    from kodi_six import xbmc, xbmcaddon
+    import xbmc
+    import xbmcaddon
 
     class XbmcLogger(logging.Handler):
 

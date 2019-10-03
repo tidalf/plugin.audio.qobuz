@@ -12,7 +12,7 @@ from qobuz.node import getNode, Flag
 from qobuz.node.inode import INode
 from time import time
 import requests
-from kodi_six import xbmcgui  # pylint:disable=E0401
+import xbmcgui  # pylint:disable=E0401
 
 logger = getLogger(__name__)
 
